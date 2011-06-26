@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>extendedmenu.png</file>
+        <file>icons/copyjid.png</file>
+        <file>icons/copynick.png</file>
+        <file>icons/ping.png</file>
+        <file>icons/copystatusmsg.png</file>
+    </qresource>
+</RCC>

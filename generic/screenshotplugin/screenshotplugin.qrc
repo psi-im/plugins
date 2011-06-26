@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/screenshotplugin">
+        <file>screenshot.png</file>
+        <file>draw.png</file>
+    </qresource>
+</RCC>

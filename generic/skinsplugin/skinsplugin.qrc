@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/skinsplugin" >
+        <file>defskin.skn</file>
+    </qresource>
+</RCC>

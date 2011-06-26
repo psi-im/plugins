@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/chessplugin" >
+        <file>figures/black_bishop.png</file>
+        <file>figures/black_castle.png</file>
+        <file>figures/black_king.png</file>
+        <file>figures/Black king 2d.png</file>
+        <file>figures/black_knight.png</file>
+        <file>figures/black_pawn.png</file>
+        <file>figures/black_queen.png</file>
+        <file>figures/Black queen 2d.png</file>
+        <file>figures/Chess.png</file>
+        <file>figures/Chess board.png</file>
+        <file>figures/white_bishop.png</file>
+        <file>figures/white_castle.png</file>
+        <file>figures/white_king.png</file>
+        <file>figures/white_knight.png</file>
+        <file>figures/white_pawn.png</file>
+        <file>figures/white_queen.png</file>
+    </qresource>
+</RCC>

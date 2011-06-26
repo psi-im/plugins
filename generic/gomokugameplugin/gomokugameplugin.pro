@@ -1,0 +1,24 @@
+CONFIG += release
+include(../../psiplugin.pri)
+HEADERS += gomokugameplugin.h \
+    pluginwindow.h \
+    boardview.h \
+    boardmodel.h \
+    boarddelegate.h \
+    gameelement.h \
+    invatedialog.h \
+    gamesessions.h \
+    common.h
+SOURCES += gomokugameplugin.cpp \
+    pluginwindow.cpp \
+    boardview.cpp \
+    boardmodel.cpp \
+    boarddelegate.cpp \
+    gameelement.cpp \
+    invatedialog.cpp \
+    gamesessions.cpp
+FORMS += pluginwindow.ui \
+    invatedialog.ui \
+    invitationdialog.ui \
+    options.ui
+RESOURCES += gomokugameplugin.qrc

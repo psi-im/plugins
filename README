@@ -1,0 +1,5 @@
+All available Psi+ plugins.
+
+generic - plugins for all platforms
+unix - plugins for unix-based systems
+dev - plugins in developemnt/unstable

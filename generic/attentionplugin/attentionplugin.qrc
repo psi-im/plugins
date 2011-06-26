@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/attentionplugin" >
+        <file>attention.png</file>
+    </qresource>
+</RCC>
