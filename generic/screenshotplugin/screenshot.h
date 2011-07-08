@@ -85,6 +85,8 @@ private:
 	void refreshSettings();
 	void saveGeometry();
 	void newRequest(const QNetworkReply *const old, const QString& link);
+	void setupStatusBar();
+	void updateStatusBar();
 
 	bool modified;
 	QPixmap originalPixmap;
@@ -97,6 +99,7 @@ private:
 	Proxy proxy_;
 	QStringList history_;
 	GrabAreaWidget* grabAreaWidget_;
+	QLabel *sbLbSize;
 
 	Ui::Screenshot ui_;
 };

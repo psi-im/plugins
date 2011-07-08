@@ -241,6 +241,7 @@ Screenshot::Screenshot()
 	ui_.pb_new_screenshot->setShortcut(QKeySequence("Ctrl+n"));
 
 	connectMenu();
+	setupStatusBar();
 
 	connect(ui_.pb_save, SIGNAL(clicked()), this, SLOT(saveScreenshot()));
 	connect(ui_.pb_upload, SIGNAL(clicked()), this, SLOT(uploadScreenshot()));
@@ -276,6 +277,26 @@ void Screenshot::connectMenu()
 	//connect(ui_.actionProxy_Settings, SIGNAL(triggered()), SLOT(doProxySettings()));
 	connect(ui_.actionSave, SIGNAL(triggered()), SLOT(saveScreenshot()));
 	connect(ui_.actionUpload, SIGNAL(triggered()), SLOT(uploadScreenshot()));
+}
+
+void Screenshot::setupStatusBar()
+{
+	QStatusBar *sb = statusBar();
+	sbLbSize = new QLabel;
+	sbLbSize->setAlignment(Qt::AlignRight);
+	sbLbSize->setTextInteractionFlags(Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
+	sb->addPermanentWidget(sbLbSize);
+}
+
+void Screenshot::updateStatusBar()
+{
+	const QSize s = ui_.lb_pixmap->getPixmap().size();
+	QBuffer buffer;
+	buffer.open( QBuffer::ReadWrite );
+	ui_.lb_pixmap->getPixmap().save( &buffer , format.toAscii() );
+	const qint64 size = buffer.size();
+	sbLbSize->setText(tr("Size: %1x%2px; %3 bytes").arg(s.width()).arg(s.height()).arg(size));
+//	sbLbSize->setMaximumWidth( QFontMetrics( sbLbSize->font() ).width( sbLbSize->text() ) + 10 );
 }
 
 void Screenshot::aboutQt()
@@ -346,10 +367,13 @@ void Screenshot::setImagePath(const QString& path)
 void Screenshot::updateScreenshotLabel()
 {
 	ui_.lb_pixmap->setPixmap(originalPixmap);
+	updateStatusBar();
 }
 
 void Screenshot::pixmapAdjusted()
 {
+	updateStatusBar();
+
 	if(windowState() == Qt::WindowMaximized)
 		return;
 
@@ -637,7 +661,6 @@ void Screenshot::uploadFtp()
 void Screenshot::uploadHttp()
 {
 	ba.clear();
-	QUrl u;
 
 	QString boundary = "AaB03x";
 	QString filename = tr("%1.").arg(QDateTime::currentDateTime().toString(fileNameFormat)) + format;

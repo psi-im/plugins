@@ -175,7 +175,7 @@ void PixmapWidget::setToolBar(ToolBar *bar)
 
 	Options* o = Options::instance();
 	init(o->getOption(constPenWidth, 2).toInt(),
-	     o->getOption(constColor, "#ffffff").toString(),
+	     o->getOption(constColor, "#000000").toString(),
 	     o->getOption(constFont, "Sans Serif,18,-1,5,50,0,0,0,0,0").toString());
 }
 

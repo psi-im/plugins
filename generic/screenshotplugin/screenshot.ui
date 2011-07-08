@@ -29,7 +29,7 @@
          <x>0</x>
          <y>0</y>
          <width>780</width>
-         <height>440</height>
+         <height>418</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -240,6 +240,7 @@
    <addaction name="menuSettings"/>
    <addaction name="menuAbout"/>
   </widget>
+  <widget class="QStatusBar" name="statusBar"/>
   <action name="actionOpen_Image">
    <property name="text">
     <string>Open</string>

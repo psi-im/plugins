@@ -21,7 +21,7 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-#define cVersion "0.5.9"
+#define cVersion "0.6.0"
 
 #define constName "Screenshot Plugin"
 #define constVersionOption "version"
