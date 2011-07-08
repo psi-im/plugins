@@ -20,6 +20,7 @@
 
 #include "viewmaildlg.h"
 #include <QDesktopServices>
+#include <QWheelEvent>
 
 static const QString mailBoxUrl = "https://mail.google.com/mail/#inbox";
 
@@ -32,6 +33,8 @@ ViewMailDlg::ViewMailDlg(QList<MailItem> l, IconFactoryAccessingHost* host, QWid
 	ui_.setupUi(this);
 	ui_.tb_next->setIcon(host->getIcon("psi/arrowRight"));
 	ui_.tb_prev->setIcon(host->getIcon("psi/arrowLeft"));
+	ui_.pb_close->setIcon(style()->standardIcon(QStyle::SP_DialogCloseButton));
+	ui_.pb_browse->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
 
 	connect(ui_.tb_next, SIGNAL(clicked()), SLOT(showNext()));
 	connect(ui_.tb_prev, SIGNAL(clicked()), SLOT(showPrev()));
@@ -42,8 +45,16 @@ ViewMailDlg::ViewMailDlg(QList<MailItem> l, IconFactoryAccessingHost* host, QWid
 		currentItem_ = 0;
 		showItem(currentItem_);
 	}
+
+	updateCaption();
 }
 
+void ViewMailDlg::updateCaption()
+{
+	setWindowTitle(tr("[%1/%2] E-Mail")
+		       .arg(QString::number(currentItem_+1))
+		       .arg(items_.size()) );
+}
 
 void ViewMailDlg::appendItems(QList<MailItem> l)
 {
@@ -53,6 +64,7 @@ void ViewMailDlg::appendItems(QList<MailItem> l)
 		showItem(currentItem_);
 	}
 	updateButtons();
+	updateCaption();
 }
 
 void ViewMailDlg::updateButtons()
@@ -69,12 +81,14 @@ void ViewMailDlg::updateButtons()
 
 void ViewMailDlg::showNext()
 {
-	showItem(++currentItem_);
+	if(ui_.tb_next->isEnabled())
+		showItem(++currentItem_);
 }
 
 void ViewMailDlg::showPrev()
 {
-	showItem(--currentItem_);
+	if(ui_.tb_prev->isEnabled())
+		showItem(--currentItem_);
 }
 
 void ViewMailDlg::showItem(int num)
@@ -86,7 +100,8 @@ void ViewMailDlg::showItem(int num)
 
 	if(num != -1
 	   && !items_.isEmpty()
-	   && num < items_.size()) {
+	   && num < items_.size() )
+	{
 		MailItem me = items_.at(num);
 		ui_.le_account->setText(me.account);
 		ui_.le_from->setText(me.from);
@@ -103,6 +118,7 @@ void ViewMailDlg::showItem(int num)
 		ui_.te_text->setHtml(text);
 	}
 	updateButtons();
+	updateCaption();
 }
 
 void ViewMailDlg::browse()
@@ -118,4 +134,24 @@ void ViewMailDlg::anchorClicked(const QUrl &url)
 			close();
 		}
 	}
+}
+
+void ViewMailDlg::wheelEvent(QWheelEvent *e)
+{
+	if(e->delta() > 0) {
+		showNext();
+	}
+	else {
+		showPrev();
+	}
+	e->accept();
+}
+
+QString ViewMailDlg::mailItemToText(const MailItem &mi)
+{
+	QStringList lst = QStringList() << mi.from
+			  << mi.subject << mi.text;
+	QString text = lst.join("\n") + "\n";
+
+	return text;
 }

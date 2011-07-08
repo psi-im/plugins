@@ -29,7 +29,6 @@
 #include "stanzasendinghost.h"
 #include "optionaccessor.h"
 #include "optionaccessinghost.h"
-//#include "eventfilter.h"
 #include "plugininfoprovider.h"
 #include "accountinfoaccessinghost.h"
 #include "accountinfoaccessor.h"
@@ -49,17 +48,16 @@
 #include "accountsettings.h"
 #include "viewmaildlg.h"
 
-//#define OPTION_TEMPLATE_MESSAGES "message"
 #define OPTION_LISTS "lists"
 #define OPTION_INTERVAL "interval"
 #define OPTION_SOUND "sound"
 
 #define POPUP_OPTION "Gmail Service Plugin"
 
-#define PLUGIN_VERSION "0.6.9"
+#define PLUGIN_VERSION "0.7.0"
 
 
-class GmailNotifyPlugin : public QObject, public PsiPlugin,/* public EventFilter,*/ public AccountInfoAccessor,
+class GmailNotifyPlugin : public QObject, public PsiPlugin, public AccountInfoAccessor,
 	public StanzaFilter, public StanzaSender, public OptionAccessor, public PluginInfoProvider,
 	public PopupAccessor, public PsiAccountController, public IconFactoryAccessor,
 	public ToolbarIconAccessor, public EventCreator, public SoundAccessor
@@ -82,9 +80,6 @@ public:
 	virtual void restoreOptions();
 	virtual bool incomingStanza(int account, const QDomElement& stanza);
 	virtual bool outgoingStanza(int account, QDomElement& stanza);
-//	virtual bool processEvent(int account, QDomElement& e);
-//	virtual bool processMessage(int /*account*/, const QString& /*fromJid*/, const QString& /*body*/, const QString& /*subject*/){ return false; };
-//	virtual bool processOutgoingMessage(int , const QString& , QString& , const QString& , QString& ) { return false; }
 	virtual void logout(int ) {};
 	virtual void setStanzaSendingHost(StanzaSendingHost *host);
 	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
@@ -135,7 +130,6 @@ private:
 	IconFactoryAccessingHost* iconHost;
 	EventCreatingHost* psiEvent;
 	SoundAccessingHost* sound_;
-//	QString message;
 	QString soundFile;
 	ActionsList* actions_;
 	QPointer<QWidget> options_;

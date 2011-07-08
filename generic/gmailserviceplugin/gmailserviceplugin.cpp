@@ -36,7 +36,6 @@ GmailNotifyPlugin::GmailNotifyPlugin()
 	, psiEvent(0)
 	, sound_(0)
 	, soundFile("sound/email.wav")
-//	, message("From: %1 %2\nHeader: %3\nUrl: http://mail.google.com/mail/")
 	, actions_(0)
 {
 }
@@ -95,8 +94,6 @@ bool GmailNotifyPlugin::enable()
 		iconHost->addIcon("gmailnotify/nohistory", f.readAll());
 	f.close();
 
-	//Read default values
-//	message = psiOptions->getPluginOption(OPTION_TEMPLATE_MESSAGES, QVariant(message)).toString();
 	soundFile = psiOptions->getPluginOption(OPTION_SOUND, soundFile).toString();
 	loadLists();
 
@@ -146,9 +143,6 @@ void GmailNotifyPlugin::applyOptions()
 		return;
 
 	optionsApplingInProgress_ = true;
-
-//	message = ui_.te_message->toPlainText();
-//	psiOptions->setPluginOption(OPTION_TEMPLATE_MESSAGES, QVariant(message));
 
 	soundFile = ui_.le_sound->text();
 	psiOptions->setPluginOption(OPTION_SOUND, soundFile);
@@ -217,7 +211,6 @@ void GmailNotifyPlugin::restoreOptions()
 
 	ui_.lb_error->hide();
 	ui_.gb_settings->setEnabled(true);
-//	ui_.te_message->setPlainText(message);
 	ui_.cb_mail->setVisible(true);
 	ui_.cb_shared_statuses->setVisible(true);
 	ui_.cb_nosave->setVisible(true);
@@ -823,7 +816,21 @@ void GmailNotifyPlugin::incomingMail(int account, const QDomElement &xml)
 		psiOptions->setGlobalOption("options.ui.notifications.sounds.enable", false);
 		playSound(soundFile);
 	}
-	psiEvent->createNewEvent(account, accInfo->getJid(account), tr("mail.google.com - incoming mail!"), this, SLOT(mailEventActivated()));
+
+	QString popupMessage = tr("<b>mail.google.com - incoming mail!</b>");
+	if(psiOptions->getGlobalOption("options.ui.notifications.passive-popups.showMessage").toBool()) {
+		popupMessage += "<br><br>";
+		foreach(const MailItem& i, l)
+			popupMessage += ViewMailDlg::mailItemToText(i).replace("\n", "<br>") + "<br>";
+	}
+	if(mailViewer_) {
+		showPopup(popupMessage);
+		mailEventActivated();
+
+	}
+	else {
+		psiEvent->createNewEvent(account, accInfo->getJid(account), popupMessage, this, SLOT(mailEventActivated()));
+	}
 	psiOptions->setGlobalOption("options.ui.notifications.sounds.enable", soundEnabled);
 }
 
@@ -841,6 +848,7 @@ void GmailNotifyPlugin::mailEventActivated()
 	}
 	mailViewer_->show();
 	mailViewer_->raise();
+	mailViewer_->activateWindow();
 }
 
 void GmailNotifyPlugin::playSound(const QString &file)

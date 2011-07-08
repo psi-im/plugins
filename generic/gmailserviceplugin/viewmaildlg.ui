@@ -79,8 +79,37 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="pb_browse">
+       <property name="toolTip">
+        <string>Open mail in browser</string>
+       </property>
        <property name="text">
         <string>Open MailBox</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="tb_prev">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Previous</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="tb_next">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Next</string>
+       </property>
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>
@@ -98,22 +127,12 @@
       </spacer>
      </item>
      <item>
-      <widget class="QToolButton" name="tb_prev">
-       <property name="enabled">
-        <bool>false</bool>
+      <widget class="QPushButton" name="pb_close">
+       <property name="toolTip">
+        <string>Close</string>
        </property>
        <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="tb_next">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string/>
+        <string>&amp;Close</string>
        </property>
       </widget>
      </item>
@@ -122,5 +141,22 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>pb_close</sender>
+   <signal>clicked()</signal>
+   <receiver>ViewMailDlg</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>460</x>
+     <y>324</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>256</x>
+     <y>175</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

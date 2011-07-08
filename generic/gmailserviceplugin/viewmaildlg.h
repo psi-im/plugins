@@ -41,6 +41,8 @@ public:
 
 	void appendItems(QList<MailItem> l);
 
+	static QString mailItemToText(const MailItem& mi);
+
 private slots:
 	void updateButtons();
 	void showNext();
@@ -50,6 +52,10 @@ private slots:
 
 private:
 	void showItem(int num);
+	void updateCaption();
+
+protected:
+	void wheelEvent(QWheelEvent *e);
 
 private:
 	Ui::ViewMailDlg ui_;
