@@ -40,6 +40,7 @@ public:
 	~ViewMailDlg() {};
 
 	void appendItems(QList<MailItem> l);
+	QString caption() const;
 
 	static QString mailItemToText(const MailItem& mi);
 

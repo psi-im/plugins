@@ -51,9 +51,14 @@ ViewMailDlg::ViewMailDlg(QList<MailItem> l, IconFactoryAccessingHost* host, QWid
 
 void ViewMailDlg::updateCaption()
 {
-	setWindowTitle(tr("[%1/%2] E-Mail")
-		       .arg(QString::number(currentItem_+1))
-		       .arg(items_.size()) );
+	setWindowTitle( caption() );
+}
+
+QString ViewMailDlg::caption() const
+{
+	return tr("[%1/%2] E-Mail")
+			.arg(QString::number(currentItem_+1))
+			.arg(items_.size());
 }
 
 void ViewMailDlg::appendItems(QList<MailItem> l)
@@ -104,8 +109,11 @@ void ViewMailDlg::showItem(int num)
 	{
 		MailItem me = items_.at(num);
 		ui_.le_account->setText(me.account);
+		ui_.le_account->setCursorPosition(0);
 		ui_.le_from->setText(me.from);
+		ui_.le_from->setCursorPosition(0);
 		ui_.le_subject->setText(me.subject);
+		ui_.le_subject->setCursorPosition(0);
 		//FIXMI gmail отдает какой-то непонятный урл
 		QRegExp re("th=([0-9]+)&");
 		QString text = me.text;
@@ -138,7 +146,7 @@ void ViewMailDlg::anchorClicked(const QUrl &url)
 
 void ViewMailDlg::wheelEvent(QWheelEvent *e)
 {
-	if(e->delta() > 0) {
+	if(e->delta() < 0) {
 		showNext();
 	}
 	else {

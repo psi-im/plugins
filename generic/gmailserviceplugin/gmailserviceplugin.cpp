@@ -823,13 +823,22 @@ void GmailNotifyPlugin::incomingMail(int account, const QDomElement &xml)
 		foreach(const MailItem& i, l)
 			popupMessage += ViewMailDlg::mailItemToText(i).replace("\n", "<br>") + "<br>";
 	}
-	if(mailViewer_) {
+	if(mailViewer_ && mailViewer_->isActiveWindow()) {
 		showPopup(popupMessage);
 		mailEventActivated();
 
 	}
 	else {
-		psiEvent->createNewEvent(account, accInfo->getJid(account), popupMessage, this, SLOT(mailEventActivated()));
+		if(mailItems_.count() > 1) {
+			showPopup(popupMessage);
+		}
+		else {
+			psiEvent->createNewEvent(account, accInfo->getJid(account), popupMessage, this, SLOT(mailEventActivated()));
+		}
+
+		if(mailViewer_) {
+			mailViewer_->setWindowTitle("*" + mailViewer_->caption());
+		}
 	}
 	psiOptions->setGlobalOption("options.ui.notifications.sounds.enable", soundEnabled);
 }
@@ -840,12 +849,14 @@ void GmailNotifyPlugin::mailEventActivated()
 		return;
 	}
 
-	if(mailViewer_) {
-		mailViewer_->appendItems(mailItems_.takeFirst());
-	}
-	else {
+	if(!mailViewer_) {
 		mailViewer_ = new ViewMailDlg(mailItems_.takeFirst(), iconHost);
 	}
+
+	while(!mailItems_.isEmpty()) {
+		mailViewer_->appendItems(mailItems_.takeFirst());
+	}
+
 	mailViewer_->show();
 	mailViewer_->raise();
 	mailViewer_->activateWindow();
