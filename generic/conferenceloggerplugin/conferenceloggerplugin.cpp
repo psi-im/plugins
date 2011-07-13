@@ -42,7 +42,7 @@
 
 #include "viewer.h"
 
-#define cVer "0.1.9"
+#define cVer "0.2.0"
 #define constHeight "Height"
 #define constWidth "Width"
 #define constlastItem "lastItem"
