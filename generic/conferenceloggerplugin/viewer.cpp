@@ -37,6 +37,10 @@ Viewer::Viewer(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *par
 	setWindowTitle(filename);
 	QVBoxLayout *layout = new QVBoxLayout(this);
 	textWid = new QTextEdit();
+	QPalette pal = textWid->palette();
+	pal.setColor(QPalette::Inactive, QPalette::Highlight, pal.color(QPalette::Active, QPalette::Highlight));
+	pal.setColor(QPalette::Inactive, QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::HighlightedText));
+	textWid->setPalette(pal);
 	layout->addWidget(textWid);
 	findBar = new TypeAheadFindBar(icoHost_, textWid, tr("Find"), this);
 	QPushButton *Close = new QPushButton(icoHost_->getIcon("psi/quit"), tr("Close"));
