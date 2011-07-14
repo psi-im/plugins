@@ -1,0 +1,90 @@
+
+Off-The-Record-Messaging plugin for Psi
+
+This is a Off-The-Record-Messaging plugin for the Psi+ instant
+messanger. Psi+ (aka Psi-dev) is a collection of patches for Psi. Psi+
+is available from http://code.google.com/p/psi-dev/.
+
+See the file INSTALL for instructions how to build the plugin.
+
+Please note that the plugin may be instable and security is not guaranteed.
+
+See http://www.cypherpunks.ca/otr/ for more information about OTR.
+
+
+
+TODOs
+* use Socialist Millionaires' Protocol
+* Configure OTR policy per contact
+* Generate key on user request.
+* Documentation
+
+
+
+
+CHANGES
+
+  0.9
+    -update to Psi+ revision 3961.
+    -fix html tidying for incoming messages.
+    -rework message boxes and button in chatdialog.
+
+  0.8
+    -update to Psi+ revision 3763.
+    -Html is removed in outgoing encrypted messages.
+
+  0.7
+    -Use icons for otr button.
+    -Fixed update of message state on button.
+    -Default policy is now 'enabled'. 
+    -Problem related to key generation fixed.
+    -Enabling and disabling of plugin fixed.
+    -Adapted to Psi+ interface changes.
+
+  0.6
+    -adapt to Psi+ plugin interface
+    -use HtmlTidy for invalid XHTML in encrypted messages 
+    -changed handling of callbacks
+    -several bugfixes
+
+  0.5
+    -adapted to Psi 0.13
+    -ignore plugin for groupchat messages
+    -repaired window shown during key generation
+    -enable "End private Conversation" button in "finish" state.
+    -add --enable-plugins to Psi configure script
+    -several bugfixes and code cleanups
+
+  0.4
+    -menu in chatdialog to start OTR session, etc.
+    -incoming messages with invalid html markup were discarded in
+     previous versions.
+    -problem with 'status' information of known fingerprints resolved 
+
+  0.3
+    -character encoding in tagged-plaintext-messages
+    -send otr-disconnect message when going offline
+    -resolved problems with configuration widget
+
+  0.2
+    -character encoding in encrypted messages  
+
+
+
+
+THANKS
+
+Thanks to Prof. Dr. Ruediger Weis for supporting this work. Thanks to
+all people who sent patches. Especially to specThor <specthor@web.de>
+for UTF8 patches, Hannes Mehnert <hannes@mehnert.org> for chatdialog.
+Rolf Wuerdemann <rowue@digitalis.org> for configure patch and several
+bugfixes. Thanks to wadealer from Psi+ for adapting and including the
+patches into Psi+.
+
+
+
+
+CONTACT
+
+http://public.beuth-hochschule.de/~s30935/
+timo-e@freenet.de

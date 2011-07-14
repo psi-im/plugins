@@ -1,0 +1,44 @@
+
+Off-the-Record messaging plugin for Psi
+
+The plugin currently only runs with Psi+ (aka Psi-dev). If you don't
+have Psi+ installed on your computer, you can get it from
+http://code.google.com/p/psi-dev/.
+
+To compile the plugin you need to have installed the following libraries:
+    - Qt4 (http://qt.nokia.com/)
+    - libotr2 (http://www.cypherpunks.ca/otr/)
+    - TidyLib (http://tidy.sourceforge.net/)
+
+Perform the following steps:
+
+- Get Psi+ and apply the patches to the latest sources of Psi. Therefor you can
+  use one of the scripts provided by Psi+.
+
+- Make the Psi/Psi+ include files available to the plugin. To achieve this, copy
+  the psi-otr-X.X/ directory to the src/plugins/generic/ directory of your
+  patched Psi/Psi+ source tree.
+ 
+- change to the psi-otr-X.X/ directory and run qmake to generate a Makefile:
+  $ qmake
+
+- Then run make to compile everything:
+  $ make
+
+The resulting binary is libpsi-otr.so. The file should be copied to the
+plugins subdirectory of the Psi resources or Psi home directory. On Unix, 
+this is usually /usr/local/share/psi/plugins and ~/.psi/plugins.
+
+
+If you have successfully build the plugin, do the following steps when
+you run Psi for the first time:
+- Enable the plugin in the 'Options'-->'Plugins' dialog and click on 'Apply'.
+- Set the OTR policy in the 'Config' Tab of the plugin options.
+  In most cases 'Automatically start private messaging' should be a good choice.
+- There is no button etc. to generate your private key. It will be generated
+  when it's needed. I.e. when you start your first private conversation.
+
+NOTE: In previous versions the jabber account was identified by the JID. since
+      version 0.5 the account is identified by an integer. From this it follows
+      that the existing files with private keys and fingerprints are not
+      useable anymore.

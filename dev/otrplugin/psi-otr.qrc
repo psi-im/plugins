@@ -1,0 +1,7 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+     <qresource prefix="/psi-otr">
+          <file>otr_yes.png</file>
+          <file>otr_no.png</file>
+     </qresource>
+</RCC>
