@@ -24,6 +24,35 @@
 namespace psiotr
 {
 
+Fingerprint::Fingerprint()
+    : fingerprint(NULL)
+{
+
+}
+
+Fingerprint::Fingerprint(const Fingerprint &fp)
+    : fingerprint(fp.fingerprint),
+      account(fp.account),
+      username(fp.username),
+      fingerprintHuman(fp.fingerprintHuman),
+      trust(fp.trust),
+      messageState(fp.messageState)
+{
+
+}
+
+Fingerprint::Fingerprint(unsigned char* fingerprint,
+                         QString account, QString username,
+                         QString trust, QString messageState)
+    : fingerprint(fingerprint),
+      account(account),
+      username(username),
+      trust(trust),
+      messageState(messageState)
+{
+    fingerprintHuman = OtrInternal::humanFingerprint(fingerprint);
+}
+
 //-----------------------------------------------------------------------------
 
 OtrMessaging::OtrMessaging(OtrCallback* callback, OtrPolicy policy)
@@ -119,6 +148,21 @@ QString OtrMessaging::getSessionId(const QString& thisJid,
                                    const QString& remoteJid)
 {
     return m_impl->getSessionId(thisJid, remoteJid);
+}
+
+//-----------------------------------------------------------------------------
+
+psiotr::Fingerprint OtrMessaging::getActiveFingerprint(const QString& thisJid,
+                                                       const QString& remoteJid)
+{
+    return m_impl->getActiveFingerprint(thisJid, remoteJid);
+}
+
+//-----------------------------------------------------------------------------
+
+bool OtrMessaging::isVerified(const QString& thisJid, const QString& remoteJid)
+{
+    return m_impl->isVerified(thisJid, remoteJid);
 }
 
 //-----------------------------------------------------------------------------

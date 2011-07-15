@@ -267,29 +267,15 @@ QList<psiotr::Fingerprint> OtrInternal::getFingerprints()
         fingerprint = context->fingerprint_root.next;
         while(fingerprint)
         {
-            psiotr::Fingerprint fp;
-
-            fp.account = QString(context->accountname);
-
-            fp.username = QString(context->username);
-
-            fp.fingerprint = fingerprint->fingerprint;
-            char fpHash[45];
-            otrl_privkey_hash_to_human(fpHash, fingerprint->fingerprint);
-            fp.fingerprintHuman = QString(fpHash);
-
-            fp.trust = QString(fingerprint->trust);
-
-            if (fingerprint == context->active_fingerprint)
-            {
-                fp.messageState = QString(
-                    getMessageStateString(context->accountname,
-                                          context->username));
-            }
-            else
-            {
-                fp.messageState.clear();
-            }
+            psiotr::Fingerprint fp (fingerprint->fingerprint,
+                                    QString(context->accountname),
+                                    QString(context->username),
+                                    QString(fingerprint->trust),
+                                    (fingerprint == context->active_fingerprint)?
+                                        QString(getMessageStateString(
+                                            context->accountname,
+                                            context->username)) :
+                                        QString());
 
             fpList.append(fp);
             fingerprint = fingerprint->next;
@@ -497,10 +483,63 @@ QString OtrInternal::getSessionId(const QString& thisJid,
 
 //-----------------------------------------------------------------------------
 
+psiotr::Fingerprint OtrInternal::getActiveFingerprint(const QString& thisJid,
+                                                      const QString& remoteJid)
+{
+    ConnContext* context;
+    context = otrl_context_find(m_userstate, remoteJid.toStdString().c_str(),
+                                thisJid.toStdString().c_str(), OTR_PROTOCOL_STRING,
+                                false, NULL, NULL, NULL);
+
+    if ((context != NULL) &&
+        (context->active_fingerprint != NULL))
+    {
+        return psiotr::Fingerprint(context->active_fingerprint->fingerprint,
+                                   QString(context->accountname),
+                                   QString(context->username),
+                                   QString(context->active_fingerprint->trust),
+                                   QString(getMessageStateString(
+                                               context->accountname,
+                                               context->username)));
+    }
+
+    return psiotr::Fingerprint();
+}
+
+//-----------------------------------------------------------------------------
+
+bool OtrInternal::isVerified(const QString& thisJid,
+                             const QString& remoteJid)
+{
+    ConnContext* context;
+    context = otrl_context_find(m_userstate, remoteJid.toStdString().c_str(),
+                                thisJid.toStdString().c_str(), OTR_PROTOCOL_STRING,
+                                false, NULL, NULL, NULL);
+
+    if ((context != NULL) &&
+        (context->active_fingerprint != NULL))
+    {
+        return (QString("verified") == context->active_fingerprint->trust);
+    }
+
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+
 void OtrInternal::generateKey(const QString& account)
 {
     otrl_privkey_generate(m_userstate, m_keysFile.toStdString().c_str(),
                           account.toStdString().c_str(), OTR_PROTOCOL_STRING);
+}
+
+//-----------------------------------------------------------------------------
+
+QString OtrInternal::humanFingerprint(const unsigned char *fingerprint)
+{
+    char fpHash[45];
+    otrl_privkey_hash_to_human(fpHash, fingerprint);
+    return QString(fpHash);
 }
 
 //-----------------------------------------------------------------------------

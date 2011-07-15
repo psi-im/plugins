@@ -79,7 +79,14 @@ public:
 
     QString getSessionId(const QString& thisJid, const QString& remoteJid);
 
+    psiotr::Fingerprint getActiveFingerprint(const QString& thisJid,
+                                             const QString& remoteJid);
+
+    bool isVerified(const QString& thisJid, const QString& remoteJid);
+
     void generateKey(const QString& account);
+
+    static QString humanFingerprint(const unsigned char *fingerprint);
 
     /*** otr callback functions ***/
     OtrlPolicy policy(ConnContext *context);

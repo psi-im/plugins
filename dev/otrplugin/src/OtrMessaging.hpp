@@ -127,6 +127,12 @@ struct Fingerprint
     * The messageState of the context (i.e. plaintext, encrypted, finished)
     */
     QString messageState;
+
+    Fingerprint();
+    Fingerprint(const Fingerprint &fp);
+    Fingerprint(unsigned char* fingerprint,
+                QString account, QString username,
+                QString trust, QString messageState);
 };
 
 // ---------------------------------------------------------------------------
@@ -226,6 +232,17 @@ public:
     * Return the secure session id (ssid) for a context
     */
     QString getSessionId(const QString& thisJid, const QString& remoteJid);
+
+    /** 
+    * Return the active fingerprint for a context
+    */
+    psiotr::Fingerprint getActiveFingerprint(const QString& thisJid,
+                                             const QString& remoteJid);
+
+    /** 
+    * Return true if the active fingerprint has been verified
+    */
+    bool isVerified(const QString& thisJid, const QString& remoteJid);
 
     /** 
     * Set the default OTR policy.

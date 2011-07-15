@@ -73,19 +73,12 @@ void PsiOtrClosure::initiateSession(bool b)
 
 void PsiOtrClosure::verifyFingerprint(bool)
 {
-    Fingerprint fingerprint;
-    bool found = false;
 
-    foreach(fingerprint, m_otr->getFingerprints())
-    {
-        if (fingerprint.account == m_myAccount)
-        {
-            found = true;
-            break;
-        }
-    }
+    Fingerprint fingerprint = m_otr->getActiveFingerprint(m_myAccount,
+                                                          m_otherJid);
 
-    if (found)
+
+    if (fingerprint.fingerprint != NULL)
     {
         QString msg("Account: " + m_myAccount + "\n" +
                     "User: " + m_otherJid + "\n" +
@@ -105,6 +98,9 @@ void PsiOtrClosure::verifyFingerprint(bool)
         {
             m_otr->verifyFingerprint(fingerprint, false);
         }
+
+        updateMessageState();
+
     }
 }
 
@@ -167,23 +163,29 @@ void PsiOtrClosure::updateMessageState()
 {
     if (m_chatDlgAction != 0)
     {
-        QString stateString("OTR Plugin [" +
-                            m_otr->getMessageStateString(m_myAccount,
-                                                         m_otherJid) +
-                            "]");
-        m_chatDlgAction->setText(stateString);
+        OtrMessageState state = m_otr->getMessageState(m_myAccount, m_otherJid);
 
-        if (m_otr->getMessageState(m_myAccount, m_otherJid) ==
-            OTR_MESSAGESTATE_ENCRYPTED)
+        QString stateString(m_otr->getMessageStateString(m_myAccount,
+                                                         m_otherJid));
+
+        if (state == OTR_MESSAGESTATE_ENCRYPTED)
         {
-            m_chatDlgAction->setIcon(QIcon(":/psi-otr/otr_yes.png"));
+            if (m_otr->isVerified(m_myAccount, m_otherJid))
+            {
+                m_chatDlgAction->setIcon(QIcon(":/psi-otr/otr_yes.png"));
+            }
+            else
+            {
+                m_chatDlgAction->setIcon(QIcon(":/psi-otr/otr_unverified.png"));
+                stateString += ", unverified";
+            }
         }
         else
         {
             m_chatDlgAction->setIcon(QIcon(":/psi-otr/otr_no.png"));
         }
 
-        OtrMessageState state = m_otr->getMessageState(m_myAccount, m_otherJid);
+        m_chatDlgAction->setText(QString("OTR Plugin [%1]").arg(stateString));
 
         if (state == OTR_MESSAGESTATE_ENCRYPTED)
         {
