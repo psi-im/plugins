@@ -410,8 +410,8 @@ QAction* PsiOtrPlugin::getAction(QObject* parent, int accountNo,
 
 QString PsiOtrPlugin::dataDir()
 {
-    return m_applicationInfo->appHomeDir(
-        ApplicationInfoAccessingHost::ConfigLocation);
+    return m_applicationInfo->appCurrentProfileDir(
+    ApplicationInfoAccessingHost::DataLocation);
 }
     
 //-----------------------------------------------------------------------------
