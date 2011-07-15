@@ -68,7 +68,8 @@ PsiOtrPlugin::PsiOtrPlugin()
       m_psiDataDir(),
       m_optionHost(NULL),
       m_senderHost(NULL),
-      m_applicationInfo(NULL)
+      m_applicationInfo(NULL),
+      m_contactInfo(NULL)
 {
 }
 
@@ -164,7 +165,9 @@ bool PsiOtrPlugin::processEvent(int accountNo, QDomElement& e)
         !e.firstChildElement("message").isNull())
     {
         QDomElement messageElement = e.firstChildElement("message");
-        QString contact = removeResource(messageElement.attribute("from"));
+
+        QString contact = getCorrectJid(accountNo,
+                                        messageElement.attribute("from"));
         QString account = QString::number(accountNo);
 
         QDomElement htmlElement = messageElement.firstChildElement("html");
@@ -250,10 +253,10 @@ bool PsiOtrPlugin::processOutgoingMessage(int account, const QString& toJid,
     {
         return false;
     }
-    
+
     QString encrypted = m_otrConnection->encryptMessage(
         QString::number(account),
-        removeResource(toJid),
+        getCorrectJid(account, toJid),
         body);
 
     body = encrypted;
@@ -314,6 +317,12 @@ void PsiOtrPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost*
 
 //-----------------------------------------------------------------------------
 
+void PsiOtrPlugin::setContactInfoAccessingHost(ContactInfoAccessingHost *host) {
+    m_contactInfo = host;
+}
+
+//-----------------------------------------------------------------------------
+
 bool PsiOtrPlugin::incomingStanza(int accountNo, const QDomElement& xml)
 {
     if (!m_enabled || xml.nodeName() != "presence")
@@ -322,7 +331,7 @@ bool PsiOtrPlugin::incomingStanza(int accountNo, const QDomElement& xml)
     }
     
     QString account = QString::number(accountNo);
-    QString contact = removeResource(xml.attribute("from"));
+    QString contact = getCorrectJid(accountNo, xml.attribute("from"));
     QString type = xml.attribute("type", "available");
     
     if (type == "available")
@@ -359,16 +368,16 @@ bool PsiOtrPlugin::outgoingStanza(int accountNo, QDomElement& xml)
     }
 
     QString account = QString::number(accountNo);
-    QString toJid = removeResource(xml.attribute("to"));
-        
-    if (!m_onlineUsers.value(account).contains(toJid))
+    QString contact = getCorrectJid(accountNo, xml.attribute("to"));
+
+    if (!m_onlineUsers.value(account).contains(contact))
     {
-        m_onlineUsers[account][toJid] = new PsiOtrClosure(account, toJid,
-                                                          m_otrConnection);
+        m_onlineUsers[account][contact] = new PsiOtrClosure(account, contact,
+                                                            m_otrConnection);
     }
 
     QDomElement htmlElement = xml.firstChildElement("html");
-    if (m_onlineUsers[account][toJid]->encrypted() && !htmlElement.isNull())
+    if (m_onlineUsers[account][contact]->encrypted() && !htmlElement.isNull())
     {
         xml.removeChild(htmlElement);
     }
@@ -393,7 +402,7 @@ QAction* PsiOtrPlugin::getAction(QObject* parent, int accountNo,
         return 0;
     }
 
-    QString contact = removeResource(contactJid);
+    QString contact = getCorrectJid(accountNo, contactJid);
     QString account = QString::number(accountNo);
     
     if (!m_onlineUsers.value(account).contains(contact))
@@ -470,6 +479,33 @@ void PsiOtrPlugin::stopMessages()
 void PsiOtrPlugin::startMessages()
 {
     m_enabled = true;
+}
+
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns full Jid for private contacts,
+ * bare Jid for non-private contacts.
+ */
+QString PsiOtrPlugin::getCorrectJid(int account, const QString& fullJid)
+{
+    QString correctJid;
+    if (m_contactInfo->isPrivate(account, fullJid))
+    {
+        correctJid = fullJid;
+    }
+    else
+    {
+        correctJid = removeResource(fullJid);
+
+        // If the contact is private but not (yet) in the roster,
+        // it will not be known as private.
+        // Therefore, check if the bare Jid is a conference.
+        if (m_contactInfo->isConference(account, correctJid)) {
+            correctJid = fullJid;
+        }
+    }
+    return correctJid;
 }
 
 //-----------------------------------------------------------------------------

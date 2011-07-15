@@ -1,4 +1,3 @@
-
 /*
  * psi-otr.h - off-the-record messaging plugin for psi
  *
@@ -40,6 +39,8 @@
 #include "applicationinfoaccessor.h"
 #include "stanzafilter.h"
 #include "toolbariconaccessor.h"
+#include "contactinfoaccessinghost.h"
+#include "contactinfoaccessor.h"
 
 class ApplicationInfoAccessingHost;
 
@@ -59,6 +60,7 @@ class PsiOtrPlugin : public QObject,
                      public ApplicationInfoAccessor,
                      public StanzaFilter,
                      public ToolbarIconAccessor,
+                     public ContactInfoAccessor,
                      public OtrCallback
 {
 Q_OBJECT
@@ -68,7 +70,8 @@ Q_INTERFACES(PsiPlugin
              StanzaSender
              ApplicationInfoAccessor
              StanzaFilter
-             ToolbarIconAccessor)
+             ToolbarIconAccessor
+             ContactInfoAccessor)
 
 public:
     PsiOtrPlugin();
@@ -111,6 +114,10 @@ public:
     virtual QList<QVariantHash> getButtonParam();
     virtual QAction* getAction(QObject* parent, int account,
                                const QString& contact);
+
+    // ContactInfoAccessor
+    virtual void setContactInfoAccessingHost(ContactInfoAccessingHost* host);
+
     // OtrCallback
     virtual QString dataDir();
     virtual void sendMessage(const QString& account, const QString& toJid,
@@ -121,6 +128,8 @@ public:
     virtual void startMessages();
 
 private:
+    QString getCorrectJid(int account, const QString& fullJid);
+
     bool                                            m_enabled;
     OtrMessaging*                                   m_otrConnection;
     QHash<QString, QHash<QString, PsiOtrClosure*> > m_onlineUsers;
@@ -128,6 +137,7 @@ private:
     OptionAccessingHost*                            m_optionHost;
     StanzaSendingHost*                              m_senderHost;
     ApplicationInfoAccessingHost*                   m_applicationInfo;
+    ContactInfoAccessingHost*                       m_contactInfo;
 };
 
 //-----------------------------------------------------------------------------
