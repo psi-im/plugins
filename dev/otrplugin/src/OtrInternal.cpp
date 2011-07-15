@@ -484,11 +484,11 @@ QString OtrInternal::getSessionId(const QString& thisJid,
 
         if (context->sessionid_half == OTRL_SESSIONID_FIRST_HALF_BOLD)
         {
-            return QString("<b>" + firstHalf + "</b>" + secondHalf);
+            return QString("<b>" + firstHalf + "</b> " + secondHalf);
         }
         else
         {
-            return QString(firstHalf + "<b>" + secondHalf + "</b>");
+            return QString(firstHalf + " <b>" + secondHalf + "</b>");
         }
     }
 
