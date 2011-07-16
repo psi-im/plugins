@@ -200,7 +200,14 @@ bool PsiOtrPlugin::processEvent(int accountNo, QDomElement& e)
             // replace plaintext body
             plainBody.removeChild(plainBody.firstChild());
             QString bodyText = decrypted;
-            bodyText.remove(QRegExp("<[^>]*>")); bodyText.remove("\n");
+            bodyText.remove("\n")
+                    .replace(QRegExp("<br(?:\\s[^>]*)?/>"), "\n")
+                    .replace(QRegExp("<b(?:\\s[^>]*)?>([^<]+)</b>"), "*\\1*")
+                    .replace(QRegExp("<i(?:\\s[^>]*)?>([^<]+)</i>"), "/\\1/")
+                    .replace(QRegExp("<u(?:\\s[^>]*)?>([^<]+)</u>"), "_\\1_")
+                    .remove(QRegExp("<[^>]*>"))
+                    .replace(QString("&quot;"), "\"")
+                    .replace(QString("&amp;"), "&");
             plainBody.appendChild(e.ownerDocument().createTextNode(bodyText));
 
             // replace html body
