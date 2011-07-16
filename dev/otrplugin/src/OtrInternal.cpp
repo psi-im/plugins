@@ -721,13 +721,11 @@ void OtrInternal::new_fingerprint(OtrlUserState us, const char *accountname,
     Q_UNUSED(us);
     Q_UNUSED(protocol);
 
-    char fpHuman[45];
-    otrl_privkey_hash_to_human(fpHuman, fingerprint);
-
     m_callback->notifyUser(psiotr::OTR_NOTIFY_INFO,
                            "Account " + QString(accountname) +
                            " has received new fingerprint from "
-                           + QString(username) + ":\n" + QString(fpHuman));
+                           + QString(username) + ":\n" +
+                           humanFingerprint(fingerprint));
 }
             
 // ---------------------------------------------------------------------------
