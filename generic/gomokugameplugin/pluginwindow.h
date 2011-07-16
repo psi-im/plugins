@@ -27,7 +27,6 @@
 #define PLUGINWINDOW_H
 
 #include <QMainWindow>
-#include <QFrame>
 #include <QCloseEvent>
 
 #include "gameelement.h"
@@ -64,18 +63,19 @@ private:
 	Ui::PluginWindow *ui;
 	BoardModel *bmodel;
 	BoardDelegate *delegate;
-	QString element_;
 	bool gameActive;
 
 private:
 	void endGame();
-	void appendStep(int x, int y, bool my_turn);
+	void appendTurn(int num, int x, int y, bool my_turn);
+	bool tryLoadGame(const QString &load_str, bool local);
+	void showDraw();
 
 protected:
 	virtual void closeEvent (QCloseEvent *event);
 
 private slots:
-	void changeGameStatus(BoardModel::GameStatus status);
+	void changeGameStatus(GameModel::GameStatus status);
 	void turnSelected();
 	void setupElement(int x, int y);
 	void acceptStep();
@@ -85,12 +85,13 @@ private slots:
 	void setSwitchColor();
 	void doSwitchColor();
 	void setLose();
+	void setDraw();
 	void setResign();
 	void setWin();
 	void setClose();
+	void newGame();
 	void saveGame();
 	void loadGame();
-	void newGame();
 	void loadRemoteGame(QString);
 	void opponentDraw();
 	void setSkin();

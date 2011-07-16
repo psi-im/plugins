@@ -23,25 +23,23 @@
  *
  */
 
-#include <QMessageBox>
 #include <QTextDocument>
 
 #include "gamesessions.h"
 #include "invatedialog.h"
 #include "common.h"
+#include "options.h"
 
 GameSessions::GameSessions(QObject *parent) :
     QObject(parent),
     stanzaId(qrand() % 10000), // Получаем псевдослучайный стартовый id
     errorStr("")
 {
-	//requests.clear();
 	gameSessions.clear();
 }
 
 GameSessions::~GameSessions()
 {
-	//requests.clear();
 	while (!gameSessions.isEmpty()) {
 		GameSession gs = gameSessions.first();
 		if (!gs.wnd.isNull()) {
@@ -53,12 +51,6 @@ GameSessions::~GameSessions()
 }
 
 GameSessions *GameSessions::instance_ = NULL;
-bool GameSessions::saveWndPosition = false;
-bool GameSessions::saveWndWidthHeight = false;
-int  GameSessions::windowTop = -1;
-int  GameSessions::windowLeft = -1;
-int  GameSessions::windowWidth = -1;
-int  GameSessions::windowHeight = -1;
 
 GameSessions *GameSessions::instance()
 {
@@ -74,6 +66,96 @@ void GameSessions::reset()
 		delete instance_;
 		instance_ = NULL;
 	}
+}
+
+/**
+ * Обработка входящей станзы и вызов соответствующих методов
+ */
+bool GameSessions::processIncomingIqStanza(int account, const QDomElement &xml, const QString &acc_status, bool conf_priv)
+{
+	const QString iq_type = xml.attribute("type");
+	if(iq_type == "set") {
+		QDomElement childElem = xml.firstChildElement("create");
+		if(!childElem.isNull() && childElem.attribute("xmlns") == "games:board"
+		&& childElem.attribute("type") == constProtoType) {
+			const QString from = xml.attribute("from");
+			const QString id = xml.attribute("id");
+			const QString protoId = childElem.attribute("id");
+			if (protoId != constProtoId) {
+				sendErrorIq(account, from, id, "Incorrect protocol version");
+				return true;
+			}
+			Options *options = Options::instance();
+			if ((options->getOption(constDndDisable).toBool() && acc_status == "dnd")
+			|| (options->getOption(constConfDisable).toBool() && conf_priv)) {
+				sendErrorIq(account, from, id, "");
+				return true;
+			}
+			if (incomingInvitation(account, from, childElem.attribute("color"), id)) {
+				emit doInviteEvent(account, from, tr("%1: Invitation from %2").arg(constPluginName).arg(from), this, SLOT(showInvitation(QString)));
+			}
+			return true;
+		}
+		if (activeCount() == 0) // Нет ни одной активной игровой сессии (наиболее вероятный исход большую часть времени)
+			return false;   // Остальные проверки бессмысленны
+		childElem = xml.firstChildElement("turn");
+		if (!childElem.isNull() && childElem.attribute("xmlns") == "games:board"
+			&& childElem.attribute("type") == constProtoType) {
+			const QString from = xml.attribute("from");
+			const QString id = xml.attribute("id");
+			const QString protoId = childElem.attribute("id");
+			if (protoId != constProtoId) {
+				sendErrorIq(account, from, id, "Incorrect protocol version");
+				return true;
+			}
+			QDomElement turnChildElem = childElem.firstChildElement("move");
+			if (!turnChildElem.isNull()) {
+				return doTurnAction(account, from, id, turnChildElem.attribute("pos"));
+			}
+			turnChildElem = childElem.firstChildElement("resign");
+			if (!turnChildElem.isNull()) {
+				return youWin(account, from, id);
+			}
+			turnChildElem = childElem.firstChildElement("draw");
+			if (!turnChildElem.isNull()) {
+				return setDraw(account, from, id);
+			}
+			return false;
+		}
+		childElem = xml.firstChildElement("close");
+		if (!childElem.isNull() && childElem.attribute("xmlns") == "games:board"
+		    && childElem.attribute("type") == constProtoType) {
+			const QString from = xml.attribute("from");
+			const QString id = xml.attribute("id");
+			const QString protoId = childElem.attribute("id");
+			if (protoId != constProtoId) {
+				sendErrorIq(account, from, id, "Incorrect protocol version");
+				return true;
+			}
+			return closeRemoteGameBoard(account, from, id);
+		}
+		childElem = xml.firstChildElement("load");
+		if (!childElem.isNull() && childElem.attribute("xmlns") == "games:board"
+		    && childElem.attribute("type") == constProtoType) {
+			const QString from = xml.attribute("from");
+			const QString id = xml.attribute("id");
+			const QString protoId = childElem.attribute("id");
+			if (protoId != constProtoId) {
+				sendErrorIq(account, from, id, "Incorrect protocol version");
+				return true;
+			}
+			return remoteLoad(account, from, id, childElem.text());
+		}
+	} else if (iq_type == "result") {
+		if (doResult(account, xml.attribute("from"), xml.attribute("id"))) {
+			return true;
+		}
+	} else if (iq_type == "error") {
+		if (doReject(account, xml.attribute("from"), xml.attribute("id"))) {
+			return true;
+		}
+	}
+	return false;
 }
 
 /**
@@ -116,12 +198,10 @@ void GameSessions::cancelInvite(int account, QString full_jid)
 /**
  * Обработка и регистрация входящего приглашения
  */
-bool GameSessions::incomingInvitation(int account, QString from, QString color, QString iq_id, QString proto_id)
+bool GameSessions::incomingInvitation(int account, QString from, QString color, QString iq_id)
 {
 	errorStr = "";
-	if (proto_id != constProtoId) {
-		errorStr = tr("Incorrect protocol version");
-	} else if (color != "black" && color != "white") {
+	if (color != "black" && color != "white") {
 		errorStr = tr("Incorrect parameters");
 	}
 	if (regGameSession(StatusInviteInDialog, account, from, iq_id, color)) {
@@ -133,22 +213,20 @@ bool GameSessions::incomingInvitation(int account, QString from, QString color, 
 		return true;
 
 	}
-	sendErrorIq(account, from, iq_id);
+	sendErrorIq(account, from, iq_id, errorStr);
 	return false;
 }
 
 /**
  * Отображение окна приглашения
  */
-void GameSessions::showInvitation(int account, QString from)
+void GameSessions::showInvitation(QString from)
 {
-	int account_ = account;
-	if (account_ == -1) {
-		const int idx = findGameSessionByJid(from);
-		if (idx == -1 || gameSessions.at(idx).status != StatusInviteInDialog)
-			return;
-		account_ = gameSessions.at(idx).my_acc;
-	}
+	int account_ = 0;
+	const int idx = findGameSessionByJid(from);
+	if (idx == -1 || gameSessions.at(idx).status != StatusInviteInDialog)
+		return;
+	account_ = gameSessions.at(idx).my_acc;
 	doInviteDialog(account_, from);
 }
 
@@ -184,7 +262,7 @@ void GameSessions::acceptInvite(int account, QString id)
 					 .arg(constProtoId);
 			emit sendStanza(account, stanza);
 		} else {
-			sendErrorIq(account, gameSessions.at(idx).full_jid, id);
+			sendErrorIq(account, gameSessions.at(idx).full_jid, id, getLastError());
 			emit doPopup(tr("You are allready playing!"));
 		}
 	}
@@ -203,7 +281,7 @@ void GameSessions::rejectInvite(int account, QString id)
 		} else {
 			gameSessions[idx].status = StatusNone;
 		}
-		sendErrorIq(account, jid, id);
+		sendErrorIq(account, jid, id, getLastError());
 	}
 }
 
@@ -229,11 +307,24 @@ void GameSessions::startGame(int sess_index)
 		connect(wnd, SIGNAL(doPopup(const QString)), this, SIGNAL(doPopup(const QString)));
 		connect(wnd, SIGNAL(playSound(const QString)), this, SIGNAL(playSound(const QString)));
 		sess->wnd = wnd;
-		if (GameSessions::saveWndPosition && GameSessions::windowTop > 0 && GameSessions::windowLeft > 0) {
-			sess->wnd->move(GameSessions::windowLeft, GameSessions::windowTop);
+		Options *options = Options::instance();
+		if (options->getOption(constSaveWndPosition).toBool()) {
+			const int topPos = options->getOption(constWindowTop).toInt();
+			if (topPos > 0) {
+				const int leftPos = options->getOption(constWindowLeft).toInt();
+				if (leftPos > 0) {
+					sess->wnd->move(leftPos, topPos);
+				}
+			}
 		}
-		if (GameSessions::saveWndWidthHeight && GameSessions::windowWidth > 300 && GameSessions::windowHeight > 300) {
-			sess->wnd->resize(GameSessions::windowWidth, GameSessions::windowHeight);
+		if (options->getOption(constSaveWndWidthHeight).toBool()) {
+			const int width = options->getOption(constWindowWidth).toInt();
+			if (width > 0) {
+				const int height = options->getOption(constWindowHeight).toInt();
+				if (height > 0) {
+					sess->wnd->resize(width, height);
+				}
+			}
 		}
 	}
 	sess->status = StatusNone;
@@ -347,8 +438,6 @@ bool GameSessions::youWin(int account, QString from, QString iq_id) {
 	if (idx == -1)
 		return false;
 	GameSession *sess = &gameSessions[idx];
-	//if (sess->status != StatusWaitOpponentCommand)
-	//	return false;
 	sess->last_iq_id = iq_id;
 	// Отправляем подтверждение получения станзы
 	QString stanza = QString("<iq type=\"result\" to=\"%1\" id=\"%2\"><turn type=\"%3\" id=\"%4\" xmlns=\"games:board\"/></iq>")
@@ -422,6 +511,19 @@ bool GameSessions::remoteLoad(int account, QString from, QString iq_id, QString 
 }
 
 /**
+ * Возвращает количество активных игровых сессий
+ */
+int GameSessions::activeCount() const
+{
+	int cnt = 0;
+	for (int i = 0, size = gameSessions.size(); i < size; i++) {
+		if (gameSessions.at(i).status != StatusNone)
+			cnt++;
+	}
+	return cnt;
+}
+
+/**
  * Установка статуса сессии игры. Статус может устанавливать только сама игра (окно),
  * т.к. только игра может достоверно знать кто ходит дальше/снова а кто ждет хода и т.д.
  * Этот статус только сессии передачи данных игры и отвечает за минимальную целостность и безопасность.
@@ -465,11 +567,11 @@ void GameSessions::closeGameWindow(bool send_for_opponent, int top, int left, in
 						.arg(constProtoType));
 	}
 	gameSessions.removeAt(idx);
-	GameSessions::windowTop = top;
-	GameSessions::windowLeft = left;
-	GameSessions::windowWidth = width;
-	GameSessions::windowHeight = height;
-	emit closeWindow();
+	Options *options = Options::instance();
+	options->setOption(constWindowTop, top);
+	options->setOption(constWindowLeft, left);
+	options->setOption(constWindowWidth, width);
+	options->setOption(constWindowHeight, height);
 }
 
 /**
@@ -542,11 +644,11 @@ void GameSessions::sendError()
 		return;
 	QString id_str = newId();
 	gameSessions[idx].last_iq_id = id_str;
-	sendErrorIq(gameSessions.at(idx).my_acc, to_jid, id_str);
+	sendErrorIq(gameSessions.at(idx).my_acc, to_jid, id_str, getLastError());
 }
 
 /**
- * Отправка оопоненту запрос на ничью
+ * Отправка оппоненту запрос на ничью
  */
 void GameSessions::sendDraw()
 {
@@ -714,7 +816,7 @@ bool GameSessions::removeGameSession(int account, QString jid)
 	return false;
 }
 
-void GameSessions::sendErrorIq(int account, QString jid, QString id)
+void GameSessions::sendErrorIq(int account, QString jid, QString id, const QString &/*err_str*/)
 {
 	emit sendStanza(account, XML::iqErrorString(jid, id));
 }

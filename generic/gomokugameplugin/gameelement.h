@@ -38,12 +38,12 @@ public:
 	};
 
 	GameElement(ElementType type, int x, int y);
+	GameElement(const GameElement *from);
 	~GameElement();
 	int x() const;
 	int y() const;
 	ElementType type() const;
-	//void setType(ElementType tp);
-	void paint(QPainter *painter, const QRectF &rect);
+	void paint(QPainter *painter, const QRectF &rect) const;
 
 private:
 	ElementType type_;
@@ -54,8 +54,8 @@ private:
 	static QPixmap *whitestonePixmap;
 
 private:
-	QPixmap *getBlackstonePixmap();
-	QPixmap *getWhitestonePixmap();
+	QPixmap *getBlackstonePixmap() const;
+	QPixmap *getWhitestonePixmap() const;
 
 };
 

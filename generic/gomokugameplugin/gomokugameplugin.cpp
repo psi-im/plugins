@@ -26,26 +26,16 @@
 #include "gomokugameplugin.h"
 #include "gamesessions.h"
 #include "common.h"
+#include "options.h"
 
-#define constVersion            "0.0.8"
+#define constVersion            "0.10.0"
 #define constShortPluginName    "gomokugameplugin"
-#define constDndDisable         "dnddsbl"
-#define constConfDisable        "confdsbl"
-#define constDefSoundSettings   "defsndstngs"
-#define constSaveWndPosition    "savewndpos"
-#define constSaveWndWidthHeight "savewndwh"
-#define constWindowTop          "wndtop"
-#define constWindowLeft         "wndleft"
-#define constWindowWidth        "wndwidth"
-#define constWindowHeight       "wndheight"
-
 
 Q_EXPORT_PLUGIN(GomokuGamePlugin);
 
 GomokuGamePlugin::GomokuGamePlugin(QObject *parent) :
 		QObject(parent),
 		enabled_(false),
-		psiOptions(NULL),
 		psiTab(NULL),
 		psiIcon(NULL),
 		psiAccInfo(NULL),
@@ -53,15 +43,9 @@ GomokuGamePlugin::GomokuGamePlugin(QObject *parent) :
 		psiSender(NULL),
 		psiEvent(NULL),
 		psiSound(NULL),
-		psiPopup(NULL),
-		soundStart("sound/chess_start.wav"),
-		soundFinish("sound/chess_finish.wav"),
-		soundMove("sound/chess_move.wav"),
-		soundError("sound/chess_error.wav"),
-		dndDisable(true),
-		confDisable(true),
-		defSoundSettings(false)
+		psiPopup(NULL)
 {
+	Options::psiOptions = NULL;
 }
 
 QString GomokuGamePlugin::name() const
@@ -115,24 +99,13 @@ bool GomokuGamePlugin::enable()
 		file.close();
 	}
 	// Грузим настройки плагина
-	soundStart = psiOptions->getPluginOption(constSoundStart, QVariant(soundStart)).toString();
-	soundFinish = psiOptions->getPluginOption(constSoundFinish, QVariant(soundFinish)).toString();
-	soundMove = psiOptions->getPluginOption(constSoundMove, QVariant(soundMove)).toString();
-	soundError = psiOptions->getPluginOption(constSoundError, QVariant(soundError)).toString();
-	dndDisable = psiOptions->getPluginOption(constDndDisable, QVariant(dndDisable)).toBool();
-	confDisable = psiOptions->getPluginOption(constConfDisable, QVariant(confDisable)).toBool();
-	defSoundSettings = psiOptions->getPluginOption(constDefSoundSettings, QVariant(defSoundSettings)).toBool();
-	GameSessions::saveWndPosition = psiOptions->getPluginOption(constSaveWndPosition, QVariant(GameSessions::saveWndPosition)).toBool();
-	GameSessions::saveWndWidthHeight = psiOptions->getPluginOption(constSaveWndWidthHeight, QVariant(GameSessions::saveWndWidthHeight)).toBool();
-	GameSessions::windowTop = psiOptions->getPluginOption(constWindowTop, QVariant(GameSessions::windowTop)).toInt();
-	GameSessions::windowLeft = psiOptions->getPluginOption(constWindowLeft, QVariant(GameSessions::windowLeft)).toInt();
-	GameSessions::windowWidth = psiOptions->getPluginOption(constWindowWidth, QVariant(GameSessions::windowWidth)).toInt();
-	GameSessions::windowHeight = psiOptions->getPluginOption(constWindowHeight, QVariant(GameSessions::windowHeight)).toInt();
+	// -- загрузятся по требованию
 	// Создаем соединения с менеджером игровых сессий
-	connect(GameSessions::instance(), SIGNAL(sendStanza(int, QString)), this, SLOT(sendGameStanza(int, QString)), Qt::QueuedConnection);
-	connect(GameSessions::instance(), SIGNAL(doPopup(const QString)), this, SLOT(doPopup(const QString)), Qt::QueuedConnection);
-	connect(GameSessions::instance(), SIGNAL(playSound(const QString)), this, SLOT(playSound(const QString)), Qt::QueuedConnection);
-	connect(GameSessions::instance(), SIGNAL(closeWindow()), this, SLOT(onCloseWindow()), Qt::QueuedConnection);
+	GameSessions *sessions = GameSessions::instance();
+	connect(sessions, SIGNAL(sendStanza(int, QString)), this, SLOT(sendGameStanza(int, QString)), Qt::QueuedConnection);
+	connect(sessions, SIGNAL(doPopup(const QString)), this, SLOT(doPopup(const QString)), Qt::QueuedConnection);
+	connect(sessions, SIGNAL(playSound(const QString)), this, SLOT(playSound(const QString)), Qt::QueuedConnection);
+	connect(sessions, SIGNAL(doInviteEvent(int,QString,QString,QObject*,const char*)), this, SLOT(doPsiEvent(int,QString,QString,QObject*,const char*)), Qt::QueuedConnection);
 	// Выставляем флаг и уходим
 	enabled_ = true;
 	return true;
@@ -142,42 +115,36 @@ bool GomokuGamePlugin::disable()
 {
 	enabled_ = false;
 	GameSessions::reset();
+	Options::reset();
 	return true;
 }
 
 void GomokuGamePlugin::applyOptions()
 {
-	soundError = ui_.le_error->text();
-	psiOptions->setPluginOption(constSoundError, QVariant(soundError));
-	soundFinish = ui_.le_finish->text();
-	psiOptions->setPluginOption(constSoundFinish, QVariant(soundFinish));
-	soundMove = ui_.le_move->text();
-	psiOptions->setPluginOption(constSoundMove, QVariant(soundMove));
-	soundStart = ui_.le_start->text();
-	psiOptions->setPluginOption(constSoundStart, QVariant(soundStart));
-	dndDisable = ui_.cb_disable_dnd->isChecked();
-	psiOptions->setPluginOption(constDndDisable, QVariant(dndDisable));
-	confDisable = ui_.cb_disable_conf->isChecked();
-	psiOptions->setPluginOption(constConfDisable, QVariant(confDisable));
-	defSoundSettings = ui_.cb_sound_override->isChecked();
-	psiOptions->setPluginOption(constDefSoundSettings, QVariant(defSoundSettings));
-	GameSessions::saveWndPosition = ui_.cb_save_pos->isChecked();
-	psiOptions->setPluginOption(constSaveWndPosition, QVariant(GameSessions::saveWndPosition));
-	GameSessions::saveWndWidthHeight = ui_.cb_save_w_h->isChecked();
-	psiOptions->setPluginOption(constSaveWndWidthHeight, QVariant(GameSessions::saveWndWidthHeight));
+	Options *options = Options::instance();
+	options->setOption(constDefSoundSettings, ui_.cb_sound_override->isChecked());
+	options->setOption(constSoundStart, ui_.le_start->text());
+	options->setOption(constSoundFinish, ui_.le_finish->text());
+	options->setOption(constSoundMove, ui_.le_move->text());
+	options->setOption(constSoundError, ui_.le_error->text());
+	options->setOption(constDndDisable, ui_.cb_disable_dnd->isChecked());
+	options->setOption(constConfDisable, ui_.cb_disable_conf->isChecked());
+	options->setOption(constSaveWndPosition, ui_.cb_save_pos->isChecked());
+	options->setOption(constSaveWndWidthHeight, ui_.cb_save_w_h->isChecked());
 }
 
 void GomokuGamePlugin::restoreOptions()
 {
-	ui_.le_error->setText(soundError);
-	ui_.le_finish->setText(soundFinish);
-	ui_.le_move->setText(soundMove);
-	ui_.le_start->setText(soundStart);
-	ui_.cb_disable_dnd->setChecked(dndDisable);
-	ui_.cb_disable_conf->setChecked(confDisable);
-	ui_.cb_sound_override->setChecked(defSoundSettings);
-	ui_.cb_save_pos->setChecked(GameSessions::saveWndPosition);
-	ui_.cb_save_w_h->setChecked(GameSessions::saveWndWidthHeight);
+	Options *options = Options::instance();
+	ui_.cb_sound_override->setChecked(options->getOption(constDefSoundSettings).toBool());
+	ui_.le_start->setText(options->getOption(constSoundStart).toString());
+	ui_.le_finish->setText(options->getOption(constSoundFinish).toString());
+	ui_.le_move->setText(options->getOption(constSoundMove).toString());
+	ui_.le_error->setText(options->getOption(constSoundError).toString());
+	ui_.cb_disable_dnd->setChecked(options->getOption(constDndDisable).toBool());
+	ui_.cb_disable_conf->setChecked(options->getOption(constConfDisable).toBool());
+	ui_.cb_save_pos->setChecked(options->getOption(constSaveWndPosition).toBool());
+	ui_.cb_save_w_h->setChecked(options->getOption(constSaveWndWidthHeight).toBool());
 }
 
 /**
@@ -199,7 +166,7 @@ void GomokuGamePlugin::invite(int account, QString full_jid)
 		// Получаем список ресурсов оппонента
 		res_list = psiContactInfo->resources(account, jid);
 	}
-	// Отправляем приглашение
+	// Отображение окна отправки приглашения
 	GameSessions::instance()->invite(account, jid, res_list);
 }
 
@@ -246,6 +213,14 @@ void GomokuGamePlugin::menuActivated()
 }
 
 /**
+ * Создания события для приглашения
+ */
+void GomokuGamePlugin::doPsiEvent(int account, QString from, QString text, QObject *receiver, const char *method)
+{
+	psiEvent->createNewEvent(account, from, text, receiver, method);
+}
+
+/**
  * Отсылка станзы по запросу игры
  */
 void GomokuGamePlugin::sendGameStanza(int account, QString stanza)
@@ -253,14 +228,6 @@ void GomokuGamePlugin::sendGameStanza(int account, QString stanza)
 	if (!enabled_ || psiAccInfo->getStatus(account) == "offline")
 		return;
 	psiSender->sendStanza(account, stanza);
-}
-
-/**
- * Пришло приглашение от другого игрока
- */
-void GomokuGamePlugin::showInvitation(QString from)
-{
-	GameSessions::instance()->showInvitation(-1, from);
 }
 
 void GomokuGamePlugin::testSound() {
@@ -301,28 +268,17 @@ void GomokuGamePlugin::doPopup(const QString text) {
 }
 
 void GomokuGamePlugin::playSound(const QString sound_id) {
-	if (defSoundSettings || psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool()) {
+	Options *options = Options::instance();
+	if (options->getOption(constDefSoundSettings).toBool() || Options::psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool()) {
 		if (sound_id == constSoundMove) {
-			psiSound->playSound(soundMove);
+			psiSound->playSound(options->getOption(constSoundMove).toString());
 		} else if (sound_id == constSoundStart) {
-			psiSound->playSound(soundStart);
+			psiSound->playSound(options->getOption(constSoundStart).toString());
 		} else if (sound_id == constSoundFinish) {
-			psiSound->playSound(soundFinish);
+			psiSound->playSound(options->getOption(constSoundFinish).toString());
 		} else if (sound_id == constSoundError) {
-			psiSound->playSound(soundError);
+			psiSound->playSound(options->getOption(constSoundError).toString());
 		}
-	}
-}
-
-void GomokuGamePlugin::onCloseWindow()
-{
-	if (GameSessions::saveWndPosition) {
-		psiOptions->setPluginOption(constWindowTop, QVariant(GameSessions::windowTop));
-		psiOptions->setPluginOption(constWindowLeft, QVariant(GameSessions::windowLeft));
-	}
-	if (GameSessions::saveWndWidthHeight) {
-		psiOptions->setPluginOption(constWindowWidth, QVariant(GameSessions::windowWidth));
-		psiOptions->setPluginOption(constWindowHeight, QVariant(GameSessions::windowHeight));
 	}
 }
 
@@ -341,7 +297,7 @@ QString GomokuGamePlugin::pluginInfo()
 
 void GomokuGamePlugin::setOptionAccessingHost(OptionAccessingHost *host)
 {
-	psiOptions = host;
+	Options::psiOptions = host;
 }
 
 void GomokuGamePlugin::optionChanged(const QString &/*option*/)
@@ -405,64 +361,13 @@ void GomokuGamePlugin::setStanzaSendingHost(StanzaSendingHost *host)
 bool GomokuGamePlugin::incomingStanza(int account, const QDomElement& xml)
 {
 	if(xml.tagName() == "iq") {
-		QString iq_type = xml.attribute("type");
-		if(iq_type == "set") {
-			QDomElement childElem = xml.firstChildElement("create");
-			if(!childElem.isNull() && childElem.attribute("xmlns") == "games:board"
-			   && childElem.attribute("type") == constProtoType) {
-				QString from = xml.attribute("from");
-				if ((dndDisable && psiAccInfo->getStatus(account) == "dnd")
-				|| (confDisable && psiContactInfo->isPrivate(account, from))) {
-					sendGameStanza(account, XML::iqErrorString(from, xml.attribute("id")));
-					return true;
-				}
-				if (GameSessions::instance()->incomingInvitation(account, from, childElem.attribute("color"), xml.attribute("id"), childElem.attribute("id"))) {
-					psiEvent->createNewEvent(account, from,
-						tr("%1: Invitation from %2").arg(constPluginName).arg(from),
-						this, SLOT(showInvitation(QString)));
-				}
-				return true;
-			}
-			childElem = xml.firstChildElement("turn");
-			if (!childElem.isNull() && childElem.attribute("xmlns") == "games:board"
-				&& childElem.attribute("type") == constProtoType) {
-				QDomElement turnChildElem = childElem.firstChildElement("move");
-				if (!turnChildElem.isNull()) {
-					GameSessions::instance()->doTurnAction(account, xml.attribute("from"), xml.attribute("id"), turnChildElem.attribute("pos"));
-					return true;
-				}
-				turnChildElem = childElem.firstChildElement("resign");
-				if (!turnChildElem.isNull()) {
-					GameSessions::instance()->youWin(account, xml.attribute("from"), xml.attribute("id"));
-					return true;
-				}
-				turnChildElem = childElem.firstChildElement("draw");
-				if (!turnChildElem.isNull()) {
-					GameSessions::instance()->setDraw(account, xml.attribute("from"), xml.attribute("id"));
-				}
-				return true;
-			}
-			childElem = xml.firstChildElement("close");
-			if (!childElem.isNull() && childElem.attribute("xmlns") == "games:board"
-			    && childElem.attribute("type") == constProtoType) {
-				GameSessions::instance()->closeRemoteGameBoard(account, xml.attribute("from"), xml.attribute("id"));
-				return true;
-			}
-			childElem = xml.firstChildElement("load");
-			if (!childElem.isNull() && childElem.attribute("xmlns") == "games:board"
-			    && childElem.attribute("type") == constProtoType) {
-				GameSessions::instance()->remoteLoad(account, xml.attribute("from"), xml.attribute("id"), childElem.text());
-				return true;
-			}
-		} else if (iq_type == "result") {
-			if (GameSessions::instance()->doResult(account, xml.attribute("from"), xml.attribute("id"))) {
-				return true;
-			}
-		} else if (iq_type == "error") {
-			if (GameSessions::instance()->doReject(account, xml.attribute("from"), xml.attribute("id"))) {
-				return true;
-			}
+		QString acc_status = "";
+		bool confPriv = false;
+		if (xml.attribute("type") == "set") {
+			acc_status = psiAccInfo->getStatus(account);
+			confPriv = psiContactInfo->isPrivate(account, xml.attribute("from"));
 		}
+		return GameSessions::instance()->processIncomingIqStanza(account, xml, acc_status, confPriv);
 	}
 	return false;
 }

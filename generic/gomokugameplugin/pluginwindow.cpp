@@ -31,6 +31,10 @@
 #include "pluginwindow.h"
 #include "ui_pluginwindow.h"
 #include "common.h"
+#include "options.h"
+#include "gamemodel.h"
+
+const QString fileFilter = "Gomoku save files (*.gmk)";
 
 //-------------------------- HintElementWidget -------------------------
 
@@ -71,7 +75,6 @@ PluginWindow::PluginWindow(QString full_jid, QWidget *parent) :
 	ui(new Ui::PluginWindow),
 	bmodel(NULL),
 	delegate(NULL),
-	element_(""),
 	gameActive(false)
 {
 	ui->setupUi(this);
@@ -86,9 +89,8 @@ PluginWindow::~PluginWindow()
 
 void PluginWindow::init(QString element)
 {
-	element_ = element;
 	GameElement::ElementType elemType;
-	if (element_ == "white") {
+	if (element == "white") {
 		elemType = GameElement::TypeWhite;
 	} else {
 		elemType = GameElement::TypeBlack;
@@ -96,18 +98,18 @@ void PluginWindow::init(QString element)
 	// Инициируем модель доски
 	if (bmodel == NULL) {
 		bmodel = new BoardModel(this);
-		connect(bmodel, SIGNAL(changeGameStatus(BoardModel::GameStatus)), this, SLOT(changeGameStatus(BoardModel::GameStatus)));
+		connect(bmodel, SIGNAL(changeGameStatus(GameModel::GameStatus)), this, SLOT(changeGameStatus(GameModel::GameStatus)));
 		connect(bmodel, SIGNAL(setupElement(int, int)), this, SLOT(setupElement(int, int)));
-		connect(bmodel, SIGNAL(lose()), this, SLOT(setLose()));
-		connect(bmodel, SIGNAL(draw()), this, SIGNAL(draw()));
+		connect(bmodel, SIGNAL(lose()), this, SLOT(setLose()), Qt::QueuedConnection);
+		connect(bmodel, SIGNAL(draw()), this, SLOT(setDraw()), Qt::QueuedConnection);
 		connect(bmodel, SIGNAL(switchColor()), this, SIGNAL(switchColor()));
 		connect(bmodel, SIGNAL(doPopup(const QString)), this, SIGNAL(doPopup(const QString)));
 	}
-	bmodel->init(elemType);
+	bmodel->init(new GameModel(elemType, 15, 15)); // GameModel убивается при уничтожении BoardModel
 	ui->board->setModel(bmodel);
 	// Создаем делегат
 	if (delegate == NULL) {
-		delegate = new BoardDelegate(bmodel, ui->board);
+		delegate = new BoardDelegate(bmodel, ui->board); // Прописан родитель
 	}
 	// Инициируем BoardView
 	ui->board->setItemDelegate(delegate);
@@ -123,52 +125,44 @@ void PluginWindow::init(QString element)
 	gameActive = true;
 }
 
-void PluginWindow::changeGameStatus(BoardModel::GameStatus status)
+void PluginWindow::changeGameStatus(GameModel::GameStatus status)
 {
 	int step = bmodel->turnNum();
 	if (step == 4) {
-		if (status == BoardModel::StatusThinking && element_ == "white") {
+		if (status == GameModel::StatusWaitingLocalAction && bmodel->myElementType() == GameElement::TypeWhite) {
 			ui->actionSwitchColor->setEnabled(true);
 		}
 	} else if (step == 5) {
 		ui->actionSwitchColor->setEnabled(false);
 	}
 	QString stat_str = "n/a";
-	if (status == BoardModel::StatusWaitingOpponent) {
+	if (status == GameModel::StatusWaitingOpponent) {
 		stat_str = tr("Waiting for opponent");
 		ui->actionResign->setEnabled(true);
 		emit changeGameSession("wait-opponent-command");
-	} else if (status == BoardModel::StatusWaitingAccept) {
+	} else if (status == GameModel::StatusWaitingAccept) {
 		stat_str = tr("Waiting for accept");
 		emit changeGameSession("wait-opponent-accept");
-	} else if (status == BoardModel::StatusThinking) {
+	} else if (status == GameModel::StatusWaitingLocalAction) {
 		stat_str = tr("Your turn");
 		emit changeGameSession("wait-game-window");
 		ui->actionResign->setEnabled(true);
 		emit playSound(constSoundMove);
-	} else if (status == BoardModel::StatusEndGame) {
+	} else if (status == GameModel::StatusBreak) {
 		stat_str = tr("End of game");
 		endGame();
-	} else if (status == BoardModel::StatusError) {
+	} else if (status == GameModel::StatusError) {
 		stat_str = tr("Error");
 		endGame();
-	} else if (status == BoardModel::StatusWin) {
+	} else if (status == GameModel::StatusWin) {
 		stat_str = tr("Win!");
 		endGame();
-	} else if (status == BoardModel::StatusLose) {
+	} else if (status == GameModel::StatusLose) {
 		stat_str = tr("Lose.");
 		endGame();
-	} else if (status == BoardModel::StatusDraw) {
+	} else if (status == GameModel::StatusDraw) {
 		stat_str = tr("Draw.");
 		endGame();
-		QMessageBox *msgBox = new QMessageBox(this);
-		msgBox->setIcon(QMessageBox::Information);
-		msgBox->setWindowTitle(tr("Gomoku Plugin"));
-		msgBox->setText(tr("Draw."));
-		msgBox->setStandardButtons(QMessageBox::Ok);
-		msgBox->setWindowModality(Qt::WindowModal);
-		msgBox->exec();
-		delete msgBox;
 	}
 	ui->lbStatus->setText(stat_str);
 }
@@ -198,31 +192,33 @@ void PluginWindow::turnSelected()
  */
 void PluginWindow::setupElement(int x, int y)
 {
-	appendStep(x, y, true);
+	appendTurn(bmodel->turnNum() - 1, x, y, true);
 	emit setElement(x, y);
 }
 
 /**
  * Добавление хода в список ходов
  */
-void PluginWindow::appendStep(int x, int y, bool my_turn)
+void PluginWindow::appendTurn(int num, int x, int y, bool my_turn)
 {
 	QString str1;
 	if (my_turn) {
-		str1 = tr("You: ");
+		str1 = tr("You");
 	} else {
-		str1 = tr("Opp: ");
+		str1 = tr("Opp", "Opponent");
 	}
-	int turnNum = bmodel->turnNum() - 1;
+	QString msg;
 	if (x == -1 && y == -1) {
-		str1 += tr("%1- swch", "Switch color").arg(turnNum);
+		msg = tr("%1: %2 - swch", "Switch color").arg(num).arg(str1);
 	} else {
-		str1 += QString("%1- %2%3").arg(turnNum).arg(horHeaderString.at(x))
+		msg = QString("%1: %2 - %3%4").arg(num).arg(str1)
+			.arg(horHeaderString.at(x))
 			.arg(QString::number(y + 1));
 	}
-	QListWidgetItem *item = new QListWidgetItem(str1, ui->lsTurnsList);
+	QListWidgetItem *item = new QListWidgetItem(msg, ui->lsTurnsList);
 	item->setData(Qt::UserRole, x);
 	item->setData(Qt::UserRole + 1, y);
+	//item->setFlags((item->flags() | Qt::ItemIsUserCheckable) & ~Qt::ItemIsUserCheckable);
 	ui->lsTurnsList->addItem(item);
 	ui->lsTurnsList->setCurrentItem(item);
 }
@@ -232,11 +228,11 @@ void PluginWindow::appendStep(int x, int y, bool my_turn)
  */
 void PluginWindow::acceptStep()
 {
-	//
+	// Визуальное отображение подтвержденного хода
 }
 
 /**
- * Пришло подтверждение хода от противника
+ * Пришло подтверждение от оппонента
  */
 void PluginWindow::setAccept()
 {
@@ -251,7 +247,7 @@ void PluginWindow::setTurn(int x, int y)
 {
 	if (bmodel) {
 		if (bmodel->opponentTurn(x, y)) {
-			appendStep(x, y, false);
+			appendTurn(bmodel->turnNum() - 1, x, y, false);
 			emit accepted();
 			if (bmodel->turnNum() == 4) { // Ходы сквозные, значит 4й всегда белые
 				ui->actionSwitchColor->setEnabled(true);
@@ -270,7 +266,7 @@ void PluginWindow::setSwitchColor()
 {
 	if (bmodel->doSwitchColor(false)) {
 		ui->hintElement->setElementType(GameElement::TypeWhite);
-		appendStep(-1, -1, false);
+		appendTurn(bmodel->turnNum() - 1, -1, -1, false);
 		emit accepted();
 	} else {
 		emit error();
@@ -314,7 +310,7 @@ void PluginWindow::setClose()
  */
 void PluginWindow::closeEvent (QCloseEvent *event)
 {
-	emit closeBoard(gameActive, y(), x(), width(), height()); // Отправляем сообщение оппоненту только если игра не завершена
+	emit closeBoard(gameActive, y(), x(), width(), height()); // Отправляем сообщение оппоненту
 	gameActive = false;
 	event->accept();
 }
@@ -334,10 +330,9 @@ void PluginWindow::doSwitchColor()
 	int res = msgBox->exec();
 	delete msgBox;
 	if (res == QMessageBox::Yes) {
-		element_ = "black";
 		if (bmodel->doSwitchColor(true)) {
 			ui->hintElement->setElementType(GameElement::TypeBlack);
-			appendStep(-1, -1, true);
+			appendTurn(bmodel->turnNum() - 1, -1, -1, true);
 		}
 	}
 }
@@ -356,6 +351,15 @@ void PluginWindow::setLose()
 	msgBox->setWindowModality(Qt::WindowModal);
 	msgBox->exec();
 	delete msgBox;
+}
+
+/**
+ * Ничья выставляем сигнал и показываем сообщение
+ */
+void PluginWindow::setDraw()
+{
+	emit draw();
+	showDraw();
 }
 
 /**
@@ -383,44 +387,6 @@ void PluginWindow::setWin()
 }
 
 /**
- * Обработчик сохранения игры
- */
-void PluginWindow::saveGame()
-{
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Save game"), "", "*.gmk");
-	if (fileName.isEmpty())
-		return;
-	if (fileName.right(4) != ".gmk")
-		fileName.append(".gmk");
-	QFile file(fileName);
-	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-		QTextStream out(&file);
-		out.setGenerateByteOrderMark(false);
-		out << bmodel->saveToString();
-	}
-}
-
-/**
- * Обработчик загрузки игры с локального файла
- */
-void PluginWindow::loadGame()
-{
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Load game"), "", "*.gmk");
-	if (fileName.isEmpty())
-		return;
-	QFile file(fileName);
-	if(file.open(QIODevice::ReadOnly)) {
-		QTextStream in(&file);
-		QString saved_str = in.readAll();
-		if (bmodel->loadFromString(saved_str, true)) {
-			ui->hintElement->setElementType(bmodel->elementType());
-			ui->lsTurnsList->clear();
-			emit load(saved_str.replace("\n", ""));
-		}
-	}
-}
-
-/**
  * Обработчик начала новой игры. Запрос у пользователя и отсылка сигнала
  */
 void PluginWindow::newGame()
@@ -439,19 +405,89 @@ void PluginWindow::newGame()
 }
 
 /**
+ * Обработчик сохранения игры
+ */
+void PluginWindow::saveGame()
+{
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save game"), "", fileFilter);
+	if (fileName.isEmpty())
+		return;
+	if (fileName.right(4) != ".gmk")
+		fileName.append(".gmk");
+	QFile file(fileName);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+		QTextStream out(&file);
+		out.setGenerateByteOrderMark(false);
+		out << bmodel->saveToString();
+	}
+}
+
+/**
+ * Обработчик загрузки игры с локального файла
+ */
+void PluginWindow::loadGame()
+{
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Load game"), "", fileFilter);
+	if (fileName.isEmpty())
+		return;
+	QFile file(fileName);
+	if(file.open(QIODevice::ReadOnly)) {
+		QTextStream in(&file);
+		QString saved_str = in.readAll();
+		saved_str.replace("\n", "");
+		if (tryLoadGame(saved_str, true)) {
+			emit load(saved_str);
+		}
+	}
+}
+
+/**
  * Обработчик загрузки игры, посланной оппонентом
  */
 void PluginWindow::loadRemoteGame(QString load_str)
 {
-	if (!load_str.isEmpty()) {
-		if (bmodel->loadFromString(load_str, false)) {
-			ui->hintElement->setElementType(bmodel->elementType());
-			ui->lsTurnsList->clear();
-			emit accepted();
-			return;
-		}
+	if (tryLoadGame(load_str, false)) {
+		emit accepted();
+		return;
 	}
 	emit error();
+}
+
+/**
+ * Попытка создать модель игры по данным из строки load_str
+ * При удачной попытке модель игровой доски инициируется с новыми данными игры
+ */
+bool PluginWindow::tryLoadGame(const QString &load_str, bool local)
+{
+	if (!load_str.isEmpty()) {
+		GameModel *gm = new GameModel(load_str, local);
+		if (gm->isValid()) {
+			QString info = gm->gameInfo();
+			QMessageBox *msgBox = new QMessageBox(this);
+			msgBox->setIcon(QMessageBox::Question);
+			msgBox->setWindowTitle(tr("Gomoku Plugin"));
+			info.append("\n").append(tr("You really want to begin loaded game?"));
+			msgBox->setText(info);
+			msgBox->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+			msgBox->setWindowModality(Qt::WindowModal);
+			int res = msgBox->exec();
+			delete msgBox;
+			if (res == QMessageBox::Yes) {
+				// Инициализация модели игровой доски новыми данными
+				bmodel->init(gm);
+				ui->hintElement->setElementType(gm->myElementType());
+				// Загрузка списка ходов
+				ui->lsTurnsList->clear();
+				for (int i = 1, cnt = gm->turnsCount(); i <= cnt; i++) {
+					GameModel::TurnInfo turn = gm->turnInfo(i);
+					appendTurn(i, turn.x, turn.y, turn.my);
+				}
+				return true;
+			}
+		}
+		delete gm;
+	}
+	return false;
 }
 
 /**
@@ -478,4 +514,20 @@ void PluginWindow::setSkin()
 void PluginWindow::opponentDraw()
 {
 	bmodel->opponentDraw();
+	showDraw();
+}
+
+/**
+ * Отображение стандартного диалогового окна, сообщающего об ничьей
+ */
+void PluginWindow::showDraw()
+{
+	QMessageBox *msgBox = new QMessageBox(this);
+	msgBox->setIcon(QMessageBox::Information);
+	msgBox->setWindowTitle(tr("Gomoku Plugin"));
+	msgBox->setText(tr("Draw."));
+	msgBox->setStandardButtons(QMessageBox::Ok);
+	msgBox->setWindowModality(Qt::WindowModal);
+	msgBox->exec();
+	delete msgBox;
 }
