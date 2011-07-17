@@ -128,6 +128,10 @@ public:
     virtual void startMessages();
 
 private:
+    /**
+     * Returns full Jid for private contacts,
+     * bare Jid for non-private contacts.
+     */
     QString getCorrectJid(int account, const QString& fullJid);
 
     bool                                            m_enabled;

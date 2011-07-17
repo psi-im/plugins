@@ -83,14 +83,14 @@ PsiOtrPlugin::~PsiOtrPlugin()
 
 QString PsiOtrPlugin::name() const
 {
-    return tr("Off-the-Record Messaging");
+    return "Off-the-Record Messaging";
 }
 
 // ---------------------------------------------------------------------------
 
 QString PsiOtrPlugin::shortName() const
 {
-    return tr("psi-otr");
+    return "psi-otr";
 }
 
 // ---------------------------------------------------------------------------
@@ -490,10 +490,6 @@ void PsiOtrPlugin::startMessages()
 
 // ---------------------------------------------------------------------------
 
-/**
- * Returns full Jid for private contacts,
- * bare Jid for non-private contacts.
- */
 QString PsiOtrPlugin::getCorrectJid(int account, const QString& fullJid)
 {
     QString correctJid;
