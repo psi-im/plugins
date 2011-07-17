@@ -47,13 +47,13 @@ ConfigDialog::ConfigDialog(OtrMessaging* otr, OptionAccessingHost* optionHost,
     QTabWidget* tabWidget = new QTabWidget(this);
 
     tabWidget->addTab(new FingerprintWidget(m_otr, tabWidget),
-                      "Known fingerprints");
+                      tr("Known fingerprints"));
 
     tabWidget->addTab(new PrivKeyWidget(m_otr, tabWidget),
-                      "My private keys");
+                      tr("My private keys"));
 
     tabWidget->addTab(new ConfigOtrWidget(m_optionHost, m_otr, tabWidget),
-                      "Config");
+                      tr("Config"));
 
     mainLayout->addWidget(tabWidget);
     setLayout(mainLayout);
@@ -72,14 +72,14 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
       m_polRequire(0)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->addWidget(new QLabel("OTR Configuration:", this));
+    layout->addWidget(new QLabel(tr("OTR Configuration:"), this));
 
-    QGroupBox* policyGroup = new QGroupBox("OTR-Policy", this);
+    QGroupBox* policyGroup = new QGroupBox(tr("OTR-Policy"), this);
     QVBoxLayout* policyLayout = new QVBoxLayout(policyGroup);
 
-    m_polEnable = new QCheckBox("Enable private messaging", policyGroup);
-    m_polAuto = new QCheckBox("Automatically start private messaging", policyGroup);
-    m_polRequire = new QCheckBox("Require private messaging", policyGroup);
+    m_polEnable = new QCheckBox(tr("Enable private messaging"), policyGroup);
+    m_polAuto = new QCheckBox(tr("Automatically start private messaging"), policyGroup);
+    m_polRequire = new QCheckBox(tr("Require private messaging"), policyGroup);
     policyLayout->addWidget(m_polEnable);
     policyLayout->addWidget(m_polAuto);
     policyLayout->addWidget(m_polRequire);
@@ -171,7 +171,7 @@ FingerprintWidget::FingerprintWidget(OtrMessaging* otr, QWidget* parent)
 {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
-    QLabel* label = new QLabel("Fingerprints", this);
+    QLabel* label = new QLabel(tr("Fingerprints"), this);
     mainLayout->addWidget(label);
 
     m_table->setShowGrid(true);
@@ -181,8 +181,8 @@ FingerprintWidget::FingerprintWidget(OtrMessaging* otr, QWidget* parent)
             SLOT(tableClicked(const QModelIndex&)));
     mainLayout->addWidget(m_table);
 
-    QPushButton* forgetButton = new QPushButton("forget fingerprint", this);
-    QPushButton* verifyButton = new QPushButton("verify fingerprint", this);
+    QPushButton* forgetButton = new QPushButton(tr("Forget fingerprint"), this);
+    QPushButton* verifyButton = new QPushButton(tr("Verify fingerprint"), this);
     connect(forgetButton,SIGNAL(clicked()),SLOT(forgetFingerprint()));
     connect(verifyButton,SIGNAL(clicked()),SLOT(verifyFingerprint()));
     QHBoxLayout* buttonLayout = new QHBoxLayout();
@@ -202,9 +202,9 @@ void FingerprintWidget::updateData()
 {
     m_tableModel->clear();
     m_tableModel->setColumnCount(5);
-    m_tableModel->setHorizontalHeaderLabels(QStringList() << "account"
-                                            << "buddy" << "fingerprint"
-                                            << "verified" << "status");
+    m_tableModel->setHorizontalHeaderLabels(QStringList() << tr("Account")
+                                            << tr("User") << tr("Fingerprint")
+                                            << tr("Verified") << tr("Status"));
 
     m_fingerprints = m_otr->getFingerprints();
     QListIterator<Fingerprint> fingerprintIt(m_fingerprints);
@@ -242,12 +242,12 @@ void FingerprintWidget::forgetFingerprint()
     {
         return;
     }
-    QString msg("Are you sure you want to delete the fingerprint:\naccount: "
-                + m_fingerprints[m_selectIndex.row()].account + "\n" +
-                "buddy: " + m_fingerprints[m_selectIndex.row()].username + "\n" +
-                "fingerprint: " + m_fingerprints[m_selectIndex.row()].fingerprintHuman);
+    QString msg(tr("Are you sure you want to delete the following fingerprint?") + "\n" +
+                tr("Account: ") + m_fingerprints[m_selectIndex.row()].account + "\n" +
+                tr("User: ") + m_fingerprints[m_selectIndex.row()].username + "\n" +
+                tr("Fingerprint: ") + m_fingerprints[m_selectIndex.row()].fingerprintHuman);
 
-    QMessageBox mb(QMessageBox::Question, "psi-otr", msg,
+    QMessageBox mb(QMessageBox::Question, tr("Psi OTR"), msg,
                    QMessageBox::Yes | QMessageBox::No, this,
                    Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
@@ -266,11 +266,11 @@ void FingerprintWidget::verifyFingerprint()
     {
         return;
     }
-    QString msg("User: " + m_fingerprints[m_selectIndex.row()].username + "\n" +
-                "Fingerprint: " + m_fingerprints[m_selectIndex.row()].fingerprintHuman + "\n\n" +
-                "Have you verified that this is in fact the correct fingerprint?");
+    QString msg(tr("User: ") + m_fingerprints[m_selectIndex.row()].username + "\n" +
+                tr("Fingerprint: ") + m_fingerprints[m_selectIndex.row()].fingerprintHuman + "\n\n" +
+                tr("Have you verified that this is in fact the correct fingerprint?"));
 
-    QMessageBox mb(QMessageBox::Question, "psi-otr", msg,
+    QMessageBox mb(QMessageBox::Question, tr("Psi OTR"), msg,
                    QMessageBox::Yes | QMessageBox::No, this,
                    Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
@@ -303,7 +303,7 @@ PrivKeyWidget::PrivKeyWidget(OtrMessaging* otr, QWidget* parent)
     QTableView* table = new QTableView(this);
     QStandardItemModel* tableModel = new QStandardItemModel(this);
     
-    QLabel* label = new QLabel("My private keys:", this);
+    QLabel* label = new QLabel(tr("My private keys:"), this);
     mainLayout->addWidget(label);
 
     mainLayout->addWidget(table);
@@ -311,8 +311,8 @@ PrivKeyWidget::PrivKeyWidget(OtrMessaging* otr, QWidget* parent)
     setLayout(mainLayout);
 
     tableModel->setColumnCount(2);
-    tableModel->setHorizontalHeaderLabels(QStringList() << "Account"
-                                          << "Fingerprint");
+    tableModel->setHorizontalHeaderLabels(QStringList() << tr("Account")
+                                          << tr("Fingerprint"));
 
     QHash<QString, QString> privateKeys = m_otr->getPrivateKeys();
     

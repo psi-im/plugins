@@ -83,14 +83,14 @@ PsiOtrPlugin::~PsiOtrPlugin()
 
 QString PsiOtrPlugin::name() const
 {
-    return "Off-the-Record Messaging";
+    return tr("Off-the-Record Messaging");
 }
 
 // ---------------------------------------------------------------------------
 
 QString PsiOtrPlugin::shortName() const
 {
-    return "psi-otr";
+    return tr("psi-otr");
 }
 
 // ---------------------------------------------------------------------------
@@ -201,7 +201,7 @@ bool PsiOtrPlugin::processEvent(int accountNo, QDomElement& e)
             plainBody.removeChild(plainBody.firstChild());
             QString bodyText = decrypted;
             bodyText.remove("\n")
-                    .replace(QRegExp("<br(?:\\s[^>]*)?/>"), "\n")
+                    .replace(QRegExp("<br(?:\\s[^/]*)?/>"), "\n")
                     .replace(QRegExp("<b(?:\\s[^>]*)?>([^<]+)</b>"), "*\\1*")
                     .replace(QRegExp("<i(?:\\s[^>]*)?>([^<]+)</i>"), "/\\1/")
                     .replace(QRegExp("<u(?:\\s[^>]*)?>([^<]+)</u>"), "_\\1_")
@@ -469,7 +469,7 @@ void PsiOtrPlugin::notifyUser(const OtrNotifyType& type, const QString& message)
         messageBoxIcon = QMessageBox::Information;
     }
 
-    QMessageBox mb(messageBoxIcon, "psi-otr", message, QMessageBox::Ok, NULL,
+    QMessageBox mb(messageBoxIcon, tr("Psi OTR"), message, QMessageBox::Ok, NULL,
                    Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     mb.exec();
 }

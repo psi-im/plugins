@@ -80,12 +80,12 @@ void PsiOtrClosure::verifyFingerprint(bool)
 
     if (fingerprint.fingerprint != NULL)
     {
-        QString msg("Account: " + m_myAccount + "\n" +
-                    "User: " + m_otherJid + "\n" +
-                    "Fingerprint: " + fingerprint.fingerprintHuman + "\n\n" +
-                    "Have you verified that this is in fact the correct fingerprint?");
+        QString msg(tr("Account: ") + m_myAccount + "\n" +
+                    tr("User: ") + m_otherJid + "\n" +
+                    tr("Fingerprint: ") + fingerprint.fingerprintHuman + "\n\n" +
+                    tr("Have you verified that this is in fact the correct fingerprint?"));
 
-        QMessageBox mb(QMessageBox::Information, "psi-otr",
+        QMessageBox mb(QMessageBox::Information, tr("Psi OTR"),
                        msg, QMessageBox::Yes | QMessageBox::No,
                        static_cast<QWidget*>(m_parentWidget),
                        Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
@@ -116,15 +116,17 @@ void PsiOtrClosure::sessionID(bool)
         (sId.compare(QString("<b> </b>")) == 0) ||
         (sId.compare(QString(" <b> </b>")) == 0))
     {
-        msg = QString("no active encrypted session");
+        msg = tr("No active encrypted session");
     }
     else
     {
-        msg = "Session ID of connection from account " + m_myAccount +
-              " to " + m_otherJid + " is:<br/>" + sId + ".";
+        msg = tr("Session ID of connection from account %1 to %2 is:<br/>%3.")
+                .arg(m_myAccount)
+                .arg(m_otherJid)
+                .arg(sId);
     }
 
-    QMessageBox mb(QMessageBox::Information, "psi-otr", msg, NULL,
+    QMessageBox mb(QMessageBox::Information, tr("Psi OTR"), msg, NULL,
                    static_cast<QWidget*>(m_parentWidget),
                    Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     mb.setTextFormat(Qt::RichText);
@@ -144,15 +146,16 @@ void PsiOtrClosure::endSession(bool b)
 
 void PsiOtrClosure::fingerprint(bool)
 {
-    QString fingerprint =  m_otr->getPrivateKeys().value(m_myAccount,
-                                                         "no private key for " +
-                                                         m_myAccount);
+    QString fingerprint =  m_otr->getPrivateKeys()
+                                    .value(m_myAccount,
+                                           tr("No private key for %1")
+                                             .arg(m_myAccount));
 
-    QString msg("Fingerprint for account " + m_myAccount + " is:\n" +
-                fingerprint + ".");
+    QString msg(tr("Fingerprint for account %1 is:\n%2."));
 
-    QMessageBox mb(QMessageBox::Information, "psi-otr",
-                   msg, NULL, static_cast<QWidget*>(m_parentWidget),
+    QMessageBox mb(QMessageBox::Information, tr("Psi OTR"),
+                   msg.arg(m_myAccount).arg(fingerprint),
+                   NULL, static_cast<QWidget*>(m_parentWidget),
                    Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     mb.exec();
 }
@@ -177,7 +180,7 @@ void PsiOtrClosure::updateMessageState()
             else
             {
                 m_chatDlgAction->setIcon(QIcon(":/psi-otr/otr_unverified.png"));
-                stateString += ", unverified";
+                stateString += ", " + tr("unverified");
             }
         }
         else
@@ -185,7 +188,7 @@ void PsiOtrClosure::updateMessageState()
             m_chatDlgAction->setIcon(QIcon(":/psi-otr/otr_no.png"));
         }
 
-        m_chatDlgAction->setText(QString("OTR Plugin [%1]").arg(stateString));
+        m_chatDlgAction->setText(tr("OTR Plugin [%1]").arg(stateString));
 
         if (state == OTR_MESSAGESTATE_ENCRYPTED)
         {
@@ -226,25 +229,25 @@ QAction* PsiOtrClosure::getChatDlgMenu(QObject* parent)
 
     m_chatDlgMenu = new QMenu();
 
-    m_startSessionAction = m_chatDlgMenu->addAction("Start private Conversation");
+    m_startSessionAction = m_chatDlgMenu->addAction(tr("Start private Conversation"));
     connect(m_startSessionAction, SIGNAL(triggered(bool)),
             this, SLOT(initiateSession(bool)));
 
-    m_endSessionAction = m_chatDlgMenu->addAction("End private Conversation");
+    m_endSessionAction = m_chatDlgMenu->addAction(tr("End private Conversation"));
     connect(m_endSessionAction, SIGNAL(triggered(bool)),
             this, SLOT(endSession(bool)));
 
     m_chatDlgMenu->insertSeparator(NULL);
 
-    m_verifyAction = m_chatDlgMenu->addAction("Verify Fingerprint");
+    m_verifyAction = m_chatDlgMenu->addAction(tr("Verify Fingerprint"));
     connect(m_verifyAction, SIGNAL(triggered(bool)),
             this, SLOT(verifyFingerprint(bool)));
 
-    m_sessionIdAction = m_chatDlgMenu->addAction("Show secure Session ID");
+    m_sessionIdAction = m_chatDlgMenu->addAction(tr("Show secure Session ID"));
     connect(m_sessionIdAction, SIGNAL(triggered(bool)),
             this, SLOT(sessionID(bool)));
 
-    m_fingerprintAction = m_chatDlgMenu->addAction("Show own Fingerprint");
+    m_fingerprintAction = m_chatDlgMenu->addAction(tr("Show own Fingerprint"));
     connect(m_fingerprintAction, SIGNAL(triggered(bool)),
             this, SLOT(fingerprint(bool)));
 

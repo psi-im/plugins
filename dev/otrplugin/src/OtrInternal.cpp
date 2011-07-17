@@ -41,51 +41,51 @@ QString otrlMessageTypeToString(const OtrlMessageType& type)
 {
     if (type == OTRL_MSGTYPE_NOTOTR)
     {
-        return "no OTR Message";
+        return QObject::tr("No OTR Message");
     }
     else if (type == OTRL_MSGTYPE_TAGGEDPLAINTEXT)
     {
-        return "OTR TaggedPlaintexMessage";
+        return QObject::tr("OTR TaggedPlaintextMessage");
     }
     else if (type == OTRL_MSGTYPE_QUERY)
     {
-        return "OTR QueryMessage";
+        return QObject::tr("OTR QueryMessage");
     }
     else if (type == OTRL_MSGTYPE_DH_COMMIT)
     {
-        return "OTR DH-Commit Message";
+        return QObject::tr("OTR DH-Commit Message");
     }
     else if (type == OTRL_MSGTYPE_DH_KEY)
     {
-        return "OTR DH-Key Message";
+        return QObject::tr("OTR DH-Key Message");
     }
     else if (type == OTRL_MSGTYPE_REVEALSIG)
     {
-        return "OTR Reveal Signature Message";
+        return QObject::tr("OTR Reveal Signature Message");
     }
     else if (type == OTRL_MSGTYPE_SIGNATURE)
     {
-        return "OTR Signature Message";
+        return QObject::tr("OTR Signature Message");
     }
     else if (type == OTRL_MSGTYPE_V1_KEYEXCH)
     {
-        return "OTR Version 1 Key Exchange Message";
+        return QObject::tr("OTR Version 1 Key Exchange Message");
     }
     else if (type == OTRL_MSGTYPE_DATA)
     {
-        return "OTR Data Message";
+        return QObject::tr("OTR Data Message");
     }
     else if (type == OTRL_MSGTYPE_ERROR)
     {
-        return "OTR Error Message";
+        return QObject::tr("OTR Error Message");
     }
     else if (type == OTRL_MSGTYPE_UNKNOWN)
     {
-        return "OTR Unknown Message";
+        return QObject::tr("OTR Unknown Message");
     }
     else
     {
-        return "Unknown OTR Message Type";
+        return QObject::tr("Unknown OTR Message Type");
     }
 }
 
@@ -180,9 +180,10 @@ QString OtrInternal::encryptMessage(const QString& from, const QString& to,
     if (err != 0)
     {
         m_callback->notifyUser(psiotr::OTR_NOTIFY_ERROR, 
-                               "Encrypting message from " +
-                               QString(from) + " to " + QString(to) +
-                               " failed.\nThe message was not sent.");
+                               QObject::tr("Encrypting message from %1 to %2 "
+                                           "failed.\nThe message was not sent.")
+                                           .arg(QString(from))
+                                           .arg(QString(to)));
         return QString();
     }
 
@@ -220,12 +221,14 @@ bool OtrInternal::decryptMessage(const QString& from, const QString& to,
                 cryptedMessage.toStdString().c_str());
 
 
-        QString retMessage("received " + otrlMessageTypeToString(type) +
-                           " [" + getMessageStateString(to, from) + "]") ;
+        QString retMessage(QObject::tr("Received %1 [%2]")
+                                       .arg(otrlMessageTypeToString(type))
+                                       .arg(getMessageStateString(to, from)));
 
         if (getMessageState(to, from) == psiotr::OTR_MESSAGESTATE_ENCRYPTED)
         {
-            retMessage.append("\nsessionId: " + getSessionId(to, from));
+            retMessage.append("<br/>" + QObject::tr("Session ID: ")
+                                      + getSessionId(to, from));
         }
 
         decrypted = "<body xmlns=\"http://www.w3.org/1999/xhtml\">" +
@@ -422,18 +425,18 @@ QString OtrInternal::getMessageStateString(const QString& thisJid,
 
     if (state == psiotr::OTR_MESSAGESTATE_PLAINTEXT)
     {
-        return "plaintext";
+        return QObject::tr("plaintext");
     }
     else if (state == psiotr::OTR_MESSAGESTATE_ENCRYPTED)
     {
-        return "encrypted";
+        return QObject::tr("encrypted");
     }
     else if (state == psiotr::OTR_MESSAGESTATE_FINISHED)
     {
-        return "finished";
+        return QObject::tr("finished");
     }
         
-    return "unknown";
+    return QObject::tr("unknown");
 }
 
 //-----------------------------------------------------------------------------
@@ -578,14 +581,14 @@ void OtrInternal::create_privkey(const char *accountname,
                                     accountname, protocol);
     keyGenerator.start();
     
-    QMessageBox infoMb(QMessageBox::Information, "psi-otr",
-                       "Generating keys for account " +
-                       QString(accountname) + "."
-                       "\nThis may take a while.",
+    QMessageBox infoMb(QMessageBox::Information, QObject::tr("Psi OTR"),
+                       QObject::tr("Generating keys for account %1."
+                                   "\nThis may take a while.")
+                                   .arg(QString(accountname)),
                        QMessageBox::Ok, NULL,
                        Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     infoMb.button(QMessageBox::Ok)->setEnabled(false);
-    infoMb.button(QMessageBox::Ok)->setText("please wait...");
+    infoMb.button(QMessageBox::Ok)->setText(QObject::tr("Please wait..."));
     infoMb.setWindowModality(Qt::ApplicationModal);
     infoMb.show();
 
@@ -595,24 +598,25 @@ void OtrInternal::create_privkey(const char *accountname,
     }
 
     infoMb.button(QMessageBox::Ok)->setEnabled(true);
-    infoMb.button(QMessageBox::Ok)->setText("Ok");
+    infoMb.button(QMessageBox::Ok)->setText(QObject::tr("Ok"));
 
     char fingerprint[45];
     if (otrl_privkey_fingerprint(m_userstate, fingerprint, accountname,
                                  protocol) == NULL)
     {
-        QMessageBox failMb(QMessageBox::Critical, "psi-otr",
-                           "Failed to generate key for account " +
-                           QString(accountname) + "."
-                           "\nThe OTR Plugin will not work.",
+        QMessageBox failMb(QMessageBox::Critical, QObject::tr("Psi OTR"),
+                           QObject::tr("Failed to generate key for account %1."
+                                       "\nThe OTR Plugin will not work.")
+                                       .arg(QString(accountname)),
                            QMessageBox::Ok, NULL,
                            Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
         failMb.exec();
     }
     else
     {
-        infoMb.setText("The fingerprint for account " + QString(accountname) +
-                       " is\n" + QString(fingerprint) + ".");
+        infoMb.setText(QObject::tr("The fingerprint for account %1 is\n%2.")
+                                   .arg(QString(accountname))
+                                   .arg(QString(fingerprint)));
     }
     infoMb.exec();
 
@@ -722,10 +726,11 @@ void OtrInternal::new_fingerprint(OtrlUserState us, const char *accountname,
     Q_UNUSED(protocol);
 
     m_callback->notifyUser(psiotr::OTR_NOTIFY_INFO,
-                           "Account " + QString(accountname) +
-                           " has received new fingerprint from "
-                           + QString(username) + ":\n" +
-                           humanFingerprint(fingerprint));
+                           QObject::tr("Account %1 has received a new "
+                                       "fingerprint from %2:\n%3")
+                                       .arg(QString(accountname))
+                                       .arg(QString(username))
+                                       .arg(humanFingerprint(fingerprint)));
 }
             
 // ---------------------------------------------------------------------------
