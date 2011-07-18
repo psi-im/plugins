@@ -28,7 +28,7 @@
 #include "plugininfoprovider.h"
 
 
-#define constVersion "0.3.3"
+#define constVersion "0.3.4"
 
 class ExtToolButton : public QToolButton
 {
@@ -84,6 +84,14 @@ private:
         QCheckBox *disablePastSend;
         QCheckBox *sayMode;
 	QCheckBox *disableSend;
+	QCheckBox *auto_capitalize;
+	QCheckBox *auto_scroll_to_bottom;
+	QLineEdit *chat_caption;
+	QComboBox *default_jid_mode;
+	QTextEdit *default_jid_mode_ignorelist;
+	QCheckBox *show_status_changes;
+	QCheckBox *chat_status_with_priority;
+
 
         //MUC-----
         QCheckBox *showJoins;
@@ -95,9 +103,21 @@ private:
         QCheckBox *skipAutojoin;
         QTextEdit *bookmarksListSkip;
         QCheckBox *mucClientIcons;
-	QCheckBox *rosterNickColors;
+	//QCheckBox *rosterNickColors;
 	QCheckBox *mucHtml;
 	QCheckBox *hideAutoJoin;
+	QCheckBox *show_initial_joins;
+	QCheckBox *status_with_priority;
+	QCheckBox *show_status_icons;
+	QCheckBox *use_slim_group_headings;
+	QComboBox *userlist_contact_sort_style;
+	QCheckBox *avatars_at_left;
+	QCheckBox *avatars_show;
+	QSpinBox *userlist_avatars_size;
+	QSpinBox *userlist_avatars_radius;
+	QLineEdit *muc_leave_status_message;
+	QCheckBox *accept_defaults;
+	QCheckBox *auto_configure;
 
         //Roster
         QCheckBox *resolveNicks;
@@ -116,7 +136,7 @@ private:
         QCheckBox *defaultAvatar;
         QCheckBox *showStatusIcons;
         QCheckBox *statusIconsOverAvatars;
-
+	QCheckBox *auto_delete_unlisted;
 
         //Menu------
         QCheckBox *admin;
@@ -159,136 +179,61 @@ private:
 	QCheckBox *hideWhenClose;
 	QCheckBox *canCloseTab;
 	QComboBox* mouseDoubleclick;
+
+
+	//Misc
+	QCheckBox *flash_windows;
+	QCheckBox *account_single;
+	QCheckBox *xml_console_enable_at_login;
         
 };
 
 Q_EXPORT_PLUGIN(ExtendedOptions);
 
-ExtendedOptions::ExtendedOptions() {
-	psiOptions = 0;
-	appInfo = 0;
-	enabled = false;
+ExtendedOptions::ExtendedOptions()
+	: psiOptions(0)
+	, appInfo(0)
+	, enabled(false)
+{
 	QTextCodec *codec = QTextCodec::codecForName("UTF-8");
 	QTextCodec::setCodecForLocale(codec);
-
-	//Chats-----
-	htmlRender = 0;
-	centralToolbar = 0;
-	confirmClearing = 0;
-	messageIcons = 0;
-	// altnSwitch = 0;
-	showAvatar = 0;
-	avatarSize = 0;
-	disablePastSend = 0;
-	sayMode = 0;
-	disableSend = 0;
-
-	//MUC-----
-	showJoins = 0;
-	showRole = 0;
-	showStatus = 0;
-	leftMucRoster = 0;
-	showGroups = 0;
-	showAffIcons = 0;
-	skipAutojoin = 0;
-	bookmarksListSkip = 0;
-	mucClientIcons = 0;
-	rosterNickColors = 0;
-	mucHtml = 0;
-	hideAutoJoin = 0;
-
-	//Roster
-	resolveNicks = 0;
-	lockRoster = 0;
-	sortContacts = 0;
-	leftRoster = 0;
-	singleLineStatus = 0;
-	avatarTip = 0;
-	statusTip = 0;
-	geoTip = 0;
-	pgpTip = 0;
-	clientTip = 0;
-	sortContacts = 0;
-	// sortGroups = 0;
-	// sortAccs = 0;
-	leftAvatars = 0;
-	defaultAvatar = 0;
-	showStatusIcons = 0;
-	statusIconsOverAvatars = 0;
-
-
-	//Menu------
-	admin = 0;
-	activeChats = 0;
-	pgpKey = 0;
-	picture = 0;
-	changeProfile = 0;
-	chat = 0;
-	invis = 0;
-	xa = 0;
-
-
-	//Look----
-	popupBorder = 0;
-	linkColor = 0;
-	mailtoColor = 0;
-	moderColor = 0;
-	parcColor = 0;
-	visitorColor = 0;
-	noroleColor = 0;
-	tipText = 0;
-	tipBase = 0;
-	composingBut = 0;
-	unreadBut = 0;
-	groupTip = 0;
-	groupMucRoster = 0;
-
-	//CSS----------------
-	chatCss = 0;
-	rosterCss = 0;
-	popupCss = 0;
-	tooltipCss = 0;
-
-	//Tabs-------------
-	disableScroll = 0;
-	bottomTabs = 0;
-	closeButton = 0;
-	middleButton = 0;
-	showTabIcons = 0;
-	hideWhenClose = 0;
-	canCloseTab = 0;
-	mouseDoubleclick = 0;
-
 }
 
-QString ExtendedOptions::name() const {
+QString ExtendedOptions::name() const
+{
         return "Extended Options Plugin";
 }
 
-QString ExtendedOptions::shortName() const {
+QString ExtendedOptions::shortName() const
+{
         return "extopt";
 }
 
-QString ExtendedOptions::version() const {
+QString ExtendedOptions::version() const
+{
         return constVersion;
 }
 
-bool ExtendedOptions::enable(){
+bool ExtendedOptions::enable()
+{
 	if(psiOptions) {
 		enabled = true;
 	}
 	return enabled;
 }
 
-bool ExtendedOptions::disable(){
+bool ExtendedOptions::disable()
+{
 	enabled = false;
         return true;
 }
 
-QWidget* ExtendedOptions::options(){
+QWidget* ExtendedOptions::options()
+{
         if (!enabled) {
 		return 0;
 	}
+
 	options_ = new QWidget();
 	QVBoxLayout *mainLayout = new QVBoxLayout(options_);
         QTabWidget *tabs = new QTabWidget;
@@ -296,9 +241,10 @@ QWidget* ExtendedOptions::options(){
         QWidget *tab2 = new QWidget;
         QWidget *tab3 = new QWidget;
         QWidget *tab4 = new QWidget;
-	 QWidget *tab5 = new QWidget;
+	QWidget *tab5 = new QWidget;
         QWidget *tab6 = new QWidget;
         QWidget *tab7 = new QWidget;
+	QWidget *tab8 = new QWidget;
         QVBoxLayout *tab1Layout = new QVBoxLayout(tab1);
         QVBoxLayout *tab2Layout = new QVBoxLayout(tab2);
         QVBoxLayout *tab3Layout = new QVBoxLayout(tab3);
@@ -306,6 +252,7 @@ QWidget* ExtendedOptions::options(){
 	QVBoxLayout *tab5Layout = new QVBoxLayout(tab5);
         QVBoxLayout *tab6Layout = new QVBoxLayout(tab6);
         QVBoxLayout *tab7Layout = new QVBoxLayout(tab7);
+	QVBoxLayout *tab8Layout = new QVBoxLayout(tab8);
         tabs->addTab(tab1, tr("Chat"));
         tabs->addTab(tab2, tr("Conference"));
 	tabs->addTab(tab5, tr("Tabs"));
@@ -313,6 +260,7 @@ QWidget* ExtendedOptions::options(){
         tabs->addTab(tab4, tr("Menu"));
         tabs->addTab(tab6, tr("Look"));
         tabs->addTab(tab7, tr("CSS"));
+	tabs->addTab(tab8, tr("Misc"));
 
         //Chats-----
         htmlRender = new QCheckBox(tr("Enable HTML rendering in chat window"));
@@ -328,12 +276,28 @@ QWidget* ExtendedOptions::options(){
 	disableSend = new QCheckBox(tr("Hide \"Send\" button"));	
 
 	avatarSize = new QSpinBox;
-        QHBoxLayout *asLayout = new QHBoxLayout;
-        asLayout->addWidget(new QLabel(tr("Avatar size:")));
-        asLayout->addWidget(avatarSize);
-        asLayout->addStretch();
+	QGridLayout *chatGridLayout = new QGridLayout;
+	chatGridLayout->addWidget(new QLabel(tr("Avatar size:")), 0, 0);
+	chatGridLayout->addWidget(avatarSize, 0, 1);
+
+	default_jid_mode = new QComboBox;
+	default_jid_mode->addItems(QStringList() << "auto" << "barejid");
+	chatGridLayout->addWidget(new QLabel(tr("Default JID mode:")), 1, 0);
+	chatGridLayout->addWidget(default_jid_mode);
 
 
+	auto_capitalize = new QCheckBox(tr("Automatically capitalize the first letter in a sentence"));
+	auto_scroll_to_bottom = new QCheckBox(tr("Automatically scroll down the log when a message was sent"));
+	show_status_changes = new QCheckBox(tr("Show status changes"));
+	chat_status_with_priority = new QCheckBox(tr("Show status priority"));
+	default_jid_mode_ignorelist = new QTextEdit;
+	default_jid_mode_ignorelist->setMaximumWidth(300);
+
+	chat_caption = new QLineEdit;
+
+
+	tab1Layout->addWidget(new QLabel(tr("Chat window caption:")));
+	tab1Layout->addWidget(chat_caption);
         tab1Layout->addWidget(htmlRender);
         tab1Layout->addWidget(centralToolbar);
         tab1Layout->addWidget(confirmClearing);
@@ -343,40 +307,107 @@ QWidget* ExtendedOptions::options(){
 	tab1Layout->addWidget(disableSend);
         tab1Layout->addWidget(sayMode);
 	tab1Layout->addWidget(showAvatar);
-        tab1Layout->addLayout(asLayout);
+	tab1Layout->addLayout(chatGridLayout);
+	tab1Layout->addWidget(new QLabel(tr("Default JID mode ignore list:")));
+	tab1Layout->addWidget(default_jid_mode_ignorelist);
+	tab1Layout->addWidget(auto_capitalize);
+	tab1Layout->addWidget(auto_scroll_to_bottom);
+	tab1Layout->addWidget(show_status_changes);
+	tab1Layout->addWidget(chat_status_with_priority);
         tab1Layout->addStretch();
 
+
+
+
         //MUC-----
+	QTabWidget *mucTabWidget = new QTabWidget;
+	QWidget *mucGeneralWidget = new QWidget;
+	QWidget *mucRosterWidget = new QWidget;
+	QVBoxLayout *mucGeneralLayout = new QVBoxLayout(mucGeneralWidget);
+	QVBoxLayout *mucRosterLayout = new QVBoxLayout(mucRosterWidget);
+	mucTabWidget->addTab(mucGeneralWidget, tr("General"));
+	mucTabWidget->addTab(mucRosterWidget, tr("Roster"));
+
+
         showJoins = new QCheckBox(tr("Show joins"));
-        showRole = new QCheckBox(tr("Show role affiliation"));
+	show_initial_joins = new QCheckBox(tr("Show initial joins"));
+	status_with_priority = new QCheckBox(tr("Show status with priority"));
+	showRole = new QCheckBox(tr("Show roles and affiliations changes"));
         showStatus = new QCheckBox(tr("Show status changes"));
-        leftMucRoster = new QCheckBox(tr("Place MUC roster at left"));
-        showGroups = new QCheckBox(tr("Show groups in MUC roster"));
-        showAffIcons = new QCheckBox(tr("Show affiliation icons in MUC roster"));
-        mucClientIcons = new QCheckBox(tr("Show client icons in MUC roster"));
-	rosterNickColors = new QCheckBox(tr("Enable nick coloring in roster"));
         skipAutojoin = new QCheckBox(tr("Enable autojoin for bookmarked conferences"));
 	hideAutoJoin = new QCheckBox(tr("Hide auto-join conferences"));
 	mucHtml = new QCheckBox(tr("Enable HTML rendering in MUC chat window"));
+
+	muc_leave_status_message = new QLineEdit;
+	accept_defaults = new QCheckBox(tr("Automatically accept the default room configuration"));
+	accept_defaults->setToolTip(tr("Automatically accept the default room configuration when a new room is created"));
+	auto_configure = new QCheckBox(tr("Automatically open the configuration dialog when a new room is created"));
+	auto_configure->setToolTip("Automatically open the configuration dialog when a new room is created.\n"
+				   "This option only has effect if accept-defaults is false.");
 
         bookmarksListSkip = new QTextEdit();
         bookmarksListSkip->setMaximumWidth(300);
         bookmarksListSkip->setPlainText(readFile());
 
-	tab2Layout->addWidget(mucHtml);
-        tab2Layout->addWidget(showJoins);
-        tab2Layout->addWidget(showRole);
-        tab2Layout->addWidget(showStatus);
-        tab2Layout->addWidget(leftMucRoster);
-        tab2Layout->addWidget(showGroups);
-        tab2Layout->addWidget(showAffIcons);
-        tab2Layout->addWidget(mucClientIcons);
-	tab2Layout->addWidget(rosterNickColors);
-        tab2Layout->addWidget(skipAutojoin);
-	tab2Layout->addWidget(hideAutoJoin);
-        tab2Layout->addWidget(new QLabel(tr("Disable autojoin to folowing conferences:\n(specify JIDs)")));
-        tab2Layout->addWidget(bookmarksListSkip);
-        tab2Layout->addStretch();
+	mucGeneralLayout->addWidget(accept_defaults);
+	mucGeneralLayout->addWidget(auto_configure);
+	mucGeneralLayout->addWidget(mucHtml);
+	mucGeneralLayout->addWidget(showJoins);
+	mucGeneralLayout->addWidget(show_initial_joins);
+	mucGeneralLayout->addWidget(showRole);
+	mucGeneralLayout->addWidget(showStatus);
+	mucGeneralLayout->addWidget(status_with_priority);
+	mucGeneralLayout->addWidget(skipAutojoin);
+	mucGeneralLayout->addWidget(hideAutoJoin);
+	mucGeneralLayout->addWidget(new QLabel(tr("Disable autojoin to folowing conferences:\n(specify JIDs)")));
+	mucGeneralLayout->addWidget(bookmarksListSkip);
+	mucGeneralLayout->addWidget(new QLabel(tr("MUC leave status message:")));
+	mucGeneralLayout->addWidget(muc_leave_status_message);
+	mucGeneralLayout->addStretch();
+
+
+	leftMucRoster = new QCheckBox(tr("Place MUC roster at left"));
+	showGroups = new QCheckBox(tr("Show groups"));
+	use_slim_group_headings = new QCheckBox(tr("Use slim group heading"));
+	show_status_icons = new QCheckBox(tr("Show status icons"));
+	showAffIcons = new QCheckBox(tr("Show affiliation icons"));
+	mucClientIcons = new QCheckBox(tr("Show client icons"));
+//	rosterNickColors = new QCheckBox(tr("Enable nick coloring"));
+	avatars_show = new QCheckBox(tr("Show avatars"));
+	avatars_at_left = new QCheckBox(tr("Place avatars at left"));
+
+	userlist_contact_sort_style = new QComboBox;
+	userlist_contact_sort_style->addItems(QStringList() << "alpha" << "status");
+
+	QGridLayout *mucRosterGrid = new QGridLayout;
+	mucRosterGrid->addWidget(new QLabel(tr("Sort style for contacts:")), 0, 0);
+	mucRosterGrid->addWidget(userlist_contact_sort_style, 0, 2);
+
+	userlist_avatars_size = new QSpinBox;
+	mucRosterGrid->addWidget(new QLabel(tr("Avatars size:")), 1, 0);
+	mucRosterGrid->addWidget(userlist_avatars_size, 1, 2);
+
+	userlist_avatars_radius = new QSpinBox;
+	mucRosterGrid->addWidget(new QLabel(tr("Avatars radius:")), 2, 0);
+	mucRosterGrid->addWidget(userlist_avatars_radius, 2, 2);
+
+
+	mucRosterLayout->addWidget(leftMucRoster);
+	mucRosterLayout->addWidget(showGroups);
+	mucRosterLayout->addWidget(use_slim_group_headings);
+	mucRosterLayout->addWidget(show_status_icons);
+	mucRosterLayout->addWidget(showAffIcons);
+	mucRosterLayout->addWidget(mucClientIcons);
+//	mucRosterLayout->addWidget(rosterNickColors);
+	mucRosterLayout->addWidget(avatars_show);
+	mucRosterLayout->addWidget(avatars_at_left);
+	mucRosterLayout->addLayout(mucRosterGrid);
+	mucRosterLayout->addStretch();
+
+	tab2Layout->addWidget(mucTabWidget);
+
+
+
 
         //Roster
         resolveNicks = new QCheckBox(tr("Resolve nicks on contact add"));
@@ -387,6 +418,9 @@ QWidget* ExtendedOptions::options(){
         defaultAvatar = new QCheckBox(tr("If contact does not have avatar, use default avatar"));
         showStatusIcons = new QCheckBox(tr("Show status icons"));
         statusIconsOverAvatars = new QCheckBox(tr("Place status icon over avatar"));
+
+	auto_delete_unlisted = new QCheckBox(tr("Automatically remove temporary contacts"));
+	auto_delete_unlisted->hide(); //FIXME!!!! Remove this when the option will be fixed
 
         QGroupBox *groupBox = new QGroupBox(tr("Tooltips:"));
         QVBoxLayout *boxLayout = new QVBoxLayout(groupBox);
@@ -413,7 +447,8 @@ QWidget* ExtendedOptions::options(){
 	sortLayout->addStretch();
 
         tab3Layout->addWidget(resolveNicks);
-        tab3Layout->addWidget(lockRoster);
+	tab3Layout->addWidget(lockRoster);
+	tab3Layout->addWidget(auto_delete_unlisted);
         tab3Layout->addWidget(leftRoster);
         tab3Layout->addWidget(singleLineStatus);
         tab3Layout->addWidget(showStatusIcons);
@@ -620,6 +655,16 @@ QWidget* ExtendedOptions::options(){
 	tab5Layout->addStretch();
 
 
+	//Misc--------------------------------
+	flash_windows = new QCheckBox(tr("Enable windows flashing"));
+	account_single = new QCheckBox(tr("Enable \"Single Account\" mode"));
+	xml_console_enable_at_login = new QCheckBox(tr("Enable XML-console on login"));
+
+	tab8Layout->addWidget(account_single);
+	tab8Layout->addWidget(flash_windows);
+	tab8Layout->addWidget(xml_console_enable_at_login);
+	tab8Layout->addStretch();
+
 
         QLabel *wikiLink = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/plugins#extended_options_plugin\">Wiki (Online)</a>"));
 	wikiLink->setOpenExternalLinks(true);
@@ -632,7 +677,8 @@ QWidget* ExtendedOptions::options(){
 	return options_;
 }
 
-void ExtendedOptions::applyOptions() {
+void ExtendedOptions::applyOptions()
+{
 	if(!options_)
 		return;
 
@@ -648,6 +694,16 @@ void ExtendedOptions::applyOptions() {
 	psiOptions->setGlobalOption("options.ui.chat.avatars.size", QVariant(avatarSize->value()));
 	psiOptions->setGlobalOption("options.ui.disable-send-button",QVariant(disableSend->isChecked()));
 
+	psiOptions->setGlobalOption("options.ui.chat.auto-capitalize",QVariant(auto_capitalize->isChecked()));
+	psiOptions->setGlobalOption("options.ui.chat.auto-scroll-to-bottom",QVariant(auto_scroll_to_bottom->isChecked()));
+	psiOptions->setGlobalOption("options.ui.chat.caption",QVariant(chat_caption->text()));
+	psiOptions->setGlobalOption("options.ui.chat.default-jid-mode",QVariant(default_jid_mode->currentText()));
+	psiOptions->setGlobalOption("options.ui.chat.default-jid-mode-ignorelist",QVariant(default_jid_mode_ignorelist->toPlainText()
+									.split(QRegExp("\\s+"), QString::SkipEmptyParts)
+									.join(",")));
+	psiOptions->setGlobalOption("options.ui.chat.show-status-changes",QVariant(show_status_changes->isChecked()));
+	psiOptions->setGlobalOption("options.ui.chat.status-with-priority",QVariant(chat_status_with_priority->isChecked()));
+
 
 	//MUC-----
 	psiOptions->setGlobalOption("options.muc.show-joins",QVariant(showJoins->isChecked()));
@@ -658,10 +714,23 @@ void ExtendedOptions::applyOptions() {
 	psiOptions->setGlobalOption("options.ui.muc.userlist.show-affiliation-icons",QVariant(showAffIcons->isChecked()));
 	psiOptions->setGlobalOption("options.ui.muc.userlist.show-client-icons",QVariant(mucClientIcons->isChecked()));
 	psiOptions->setGlobalOption("options.muc.bookmarks.auto-join",QVariant(skipAutojoin->isChecked()));
-	psiOptions->setGlobalOption("options.ui.muc.userlist.nick-coloring",QVariant(rosterNickColors->isChecked()));
+//	psiOptions->setGlobalOption("options.ui.muc.userlist.nick-coloring",QVariant(rosterNickColors->isChecked()));
 	psiOptions->setGlobalOption("options.html.muc.render",QVariant(mucHtml->isChecked()));
 	psiOptions->setGlobalOption("options.ui.muc.hide-on-autojoin",QVariant(hideAutoJoin->isChecked()));
 	saveFile(bookmarksListSkip->toPlainText());
+
+	psiOptions->setGlobalOption("options.ui.muc.show-initial-joins",QVariant(show_initial_joins->isChecked()));
+	psiOptions->setGlobalOption("options.ui.muc.status-with-priority",QVariant(status_with_priority->isChecked()));
+	psiOptions->setGlobalOption("options.ui.muc.userlist.show-status-icons",QVariant(show_status_icons->isChecked()));
+	psiOptions->setGlobalOption("options.ui.muc.userlist.use-slim-group-headings",QVariant(use_slim_group_headings->isChecked()));
+	psiOptions->setGlobalOption("options.ui.muc.userlist.contact-sort-style",QVariant(userlist_contact_sort_style->currentText()));
+	psiOptions->setGlobalOption("options.ui.muc.userlist.avatars.avatars-at-left",QVariant(avatars_at_left->isChecked()));
+	psiOptions->setGlobalOption("options.ui.muc.userlist.avatars.show",QVariant(avatars_show->isChecked()));
+	psiOptions->setGlobalOption("options.ui.muc.userlist.avatars.size",QVariant(userlist_avatars_size->value()));
+	psiOptions->setGlobalOption("options.ui.muc.userlist.avatars.radius",QVariant(userlist_avatars_radius->value()));
+	psiOptions->setGlobalOption("options.muc.leave-status-message",QVariant(muc_leave_status_message->text()));
+	psiOptions->setGlobalOption("options.muc.accept-defaults",QVariant(accept_defaults->isChecked()));
+	psiOptions->setGlobalOption("options.muc.auto-configure",QVariant(auto_configure->isChecked()));
 
 	//Tabs--------------------
 	psiOptions->setGlobalOption("options.ui.tabs.disable-wheel-scroll",QVariant(disableScroll->isChecked()));
@@ -690,6 +759,8 @@ void ExtendedOptions::applyOptions() {
 	psiOptions->setGlobalOption("options.ui.contactlist.avatars.use-default-avatar",QVariant(defaultAvatar->isChecked()));
 	psiOptions->setGlobalOption("options.ui.contactlist.show-status-icons",QVariant(showStatusIcons->isChecked()));
 	psiOptions->setGlobalOption("options.ui.contactlist.status-icon-over-avatar",QVariant(statusIconsOverAvatars->isChecked()));
+	psiOptions->setGlobalOption("options.ui.contactlist.auto-delete-unlisted",QVariant(auto_delete_unlisted->isChecked()));
+
 
 	//Menu------
 	psiOptions->setGlobalOption("options.ui.menu.account.admin",QVariant(admin->isChecked()));
@@ -714,7 +785,7 @@ void ExtendedOptions::applyOptions() {
 	psiOptions->setGlobalOption("options.ui.look.colors.chat.unread-message-color", QVariant(unreadBut->property("psi_color").value<QColor>()));
 	psiOptions->setGlobalOption("options.ui.look.colors.chat.composing-color", QVariant(composingBut->property("psi_color").value<QColor>()));
 	psiOptions->setGlobalOption("options.ui.look.colors.tooltip.enable",QVariant(groupTip->isChecked()));
-	psiOptions->setGlobalOption("options.ui.muc.roster-nick-coloring",QVariant(groupMucRoster->isChecked()));
+	psiOptions->setGlobalOption("options.ui.muc.userlist.nick-coloring",QVariant(groupMucRoster->isChecked()));
 
 	//CSS----------------
 	psiOptions->setGlobalOption("options.ui.chat.css", QVariant(chatCss->toPlainText()));
@@ -722,9 +793,16 @@ void ExtendedOptions::applyOptions() {
 	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.css", QVariant(popupCss->toPlainText()));
 	psiOptions->setGlobalOption("options.ui.contactlist.tooltip.css", QVariant(tooltipCss->toPlainText()));
 
+
+	//Misc--------------------
+	psiOptions->setGlobalOption("options.ui.flash-windows", QVariant(flash_windows->isChecked()));
+	psiOptions->setGlobalOption("options.ui.account.single", QVariant(account_single->isChecked()));
+	psiOptions->setGlobalOption("options.xml-console.enable-at-login", QVariant(xml_console_enable_at_login->isChecked()));
+
 }
 
-void ExtendedOptions::restoreOptions() {
+void ExtendedOptions::restoreOptions()
+{
 	if(!options_)
 		return;
 
@@ -740,6 +818,13 @@ void ExtendedOptions::restoreOptions() {
 	sayMode->setChecked(psiOptions->getGlobalOption("options.ui.chat.use-chat-says-style").toBool());
 	disableSend->setChecked(psiOptions->getGlobalOption("options.ui.disable-send-button").toBool());
 
+	auto_capitalize->setChecked(psiOptions->getGlobalOption("options.ui.chat.auto-capitalize").toBool());
+	auto_scroll_to_bottom->setChecked(psiOptions->getGlobalOption("options.ui.chat.auto-scroll-to-bottom").toBool());
+	chat_caption->setText(psiOptions->getGlobalOption("options.ui.chat.caption").toString());
+	default_jid_mode->setCurrentIndex(default_jid_mode->findText(psiOptions->getGlobalOption("options.ui.chat.default-jid-mode").toString()));;
+	default_jid_mode_ignorelist->setPlainText(psiOptions->getGlobalOption("options.ui.chat.default-jid-mode-ignorelist").toString().split(",").join("\n"));
+	show_status_changes->setChecked(psiOptions->getGlobalOption("options.ui.chat.show-status-changes").toBool());
+	chat_status_with_priority->setChecked(psiOptions->getGlobalOption("options.ui.chat.status-with-priority").toBool());
 
         //MUC-----
         showJoins->setChecked(psiOptions->getGlobalOption("options.muc.show-joins").toBool());
@@ -751,9 +836,22 @@ void ExtendedOptions::restoreOptions() {
         skipAutojoin->setChecked(psiOptions->getGlobalOption("options.muc.bookmarks.auto-join").toBool());
         bookmarksListSkip->setPlainText(readFile());
 	mucClientIcons->setChecked(psiOptions->getGlobalOption("options.ui.muc.userlist.show-client-icons").toBool());
-	rosterNickColors->setChecked(psiOptions->getGlobalOption("options.ui.muc.userlist.nick-coloring").toBool());
+//	rosterNickColors->setChecked(psiOptions->getGlobalOption("options.ui.muc.userlist.nick-coloring").toBool());
 	mucHtml->setChecked(psiOptions->getGlobalOption("options.html.muc.render").toBool());
 	hideAutoJoin->setChecked(psiOptions->getGlobalOption("options.ui.muc.hide-on-autojoin").toBool());
+
+	show_initial_joins->setChecked(psiOptions->getGlobalOption("options.ui.muc.show-initial-joins").toBool());
+	status_with_priority->setChecked(psiOptions->getGlobalOption("options.ui.muc.status-with-priority").toBool());
+	show_status_icons->setChecked(psiOptions->getGlobalOption("options.ui.muc.userlist.show-status-icons").toBool());
+	use_slim_group_headings->setChecked(psiOptions->getGlobalOption("options.ui.muc.userlist.use-slim-group-headings").toBool());
+	userlist_contact_sort_style->setCurrentIndex(userlist_contact_sort_style->findText(psiOptions->getGlobalOption("options.ui.muc.userlist.contact-sort-style").toString()));
+	avatars_at_left->setChecked(psiOptions->getGlobalOption("options.ui.muc.userlist.avatars.avatars-at-left").toBool());
+	avatars_show->setChecked(psiOptions->getGlobalOption("options.ui.muc.userlist.avatars.show").toBool());
+	userlist_avatars_size->setValue(psiOptions->getGlobalOption("options.ui.muc.userlist.avatars.size").toInt());
+	userlist_avatars_radius->setValue(psiOptions->getGlobalOption("options.ui.muc.userlist.avatars.radius").toInt());
+	muc_leave_status_message->setText(psiOptions->getGlobalOption("options.muc.leave-status-message").toString());
+	accept_defaults->setChecked(psiOptions->getGlobalOption("options.muc.accept-defaults").toBool());
+	auto_configure->setChecked(psiOptions->getGlobalOption("options.muc.auto-configure").toBool());
 
 	//Tabs----------------------
 	disableScroll->setChecked(psiOptions->getGlobalOption("options.ui.tabs.disable-wheel-scroll").toBool());
@@ -783,6 +881,7 @@ void ExtendedOptions::restoreOptions() {
         defaultAvatar->setChecked(psiOptions->getGlobalOption("options.ui.contactlist.avatars.use-default-avatar").toBool());
         showStatusIcons->setChecked(psiOptions->getGlobalOption("options.ui.contactlist.show-status-icons").toBool());
         statusIconsOverAvatars->setChecked(psiOptions->getGlobalOption("options.ui.contactlist.status-icon-over-avatar").toBool());
+	auto_delete_unlisted->setChecked(psiOptions->getGlobalOption("options.ui.contactlist.auto-delete-unlisted").toBool());
 
         //Menu------
         admin->setChecked(psiOptions->getGlobalOption("options.ui.menu.account.admin").toBool());
@@ -830,7 +929,7 @@ void ExtendedOptions::restoreOptions() {
 	composingBut->setStyleSheet(QString("background-color: %1;").arg(color.name()));
 	composingBut->setProperty("psi_color", color);
 	groupTip->setChecked(psiOptions->getGlobalOption("options.ui.look.colors.tooltip.enable").toBool());
-	groupMucRoster->setChecked(psiOptions->getGlobalOption("options.ui.muc.roster-nick-coloring").toBool());
+	groupMucRoster->setChecked(psiOptions->getGlobalOption("options.ui.muc.userlist.nick-coloring").toBool());
 
         //CSS----------------
         chatCss->setText(psiOptions->getGlobalOption("options.ui.chat.css").toString());
@@ -838,19 +937,25 @@ void ExtendedOptions::restoreOptions() {
         popupCss->setText(psiOptions->getGlobalOption("options.ui.notifications.passive-popups.css").toString());
         tooltipCss->setText(psiOptions->getGlobalOption("options.ui.contactlist.tooltip.css").toString());
 
-
+	//Misc--------------------
+	flash_windows->setChecked(psiOptions->getGlobalOption("options.ui.flash-windows").toBool());
+	account_single->setChecked(psiOptions->getGlobalOption("options.ui.account.single").toBool());
+	xml_console_enable_at_login->setChecked(psiOptions->getGlobalOption("options.xml-console.enable-at-login").toBool());
 }
 
 
-void ExtendedOptions::setOptionAccessingHost(OptionAccessingHost *host) {
+void ExtendedOptions::setOptionAccessingHost(OptionAccessingHost *host)
+{
 	psiOptions = host;
 }
 
-void ExtendedOptions::optionChanged(const QString &option) {
+void ExtendedOptions::optionChanged(const QString &option)
+{
 	Q_UNUSED(option);
 }
 
-void ExtendedOptions::chooseColor(QAbstractButton* button) {
+void ExtendedOptions::chooseColor(QAbstractButton* button)
+{
         QColor c;
         c = button->property("psi_color").value<QColor>();
         c = QColorDialog::getColor(c, new QWidget());
@@ -862,11 +967,13 @@ void ExtendedOptions::chooseColor(QAbstractButton* button) {
        hack();
 }
 
-void ExtendedOptions::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host) {
+void ExtendedOptions::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host)
+{
 	appInfo = host;
 }
 
-QString ExtendedOptions::readFile() {
+QString ExtendedOptions::readFile()
+{
 	QFile file(profileDir() + QDir::separator() + QString("mucskipautojoin.txt"));
 	if(file.open(QIODevice::ReadOnly)) {
 		QTextStream in(&file);
@@ -875,7 +982,8 @@ QString ExtendedOptions::readFile() {
 	return QString();
 }
 
-void ExtendedOptions::saveFile(QString text) {
+void ExtendedOptions::saveFile(QString text)
+{
 	QFile file(profileDir() + QDir::separator() + QString("mucskipautojoin.txt"));
 	if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 		QTextStream out(&file);
@@ -885,20 +993,23 @@ void ExtendedOptions::saveFile(QString text) {
 	}
 }
 
-void ExtendedOptions::hack() {
+void ExtendedOptions::hack()
+{
 	//Enable "Apply" button
 	htmlRender->toggle();
 	htmlRender->toggle();
 }
 
-QString ExtendedOptions::profileDir() {
+QString ExtendedOptions::profileDir()
+{
 	QString profileDir = appInfo->appHistoryDir();
 	int index = profileDir.size() - profileDir.lastIndexOf("/");
 	profileDir.chop(index);
 	return profileDir;
 }
 
-QString ExtendedOptions::pluginInfo() {
+QString ExtendedOptions::pluginInfo()
+{
 	return tr("Author: ") +  "Dealer_WeARE\n"
 			+ tr("Email: ") + "wadealer@gmail.com\n\n"
 			+ trUtf8("This plugin is designed to allow easy configuration of some advanced options in Psi+.\n"
