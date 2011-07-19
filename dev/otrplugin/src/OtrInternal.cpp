@@ -292,21 +292,26 @@ QList<psiotr::Fingerprint> OtrInternal::getFingerprints()
 void OtrInternal::verifyFingerprint(const psiotr::Fingerprint& fingerprint,
                                     bool verified)
 {
-    ConnContext* context;
-    ::Fingerprint* fp;
-
-    for (context = m_userstate->context_root; context != NULL;
-         context = context->next)
+    ConnContext* context = otrl_context_find(m_userstate,
+                                             fingerprint.username.toUtf8().data(),
+                                             fingerprint.account.toUtf8().data(),
+                                             OTR_PROTOCOL_STRING, false,
+                                             NULL, NULL, NULL);
+    if (context != NULL)
     {
-        fp = otrl_context_find_fingerprint(context, fingerprint.fingerprint,
-                                           0, NULL);
-        if (verified)
+        ::Fingerprint* fp = otrl_context_find_fingerprint(context,
+                                                          fingerprint.fingerprint,
+                                                          0, NULL);
+        if (fp != NULL)
         {
-            otrl_context_set_trust(fp, "verified");
-        }
-        else
-        {
-            otrl_context_set_trust(fp, "");
+            if (verified)
+            {
+                otrl_context_set_trust(fp, "verified");
+            }
+            else
+            {
+                otrl_context_set_trust(fp, "");
+            }
         }
     }
 
@@ -317,18 +322,19 @@ void OtrInternal::verifyFingerprint(const psiotr::Fingerprint& fingerprint,
 
 void OtrInternal::deleteFingerprint(const psiotr::Fingerprint& fingerprint)
 {
-    ConnContext* context;
-    ::Fingerprint* fp;
-
-    for (context = m_userstate->context_root; context != NULL;
-         context = context->next)
+    ConnContext* context = otrl_context_find(m_userstate,
+                                             fingerprint.username.toUtf8().data(),
+                                             fingerprint.account.toUtf8().data(),
+                                             OTR_PROTOCOL_STRING, false,
+                                             NULL, NULL, NULL);
+    if (context != NULL)
     {
-        fp = otrl_context_find_fingerprint(context, fingerprint.fingerprint, 0,
-                                           NULL);
+        ::Fingerprint* fp = otrl_context_find_fingerprint(context,
+                                                          fingerprint.fingerprint,
+                                                          0, NULL);
         if (fp != NULL)
         {
             otrl_context_forget_fingerprint(fp, true);
-            break;
         }
     }
     write_fingerprints();
