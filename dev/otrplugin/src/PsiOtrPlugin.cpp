@@ -58,6 +58,21 @@ QString removeResource(const QString& aJid)
 
 // ---------------------------------------------------------------------------
 
+/**
+ * Reverts Qt::escape()
+ */
+QString unescape(const QString& escaped)
+{
+    QString plain = escaped;
+    plain.replace("&lt;", "<")
+         .replace("&gt;", ">")
+         .replace("&quot;", "\"")
+         .replace("&amp;", "&");
+    return plain;
+}
+
+// ---------------------------------------------------------------------------
+
 } // namespace
 
 // ===========================================================================
@@ -220,8 +235,7 @@ bool PsiOtrPlugin::processEvent(int accountNo, QDomElement& e)
                         .replace(QRegExp("<b(?:\\s[^>]*)?>([^<]+)</b>"), "*\\1*")
                         .replace(QRegExp("<i(?:\\s[^>]*)?>([^<]+)</i>"), "/\\1/")
                         .replace(QRegExp("<u(?:\\s[^>]*)?>([^<]+)</u>"), "_\\1_")
-                        .remove(QRegExp("<[^>]*>"))
-                        .replace("&quot;", "\"");
+                        .remove(QRegExp("<[^>]*>"));
 
                 // replace html body
                 if (htmlElement.isNull())
@@ -239,22 +253,23 @@ bool PsiOtrPlugin::processEvent(int accountNo, QDomElement& e)
                 QDomDocument document;
                 int errorLine = 0, errorColumn = 0;
                 QString errorText;
-                if (!document.setContent(decrypted, true, &errorText, &errorLine,
-                                         &errorColumn))
+                if (document.setContent(decrypted, true, &errorText, &errorLine,
+                                        &errorColumn))
+                {
+                    htmlElement.appendChild(document.documentElement());
+                }
+                else
                 {
                     qWarning() << "---- parsing error:\n" << decrypted <<
                                   "\n----\n" << errorText << " line:" <<
                                   errorLine << " column:" << errorColumn;
-                    QDomElement domBody = e.ownerDocument().createElement("body");
-                    domBody.appendChild(e.ownerDocument().createTextNode(bodyText));
-                    htmlElement.appendChild(domBody);
+                    messageElement.removeChild(htmlElement);
                 }
-                htmlElement.appendChild(document.documentElement());
             }
 
             // replace plaintext body
             plainBody.removeChild(plainBody.firstChild());
-            plainBody.appendChild(e.ownerDocument().createTextNode(bodyText));
+            plainBody.appendChild(e.ownerDocument().createTextNode(unescape(bodyText)));
         }
     }
     return false;
@@ -282,9 +297,9 @@ bool PsiOtrPlugin::processOutgoingMessage(int account, const QString& toJid,
     QString encrypted = m_otrConnection->encryptMessage(
         QString::number(account),
         getCorrectJid(account, toJid),
-        body);
+        Qt::escape(body));
 
-    body = encrypted;
+    body = unescape(encrypted);
 
     return false;
 }
