@@ -23,7 +23,6 @@
  */
 
 #include "OtrInternal.hpp"
-#include "HtmlTidy.hpp"
 
 #include <assert.h>
 #include <QString>
@@ -221,29 +220,24 @@ bool OtrInternal::decryptMessage(const QString& from, const QString& to,
                 cryptedMessage.toUtf8().data());
 
 
-        QString retMessage(QObject::tr("Received %1 [%2]")
-                                       .arg(otrlMessageTypeToString(type))
-                                       .arg(getMessageStateString(to, from)));
+        decrypted = QObject::tr("Received %1 [%2]")
+                               .arg(otrlMessageTypeToString(type))
+                               .arg(getMessageStateString(to, from));
 
         if (getMessageState(to, from) == psiotr::OTR_MESSAGESTATE_ENCRYPTED)
         {
-            retMessage.append("<br/>" + QObject::tr("Session ID: ")
+            decrypted.append("<br/>" + QObject::tr("Session ID: ")
                                       + getSessionId(to, from));
         }
 
-        decrypted = "<body xmlns=\"http://www.w3.org/1999/xhtml\">" +
-                    retMessage + "</body>";
         return true;
     }
     else if (ignoreMessage == 0)
     {
         if (newMessage != NULL) // message has been decrypted. replace it
         {
-            QString retMessage = QString::fromUtf8(newMessage);
+            decrypted = QString::fromUtf8(newMessage);
             otrl_message_free(newMessage);
-            HtmlTidy htmlTidy("<body xmlns=\"http://www.w3.org/1999/xhtml\">" +
-                              retMessage + "</body>");
-            decrypted = htmlTidy.output();
             return true;
         }
         else // received message was not an otr message

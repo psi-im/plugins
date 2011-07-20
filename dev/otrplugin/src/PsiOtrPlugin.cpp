@@ -26,6 +26,7 @@
 #include "psiotrclosure.h"
 #include "PsiOtrConfig.hpp"
 #include "applicationinfoaccessinghost.h"
+#include "HtmlTidy.hpp"
 
 namespace psiotr
 {
@@ -196,47 +197,64 @@ bool PsiOtrPlugin::processEvent(int accountNo, QDomElement& e)
             {
                 m_onlineUsers[account][contact]->updateMessageState();
             }
-            
-            // replace plaintext body
-            plainBody.removeChild(plainBody.firstChild());
-            QString bodyText = decrypted;
-            bodyText.remove("\n")
-                    .replace(QRegExp("<br(?:\\s[^/]*)?/>"), "\n")
-                    .replace(QRegExp("<b(?:\\s[^>]*)?>([^<]+)</b>"), "*\\1*")
-                    .replace(QRegExp("<i(?:\\s[^>]*)?>([^<]+)</i>"), "/\\1/")
-                    .replace(QRegExp("<u(?:\\s[^>]*)?>([^<]+)</u>"), "_\\1_")
-                    .remove(QRegExp("<[^>]*>"))
-                    .replace(QString("&quot;"), "\"")
-                    .replace(QString("&amp;"), "&");
-            plainBody.appendChild(e.ownerDocument().createTextNode(bodyText));
 
-            // replace html body
-            if (htmlElement.isNull())
+            QString bodyText;
+
+            bool isHTML = !htmlElement.isNull() ||
+                          decrypted.contains('<') ||
+                          decrypted.contains('>');
+
+            if (!isHTML)
             {
-                htmlElement = e.ownerDocument().createElement("html");
-                htmlElement.setAttribute("xmlns",
-                                         "http://jabber.org/protocol/xhtml-im");
-                messageElement.appendChild(htmlElement);
+                bodyText = decrypted;
             }
             else
             {
-                htmlElement.removeChild(htmlElement.firstChildElement("body"));
+                HtmlTidy htmlTidy("<body xmlns=\"http://www.w3.org/1999/xhtml\">" +
+                                  decrypted + "</body>");
+                decrypted = htmlTidy.output();
+
+                bodyText = decrypted;
+                bodyText.replace("\n", " ")
+                        .replace(QRegExp("<br(?:\\s[^>]*)?/>"), "\n")
+                        .replace(QRegExp("<b(?:\\s[^>]*)?>([^<]+)</b>"), "*\\1*")
+                        .replace(QRegExp("<i(?:\\s[^>]*)?>([^<]+)</i>"), "/\\1/")
+                        .replace(QRegExp("<u(?:\\s[^>]*)?>([^<]+)</u>"), "_\\1_")
+                        .remove(QRegExp("<[^>]*>"))
+                        .replace("&quot;", "\"");
+
+                // replace html body
+                if (htmlElement.isNull())
+                {
+                    htmlElement = e.ownerDocument().createElement("html");
+                    htmlElement.setAttribute("xmlns",
+                                             "http://jabber.org/protocol/xhtml-im");
+                    messageElement.appendChild(htmlElement);
+                }
+                else
+                {
+                    htmlElement.removeChild(htmlElement.firstChildElement("body"));
+                }
+
+                QDomDocument document;
+                int errorLine = 0, errorColumn = 0;
+                QString errorText;
+                if (!document.setContent(decrypted, true, &errorText, &errorLine,
+                                         &errorColumn))
+                {
+                    qWarning() << "---- parsing error:\n" << decrypted <<
+                                  "\n----\n" << errorText << " line:" <<
+                                  errorLine << " column:" << errorColumn;
+                    QDomElement domBody = e.ownerDocument().createElement("body");
+                    domBody.appendChild(e.ownerDocument().createTextNode(bodyText));
+                    htmlElement.appendChild(domBody);
+                }
+                htmlElement.appendChild(document.documentElement());
             }
 
-            QDomDocument document;
-            int errorLine = 0, errorColumn = 0;
-            QString errorText;
-            if (!document.setContent(decrypted, true, &errorText, &errorLine,
-                                     &errorColumn))
-            {
-                qWarning() << "---- parsing error:\n" << decrypted <<
-                              "\n----\n" << errorText << " line:" <<
-                              errorLine << " column:" << errorColumn;
-                QDomElement domBody = e.ownerDocument().createElement("body");
-                domBody.appendChild(e.ownerDocument().createTextNode(bodyText));
-                htmlElement.appendChild(domBody);
-            }
-            htmlElement.appendChild(document.documentElement());
+            // replace plaintext body
+            plainBody.removeChild(plainBody.firstChild());
+            plainBody.appendChild(e.ownerDocument().createTextNode(bodyText));
         }
     }
     return false;
