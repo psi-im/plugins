@@ -454,7 +454,8 @@ QString OtrInternal::getSessionId(const QString& thisJid,
     context = otrl_context_find(m_userstate, remoteJid.toUtf8().data(),
                                 thisJid.toUtf8().data(), OTR_PROTOCOL_STRING,
                                 false, NULL, NULL, NULL);
-    if (context != NULL)
+    if ((context != NULL) &&
+        (context->sessionid_len > 0))
     {
         QString firstHalf;
         QString secondHalf;

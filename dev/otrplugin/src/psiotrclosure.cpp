@@ -111,10 +111,7 @@ void PsiOtrClosure::sessionID(bool)
     QString sId = m_otr->getSessionId(m_myAccount, m_otherJid);
     QString msg;
 
-    if (sId.isEmpty() ||
-        (sId.compare(QString("<b></b>")) == 0) ||
-        (sId.compare(QString("<b> </b>")) == 0) ||
-        (sId.compare(QString(" <b> </b>")) == 0))
+    if (sId.isEmpty())
     {
         msg = tr("No active encrypted session");
     }
