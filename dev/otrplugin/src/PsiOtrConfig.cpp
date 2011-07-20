@@ -53,7 +53,7 @@ ConfigDialog::ConfigDialog(OtrMessaging* otr, OptionAccessingHost* optionHost,
                       tr("My private keys"));
 
     tabWidget->addTab(new ConfigOtrWidget(m_optionHost, m_otr, tabWidget),
-                      tr("Config"));
+                      tr("Configuration"));
 
     mainLayout->addWidget(tabWidget);
     setLayout(mainLayout);
@@ -74,7 +74,7 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(new QLabel(tr("OTR Configuration:"), this));
 
-    QGroupBox* policyGroup = new QGroupBox(tr("OTR-Policy"), this);
+    QGroupBox* policyGroup = new QGroupBox(tr("OTR Policy"), this);
     QVBoxLayout* policyLayout = new QVBoxLayout(policyGroup);
 
     m_polEnable = new QCheckBox(tr("Enable private messaging"), policyGroup);

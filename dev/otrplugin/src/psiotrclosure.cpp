@@ -120,7 +120,7 @@ void PsiOtrClosure::sessionID(bool)
     }
     else
     {
-        msg = tr("Session ID of connection from account %1 to %2 is:<br/>%3.")
+        msg = tr("Session ID of connection from account %1 to %2 is:<br/>%3")
                 .arg(m_myAccount)
                 .arg(m_otherJid)
                 .arg(sId);
@@ -151,7 +151,7 @@ void PsiOtrClosure::fingerprint(bool)
                                            tr("No private key for %1")
                                              .arg(m_myAccount));
 
-    QString msg(tr("Fingerprint for account %1 is:\n%2."));
+    QString msg(tr("Fingerprint for account %1 is:\n%2"));
 
     QMessageBox mb(QMessageBox::Information, tr("Psi OTR"),
                    msg.arg(m_myAccount).arg(fingerprint),
@@ -188,7 +188,7 @@ void PsiOtrClosure::updateMessageState()
             m_chatDlgAction->setIcon(QIcon(":/psi-otr/otr_no.png"));
         }
 
-        m_chatDlgAction->setText(tr("OTR Plugin [%1]").arg(stateString));
+        m_chatDlgAction->setText(tr("OTR Messaging [%1]").arg(stateString));
 
         if (state == OTR_MESSAGESTATE_ENCRYPTED)
         {
