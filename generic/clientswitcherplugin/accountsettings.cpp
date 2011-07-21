@@ -48,7 +48,7 @@ bool AccountSettings::isValid()
 
 bool AccountSettings::isEmpty()
 {
-	if (!enable_contacts && !enable_conferences && !lock_requ && show_requ_mode == 0 && log_mode == 0) {
+	if (!enable_contacts && !enable_conferences && !lock_requ && !lock_time_requ && show_requ_mode == 0 && log_mode == 0) {
 		if (os_name.isEmpty() && client_name.isEmpty() && caps_node.isEmpty() && caps_version.isEmpty()) {
 			return true;
 		}
@@ -93,6 +93,8 @@ void AccountSettings::fromString(const QString& set_str)
 				enable_conferences = (param_value == "true") ? true : false;
 			} else if (param_name == "l_req") {
 				lock_requ = (param_value == "true") ? true : false;
+			} else if (param_name == "l_treq") {
+				lock_time_requ = (param_value == "true") ? true : false;
 			} else if (param_name == "s_req") {
 				show_requ_mode = 0;
 				if (param_value == "true" || param_value == "if-repl") {
@@ -129,6 +131,7 @@ QString AccountSettings::toString()
 	s_res.append(";en_cnt=").append((enable_contacts) ? "true" : "false");
 	s_res.append(";en_cnf=").append((enable_conferences) ? "true" : "false");
 	s_res.append(";l_req=").append((lock_requ) ? "true" : "false");
+	s_res.append(";l_treq=").append((lock_time_requ) ? "true" : "false");
 	QString str1;
 	if (show_requ_mode == 1) {
 		str1 = "if-repl";
@@ -160,6 +163,7 @@ void AccountSettings::init()
 	enable_contacts = false;
 	enable_conferences = false;
 	lock_requ = false;
+	lock_time_requ = false;
 	show_requ_mode = 0;
 	os_name = "";
 	client_name = "";
