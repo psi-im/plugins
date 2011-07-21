@@ -216,8 +216,7 @@ bool PsiOtrPlugin::processEvent(int accountNo, QDomElement& e)
             QString bodyText;
 
             bool isHTML = !htmlElement.isNull() ||
-                          decrypted.contains('<') ||
-                          decrypted.contains('>');
+                          Qt::mightBeRichText(decrypted);
 
             if (!isHTML)
             {
