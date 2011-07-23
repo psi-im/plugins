@@ -38,7 +38,7 @@ namespace psiotr
 
 // ---------------------------------------------------------------------------
 
-const QString PSI_CONFIG_POLICY = "plugins.psi-otr.otr-policy";
+const QString PSI_CONFIG_POLICY = "otr-policy";
 
 // ---------------------------------------------------------------------------
 

@@ -90,7 +90,7 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
 
     setLayout(layout);
 
-    QVariant policyOption = m_optionHost->getGlobalOption(PSI_CONFIG_POLICY);
+    QVariant policyOption = m_optionHost->getPluginOption(PSI_CONFIG_POLICY);
     if (policyOption == QVariant::Invalid)
     {
         policyOption = OTR_POLICY_ENABLED;
@@ -155,7 +155,7 @@ void ConfigOtrWidget::handlePolicyChange()
         policy = OTR_POLICY_ENABLED;
     }
     
-    m_optionHost->setGlobalOption(PSI_CONFIG_POLICY, policy);
+    m_optionHost->setPluginOption(PSI_CONFIG_POLICY, policy);
     m_otr->setPolicy(policy);
 }
 

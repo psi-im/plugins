@@ -106,7 +106,7 @@ QString PsiOtrPlugin::name() const
 
 QString PsiOtrPlugin::shortName() const
 {
-    return "psi-otr";
+    return "otr";
 }
 
 // ---------------------------------------------------------------------------
@@ -134,7 +134,7 @@ QWidget* PsiOtrPlugin::options()
 
 bool PsiOtrPlugin::enable()
 {
-    QVariant policyOption = m_optionHost->getGlobalOption(PSI_CONFIG_POLICY);
+    QVariant policyOption = m_optionHost->getPluginOption(PSI_CONFIG_POLICY);
     m_otrConnection = new OtrMessaging(this,
                                        static_cast<OtrPolicy>(policyOption.toInt()));
     m_enabled = true;
@@ -336,7 +336,7 @@ void PsiOtrPlugin::setOptionAccessingHost(OptionAccessingHost* host)
 
 void PsiOtrPlugin::optionChanged(const QString&)
 {
-    QVariant policyOption = m_optionHost->getGlobalOption(PSI_CONFIG_POLICY);
+    QVariant policyOption = m_optionHost->getPluginOption(PSI_CONFIG_POLICY);
     m_otrConnection->setPolicy(static_cast<OtrPolicy>(policyOption.toInt()));
 }
 
