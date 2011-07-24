@@ -85,6 +85,7 @@ PsiOtrPlugin::PsiOtrPlugin()
       m_optionHost(NULL),
       m_senderHost(NULL),
       m_applicationInfo(NULL),
+      m_accountInfo(NULL),
       m_contactInfo(NULL)
 {
 }
@@ -138,6 +139,14 @@ bool PsiOtrPlugin::enable()
     m_otrConnection = new OtrMessaging(this,
                                        static_cast<OtrPolicy>(policyOption.toInt()));
     m_enabled = true;
+
+    m_accountMap.clear();
+    QString id;
+    int accountNo = 0;
+    while ((id = m_accountInfo->getId(accountNo)) != "-1") {
+        m_accountMap[id] = accountNo++;
+    }
+
     return true;
 }
 
@@ -158,6 +167,7 @@ bool PsiOtrPlugin::disable()
     
     delete m_otrConnection;
     m_enabled = false;
+    m_accountMap.clear();
     return true;
 }
 
@@ -184,7 +194,7 @@ bool PsiOtrPlugin::processEvent(int accountNo, QDomElement& e)
 
         QString contact = getCorrectJid(accountNo,
                                         messageElement.attribute("from"));
-        QString account = QString::number(accountNo);
+        QString account = m_accountInfo->getId(accountNo);
 
         QDomElement htmlElement = messageElement.firstChildElement("html");
         QDomElement plainBody   = messageElement.firstChildElement("body");
@@ -284,7 +294,7 @@ bool PsiOtrPlugin::processMessage(int, const QString&, const QString&,
 
 //-----------------------------------------------------------------------------
 
-bool PsiOtrPlugin::processOutgoingMessage(int account, const QString& toJid,
+bool PsiOtrPlugin::processOutgoingMessage(int accountNo, const QString& toJid,
                                           QString& body, const QString& type,
                                           QString&)
 {
@@ -293,9 +303,11 @@ bool PsiOtrPlugin::processOutgoingMessage(int account, const QString& toJid,
         return false;
     }
 
+    QString account = m_accountInfo->getId(accountNo);
+
     QString encrypted = m_otrConnection->encryptMessage(
-        QString::number(account),
-        getCorrectJid(account, toJid),
+        account,
+        getCorrectJid(accountNo, toJid),
         Qt::escape(body));
 
     body = unescape(encrypted);
@@ -312,7 +324,7 @@ void PsiOtrPlugin::logout(int accountNo)
         return;
     }
     
-    QString account = QString::number(accountNo);
+    QString account = m_accountInfo->getId(accountNo);
 
     if (m_onlineUsers.contains(account))
     {
@@ -356,7 +368,15 @@ void PsiOtrPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost*
 
 //-----------------------------------------------------------------------------
 
-void PsiOtrPlugin::setContactInfoAccessingHost(ContactInfoAccessingHost *host) {
+void PsiOtrPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost *host)
+{
+    m_accountInfo = host;
+}
+
+//-----------------------------------------------------------------------------
+
+void PsiOtrPlugin::setContactInfoAccessingHost(ContactInfoAccessingHost *host)
+{
     m_contactInfo = host;
 }
 
@@ -369,7 +389,7 @@ bool PsiOtrPlugin::incomingStanza(int accountNo, const QDomElement& xml)
         return false;
     }
     
-    QString account = QString::number(accountNo);
+    QString account = m_accountInfo->getId(accountNo);
     QString contact = getCorrectJid(accountNo, xml.attribute("from"));
     QString type = xml.attribute("type", "available");
     
@@ -406,7 +426,7 @@ bool PsiOtrPlugin::outgoingStanza(int accountNo, QDomElement& xml)
         return false;
     }
 
-    QString account = QString::number(accountNo);
+    QString account = m_accountInfo->getId(accountNo);
     QString contact = getCorrectJid(accountNo, xml.attribute("to"));
 
     if (!m_onlineUsers.value(account).contains(contact))
@@ -442,7 +462,7 @@ QAction* PsiOtrPlugin::getAction(QObject* parent, int accountNo,
     }
 
     QString contact = getCorrectJid(accountNo, contactJid);
-    QString account = QString::number(accountNo);
+    QString account = m_accountInfo->getId(accountNo);
     
     if (!m_onlineUsers.value(account).contains(contact))
     {
@@ -467,7 +487,7 @@ QString PsiOtrPlugin::dataDir()
 void PsiOtrPlugin::sendMessage(const QString& account, const QString& toJid,
                                const QString& message)
 {
-    m_senderHost->sendMessage(account.toInt(), toJid, message, "", "chat");
+    m_senderHost->sendMessage(m_accountMap[account], toJid, message, "", "chat");
 }
 
 //-----------------------------------------------------------------------------

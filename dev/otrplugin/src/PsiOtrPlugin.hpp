@@ -39,6 +39,8 @@
 #include "applicationinfoaccessor.h"
 #include "stanzafilter.h"
 #include "toolbariconaccessor.h"
+#include "accountinfoaccessinghost.h"
+#include "accountinfoaccessor.h"
 #include "contactinfoaccessinghost.h"
 #include "contactinfoaccessor.h"
 
@@ -60,6 +62,7 @@ class PsiOtrPlugin : public QObject,
                      public ApplicationInfoAccessor,
                      public StanzaFilter,
                      public ToolbarIconAccessor,
+                     public AccountInfoAccessor,
                      public ContactInfoAccessor,
                      public OtrCallback
 {
@@ -71,6 +74,7 @@ Q_INTERFACES(PsiPlugin
              ApplicationInfoAccessor
              StanzaFilter
              ToolbarIconAccessor
+             AccountInfoAccessor
              ContactInfoAccessor)
 
 public:
@@ -115,6 +119,9 @@ public:
     virtual QAction* getAction(QObject* parent, int account,
                                const QString& contact);
 
+    // AccountInfoAccessor
+    virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+
     // ContactInfoAccessor
     virtual void setContactInfoAccessingHost(ContactInfoAccessingHost* host);
 
@@ -136,11 +143,13 @@ private:
 
     bool                                            m_enabled;
     OtrMessaging*                                   m_otrConnection;
+    QHash<QString, int>                             m_accountMap;
     QHash<QString, QHash<QString, PsiOtrClosure*> > m_onlineUsers;
     QString                                         m_psiDataDir;
     OptionAccessingHost*                            m_optionHost;
     StanzaSendingHost*                              m_senderHost;
     ApplicationInfoAccessingHost*                   m_applicationInfo;
+    AccountInfoAccessingHost*                       m_accountInfo;
     ContactInfoAccessingHost*                       m_contactInfo;
 };
 
