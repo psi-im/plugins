@@ -89,6 +89,8 @@ public:
 
     virtual void stopMessages() = 0;
     virtual void startMessages() = 0;
+
+    virtual QString humanAccount(const QString accountId) = 0;
 };
 
 // ---------------------------------------------------------------------------
@@ -260,9 +262,16 @@ public:
     */
     void generateKey(const QString& account);
 
+    /**
+     * Return a human-readable representation
+     * of an account identified by accountId
+     */
+    QString humanAccount(const QString accountId);
+
 private:
     OtrPolicy    m_otrPolicy;
     OtrInternal* m_impl;
+    OtrCallback* m_callback;
 };
 
 // ---------------------------------------------------------------------------

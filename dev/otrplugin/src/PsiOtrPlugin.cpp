@@ -535,6 +535,13 @@ void PsiOtrPlugin::startMessages()
     m_enabled = true;
 }
 
+//-----------------------------------------------------------------------------
+
+QString PsiOtrPlugin::humanAccount(const QString accountId)
+{
+    return getAccountNameById(accountId);
+}
+
 // ---------------------------------------------------------------------------
 
 int PsiOtrPlugin::getAccountIndexById(const QString& accountId)

@@ -57,7 +57,8 @@ Fingerprint::Fingerprint(unsigned char* fingerprint,
 
 OtrMessaging::OtrMessaging(OtrCallback* callback, OtrPolicy policy)
     : m_otrPolicy(policy),
-      m_impl(new OtrInternal(callback, m_otrPolicy))
+      m_impl(new OtrInternal(callback, m_otrPolicy)),
+      m_callback(callback)
 {
 }
 
@@ -184,6 +185,13 @@ OtrPolicy OtrMessaging::getPolicy()
 void OtrMessaging::generateKey(const QString& account)
 {
     m_impl->generateKey(account);
+}
+
+//-----------------------------------------------------------------------------
+
+QString OtrMessaging::humanAccount(const QString accountId)
+{
+    return m_callback->humanAccount(accountId);
 }
 
 //-----------------------------------------------------------------------------

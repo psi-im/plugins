@@ -80,7 +80,7 @@ void PsiOtrClosure::verifyFingerprint(bool)
 
     if (fingerprint.fingerprint != NULL)
     {
-        QString msg(tr("Account: ") + m_myAccount + "\n" +
+        QString msg(tr("Account: ") + m_otr->humanAccount(m_myAccount) + "\n" +
                     tr("User: ") + m_otherJid + "\n" +
                     tr("Fingerprint: ") + fingerprint.fingerprintHuman + "\n\n" +
                     tr("Have you verified that this is in fact the correct fingerprint?"));
@@ -117,8 +117,8 @@ void PsiOtrClosure::sessionID(bool)
     }
     else
     {
-        msg = tr("Session ID of connection from account %1 to %2 is:<br/>%3")
-                .arg(m_myAccount)
+        msg = tr("Session ID of connection from account \"%1\" to %2 is:<br/>%3")
+                .arg(m_otr->humanAccount(m_myAccount))
                 .arg(m_otherJid)
                 .arg(sId);
     }
@@ -143,15 +143,16 @@ void PsiOtrClosure::endSession(bool b)
 
 void PsiOtrClosure::fingerprint(bool)
 {
-    QString fingerprint =  m_otr->getPrivateKeys()
+    QString fingerprint = m_otr->getPrivateKeys()
                                     .value(m_myAccount,
-                                           tr("No private key for %1")
-                                             .arg(m_myAccount));
+                                           tr("No private key for account \"%1\"")
+                                             .arg(m_otr->humanAccount(m_myAccount)));
 
-    QString msg(tr("Fingerprint for account %1 is:\n%2"));
+    QString msg(tr("Fingerprint for account \"%1\" is:\n%2"));
 
     QMessageBox mb(QMessageBox::Information, tr("Psi OTR"),
-                   msg.arg(m_myAccount).arg(fingerprint),
+                   msg.arg(m_otr->humanAccount(m_myAccount))
+                      .arg(fingerprint),
                    NULL, static_cast<QWidget*>(m_parentWidget),
                    Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     mb.exec();

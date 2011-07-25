@@ -179,10 +179,9 @@ QString OtrInternal::encryptMessage(const QString& from, const QString& to,
     if (err != 0)
     {
         m_callback->notifyUser(psiotr::OTR_NOTIFY_ERROR, 
-                               QObject::tr("Encrypting message from %1 to %2 "
+                               QObject::tr("Encrypting message to %1 "
                                            "failed.\nThe message was not sent.")
-                                           .arg(QString(from))
-                                           .arg(QString(to)));
+                                           .arg(to));
         return QString();
     }
 
@@ -583,9 +582,10 @@ void OtrInternal::create_privkey(const char *accountname,
     keyGenerator.start();
     
     QMessageBox infoMb(QMessageBox::Information, QObject::tr("Psi OTR"),
-                       QObject::tr("Generating keys for account %1."
+                       QObject::tr("Generating keys for account \"%1\"."
                                    "\nThis may take a while.")
-                                   .arg(QString::fromUtf8(accountname)),
+                                   .arg(m_callback->humanAccount(
+                                            QString::fromUtf8(accountname))),
                        QMessageBox::Ok, NULL,
                        Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     infoMb.button(QMessageBox::Ok)->setEnabled(false);
@@ -606,17 +606,19 @@ void OtrInternal::create_privkey(const char *accountname,
                                  protocol) == NULL)
     {
         QMessageBox failMb(QMessageBox::Critical, QObject::tr("Psi OTR"),
-                           QObject::tr("Failed to generate key for account %1."
+                           QObject::tr("Failed to generate key for account \"%1\"."
                                        "\nThe OTR Plugin will not work.")
-                                       .arg(QString::fromUtf8(accountname)),
+                                       .arg(m_callback->humanAccount(
+                                                QString::fromUtf8(accountname))),
                            QMessageBox::Ok, NULL,
                            Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
         failMb.exec();
     }
     else
     {
-        infoMb.setText(QObject::tr("The fingerprint for account %1 is\n%2.")
-                                   .arg(QString::fromUtf8(accountname))
+        infoMb.setText(QObject::tr("The fingerprint for account %1 is\n%2")
+                                   .arg(m_callback->humanAccount(
+                                            QString::fromUtf8(accountname)))
                                    .arg(QString(fingerprint)));
     }
     infoMb.exec();
@@ -730,9 +732,10 @@ void OtrInternal::new_fingerprint(OtrlUserState us, const char *accountname,
     Q_UNUSED(protocol);
 
     m_callback->notifyUser(psiotr::OTR_NOTIFY_INFO,
-                           QObject::tr("Account %1 has received a new "
+                           QObject::tr("Account \"%1\" has received a new "
                                        "fingerprint from %2:\n%3")
-                                       .arg(QString::fromUtf8(accountname))
+                                       .arg(m_callback->humanAccount(
+                                                QString::fromUtf8(accountname)))
                                        .arg(QString::fromUtf8(username))
                                        .arg(humanFingerprint(fingerprint)));
 }

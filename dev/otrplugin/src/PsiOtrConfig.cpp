@@ -212,7 +212,7 @@ void FingerprintWidget::updateData()
     {
         QList<QStandardItem*> row;
         Fingerprint fp = fingerprintIt.next();
-        row.append(new QStandardItem(fp.account));
+        row.append(new QStandardItem(m_otr->humanAccount(fp.account)));
         row.append(new QStandardItem(fp.username));
         row.append(new QStandardItem(fp.fingerprintHuman));
         row.append(new QStandardItem(fp.trust));
@@ -243,7 +243,7 @@ void FingerprintWidget::forgetFingerprint()
         return;
     }
     QString msg(tr("Are you sure you want to delete the following fingerprint?") + "\n" +
-                tr("Account: ") + m_fingerprints[m_selectIndex.row()].account + "\n" +
+                tr("Account: ") + m_otr->humanAccount(m_fingerprints[m_selectIndex.row()].account) + "\n" +
                 tr("User: ") + m_fingerprints[m_selectIndex.row()].username + "\n" +
                 tr("Fingerprint: ") + m_fingerprints[m_selectIndex.row()].fingerprintHuman);
 
@@ -266,7 +266,8 @@ void FingerprintWidget::verifyFingerprint()
     {
         return;
     }
-    QString msg(tr("User: ") + m_fingerprints[m_selectIndex.row()].username + "\n" +
+    QString msg(tr("Account: ") + m_otr->humanAccount(m_fingerprints[m_selectIndex.row()].account) + "\n" +
+                tr("User: ") + m_fingerprints[m_selectIndex.row()].username + "\n" +
                 tr("Fingerprint: ") + m_fingerprints[m_selectIndex.row()].fingerprintHuman + "\n\n" +
                 tr("Have you verified that this is in fact the correct fingerprint?"));
 
@@ -320,7 +321,7 @@ PrivKeyWidget::PrivKeyWidget(OtrMessaging* otr, QWidget* parent)
     for (keyIt = privateKeys.begin(); keyIt != privateKeys.end(); ++keyIt)
     {
         QList<QStandardItem*> row;
-        row.append(new QStandardItem(keyIt.key()));
+        row.append(new QStandardItem(m_otr->humanAccount(keyIt.key())));
         row.append(new QStandardItem(keyIt.value()));
 
         tableModel->appendRow(row);
