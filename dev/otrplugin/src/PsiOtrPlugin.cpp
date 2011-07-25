@@ -478,14 +478,8 @@ QString PsiOtrPlugin::dataDir()
 void PsiOtrPlugin::sendMessage(const QString& account, const QString& toJid,
                                const QString& message)
 {
-    QString id;
-    int accountIndex = 0;
-    while (((id = m_accountInfo->getId(accountIndex)) != "-1") &&
-           (id != account))
-    {
-        accountIndex++;
-    }
-    if (id == account)
+    int accountIndex = getAccountIndexById(account);
+    if (accountIndex != -1)
     {
         m_senderHost->sendMessage(accountIndex, toJid, message, "", "chat");
     }
@@ -539,6 +533,34 @@ void PsiOtrPlugin::stopMessages()
 void PsiOtrPlugin::startMessages()
 {
     m_enabled = true;
+}
+
+// ---------------------------------------------------------------------------
+
+int PsiOtrPlugin::getAccountIndexById(const QString& accountId)
+{
+    QString id;
+    int accountIndex = 0;
+    while (((id = m_accountInfo->getId(accountIndex)) != "-1") &&
+           (id != accountId))
+    {
+        accountIndex++;
+    }
+    return (id == "-1")? -1 : accountIndex;
+}
+
+// ---------------------------------------------------------------------------
+
+QString PsiOtrPlugin::getAccountNameById(const QString& accountId)
+{
+    return m_accountInfo->getName(getAccountIndexById(accountId));
+}
+
+// ---------------------------------------------------------------------------
+
+QString PsiOtrPlugin::getAccountJidById(const QString& accountId)
+{
+    return m_accountInfo->getJid(getAccountIndexById(accountId));
 }
 
 // ---------------------------------------------------------------------------

@@ -134,6 +134,22 @@ public:
     virtual void stopMessages();
     virtual void startMessages();
 
+    // Helper methods
+    /**
+     * Returns the index of the account identified by accountId or -1
+     */
+    int getAccountIndexById(const QString& accountId);
+
+    /**
+     * Returns the name of the account identified by accountId or ""
+     */
+    QString getAccountNameById(const QString& accountId);
+
+    /**
+     * Returns the Jid of the account identified by accountId or "-1"
+     */
+    QString getAccountJidById(const QString& accountId);
+
 private:
     /**
      * Returns full Jid for private contacts,
