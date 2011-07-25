@@ -139,14 +139,6 @@ bool PsiOtrPlugin::enable()
     m_otrConnection = new OtrMessaging(this,
                                        static_cast<OtrPolicy>(policyOption.toInt()));
     m_enabled = true;
-
-    m_accountMap.clear();
-    QString id;
-    int accountNo = 0;
-    while ((id = m_accountInfo->getId(accountNo)) != "-1") {
-        m_accountMap[id] = accountNo++;
-    }
-
     return true;
 }
 
@@ -167,7 +159,6 @@ bool PsiOtrPlugin::disable()
     
     delete m_otrConnection;
     m_enabled = false;
-    m_accountMap.clear();
     return true;
 }
 
@@ -487,7 +478,17 @@ QString PsiOtrPlugin::dataDir()
 void PsiOtrPlugin::sendMessage(const QString& account, const QString& toJid,
                                const QString& message)
 {
-    m_senderHost->sendMessage(m_accountMap[account], toJid, message, "", "chat");
+    QString id;
+    int accountIndex = 0;
+    while (((id = m_accountInfo->getId(accountIndex)) != "-1") &&
+           (id != account))
+    {
+        accountIndex++;
+    }
+    if (id == account)
+    {
+        m_senderHost->sendMessage(accountIndex, toJid, message, "", "chat");
+    }
 }
 
 //-----------------------------------------------------------------------------
