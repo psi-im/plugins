@@ -223,12 +223,7 @@ void FingerprintWidget::updateData()
 
     m_table->setModel(m_tableModel);
 
-    m_table->setColumnWidth(0, 60);
-    m_table->setColumnWidth(1, 200);
-    m_table->setColumnWidth(2, 360);
-    m_table->setColumnWidth(3, 80);
-    m_table->setColumnWidth(4, 80);
-
+    m_table->resizeColumnsToContents();
 
     m_selectIndex = QModelIndex();
 }
@@ -331,8 +326,7 @@ PrivKeyWidget::PrivKeyWidget(OtrMessaging* otr, QWidget* parent)
     table->setShowGrid(true);
     table->setEditTriggers(0);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
-    table->setColumnWidth(0, 60);
-    table->setColumnWidth(1, 360);
+    table->resizeColumnsToContents();
 }
 
 //-----------------------------------------------------------------------------
