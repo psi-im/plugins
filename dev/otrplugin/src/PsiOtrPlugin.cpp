@@ -301,6 +301,12 @@ bool PsiOtrPlugin::processOutgoingMessage(int accountNo, const QString& toJid,
         getCorrectJid(accountNo, toJid),
         Qt::escape(body));
 
+    //if there has been an error, drop the message
+    if (encrypted.isEmpty())
+    {
+        return true;
+    }
+
     body = unescape(encrypted);
 
     return false;
