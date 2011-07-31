@@ -166,7 +166,6 @@ FingerprintWidget::FingerprintWidget(OtrMessaging* otr, QWidget* parent)
       m_otr(otr),
       m_table(new QTableView(this)),
       m_tableModel(new QStandardItemModel(this)),
-      m_selectIndex(),
       m_fingerprints()
 {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -177,8 +176,6 @@ FingerprintWidget::FingerprintWidget(OtrMessaging* otr, QWidget* parent)
     m_table->setShowGrid(true);
     m_table->setEditTriggers(0);
     m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
-    connect(m_table, SIGNAL(clicked(QModelIndex)),
-            SLOT(tableClicked(const QModelIndex&)));
     mainLayout->addWidget(m_table);
 
     QPushButton* forgetButton = new QPushButton(tr("Forget fingerprint"), this);
@@ -224,8 +221,6 @@ void FingerprintWidget::updateData()
     m_table->setModel(m_tableModel);
 
     m_table->resizeColumnsToContents();
-
-    m_selectIndex = QModelIndex();
 }
 
 //-----------------------------------------------------------------------------
@@ -233,60 +228,58 @@ void FingerprintWidget::updateData()
 
 void FingerprintWidget::forgetFingerprint()
 {
-    if (!m_selectIndex.isValid())
+    if (!m_table->selectionModel()->hasSelection())
     {
         return;
     }
-    QString msg(tr("Are you sure you want to delete the following fingerprint?") + "\n" +
-                tr("Account: ") + m_otr->humanAccount(m_fingerprints[m_selectIndex.row()].account) + "\n" +
-                tr("User: ") + m_fingerprints[m_selectIndex.row()].username + "\n" +
-                tr("Fingerprint: ") + m_fingerprints[m_selectIndex.row()].fingerprintHuman);
-
-    QMessageBox mb(QMessageBox::Question, tr("Psi OTR"), msg,
-                   QMessageBox::Yes | QMessageBox::No, this,
-                   Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
-
-    if (mb.exec() == QMessageBox::Yes)
+    foreach(QModelIndex selectIndex, m_table->selectionModel()->selectedRows())
     {
-        m_otr->deleteFingerprint(m_fingerprints[m_selectIndex.row()]);
-        updateData();
+        QString msg(tr("Are you sure you want to delete the following fingerprint?") + "\n" +
+                    tr("Account: ") + m_otr->humanAccount(m_fingerprints[selectIndex.row()].account) + "\n" +
+                    tr("User: ") + m_fingerprints[selectIndex.row()].username + "\n" +
+                    tr("Fingerprint: ") + m_fingerprints[selectIndex.row()].fingerprintHuman);
+
+        QMessageBox mb(QMessageBox::Question, tr("Psi OTR"), msg,
+                       QMessageBox::Yes | QMessageBox::No, this,
+                       Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+
+        if (mb.exec() == QMessageBox::Yes)
+        {
+            m_otr->deleteFingerprint(m_fingerprints[selectIndex.row()]);
+        }
     }
+    updateData();
 }
 
 //-----------------------------------------------------------------------------
 
 void FingerprintWidget::verifyFingerprint()
 {
-    if (!m_selectIndex.isValid())
+    if (!m_table->selectionModel()->hasSelection())
     {
         return;
     }
-    QString msg(tr("Account: ") + m_otr->humanAccount(m_fingerprints[m_selectIndex.row()].account) + "\n" +
-                tr("User: ") + m_fingerprints[m_selectIndex.row()].username + "\n" +
-                tr("Fingerprint: ") + m_fingerprints[m_selectIndex.row()].fingerprintHuman + "\n\n" +
-                tr("Have you verified that this is in fact the correct fingerprint?"));
-
-    QMessageBox mb(QMessageBox::Question, tr("Psi OTR"), msg,
-                   QMessageBox::Yes | QMessageBox::No, this,
-                   Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
-
-    if (mb.exec() == QMessageBox::Yes)
+    foreach(QModelIndex selectIndex, m_table->selectionModel()->selectedRows())
     {
-        m_otr->verifyFingerprint(m_fingerprints[m_selectIndex.row()], true);
-    }
-    else
-    {
-        m_otr->verifyFingerprint(m_fingerprints[m_selectIndex.row()], false);
-    }
+        QString msg(tr("Account: ") + m_otr->humanAccount(m_fingerprints[selectIndex.row()].account) + "\n" +
+                    tr("User: ") + m_fingerprints[selectIndex.row()].username + "\n" +
+                    tr("Fingerprint: ") + m_fingerprints[selectIndex.row()].fingerprintHuman + "\n\n" +
+                    tr("Have you verified that this is in fact the correct fingerprint?"));
 
+        QMessageBox mb(QMessageBox::Question, tr("Psi OTR"), msg,
+                       QMessageBox::Yes | QMessageBox::No, this,
+                       Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+
+        if (mb.exec() == QMessageBox::Yes)
+        {
+            m_otr->verifyFingerprint(m_fingerprints[selectIndex.row()], true);
+        }
+        else
+        {
+            m_otr->verifyFingerprint(m_fingerprints[selectIndex.row()], false);
+        }
+    }
     updateData();
-}
-
-//-----------------------------------------------------------------------------
-
-void FingerprintWidget::tableClicked(const QModelIndex& index)
-{
-    m_selectIndex = index;
 }
 
 //=============================================================================

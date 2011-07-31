@@ -103,13 +103,11 @@ private:
     OtrMessaging*       m_otr;
     QTableView*         m_table;
     QStandardItemModel* m_tableModel;
-    QModelIndex         m_selectIndex;
     QList<Fingerprint>  m_fingerprints;
 
 private slots:
     void forgetFingerprint();
     void verifyFingerprint();
-    void tableClicked(const QModelIndex& index);
 };
 
 // ---------------------------------------------------------------------------
