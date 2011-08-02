@@ -338,19 +338,19 @@ void OtrInternal::deleteFingerprint(const psiotr::Fingerprint& fingerprint)
 QHash<QString, QString> OtrInternal::getPrivateKeys()
 {
     QHash<QString, QString> privKeyList;
-    ConnContext* context;
+    OtrlPrivKey* privKey;
 
-    for (context = m_userstate->context_root; context != NULL;
-         context = context->next)
+    for (privKey = m_userstate->privkey_root; privKey != NULL;
+         privKey = privKey->next)
     {
         char fingerprintBuf[45];
         char* success = otrl_privkey_fingerprint(m_userstate,
                                                  fingerprintBuf,
-                                                 context->accountname,
+                                                 privKey->accountname,
                                                  OTR_PROTOCOL_STRING);
         if (success)
         {
-            privKeyList.insert(QString::fromUtf8(context->accountname),
+            privKeyList.insert(QString::fromUtf8(privKey->accountname),
                                QString(fingerprintBuf));
         }
     }
