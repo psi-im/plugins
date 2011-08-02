@@ -327,10 +327,14 @@ void OtrInternal::deleteFingerprint(const psiotr::Fingerprint& fingerprint)
                                                           0, NULL);
         if (fp != NULL)
         {
+            if (context->active_fingerprint == fp)
+            {
+                otrl_context_force_finished(context);
+            }
             otrl_context_forget_fingerprint(fp, true);
+            write_fingerprints();
         }
     }
-    write_fingerprints();
 }
 
 //-----------------------------------------------------------------------------
