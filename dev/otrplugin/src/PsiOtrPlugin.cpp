@@ -230,7 +230,7 @@ bool PsiOtrPlugin::processEvent(int accountNo, QDomElement& e)
                 decrypted = htmlTidy.output();
 
                 bodyText = decrypted;
-                bodyText.replace(QRegExp("\\r?\\n"), " ")
+                bodyText.replace(QRegExp(" ?\\n"), " ")
                         .replace(QRegExp("<br(?:\\s[^>]*)?/>"), "\n")
                         .replace(QRegExp("<b(?:\\s[^>]*)?>([^<]+)</b>"), "*\\1*")
                         .replace(QRegExp("<i(?:\\s[^>]*)?>([^<]+)</i>"), "/\\1/")
