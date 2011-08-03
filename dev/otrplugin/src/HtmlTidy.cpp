@@ -11,6 +11,7 @@ HtmlTidy::HtmlTidy(const QString& html)
 {
     tidyOptSetBool(m_tidyDoc, TidyXmlOut, yes);
     tidyOptSetValue(m_tidyDoc, TidyCharEncoding, "utf8");
+    tidyOptSetInt(m_tidyDoc, TidyNewline, TidyLF);
     tidyOptSetBool(m_tidyDoc, TidyForceOutput, yes);
 
     tidySetErrorBuffer(m_tidyDoc, &m_errorOutput);  
