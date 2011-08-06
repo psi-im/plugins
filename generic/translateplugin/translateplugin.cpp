@@ -34,7 +34,7 @@
 #define constNew "newsymbol"
 #define constShortCut "shortcut"
 #define constNotTranslate "nottranslate"
-#define constVersion "0.3.2"
+#define constVersion "0.4.0"
 
 class TranslatePlugin : public QObject, public PsiPlugin, public OptionAccessor, public ShortcutAccessor, public ActiveTabAccessor, public PluginInfoProvider
 {
@@ -75,6 +75,7 @@ private slots:
         void changeItem(int,int);
         void storeItem(QTableWidgetItem*);
         void restoreMap();
+	void hack();
 private:
         bool enabled_;
         bool notTranslate;
@@ -88,135 +89,23 @@ private:
         QString shortCut;
         QCheckBox *check_button;
         QString storage;
+	QPointer<QWidget> options_;
 
 };
 
 Q_EXPORT_PLUGIN(TranslatePlugin);
 
 TranslatePlugin::TranslatePlugin()
+	: enabled_(false)
+	, notTranslate(false)
+	, table(0)
+	, shortCutWidget(0)
+	, psiOptions(0)
+	, psiShortcuts(0)
+	, activeTab(0)
+	, shortCut("Alt+Ctrl+t")
+	, check_button(0)
 {
-        shortCut = "Alt+Ctrl+t";
-        enabled_ = false;
-        notTranslate = false;
-        table = 0;
-        psiOptions = 0;
-        shortCutWidget = 0;
-        check_button = 0;
-        activeTab = 0;
-}
-
-QString TranslatePlugin::name() const
-{
-        return "Translate Plugin";
-}
-
-QString TranslatePlugin::shortName() const
-{
-        return "Translate";
-}
-
-QString TranslatePlugin::version() const
-{
-        return constVersion;
-}
-
-QWidget* TranslatePlugin::options()
-{
-        if (!enabled_) {
-                return 0;
-        }
-        QWidget *optionsWid = new QWidget();
-        table = new QTableWidget(optionsWid);
-        table->setColumnCount(2);
-        QStringList header;
-        header <<tr("from")<<tr("to");
-        table->setHorizontalHeaderLabels(header);
-        table->verticalHeader()->setVisible(false);
-        table->setTextElideMode(Qt::ElideMiddle);
-        table->setSelectionBehavior(QAbstractItemView::SelectRows);
-        table->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        table->setEditTriggers(QAbstractItemView::DoubleClicked);
-        table->verticalHeader()->setDefaultSectionSize(20);
-        table->verticalHeader()->setMinimumSectionSize(20);
-        table->horizontalHeader()->setDefaultSectionSize(50);
-        table->horizontalHeader()->setMinimumSectionSize(20);
-        table->setColumnWidth(0,50);
-        table->setColumnWidth(1,50);
-        table->setMaximumWidth(120);
-        QHBoxLayout *hBox = new QHBoxLayout(optionsWid);
-        QVBoxLayout *leftSide = new QVBoxLayout;
-        leftSide->addWidget(table);
-        QHBoxLayout *buttonLayout = new QHBoxLayout;
-        QPushButton *addButton = new QPushButton(tr("Add"), optionsWid);
-        QPushButton *delButton = new QPushButton(tr("Delete"), optionsWid);
-        buttonLayout->addWidget(addButton);
-        buttonLayout->addWidget(delButton);
-        leftSide->addLayout(buttonLayout);
-        hBox->addLayout(leftSide);
-        QVBoxLayout *rightSide = new QVBoxLayout;
-        rightSide->addWidget(new QLabel(tr("ShortCut:")),5,Qt::AlignTop);
-        QHBoxLayout *shortBox = new QHBoxLayout;
-        shortCutWidget = new QLineEdit(optionsWid);
-        shortCutWidget->setFixedWidth(100);
-        shortCutWidget->setText(shortCut);
-        shortCutWidget->setDisabled(true);
-        QPushButton * modShortCut = new QPushButton(tr("Modify"), optionsWid);
-        shortBox->addWidget(shortCutWidget,0,Qt::AlignLeft);
-        shortBox->addWidget(modShortCut,200,Qt::AlignLeft);
-        rightSide->addLayout(shortBox,30);
-        check_button = new QCheckBox(tr("Not translating \"Nickname:\""), optionsWid);
-        check_button->setChecked(notTranslate);
-        check_button->setProperty("isOption",true);
-        rightSide->addWidget(check_button,30,Qt::AlignTop);
-        QPushButton *restoreButton = new QPushButton(tr("Restore Defaults Settings"), optionsWid);
-        restoreButton->setFixedWidth(220);
-        rightSide->addWidget(restoreButton,30,Qt::AlignBottom);
-	if (!map.isEmpty()) {
-		foreach(QString symbol, map.keys()){
-			table->insertRow(table->rowCount());
-			table->setItem(table->rowCount()-1,0,new QTableWidgetItem(symbol));
-			table->setItem(table->rowCount()-1,1,new QTableWidgetItem(map.value(symbol)));
-		}
-        }
-        hBox->addLayout(rightSide);
-        connect(delButton,SIGNAL(clicked()),this,SLOT(del()));
-        connect(addButton,SIGNAL(clicked()),this,SLOT(addToMap()));
-        connect(modShortCut,SIGNAL(clicked()),this,SLOT(grep()));
-        connect(restoreButton,SIGNAL(clicked()),this,SLOT(restoreMap()));
-        connect(table,SIGNAL(cellChanged(int,int)),this,SLOT(changeItem(int,int)));
-        connect(table,SIGNAL(itemDoubleClicked(QTableWidgetItem*)),this,SLOT(storeItem(QTableWidgetItem*)));
-        return optionsWid;
-}
-
-bool TranslatePlugin::enable()
-{
-        enabled_ = true;
-
-        QVariant vShortCut(shortCut);
-        vShortCut = psiOptions->getPluginOption(constShortCut);
-        if (!vShortCut.isNull()) {
-		shortCut = vShortCut.toString();
-        }
-        QVariant vNotTraslate(notTranslate);
-        vNotTraslate = psiOptions->getPluginOption(constNotTranslate);
-        if (!vNotTraslate.isNull()) {
-		notTranslate = vNotTraslate.toBool();
-        }
-        psiShortcuts->connectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
-	QVariant vOldSymbols(QStringList(map.keys()));
-	QVariant vNewSymbols(QStringList(map.values()));
-        vOldSymbols = psiOptions->getPluginOption(constOld);
-        vNewSymbols = psiOptions->getPluginOption(constNew);
-        int iterator = 0;
-        if (!vOldSymbols.isNull() && !vNewSymbols.isNull()) {
-		map.clear();
-		foreach(QString symbol, vOldSymbols.toStringList()){
-			map.insert(symbol,vNewSymbols.toStringList().at(iterator++));
-		}
-        }
-
-	map.clear();
-	mapBakup.clear();
 	map.insert("~",QString::fromUtf8("Ё")); map.insert(QString::fromUtf8("Ё"),"~");
 	map.insert("`",QString::fromUtf8("ё")); map.insert(QString::fromUtf8("ё"),"`");
 	map.insert("#",QString::fromUtf8("№")); map.insert(QString::fromUtf8("№"),"#");
@@ -291,7 +180,108 @@ bool TranslatePlugin::enable()
 	map.insert("|",QString::fromUtf8("/")); map.insert(QString::fromUtf8("/"),"|");
 	map.insert("/",QString::fromUtf8(".")); map.insert(QString::fromUtf8("."),"/");
 	map.insert(".",QString::fromUtf8("ю")); map.insert(QString::fromUtf8("ю"),".");
+
 	mapBakup = map;
+}
+
+QString TranslatePlugin::name() const
+{
+        return "Translate Plugin";
+}
+
+QString TranslatePlugin::shortName() const
+{
+        return "Translate";
+}
+
+QString TranslatePlugin::version() const
+{
+        return constVersion;
+}
+
+QWidget* TranslatePlugin::options()
+{
+        if (!enabled_) {
+                return 0;
+        }
+	options_ = new QWidget();
+	table = new QTableWidget(options_);
+	table->setColumnCount(2);
+	QStringList header;
+	header <<tr("from")<<tr("to");
+	table->setHorizontalHeaderLabels(header);
+	table->verticalHeader()->setVisible(false);
+	table->setTextElideMode(Qt::ElideMiddle);
+	table->setSelectionBehavior(QAbstractItemView::SelectRows);
+	table->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	table->setEditTriggers(QAbstractItemView::DoubleClicked);
+	table->verticalHeader()->setDefaultSectionSize(20);
+	table->verticalHeader()->setMinimumSectionSize(20);
+	table->horizontalHeader()->setDefaultSectionSize(50);
+	table->horizontalHeader()->setMinimumSectionSize(20);
+	table->setColumnWidth(0,50);
+	table->setColumnWidth(1,50);
+	table->setMaximumWidth(120);
+	QHBoxLayout *hBox = new QHBoxLayout(options_);
+	QVBoxLayout *leftSide = new QVBoxLayout;
+	leftSide->addWidget(table);
+	QHBoxLayout *buttonLayout = new QHBoxLayout;
+	QPushButton *addButton = new QPushButton(tr("Add"), options_);
+	QPushButton *delButton = new QPushButton(tr("Delete"), options_);
+	buttonLayout->addWidget(addButton);
+	buttonLayout->addWidget(delButton);
+	leftSide->addLayout(buttonLayout);
+	hBox->addLayout(leftSide);
+	QVBoxLayout *rightSide = new QVBoxLayout;
+	rightSide->addWidget(new QLabel(tr("ShortCut:")),5,Qt::AlignTop);
+	QHBoxLayout *shortBox = new QHBoxLayout;
+	shortCutWidget = new QLineEdit(options_);
+	shortCutWidget->setFixedWidth(100);
+	shortCutWidget->setText(shortCut);
+	shortCutWidget->setDisabled(true);
+	QPushButton * modShortCut = new QPushButton(tr("Modify"), options_);
+	shortBox->addWidget(shortCutWidget,0,Qt::AlignLeft);
+	shortBox->addWidget(modShortCut,200,Qt::AlignLeft);
+	rightSide->addLayout(shortBox,30);
+	check_button = new QCheckBox(tr("Not translating \"Nickname:\""), options_);
+	check_button->setChecked(notTranslate);
+	check_button->setProperty("isOption",true);
+	rightSide->addWidget(check_button,30,Qt::AlignTop);
+	QPushButton *restoreButton = new QPushButton(tr("Restore Defaults Settings"), options_);
+	restoreButton->setFixedWidth(220);
+	rightSide->addWidget(restoreButton,30,Qt::AlignBottom);
+	if (!map.isEmpty()) {
+		foreach(QString symbol, map.keys()){
+			table->insertRow(table->rowCount());
+			table->setItem(table->rowCount()-1,0,new QTableWidgetItem(symbol));
+			table->setItem(table->rowCount()-1,1,new QTableWidgetItem(map.value(symbol)));
+		}
+	}
+	hBox->addLayout(rightSide);
+	connect(delButton,SIGNAL(clicked()),this,SLOT(del()));
+	connect(addButton,SIGNAL(clicked()),this,SLOT(addToMap()));
+	connect(modShortCut,SIGNAL(clicked()),this,SLOT(grep()));
+	connect(restoreButton,SIGNAL(clicked()),this,SLOT(restoreMap()));
+	connect(table,SIGNAL(cellChanged(int,int)),this,SLOT(changeItem(int,int)));
+	connect(table,SIGNAL(itemDoubleClicked(QTableWidgetItem*)),this,SLOT(storeItem(QTableWidgetItem*)));
+	return options_;
+}
+
+bool TranslatePlugin::enable()
+{
+        enabled_ = true;
+
+	shortCut = psiOptions->getPluginOption(constShortCut, shortCut).toString();
+	notTranslate = psiOptions->getPluginOption(constNotTranslate, notTranslate).toBool();
+        psiShortcuts->connectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
+
+	QStringList oldList = psiOptions->getPluginOption(constOld, QStringList(map.keys())).toStringList();
+	QStringList newList = psiOptions->getPluginOption(constNew, QStringList(map.values())).toStringList();
+        int iterator = 0;
+	map.clear();
+	foreach(const QString& symbol, oldList){
+		map.insert(symbol, newList.at(iterator++));
+	}
 
         return true;
 }
@@ -303,17 +293,19 @@ bool TranslatePlugin::disable()
         return true;
 }
 
-void TranslatePlugin::trans(){
+void TranslatePlugin::trans()
+{
 	QTextEdit * ed = activeTab->getEditBox();
-	if (ed == 0){
+	if (!ed) {
 		return;
 	}
+
 	QString toReverse = ed->textCursor().selectedText();
 	bool isSelect = true;
 	QString nick("");
-	if (toReverse == ""){
+	if (toReverse.isEmpty()) {
 		toReverse = ed->toPlainText();
-		if (notTranslate){
+		if (notTranslate) {
 			int index = toReverse.indexOf(":") + 1;
 			nick = toReverse.left(index);
 			toReverse = toReverse.right(toReverse.size() - index);
@@ -323,16 +315,16 @@ void TranslatePlugin::trans(){
 	//запоминаем позицию курсора
 	int pos = ed->textCursor().position();
 	QString newString = "";
-	foreach(QString symbol,toReverse){
+	foreach(QString symbol, toReverse){
 		newString.append(map.value(symbol,symbol));
 	}
-	if (!isSelect){
+	if (!isSelect) {
 		ed->setPlainText(nick + newString);
 		//восстанавливаем позицию курсора
 		QTextCursor c = ed->textCursor();
 		c.setPosition( pos );
 		ed->setTextCursor( c );
-	}else{
+	} else {
 		int end = ed->textCursor().selectionEnd();
 		int start = ed->textCursor().selectionStart();
 		ed->textCursor().clearSelection();
@@ -349,13 +341,18 @@ void TranslatePlugin::trans(){
 	}
 }
 
-void TranslatePlugin::addToMap(){
-	if (table != 0){
-		if (table->currentRow() != -1){
-			table->insertRow(table->currentRow());
-		} else {
-			table->insertRow(0);
+void TranslatePlugin::addToMap()
+{
+	if (options_) {
+		int curRow = table->currentRow();
+		if (curRow == -1) {
+			curRow = 0;
 		}
+		table->insertRow(curRow);
+		table->setItem(curRow,0,new QTableWidgetItem());
+		table->setItem(curRow,1,new QTableWidgetItem());
+
+		hack();
 	}
 }
 
@@ -381,109 +378,114 @@ void TranslatePlugin::setShortcuts()
 	}
 }
 
-void TranslatePlugin::applyOptions() {
-        if (table == 0 || shortCutWidget == 0 || shortCutWidget->text() == "" || check_button == 0){
+void TranslatePlugin::applyOptions()
+{
+	if (!options_)
 		return;
-        }
-        QVariant vShortCut(shortCutWidget->text());
-        psiOptions->setPluginOption(constShortCut, vShortCut);
-        psiShortcuts->disconnectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
-        shortCut = vShortCut.toString();
+
+	psiShortcuts->disconnectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
+	shortCut = shortCutWidget->text();
+	psiOptions->setPluginOption(constShortCut, shortCut);
         psiShortcuts->connectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
-        QVariant vNotTranslate(check_button->isChecked());
-        psiOptions->setPluginOption(constNotTranslate, vNotTranslate);
-        notTranslate = vNotTranslate.toBool();
+
+	notTranslate = check_button->isChecked();
+	psiOptions->setPluginOption(constNotTranslate, notTranslate);
 
 	map.clear();
         int count = table->rowCount();
-        for (int row = 0 ; row < count; ++row){
-		if (table->item(row,0)->text() != "" && table->item(row,1)->text() != ""){
+	for (int row = 0 ; row < count; row++) {
+		if (!table->item(row,0)->text().isEmpty() && !table->item(row,1)->text().isEmpty()) {
 			map.insert(table->item(row,0)->text().left(1),table->item(row,1)->text());
 		}
         }
-	QVariant vOldSymbols(QStringList(map.keys()));
-        psiOptions->setPluginOption(constOld, vOldSymbols);
-	QVariant vNewSymbols(QStringList(map.values()));
-        psiOptions->setPluginOption(constNew, vNewSymbols);
+
+	psiOptions->setPluginOption(constOld, QStringList(map.keys()));
+	psiOptions->setPluginOption(constNew, QStringList(map.values()));
 }
 
-void TranslatePlugin::restoreOptions() {
-        if (table == 0 || shortCutWidget == 0 || check_button == 0){
+void TranslatePlugin::restoreOptions()
+{
+	if (!options_)
 		return;
-        }
-        QVariant vShort(shortCut);
-        vShort = psiOptions->getPluginOption(constShortCut);
-        if (!vShort.isNull()) {
-		shortCutWidget->setText(vShort.toString());
-        }
-        QVariant vNotTranslate(notTranslate);
-        vNotTranslate = psiOptions->getPluginOption(constNotTranslate);
-        if (!vNotTranslate.isNull()) {
-		check_button->setChecked(vNotTranslate.toBool());
-        }
-	QVariant vOldSymbols(QStringList(map.keys()));
-	QVariant vNewSymbols(QStringList(map.values()));
-        vOldSymbols = psiOptions->getPluginOption(constOld);
-        vNewSymbols = psiOptions->getPluginOption(constNew);
-        int iterator = 0;
-        if (!vOldSymbols.isNull() && !vNewSymbols.isNull()) {
-		foreach(QString symbol, vOldSymbols.toStringList()){
-			table->insertRow(table->rowCount());
-			table->setItem(table->rowCount()-1,0,new QTableWidgetItem(symbol));
-			table->setItem(table->rowCount()-1,1,new QTableWidgetItem(vNewSymbols.toStringList().at(++iterator)));
-		}
-        }
+
+
+	shortCutWidget->setText(shortCut);
+	check_button->setChecked(notTranslate);
+	foreach(const QString& symbol, map.keys()) {
+		table->insertRow(table->rowCount());
+		table->setItem(table->rowCount()-1,0,new QTableWidgetItem(symbol));
+		table->setItem(table->rowCount()-1,1,new QTableWidgetItem(map.value(symbol)));
+	}
 }
 
 
-void TranslatePlugin::del(){
-	if (table->currentRow() == -1){
+void TranslatePlugin::del()
+{
+	if (table->currentRow() == -1) {
 		return;
 	}
 	table->removeRow(table->currentRow());
+	hack();
 }
 
-void TranslatePlugin::grep(){
+void TranslatePlugin::grep()
+{
 	psiShortcuts->requestNewShortcut(this, SLOT(onNewShortcutKey(QKeySequence)));
 }
 
-void TranslatePlugin::onNewShortcutKey(QKeySequence ks){
+void TranslatePlugin::onNewShortcutKey(QKeySequence ks)
+{
 	shortCutWidget->setText(ks.toString(QKeySequence::NativeText));
 }
-void TranslatePlugin::changeItem(int row,int column){
-	if (column == 0 && storage != ""){
+
+void TranslatePlugin::changeItem(int row,int column)
+{
+	if (column == 0 && !storage.isEmpty()) {
 		//если первая колонка, то её менять нельзя, возвращаем старое значение
 		table->item(row,column)->setText(storage);
 	} else {
 		//иначе приравниваем ячейке значение первого символа
-		if (table->item(row,column)->text() == ""){
+		if (table->item(row,column)->text().isEmpty()) {
 			table->item(row,column)->setText(storage);
 		} else {
 			table->item(row,column)->setText(table->item(row,column)->text().left(1));
 		}
 	}
+	hack();
 }
 
-void TranslatePlugin::storeItem(QTableWidgetItem* item){
+void TranslatePlugin::storeItem(QTableWidgetItem* item)
+{
 	storage = item->text();
 }
 
-void TranslatePlugin::restoreMap(){
+void TranslatePlugin::restoreMap()
+{
 	disconnect(table,SIGNAL(cellChanged(int,int)),this,SLOT(changeItem(int,int)));
+	table->clear();
 	table->setRowCount(0);
-	foreach(QString symbol, mapBakup.keys()){
+	foreach(const QString& symbol, mapBakup.keys()){
 		table->insertRow(table->rowCount());
 		table->setItem(table->rowCount()-1,0,new QTableWidgetItem(symbol));
 		table->setItem(table->rowCount()-1,1,new QTableWidgetItem(mapBakup.value(symbol)));
 	}
 	connect(table,SIGNAL(cellChanged(int,int)),this,SLOT(changeItem(int,int)));
+	hack();
 }
 
-void TranslatePlugin::setActiveTabAccessingHost(ActiveTabAccessingHost* host){
+void TranslatePlugin::setActiveTabAccessingHost(ActiveTabAccessingHost* host)
+{
 	activeTab = host;
 }
 
-QString TranslatePlugin::pluginInfo() {
+void TranslatePlugin::hack()
+{
+	check_button->toggle();
+	check_button->toggle();
+}
+
+QString TranslatePlugin::pluginInfo()
+{
 	return tr("Author: ") +  "VampiRUS\n\n"
 			+ trUtf8("This plugin allows you to convert selected text into another language.\n");
 }

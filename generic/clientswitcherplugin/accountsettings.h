@@ -44,6 +44,7 @@ public:
 	bool enable_contacts;
 	bool enable_conferences;
 	bool lock_requ;
+	bool lock_time_requ;
 	int  show_requ_mode;
 	QString os_name;
 	QString client_name;

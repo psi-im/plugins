@@ -113,12 +113,8 @@ public:
 	// Popup accessor
 	virtual void setPopupAccessingHost(PopupAccessingHost*);
 
-
-	//virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
-
 private:
 	bool enabled_;
-	OptionAccessingHost *psiOptions;
 	ActiveTabAccessingHost *psiTab;
 	IconFactoryAccessingHost *psiIcon;
 	AccountInfoAccessingHost *psiAccInfo;
@@ -128,14 +124,6 @@ private:
 	SoundAccessingHost *psiSound;
 	PopupAccessingHost *psiPopup;
 	// --
-	QString soundStart;
-	QString soundFinish;
-	QString soundMove;
-	QString soundError;
-	bool dndDisable;
-	bool confDisable;
-	bool defSoundSettings;
-	//bool enableSound;
 	Ui::options ui_;
 
 private:
@@ -144,13 +132,12 @@ private:
 private slots:
 	void toolButtonPressed();
 	void menuActivated();
+	void doPsiEvent(int, QString, QString, QObject *, const char *);
 	void sendGameStanza(int account, const QString stanza);
-	void showInvitation(QString from);
 	void testSound();
 	void getSound();
 	void doPopup(const QString text);
 	void playSound(const QString);
-	void onCloseWindow();
 
 };
 

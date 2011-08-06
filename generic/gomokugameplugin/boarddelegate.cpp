@@ -189,7 +189,7 @@ void BoardDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
 			painter->drawRect(rect2);
 		}
 		// Отрисовка элемента
-		GameElement *el = model_->getGameElement(col - 2, row - 2);
+		const GameElement *el = model_->getGameElement(col, row);
 		if (el) {
 			el->paint(painter, rect);
 		}

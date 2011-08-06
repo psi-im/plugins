@@ -25,9 +25,6 @@
 
 #include <QHeaderView>
 
-#include <QDebug>
-#include <QTimer>
-
 #include "boardview.h"
 
 BoardView::BoardView(QWidget *parent) :

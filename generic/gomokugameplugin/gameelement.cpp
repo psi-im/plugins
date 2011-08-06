@@ -33,6 +33,15 @@ GameElement::GameElement(ElementType type, int x, int y)
 	++GameElement::usesCnt;
 }
 
+GameElement::GameElement(const GameElement *from)
+{
+	if (this == from)
+		return;
+	type_ = from->type();
+	posX = from->x();
+	posY = from->y();
+}
+
 GameElement::~GameElement()
 {
 	--GameElement::usesCnt;
@@ -63,12 +72,7 @@ GameElement::ElementType GameElement::type() const
 	return type_;
 }
 
-/*void GameElement::setType(ElementType tp)
-{
-	type_ = tp;
-}*/
-
-void GameElement::paint(QPainter *painter, const QRectF &rect)
+void GameElement::paint(QPainter *painter, const QRectF &rect) const
 {
 	if (type_ == TypeNone)
 		return;
@@ -91,7 +95,7 @@ int GameElement::usesCnt = 0;
 
 QPixmap *GameElement::blackstonePixmap = NULL;
 
-QPixmap *GameElement::getBlackstonePixmap()
+QPixmap *GameElement::getBlackstonePixmap() const
 {
 	if (!GameElement::blackstonePixmap) {
 		GameElement::blackstonePixmap = new QPixmap(":/gomokugameplugin/black-stone");
@@ -101,7 +105,7 @@ QPixmap *GameElement::getBlackstonePixmap()
 
 QPixmap *GameElement::whitestonePixmap = NULL;
 
-QPixmap *GameElement::getWhitestonePixmap()
+QPixmap *GameElement::getWhitestonePixmap() const
 {
 	if (!GameElement::whitestonePixmap) {
 		GameElement::whitestonePixmap = new QPixmap(":/gomokugameplugin/white-stone");

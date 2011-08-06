@@ -30,25 +30,15 @@
 #include <QStringList>
 
 #include "gameelement.h"
+#include "gamemodel.h"
 
 class BoardModel : public QAbstractTableModel
 {
 Q_OBJECT
 public:
-	enum GameStatus {
-		StatusNone,
-		StatusWaitingOpponent,
-		StatusWaitingAccept,
-		StatusThinking,
-		StatusEndGame,
-		StatusError,
-		StatusWin,
-		StatusLose,
-		StatusDraw
-	};
 	explicit BoardModel(QObject *parent = 0);
 	~BoardModel();
-	void init(GameElement::ElementType myElement);
+	void init(GameModel *gameModel);
 	virtual Qt::ItemFlags flags(const QModelIndex & index) const;
 	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -56,7 +46,7 @@ public:
 	virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
 	virtual int columnCount(const QModelIndex & parent = QModelIndex()) const;
 	// --
-	GameElement *getGameElement(int x, int y);
+	const GameElement *getGameElement(int x, int y);
 	bool clickToBoard(QModelIndex index);
 	bool opponentTurn(int x, int y);
 	void setAccept();
@@ -66,46 +56,26 @@ public:
 	void opponentDraw();
 	void setResign();
 	int  turnNum();
-	GameElement::ElementType elementType();
-	bool doSwitchColor(bool local_init);
+	bool doSwitchColor(bool local);
 	QString saveToString() const;
-	bool loadFromString(const QString settings, bool my_load);
 	void setSelect(int x, int y);
-	//--
+	GameElement::ElementType myElementType() const;
+
+public:
 	int selectX;
 	int selectY;
 
 private:
-	GameStatus gameStatus;
-	GameElement::ElementType myElement_;
-	int boardSizeX;
-	int boardSizeY;
 	int columnCount_;
 	int rowCount_;
-	QList<GameElement*> gameElements;
-	int lastX;
-	int lastY;
-	int turnsCount;
-	int blackCount;
-	int whiteCount;
-	bool loadGameFlag;
+	GameModel *gameModel;
 
 private:
-	void reset();
 	void setHeaders();
-	void setGameStatus(GameStatus status);
 	bool setElementToBoard(int x, int y, bool my_element);
-	int  getGameElementIndex(int x, int y) const;
-	bool setGameElement(GameElement* el);
-	bool checkGameForLose();
-	bool checkGameForDraw();
-
-private slots:
-	void setLose();
-	void setMyDraw();
 
 signals:
-	void changeGameStatus(BoardModel::GameStatus);
+	void changeGameStatus(GameModel::GameStatus);
 	void setupElement(int x, int y);
 	void lose();
 	void draw();

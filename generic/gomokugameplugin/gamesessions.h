@@ -28,6 +28,7 @@
 
 #include <QObject>
 #include <QPointer>
+#include <QDomElement>
 
 #include "pluginwindow.h"
 
@@ -47,37 +48,11 @@ public:
 	~GameSessions();
 	static GameSessions *instance();
 	static void reset();
+	bool processIncomingIqStanza(int accont, const QDomElement& xml, const QString &acc_status, bool conf_priv);
 	void invite(int account, const QString jid, const QStringList res_list, QWidget *parent = NULL);
-	bool incomingInvitation(int account, QString from, QString color, QString iq_id, QString proto_id);
-	void showInvitation(int account, QString from);
-	bool doResult(int account, QString from, QString iq_id);
-	bool doReject(int account, QString from, QString iq_id);
-	bool doTurnAction(int account, QString from, QString iq_id, QString value);
-	bool youWin(int account, QString from, QString iq_id);
-	bool setDraw(int account, QString from, QString iq_id);
-	bool closeRemoteGameBoard(int account, QString from, QString iq_id);
-	bool remoteLoad(int account, QString from, QString iq_id, QString value);
-	static bool saveWndPosition;
-	static bool saveWndWidthHeight;
-	static int  windowTop;
-	static int  windowLeft;
-	static int  windowWidth;
-	static int  windowHeight;
+	int  activeCount() const;
 
 private:
-	//enum RequestStatus {
-	//	OutDialog,
-	//	OutSend,
-	//	InDialog
-	//};
-	//struct Request {
-	//	RequestStatus status;
-	//	int           my_acc;
-	//	QString       jid;
-	//	QString       resource;
-	//	QString       id;
-	//	QString       element;
-	//};
 	enum SessionStatus {
 		StatusNone,
 		StatusInviteOutDialog,      // Окно приглашения с нашей стороны
@@ -95,13 +70,20 @@ private:
 		QString                last_iq_id;
 		QString                element;
 	};
-	//QList<Request> requests;
 	QList<GameSession> gameSessions;
 	int  stanzaId;
 	static GameSessions *instance_;
 	QString errorStr;
 
 private:
+	bool incomingInvitation(int account, QString from, QString color, QString iq_id);
+	bool doResult(int account, QString from, QString iq_id);
+	bool doReject(int account, QString from, QString iq_id);
+	bool doTurnAction(int account, QString from, QString iq_id, QString value);
+	bool youWin(int account, QString from, QString iq_id);
+	bool setDraw(int account, QString from, QString iq_id);
+	bool closeRemoteGameBoard(int account, QString from, QString iq_id);
+	bool remoteLoad(int account, QString from, QString iq_id, QString value);
 	bool regGameSession(SessionStatus status, int account, QString jid, QString id = "", QString element = "");
 	void startGame(int sess_index);
 	int  findGameSessionByWnd(QObject *wnd) const;
@@ -111,9 +93,10 @@ private:
 	bool removeGameSession(int account, const QString jid);
 	QString newId(bool big_add = false);
 	QString getLastError() const;
-	void sendErrorIq(int account, const QString jid, const QString id);
+	void sendErrorIq(int account, const QString jid, const QString id, const QString &/*err_str*/);
 
 private slots:
+	void showInvitation(QString from);
 	void doInviteDialog(int account, QString from);
 	void sendInvite(int account, QString full_jid, QString element);
 	void cancelInvite(int account, QString full_jid);
@@ -132,9 +115,9 @@ private slots:
 
 signals:
 	void sendStanza(int, QString);
+	void doInviteEvent(int, QString, QString, QObject *, const char *);
 	void doPopup(const QString);
 	void playSound(const QString);
-	void closeWindow();
 
 };
 

@@ -32,7 +32,7 @@
 
 Q_EXPORT_PLUGIN(ClientSwitcherPlugin);
 
-#define cVer                    "0.0.9"
+#define cVer                    "0.0.10"
 #define constPluginShortName    "clientswitcher"
 #define constPluginName         "Client Switcher Plugin"
 #define constForAllAcc          "for_all_acc"
@@ -181,7 +181,6 @@ QWidget* ClientSwitcherPlugin::options()
 		ui_options.cb_clientpreset->addItem(client_presets.at(i).name);
 	}
 	// Элементы для просмотра логов
-
 	QDir dir(logsDir);
 	int pos = -1;
 	foreach(QString file, dir.entryList(QDir::Files)) {
@@ -240,6 +239,12 @@ void ClientSwitcherPlugin::applyOptions() {
 	tmp_flag = ui_options.cb_lockrequ->isChecked();
 	if (as->lock_requ != tmp_flag) {
 		as->lock_requ = tmp_flag;
+		caps_updated = true;
+	}
+	// Блокировка запроса времени
+	tmp_flag = ui_options.cb_locktimerequ->isChecked();
+	if (as->lock_time_requ != tmp_flag) {
+		as->lock_time_requ = tmp_flag;
 		caps_updated = true;
 	}
 	// Уведомления при запросах версии
@@ -368,7 +373,7 @@ bool ClientSwitcherPlugin::incomingStanza(int account, const QDomElement& stanza
 		return false;
 	if (!as->enable_contacts && !as->enable_conferences)
 		return false;
-	if (as->lock_requ || !as->caps_node.isEmpty() || !as->caps_version.isEmpty()) {
+	if (as->lock_requ || as->lock_time_requ || !as->caps_node.isEmpty() || !as->caps_version.isEmpty()) {
 		if (stanza.tagName() == "iq" && stanza.attribute("type") == "get") {
 			if (isSkipStanza(as, account, stanza.attribute("from")))
 				return false;
@@ -459,7 +464,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 					// --- Ответ disco
 					if (isSkipStanza(as, account, s_to))
 						return false;
-					if (!as->lock_requ && as->caps_node.isEmpty() && as->caps_version.isEmpty())
+					if (!as->lock_requ && !as->lock_time_requ && as->caps_node.isEmpty() && as->caps_version.isEmpty())
 						return false;
 					// Подменяем ноду, если она есть
 					QString node = s_child.toElement().attribute("node");
@@ -479,26 +484,37 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 					int update = 0;
 					if (!as->lock_requ)
 						++update;
+					if (!as->lock_time_requ)
+						++update;
 					QDomNode ver_domnode;
+					QDomNode time_domnode;
 					QDomNode q_child = s_child.firstChild();
 					while (!q_child.isNull()) {
 						QString tag_name = q_child.toElement().tagName();
-						if (as->lock_requ && tag_name == "feature") {
-							if (q_child.toElement().attribute("var") == "jabber:iq:version") {
+						if (tag_name == "feature") {
+							if (as->lock_requ && q_child.toElement().attribute("var") == "jabber:iq:version") {
 								ver_domnode = q_child;
-								if (++update >= 2)
+								if (++update >= 3)
+									break;
+							} else if (as->lock_time_requ && q_child.toElement().attribute("var") == "urn:xmpp:time") {
+								time_domnode = q_child;
+								if (++update >= 3)
 									break;
 							}
 						} else if (tag_name == "identity") {
 							if (!q_child.toElement().attribute("name").isEmpty())
 								q_child.toElement().setAttribute("name", (!as->lock_requ) ? sender_->escape(as->client_name) : "unknow");
-							if (++update >= 2)
+							if (++update >= 3)
 								break;
 						}
 						q_child = q_child.nextSibling();
 					}
-					if (!s_child.isNull() && !ver_domnode.isNull())
-						s_child.removeChild(ver_domnode);
+					if (!s_child.isNull()) {
+						if (!ver_domnode.isNull())
+							s_child.removeChild(ver_domnode);
+						if (!time_domnode.isNull())
+							s_child.removeChild(time_domnode);
+					}
 				} else if (xmlns_str == "jabber:iq:version") {
 					// Ответ version
 					is_version_query = true;
@@ -589,9 +605,32 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 						err.appendChild(not_imp);
 						send_ver_list.push_back("feature-not-implemented");
 					}
-
 				}
 				break;
+			} else if (s_child.toElement().tagName() == "time") {
+				QString xmlns_str = s_child.namespaceURI();
+				if (xmlns_str == "urn:xmpp:time") {
+					// Ответ time
+					if (isSkipStanza(as, account, s_to))
+						break;
+					if (as->lock_time_requ) {
+						QDomDocument xmldoc = stanza.ownerDocument();
+						// Отклонение запроса, как будто не реализовано
+						stanza.setAttribute("type", "error");
+						QDomNode q_child = s_child.firstChild();
+						while (!q_child.isNull()) {
+							s_child.removeChild(q_child);
+							q_child = s_child.firstChild();
+						}
+						QDomElement err = xmldoc.createElement("error");
+						err.setAttribute("type", "cancel");
+						err.setAttribute("code", "501");
+						stanza.appendChild(err);
+						QDomElement not_imp = xmldoc.createElement("feature-not-implemented");
+						not_imp.setAttribute("xmlns", "urn:ietf:params:xml:ns:xmpp-stanzas");
+						err.appendChild(not_imp);
+					}
+				}
 			}
 			s_child = s_child.nextSibling();
 		}
@@ -675,6 +714,7 @@ void ClientSwitcherPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost*
 }
 
 // ----------------------- Private ------------------------------
+
 int ClientSwitcherPlugin::getOsTemplateIndex(QString &os_name)
 {
 	if (os_name.isEmpty())
@@ -819,6 +859,8 @@ void ClientSwitcherPlugin::restoreOptionsAcc(int acc_index)
 			ui_options.cb_conferencesenable->setChecked(as->enable_conferences);
 			// Блокировка запроса версии
 			ui_options.cb_lockrequ->setChecked(as->lock_requ);
+			// Блокировка запроса времени
+			ui_options.cb_locktimerequ->setChecked(as->lock_time_requ);
 			// Уведомления при запросах версии
 			ui_options.cmb_showrequ->setCurrentIndex(as->show_requ_mode);
 			// Ведение лога

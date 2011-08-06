@@ -30,10 +30,6 @@
 
 #define constPluginName         "Gomoku Game Plugin"
 #define constProtoType          "gomoku"
-#define constSoundStart         "soundstart"
-#define constSoundFinish        "soundfinish"
-#define constSoundMove          "soundmove"
-#define constSoundError         "sounderror"
 
 const QString horHeaderString = "ABCDEFGHJKLMNOP";
 

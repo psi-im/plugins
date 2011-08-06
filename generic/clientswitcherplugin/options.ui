@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>494</width>
-    <height>594</height>
+    <height>527</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -77,7 +77,14 @@
          <item>
           <widget class="QCheckBox" name="cb_lockrequ">
            <property name="text">
-            <string>Deny version iq</string>
+            <string>Deny iq version</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="cb_locktimerequ">
+           <property name="text">
+            <string>Deny iq time request</string>
            </property>
           </widget>
          </item>
@@ -314,14 +321,14 @@
         </layout>
        </item>
        <item>
-        <spacer name="verticalSpacer">
+        <spacer name="verticalSpacer_4">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>16</height>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -389,7 +396,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>17</height>
+       <height>1000</height>
       </size>
      </property>
     </spacer>
@@ -401,6 +408,7 @@
   <tabstop>cb_accounts</tabstop>
   <tabstop>cb_allaccounts</tabstop>
   <tabstop>cb_lockrequ</tabstop>
+  <tabstop>cb_locktimerequ</tabstop>
   <tabstop>cb_ospreset</tabstop>
   <tabstop>le_osname</tabstop>
   <tabstop>cb_clientpreset</tabstop>
