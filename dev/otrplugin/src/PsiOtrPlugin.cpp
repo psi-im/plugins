@@ -543,9 +543,16 @@ void PsiOtrPlugin::startMessages()
 
 //-----------------------------------------------------------------------------
 
-QString PsiOtrPlugin::humanAccount(const QString accountId)
+QString PsiOtrPlugin::humanAccount(const QString& accountId)
 {
     return getAccountNameById(accountId);
+}
+
+//-----------------------------------------------------------------------------
+
+QString PsiOtrPlugin::humanAccountPublic(const QString& accountId)
+{
+    return getAccountJidById(accountId);
 }
 
 // ---------------------------------------------------------------------------

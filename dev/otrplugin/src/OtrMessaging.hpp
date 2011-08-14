@@ -90,7 +90,8 @@ public:
     virtual void stopMessages() = 0;
     virtual void startMessages() = 0;
 
-    virtual QString humanAccount(const QString accountId) = 0;
+    virtual QString humanAccount(const QString& accountId) = 0;
+    virtual QString humanAccountPublic(const QString& accountId) = 0;
 };
 
 // ---------------------------------------------------------------------------

@@ -112,6 +112,10 @@ public:
     void still_secure(ConnContext *context, int is_reply);
     void log_message(const char *message);
 
+    const char* account_name(const char *account,
+                             const char *protocol);
+    void account_name_free(const char *account_name);
+
 
     /*** static otr callback wrapper-functions ***/
     static OtrlPolicy cb_policy(void *opdata, ConnContext *context);
@@ -141,6 +145,8 @@ public:
     static void cb_still_secure(void *opdata, ConnContext *context, int is_reply);
     static void cb_log_message(void *opdata, const char *message);
     
+    static const char* cb_account_name(void *opdata, const char *account, const char *protocol);
+    static void cb_account_name_free(void *opdata, const char *account_name);
 private:
 
     /** 

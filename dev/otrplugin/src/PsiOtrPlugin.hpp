@@ -133,7 +133,8 @@ public:
     virtual void notifyUser(const OtrNotifyType& type, const QString& message);
     virtual void stopMessages();
     virtual void startMessages();
-    virtual QString humanAccount(QString accountId);
+    virtual QString humanAccount(const QString& accountId);
+    virtual QString humanAccountPublic(const QString& accountId);
 
     // Helper methods
     /**

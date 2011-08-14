@@ -144,10 +144,10 @@ OtrInternal::OtrInternal(psiotr::OtrCallback* callback,
     m_uiOps.still_secure        = (*OtrInternal::cb_still_secure);
     m_uiOps.log_message         = (*OtrInternal::cb_log_message);
 
-#if not (OTRL_VERSION_MAJOR==3 && OTRL_VERSION_MINOR==0)
-    m_uiOps.max_message_size = NULL;
-    m_uiOps.account_name = NULL;
-    m_uiOps.account_name_free = NULL;
+#if (OTRL_VERSION_MAJOR>3 || (OTRL_VERSION_MAJOR==3 && OTRL_VERSION_MINOR>=2))
+    m_uiOps.max_message_size  = NULL;
+    m_uiOps.account_name      = (*OtrInternal::cb_account_name);
+    m_uiOps.account_name_free = (*OtrInternal::cb_account_name_free);
 #endif
 
     otrl_privkey_read(m_userstate, m_keysFile.toUtf8().data());
@@ -775,10 +775,26 @@ void OtrInternal::still_secure(ConnContext *context, int is_reply)
 }
 
 // ---------------------------------------------------------------------------
-    
+
 void OtrInternal::log_message(const char *message)
 {
     Q_UNUSED(message);
+}
+
+// ---------------------------------------------------------------------------
+
+const char* OtrInternal::account_name(const char *account,
+                                      const char *protocol)
+{
+    Q_UNUSED(protocol);
+    return m_callback->humanAccountPublic(QString::fromUtf8(account)).toUtf8().data();
+}
+
+// ---------------------------------------------------------------------------
+
+void OtrInternal::account_name_free(const char *account_name)
+{
+    Q_UNUSED(account_name);
 }
 
 // ---------------------------------------------------------------------------
@@ -842,6 +858,15 @@ void OtrInternal::cb_still_secure(void *opdata, ConnContext *context, int is_rep
     
 void OtrInternal::cb_log_message(void *opdata, const char *message) {
     static_cast<OtrInternal*>(opdata)->log_message(message);
+}
+
+const char* OtrInternal::cb_account_name(void *opdata, const char *account,
+                                         const char *protocol) {
+    return static_cast<OtrInternal*>(opdata)->account_name(account, protocol);
+}
+
+void OtrInternal::cb_account_name_free(void *opdata, const char *account_name) {
+    static_cast<OtrInternal*>(opdata)->account_name_free(account_name);
 }
 
 // ---------------------------------------------------------------------------
