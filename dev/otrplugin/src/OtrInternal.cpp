@@ -104,7 +104,7 @@ public:
     
     void run()
     {
-        otrl_privkey_generate(m_userstate, m_keysFile.toUtf8().data(),
+        otrl_privkey_generate(m_userstate, m_keysFile.toUtf8().constData(),
                               m_accountname, m_protocol);
     }
 
@@ -150,9 +150,9 @@ OtrInternal::OtrInternal(psiotr::OtrCallback* callback,
     m_uiOps.account_name_free = (*OtrInternal::cb_account_name_free);
 #endif
 
-    otrl_privkey_read(m_userstate, m_keysFile.toUtf8().data());
+    otrl_privkey_read(m_userstate, m_keysFile.toUtf8().constData());
     otrl_privkey_read_fingerprints(m_userstate,
-                                   m_fingerprintFile.toUtf8().data(),
+                                   m_fingerprintFile.toUtf8().constData(),
                                    NULL, NULL);
 }
 
@@ -166,15 +166,15 @@ OtrInternal::~OtrInternal()
 //-----------------------------------------------------------------------------
 
 QString OtrInternal::encryptMessage(const QString& from, const QString& to,
-                                      const QString& message)
+                                    const QString& message)
 {
     char* encMessage = NULL;
     gcry_error_t err;
 
     err = otrl_message_sending(m_userstate, &m_uiOps, this,
-                               from.toUtf8().data(), OTR_PROTOCOL_STRING,
-                               to.toUtf8().data(),
-                               message.toUtf8().data(),
+                               from.toUtf8().constData(), OTR_PROTOCOL_STRING,
+                               to.toUtf8().constData(),
+                               message.toUtf8().constData(),
                                NULL, &encMessage, NULL, NULL);
     if (err != 0)
     {
@@ -206,17 +206,17 @@ bool OtrInternal::decryptMessage(const QString& from, const QString& to,
     char *newMessage = NULL;
 
     ignoreMessage = otrl_message_receiving(m_userstate, &m_uiOps, this,
-                                           to.toUtf8().data(),
+                                           to.toUtf8().constData(),
                                            OTR_PROTOCOL_STRING,
-                                           from.toUtf8().data(),
-                                           cryptedMessage.toUtf8().data(),
+                                           from.toUtf8().constData(),
+                                           cryptedMessage.toUtf8().constData(),
                                            &newMessage,
                                            NULL, NULL, NULL);
 
     if (ignoreMessage == 1) // internal protocol message
     {
         OtrlMessageType type = otrl_proto_message_type(
-                cryptedMessage.toUtf8().data());
+                cryptedMessage.toUtf8().constData());
 
 
         decrypted = QObject::tr("Received %1 [%2]")
@@ -286,8 +286,8 @@ void OtrInternal::verifyFingerprint(const psiotr::Fingerprint& fingerprint,
                                     bool verified)
 {
     ConnContext* context = otrl_context_find(m_userstate,
-                                             fingerprint.username.toUtf8().data(),
-                                             fingerprint.account.toUtf8().data(),
+                                             fingerprint.username.toUtf8().constData(),
+                                             fingerprint.account.toUtf8().constData(),
                                              OTR_PROTOCOL_STRING, false,
                                              NULL, NULL, NULL);
     if (context != NULL)
@@ -316,8 +316,8 @@ void OtrInternal::verifyFingerprint(const psiotr::Fingerprint& fingerprint,
 void OtrInternal::deleteFingerprint(const psiotr::Fingerprint& fingerprint)
 {
     ConnContext* context = otrl_context_find(m_userstate,
-                                             fingerprint.username.toUtf8().data(),
-                                             fingerprint.account.toUtf8().data(),
+                                             fingerprint.username.toUtf8().constData(),
+                                             fingerprint.account.toUtf8().constData(),
                                              OTR_PROTOCOL_STRING, false,
                                              NULL, NULL, NULL);
     if (context != NULL)
@@ -368,14 +368,14 @@ void OtrInternal::startSession(const QString& account, const QString& jid)
 {
     char fingerprint[45];
     if (!otrl_privkey_fingerprint(m_userstate, fingerprint,
-                                  account.toUtf8().data(), 
+                                  account.toUtf8().constData(), 
                                   OTR_PROTOCOL_STRING))
     {
-        create_privkey(account.toUtf8().data(), OTR_PROTOCOL_STRING);
+        create_privkey(account.toUtf8().constData(), OTR_PROTOCOL_STRING);
     }
 
     //TODO: make allowed otr versions configureable
-    char* msg = otrl_proto_default_query_msg(account.toUtf8().data(),
+    char* msg = otrl_proto_default_query_msg(account.toUtf8().constData(),
                                              OTRL_POLICY_DEFAULT);
 
     m_callback->sendMessage(account, jid, QString::fromUtf8(msg));
@@ -386,8 +386,8 @@ void OtrInternal::startSession(const QString& account, const QString& jid)
 void OtrInternal::endSession(const QString& account, const QString& jid)
 {
     otrl_message_disconnect(m_userstate, &m_uiOps, this, 
-                            account.toUtf8().data(), OTR_PROTOCOL_STRING,
-                            jid.toUtf8().data());
+                            account.toUtf8().constData(), OTR_PROTOCOL_STRING,
+                            jid.toUtf8().constData());
 }
 
 //-----------------------------------------------------------------------------
@@ -396,8 +396,8 @@ psiotr::OtrMessageState OtrInternal::getMessageState(const QString& thisJid,
                                                      const QString& remoteJid)
 {
     ConnContext* context = otrl_context_find(m_userstate,
-                                             remoteJid.toUtf8().data(),
-                                             thisJid.toUtf8().data(),
+                                             remoteJid.toUtf8().constData(),
+                                             thisJid.toUtf8().constData(),
                                              OTR_PROTOCOL_STRING, false, NULL, NULL,
                                              NULL);
     if (context != NULL)
@@ -448,8 +448,8 @@ QString OtrInternal::getSessionId(const QString& thisJid,
                                   const QString& remoteJid)
 {
     ConnContext* context;
-    context = otrl_context_find(m_userstate, remoteJid.toUtf8().data(),
-                                thisJid.toUtf8().data(), OTR_PROTOCOL_STRING,
+    context = otrl_context_find(m_userstate, remoteJid.toUtf8().constData(),
+                                thisJid.toUtf8().constData(), OTR_PROTOCOL_STRING,
                                 false, NULL, NULL, NULL);
     if ((context != NULL) &&
         (context->sessionid_len > 0))
@@ -494,8 +494,8 @@ psiotr::Fingerprint OtrInternal::getActiveFingerprint(const QString& thisJid,
                                                       const QString& remoteJid)
 {
     ConnContext* context;
-    context = otrl_context_find(m_userstate, remoteJid.toUtf8().data(),
-                                thisJid.toUtf8().data(), OTR_PROTOCOL_STRING,
+    context = otrl_context_find(m_userstate, remoteJid.toUtf8().constData(),
+                                thisJid.toUtf8().constData(), OTR_PROTOCOL_STRING,
                                 false, NULL, NULL, NULL);
 
     if ((context != NULL) &&
@@ -519,8 +519,8 @@ bool OtrInternal::isVerified(const QString& thisJid,
                              const QString& remoteJid)
 {
     ConnContext* context;
-    context = otrl_context_find(m_userstate, remoteJid.toUtf8().data(),
-                                thisJid.toUtf8().data(), OTR_PROTOCOL_STRING,
+    context = otrl_context_find(m_userstate, remoteJid.toUtf8().constData(),
+                                thisJid.toUtf8().constData(), OTR_PROTOCOL_STRING,
                                 false, NULL, NULL, NULL);
 
     if ((context != NULL) &&
@@ -536,8 +536,8 @@ bool OtrInternal::isVerified(const QString& thisJid,
 
 void OtrInternal::generateKey(const QString& account)
 {
-    otrl_privkey_generate(m_userstate, m_keysFile.toUtf8().data(),
-                          account.toUtf8().data(), OTR_PROTOCOL_STRING);
+    otrl_privkey_generate(m_userstate, m_keysFile.toUtf8().constData(),
+                          account.toUtf8().constData(), OTR_PROTOCOL_STRING);
 }
 
 //-----------------------------------------------------------------------------
@@ -749,7 +749,7 @@ void OtrInternal::new_fingerprint(OtrlUserState us, const char *accountname,
 void OtrInternal::write_fingerprints()
 {
     otrl_privkey_write_fingerprints(m_userstate,
-                                    m_fingerprintFile.toUtf8().data());
+                                    m_fingerprintFile.toUtf8().constData());
 }
 
 // ---------------------------------------------------------------------------
@@ -787,7 +787,7 @@ const char* OtrInternal::account_name(const char *account,
                                       const char *protocol)
 {
     Q_UNUSED(protocol);
-    return m_callback->humanAccountPublic(QString::fromUtf8(account)).toUtf8().data();
+    return m_callback->humanAccountPublic(QString::fromUtf8(account)).toUtf8().constData();
 }
 
 // ---------------------------------------------------------------------------
