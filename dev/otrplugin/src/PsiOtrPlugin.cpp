@@ -63,11 +63,28 @@ QString removeResource(const QString& aJid)
  */
 QString unescape(const QString& escaped)
 {
-    QString plain = escaped;
+    QString plain(escaped);
     plain.replace("&lt;", "<")
          .replace("&gt;", ">")
          .replace("&quot;", "\"")
          .replace("&amp;", "&");
+    return plain;
+}
+
+// ---------------------------------------------------------------------------
+
+/**
+ * Converts HTML to plaintext
+ */
+QString htmlToPlain(const QString& html)
+{
+    QString plain(html);
+    plain.replace(QRegExp(" ?\\n"), " ")
+         .replace(QRegExp("<br(?:\\s[^>]*)?/>"), "\n")
+         .replace(QRegExp("<b(?:\\s[^>]*)?>([^<]+)</b>"), "*\\1*")
+         .replace(QRegExp("<i(?:\\s[^>]*)?>([^<]+)</i>"), "/\\1/")
+         .replace(QRegExp("<u(?:\\s[^>]*)?>([^<]+)</u>"), "_\\1_")
+         .remove(QRegExp("<[^>]*>"));
     return plain;
 }
 
@@ -229,13 +246,7 @@ bool PsiOtrPlugin::processEvent(int accountNo, QDomElement& e)
                                   decrypted + "</body>");
                 decrypted = htmlTidy.output();
 
-                bodyText = decrypted;
-                bodyText.replace(QRegExp(" ?\\n"), " ")
-                        .replace(QRegExp("<br(?:\\s[^>]*)?/>"), "\n")
-                        .replace(QRegExp("<b(?:\\s[^>]*)?>([^<]+)</b>"), "*\\1*")
-                        .replace(QRegExp("<i(?:\\s[^>]*)?>([^<]+)</i>"), "/\\1/")
-                        .replace(QRegExp("<u(?:\\s[^>]*)?>([^<]+)</u>"), "_\\1_")
-                        .remove(QRegExp("<[^>]*>"));
+                bodyText = htmlToPlain(decrypted);
 
                 // replace html body
                 if (htmlElement.isNull())
@@ -487,7 +498,8 @@ void PsiOtrPlugin::sendMessage(const QString& account, const QString& toJid,
     int accountIndex = getAccountIndexById(account);
     if (accountIndex != -1)
     {
-        m_senderHost->sendMessage(accountIndex, toJid, message, "", "chat");
+        m_senderHost->sendMessage(accountIndex, toJid,
+                                  htmlToPlain(message), "", "chat");
     }
 }
 
