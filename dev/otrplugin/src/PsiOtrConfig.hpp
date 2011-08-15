@@ -122,8 +122,17 @@ Q_OBJECT
 public:
     PrivKeyWidget(OtrMessaging* otr, QWidget* parent);
 
+protected:
+    void updateData();
+
 private:
-    OtrMessaging* m_otr;
+    OtrMessaging*           m_otr;
+    QTableView*             m_table;
+    QStandardItemModel*     m_tableModel;
+    QHash<QString, QString> m_keys;
+
+private slots:
+    void forgetKey();
 };
 
 //-----------------------------------------------------------------------------

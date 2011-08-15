@@ -286,40 +286,85 @@ void FingerprintWidget::verifyFingerprint()
 
 PrivKeyWidget::PrivKeyWidget(OtrMessaging* otr, QWidget* parent)
     : QWidget(parent),
-      m_otr(otr)
+      m_otr(otr),
+      m_table(new QTableView(this)),
+      m_tableModel(new QStandardItemModel(this)),
+      m_keys()
 {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
-    QTableView* table = new QTableView(this);
-    QStandardItemModel* tableModel = new QStandardItemModel(this);
     
     QLabel* label = new QLabel(tr("My private keys:"), this);
     mainLayout->addWidget(label);
 
-    mainLayout->addWidget(table);
+    mainLayout->addWidget(m_table);
+
+    QPushButton* forgetButton = new QPushButton(tr("Forget Key"), this);
+    connect(forgetButton,SIGNAL(clicked()),SLOT(forgetKey()));
+    QHBoxLayout* buttonLayout = new QHBoxLayout();
+    buttonLayout->addWidget(forgetButton);
+
+    mainLayout->addLayout(buttonLayout);
 
     setLayout(mainLayout);
 
-    tableModel->setColumnCount(2);
-    tableModel->setHorizontalHeaderLabels(QStringList() << tr("Account")
-                                          << tr("Fingerprint"));
+    m_table->setShowGrid(true);
+    m_table->setEditTriggers(0);
+    m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-    QHash<QString, QString> privateKeys = m_otr->getPrivateKeys();
-    
+    updateData();
+}
+
+//-----------------------------------------------------------------------------
+
+void PrivKeyWidget::updateData()
+{
+    m_tableModel->clear();
+    m_tableModel->setColumnCount(2);
+    m_tableModel->setHorizontalHeaderLabels(QStringList() << tr("Account")
+                                                          << tr("Fingerprint"));
+
+    m_keys = m_otr->getPrivateKeys();
     QHash<QString, QString>::iterator keyIt;
-    for (keyIt = privateKeys.begin(); keyIt != privateKeys.end(); ++keyIt)
+    for (keyIt = m_keys.begin(); keyIt != m_keys.end(); ++keyIt)
     {
         QList<QStandardItem*> row;
         row.append(new QStandardItem(m_otr->humanAccount(keyIt.key())));
         row.append(new QStandardItem(keyIt.value()));
 
-        tableModel->appendRow(row);
+        m_tableModel->appendRow(row);
     }
 
-    table->setModel(tableModel);
-    table->setShowGrid(true);
-    table->setEditTriggers(0);
-    table->setSelectionBehavior(QAbstractItemView::SelectRows);
-    table->resizeColumnsToContents();
+    m_table->setModel(m_tableModel);
+
+    m_table->resizeColumnsToContents();
+}
+
+//-----------------------------------------------------------------------------
+
+void PrivKeyWidget::forgetKey()
+{
+    if (!m_table->selectionModel()->hasSelection())
+    {
+        return;
+    }
+    foreach(QModelIndex selectIndex, m_table->selectionModel()->selectedRows(1))
+    {
+        QString fpr(m_tableModel->item(selectIndex.row(), 1)->text());
+        QString account(m_keys.key(fpr));
+        QString msg(tr("Are you sure you want to delete the following private key?") + "\n" +
+                    tr("Account: ") + m_otr->humanAccount(account) + "\n" +
+                    tr("Fingerprint: ") + fpr);
+
+        QMessageBox mb(QMessageBox::Question, tr("Psi OTR"), msg,
+                       QMessageBox::Yes | QMessageBox::No, this,
+                       Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+
+        if (mb.exec() == QMessageBox::Yes)
+        {
+            m_otr->deleteKey(account);
+        }
+    }
+    updateData();
 }
 
 //-----------------------------------------------------------------------------

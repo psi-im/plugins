@@ -364,6 +364,19 @@ QHash<QString, QString> OtrInternal::getPrivateKeys()
 
 //-----------------------------------------------------------------------------
 
+void OtrInternal::deleteKey(const QString& account)
+{
+    OtrlPrivKey *privKey = otrl_privkey_find(m_userstate,
+                                             account.toUtf8().constData(),
+                                             OTR_PROTOCOL_STRING);
+
+    otrl_privkey_forget(privKey);
+
+    otrl_privkey_write(m_userstate, m_keysFile.toUtf8().constData());
+}
+
+//-----------------------------------------------------------------------------
+
 void OtrInternal::startSession(const QString& account, const QString& jid)
 {
     char fingerprint[45];

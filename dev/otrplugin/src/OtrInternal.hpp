@@ -35,6 +35,7 @@ extern "C"
 #include <libotr/proto.h>
 #include <libotr/message.h>
 #include <libotr/privkey.h>
+#include "otrl_extensions.h"
 }
 
 class QString;
@@ -66,6 +67,8 @@ public:
     void deleteFingerprint(const psiotr::Fingerprint& fingerprint);
 
     QHash<QString, QString> getPrivateKeys();
+
+    void deleteKey(const QString& account);
 
     void startSession(const QString& account, const QString& jid);
     

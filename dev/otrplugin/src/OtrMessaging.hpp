@@ -209,6 +209,11 @@ public:
     QHash<QString, QString> getPrivateKeys();
 
     /** 
+    * Delete a private key.
+    */
+    void deleteKey(const QString& account);
+
+    /** 
     * Send an OTR query message from account to jid.
     */
     void startSession(const QString& account, const QString& jid);

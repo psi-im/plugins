@@ -116,6 +116,13 @@ QHash<QString, QString> OtrMessaging::getPrivateKeys()
 
 //-----------------------------------------------------------------------------
 
+void OtrMessaging::deleteKey(const QString& account)
+{
+    m_impl->deleteKey(account);
+}
+
+//-----------------------------------------------------------------------------
+
 void OtrMessaging::startSession(const QString& account, const QString& jid)
 {
     m_impl->startSession(account, jid);
