@@ -72,7 +72,6 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
       m_polRequire(0)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->addWidget(new QLabel(tr("OTR Configuration:"), this));
 
     QGroupBox* policyGroup = new QGroupBox(tr("OTR Policy"), this);
     QVBoxLayout* policyLayout = new QVBoxLayout(policyGroup);
@@ -169,9 +168,6 @@ FingerprintWidget::FingerprintWidget(OtrMessaging* otr, QWidget* parent)
       m_fingerprints()
 {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
-
-    QLabel* label = new QLabel(tr("Fingerprints"), this);
-    mainLayout->addWidget(label);
 
     m_table->setShowGrid(true);
     m_table->setEditTriggers(0);
@@ -292,9 +288,6 @@ PrivKeyWidget::PrivKeyWidget(OtrMessaging* otr, QWidget* parent)
       m_keys()
 {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
-    
-    QLabel* label = new QLabel(tr("My private keys:"), this);
-    mainLayout->addWidget(label);
 
     mainLayout->addWidget(m_table);
 
