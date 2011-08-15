@@ -549,8 +549,7 @@ bool OtrInternal::isVerified(const QString& thisJid,
 
 void OtrInternal::generateKey(const QString& account)
 {
-    otrl_privkey_generate(m_userstate, m_keysFile.toUtf8().constData(),
-                          account.toUtf8().constData(), OTR_PROTOCOL_STRING);
+    create_privkey(account.toUtf8().constData(), OTR_PROTOCOL_STRING);
 }
 
 //-----------------------------------------------------------------------------

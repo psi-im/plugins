@@ -144,7 +144,7 @@ QWidget* PsiOtrPlugin::options()
     }
     else
     {
-        return new ConfigDialog(m_otrConnection, m_optionHost);
+        return new ConfigDialog(m_otrConnection, m_optionHost, m_accountInfo);
     }
 } 
 

@@ -20,6 +20,7 @@
 
 #include "PsiOtrConfig.hpp"
 #include "optionaccessinghost.h"
+#include "accountinfoaccessinghost.h"
 
 #include <QCheckBox>
 #include <QGroupBox>
@@ -38,10 +39,12 @@ namespace psiotr
 //-----------------------------------------------------------------------------
 
 ConfigDialog::ConfigDialog(OtrMessaging* otr, OptionAccessingHost* optionHost,
+                           AccountInfoAccessingHost* accountInfo,
                            QWidget* parent)
     : QWidget(parent),
       m_otr(otr),
-      m_optionHost(optionHost)
+      m_optionHost(optionHost),
+      m_accountInfo(accountInfo)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     QTabWidget* tabWidget = new QTabWidget(this);
@@ -49,7 +52,7 @@ ConfigDialog::ConfigDialog(OtrMessaging* otr, OptionAccessingHost* optionHost,
     tabWidget->addTab(new FingerprintWidget(m_otr, tabWidget),
                       tr("Known fingerprints"));
 
-    tabWidget->addTab(new PrivKeyWidget(m_otr, tabWidget),
+    tabWidget->addTab(new PrivKeyWidget(m_accountInfo, m_otr, tabWidget),
                       tr("My private keys"));
 
     tabWidget->addTab(new ConfigOtrWidget(m_optionHost, m_otr, tabWidget),
@@ -280,8 +283,10 @@ void FingerprintWidget::verifyFingerprint()
 
 //=============================================================================
 
-PrivKeyWidget::PrivKeyWidget(OtrMessaging* otr, QWidget* parent)
+PrivKeyWidget::PrivKeyWidget(AccountInfoAccessingHost* accountInfo,
+                             OtrMessaging* otr, QWidget* parent)
     : QWidget(parent),
+      m_accountInfo(accountInfo),
       m_otr(otr),
       m_table(new QTableView(this)),
       m_tableModel(new QStandardItemModel(this)),
@@ -289,10 +294,29 @@ PrivKeyWidget::PrivKeyWidget(OtrMessaging* otr, QWidget* parent)
 {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
+    m_accountBox = new QComboBox(this);
+
+    QString id;
+    int accountIndex = 0;
+    while ((id = m_accountInfo->getId(accountIndex)) != "-1")
+    {
+        m_accountBox->addItem(m_accountInfo->getName(accountIndex), QVariant(id));
+        accountIndex++;
+    }
+
+    QPushButton* generateButton = new QPushButton(tr("Generate Key"), this);
+    connect(generateButton,SIGNAL(clicked()),SLOT(generateKey()));
+
+    QHBoxLayout* generateLayout = new QHBoxLayout();
+    generateLayout->addWidget(m_accountBox);
+    generateLayout->addWidget(generateButton);
+
+    mainLayout->addLayout(generateLayout);
     mainLayout->addWidget(m_table);
 
     QPushButton* forgetButton = new QPushButton(tr("Forget Key"), this);
     connect(forgetButton,SIGNAL(clicked()),SLOT(forgetKey()));
+
     QHBoxLayout* buttonLayout = new QHBoxLayout();
     buttonLayout->addWidget(forgetButton);
 
@@ -357,6 +381,31 @@ void PrivKeyWidget::forgetKey()
             m_otr->deleteKey(account);
         }
     }
+    updateData();
+}
+
+//-----------------------------------------------------------------------------
+
+void PrivKeyWidget::generateKey()
+{
+    int accountIndex = m_accountBox->currentIndex();
+
+    QString accountName(m_accountBox->currentText());
+    QString accountId(m_accountBox->itemData(accountIndex).toString());
+
+    QString msg(tr("Are you sure you want to generate a new private key "
+                   "for account \"%1\"? Existing keys for that account will be "
+                   "overwritten.").arg(accountName));
+
+    QMessageBox mb(QMessageBox::Question, tr("Psi OTR"), msg,
+                   QMessageBox::Yes | QMessageBox::No, this,
+                   Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+
+    if (mb.exec() == QMessageBox::Yes)
+    {
+        m_otr->generateKey(accountId);
+    }
+
     updateData();
 }
 

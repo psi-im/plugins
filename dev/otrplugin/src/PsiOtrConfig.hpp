@@ -25,8 +25,10 @@
 
 #include <QWidget>
 #include <QModelIndex>
+#include <QComboBox>
 
 class OptionAccessingHost;
+class AccountInfoAccessingHost;
 class QCheckBox;
 class QStandardItemModel;
 class QTableView;
@@ -51,11 +53,13 @@ Q_OBJECT
 
 public:
     ConfigDialog(OtrMessaging* otr, OptionAccessingHost* optionHost,
+                 AccountInfoAccessingHost* accountInfo,
                  QWidget* parent = 0);
 
 private:
-    OtrMessaging*        m_otr;
-    OptionAccessingHost* m_optionHost;
+    OtrMessaging*             m_otr;
+    OptionAccessingHost*      m_optionHost;
+    AccountInfoAccessingHost* m_accountInfo;
 };
 
 // ---------------------------------------------------------------------------
@@ -120,19 +124,23 @@ class PrivKeyWidget : public QWidget
 Q_OBJECT
 
 public:
-    PrivKeyWidget(OtrMessaging* otr, QWidget* parent);
+    PrivKeyWidget(AccountInfoAccessingHost* accountInfo,
+                  OtrMessaging* otr, QWidget* parent);
 
 protected:
     void updateData();
 
 private:
-    OtrMessaging*           m_otr;
-    QTableView*             m_table;
-    QStandardItemModel*     m_tableModel;
-    QHash<QString, QString> m_keys;
+    AccountInfoAccessingHost* m_accountInfo;
+    OtrMessaging*             m_otr;
+    QTableView*               m_table;
+    QStandardItemModel*       m_tableModel;
+    QHash<QString, QString>   m_keys;
+    QComboBox*                m_accountBox;
 
 private slots:
     void forgetKey();
+    void generateKey();
 };
 
 //-----------------------------------------------------------------------------
