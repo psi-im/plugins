@@ -1,5 +1,7 @@
 /*
- *  Off-the-Record Messaging library
+ *  Off-the-Record Messaging library extensions
+ *
+ *  strongly based on parts of the Off-the-Record Messaging library,
  *  Copyright (C) 2004-2008  Ian Goldberg, Chris Alexander, Nikita Borisov
  *                           <otr@cypherpunks.ca>
  *
@@ -28,7 +30,6 @@
 
 /* libotr headers */
 #include <libotr/privkey.h>
-#include <libotr/serial.h>
 
 #include "otrl_extensions.h"
 
@@ -40,7 +41,7 @@ static gcry_error_t sexp_write(FILE *privf, gcry_sexp_t sexp)
     buflen = gcry_sexp_sprint(sexp, GCRYSEXP_FMT_ADVANCED, NULL, 0);
     buf = malloc(buflen);
     if (buf == NULL && buflen > 0) {
-	return gcry_error(GPG_ERR_ENOMEM);
+        return gcry_error(GPG_ERR_ENOMEM);
     }
     gcry_sexp_sprint(sexp, GCRYSEXP_FMT_ADVANCED, buf, buflen);
     
@@ -60,13 +61,13 @@ static gcry_error_t account_write(FILE *privf, const char *accountname,
 
     err = gcry_sexp_build(&names, NULL, "(name %s)", accountname);
     if (!err) {
-	err = sexp_write(privf, names);
-	gcry_sexp_release(names);
+        err = sexp_write(privf, names);
+        gcry_sexp_release(names);
     }
     if (!err) err = gcry_sexp_build(&protos, NULL, "(protocol %s)", protocol);
     if (!err) {
-	err = sexp_write(privf, protos);
-	gcry_sexp_release(protos);
+        err = sexp_write(privf, protos);
+        gcry_sexp_release(protos);
     }
     if (!err) err = sexp_write(privf, privkey);
 
@@ -110,10 +111,10 @@ gcry_error_t otrl_privkey_write(OtrlUserState us, const char *filename)
     privf = fopen(filename, "w+b");
     if (!privf) {
 #ifndef WIN32
-	umask(oldmask);
+        umask(oldmask);
 #endif
-	err = gcry_error_from_errno(errno);
-	return err;
+        err = gcry_error_from_errno(errno);
+        return err;
     }
 
     err = otrl_privkey_write_FILEp(us, privf);

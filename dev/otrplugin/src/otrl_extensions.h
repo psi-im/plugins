@@ -1,5 +1,7 @@
 /*
- *  Off-the-Record Messaging library
+ *  Off-the-Record Messaging library extensions
+ *
+ *  strongly based on parts of the Off-the-Record Messaging library,
  *  Copyright (C) 2004-2008  Ian Goldberg, Chris Alexander, Nikita Borisov
  *                           <otr@cypherpunks.ca>
  *

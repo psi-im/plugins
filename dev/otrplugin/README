@@ -16,13 +16,32 @@ See http://www.cypherpunks.ca/otr/ for more information about OTR.
 TODOs
 * use Socialist Millionaires' Protocol
 * Configure OTR policy per contact
-* Generate key on user request.
 * Documentation
 
 
 
 
 CHANGES
+
+  0.9.x
+    -Added context menu to fingerprint and private key widget
+    -Added key generation and deletion to options
+    -Don't quote non-breaking spaces
+    -Enforce Unix line feeds
+    -Finish session when forgetting a fingerprint
+    -Fix fetching private keys
+    -Handle multiple selections in the fingerprint widget, fix selections made without mouse
+    -Don't send empty messages
+    -Output accounts by name
+    -Identify accounts by ID, not by index
+    -Changed options namespace and short name
+    -Escape XML entities before encrypting
+    -Only handle decrypted messages as HTML if they look like HTML
+    -Made strings translatable
+    -Improved HTML to plaintext conversion
+    -Fixed OTR for private messages
+    -Fixed fingerprint verification and deletion
+    -OTR data is now stored in the data directory of the current profile
 
   0.9
     -update to Psi+ revision 3961.
