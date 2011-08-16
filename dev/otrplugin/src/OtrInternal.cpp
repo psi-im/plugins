@@ -632,7 +632,7 @@ void OtrInternal::create_privkey(const char *accountname,
     }
     else
     {
-        infoMb.setText(QObject::tr("The fingerprint for account %1 is\n%2")
+        infoMb.setText(QObject::tr("The fingerprint for account \"%1\" is\n%2")
                                    .arg(m_callback->humanAccount(
                                             QString::fromUtf8(accountname)))
                                    .arg(QString(fingerprint)));

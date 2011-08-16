@@ -557,7 +557,9 @@ void PsiOtrPlugin::startMessages()
 
 QString PsiOtrPlugin::humanAccount(const QString& accountId)
 {
-    return getAccountNameById(accountId);
+    QString human(getAccountNameById(accountId));
+
+    return human.isEmpty()? accountId : human;
 }
 
 //-----------------------------------------------------------------------------

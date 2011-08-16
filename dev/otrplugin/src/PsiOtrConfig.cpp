@@ -345,7 +345,11 @@ void PrivKeyWidget::updateData()
     for (keyIt = m_keys.begin(); keyIt != m_keys.end(); ++keyIt)
     {
         QList<QStandardItem*> row;
-        row.append(new QStandardItem(m_otr->humanAccount(keyIt.key())));
+
+        QStandardItem* accItem = new QStandardItem(m_otr->humanAccount(keyIt.key()));
+        accItem->setData(QVariant(keyIt.key()));
+
+        row.append(accItem);
         row.append(new QStandardItem(keyIt.value()));
 
         m_tableModel->appendRow(row);
@@ -367,7 +371,8 @@ void PrivKeyWidget::forgetKey()
     foreach(QModelIndex selectIndex, m_table->selectionModel()->selectedRows(1))
     {
         QString fpr(m_tableModel->item(selectIndex.row(), 1)->text());
-        QString account(m_keys.key(fpr));
+        QString account(m_tableModel->item(selectIndex.row(), 0)->data().toString());
+
         QString msg(tr("Are you sure you want to delete the following private key?") + "\n" +
                     tr("Account: ") + m_otr->humanAccount(account) + "\n" +
                     tr("Fingerprint: ") + fpr);
@@ -390,21 +395,31 @@ void PrivKeyWidget::generateKey()
 {
     int accountIndex = m_accountBox->currentIndex();
 
+    if (accountIndex == -1)
+    {
+        return;
+    }
+
     QString accountName(m_accountBox->currentText());
     QString accountId(m_accountBox->itemData(accountIndex).toString());
 
-    QString msg(tr("Are you sure you want to generate a new private key "
-                   "for account \"%1\"? Existing keys for that account will be "
-                   "overwritten.").arg(accountName));
-
-    QMessageBox mb(QMessageBox::Question, tr("Psi OTR"), msg,
-                   QMessageBox::Yes | QMessageBox::No, this,
-                   Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
-
-    if (mb.exec() == QMessageBox::Yes)
+    if (m_keys.contains(accountId))
     {
-        m_otr->generateKey(accountId);
+        QString msg(tr("Are you sure you want to overwrite the following key?") + "\n" +
+                    tr("Account: ") + accountName + "\n" +
+                    tr("Fingerprint: ") + m_keys.value(accountId));
+
+        QMessageBox mb(QMessageBox::Question, tr("Psi OTR"), msg,
+                       QMessageBox::Yes | QMessageBox::No, this,
+                       Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+
+        if (mb.exec() == QMessageBox::No)
+        {
+            return;
+        }
     }
+
+    m_otr->generateKey(accountId);
 
     updateData();
 }
