@@ -117,7 +117,7 @@ void PsiOtrClosure::sessionID(bool)
     }
     else
     {
-        msg = tr("Session ID of connection from account \"%1\" to %2 is:<br/>%3")
+        msg = tr("Session ID between account \"%1\" and %2:<br/>%3")
                 .arg(m_otr->humanAccount(m_myAccount))
                 .arg(m_otherJid)
                 .arg(sId);
@@ -148,7 +148,7 @@ void PsiOtrClosure::fingerprint(bool)
                                            tr("No private key for account \"%1\"")
                                              .arg(m_otr->humanAccount(m_myAccount)));
 
-    QString msg(tr("Fingerprint for account \"%1\" is:\n%2"));
+    QString msg(tr("Fingerprint for account \"%1\":\n%2"));
 
     QMessageBox mb(QMessageBox::Information, tr("Psi OTR"),
                    msg.arg(m_otr->humanAccount(m_myAccount))
@@ -227,25 +227,25 @@ QAction* PsiOtrClosure::getChatDlgMenu(QObject* parent)
 
     m_chatDlgMenu = new QMenu();
 
-    m_startSessionAction = m_chatDlgMenu->addAction(tr("Start private Conversation"));
+    m_startSessionAction = m_chatDlgMenu->addAction(tr("Start private conversation"));
     connect(m_startSessionAction, SIGNAL(triggered(bool)),
             this, SLOT(initiateSession(bool)));
 
-    m_endSessionAction = m_chatDlgMenu->addAction(tr("End private Conversation"));
+    m_endSessionAction = m_chatDlgMenu->addAction(tr("End private conversation"));
     connect(m_endSessionAction, SIGNAL(triggered(bool)),
             this, SLOT(endSession(bool)));
 
     m_chatDlgMenu->insertSeparator(NULL);
 
-    m_verifyAction = m_chatDlgMenu->addAction(tr("Verify Fingerprint"));
+    m_verifyAction = m_chatDlgMenu->addAction(tr("Verify fingerprint"));
     connect(m_verifyAction, SIGNAL(triggered(bool)),
             this, SLOT(verifyFingerprint(bool)));
 
-    m_sessionIdAction = m_chatDlgMenu->addAction(tr("Show secure Session ID"));
+    m_sessionIdAction = m_chatDlgMenu->addAction(tr("Show secure session ID"));
     connect(m_sessionIdAction, SIGNAL(triggered(bool)),
             this, SLOT(sessionID(bool)));
 
-    m_fingerprintAction = m_chatDlgMenu->addAction(tr("Show own Fingerprint"));
+    m_fingerprintAction = m_chatDlgMenu->addAction(tr("Show own fingerprint"));
     connect(m_fingerprintAction, SIGNAL(triggered(bool)),
             this, SLOT(fingerprint(bool)));
 

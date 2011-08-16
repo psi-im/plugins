@@ -622,7 +622,7 @@ void OtrInternal::create_privkey(const char *accountname,
                                  protocol) == NULL)
     {
         QMessageBox failMb(QMessageBox::Critical, QObject::tr("Psi OTR"),
-                           QObject::tr("Failed to generate key for account \"%1\"."
+                           QObject::tr("Failed to generate keys for account \"%1\"."
                                        "\nThe OTR Plugin will not work.")
                                        .arg(m_callback->humanAccount(
                                                 QString::fromUtf8(accountname))),
@@ -632,7 +632,7 @@ void OtrInternal::create_privkey(const char *accountname,
     }
     else
     {
-        infoMb.setText(QObject::tr("The fingerprint for account \"%1\" is\n%2")
+        infoMb.setText(QObject::tr("Fingerprint for account \"%1\":\n%2")
                                    .arg(m_callback->humanAccount(
                                             QString::fromUtf8(accountname)))
                                    .arg(QString(fingerprint)));
@@ -748,10 +748,8 @@ void OtrInternal::new_fingerprint(OtrlUserState us, const char *accountname,
     Q_UNUSED(protocol);
 
     m_callback->notifyUser(psiotr::OTR_NOTIFY_INFO,
-                           QObject::tr("Account \"%1\" has received a new "
-                                       "fingerprint from %2:\n%3")
-                                       .arg(m_callback->humanAccount(
-                                                QString::fromUtf8(accountname)))
+                           QObject::tr("You have received a new "
+                                       "fingerprint from %1:\n%2")
                                        .arg(QString::fromUtf8(username))
                                        .arg(humanFingerprint(fingerprint)));
 }

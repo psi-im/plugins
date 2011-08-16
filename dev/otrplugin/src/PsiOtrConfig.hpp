@@ -111,7 +111,7 @@ private:
     QList<Fingerprint>  m_fingerprints;
 
 private slots:
-    void forgetFingerprint();
+    void deleteFingerprint();
     void verifyFingerprint();
     void copyFingerprint();
     void contextMenu(const QPoint& pos);
@@ -142,7 +142,7 @@ private:
     QComboBox*                m_accountBox;
 
 private slots:
-    void forgetKey();
+    void deleteKey();
     void generateKey();
     void copyFingerprint();
     void contextMenu(const QPoint& pos);
