@@ -30,6 +30,9 @@
 #include <QStandardItem>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QMenu>
+#include <QClipboard>
+#include <QApplication>
 
 //-----------------------------------------------------------------------------
 
@@ -175,6 +178,10 @@ FingerprintWidget::FingerprintWidget(OtrMessaging* otr, QWidget* parent)
     m_table->setShowGrid(true);
     m_table->setEditTriggers(0);
     m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    m_table->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    connect(m_table, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(contextMenu(const QPoint&)));
+
     mainLayout->addWidget(m_table);
 
     QPushButton* forgetButton = new QPushButton(tr("Forget fingerprint"), this);
@@ -281,6 +288,46 @@ void FingerprintWidget::verifyFingerprint()
     updateData();
 }
 
+//-----------------------------------------------------------------------------
+
+void FingerprintWidget::copyFingerprint()
+{
+    if (!m_table->selectionModel()->hasSelection())
+    {
+        return;
+    }
+    QString text;
+    foreach(QModelIndex selectIndex, m_table->selectionModel()->selectedRows(1))
+    {
+        if (!text.isEmpty())
+        {
+            text += "\n";
+        }
+        text += m_fingerprints[selectIndex.row()].fingerprintHuman;
+    }
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(text);
+}
+
+//-----------------------------------------------------------------------------
+
+void FingerprintWidget::contextMenu(const QPoint& pos)
+{
+    QModelIndex index = m_table->indexAt(pos);
+    if (!index.isValid())
+    {
+        return;
+    }
+
+    QMenu *menu = new QMenu(this);
+
+    menu->addAction(QIcon::fromTheme("edit-delete"), tr("Delete"), this, SLOT(forgetFingerprint()));
+    menu->addAction(QIcon::fromTheme("mail-signed-verified"), tr("Verify fingerprint"), this, SLOT(verifyFingerprint()));
+    menu->addAction(QIcon::fromTheme("edit-copy"), tr("Copy fingerprint"), this, SLOT(copyFingerprint()));
+
+    menu->exec(QCursor::pos());
+}
+
 //=============================================================================
 
 PrivKeyWidget::PrivKeyWidget(AccountInfoAccessingHost* accountInfo,
@@ -304,7 +351,7 @@ PrivKeyWidget::PrivKeyWidget(AccountInfoAccessingHost* accountInfo,
         accountIndex++;
     }
 
-    QPushButton* generateButton = new QPushButton(tr("Generate Key"), this);
+    QPushButton* generateButton = new QPushButton(tr("Generate new key"), this);
     connect(generateButton,SIGNAL(clicked()),SLOT(generateKey()));
 
     QHBoxLayout* generateLayout = new QHBoxLayout();
@@ -314,7 +361,7 @@ PrivKeyWidget::PrivKeyWidget(AccountInfoAccessingHost* accountInfo,
     mainLayout->addLayout(generateLayout);
     mainLayout->addWidget(m_table);
 
-    QPushButton* forgetButton = new QPushButton(tr("Forget Key"), this);
+    QPushButton* forgetButton = new QPushButton(tr("Forget key"), this);
     connect(forgetButton,SIGNAL(clicked()),SLOT(forgetKey()));
 
     QHBoxLayout* buttonLayout = new QHBoxLayout();
@@ -327,6 +374,9 @@ PrivKeyWidget::PrivKeyWidget(AccountInfoAccessingHost* accountInfo,
     m_table->setShowGrid(true);
     m_table->setEditTriggers(0);
     m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    m_table->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_table, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(contextMenu(const QPoint&)));
 
     updateData();
 }
@@ -422,6 +472,45 @@ void PrivKeyWidget::generateKey()
     m_otr->generateKey(accountId);
 
     updateData();
+}
+
+//-----------------------------------------------------------------------------
+
+void PrivKeyWidget::copyFingerprint()
+{
+    if (!m_table->selectionModel()->hasSelection())
+    {
+        return;
+    }
+    QString text;
+    foreach(QModelIndex selectIndex, m_table->selectionModel()->selectedRows(1))
+    {
+        if (!text.isEmpty())
+        {
+            text += "\n";
+        }
+        text += m_tableModel->item(selectIndex.row(), 1)->text();
+    }
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(text);
+}
+
+//-----------------------------------------------------------------------------
+
+void PrivKeyWidget::contextMenu(const QPoint& pos)
+{
+    QModelIndex index = m_table->indexAt(pos);
+    if (!index.isValid())
+    {
+        return;
+    }
+
+    QMenu *menu = new QMenu(this);
+
+    menu->addAction(QIcon::fromTheme("edit-delete"), tr("Delete"), this, SLOT(forgetKey()));
+    menu->addAction(QIcon::fromTheme("edit-copy"), tr("Copy fingerprint"), this, SLOT(copyFingerprint()));
+
+    menu->exec(QCursor::pos());
 }
 
 //-----------------------------------------------------------------------------

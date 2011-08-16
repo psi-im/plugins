@@ -26,6 +26,7 @@
 #include <QWidget>
 #include <QModelIndex>
 #include <QComboBox>
+#include <QPoint>
 
 class OptionAccessingHost;
 class AccountInfoAccessingHost;
@@ -112,6 +113,8 @@ private:
 private slots:
     void forgetFingerprint();
     void verifyFingerprint();
+    void copyFingerprint();
+    void contextMenu(const QPoint& pos);
 };
 
 // ---------------------------------------------------------------------------
@@ -141,6 +144,8 @@ private:
 private slots:
     void forgetKey();
     void generateKey();
+    void copyFingerprint();
+    void contextMenu(const QPoint& pos);
 };
 
 //-----------------------------------------------------------------------------
