@@ -27,6 +27,7 @@
 #include <assert.h>
 #include <QString>
 #include <QtGui>
+#include <QFile>
 
 //-----------------------------------------------------------------------------
 
@@ -104,7 +105,7 @@ public:
     
     void run()
     {
-        otrl_privkey_generate(m_userstate, m_keysFile.toUtf8().constData(),
+        otrl_privkey_generate(m_userstate, QFile::encodeName(m_keysFile).constData(),
                               m_accountname, m_protocol);
     }
 
@@ -150,9 +151,9 @@ OtrInternal::OtrInternal(psiotr::OtrCallback* callback,
     m_uiOps.account_name_free = (*OtrInternal::cb_account_name_free);
 #endif
 
-    otrl_privkey_read(m_userstate, m_keysFile.toUtf8().constData());
+    otrl_privkey_read(m_userstate, QFile::encodeName(m_keysFile).constData());
     otrl_privkey_read_fingerprints(m_userstate,
-                                   m_fingerprintFile.toUtf8().constData(),
+                                   QFile::encodeName(m_fingerprintFile).constData(),
                                    NULL, NULL);
 }
 
@@ -372,7 +373,7 @@ void OtrInternal::deleteKey(const QString& account)
 
     otrl_privkey_forget(privKey);
 
-    otrl_privkey_write(m_userstate, m_keysFile.toUtf8().constData());
+    otrl_privkey_write(m_userstate, QFile::encodeName(m_keysFile).constData());
 }
 
 //-----------------------------------------------------------------------------
@@ -759,7 +760,7 @@ void OtrInternal::new_fingerprint(OtrlUserState us, const char *accountname,
 void OtrInternal::write_fingerprints()
 {
     otrl_privkey_write_fingerprints(m_userstate,
-                                    m_fingerprintFile.toUtf8().constData());
+                                    QFile::encodeName(m_fingerprintFile).constData());
 }
 
 // ---------------------------------------------------------------------------
