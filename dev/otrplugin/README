@@ -23,25 +23,37 @@ TODOs
 
 CHANGES
 
-  0.9.x
-    -Added context menu to fingerprint and private key widget
-    -Added key generation and deletion to options
-    -Don't quote non-breaking spaces
-    -Enforce Unix line feeds
-    -Finish session when forgetting a fingerprint
+  0.9.3
     -Fix fetching private keys
-    -Handle multiple selections in the fingerprint widget, fix selections made without mouse
-    -Don't send empty messages
-    -Output accounts by name
-    -Identify accounts by ID, not by index
-    -Changed options namespace and short name
-    -Escape XML entities before encrypting
+    -Finish session when forgetting a fingerprint
+    -Enforce Unix line feeds
+    -Don't quote non-breaking spaces
+    -Use account JID instead of ID in libotr messages where possible
+    -Remove HTML from outgoing libotr messages
+    -Add key generation and deletion to options
+    -Add context menu to fingerprint and private key widget
+    -Fix file path encoding for non-UTF-8 systems
+
+  0.9.2
+    -Encode strings as UTF-8 before passing them to libotr
+    -Fix fingerprint verification and deletion
     -Only handle decrypted messages as HTML if they look like HTML
-    -Made strings translatable
-    -Improved HTML to plaintext conversion
-    -Fixed OTR for private messages
-    -Fixed fingerprint verification and deletion
+    -Escape XML entities before encrypting
+    -Change options namespace and short name
+    -Identify accounts by ID, not by index
+    -Output accounts by name
+    -Auto-resize table columns in options
+    -Don't send empty messages
+    -Handle multiple selections in the fingerprint widget, fix selections made without mouse
+
+  0.9.1
     -OTR data is now stored in the data directory of the current profile
+    -Fix OTR for private messages
+    -Fix fingerprint verification
+    -Add indication for unverified sessions
+    -New Icons
+    -Improved HTML to plaintext conversion
+    -Make strings translatable
 
   0.9
     -update to Psi+ revision 3961.
