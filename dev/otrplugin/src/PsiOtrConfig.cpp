@@ -322,7 +322,7 @@ void FingerprintWidget::contextMenu(const QPoint& pos)
     QMenu *menu = new QMenu(this);
 
     menu->addAction(QIcon::fromTheme("edit-delete"), tr("Delete"), this, SLOT(deleteFingerprint()));
-    menu->addAction(QIcon::fromTheme("mail-signed-verified"), tr("Verify fingerprint"), this, SLOT(verifyFingerprint()));
+    menu->addAction(QIcon(":/psi-otr/otr_unverified.png"), tr("Verify fingerprint"), this, SLOT(verifyFingerprint()));
     menu->addAction(QIcon::fromTheme("edit-copy"), tr("Copy fingerprint"), this, SLOT(copyFingerprint()));
 
     menu->exec(QCursor::pos());
