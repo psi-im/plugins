@@ -28,7 +28,7 @@ CHANGES
     -Finish session when forgetting a fingerprint
     -Enforce Unix line feeds
     -Don't quote non-breaking spaces
-    -Use account JID instead of ID in libotr messages where possible
+    -Use JID instead of account ID in libotr messages
     -Remove HTML from outgoing libotr messages
     -Add key generation and deletion to options
     -Add context menu to fingerprint and private key widget
