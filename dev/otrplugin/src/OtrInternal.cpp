@@ -389,7 +389,7 @@ void OtrInternal::startSession(const QString& account, const QString& jid)
     }
 
     //TODO: make allowed otr versions configureable
-    char* msg = otrl_proto_default_query_msg(account.toUtf8().constData(),
+    char* msg = otrl_proto_default_query_msg(m_callback->humanAccountPublic(account).toUtf8().constData(),
                                              OTRL_POLICY_DEFAULT);
 
     m_callback->sendMessage(account, jid, QString::fromUtf8(msg));
