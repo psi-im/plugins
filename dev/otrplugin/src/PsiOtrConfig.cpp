@@ -27,6 +27,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QTableView>
+#include <QHeaderView>
 #include <QStandardItem>
 #include <QMessageBox>
 #include <QPushButton>
@@ -179,6 +180,7 @@ FingerprintWidget::FingerprintWidget(OtrMessaging* otr, QWidget* parent)
     m_table->setEditTriggers(0);
     m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_table->setContextMenuPolicy(Qt::CustomContextMenu);
+    m_table->setSortingEnabled(true);
 
     connect(m_table, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(contextMenu(const QPoint&)));
 
@@ -203,6 +205,9 @@ FingerprintWidget::FingerprintWidget(OtrMessaging* otr, QWidget* parent)
 
 void FingerprintWidget::updateData()
 {
+    int sortSection         = m_table->horizontalHeader()->sortIndicatorSection();
+    Qt::SortOrder sortOrder = m_table->horizontalHeader()->sortIndicatorOrder();
+
     m_tableModel->clear();
     m_tableModel->setColumnCount(5);
     m_tableModel->setHorizontalHeaderLabels(QStringList() << tr("Account")
@@ -211,21 +216,29 @@ void FingerprintWidget::updateData()
 
     m_fingerprints = m_otr->getFingerprints();
     QListIterator<Fingerprint> fingerprintIt(m_fingerprints);
+    int fpIndex = 0;
     while(fingerprintIt.hasNext())
     {
         QList<QStandardItem*> row;
         Fingerprint fp = fingerprintIt.next();
-        row.append(new QStandardItem(m_otr->humanAccount(fp.account)));
+
+        QStandardItem* item = new QStandardItem(m_otr->humanAccount(fp.account));
+        item->setData(QVariant(fpIndex));
+
+        row.append(item);
         row.append(new QStandardItem(fp.username));
         row.append(new QStandardItem(fp.fingerprintHuman));
         row.append(new QStandardItem(fp.trust));
         row.append(new QStandardItem(fp.messageState));
 
         m_tableModel->appendRow(row);
+
+        fpIndex++;
     }
 
     m_table->setModel(m_tableModel);
 
+    m_table->sortByColumn(sortSection, sortOrder);
     m_table->resizeColumnsToContents();
 }
 
@@ -240,10 +253,12 @@ void FingerprintWidget::deleteFingerprint()
     }
     foreach(QModelIndex selectIndex, m_table->selectionModel()->selectedRows())
     {
+        int fpIndex = m_tableModel->item(selectIndex.row(), 0)->data().toInt();
+
         QString msg(tr("Are you sure you want to delete the following fingerprint?") + "\n\n" +
-                    tr("Account: ") + m_otr->humanAccount(m_fingerprints[selectIndex.row()].account) + "\n" +
-                    tr("User: ") + m_fingerprints[selectIndex.row()].username + "\n" +
-                    tr("Fingerprint: ") + m_fingerprints[selectIndex.row()].fingerprintHuman);
+                    tr("Account: ") + m_otr->humanAccount(m_fingerprints[fpIndex].account) + "\n" +
+                    tr("User: ") + m_fingerprints[fpIndex].username + "\n" +
+                    tr("Fingerprint: ") + m_fingerprints[fpIndex].fingerprintHuman);
 
         QMessageBox mb(QMessageBox::Question, tr("Psi OTR"), msg,
                        QMessageBox::Yes | QMessageBox::No, this,
@@ -251,7 +266,7 @@ void FingerprintWidget::deleteFingerprint()
 
         if (mb.exec() == QMessageBox::Yes)
         {
-            m_otr->deleteFingerprint(m_fingerprints[selectIndex.row()]);
+            m_otr->deleteFingerprint(m_fingerprints[fpIndex]);
         }
     }
     updateData();
@@ -267,23 +282,19 @@ void FingerprintWidget::verifyFingerprint()
     }
     foreach(QModelIndex selectIndex, m_table->selectionModel()->selectedRows())
     {
+        int fpIndex = m_tableModel->item(selectIndex.row(), 0)->data().toInt();
+
         QString msg(tr("Have you verified that this is in fact the correct fingerprint?") + "\n\n" +
-                    tr("Account: ") + m_otr->humanAccount(m_fingerprints[selectIndex.row()].account) + "\n" +
-                    tr("User: ") + m_fingerprints[selectIndex.row()].username + "\n" +
-                    tr("Fingerprint: ") + m_fingerprints[selectIndex.row()].fingerprintHuman);
+                    tr("Account: ") + m_otr->humanAccount(m_fingerprints[fpIndex].account) + "\n" +
+                    tr("User: ") + m_fingerprints[fpIndex].username + "\n" +
+                    tr("Fingerprint: ") + m_fingerprints[fpIndex].fingerprintHuman);
 
         QMessageBox mb(QMessageBox::Question, tr("Psi OTR"), msg,
                        QMessageBox::Yes | QMessageBox::No, this,
                        Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
-        if (mb.exec() == QMessageBox::Yes)
-        {
-            m_otr->verifyFingerprint(m_fingerprints[selectIndex.row()], true);
-        }
-        else
-        {
-            m_otr->verifyFingerprint(m_fingerprints[selectIndex.row()], false);
-        }
+        m_otr->verifyFingerprint(m_fingerprints[fpIndex],
+                                 (mb.exec() == QMessageBox::Yes));
     }
     updateData();
 }
@@ -299,11 +310,13 @@ void FingerprintWidget::copyFingerprint()
     QString text;
     foreach(QModelIndex selectIndex, m_table->selectionModel()->selectedRows(1))
     {
+        int fpIndex = m_tableModel->item(selectIndex.row(), 0)->data().toInt();
+
         if (!text.isEmpty())
         {
             text += "\n";
         }
-        text += m_fingerprints[selectIndex.row()].fingerprintHuman;
+        text += m_fingerprints[fpIndex].fingerprintHuman;
     }
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(text);
@@ -374,6 +387,7 @@ PrivKeyWidget::PrivKeyWidget(AccountInfoAccessingHost* accountInfo,
     m_table->setShowGrid(true);
     m_table->setEditTriggers(0);
     m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    m_table->setSortingEnabled(true);
 
     m_table->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_table, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(contextMenu(const QPoint&)));
@@ -385,6 +399,9 @@ PrivKeyWidget::PrivKeyWidget(AccountInfoAccessingHost* accountInfo,
 
 void PrivKeyWidget::updateData()
 {
+    int sortSection         = m_table->horizontalHeader()->sortIndicatorSection();
+    Qt::SortOrder sortOrder = m_table->horizontalHeader()->sortIndicatorOrder();
+
     m_tableModel->clear();
     m_tableModel->setColumnCount(2);
     m_tableModel->setHorizontalHeaderLabels(QStringList() << tr("Account")
@@ -407,6 +424,7 @@ void PrivKeyWidget::updateData()
 
     m_table->setModel(m_tableModel);
 
+    m_table->sortByColumn(sortSection, sortOrder);
     m_table->resizeColumnsToContents();
 }
 
