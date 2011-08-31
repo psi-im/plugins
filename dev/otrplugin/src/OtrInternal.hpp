@@ -74,6 +74,8 @@ public:
     
     void endSession(const QString& account, const QString& jid);
 
+    void expireSession(const QString& account, const QString& jid);
+
     psiotr::OtrMessageState getMessageState(const QString& thisJid,
                                             const QString& remoteJid);
 

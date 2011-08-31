@@ -406,6 +406,22 @@ void OtrInternal::endSession(const QString& account, const QString& jid)
 
 //-----------------------------------------------------------------------------
 
+void OtrInternal::expireSession(const QString& account, const QString& jid)
+{
+    ConnContext* context = otrl_context_find(m_userstate,
+                                             jid.toUtf8().constData(),
+                                             account.toUtf8().constData(),
+                                             OTR_PROTOCOL_STRING, false,
+                                             NULL, NULL, NULL);
+    if ((context != NULL) &&
+        (context->msgstate == OTRL_MSGSTATE_ENCRYPTED))
+    {
+        otrl_context_force_finished(context);
+    }
+}
+
+//-----------------------------------------------------------------------------
+
 psiotr::OtrMessageState OtrInternal::getMessageState(const QString& thisJid,
                                                      const QString& remoteJid)
 {

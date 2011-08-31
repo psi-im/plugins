@@ -223,6 +223,11 @@ public:
     */
     void endSession(const QString& account, const QString& jid);
 
+    /** 
+    * Force a session to expire.
+    */
+    void expireSession(const QString& account, const QString& jid);
+
     /**
     * Return the messageState of a context.
     * i.e. plaintext, encrypted, finished

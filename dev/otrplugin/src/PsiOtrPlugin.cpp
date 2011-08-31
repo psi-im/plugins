@@ -417,6 +417,10 @@ bool PsiOtrPlugin::incomingStanza(int accountNo, const QDomElement& xml)
         if (m_onlineUsers.contains(account) && 
             m_onlineUsers.value(account).contains(contact))
         {
+            if (m_optionHost->getPluginOption(PSI_CONFIG_END_WHEN_OFFLINE).toBool())
+            {
+                m_otrConnection->expireSession(account, contact);
+            }
             m_onlineUsers[account][contact]->setIsLoggedIn(false);
             m_onlineUsers[account][contact]->updateMessageState();
         }

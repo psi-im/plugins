@@ -134,6 +134,14 @@ void OtrMessaging::endSession(const QString& account, const QString& jid)
 {
     m_impl->endSession(account, jid);
 }
+
+//-----------------------------------------------------------------------------
+
+void OtrMessaging::expireSession(const QString& account, const QString& jid)
+{
+    m_impl->expireSession(account, jid);
+}
+
 //-----------------------------------------------------------------------------
 
 OtrMessageState OtrMessaging::getMessageState(const QString& thisJid,

@@ -91,7 +91,10 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
     policyLayout->addWidget(m_polRequire);
     policyGroup->setLayout(policyLayout);
 
+    m_endWhenOffline = new QCheckBox(tr("End session when contact goes offline"), this);
+
     layout->addWidget(policyGroup);
+    layout->addWidget(m_endWhenOffline);
     layout->addStretch();
 
     setLayout(layout);
@@ -112,20 +115,27 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
         case OTR_POLICY_OFF:
             break;
     }
-    
-    handlePolicyChange();
-  
+
+    if (m_optionHost->getPluginOption(PSI_CONFIG_END_WHEN_OFFLINE).toBool())
+    {
+        m_endWhenOffline->setCheckState(Qt::Checked);
+    }
+
+    widgetsChanged();
+
     connect(m_polEnable,  SIGNAL(stateChanged(int)),
-            SLOT(handlePolicyChange()));
+            SLOT(widgetsChanged()));
     connect(m_polAuto,    SIGNAL(stateChanged(int)),
-            SLOT(handlePolicyChange()));
+            SLOT(widgetsChanged()));
     connect(m_polRequire, SIGNAL(stateChanged(int)),
-            SLOT(handlePolicyChange()));
+            SLOT(widgetsChanged()));
+    connect(m_endWhenOffline, SIGNAL(stateChanged(int)),
+            SLOT(widgetsChanged()));
 }
 
 // ---------------------------------------------------------------------------
 
-void ConfigOtrWidget::handlePolicyChange()
+void ConfigOtrWidget::widgetsChanged()
 {
     if (m_polEnable->checkState() == Qt::Unchecked)
     {
@@ -162,6 +172,8 @@ void ConfigOtrWidget::handlePolicyChange()
     }
     
     m_optionHost->setPluginOption(PSI_CONFIG_POLICY, policy);
+    m_optionHost->setPluginOption(PSI_CONFIG_END_WHEN_OFFLINE,
+                                  m_endWhenOffline->checkState() == Qt::Checked);
     m_otr->setPolicy(policy);
 }
 

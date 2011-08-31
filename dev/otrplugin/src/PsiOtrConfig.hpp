@@ -41,7 +41,8 @@ namespace psiotr
 
 // ---------------------------------------------------------------------------
 
-const QString PSI_CONFIG_POLICY = "otr-policy";
+const QString PSI_CONFIG_POLICY           = "otr-policy";
+const QString PSI_CONFIG_END_WHEN_OFFLINE = "end-session-when-offline";
 
 // ---------------------------------------------------------------------------
 
@@ -85,8 +86,10 @@ private:
     QCheckBox*   m_polAuto;
     QCheckBox*   m_polRequire;
 
+    QCheckBox*   m_endWhenOffline;
+
 private slots:
-    void handlePolicyChange();
+    void widgetsChanged();
 };
 
 // ---------------------------------------------------------------------------
