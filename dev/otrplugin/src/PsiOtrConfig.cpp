@@ -72,28 +72,33 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
                                  QWidget* parent)
     : QWidget(parent),
       m_optionHost(optionHost),
-      m_otr(otr),
-      m_polEnable(0),
-      m_polAuto(0),
-      m_polRequire(0)
+      m_otr(otr)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
 
     QGroupBox* policyGroup = new QGroupBox(tr("OTR Policy"), this);
     QVBoxLayout* policyLayout = new QVBoxLayout(policyGroup);
 
-    m_polDisable = new QRadioButton(tr("Disable private messaging"), policyGroup);
-    m_polEnable  = new QRadioButton(tr("Manually start private messaging"), policyGroup);
-    m_polAuto    = new QRadioButton(tr("Automatically start private messaging"), policyGroup);
-    m_polRequire = new QRadioButton(tr("Require private messaging"), policyGroup);
+    m_policy = new QButtonGroup(policyGroup);
 
-    policyLayout->addWidget(m_polDisable);
-    policyLayout->addWidget(m_polEnable);
-    policyLayout->addWidget(m_polAuto);
-    policyLayout->addWidget(m_polRequire);
-    policyGroup->setLayout(policyLayout);
+    QRadioButton* polDisable = new QRadioButton(tr("Disable private messaging"), policyGroup);
+    QRadioButton* polEnable  = new QRadioButton(tr("Manually start private messaging"), policyGroup);
+    QRadioButton* polAuto    = new QRadioButton(tr("Automatically start private messaging"), policyGroup);
+    QRadioButton* polRequire = new QRadioButton(tr("Require private messaging"), policyGroup);
 
     m_endWhenOffline = new QCheckBox(tr("End session when contact goes offline"), this);
+
+
+    m_policy->addButton(polDisable, OTR_POLICY_OFF);
+    m_policy->addButton(polEnable,  OTR_POLICY_ENABLED);
+    m_policy->addButton(polAuto,    OTR_POLICY_AUTO);
+    m_policy->addButton(polRequire, OTR_POLICY_REQUIRE);
+
+    policyLayout->addWidget(polDisable);
+    policyLayout->addWidget(polEnable);
+    policyLayout->addWidget(polAuto);
+    policyLayout->addWidget(polRequire);
+    policyGroup->setLayout(policyLayout);
 
     layout->addWidget(policyGroup);
     layout->addWidget(m_endWhenOffline);
@@ -101,64 +106,35 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
 
     setLayout(layout);
 
-    QVariant policyOption = m_optionHost->getPluginOption(PSI_CONFIG_POLICY);
-    if (policyOption == QVariant::Invalid)
+
+    int policyOption = m_optionHost->getPluginOption(PSI_CONFIG_POLICY,
+                                                     QVariant(OTR_POLICY_ENABLED)).toInt();
+    if ((policyOption < OTR_POLICY_OFF) || (policyOption > OTR_POLICY_REQUIRE))
     {
-        policyOption = OTR_POLICY_ENABLED;
-    }
-    switch (policyOption.toInt())
-    {
-        case OTR_POLICY_REQUIRE:
-            m_polRequire->setChecked(true);
-            break;
-        case OTR_POLICY_AUTO:
-            m_polAuto->setChecked(true);
-            break;
-        case OTR_POLICY_ENABLED:
-            m_polEnable->setChecked(true);
-            break;
-        case OTR_POLICY_OFF:
-            m_polDisable->setChecked(true);
-            break;
+        policyOption = static_cast<int>(OTR_POLICY_ENABLED);
     }
 
-    if (m_optionHost->getPluginOption(PSI_CONFIG_END_WHEN_OFFLINE).toBool())
-    {
-        m_endWhenOffline->setCheckState(Qt::Checked);
-    }
+    bool endWhenOfflineOption = m_optionHost->getPluginOption(PSI_CONFIG_END_WHEN_OFFLINE,
+                                                              QVariant(false)).toBool();
 
-    widgetsChanged();
+    m_policy->button(policyOption)->setChecked(true);
 
-    connect(m_polDisable, SIGNAL(toggled(bool)),
-            SLOT(widgetsChanged()));
-    connect(m_polEnable,  SIGNAL(toggled(bool)),
-            SLOT(widgetsChanged()));
-    connect(m_polAuto,    SIGNAL(toggled(bool)),
-            SLOT(widgetsChanged()));
-    connect(m_polRequire, SIGNAL(toggled(bool)),
-            SLOT(widgetsChanged()));
+    m_endWhenOffline->setChecked(endWhenOfflineOption);
+
+    updateOptions();
+
+    connect(m_policy, SIGNAL(buttonClicked(int)),
+            SLOT(updateOptions()));
 
     connect(m_endWhenOffline, SIGNAL(stateChanged(int)),
-            SLOT(widgetsChanged()));
+            SLOT(updateOptions()));
 }
 
 // ---------------------------------------------------------------------------
 
-void ConfigOtrWidget::widgetsChanged()
+void ConfigOtrWidget::updateOptions()
 {
-    OtrPolicy policy = OTR_POLICY_OFF;
-    if (m_polRequire->isChecked())
-    {
-        policy = OTR_POLICY_REQUIRE;
-    }
-    else if (m_polAuto->isChecked())
-    {
-        policy = OTR_POLICY_AUTO;
-    }
-    else if (m_polEnable->isChecked())
-    {
-        policy = OTR_POLICY_ENABLED;
-    }
+    OtrPolicy policy = static_cast<OtrPolicy>(m_policy->checkedId());
     
     m_optionHost->setPluginOption(PSI_CONFIG_POLICY, policy);
     m_optionHost->setPluginOption(PSI_CONFIG_END_WHEN_OFFLINE,
