@@ -25,6 +25,8 @@
 
 #include <QWidget>
 #include <QModelIndex>
+#include <QCheckBox>
+#include <QRadioButton>
 #include <QComboBox>
 #include <QPoint>
 
@@ -82,11 +84,12 @@ private:
     OptionAccessingHost* m_optionHost;
     OtrMessaging*        m_otr;
 
-    QCheckBox*   m_polEnable;
-    QCheckBox*   m_polAuto;
-    QCheckBox*   m_polRequire;
+    QRadioButton*        m_polDisable;
+    QRadioButton*        m_polEnable;
+    QRadioButton*        m_polAuto;
+    QRadioButton*        m_polRequire;
 
-    QCheckBox*   m_endWhenOffline;
+    QCheckBox*           m_endWhenOffline;
 
 private slots:
     void widgetsChanged();

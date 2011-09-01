@@ -22,7 +22,6 @@
 #include "optionaccessinghost.h"
 #include "accountinfoaccessinghost.h"
 
-#include <QCheckBox>
 #include <QGroupBox>
 #include <QVBoxLayout>
 #include <QLabel>
@@ -83,9 +82,12 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
     QGroupBox* policyGroup = new QGroupBox(tr("OTR Policy"), this);
     QVBoxLayout* policyLayout = new QVBoxLayout(policyGroup);
 
-    m_polEnable = new QCheckBox(tr("Enable private messaging"), policyGroup);
-    m_polAuto = new QCheckBox(tr("Automatically start private messaging"), policyGroup);
-    m_polRequire = new QCheckBox(tr("Require private messaging"), policyGroup);
+    m_polDisable = new QRadioButton(tr("Disable private messaging"), policyGroup);
+    m_polEnable  = new QRadioButton(tr("Manually start private messaging"), policyGroup);
+    m_polAuto    = new QRadioButton(tr("Automatically start private messaging"), policyGroup);
+    m_polRequire = new QRadioButton(tr("Require private messaging"), policyGroup);
+
+    policyLayout->addWidget(m_polDisable);
     policyLayout->addWidget(m_polEnable);
     policyLayout->addWidget(m_polAuto);
     policyLayout->addWidget(m_polRequire);
@@ -107,12 +109,16 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
     switch (policyOption.toInt())
     {
         case OTR_POLICY_REQUIRE:
-            m_polRequire->setCheckState(Qt::Checked);
+            m_polRequire->setChecked(true);
+            break;
         case OTR_POLICY_AUTO:
-            m_polAuto->setCheckState(Qt::Checked);
+            m_polAuto->setChecked(true);
+            break;
         case OTR_POLICY_ENABLED:
-            m_polEnable->setCheckState(Qt::Checked);
+            m_polEnable->setChecked(true);
+            break;
         case OTR_POLICY_OFF:
+            m_polDisable->setChecked(true);
             break;
     }
 
@@ -123,12 +129,15 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
 
     widgetsChanged();
 
-    connect(m_polEnable,  SIGNAL(stateChanged(int)),
+    connect(m_polDisable, SIGNAL(toggled(bool)),
             SLOT(widgetsChanged()));
-    connect(m_polAuto,    SIGNAL(stateChanged(int)),
+    connect(m_polEnable,  SIGNAL(toggled(bool)),
             SLOT(widgetsChanged()));
-    connect(m_polRequire, SIGNAL(stateChanged(int)),
+    connect(m_polAuto,    SIGNAL(toggled(bool)),
             SLOT(widgetsChanged()));
+    connect(m_polRequire, SIGNAL(toggled(bool)),
+            SLOT(widgetsChanged()));
+
     connect(m_endWhenOffline, SIGNAL(stateChanged(int)),
             SLOT(widgetsChanged()));
 }
@@ -137,36 +146,16 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
 
 void ConfigOtrWidget::widgetsChanged()
 {
-    if (m_polEnable->checkState() == Qt::Unchecked)
-    {
-        m_polAuto->setEnabled(false);
-        m_polAuto->setCheckState(Qt::Unchecked);
-    }
-    if (m_polAuto->checkState() == Qt::Unchecked)
-    {
-        m_polRequire->setEnabled(false);
-        m_polRequire->setCheckState(Qt::Unchecked);
-    }
-    if (m_polEnable->checkState() == Qt::Checked)
-    {
-        m_polAuto->setEnabled(true);
-    }
-    if (m_polAuto->checkState() == Qt::Checked)
-    {
-        m_polRequire->setEnabled(true);
-    }
-
-
     OtrPolicy policy = OTR_POLICY_OFF;
-    if (m_polRequire->checkState() == Qt::Checked)
+    if (m_polRequire->isChecked())
     {
         policy = OTR_POLICY_REQUIRE;
     }
-    else if (m_polAuto->checkState() == Qt::Checked)
+    else if (m_polAuto->isChecked())
     {
         policy = OTR_POLICY_AUTO;
     }
-    else if (m_polEnable->checkState() == Qt::Checked)
+    else if (m_polEnable->isChecked())
     {
         policy = OTR_POLICY_ENABLED;
     }
