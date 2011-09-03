@@ -799,7 +799,8 @@ const char* OtrInternal::account_name(const char *account,
                                       const char *protocol)
 {
     Q_UNUSED(protocol);
-    return m_callback->humanAccountPublic(QString::fromUtf8(account)).toUtf8().constData();
+    return qstrdup(m_callback->humanAccountPublic(QString::fromUtf8(account))
+                                                 .toUtf8().constData());
 }
 
 // ---------------------------------------------------------------------------
@@ -807,6 +808,7 @@ const char* OtrInternal::account_name(const char *account,
 void OtrInternal::account_name_free(const char *account_name)
 {
     Q_UNUSED(account_name);
+    delete [] account_name;
 }
 
 // ---------------------------------------------------------------------------
