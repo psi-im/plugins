@@ -807,7 +807,6 @@ const char* OtrInternal::account_name(const char *account,
 
 void OtrInternal::account_name_free(const char *account_name)
 {
-    Q_UNUSED(account_name);
     delete [] account_name;
 }
 
