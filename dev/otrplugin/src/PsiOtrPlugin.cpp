@@ -195,11 +195,12 @@ void PsiOtrPlugin::restoreOptions()
 
 bool PsiOtrPlugin::processEvent(int accountNo, QDomElement& e)
 {
-    if (m_enabled && e.attribute("type") == "MessageEvent" &&
-        !e.firstChildElement("message").isNull())
-    {
-        QDomElement messageElement = e.firstChildElement("message");
+    QDomElement messageElement = e.firstChildElement("message");
 
+    if (m_enabled && e.attribute("type") == "MessageEvent" &&
+        !messageElement.isNull() &&
+        messageElement.attribute("type") != "error")
+    {
         QString contact = getCorrectJid(accountNo,
                                         messageElement.attribute("from"));
         QString account = m_accountInfo->getId(accountNo);

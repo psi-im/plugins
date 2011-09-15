@@ -1,7 +1,7 @@
 include(../../psiplugin.pri)
 
 CONFIG += release
-LIBS += -lotr -ltidy -L/usr/local/lib
+LIBS += -lotr -ltidy -lgcrypt -L/usr/local/lib
 RESOURCES = psi-otr.qrc
 
 HEADERS += src/PsiOtrPlugin.hpp
