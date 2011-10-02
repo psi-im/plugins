@@ -223,7 +223,7 @@ bool PsiOtrPlugin::processEvent(int accountNo, QDomElement& e)
         }
 
         QString decrypted;
-        if (m_otrConnection->decryptMessage(contact, account, cyphertext,
+        if (m_otrConnection->decryptMessage(contact, account, Qt::escape(cyphertext),
                                             decrypted))
         {
             if (m_onlineUsers.contains(account) && 
