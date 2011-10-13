@@ -31,7 +31,6 @@ public:
 
 private:
 	yandexnarodNetMan *netman;
-	//yandexnarodNetMan *upnetman;
 	QStringList cooks;
 	QList<QIcon> fileicons;
 	QHash<QString, int> fileiconstyles;
@@ -51,8 +50,12 @@ private slots:
 	void on_listWidget_pressed(QModelIndex index);
 	void on_btnReload_clicked();
 	void on_btnUpload_clicked();
+	void on_btnProlong_clicked();
 	void removeUploadWidget();
 	void netmanFinished();
+
+private:
+	QList<yandexnarodNetMan::FileItem> selectedItems() const;
 
 signals:
 	void cookies(QStringList);

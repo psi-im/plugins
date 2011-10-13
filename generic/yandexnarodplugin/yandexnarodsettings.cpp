@@ -26,6 +26,7 @@ yandexnarodSettings::yandexnarodSettings(OptionAccessingHost *host)
 
 	connect(ui.btnTest, SIGNAL(clicked()), this,  SLOT(saveSettings()));
 	connect(ui.btnTest, SIGNAL(clicked()), this,  SIGNAL(testclick()));
+	connect(ui.pb_startManager, SIGNAL(clicked()), this, SIGNAL(startManager()));
 }
 
 yandexnarodSettings::~yandexnarodSettings()

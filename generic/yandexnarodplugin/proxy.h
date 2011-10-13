@@ -17,6 +17,7 @@
 #define PROXY_H
 
 #include <QObject>
+#include <QNetworkProxy>
 
 #include "applicationinfoaccessinghost.h"
 
@@ -27,7 +28,8 @@ public:
 	static ProxyManager* instance();
 	static void reset();
 	void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
-	Proxy getProxy();
+	QNetworkProxy getProxy() const;
+	bool useProxy() const;
 
 private:
 	static ProxyManager* instance_;

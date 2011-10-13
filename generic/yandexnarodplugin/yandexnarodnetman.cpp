@@ -26,13 +26,8 @@ yandexnarodNetMan::yandexnarodNetMan(QObject *parent, OptionAccessingHost* host)
 	netman = new QNetworkAccessManager(this);
 	connect(netman, SIGNAL(finished(QNetworkReply*)), this, SLOT(netrpFinished(QNetworkReply*)));
 
-	Proxy p = ProxyManager::instance()->getProxy();
-	if(!p.host.isEmpty()) {
-		QNetworkProxy np(QNetworkProxy::HttpCachingProxy, p.host, p.port, p.user, p.pass);
-		if(p.type != "http")
-			np.setType(QNetworkProxy::Socks5Proxy);
-
-		netman->setProxy(np);
+	if(ProxyManager::instance()->useProxy()) {
+		netman->setProxy(ProxyManager::instance()->getProxy());
 	}
 
 	loadSettings();
@@ -63,9 +58,23 @@ void yandexnarodNetMan::startGetFilelist() {
 }
 
 void yandexnarodNetMan::startDelFiles(QList<FileItem> fileItems_) {
+	if(fileItems_.isEmpty()) {
+		emit finished();
+		return;
+	}
 	action = "del_files";
 	fileItems = fileItems_;
 //	loadCookies();
+	netmanDo();
+}
+
+void yandexnarodNetMan::startProlongFiles(QList<FileItem> fileItems_) {
+	if(fileItems_.isEmpty()) {
+		emit finished();
+		return;
+	}
+	action = "prolong_files";
+	fileItems = fileItems_;
 	netmanDo();
 }
 
@@ -143,7 +152,9 @@ void yandexnarodNetMan::netmanDo() {
 				}
 				post = "login=" + narodLogin.toLatin1() + "&passwd=" + narodPasswd.toLatin1();
 			}
-			else { post.clear(); }
+			else {
+				post.clear();
+			}
 			if (!post.isEmpty() && narodCaptchaKey.length()>0) {
 				post += "&idkey="+narodCaptchaKey.toLatin1()+"&code="+authdialog.getCode();
 			}
@@ -168,12 +179,12 @@ void yandexnarodNetMan::netmanDo() {
 			netreq.setUrl(QUrl("http://narod.yandex.ru/disk/all/page1/?sort=cdate%20desc"));
 			netman->get(netreq);
 		}
-		else if (action=="del_files") {
+		else if (action == "del_files" || action == "prolong_files") {
 			emit progressMax(1);
 			emit progressValue(0);
-			emit statusText(tr("Deleting files..."));
+			emit statusText((action == "del_files") ? tr("Deleting files...") : tr("Prolongate files..."));
 			QByteArray postData;
-			postData.append("action=delete");
+			postData.append((action == "del_files") ? "action=delete" : "action=prolongate");
 			foreach (const FileItem& item,  fileItems) {
 				postData.append(QString("&fid=%1&token-%1=%2").arg(item.fileid, item.token));
 			}
@@ -278,7 +289,8 @@ void yandexnarodNetMan::netrpFinished( QNetworkReply* reply ) {
 								emit statusText(tr("Authorization captcha request"));
 								narodCaptchaKey = rx.cap(1);
 								netreq.setUrl(QUrl("http://narod.yandex.ru")); //hack
-								netmanDo(); stop=true;
+								netmanDo();
+								stop=true;
 							}
 							else {
 								auth_flag = -1;
@@ -303,6 +315,7 @@ void yandexnarodNetMan::netrpFinished( QNetworkReply* reply ) {
 
 	if (!stop && auth_flag < 0) {
 		emit statusText(tr("Authorization failed"));
+		emit finished();
 	}
 
 	if (!stop && auth_flag>-1) {
@@ -317,7 +330,9 @@ void yandexnarodNetMan::netrpFinished( QNetworkReply* reply ) {
 				emit progressMax(filesnum);
 			}
 			int cpos=0;
-			QRegExp rx("class=\"\\S+icon\\s(\\S+)\"[^<]+<img[^<]+</i[^<]+</td[^<]+<td[^<]+<input[^v]+value=\"(\\d+)\" data-token=\"(\\S+)\"[^<]+</td[^<]+<td[^<]+<span\\sclass='b-fname'><a\\shref=\"(\\S+)\">([^<]+)");
+			QRegExp rx("class=\"\\S+icon\\s(\\S+)\"[^<]+<img[^<]+</i[^<]+</td[^<]+<td[^<]+<input[^v]+value=\"(\\d+)\" data-token=\"(\\S+)\""
+				   "[^<]+</td[^<]+<td[^<]+<span\\sclass='b-fname'><a\\shref=\"(\\S+)\">([^<]+)</a>.*"
+				   "<td class=\"size\">(\\S+)</td>.*<td class=\"date prolongate\"><nobr>(\\S+ \\S+)</nobr></td>");
 			cpos = rx.indexIn(page);
 			while (cpos > 0) {
 				FileItem fileitem;
@@ -326,6 +341,8 @@ void yandexnarodNetMan::netrpFinished( QNetworkReply* reply ) {
 				fileitem.token = rx.cap(3);
 				fileitem.fileurl = rx.cap(4);
 				fileitem.fileicon = rx.cap(1);
+				fileitem.size = QString::fromUtf8(rx.cap(6).toLatin1());
+				fileitem.date = QString::fromUtf8(rx.cap(7).toLatin1());
 				emit newFileItem(fileitem);
 				fileids.append(rx.cap(2));
 				emit progressValue(fileids.count());
@@ -347,9 +364,15 @@ void yandexnarodNetMan::netrpFinished( QNetworkReply* reply ) {
 			emit progressValue(1);
 			emit finished();
 		}
+		else if (action=="prolong_files") {
+			emit statusText(tr("File(s) prolongated"));
+			emit progressValue(1);
+			emit finished();
+		}
 		else if (action=="upload") {
 			if (nstep==1 || nstep==2) {
-				nstep++; netmanDo();
+				nstep++;
+				netmanDo();
 			}
 			else if (nstep==3) {
 				emit finished();

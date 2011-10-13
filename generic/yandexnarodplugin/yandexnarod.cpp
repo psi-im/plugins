@@ -54,6 +54,8 @@ QWidget* yandexnarodPlugin::options()
 
 	settingswidget = new yandexnarodSettings(psiOptions);
 	connect(settingswidget, SIGNAL(testclick()), this,  SLOT(on_btnTest_clicked()));
+	connect(settingswidget, SIGNAL(startManager()), this, SLOT(manage_clicked()));
+
 	return settingswidget;
 }
 

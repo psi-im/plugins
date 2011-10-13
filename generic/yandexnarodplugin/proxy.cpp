@@ -18,8 +18,9 @@
 ProxyManager* ProxyManager::instance_ = 0;
 
 
-ProxyManager::ProxyManager() :
-    QObject()
+ProxyManager::ProxyManager()
+	: QObject()
+	, appInfo(0)
 {
 }
 
@@ -43,8 +44,27 @@ void ProxyManager::reset()
 	instance_ = 0;
 }
 
-Proxy ProxyManager::getProxy()
+bool ProxyManager::useProxy() const
 {
-	return appInfo->getProxyFor("Yandex Narod Plugin");
+	bool use = false;
+	if(appInfo) {
+		Proxy p = appInfo->getProxyFor("Yandex Narod Plugin");
+		use = !p.host.isEmpty();
+	}
+
+	return use;
+}
+
+QNetworkProxy ProxyManager::getProxy() const
+{
+	QNetworkProxy np;
+	if(appInfo) {
+		Proxy p = appInfo->getProxyFor("Yandex Narod Plugin");
+		np = QNetworkProxy(QNetworkProxy::HttpCachingProxy, p.host, p.port, p.user, p.pass);
+		if(p.type != "http")
+			np.setType(QNetworkProxy::Socks5Proxy);
+	}
+
+	return np;
 }
 

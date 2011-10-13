@@ -2,6 +2,7 @@
     requestAuthDialog
 
     Copyright (c) 2008-2009 by Alexander Kazarin <boiler@co.ru>
+		  2011 by Evgeny Khryukin
 
  ***************************************************************************
  *                                                                         *
@@ -13,8 +14,8 @@
  ***************************************************************************
 */
 
-//#include <qutim/plugininterface.h>
 #include "requestauthdialog.h"
+#include "proxy.h"
 
 requestAuthDialog::requestAuthDialog(QWidget *parent) : QDialog(parent)
 {
@@ -22,7 +23,8 @@ requestAuthDialog::requestAuthDialog(QWidget *parent) : QDialog(parent)
 	ui.frameCaptcha->hide();
 	this->setFixedHeight(180);
 	this->setMaximumHeight(180);
-//	qutim_sdk_0_2::SystemsCity::PluginSystem()->centerizeWidget(this);
+	if(ProxyManager::instance()->useProxy())
+		ui.webCaptcha->page()->networkAccessManager()->setProxy(ProxyManager::instance()->getProxy());
 }
 
 
@@ -31,7 +33,8 @@ requestAuthDialog::~requestAuthDialog()
 	
 }
 
-void requestAuthDialog::setCaptcha(QString imgurl) {
+void requestAuthDialog::setCaptcha(QString imgurl)
+{
 	this->setFixedHeight(305);
 	this->setMaximumHeight(305);
 	ui.frameCaptcha->show();

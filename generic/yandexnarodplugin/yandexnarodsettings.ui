@@ -68,18 +68,12 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
-    <spacer name="horizontalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+   <item row="5" column="2">
+    <widget class="QPushButton" name="pb_startManager">
+     <property name="text">
+      <string>Start Manager</string>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>245</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
+    </widget>
    </item>
    <item row="6" column="0">
     <widget class="QLabel" name="label">
@@ -88,7 +82,7 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
+   <item row="7" column="0" colspan="2">
     <widget class="QTextEdit" name="textTpl">
      <property name="html">
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -99,7 +93,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="8" column="0">
+   <item row="8" column="0" colspan="2">
     <widget class="QLabel" name="label_2">
      <property name="maximumSize">
       <size>

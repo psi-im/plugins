@@ -43,12 +43,15 @@ public:
 		QString filename;
 		QString fileurl;
 		QString token;
+		QString size;
+		QString date;
 	};
 
 	void setFilepath (QString arg) { filepath = arg; }
 	void startAuthTest(QString, QString);
 	void startGetFilelist();
 	void startDelFiles(QList<FileItem> fileItems);
+	void startProlongFiles(QList<FileItem> fileItems);
 	void startUploadFile(QString);
 
 private:

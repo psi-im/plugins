@@ -22,7 +22,7 @@
 #define CONST_PASS "pass"
 #define CONST_TEMPLATE "template"
 #define CONST_LAST_FOLDER "lastfolder"
-#define VERSION "0.0.1"
+#define VERSION "0.0.2"
 
 class OptionAccessingHost;
 
@@ -48,6 +48,7 @@ private:
 
 signals:
 	void testclick();
+	void startManager();
 
 };
 #endif

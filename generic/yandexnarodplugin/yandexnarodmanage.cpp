@@ -79,6 +79,14 @@ void yandexnarodManage::newFileItem(yandexnarodNetMan::FileItem fileitem)
 	QListWidgetItem *listitem = new QListWidgetItem(fileicons[iconnum], fileitem.filename);
 	listWidget->addItem(listitem);
 
+	QString toolTip = tr("Name: %1\nSize: %2\nDate prolongate: %3\nURL: %4")
+				.arg(fileitem.filename)
+				.arg(fileitem.size.replace("&nbsp;", " "))
+				.arg(fileitem.date)
+				.arg(fileitem.fileurl);
+
+	listitem->setToolTip(toolTip);
+
 	fileitems.append(fileitem);
 }
 
@@ -110,7 +118,18 @@ void yandexnarodManage::on_btnDelete_clicked()
 {
 	progressBar->setMaximum(1);
 	netmanPrepare();
+	netman->startDelFiles(selectedItems());
+}
 
+void yandexnarodManage::on_btnProlong_clicked()
+{
+	progressBar->setMaximum(1);
+	netmanPrepare();
+	netman->startProlongFiles(selectedItems());
+}
+
+QList<yandexnarodNetMan::FileItem> yandexnarodManage::selectedItems() const
+{
 	QList<yandexnarodNetMan::FileItem> delfileids;
 	for (int i = 0; i < listWidget->count(); i++) {
 		if (listWidget->item(i)->isSelected()) {
@@ -119,7 +138,7 @@ void yandexnarodManage::on_btnDelete_clicked()
 		}
 	}
 
-	netman->startDelFiles(delfileids);
+	return delfileids;
 }
 
 void yandexnarodManage::on_listWidget_pressed(QModelIndex)
