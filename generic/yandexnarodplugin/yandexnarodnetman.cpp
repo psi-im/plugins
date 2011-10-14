@@ -127,21 +127,21 @@ void yandexnarodNetMan::loadSettings() {
 void yandexnarodNetMan::netmanDo() {
 	QStringList cooks;
 	QNetworkCookieJar *netcookjar = netman->cookieJar();
-	foreach (QNetworkCookie netcook, netcookjar->cookiesForUrl(QUrl("http://narod.yandex.ru"))) {
+	QList<QNetworkCookie> cookList = netcookjar->cookiesForUrl(QUrl("http://narod.yandex.ru"));
+	foreach (QNetworkCookie netcook, cookList) {
 		cooks.append(netcook.name()+"="+netcook.value());
 	}
-	if (cooks.isEmpty() && netreq.url().toString() != "http://passport.yandex.ru/passport?mode=auth") {
+	if (cooks.isEmpty() || netreq.url().toString() != "http://passport.yandex.ru/passport?mode=auth") {
 		emit statusText(tr("Authorizing..."));
 		narodLogin = psiOptions->getPluginOption(CONST_LOGIN).toString();
 		narodPasswd = psiOptions->getPluginOption(CONST_PASS).toString();
 		QByteArray post = "login=" + narodLogin.toLatin1() + "&passwd=" + narodPasswd.toLatin1();
-//qDebug()<<"SEND AUTH";
-		if (narodLogin.isEmpty() || narodPasswd.isEmpty() || narodCaptchaKey.length()>0) {
+		if (narodLogin.isEmpty() || narodPasswd.isEmpty() || !narodCaptchaKey.isEmpty()) {
 			requestAuthDialog authdialog;
 			authdialog.setLogin(narodLogin);
 			authdialog.setPasswd(narodPasswd);
-			if (narodCaptchaKey.length()>0) {
-				authdialog.setCaptcha("http://passport.yandex.ru/digits?idkey="+narodCaptchaKey);
+			if (!narodCaptchaKey.isEmpty()) {
+				authdialog.setCaptcha(cookList, "http://passport.yandex.ru/digits?idkey="+narodCaptchaKey);
 			}
 			if (authdialog.exec()) {
 				narodLogin = authdialog.getLogin();
@@ -155,7 +155,7 @@ void yandexnarodNetMan::netmanDo() {
 			else {
 				post.clear();
 			}
-			if (!post.isEmpty() && narodCaptchaKey.length()>0) {
+			if (!post.isEmpty() && !narodCaptchaKey.isEmpty()) {
 				post += "&idkey="+narodCaptchaKey.toLatin1()+"&code="+authdialog.getCode();
 			}
 		}
@@ -232,7 +232,8 @@ void yandexnarodNetMan::netmanDo() {
 
 						netreq.setRawHeader("Content-Type", "multipart/form-data, boundary=" + boundary.toLatin1());
 						netreq.setRawHeader("Content-Length", QString::number(mpData.length()).toLatin1());
-						for (int i=0; i<cooks.size(); ++i) netreq.setRawHeader("Cookie", cooks[i].toLatin1());
+						for (int i=0; i<cooks.size(); ++i)
+							netreq.setRawHeader("Cookie", cooks[i].toLatin1());
 
 						emit statusFileName(fName);
 
@@ -268,40 +269,40 @@ void yandexnarodNetMan::netrpFinished( QNetworkReply* reply ) {
 	QString replycookstr = reply->rawHeader("Set-Cookie");
 	if (!replycookstr.isEmpty()) {
 		QNetworkCookieJar *netcookjar = netman->cookieJar();
-		foreach (QNetworkCookie netcook, netcookjar->cookiesForUrl(QUrl("http://narod.yandex.ru"))) {
-//qDebug()<<"Cookie"<<netcook.name()<<netcook.value();
-			if (netcook.name()=="yandex_login") {
-				if (netcook.value().isEmpty()) {
-					if (reply->url().toString()=="http://passport.yandex.ru/passport?mode=auth") {
-						QRegExp rx("<input type=\"?submit\"?[^>]+name=\"no\"");
-						if (rx.indexIn(page)>0) {
-							QRegExp rx1("<input type=\"hidden\" name=\"idkey\" value=\"(\\S+)\"[^>]*>");
-							if (rx1.indexIn(page)>0) {
-//qDebug()<<"Confirmation send";
-								QByteArray post = "idkey="+rx1.cap(1).toAscii()+"&no=no";
-								netman->post(netreq, post);
-								stop=true;
-							}
-						}
-						else {
-							rx.setPattern("<img\\ssrc=\"\\S+\\?idkey=(\\S+)\"\\sname=\"captcha\"");
-							if (rx.indexIn(page)>0) {
-								emit statusText(tr("Authorization captcha request"));
-								narodCaptchaKey = rx.cap(1);
-								netreq.setUrl(QUrl("http://narod.yandex.ru")); //hack
-								netmanDo();
-								stop=true;
-							}
-							else {
-								auth_flag = -1;
-							}
-						}
+		QList<QNetworkCookie> cooks = netcookjar->cookiesForUrl(QUrl("http://narod.yandex.ru"));
+		bool found = false;
+		foreach (QNetworkCookie netcook, cooks) {
+			if (netcook.name() == "yandex_login" && !netcook.value().isEmpty())
+				found = true;
+		}
+		if (!found) {
+			if (reply->url().toString()=="http://passport.yandex.ru/passport?mode=auth") {
+				QRegExp rx("<input type=\"?submit\"?[^>]+name=\"no\"");
+				if (rx.indexIn(page) > 0) {
+					QRegExp rx1("<input type=\"hidden\" name=\"idkey\" value=\"(\\S+)\"[^>]*>");
+					if (rx1.indexIn(page) > 0) {
+						QByteArray post = "idkey="+rx1.cap(1).toAscii()+"&no=no";
+						netman->post(netreq, post);
+						stop=true;
 					}
 				}
-				else auth_flag = 1;
+				else {
+					rx.setPattern("<input type=\"hidden\" name=\"idkey\" value=\"(\\S+)\" />");
+					if (rx.indexIn(page) > 0) {
+						emit statusText(tr("Authorization captcha request"));
+						narodCaptchaKey = rx.cap(1);
+						netreq.setUrl(QUrl("http://narod.yandex.ru")); //hack
+						netmanDo();
+						stop=true;
+					}
+					else {
+						auth_flag = -1;
+					}
+				}
 			}
-
 		}
+		else
+			auth_flag = 1;
 	}
 
 	if (!stop && reply->url().toString()=="http://passport.yandex.ru/passport?mode=auth") {
@@ -391,4 +392,5 @@ void yandexnarodNetMan::netrpFinished( QNetworkReply* reply ) {
 			}
 		}
 	}
+	reply->deleteLater();
 }

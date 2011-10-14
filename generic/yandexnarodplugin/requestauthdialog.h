@@ -25,13 +25,13 @@ class requestAuthDialog : public QDialog
 public:
 	requestAuthDialog(QWidget *parent = 0);
 	~requestAuthDialog();
-	void setLogin(QString login) { ui.editLogin->setText(login); ui.editPasswd->setFocus(); }
-	void setPasswd(QString passwd) { ui.editPasswd->setText(passwd); ui.editPasswd->setFocus(); }
-	QString getLogin() { return ui.editLogin->text(); }
-	QString getPasswd() { return ui.editPasswd->text(); }
-	bool getRemember() { return ui.cbRemember->isChecked(); }
-	QString getCode() { return ui.editCaptcha->text(); }
-	void setCaptcha(QString);
+	void setLogin(const QString& login) { ui.editLogin->setText(login); ui.editPasswd->setFocus(); }
+	void setPasswd(const QString& passwd) { ui.editPasswd->setText(passwd); ui.editPasswd->setFocus(); }
+	QString getLogin() const { return ui.editLogin->text(); }
+	QString getPasswd() const { return ui.editPasswd->text(); }
+	bool getRemember() const { return ui.cbRemember->isChecked(); }
+	QString getCode() const { return ui.editCaptcha->text(); }
+	void setCaptcha(const QList<QNetworkCookie>& cooks, const QString& url);
 
 
 private:

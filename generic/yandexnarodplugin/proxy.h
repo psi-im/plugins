@@ -16,10 +16,9 @@
 #ifndef PROXY_H
 #define PROXY_H
 
-#include <QObject>
 #include <QNetworkProxy>
 
-#include "applicationinfoaccessinghost.h"
+class ApplicationInfoAccessingHost;
 
 class ProxyManager : public QObject
 {
@@ -34,6 +33,7 @@ public:
 private:
 	static ProxyManager* instance_;
 	ProxyManager();
+	virtual ~ProxyManager();
 
 	ApplicationInfoAccessingHost* appInfo;
 };

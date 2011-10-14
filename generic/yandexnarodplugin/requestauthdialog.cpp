@@ -14,17 +14,19 @@
  ***************************************************************************
 */
 
+#include <QNetworkCookieJar>
 #include "requestauthdialog.h"
 #include "proxy.h"
 
-requestAuthDialog::requestAuthDialog(QWidget *parent) : QDialog(parent)
+requestAuthDialog::requestAuthDialog(QWidget *parent)
+	: QDialog(parent)
 {
 	ui.setupUi(this);
 	ui.frameCaptcha->hide();
-	this->setFixedHeight(180);
-	this->setMaximumHeight(180);
 	if(ProxyManager::instance()->useProxy())
 		ui.webCaptcha->page()->networkAccessManager()->setProxy(ProxyManager::instance()->getProxy());
+
+	setFixedSize(size());
 }
 
 
@@ -33,11 +35,12 @@ requestAuthDialog::~requestAuthDialog()
 	
 }
 
-void requestAuthDialog::setCaptcha(QString imgurl)
+void requestAuthDialog::setCaptcha(const QList<QNetworkCookie> &cooks, const QString &url)
 {
-	this->setFixedHeight(305);
-	this->setMaximumHeight(305);
 	ui.frameCaptcha->show();
-	ui.webCaptcha->setHtml("<img src='"+imgurl+"'>");
+	ui.webCaptcha->page()->networkAccessManager()->cookieJar()->setCookiesFromUrl(cooks, url);
+	ui.webCaptcha->setHtml("<img src=\"" + url + "\" />");
 	ui.labelCaptcha->show();
+	adjustSize();
+	setFixedSize(size());
 }

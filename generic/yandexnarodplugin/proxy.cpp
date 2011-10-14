@@ -13,14 +13,20 @@
  ***************************************************************************
 */
 
+#include <QApplication>
 #include "proxy.h"
+#include "applicationinfoaccessinghost.h"
 
 ProxyManager* ProxyManager::instance_ = 0;
 
 
 ProxyManager::ProxyManager()
-	: QObject()
+	: QObject(QApplication::instance())
 	, appInfo(0)
+{
+}
+
+ProxyManager::~ProxyManager()
 {
 }
 

@@ -22,7 +22,7 @@
 #define CONST_PASS "pass"
 #define CONST_TEMPLATE "template"
 #define CONST_LAST_FOLDER "lastfolder"
-#define VERSION "0.0.2"
+#define VERSION "0.0.3"
 
 class OptionAccessingHost;
 

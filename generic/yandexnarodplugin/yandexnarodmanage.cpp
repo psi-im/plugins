@@ -23,7 +23,7 @@
 #define CONST_HEIGHT "height"
 
 yandexnarodManage::yandexnarodManage(OptionAccessingHost *host)
-	: QDialog()
+	: QDialog(0, Qt::Window)
 	, psiOptions(host)
 {
 	setupUi(this);
@@ -39,6 +39,8 @@ yandexnarodManage::yandexnarodManage(OptionAccessingHost *host)
 	connect(netman, SIGNAL(progressValue(int)), progressBar, SLOT(setValue(int)));
 	connect(netman, SIGNAL(newFileItem(yandexnarodNetMan::FileItem)), this, SLOT(newFileItem(yandexnarodNetMan::FileItem)));
 	connect(netman, SIGNAL(finished()), this, SLOT(netmanFinished()));
+
+	this->btnProlong->hide(); // hide cos it doesnt work
 
 	QPixmap iconimage(":/icons/yandexnarod-icons-files.png");
 	for (int i=0; i<(iconimage.width()/16); i++) {

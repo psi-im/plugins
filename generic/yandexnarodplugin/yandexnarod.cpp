@@ -171,7 +171,7 @@ void yandexnarodPlugin::on_btnTest_clicked()
 void yandexnarodPlugin::on_TestFinished()
 {
 	yandexnarodNetMan* testnetman = static_cast<yandexnarodNetMan*>(sender());
-	delete testnetman;
+	testnetman->deleteLater();
 	restoreOptions();
 }
 
@@ -219,7 +219,9 @@ void yandexnarodPlugin::onFileURL(const QString& url)
 
 QString yandexnarodPlugin::pluginInfo()
 {
-	return tr("Ported from QutIM Yandex.Narod plugin\nhttp://qutim.org/forum/viewtopic.php?f=62&t=711");
+	return trUtf8("Ported from QutIM Yandex.Narod plugin\nhttp://qutim.org/forum/viewtopic.php?f=62&t=711\n\n"
+		  "If authorization fails, go to page http://passport.yandex.ru/passport?mode=tune"
+		  " and enable \"Don't remember me\" option");
 }
 
 Q_EXPORT_PLUGIN(yandexnarodPlugin);
