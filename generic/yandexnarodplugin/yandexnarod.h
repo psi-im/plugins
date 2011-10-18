@@ -81,7 +81,6 @@ private:
 private slots:
 	void manage_clicked();
 	void on_btnTest_clicked();
-	void on_TestFinished();
 	void actionStart();
 	void onFileURL(const QString& url);
 };

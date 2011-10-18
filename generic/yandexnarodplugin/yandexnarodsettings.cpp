@@ -15,9 +15,10 @@
 
 #include "yandexnarodsettings.h"
 #include "optionaccessinghost.h"
+#include "options.h"
 
-yandexnarodSettings::yandexnarodSettings(OptionAccessingHost *host)
-	: psiOptions(host)
+yandexnarodSettings::yandexnarodSettings(QWidget *p)
+	: QWidget(p)
 {
 	ui.setupUi(this);
 	ui.labelStatus->setText(NULL);
@@ -35,19 +36,21 @@ yandexnarodSettings::~yandexnarodSettings()
 
 void yandexnarodSettings::saveSettings()
 {
-	psiOptions->setPluginOption(CONST_LOGIN, ui.editLogin->text());
-	psiOptions->setPluginOption(CONST_PASS, ui.editPasswd->text());
-	psiOptions->setPluginOption(CONST_TEMPLATE,  ui.textTpl->toPlainText());
+	Options* o = Options::instance();
+	o->setOption(CONST_LOGIN, ui.editLogin->text());
+	o->setOption(CONST_PASS, ui.editPasswd->text());
+	o->setOption(CONST_TEMPLATE,  ui.textTpl->toPlainText());
 }
 
-void yandexnarodSettings::setStatus(QString str)
+void yandexnarodSettings::setStatus(const QString& str)
 {
 	ui.labelStatus->setText(str);
 }
 
 void yandexnarodSettings::restoreSettings()
 {
-	ui.editLogin->setText(psiOptions->getPluginOption(CONST_LOGIN).toString());
-	ui.editPasswd->setText(psiOptions->getPluginOption(CONST_PASS).toString());
-	ui.textTpl->setText(psiOptions->getPluginOption(CONST_TEMPLATE, QVariant("File sent: %N (%S bytes)\n%U")).toString());
+	Options* o = Options::instance();
+	ui.editLogin->setText(o->getOption(CONST_LOGIN).toString());
+	ui.editPasswd->setText(o->getOption(CONST_PASS).toString());
+	ui.textTpl->setText(o->getOption(CONST_TEMPLATE, QVariant("File sent: %N (%S bytes)\n%U")).toString());
 }

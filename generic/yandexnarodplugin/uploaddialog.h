@@ -2,6 +2,8 @@
     uploadDialog
 
     Copyright (c) 2008 by Alexander Kazarin <boiler@co.ru>
+		  2011 Evgeny Khryukin
+
 
  ***************************************************************************
  *                                                                         *
@@ -20,6 +22,8 @@
 #include <QDialog>
 #include "ui_uploaddialog.h"
 
+class UploadManager;
+
 class uploadDialog : public QDialog
 {
 	Q_OBJECT
@@ -27,20 +31,24 @@ class uploadDialog : public QDialog
 public:
 	uploadDialog(QWidget* p = 0);
 	~uploadDialog();
-	void start();
+	void start(const QString& fileName);
 
 private:
+	void setFilename(const QString& str);
 	Ui::uploadDialogClass ui;
 	QTime utime;
+	UploadManager* netman;
+
 
 signals:
 	void canceled();
+	void finished();
+	void fileUrl(const QString&);
 
-public slots:
+private slots:
 	void progress(qint64, qint64);
-	void setStatus(QString str) { ui.labelStatus->setText(str); }
-	void setFilename(QString str) { ui.labelFile->setText("File: "+str); this->setWindowTitle(tr("Uploading")+" - "+str); }
-	void setDone() { ui.btnUploadCancel->setText(tr("Done")); }
+	void setStatus(const QString& str) { ui.labelStatus->setText(str); }
+	void setDone();
 
 };
 #endif

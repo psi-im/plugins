@@ -22,29 +22,27 @@
 #define CONST_PASS "pass"
 #define CONST_TEMPLATE "template"
 #define CONST_LAST_FOLDER "lastfolder"
-#define VERSION "0.0.3"
-
-class OptionAccessingHost;
+#define VERSION "0.0.4"
 
 class yandexnarodSettings  : public QWidget
 {
 	Q_OBJECT;
 
 public:
-	yandexnarodSettings(OptionAccessingHost* host);
+	yandexnarodSettings(QWidget *p = 0);
 	~yandexnarodSettings();
-	QString getLogin() { return ui.editLogin->text(); }
-	QString getPasswd() { return ui.editPasswd->text(); }
+	QString getLogin() const { return ui.editLogin->text(); }
+	QString getPasswd() const { return ui.editPasswd->text(); }
 	void btnTest_enabled(bool b) { ui.btnTest->setEnabled(b); }
 	void restoreSettings();
 
 public slots:
-	void setStatus(QString str);
+	void setStatus(const QString& str);
 	void saveSettings();
 
 private:
 	Ui::yandexnarodSettingsClass ui;
-	OptionAccessingHost* psiOptions;
+
 
 signals:
 	void testclick();

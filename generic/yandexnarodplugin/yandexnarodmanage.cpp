@@ -14,17 +14,19 @@
 */
 
 #include <QClipboard>
+#include <QFileDialog>
+
 #include "yandexnarodmanage.h"
 #include "uploaddialog.h"
 #include "optionaccessinghost.h"
 #include "yandexnarodsettings.h"
+#include "options.h"
 
 #define CONST_WIDTH "width"
 #define CONST_HEIGHT "height"
 
-yandexnarodManage::yandexnarodManage(OptionAccessingHost *host)
-	: QDialog(0, Qt::Window)
-	, psiOptions(host)
+yandexnarodManage::yandexnarodManage(QWidget* p)
+	: QDialog(p, Qt::Window)
 {
 	setupUi(this);
 	this->setWindowTitle(tr("Yandex.Narod file manager"));
@@ -33,7 +35,7 @@ yandexnarodManage::yandexnarodManage(OptionAccessingHost *host)
 	frameFileActions->hide();
 	listWidget->clear();
 
-	netman = new yandexnarodNetMan(this, psiOptions);
+	netman = new yandexnarodNetMan(this);
 	connect(netman, SIGNAL(statusText(QString)), labelStatus, SLOT(setText(QString)));
 	connect(netman, SIGNAL(progressMax(int)), progressBar, SLOT(setMaximum(int)));
 	connect(netman, SIGNAL(progressValue(int)), progressBar, SLOT(setValue(int)));
@@ -56,8 +58,9 @@ yandexnarodManage::yandexnarodManage(OptionAccessingHost *host)
 	fileiconstyles["b-icon-unknown"] = 5;
 	fileiconstyles["b-icon-picture"] = 14;
 
-	int h = psiOptions->getPluginOption(CONST_HEIGHT, 200).toInt();
-	int w = psiOptions->getPluginOption(CONST_WIDTH, 300).toInt();
+	Options* o = Options::instance();
+	int h = o->getOption(CONST_HEIGHT, 200).toInt();
+	int w = o->getOption(CONST_WIDTH, 300).toInt();
 
 	resize(w, h);
 
@@ -67,8 +70,9 @@ yandexnarodManage::yandexnarodManage(OptionAccessingHost *host)
 
 yandexnarodManage::~yandexnarodManage()
 {
-	psiOptions->setPluginOption(CONST_HEIGHT, height());
-	psiOptions->setPluginOption(CONST_WIDTH, width());
+	Options* o = Options::instance();
+	o->setOption(CONST_HEIGHT, height());
+	o->setOption(CONST_WIDTH, width());
 }
 
 void yandexnarodManage::newFileItem(yandexnarodNetMan::FileItem fileitem)
@@ -167,29 +171,16 @@ void yandexnarodManage::on_btnClipboard_clicked()
 
 void yandexnarodManage::on_btnUpload_clicked()
 {
-	QString filepath = QFileDialog::getOpenFileName(this, tr("Choose file"), psiOptions->getPluginOption(CONST_LAST_FOLDER).toString());
+	QString filepath = QFileDialog::getOpenFileName(this, tr("Choose file"), Options::instance()->getOption(CONST_LAST_FOLDER).toString());
 
 	if (filepath.length() > 0) {
-		uploadDialog* uploadwidget = new uploadDialog(this);
-		connect(uploadwidget, SIGNAL(canceled()), this, SLOT(removeUploadWidget()));
-		uploadwidget->show();
-		uploadwidget->start();
-
 		QFileInfo fi(filepath);
-		psiOptions->setPluginOption(CONST_LAST_FOLDER, fi.dir().path());
-		yandexnarodNetMan* upnetman = new yandexnarodNetMan(uploadwidget, psiOptions);
-		connect(upnetman, SIGNAL(statusText(QString)), uploadwidget, SLOT(setStatus(QString)));
-		connect(upnetman, SIGNAL(statusFileName(QString)), uploadwidget, SLOT(setFilename(QString)));
-		connect(upnetman, SIGNAL(transferProgress(qint64,qint64)), uploadwidget, SLOT(progress(qint64,qint64)));
-		connect(upnetman, SIGNAL(uploadFinished()), uploadwidget, SLOT(setDone()));
-		connect(upnetman, SIGNAL(finished()), this, SLOT(netmanFinished()));
-		upnetman->startUploadFile(filepath);
-	}
-}
+		Options::instance()->setOption(CONST_LAST_FOLDER, fi.dir().path());
 
-void yandexnarodManage::removeUploadWidget()
-{
-	//uploadDialog* uploadwidget = static_cast<uploadDialog*>(sender());
-	netmanFinished();
-	//uploadwidget->deleteLater();
+		uploadDialog* uploadwidget = new uploadDialog(this);
+		connect(uploadwidget, SIGNAL(canceled()), this, SLOT(netmanFinished()));
+		connect(uploadwidget, SIGNAL(finished()), this, SLOT(netmanFinished()));
+		uploadwidget->show();
+		uploadwidget->start(filepath);
+	}
 }

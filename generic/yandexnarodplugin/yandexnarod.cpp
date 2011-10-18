@@ -14,12 +14,14 @@
  ***************************************************************************
 */
 
+#include <QFileDialog>
+
 #include "yandexnarod.h"
-#include "requestauthdialog.h"
+//#include "requestauthdialog.h"
 #include "yandexnarodmanage.h"
 #include "yandexnarodsettings.h"
 #include "uploaddialog.h"
-#include "proxy.h"
+#include "options.h"
 
 
 yandexnarodPlugin::yandexnarodPlugin()
@@ -52,7 +54,7 @@ QWidget* yandexnarodPlugin::options()
 		return 0;
 	}
 
-	settingswidget = new yandexnarodSettings(psiOptions);
+	settingswidget = new yandexnarodSettings();
 	connect(settingswidget, SIGNAL(testclick()), this,  SLOT(on_btnTest_clicked()));
 	connect(settingswidget, SIGNAL(startManager()), this, SLOT(manage_clicked()));
 
@@ -68,7 +70,8 @@ bool yandexnarodPlugin::enable()
 	psiIcons->addIcon("yandexnarod/logo",image);
 	file.close();
 
-	ProxyManager::instance()->setApplicationInfoAccessingHost(appInfo);
+	Options::instance()->setApplicationInfoAccessingHost(appInfo);
+	Options::instance()->setOptionAccessingHost(psiOptions);
 
 	return enabled;
 }
@@ -82,7 +85,7 @@ bool yandexnarodPlugin::disable()
 	if(uploadwidget)
 		delete uploadwidget;
 
-	ProxyManager::reset();
+	Options::reset();
 
 	return true;
 }
@@ -148,7 +151,7 @@ QList < QVariantHash > yandexnarodPlugin::getContactMenuParam()
 void yandexnarodPlugin::manage_clicked()
 {
 	if(!manageDialog) {
-		manageDialog = new yandexnarodManage(psiOptions);
+		manageDialog = new yandexnarodManage();
 		manageDialog->show();
 	}
 	else {
@@ -162,17 +165,11 @@ void yandexnarodPlugin::on_btnTest_clicked()
 	if(!settingswidget)
 		return;
 
-	yandexnarodNetMan* testnetman = new yandexnarodNetMan(settingswidget, psiOptions);
-	connect(testnetman, SIGNAL(statusText(QString)), settingswidget, SLOT(setStatus(QString)));
-	connect(testnetman, SIGNAL(finished()), this , SLOT(on_TestFinished()));
-	testnetman->startAuthTest(settingswidget->getLogin(), settingswidget->getPasswd());
-}
-
-void yandexnarodPlugin::on_TestFinished()
-{
-	yandexnarodNetMan* testnetman = static_cast<yandexnarodNetMan*>(sender());
-	testnetman->deleteLater();
-	restoreOptions();
+	AuthManager am;
+	settingswidget->setStatus(tr("Authorizing..."));
+	bool auth = am.go(settingswidget->getLogin(), settingswidget->getPasswd());
+	QString rez = auth ? tr("Authorizing OK") : tr("Authorization failed");
+	settingswidget->setStatus(rez);
 }
 
 void yandexnarodPlugin::actionStart()
@@ -183,21 +180,14 @@ void yandexnarodPlugin::actionStart()
 							psiOptions->getPluginOption(CONST_LAST_FOLDER).toString());
 
 	if (filepath.length() > 0) {
-		uploadwidget = new uploadDialog();
-		//connect(uploadwidget, SIGNAL(canceled()), uploadwidget, SLOT(close()));
-		uploadwidget->show();
-		uploadwidget->start();
-
 		fi = QFileInfo(filepath);
 		psiOptions->setPluginOption(CONST_LAST_FOLDER, fi.dir().path());
 
-		yandexnarodNetMan* netman = new yandexnarodNetMan(uploadwidget, psiOptions);
-		connect(netman, SIGNAL(statusText(QString)), uploadwidget, SLOT(setStatus(QString)));
-		connect(netman, SIGNAL(statusFileName(QString)), uploadwidget, SLOT(setFilename(QString)));
-		connect(netman, SIGNAL(transferProgress(qint64,qint64)), uploadwidget, SLOT(progress(qint64,qint64)));
-		connect(netman, SIGNAL(uploadFileURL(QString)), this, SLOT(onFileURL(QString)));
-		connect(netman, SIGNAL(uploadFinished()), uploadwidget, SLOT(setDone()));
-		netman->startUploadFile(filepath);
+		uploadwidget = new uploadDialog();
+		connect(uploadwidget, SIGNAL(fileUrl(QString)), this, SLOT(onFileURL(QString)));
+
+		uploadwidget->show();
+		uploadwidget->start(filepath);
 	}
 }
 
@@ -207,7 +197,7 @@ void yandexnarodPlugin::onFileURL(const QString& url)
 	sendmsg.replace("%N", fi.fileName());
 	sendmsg.replace("%U", url);
 	sendmsg.replace("%S", QString::number(fi.size()));
-	uploadwidget->deleteLater();
+	uploadwidget->close();
 
 	if(currentAccount != -1 && !currentJid.isEmpty()) {
 		stanzaSender->sendMessage(currentAccount, currentJid, stanzaSender->escape(sendmsg), "", "chat");

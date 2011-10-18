@@ -16,17 +16,17 @@
 #ifndef YANDEXNARODMANAGE_H
 #define YANDEXNARODMANAGE_H
 
+#include <QDialog>
+
 #include "yandexnarodnetman.h"
 #include "ui_yandexnarodmanage.h"
-
-class OptionAccessingHost;
 
 class yandexnarodManage : public QDialog, public Ui::yandexnarodManageClass
 {
 	Q_OBJECT
 
 public:
-	yandexnarodManage(OptionAccessingHost* host);
+	yandexnarodManage(QWidget* p = 0);
 	~yandexnarodManage();
 
 private:
@@ -35,12 +35,11 @@ private:
 	QList<QIcon> fileicons;
 	QHash<QString, int> fileiconstyles;
 	void netmanPrepare();
-	OptionAccessingHost* psiOptions;
 
 	QList<yandexnarodNetMan::FileItem> fileitems;
 
 public slots:
-	void setCookies(QStringList incooks) { cooks = incooks; }
+	void setCookies(const QStringList& incooks) { cooks = incooks; }
 
 private slots:
 	void setCooks(QStringList /*incooks*/) { /*if (incooks.count()>0) { cooks = incooks; emit cookies(incooks); }*/ }
@@ -51,7 +50,6 @@ private slots:
 	void on_btnReload_clicked();
 	void on_btnUpload_clicked();
 	void on_btnProlong_clicked();
-	void removeUploadWidget();
 	void netmanFinished();
 
 private:

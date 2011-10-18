@@ -14,43 +14,50 @@
 */
 
 #include <QApplication>
-#include "proxy.h"
+#include "options.h"
 #include "applicationinfoaccessinghost.h"
+#include "optionaccessinghost.h"
 
-ProxyManager* ProxyManager::instance_ = 0;
+Options * Options ::instance_ = 0;
 
 
-ProxyManager::ProxyManager()
+Options ::Options ()
 	: QObject(QApplication::instance())
 	, appInfo(0)
+	, options(0)
 {
 }
 
-ProxyManager::~ProxyManager()
+Options ::~Options()
 {
 }
 
-void ProxyManager::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host)
+void Options ::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host)
 {
 	appInfo = host;
 	getProxy();
 }
 
-ProxyManager* ProxyManager::instance()
+void Options ::setOptionAccessingHost(OptionAccessingHost *host)
+{
+	options = host;
+}
+
+Options * Options ::instance()
 {
 	if(!instance_)
-		instance_ = new ProxyManager();
+		instance_ = new Options();
 
 	return instance_;
 }
 
-void ProxyManager::reset()
+void Options ::reset()
 {
 	delete instance_;
 	instance_ = 0;
 }
 
-bool ProxyManager::useProxy() const
+bool Options ::useProxy() const
 {
 	bool use = false;
 	if(appInfo) {
@@ -61,7 +68,7 @@ bool ProxyManager::useProxy() const
 	return use;
 }
 
-QNetworkProxy ProxyManager::getProxy() const
+QNetworkProxy Options ::getProxy() const
 {
 	QNetworkProxy np;
 	if(appInfo) {
@@ -74,3 +81,19 @@ QNetworkProxy ProxyManager::getProxy() const
 	return np;
 }
 
+void Options::setOption(const QString &name, const QVariant &value)
+{
+	if(options) {
+		options->setPluginOption(name, value);
+	}
+}
+
+QVariant Options::getOption(const QString &name, const QVariant &def)
+{
+	QVariant ret(def);
+	if(options) {
+		ret = options->getPluginOption(name, def);
+	}
+
+	return ret;
+}

@@ -2,6 +2,8 @@
     uploadDialog
 
     Copyright (c) 2008-2009 by Alexander Kazarin <boiler@co.ru>
+		  2011 Evgeny Khryukin
+
 
  ***************************************************************************
  *                                                                         *
@@ -13,8 +15,10 @@
  ***************************************************************************
 */
 
-//#include <qutim/plugininterface.h>
+#include <QFileInfo>
+
 #include "uploaddialog.h"
+#include "yandexnarodnetman.h"
 
 uploadDialog::uploadDialog(QWidget *p)
 	: QDialog(p)
@@ -23,9 +27,13 @@ uploadDialog::uploadDialog(QWidget *p)
 	ui.progressBar->setValue(0);
 	connect(ui.btnUploadCancel, SIGNAL(clicked()), this, SIGNAL(canceled()));
 	connect(ui.btnUploadCancel, SIGNAL(clicked()), this, SLOT(close()));
-//	qutim_sdk_0_2::SystemsCity::PluginSystem()->centerizeWidget(this);
-	setAttribute(Qt::WA_QuitOnClose, false);
 	setAttribute(Qt::WA_DeleteOnClose, true);
+
+	netman = new UploadManager(this);
+	connect(netman, SIGNAL(statusText(QString)), this, SLOT(setStatus(QString)));
+	connect(netman, SIGNAL(transferProgress(qint64,qint64)),this, SLOT(progress(qint64,qint64)));
+	connect(netman, SIGNAL(uploadFileURL(QString)), this, SIGNAL(fileUrl(QString)));
+	connect(netman, SIGNAL(uploaded()), this, SLOT(setDone()));
 }
 
 uploadDialog::~uploadDialog() 
@@ -33,12 +41,24 @@ uploadDialog::~uploadDialog()
 	
 }
 
-void uploadDialog::start() {
-	ui.progressBar->setValue(0);
-	utime.start();
+void uploadDialog::setFilename(const QString& str)
+{
+	ui.labelFile->setText("File: " + str);
+	setWindowTitle(tr("Uploading") + " - " + str);
 }
 
-void uploadDialog::progress(qint64 cBytes, qint64 totalBytes) {
+void uploadDialog::start(const QString& fileName)
+{
+	QFileInfo fi(fileName);
+	setFilename(fi.fileName());
+
+	ui.progressBar->setValue(0);
+	utime.start();
+	netman->go(fileName);
+}
+
+void uploadDialog::progress(qint64 cBytes, qint64 totalBytes)
+{
 	ui.labelStatus->setText("Uploading...");
 	ui.labelProgress->setText("Progress: "+QString::number(cBytes)+" / "+QString::number(totalBytes));
 	ui.progressBar->setMaximum(totalBytes);
@@ -57,4 +77,14 @@ void uploadDialog::progress(qint64 cBytes, qint64 totalBytes) {
 	
 	if (cBytes == totalBytes)
 		ui.labelStatus->setText("Upload complete.");
+}
+
+void uploadDialog::setDone()
+{
+	if(netman->success())
+		ui.btnUploadCancel->setText(tr("Done"));
+	else
+		ui.btnUploadCancel->setText(tr("Close"));
+
+	emit finished();
 }

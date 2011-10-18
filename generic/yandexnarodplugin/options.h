@@ -17,25 +17,31 @@
 #define PROXY_H
 
 #include <QNetworkProxy>
+#include "QVariant"
 
 class ApplicationInfoAccessingHost;
+class OptionAccessingHost;
 
-class ProxyManager : public QObject
+class Options : public QObject
 {
 	Q_OBJECT
 public:
-	static ProxyManager* instance();
+	static Options * instance();
 	static void reset();
 	void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
+	void setOptionAccessingHost(OptionAccessingHost* host);
+	void setOption(const QString& name, const QVariant& value);
+	QVariant getOption(const QString& name, const QVariant& def = QVariant::Invalid);
 	QNetworkProxy getProxy() const;
 	bool useProxy() const;
 
 private:
-	static ProxyManager* instance_;
-	ProxyManager();
-	virtual ~ProxyManager();
+	static Options * instance_;
+	Options ();
+	virtual ~Options();
 
 	ApplicationInfoAccessingHost* appInfo;
+	OptionAccessingHost* options;
 };
 
 #endif // PROXY_H

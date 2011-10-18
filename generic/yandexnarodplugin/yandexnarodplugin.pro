@@ -8,7 +8,7 @@ HEADERS += yandexnarod.h \
     yandexnarodsettings.h \
     yandexnarodmanage.h \
     yandexnarodnetman.h \
-    proxy.h
+    options.h
 
 SOURCES += yandexnarod.cpp \
     requestauthdialog.cpp \
@@ -16,7 +16,7 @@ SOURCES += yandexnarod.cpp \
     yandexnarodsettings.cpp \
     yandexnarodmanage.cpp \
     yandexnarodnetman.cpp \
-    proxy.cpp
+    options.cpp
 
 RESOURCES += yandexnarod.qrc
 

@@ -16,24 +16,77 @@
 #ifndef YANDEXNARODNETMAN_H
 #define YANDEXNARODNETMAN_H
 
-#include <QtNetwork>
-#include <QObject>
-#include <QFileDialog>
+#include <QNetworkCookie>
+#include <QStringList>
 
 class QNetworkAccessManager;
-class QNetworkRequest;
 class QNetworkReply;
-class OptionAccessingHost;
+class QEventLoop;
+class QTimer;
 
 #define CONST_COOKIES_NAMES "cookiesnames"
 #define CONST_COOKIES_VALUES "cookiesvalues"
+
+
+class AuthManager : public QObject
+{
+	Q_OBJECT
+public:
+	AuthManager(QObject* p = 0);
+	~AuthManager();
+
+	bool go(const QString& login, const QString& pass, const QString& captcha = "");
+	QList<QNetworkCookie> cookies() const;
+
+private slots:
+	void timeout();
+	void replyFinished(QNetworkReply* r);
+
+private:
+	bool authorized_;
+	QString narodLogin, narodPass;
+	QNetworkAccessManager *manager_;
+	QEventLoop *loop_;
+	QTimer *timer_;
+};
+
+
+class UploadManager : public QObject
+{
+	Q_OBJECT
+public:
+	UploadManager(QObject* p = 0);
+	~UploadManager();
+	void go(const QString& file);
+	void setCookies(const QList<QNetworkCookie>& cookies);
+	bool success() const { return success_; };
+
+signals:
+	void transferProgress(qint64, qint64);
+	void uploaded();
+	void statusText(const QString&);
+	void uploadFileURL(QString);
+
+private slots:
+	void getStorageFinished();
+	void uploadFinished();
+	void verifyingFinished();
+
+private:
+	void doUpload(const QUrl& url);
+
+private:
+	QNetworkAccessManager* manager_;
+	QString fileName_;
+	bool success_;
+};
 
 class yandexnarodNetMan : public QObject
 {
 	Q_OBJECT
 
 public:
-	yandexnarodNetMan(QObject *parent, OptionAccessingHost* host);
+	yandexnarodNetMan(QObject *parent);
 	~yandexnarodNetMan();
 
 	struct FileItem
@@ -47,49 +100,30 @@ public:
 		QString date;
 	};
 
-	void setFilepath (QString arg) { filepath = arg; }
-	void startAuthTest(QString, QString);
+	void startAuth(const QString& login, const QString& pass);
 	void startGetFilelist();
-	void startDelFiles(QList<FileItem> fileItems);
-	void startProlongFiles(QList<FileItem> fileItems);
-	void startUploadFile(QString);
+	void startDelFiles(const QList<FileItem>& fileItems);
+	void startProlongFiles(const QList<FileItem>& fileItems);
 
 private:
 	void netmanDo();
-	QString narodCaptchaKey;
+
 	QString action;
-	QString page;
 	QNetworkAccessManager *netman;
-	QNetworkRequest netreq;
 	int nstep;
 	int filesnum;
-	QString purl;
 	QList<FileItem> fileItems;
 	QStringList fileids;
-	QString filepath;
-	QString lastdir;
-	QFileInfo fi;
-	void loadSettings();
-//	void loadCookies();
-//	void saveCookies();
-	QString narodLogin;
-	QString narodPasswd;
-	int auth_flag;
-	OptionAccessingHost* psiOptions;
+
 
 private slots:
 	void netrpFinished(QNetworkReply*);
-//	void netmanTransferProgress(qint64, qint64);
 
 signals:
-	void statusText(QString);
-	void statusFileName(QString);
+	void statusText(const QString&);
 	void progressMax(int);
 	void progressValue(int);
 	void newFileItem(yandexnarodNetMan::FileItem);
-	void uploadFileURL(QString);
-	void transferProgress(qint64, qint64);
-	void uploadFinished();
 	void finished();
 };
 
