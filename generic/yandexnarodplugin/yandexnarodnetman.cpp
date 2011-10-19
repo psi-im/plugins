@@ -354,7 +354,7 @@ void UploadManager::verifyingFinished()
 	QNetworkReply *reply = static_cast<QNetworkReply*>(sender());
 	if(reply->error() == QNetworkReply::NoError) {
 		QString page = reply->readAll();
-		QRegExp rx("<span class='b-fname'><a href=\"(http://narod.ru/disk/\\S+html)\">\\S+</a></span><br/>");
+		QRegExp rx("<span class='b-fname'><a href=\"(http://narod.ru/disk/\\S+html)\">[^<]+</a></span><br/>");
 		if (rx.indexIn(page) != -1) {
 			success_ = true;
 			emit statusText(tr("Uploaded successfully"));
@@ -483,7 +483,7 @@ void yandexnarodNetMan::netrpFinished( QNetworkReply* reply )
 //				emit progressMax(filesnum);
 //			}
 			int cpos = 0;
-			int count = 0;
+			static int count = 0;
 			QRegExp rx("class=\"\\S+icon\\s(\\S+)\"[^<]+<img[^<]+</i[^<]+</td[^<]+<td[^<]+<input[^v]+value=\"(\\d+)\" data-token=\"(\\S+)\""
 				   "[^<]+</td[^<]+<td[^<]+<span\\sclass='b-fname'><a\\shref=\"(\\S+)\">([^<]+)</a>.*"
 				   "<td class=\"size\">(\\S+)</td>.*<td class=\"date prolongate\"><nobr>(\\S+ \\S+)</nobr></td>");
@@ -513,6 +513,7 @@ void yandexnarodNetMan::netrpFinished( QNetworkReply* reply )
 			else {
 				emit statusText(QString(tr("Filelist downloaded\n(%1 files)")).arg(QString::number(count)));
 				emit finished();
+				count = 0;
 			}
 		}
 		else if (action == "del_files") {
