@@ -14,6 +14,7 @@
 */
 
 #include <QApplication>
+#include <QByteArray>
 #include "options.h"
 #include "applicationinfoaccessinghost.h"
 #include "optionaccessinghost.h"
@@ -93,6 +94,39 @@ QVariant Options::getOption(const QString &name, const QVariant &def)
 	QVariant ret(def);
 	if(options) {
 		ret = options->getPluginOption(name, def);
+	}
+
+	return ret;
+}
+
+void Options::saveCookies(const QList<QNetworkCookie> &cooks)
+{
+	if(options) {
+		QByteArray ba;
+		QDataStream ds(&ba, QIODevice::WriteOnly);
+		foreach(const QNetworkCookie& cookie, cooks) {
+			//qDebug() << cookie.toRawForm(QNetworkCookie::NameAndValueOnly);
+			ds << cookie.toRawForm(QNetworkCookie::NameAndValueOnly);
+		}
+		options->setPluginOption(CONST_COOKIES, ba);
+	}
+}
+
+QList<QNetworkCookie> Options::loadCookies()
+{
+	QList<QNetworkCookie> ret;
+	if(options) {
+		QByteArray ba = options->getPluginOption(CONST_COOKIES, QByteArray()).toByteArray();
+		if(!ba.isEmpty()) {
+			QDataStream ds(&ba, QIODevice::ReadOnly);
+			QByteArray byte;
+			while(!ds.atEnd()) {
+				ds >> byte;
+				//qDebug() << byte;
+				QList<QNetworkCookie> list = QNetworkCookie::parseCookies(byte);
+				ret += list;
+			}
+		}
 	}
 
 	return ret;

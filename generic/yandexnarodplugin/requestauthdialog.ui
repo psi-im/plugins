@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>230</width>
-    <height>325</height>
+    <width>234</width>
+    <height>332</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -111,17 +111,15 @@
        </widget>
       </item>
       <item>
-       <widget class="QWebView" name="webCaptcha" native="true">
+       <widget class="QLabel" name="webCaptcha">
         <property name="minimumSize">
          <size>
           <width>0</width>
           <height>60</height>
          </size>
         </property>
-        <property name="url" stdset="0">
-         <url>
-          <string>about:blank</string>
-         </url>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </item>
@@ -177,13 +175,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>QtWebKit/QWebView</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="yandexnarod.qrc"/>
  </resources>

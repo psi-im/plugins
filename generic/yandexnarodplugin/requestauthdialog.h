@@ -17,6 +17,10 @@
 #define REQUESTAUTHDIALOG_H
 
 #include "ui_requestauthdialog.h"
+#include <QNetworkCookie>
+
+class QNetworkAccessManager;
+class QNetworkReply;
 
 class requestAuthDialog : public QDialog
 {
@@ -33,9 +37,13 @@ public:
 	QString getCode() const { return ui.editCaptcha->text(); }
 	void setCaptcha(const QList<QNetworkCookie>& cooks, const QString& url);
 
+private slots:
+	void reply(QNetworkReply* r);
+
 
 private:
 	Ui::requestAuthDialogClass ui;
+	QNetworkAccessManager *manager_;
 
 };
 #endif

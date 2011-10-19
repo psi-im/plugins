@@ -24,9 +24,6 @@ class QNetworkReply;
 class QEventLoop;
 class QTimer;
 
-#define CONST_COOKIES_NAMES "cookiesnames"
-#define CONST_COOKIES_VALUES "cookiesvalues"
-
 
 class AuthManager : public QObject
 {
@@ -100,7 +97,7 @@ public:
 		QString date;
 	};
 
-	void startAuth(const QString& login, const QString& pass);
+	bool startAuth(const QString& login, const QString& pass);
 	void startGetFilelist();
 	void startDelFiles(const QList<FileItem>& fileItems);
 	void startProlongFiles(const QList<FileItem>& fileItems);
@@ -111,9 +108,9 @@ private:
 	QString action;
 	QNetworkAccessManager *netman;
 	int nstep;
-	int filesnum;
+	//int filesnum;
 	QList<FileItem> fileItems;
-	QStringList fileids;
+	//QStringList fileids;
 
 
 private slots:
@@ -121,8 +118,6 @@ private slots:
 
 signals:
 	void statusText(const QString&);
-	void progressMax(int);
-	void progressValue(int);
 	void newFileItem(yandexnarodNetMan::FileItem);
 	void finished();
 };

@@ -1,6 +1,6 @@
 include(../../psiplugin.pri)
 CONFIG += release
-QT += network webkit
+QT += network
 
 HEADERS += yandexnarod.h \
     requestauthdialog.h \

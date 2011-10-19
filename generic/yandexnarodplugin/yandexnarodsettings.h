@@ -18,11 +18,6 @@
 
 #include "ui_yandexnarodsettings.h"
 
-#define CONST_LOGIN "login"
-#define CONST_PASS "pass"
-#define CONST_TEMPLATE "template"
-#define CONST_LAST_FOLDER "lastfolder"
-#define VERSION "0.0.4"
 
 class yandexnarodSettings  : public QWidget
 {
@@ -39,6 +34,9 @@ public:
 public slots:
 	void setStatus(const QString& str);
 	void saveSettings();
+
+private slots:
+	void on_btnClearCookies_clicked();
 
 private:
 	Ui::yandexnarodSettingsClass ui;

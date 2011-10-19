@@ -54,3 +54,9 @@ void yandexnarodSettings::restoreSettings()
 	ui.editPasswd->setText(o->getOption(CONST_PASS).toString());
 	ui.textTpl->setText(o->getOption(CONST_TEMPLATE, QVariant("File sent: %N (%S bytes)\n%U")).toString());
 }
+
+void yandexnarodSettings::on_btnClearCookies_clicked()
+{
+	Options::instance()->saveCookies(QList<QNetworkCookie>());
+	setStatus(tr("Cookies are removed"));
+}

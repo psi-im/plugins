@@ -37,6 +37,16 @@ static QNetworkRequest newRequest()
 	return nr;
 }
 
+static QNetworkAccessManager* newMnager(QObject* parent)
+{
+	QNetworkAccessManager* netman = new QNetworkAccessManager(parent);
+	if(Options::instance()->useProxy()) {
+		netman->setProxy(Options::instance()->getProxy());
+	}
+
+	return netman;
+}
+
 //-------------------------------------------
 //------AuthManager--------------------------
 //-------------------------------------------
@@ -45,7 +55,7 @@ AuthManager::AuthManager(QObject* p)
 	: QObject(p)
 	, authorized_(false)
 {
-	manager_ = new QNetworkAccessManager(this);
+	manager_ = newMnager(this);
 	connect(manager_, SIGNAL(finished(QNetworkReply*)), SLOT(replyFinished(QNetworkReply*)));
 
 	timer_ = new QTimer(this);
@@ -101,14 +111,14 @@ bool AuthManager::go(const QString& login, const QString& pass, const QString& c
 		QNetworkRequest nr = newRequest();
 		nr.setUrl(authUrl);
 		manager_->post(nr, post);
+
+		if(!loop_->isRunning()) {
+			timer_->start();
+			loop_->exec();
+		}
 	}
 	else {
 		return false;
-	}
-
-	if(!loop_->isRunning()) {
-		timer_->start();
-		loop_->exec();
 	}
 
 	return authorized_;
@@ -153,18 +163,22 @@ void AuthManager::replyFinished(QNetworkReply* reply)
 					QNetworkRequest nr = newRequest();
 					nr.setUrl(authUrl);
 					manager_->post(nr, post);
+					reply->deleteLater();
 					return;
 				}
 			}
 			else {
 				rx.setPattern("<input type=\"hidden\" name=\"idkey\" value=\"(\\S+)\" />");
 				if (rx.indexIn(page) > 0) {
+					timer_->stop();
 					go(narodLogin, narodPass, rx.cap(1));
+					reply->deleteLater();
 					return;
 				}
 				else {
 					authorized_ = false;
 					loop_->exit();
+					reply->deleteLater();
 					return;
 				}
 			}
@@ -172,12 +186,14 @@ void AuthManager::replyFinished(QNetworkReply* reply)
 		else {
 			authorized_ = true;
 			loop_->exit();
+			reply->deleteLater();
 			return;
 		}
 	}
 
 	authorized_ = false;
 	loop_->exit();
+	reply->deleteLater();
 	return;
 }
 
@@ -192,7 +208,7 @@ UploadManager::UploadManager(QObject* p)
 	: QObject(p)
 	, success_(false)
 {
-	manager_ = new QNetworkAccessManager(this);
+	manager_ = newMnager(this);
 }
 
 UploadManager::~UploadManager()
@@ -208,6 +224,8 @@ void UploadManager::go(const QString& file)
 		return;
 	}
 
+	//manager_->cookieJar()->setCookiesFromUrl(Options::instance()->loadCookies(), mainUrl);
+
 	if(manager_->cookieJar()->cookiesForUrl(mainUrl).isEmpty()) {
 		AuthManager am;
 		emit statusText(tr("Authorizing..."));
@@ -215,6 +233,7 @@ void UploadManager::go(const QString& file)
 				  Options::instance()->getOption(CONST_PASS, "").toString() );
 		if(auth) {
 			setCookies(am.cookies());
+			Options::instance()->saveCookies(am.cookies());
 			emit statusText(tr("Authorizing OK"));
 		}
 		else {
@@ -255,6 +274,8 @@ void UploadManager::getStorageFinished()
 		emit statusText(tr("Error! %1").arg(reply->errorString()));
 		emit uploaded();
 	}
+
+	reply->deleteLater();
 }
 
 void UploadManager::doUpload(const QUrl &url)
@@ -324,6 +345,8 @@ void UploadManager::uploadFinished()
 		emit statusText(tr("Error! %1").arg(reply->errorString()));
 		emit uploaded();
 	}
+
+	reply->deleteLater();
 }
 
 void UploadManager::verifyingFinished()
@@ -347,6 +370,8 @@ void UploadManager::verifyingFinished()
 	}
 
 	emit uploaded();
+
+	reply->deleteLater();
 }
 
 
@@ -357,41 +382,37 @@ void UploadManager::verifyingFinished()
 yandexnarodNetMan::yandexnarodNetMan(QObject *parent)
 	: QObject(parent)
 {
-	netman = new QNetworkAccessManager(this);
+	netman = newMnager(this);
+	netman->cookieJar()->setCookiesFromUrl(Options::instance()->loadCookies(), mainUrl);
 	connect(netman, SIGNAL(finished(QNetworkReply*)), this, SLOT(netrpFinished(QNetworkReply*)));
-
-	if(Options::instance()->useProxy()) {
-		netman->setProxy(Options::instance()->getProxy());
-	}
-
-//	loadCookies();
 }
 
 yandexnarodNetMan::~yandexnarodNetMan()
 {
 }
 
-void yandexnarodNetMan::startAuth(const QString& login, const QString& passwd)
+bool yandexnarodNetMan::startAuth(const QString& login, const QString& passwd)
 {
 	AuthManager am;
 	emit statusText(tr("Authorizing..."));
 	bool auth = am.go(login, passwd);
 	if(auth) {
 		netman->cookieJar()->setCookiesFromUrl(am.cookies(), mainUrl);
+		Options::instance()->saveCookies(am.cookies());
 		emit statusText(tr("Authorizing OK"));
 	}
 	else {
 		emit statusText(tr("Authorization failed"));
 	}
+
+	return auth;
 }
 
 void yandexnarodNetMan::startGetFilelist()
 {
 	action = "get_filelist";
-	filesnum = 0;
 	fileItems.clear();
-	fileids.clear();
-//	loadCookies();
+	//fileids.clear();
 	netmanDo();
 }
 
@@ -403,7 +424,6 @@ void yandexnarodNetMan::startDelFiles(const QList<FileItem>& fileItems_)
 	}
 	action = "del_files";
 	fileItems = fileItems_;
-//	loadCookies();
 	netmanDo();
 }
 
@@ -418,48 +438,16 @@ void yandexnarodNetMan::startProlongFiles(const QList<FileItem>& fileItems_)
 	netmanDo();
 }
 
-//void yandexnarodNetMan::loadCookies()
-//{
-//	Options *o = Options::instance();
-//	QNetworkCookieJar *netcookjar = netman->cookieJar();
-//	int i = 0;
-//	QStringList listval = o->getOption(CONST_COOKIES_VALUES, QStringList()).toStringList();
-//	QList<QNetworkCookie> cookieList;
-//	foreach (QString cookname, o->getOption(CONST_COOKIES_NAMES, QStringList()).toStringList()) {
-//		if(listval.size() <= i)
-//			break;
-//		QString cookvalue = listval.at(i++);
-//		QNetworkCookie netcook;
-//		netcook.setName(cookname.toAscii());
-//		netcook.setValue(cookvalue.toAscii());
-//		netcook.setDomain(".yandex.ru");
-//		netcook.setPath("/");
-//		cookieList.append(netcook);
-//	}
-//	if(!cookieList.isEmpty())
-//		netcookjar->setCookiesFromUrl(cookieList, mainUrl);
-//}
-
-//void yandexnarodNetMan::saveCookies()
-//{
-//	Options *o = Options::instance();
-//	QNetworkCookieJar *netcookjar = netman->cookieJar();
-//	QStringList names, values;
-//	foreach (QNetworkCookie netcook, netcookjar->cookiesForUrl(mainUrl)) {
-//		names.append(netcook.name());
-//		values.append(netcook.value());
-//	}
-//	o->setOption(CONST_COOKIES_NAMES, names);
-//	o->setOption(CONST_COOKIES_VALUES, values);
-//}
-
 void yandexnarodNetMan::netmanDo()
 {
 	QNetworkCookieJar *netcookjar = netman->cookieJar();
 	QList<QNetworkCookie> cookList = netcookjar->cookiesForUrl(mainUrl);
 	if (cookList.isEmpty()/* && netreq.url().toString() != "http://passport.yandex.ru/passport?mode=auth"*/) {
-		startAuth(Options::instance()->getOption(CONST_LOGIN, "").toString(),
+		bool auth = startAuth(Options::instance()->getOption(CONST_LOGIN, "").toString(),
 			      Options::instance()->getOption(CONST_PASS, "").toString() );
+
+		if(!auth)
+			return;
 	}
 
 	if (action == "get_filelist") {
@@ -469,8 +457,6 @@ void yandexnarodNetMan::netmanDo()
 		netman->get(nr);
 	}
 	else if (action == "del_files" || action == "prolong_files") {
-		emit progressMax(1);
-		emit progressValue(0);
 		emit statusText((action == "del_files") ? tr("Deleting files...") : tr("Prolongate files..."));
 		QByteArray postData;
 		postData.append((action == "del_files") ? "action=delete" : "action=prolongate");
@@ -485,56 +471,61 @@ void yandexnarodNetMan::netmanDo()
 
 void yandexnarodNetMan::netrpFinished( QNetworkReply* reply )
 {
-	QString page = reply->readAll();
-	//qDebug()<<"PAGE"<<page;
+	if(reply->error() == QNetworkReply::NoError) {
+		QString page = reply->readAll();
+		//qDebug()<<"PAGE"<<page;
 
-	if (action == "get_filelist") {
-		page.replace("<wbr/>", "");
-		QRegExp rxfn("<span\\sclass=\"num\">\\((\\d+)\\)</span>");
-		if (rxfn.indexIn(page)>-1) {
-			filesnum=rxfn.cap(1).toInt();
-			emit progressMax(filesnum);
+		if (action == "get_filelist") {
+			page.replace("<wbr/>", "");
+//			QRegExp rxfn("<span\\sclass=\"num\">\\((\\d+)\\)</span>");
+//			if (rxfn.indexIn(page)>-1) {
+//				filesnum=rxfn.cap(1).toInt();
+//				emit progressMax(filesnum);
+//			}
+			int cpos = 0;
+			int count = 0;
+			QRegExp rx("class=\"\\S+icon\\s(\\S+)\"[^<]+<img[^<]+</i[^<]+</td[^<]+<td[^<]+<input[^v]+value=\"(\\d+)\" data-token=\"(\\S+)\""
+				   "[^<]+</td[^<]+<td[^<]+<span\\sclass='b-fname'><a\\shref=\"(\\S+)\">([^<]+)</a>.*"
+				   "<td class=\"size\">(\\S+)</td>.*<td class=\"date prolongate\"><nobr>(\\S+ \\S+)</nobr></td>");
+			rx.setMinimal(true);
+			cpos = rx.indexIn(page);
+			while (cpos != -1) {
+				FileItem fileitem;
+				fileitem.filename = QString::fromUtf8(rx.cap(5).toLatin1());
+				fileitem.fileid = rx.cap(2);
+				fileitem.token = rx.cap(3);
+				fileitem.fileurl = rx.cap(4);
+				fileitem.fileicon = rx.cap(1);
+				fileitem.size = QString::fromUtf8(rx.cap(6).toLatin1());
+				fileitem.date = QString::fromUtf8(rx.cap(7).toLatin1());
+				emit newFileItem(fileitem);
+				//fileids.append(rx.cap(2));
+				cpos = rx.indexIn(page, cpos+1);
+				++count;
+			}
+			QRegExp rxnp("<a\\sid=\"next_page\"\\shref=\"([^\"]+)\"");
+			cpos = rxnp.indexIn(page);
+			if (cpos > 0 && rxnp.capturedTexts()[1].length()) {
+				QNetworkRequest nr = newRequest();
+				nr.setUrl(QUrl("http://narod.yandex.ru"+rxnp.cap(1)));
+				netman->get(nr);
+			}
+			else {
+				emit statusText(QString(tr("Filelist downloaded\n(%1 files)")).arg(QString::number(count)));
+				emit finished();
+			}
 		}
-		int cpos = 0;
-		QRegExp rx("class=\"\\S+icon\\s(\\S+)\"[^<]+<img[^<]+</i[^<]+</td[^<]+<td[^<]+<input[^v]+value=\"(\\d+)\" data-token=\"(\\S+)\""
-			   "[^<]+</td[^<]+<td[^<]+<span\\sclass='b-fname'><a\\shref=\"(\\S+)\">([^<]+)</a>.*"
-			   "<td class=\"size\">(\\S+)</td>.*<td class=\"date prolongate\"><nobr>(\\S+ \\S+)</nobr></td>");
-		rx.setMinimal(true);
-		cpos = rx.indexIn(page);
-		while (cpos != -1) {
-			FileItem fileitem;
-			fileitem.filename = QString::fromUtf8(rx.cap(5).toLatin1());
-			fileitem.fileid = rx.cap(2);
-			fileitem.token = rx.cap(3);
-			fileitem.fileurl = rx.cap(4);
-			fileitem.fileicon = rx.cap(1);
-			fileitem.size = QString::fromUtf8(rx.cap(6).toLatin1());
-			fileitem.date = QString::fromUtf8(rx.cap(7).toLatin1());
-			emit newFileItem(fileitem);
-			fileids.append(rx.cap(2));
-			emit progressValue(fileids.count());
-			cpos = rx.indexIn(page, cpos+1);
+		else if (action == "del_files") {
+			emit statusText(tr("File(s) deleted"));
+			emit finished();
 		}
-		QRegExp rxnp("<a\\sid=\"next_page\"\\shref=\"([^\"]+)\"");
-		cpos = rxnp.indexIn(page);
-		if (cpos>0 && rxnp.capturedTexts()[1].length()) {
-			QNetworkRequest nr = newRequest();
-			nr.setUrl(QUrl("http://narod.yandex.ru"+rxnp.cap(1)));
-			netman->get(nr);
-		}
-		else {
-			emit statusText(QString(tr("Filelist downloaded\n(%1 files)")).arg(QString::number(filesnum)));
+		else if (action == "prolong_files") {
+			emit statusText(tr("File(s) prolongated"));
 			emit finished();
 		}
 	}
-	else if (action == "del_files") {
-		emit statusText(tr("File(s) deleted"));
-		emit progressValue(1);
-		emit finished();
-	}
-	else if (action == "prolong_files") {
-		emit statusText(tr("File(s) prolongated"));
-		emit progressValue(1);
+	else {
+		emit statusText(tr("Error! %1").arg(reply->errorString()));
 		emit finished();
 	}
 

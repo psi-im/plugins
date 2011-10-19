@@ -75,14 +75,14 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="0">
+   <item row="7" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Send file template</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="0" colspan="2">
+   <item row="8" column="0" colspan="2">
     <widget class="QTextEdit" name="textTpl">
      <property name="html">
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -93,7 +93,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="8" column="0" colspan="2">
+   <item row="9" column="0" colspan="2">
     <widget class="QLabel" name="label_2">
      <property name="maximumSize">
       <size>
@@ -103,6 +103,13 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="text">
       <string>%N - file name; %U - file URL; %S - file size</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QPushButton" name="btnClearCookies">
+     <property name="text">
+      <string>Clear Cookies</string>
      </property>
     </widget>
    </item>

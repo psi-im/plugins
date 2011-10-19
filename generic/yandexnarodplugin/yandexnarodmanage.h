@@ -16,12 +16,29 @@
 #ifndef YANDEXNARODMANAGE_H
 #define YANDEXNARODMANAGE_H
 
+#include <QListWidget>
 #include <QDialog>
 
 #include "yandexnarodnetman.h"
-#include "ui_yandexnarodmanage.h"
 
-class yandexnarodManage : public QDialog, public Ui::yandexnarodManageClass
+namespace Ui {
+	class yandexnarodManageClass;
+}
+
+
+class ListWidget : public QListWidget
+{
+public:
+	ListWidget(QWidget* p = 0);
+
+protected:
+	virtual QStringList mimeTypes() const;
+	virtual QMimeData *mimeData(const QList<QListWidgetItem *> items) const;
+};
+
+
+
+class yandexnarodManage : public QDialog
 {
 	Q_OBJECT
 
@@ -30,19 +47,11 @@ public:
 	~yandexnarodManage();
 
 private:
-	yandexnarodNetMan *netman;
-	QStringList cooks;
-	QList<QIcon> fileicons;
-	QHash<QString, int> fileiconstyles;
+	QList<yandexnarodNetMan::FileItem> selectedItems() const;
+	void newNetMan();
 	void netmanPrepare();
 
-	QList<yandexnarodNetMan::FileItem> fileitems;
-
-public slots:
-	void setCookies(const QStringList& incooks) { cooks = incooks; }
-
 private slots:
-	void setCooks(QStringList /*incooks*/) { /*if (incooks.count()>0) { cooks = incooks; emit cookies(incooks); }*/ }
 	void newFileItem(yandexnarodNetMan::FileItem);
 	void on_btnDelete_clicked();
 	void on_btnClipboard_clicked();
@@ -50,13 +59,15 @@ private slots:
 	void on_btnReload_clicked();
 	void on_btnUpload_clicked();
 	void on_btnProlong_clicked();
+	void on_btnClearCookies_clicked();
 	void netmanFinished();
 
 private:
-	QList<yandexnarodNetMan::FileItem> selectedItems() const;
-
-signals:
-	void cookies(QStringList);
+	Ui::yandexnarodManageClass* ui_;
+	yandexnarodNetMan *netman;
+	QList<QIcon> fileicons;
+	QHash<QString, int> fileiconstyles;
+	QList<yandexnarodNetMan::FileItem> fileitems;
 
 };
 #endif

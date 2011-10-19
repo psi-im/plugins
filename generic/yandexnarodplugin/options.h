@@ -17,10 +17,20 @@
 #define PROXY_H
 
 #include <QNetworkProxy>
+#include <QNetworkCookie>
 #include "QVariant"
 
 class ApplicationInfoAccessingHost;
 class OptionAccessingHost;
+
+#define CONST_COOKIES "cookies"
+#define CONST_LOGIN "login"
+#define CONST_PASS "pass"
+#define CONST_TEMPLATE "template"
+#define CONST_LAST_FOLDER "lastfolder"
+#define CONST_WIDTH "width"
+#define CONST_HEIGHT "height"
+#define VERSION "0.0.5"
 
 class Options : public QObject
 {
@@ -34,6 +44,8 @@ public:
 	QVariant getOption(const QString& name, const QVariant& def = QVariant::Invalid);
 	QNetworkProxy getProxy() const;
 	bool useProxy() const;
+	void saveCookies(const QList<QNetworkCookie>& cooks);
+	QList<QNetworkCookie> loadCookies();
 
 private:
 	static Options * instance_;

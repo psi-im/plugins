@@ -82,8 +82,10 @@ bool yandexnarodPlugin::disable()
 	if(manageDialog)
 		delete manageDialog;
 
-	if(uploadwidget)
+	if(uploadwidget) {
+		uploadwidget->disconnect();
 		delete uploadwidget;
+	}
 
 	Options::reset();
 
@@ -170,6 +172,9 @@ void yandexnarodPlugin::on_btnTest_clicked()
 	bool auth = am.go(settingswidget->getLogin(), settingswidget->getPasswd());
 	QString rez = auth ? tr("Authorizing OK") : tr("Authorization failed");
 	settingswidget->setStatus(rez);
+	if(auth) {
+		Options::instance()->saveCookies(am.cookies());
+	}
 }
 
 void yandexnarodPlugin::actionStart()
