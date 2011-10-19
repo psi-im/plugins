@@ -214,9 +214,7 @@ void yandexnarodPlugin::onFileURL(const QString& url)
 
 QString yandexnarodPlugin::pluginInfo()
 {
-	return trUtf8("Ported from QutIM Yandex.Narod plugin\nhttp://qutim.org/forum/viewtopic.php?f=62&t=711\n\n"
-		  "If authorization fails, go to page http://passport.yandex.ru/passport?mode=tune"
-		  " and enable \"Don't remember me\" option");
+	return trUtf8("Ported from QutIM Yandex.Narod plugin\nhttp://qutim.org/forum/viewtopic.php?f=62&t=711\n\n");
 }
 
 Q_EXPORT_PLUGIN(yandexnarodPlugin);

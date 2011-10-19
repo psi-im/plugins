@@ -47,6 +47,17 @@ static QNetworkAccessManager* newMnager(QObject* parent)
 	return netman;
 }
 
+// function needed for tests only
+//static void saveData(const QString& text)
+//{
+//	//qDebug() << text;
+//	QFile file(QDir::homePath() + "/page.html");
+//	if(file.open(QIODevice::WriteOnly | QIODevice::Truncate) ) {
+//		QTextStream str(&file);
+//		str << QString::fromUtf8(text.toLatin1());
+//	}
+//}
+
 //-------------------------------------------
 //------AuthManager--------------------------
 //-------------------------------------------
@@ -144,6 +155,7 @@ void AuthManager::timeout()
 
 void AuthManager::replyFinished(QNetworkReply* reply)
 {
+	//saveData(reply->readAll());
 	QString replycookstr = reply->rawHeader("Set-Cookie");
 	if (!replycookstr.isEmpty()) {
 		QNetworkCookieJar *netcookjar = manager_->cookieJar();
@@ -159,7 +171,7 @@ void AuthManager::replyFinished(QNetworkReply* reply)
 			if (rx.indexIn(page) > 0) {
 				QRegExp rx1("<input type=\"hidden\" name=\"idkey\" value=\"(\\S+)\"[^>]*>");
 				if (rx1.indexIn(page) > 0) {
-					QByteArray post = "idkey="+rx1.cap(1).toAscii()+"&no=no";
+					QByteArray post = "idkey=" + rx1.cap(1).toAscii() + "&filled=yes";
 					QNetworkRequest nr = newRequest();
 					nr.setUrl(authUrl);
 					manager_->post(nr, post);
@@ -473,7 +485,6 @@ void yandexnarodNetMan::netrpFinished( QNetworkReply* reply )
 {
 	if(reply->error() == QNetworkReply::NoError) {
 		QString page = reply->readAll();
-		//qDebug()<<"PAGE"<<page;
 
 		if (action == "get_filelist") {
 			page.replace("<wbr/>", "");
