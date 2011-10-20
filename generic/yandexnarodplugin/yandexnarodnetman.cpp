@@ -54,7 +54,7 @@ static QNetworkAccessManager* newMnager(QObject* parent)
 //	QFile file(QDir::homePath() + "/page.html");
 //	if(file.open(QIODevice::WriteOnly | QIODevice::Truncate) ) {
 //		QTextStream str(&file);
-//		str << QString::fromUtf8(text.toLatin1());
+//		str << text;
 //	}
 //}
 
@@ -119,6 +119,7 @@ bool AuthManager::go(const QString& login, const QString& pass, const QString& c
 		}
 	}
 	if (!post.isEmpty()) {
+		post += "&twoweeks=yes";
 		QNetworkRequest nr = newRequest();
 		nr.setUrl(authUrl);
 		manager_->post(nr, post);
@@ -155,7 +156,6 @@ void AuthManager::timeout()
 
 void AuthManager::replyFinished(QNetworkReply* reply)
 {
-	//saveData(reply->readAll());
 	QString replycookstr = reply->rawHeader("Set-Cookie");
 	if (!replycookstr.isEmpty()) {
 		QNetworkCookieJar *netcookjar = manager_->cookieJar();
@@ -292,12 +292,12 @@ void UploadManager::getStorageFinished()
 
 void UploadManager::doUpload(const QUrl &url)
 {
-	QStringList cooks;
-	QNetworkCookieJar *netcookjar = manager_->cookieJar();
-	QList<QNetworkCookie> cookList = netcookjar->cookiesForUrl(mainUrl);
-	foreach (QNetworkCookie netcook, cookList) {
-		cooks.append(netcook.name()+"="+netcook.value());
-	}
+//	QStringList cooks;
+//	QNetworkCookieJar *netcookjar = manager_->cookieJar();
+//	QList<QNetworkCookie> cookList = netcookjar->cookiesForUrl(mainUrl);
+//	foreach (QNetworkCookie netcook, cookList) {
+//		cooks.append(netcook.name()+"="+netcook.value());
+//	}
 
 	QNetworkRequest nr = newRequest();
 	nr.setUrl(url);
@@ -327,8 +327,8 @@ void UploadManager::doUpload(const QUrl &url)
 
 		nr.setRawHeader("Content-Type", "multipart/form-data, boundary=" + boundary.toLatin1());
 		nr.setRawHeader("Content-Length", QString::number(mpData.length()).toLatin1());
-		for (int i=0; i<cooks.size(); ++i)
-			nr.setRawHeader("Cookie", cooks[i].toLatin1());
+//		for (int i=0; i<cooks.size(); ++i)
+//			nr.setRawHeader("Cookie", cooks[i].toLatin1());
 
 		QNetworkReply* netrp;
 		netrp = manager_->post(nr, mpData);
@@ -422,9 +422,7 @@ bool yandexnarodNetMan::startAuth(const QString& login, const QString& passwd)
 
 void yandexnarodNetMan::startGetFilelist()
 {
-	action = "get_filelist";
-	fileItems.clear();
-	//fileids.clear();
+	action = GetFiles;
 	netmanDo();
 }
 
@@ -434,9 +432,8 @@ void yandexnarodNetMan::startDelFiles(const QList<FileItem>& fileItems_)
 		emit finished();
 		return;
 	}
-	action = "del_files";
-	fileItems = fileItems_;
-	netmanDo();
+	action = DeleteFiles;
+	netmanDo(fileItems_);
 }
 
 void yandexnarodNetMan::startProlongFiles(const QList<FileItem>& fileItems_)
@@ -445,16 +442,15 @@ void yandexnarodNetMan::startProlongFiles(const QList<FileItem>& fileItems_)
 		emit finished();
 		return;
 	}
-	action = "prolong_files";
-	fileItems = fileItems_;
-	netmanDo();
+	action = ProlongateFiles;
+	netmanDo(fileItems_);
 }
 
-void yandexnarodNetMan::netmanDo()
+void yandexnarodNetMan::netmanDo(QList<FileItem> fileItems)
 {
 	QNetworkCookieJar *netcookjar = netman->cookieJar();
 	QList<QNetworkCookie> cookList = netcookjar->cookiesForUrl(mainUrl);
-	if (cookList.isEmpty()/* && netreq.url().toString() != "http://passport.yandex.ru/passport?mode=auth"*/) {
+	if (cookList.isEmpty()) {
 		bool auth = startAuth(Options::instance()->getOption(CONST_LOGIN, "").toString(),
 			      Options::instance()->getOption(CONST_PASS, "").toString() );
 
@@ -462,78 +458,118 @@ void yandexnarodNetMan::netmanDo()
 			return;
 	}
 
-	if (action == "get_filelist") {
-		emit statusText(tr("Downloading filelist..."));
-		QNetworkRequest nr = newRequest();
-		nr.setUrl(QUrl("http://narod.yandex.ru/disk/all/page1/?sort=cdate%20desc"));
-		netman->get(nr);
-	}
-	else if (action == "del_files" || action == "prolong_files") {
-		emit statusText((action == "del_files") ? tr("Deleting files...") : tr("Prolongate files..."));
-		QByteArray postData;
-		postData.append((action == "del_files") ? "action=delete" : "action=prolongate");
-		foreach (const FileItem& item,  fileItems) {
-			postData.append(QString("&fid=%1&token-%1=%2").arg(item.fileid, item.token));
+	switch(action) {
+		case GetFiles:
+		{
+			emit statusText(tr("Downloading filelist..."));
+			QNetworkRequest nr = newRequest();
+			nr.setUrl(QUrl("http://narod.yandex.ru/disk/all/page1/?sort=cdate%20desc"));
+			netman->get(nr);
+			break;
 		}
-		QNetworkRequest nr = newRequest();
-		nr.setUrl(QUrl("http://narod.yandex.ru/disk/all"));
-		netman->post(nr, postData);
+		case DeleteFiles:
+		case ProlongateFiles:
+		{
+			emit statusText((action == DeleteFiles) ? tr("Deleting files...") : tr("Prolongate files..."));
+			QByteArray postData;
+			postData.append((action == DeleteFiles) ? "action=delete" : "action=prolongate");
+			foreach (const FileItem& item,  fileItems) {
+				postData.append(QString("&fid=%1&token-%1=%2").arg(item.fileid, item.token));
+			}
+			QNetworkRequest nr = newRequest();
+			nr.setUrl(QUrl("http://narod.yandex.ru/disk/all"));
+			netman->post(nr, postData);
+			break;
+		}
+		default:
+			break;
 	}
 }
 
-void yandexnarodNetMan::netrpFinished( QNetworkReply* reply )
+void yandexnarodNetMan::netrpFinished(QNetworkReply* reply)
 {
-	if(reply->error() == QNetworkReply::NoError) {
+	if(reply->error() == QNetworkReply::NoError)
+	{
 		QString page = reply->readAll();
 
-		if (action == "get_filelist") {
-			page.replace("<wbr/>", "");
-//			QRegExp rxfn("<span\\sclass=\"num\">\\((\\d+)\\)</span>");
-//			if (rxfn.indexIn(page)>-1) {
-//				filesnum=rxfn.cap(1).toInt();
-//				emit progressMax(filesnum);
-//			}
-			int cpos = 0;
-			static int count = 0;
-			QRegExp rx("class=\"\\S+icon\\s(\\S+)\"[^<]+<img[^<]+</i[^<]+</td[^<]+<td[^<]+<input[^v]+value=\"(\\d+)\" data-token=\"(\\S+)\""
-				   "[^<]+</td[^<]+<td[^<]+<span\\sclass='b-fname'><a\\shref=\"(\\S+)\">([^<]+)</a>.*"
-				   "<td class=\"size\">(\\S+)</td>.*<td class=\"date prolongate\"><nobr>(\\S+ \\S+)</nobr></td>");
-			rx.setMinimal(true);
-			cpos = rx.indexIn(page);
-			while (cpos != -1) {
-				FileItem fileitem;
-				fileitem.filename = QString::fromUtf8(rx.cap(5).toLatin1());
-				fileitem.fileid = rx.cap(2);
-				fileitem.token = rx.cap(3);
-				fileitem.fileurl = rx.cap(4);
-				fileitem.fileicon = rx.cap(1);
-				fileitem.size = QString::fromUtf8(rx.cap(6).toLatin1());
-				fileitem.date = QString::fromUtf8(rx.cap(7).toLatin1());
-				emit newFileItem(fileitem);
-				//fileids.append(rx.cap(2));
-				cpos = rx.indexIn(page, cpos+1);
-				++count;
+		switch(action) {
+			case GetFiles:
+			{
+				static bool firstTry = true;
+				if(page.isEmpty())
+				{
+					if(firstTry) {
+						firstTry = false;
+						emit statusText(tr("Cookies are obsolete!\nReathorization..."));
+						QNetworkCookieJar *jar = netman->cookieJar();
+						delete jar;
+						jar = new QNetworkCookieJar(netman);
+						netman->setCookieJar(jar);
+						netmanDo();
+					}
+					else {
+						emit statusText(tr("Can't get files!\nTry remove cookies."));
+					}
+					emit finished();
+					reply->deleteLater();
+					return;
+				}
+				else {
+					firstTry = true;
+					page.replace("<wbr/>", "");
+					int cpos = 0;
+					static int count = 0;
+					QRegExp rx("class=\"\\S+icon\\s(\\S+)\"[^<]+<img[^<]+</i[^<]+</td[^<]+<td[^<]+<input[^v]+value=\"(\\d+)\" data-token=\"(\\S+)\""
+						   "[^<]+</td[^<]+<td[^<]+<span\\sclass='b-fname'><a\\shref=\"(\\S+)\">([^<]+)</a>.*"
+						   "<td class=\"size\">(\\S+)</td>.*<td class=\"date prolongate\"><nobr>(\\S+ \\S+)</nobr></td>");
+					rx.setMinimal(true);
+					cpos = rx.indexIn(page);
+					while (cpos != -1) {
+						FileItem fileitem;
+						fileitem.filename = QString::fromUtf8(rx.cap(5).toLatin1());
+						fileitem.fileid = rx.cap(2);
+						fileitem.token = rx.cap(3);
+						fileitem.fileurl = rx.cap(4);
+						fileitem.fileicon = rx.cap(1);
+						fileitem.size = QString::fromUtf8(rx.cap(6).toLatin1());
+						fileitem.date = QString::fromUtf8(rx.cap(7).toLatin1());
+						emit newFileItem(fileitem);
+						cpos = rx.indexIn(page, cpos+1);
+						++count;
+					}
+					QRegExp rxnp("<a\\sid=\"next_page\"\\shref=\"([^\"]+)\"");
+					cpos = rxnp.indexIn(page);
+					if (cpos > 0 && rxnp.capturedTexts()[1].length()) {
+						QNetworkRequest nr = newRequest();
+						nr.setUrl(QUrl("http://narod.yandex.ru"+rxnp.cap(1)));
+						netman->get(nr);
+					}
+					else {
+						emit statusText(QString(tr("Filelist downloaded\n(%1 files)")).arg(QString::number(count)));
+						emit finished();
+						count = 0;
+					}
+				}
+				break;
 			}
-			QRegExp rxnp("<a\\sid=\"next_page\"\\shref=\"([^\"]+)\"");
-			cpos = rxnp.indexIn(page);
-			if (cpos > 0 && rxnp.capturedTexts()[1].length()) {
-				QNetworkRequest nr = newRequest();
-				nr.setUrl(QUrl("http://narod.yandex.ru"+rxnp.cap(1)));
-				netman->get(nr);
-			}
-			else {
-				emit statusText(QString(tr("Filelist downloaded\n(%1 files)")).arg(QString::number(count)));
+
+			case DeleteFiles:
+			{
+				emit statusText(tr("File(s) deleted"));
 				emit finished();
-				count = 0;
+				break;
 			}
-		}
-		else if (action == "del_files") {
-			emit statusText(tr("File(s) deleted"));
-			emit finished();
-		}
-		else if (action == "prolong_files") {
-			emit statusText(tr("File(s) prolongated"));
-			emit finished();
+
+			case ProlongateFiles:
+			{
+				emit statusText(tr("File(s) prolongated"));
+				emit finished();
+				break;
+			}
+
+			default:
+				emit finished();
+				break;
 		}
 	}
 	else {

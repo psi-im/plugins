@@ -17,7 +17,6 @@
 #include <QFileDialog>
 
 #include "yandexnarod.h"
-//#include "requestauthdialog.h"
 #include "yandexnarodmanage.h"
 #include "yandexnarodsettings.h"
 #include "uploaddialog.h"
@@ -29,6 +28,7 @@ yandexnarodPlugin::yandexnarodPlugin()
 	, psiIcons(0)
 	, stanzaSender(0)
 	, appInfo(0)
+	, popup(0)
 	, enabled(false)
 	, currentAccount(-1)
 {
@@ -73,6 +73,8 @@ bool yandexnarodPlugin::enable()
 	Options::instance()->setApplicationInfoAccessingHost(appInfo);
 	Options::instance()->setOptionAccessingHost(psiOptions);
 
+	popup->registerOption(name(), 3, "plugins.options." + shortName() + POPUP_OPTION_NAME);
+
 	return enabled;
 }
 
@@ -110,6 +112,11 @@ void yandexnarodPlugin::setStanzaSendingHost(StanzaSendingHost *host)
 void yandexnarodPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host)
 {
 	appInfo = host;
+}
+
+void yandexnarodPlugin::setPopupAccessingHost(PopupAccessingHost *host)
+{
+	popup = host;
 }
 
 void yandexnarodPlugin::applyOptions()
@@ -184,7 +191,7 @@ void yandexnarodPlugin::actionStart()
 	QString filepath = QFileDialog::getOpenFileName(uploadwidget, tr("Choose file"),
 							psiOptions->getPluginOption(CONST_LAST_FOLDER).toString());
 
-	if (filepath.length() > 0) {
+	if (!filepath.isEmpty()) {
 		fi = QFileInfo(filepath);
 		psiOptions->setPluginOption(CONST_LAST_FOLDER, fi.dir().path());
 
@@ -206,10 +213,24 @@ void yandexnarodPlugin::onFileURL(const QString& url)
 
 	if(currentAccount != -1 && !currentJid.isEmpty()) {
 		stanzaSender->sendMessage(currentAccount, currentJid, stanzaSender->escape(sendmsg), "", "chat");
+		showPopup(currentAccount, currentJid, tr("File sent to %1").arg(currentJid));
 	}
 
 	currentJid.clear();
 	currentAccount = -1;
+}
+
+void yandexnarodPlugin::showPopup(int/* account*/, const QString&/* jid*/, const QString& text)
+{
+	int interval = popup->popupDuration(name())*1000;
+	if(interval) {
+		QVariant delay_ = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.delays.status");
+		psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", interval);
+
+		popup->initPopup(text, tr("Yandex Narod Plugin"), "yandexnarod/logo");
+
+		psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", delay_);
+	}
 }
 
 QString yandexnarodPlugin::pluginInfo()

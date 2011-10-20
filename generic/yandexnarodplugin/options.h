@@ -30,7 +30,8 @@ class OptionAccessingHost;
 #define CONST_LAST_FOLDER "lastfolder"
 #define CONST_WIDTH "width"
 #define CONST_HEIGHT "height"
-#define VERSION "0.0.5"
+#define POPUP_OPTION_NAME ".popupinterval"
+#define VERSION "0.0.6"
 
 class Options : public QObject
 {

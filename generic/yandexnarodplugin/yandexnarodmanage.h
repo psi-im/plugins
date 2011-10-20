@@ -67,7 +67,7 @@ private:
 	yandexnarodNetMan *netman;
 	QList<QIcon> fileicons;
 	QHash<QString, int> fileiconstyles;
-	QList<yandexnarodNetMan::FileItem> fileitems;
+	//QList<yandexnarodNetMan::FileItem> fileitems;
 
 };
 #endif

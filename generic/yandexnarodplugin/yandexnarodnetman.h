@@ -62,7 +62,7 @@ signals:
 	void transferProgress(qint64, qint64);
 	void uploaded();
 	void statusText(const QString&);
-	void uploadFileURL(QString);
+	void uploadFileURL(const QString&);
 
 private slots:
 	void getStorageFinished();
@@ -103,15 +103,9 @@ public:
 	void startProlongFiles(const QList<FileItem>& fileItems);
 
 private:
-	void netmanDo();
+	enum Actions { NoAction = 0, GetFiles, DeleteFiles, ProlongateFiles };
 
-	QString action;
-	QNetworkAccessManager *netman;
-	int nstep;
-	//int filesnum;
-	QList<FileItem> fileItems;
-	//QStringList fileids;
-
+	void netmanDo(QList<FileItem> fileItems = QList<FileItem>());
 
 private slots:
 	void netrpFinished(QNetworkReply*);
@@ -120,6 +114,10 @@ signals:
 	void statusText(const QString&);
 	void newFileItem(yandexnarodNetMan::FileItem);
 	void finished();
+
+private:
+	Actions action;
+	QNetworkAccessManager *netman;
 };
 
 #endif // YANDEXNARODNETMAN_H

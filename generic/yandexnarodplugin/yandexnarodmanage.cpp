@@ -45,9 +45,9 @@ public:
 		setToolTip(toolTip);
 	}
 
-	QString url() const
+	const yandexnarodNetMan::FileItem& fileItem() const
 	{
-		return item_.fileurl;
+		return item_;
 	}
 
 private:
@@ -78,7 +78,7 @@ QMimeData* ListWidget::mimeData(const QList<QListWidgetItem *> items) const
 	QMimeData* d = new QMimeData();
 	QString text;
 	foreach(QListWidgetItem *i, items) {
-		text += static_cast<ListWidgetItem*>(i)->url() + "\n";
+		text += static_cast<ListWidgetItem*>(i)->fileItem().fileurl + "\n";
 	}
 	d->setText(text);
 
@@ -156,12 +156,10 @@ void yandexnarodManage::newFileItem(yandexnarodNetMan::FileItem fileitem)
 
 	QListWidgetItem *listitem = new ListWidgetItem(fileicons[iconnum], fileitem);
 	ui_->listWidget->addItem(listitem);
-	fileitems.append(fileitem);
 }
 
 void yandexnarodManage::netmanPrepare()
 {
-//	progressBar->setValue(0);
 	ui_->frameProgress->show();
 	ui_->labelStatus->clear();
 	ui_->frameFileActions->hide();
@@ -171,28 +169,27 @@ void yandexnarodManage::netmanPrepare()
 void yandexnarodManage::netmanFinished()
 {
 	ui_->btnReload->setEnabled(true);
-//	progressBar->setValue(progressBar->maximum());
 }
 
 void yandexnarodManage::on_btnReload_clicked()
 {
 	ui_->listWidget->clear();
-	fileitems.clear();
-
 	netmanPrepare();
 	netman->startGetFilelist();
 }
 
 void yandexnarodManage::on_btnDelete_clicked()
 {
-//	progressBar->setMaximum(1);
 	netmanPrepare();
+	foreach(QListWidgetItem* i, ui_->listWidget->selectedItems()) {
+		i->setIcon(fileicons[15]);
+	}
+
 	netman->startDelFiles(selectedItems());
 }
 
 void yandexnarodManage::on_btnProlong_clicked()
 {
-//	progressBar->setMaximum(1);
 	netmanPrepare();
 	netman->startProlongFiles(selectedItems());
 }
@@ -211,22 +208,16 @@ void yandexnarodManage::on_btnClearCookies_clicked()
 
 QList<yandexnarodNetMan::FileItem> yandexnarodManage::selectedItems() const
 {
-	QList<yandexnarodNetMan::FileItem> delfileids;
-	for (int i = 0; i < ui_->listWidget->count(); i++) {
-		if (ui_->listWidget->item(i)->isSelected()) {
-			ui_->listWidget->item(i)->setIcon(fileicons[15]);
-			delfileids.append(fileitems[i]);
-		}
+	QList<yandexnarodNetMan::FileItem> items;
+	foreach(QListWidgetItem* i, ui_->listWidget->selectedItems()) {
+		items.append(static_cast<ListWidgetItem*>(i)->fileItem());
 	}
 
-	return delfileids;
+	return items;
 }
 
 void yandexnarodManage::on_listWidget_pressed(QModelIndex)
 {
-//	if (progressBar->value() == progressBar->maximum())
-//		frameProgress->hide();
-
 	if (ui_->frameFileActions->isHidden())
 		ui_->frameFileActions->show();
 }
@@ -234,10 +225,8 @@ void yandexnarodManage::on_listWidget_pressed(QModelIndex)
 void yandexnarodManage::on_btnClipboard_clicked()
 {
 	QString text;
-	for (int i=0; i < ui_->listWidget->count(); i++) {
-		if (ui_->listWidget->item(i)->isSelected()) {
-			text += fileitems[i].fileurl+"\n";
-		}
+	foreach(QListWidgetItem* i, ui_->listWidget->selectedItems()) {
+		text += static_cast<ListWidgetItem*>(i)->fileItem().fileurl + "\n";
 	}
 	QClipboard *clipboard = QApplication::clipboard();
 	clipboard->setText(text);
@@ -248,7 +237,7 @@ void yandexnarodManage::on_btnUpload_clicked()
 {
 	QString filepath = QFileDialog::getOpenFileName(this, tr("Choose file"), Options::instance()->getOption(CONST_LAST_FOLDER).toString());
 
-	if (filepath.length() > 0) {
+	if (!filepath.isEmpty()) {
 		QFileInfo fi(filepath);
 		Options::instance()->setOption(CONST_LAST_FOLDER, fi.dir().path());
 

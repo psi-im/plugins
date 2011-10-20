@@ -30,17 +30,21 @@ class QAction;
 #include "plugininfoprovider.h"
 #include "applicationinfoaccessinghost.h"
 #include "applicationinfoaccessor.h"
+#include "popupaccessinghost.h"
+#include "popupaccessor.h"
 
 class yandexnarodSettings;
 class uploadDialog;
 class yandexnarodManage;
 
 
-class yandexnarodPlugin : public QObject, public PsiPlugin, public OptionAccessor, public MenuAccessor, public IconFactoryAccessor
-			, public StanzaSender, public PluginInfoProvider, ApplicationInfoAccessor
+class yandexnarodPlugin : public QObject, public PsiPlugin, public OptionAccessor, public MenuAccessor
+		, public IconFactoryAccessor , public StanzaSender, public PluginInfoProvider
+		, public ApplicationInfoAccessor, public PopupAccessor
 {
 	Q_OBJECT
-	Q_INTERFACES(PsiPlugin OptionAccessor MenuAccessor IconFactoryAccessor StanzaSender PluginInfoProvider ApplicationInfoAccessor)
+	Q_INTERFACES(PsiPlugin OptionAccessor MenuAccessor IconFactoryAccessor StanzaSender
+		     PluginInfoProvider ApplicationInfoAccessor PopupAccessor)
 
 public:
 	yandexnarodPlugin();
@@ -54,6 +58,7 @@ public:
 	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
 	virtual void setStanzaSendingHost(StanzaSendingHost* host);
 	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
+	virtual void setPopupAccessingHost(PopupAccessingHost* host);
 	virtual void optionChanged(const QString& /*option*/) {};
 	virtual void applyOptions();
 	virtual void restoreOptions();
@@ -63,11 +68,21 @@ public:
 	virtual QAction* getAccountAction(QObject* /*parent*/, int /*account*/) { return 0; };
 	virtual QString pluginInfo();
 
+private slots:
+	void manage_clicked();
+	void on_btnTest_clicked();
+	void actionStart();
+	void onFileURL(const QString& url);
+
+private:
+	void showPopup(int account, const QString& jid, const QString& text);
+
 private:
 	OptionAccessingHost* psiOptions;
 	IconFactoryAccessingHost* psiIcons;
 	StanzaSendingHost* stanzaSender;
 	ApplicationInfoAccessingHost* appInfo;
+	PopupAccessingHost* popup;
 	bool enabled;
 	QString currentJid;
 	int currentAccount;
@@ -76,13 +91,6 @@ private:
 	QPointer<yandexnarodSettings> settingswidget;
 	QPointer<yandexnarodManage> manageDialog;
 	QFileInfo fi;
-
-
-private slots:
-	void manage_clicked();
-	void on_btnTest_clicked();
-	void actionStart();
-	void onFileURL(const QString& url);
 };
 
 #endif
