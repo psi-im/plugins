@@ -17,6 +17,8 @@
 #include <QNetworkRequest>
 #include <QTimer>
 #include <QNetworkReply>
+#include <QToolTip>
+
 
 #include "yandexnarodnetman.h"
 #include "requestauthdialog.h"
@@ -58,10 +60,70 @@ static QNetworkAccessManager* newMnager(QObject* parent)
 //	}
 //}
 
+
+//-------------------------------------------
+//------GetPassDlg---------------------------
+//-------------------------------------------
+class GetPassDlg : public QDialog
+{
+	Q_OBJECT
+public:
+	GetPassDlg(QWidget *p = 0)
+		: QDialog(p)
+		, lePass(new QLineEdit)
+		, leConfirmPass(new QLineEdit)
+	{
+		setWindowTitle(tr("Set Password"));
+		lePass->setEchoMode(QLineEdit::Password);
+		leConfirmPass->setEchoMode(QLineEdit::Password);
+
+		QDialogButtonBox *bb = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+		QVBoxLayout* l = new QVBoxLayout(this);
+		l->addWidget(new QLabel(tr("Password:")));
+		l->addWidget(lePass);
+		l->addWidget(new QLabel(tr("Confirm password:")));
+		l->addWidget(leConfirmPass);
+		l->addWidget(bb);
+
+		connect(bb, SIGNAL(rejected()), SLOT(reject()));
+		connect(bb, SIGNAL(accepted()), SLOT(okPressed()));
+
+		adjustSize();
+		setFixedSize(size());
+		show();
+	}
+
+	QString password() const
+	{
+		return lePass->text();
+	}
+
+private slots:
+	void okPressed()
+	{
+		if(isPassOk()) {
+			accept();
+		}
+		else {
+			QToolTip::showText(pos() + leConfirmPass->pos(), tr("Password does not match"), leConfirmPass);
+		}
+	}
+
+private:
+	bool isPassOk() const
+	{
+		return lePass->text() == leConfirmPass->text();
+	}
+
+private:
+	QLineEdit *lePass, *leConfirmPass;
+};
+
+
+
 //-------------------------------------------
 //------AuthManager--------------------------
 //-------------------------------------------
-
 AuthManager::AuthManager(QObject* p)
 	: QObject(p)
 	, authorized_(false)
@@ -70,7 +132,7 @@ AuthManager::AuthManager(QObject* p)
 	connect(manager_, SIGNAL(finished(QNetworkReply*)), SLOT(replyFinished(QNetworkReply*)));
 
 	timer_ = new QTimer(this);
-	timer_->setInterval(5000);
+	timer_->setInterval(10000);
 	timer_->setSingleShot(true);
 	connect(timer_, SIGNAL(timeout()), SLOT(timeout()));
 
@@ -446,6 +508,26 @@ void yandexnarodNetMan::startProlongFiles(const QList<FileItem>& fileItems_)
 	netmanDo(fileItems_);
 }
 
+void yandexnarodNetMan::startSetPass(const FileItem &item)
+{
+	if(item.passset) {
+		emit finished();
+		return;
+	}
+	action = SetPass;
+	netmanDo(QList<FileItem>() << item);
+}
+
+void yandexnarodNetMan::startRemovePass(const FileItem &item)
+{
+	if(!item.passset) {
+		emit finished();
+		return;
+	}
+	action = RemovePass;
+	netmanDo(QList<FileItem>() << item);
+}
+
 void yandexnarodNetMan::netmanDo(QList<FileItem> fileItems)
 {
 	QNetworkCookieJar *netcookjar = netman->cookieJar();
@@ -479,6 +561,33 @@ void yandexnarodNetMan::netmanDo(QList<FileItem> fileItems)
 			QNetworkRequest nr = newRequest();
 			nr.setUrl(QUrl("http://narod.yandex.ru/disk/all"));
 			netman->post(nr, postData);
+			break;
+		}
+		case SetPass:
+		{
+			GetPassDlg gpd;
+			if(gpd.exec() == QDialog::Accepted) {
+				QNetworkRequest nr = newRequest();
+				nr.setUrl(QUrl("http://narod.yandex.ru/disk/setpasswd/" + fileItems.first().fileid));
+				const QString pass = gpd.password();
+				QByteArray post;
+				post.append("passwd=" + pass);
+				post.append("&token=" + fileItems.first().passtoken);
+				netman->post(nr, post);
+			}
+			else {
+				emit statusText(tr("Canceled"));
+				emit finished();
+			}
+			break;
+		}
+		case RemovePass:
+		{
+			QNetworkRequest nr = newRequest();
+			nr.setUrl(QUrl("http://narod.yandex.ru/disk/setpasswd/" + fileItems.first().fileid));
+			QByteArray post;
+			post.append("passwd=&token=" + fileItems.first().passtoken);
+			netman->post(nr, post);
 			break;
 		}
 		default:
@@ -521,7 +630,8 @@ void yandexnarodNetMan::netrpFinished(QNetworkReply* reply)
 					static int count = 0;
 					QRegExp rx("class=\"\\S+icon\\s(\\S+)\"[^<]+<img[^<]+</i[^<]+</td[^<]+<td[^<]+<input[^v]+value=\"(\\d+)\" data-token=\"(\\S+)\""
 						   "[^<]+</td[^<]+<td[^<]+<span\\sclass='b-fname'><a\\shref=\"(\\S+)\">([^<]+)</a>.*"
-						   "<td class=\"size\">(\\S+)</td>.*<td class=\"date prolongate\"><nobr>(\\S+ \\S+)</nobr></td>");
+						   "<td class=\"size\">(\\S+)</td>.*data-token=\"(\\S+)\".*<i class=\"([^\"]+)\".*"
+						   "<td class=\"date prolongate\"><nobr>(\\S+ \\S+)</nobr></td>");
 					rx.setMinimal(true);
 					cpos = rx.indexIn(page);
 					while (cpos != -1) {
@@ -532,7 +642,9 @@ void yandexnarodNetMan::netrpFinished(QNetworkReply* reply)
 						fileitem.fileurl = rx.cap(4);
 						fileitem.fileicon = rx.cap(1);
 						fileitem.size = QString::fromUtf8(rx.cap(6).toLatin1());
-						fileitem.date = QString::fromUtf8(rx.cap(7).toLatin1());
+						fileitem.passtoken = rx.cap(7);
+						fileitem.passset = (rx.cap(8) == "b-old-icon b-old-icon-pwd-on");
+						fileitem.date = QString::fromUtf8(rx.cap(9).toLatin1());
 						emit newFileItem(fileitem);
 						cpos = rx.indexIn(page, cpos+1);
 						++count;
@@ -567,6 +679,20 @@ void yandexnarodNetMan::netrpFinished(QNetworkReply* reply)
 				break;
 			}
 
+			case SetPass:
+			{
+				emit statusText(tr("Password is set"));
+				emit finished();
+				break;
+			}
+
+			case RemovePass:
+			{
+				emit statusText(tr("Password is deleted"));
+				emit finished();
+				break;
+			}
+
 			default:
 				emit finished();
 				break;
@@ -579,3 +705,5 @@ void yandexnarodNetMan::netrpFinished(QNetworkReply* reply)
 
 	reply->deleteLater();
 }
+
+#include "yandexnarodnetman.moc"

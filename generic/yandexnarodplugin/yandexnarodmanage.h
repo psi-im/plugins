@@ -28,12 +28,17 @@ namespace Ui {
 
 class ListWidget : public QListWidget
 {
+	Q_OBJECT
 public:
 	ListWidget(QWidget* p = 0);
 
 protected:
 	virtual QStringList mimeTypes() const;
 	virtual QMimeData *mimeData(const QList<QListWidgetItem *> items) const;
+	virtual void mousePressEvent(QMouseEvent *event);
+
+signals:
+	void menu(const yandexnarodNetMan::FileItem&);
 };
 
 
@@ -61,14 +66,13 @@ private slots:
 	void on_btnProlong_clicked();
 	void on_btnClearCookies_clicked();
 	void netmanFinished();
+	void doMenu(const yandexnarodNetMan::FileItem& item);
 
 private:
 	Ui::yandexnarodManageClass* ui_;
 	yandexnarodNetMan *netman;
 	QList<QIcon> fileicons;
 	QHash<QString, int> fileiconstyles;
-	//QList<yandexnarodNetMan::FileItem> fileitems;
-
 };
 #endif
 

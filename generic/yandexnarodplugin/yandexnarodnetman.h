@@ -95,15 +95,19 @@ public:
 		QString token;
 		QString size;
 		QString date;
+		QString passtoken;
+		bool passset;
 	};
 
 	bool startAuth(const QString& login, const QString& pass);
 	void startGetFilelist();
 	void startDelFiles(const QList<FileItem>& fileItems);
 	void startProlongFiles(const QList<FileItem>& fileItems);
+	void startSetPass(const FileItem& item);
+	void startRemovePass(const FileItem& item);
 
 private:
-	enum Actions { NoAction = 0, GetFiles, DeleteFiles, ProlongateFiles };
+	enum Actions { NoAction = 0, GetFiles, DeleteFiles, ProlongateFiles, SetPass, RemovePass };
 
 	void netmanDo(QList<FileItem> fileItems = QList<FileItem>());
 

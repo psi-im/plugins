@@ -31,7 +31,7 @@ class OptionAccessingHost;
 #define CONST_WIDTH "width"
 #define CONST_HEIGHT "height"
 #define POPUP_OPTION_NAME ".popupinterval"
-#define VERSION "0.0.6"
+#define VERSION "0.0.7"
 
 class Options : public QObject
 {

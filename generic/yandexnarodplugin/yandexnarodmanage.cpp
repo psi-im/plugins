@@ -17,6 +17,8 @@
 #include <QFileDialog>
 #include <QMimeData>
 #include <QListWidgetItem>
+#include <QMouseEvent>
+#include <QMenu>
 
 #include "yandexnarodmanage.h"
 #include "uploaddialog.h"
@@ -37,11 +39,12 @@ public:
 		: QListWidgetItem(ico, fileitem.filename)
 		, item_(fileitem)
 	{
-		QString toolTip = QObject::tr("Name: %1\nSize: %2\nDate prolongate: %3\nURL: %4")
+		QString toolTip = QObject::tr("Name: %1\nSize: %2\nDate prolongate: %3\nURL: %4\nPassword: %5")
 					.arg(fileitem.filename)
 					.arg( QString(fileitem.size).replace("&nbsp;", " ") )
 					.arg(fileitem.date)
-					.arg(fileitem.fileurl);
+					.arg(fileitem.fileurl)
+					.arg(fileitem.passset ? QObject::tr("Yes") : QObject::tr("No"));
 		setToolTip(toolTip);
 	}
 
@@ -83,6 +86,19 @@ QMimeData* ListWidget::mimeData(const QList<QListWidgetItem *> items) const
 	d->setText(text);
 
 	return d;
+}
+
+void ListWidget::mousePressEvent(QMouseEvent *event)
+{
+	QListWidget::mousePressEvent(event);
+	if(event->button() == Qt::RightButton) {
+		QListWidgetItem *lwi = itemAt(event->pos());
+		if(lwi) {
+			ListWidgetItem *it = static_cast<ListWidgetItem*>(lwi);
+			emit menu(it->fileItem());
+			event->accept();
+		}
+	}
 }
 
 
@@ -128,6 +144,8 @@ yandexnarodManage::yandexnarodManage(QWidget* p)
 
 	setAttribute(Qt::WA_QuitOnClose, false);
 	setAttribute(Qt::WA_DeleteOnClose, true);
+
+	connect(ui_->listWidget, SIGNAL(menu(yandexnarodNetMan::FileItem)), SLOT(doMenu(yandexnarodNetMan::FileItem)));
 }
 
 yandexnarodManage::~yandexnarodManage()
@@ -248,3 +266,37 @@ void yandexnarodManage::on_btnUpload_clicked()
 		uploadwidget->start(filepath);
 	}
 }
+void yandexnarodManage::doMenu(const yandexnarodNetMan::FileItem &it)
+{
+	QMenu m;
+	QList<QAction*> actions;
+	QAction *act = new QAction(tr("Set password"), &m);
+	act->setVisible(!it.passset);
+	act->setData(1);
+	actions << act;
+	act = new QAction(tr("Remove password"), &m);
+	act->setVisible(it.passset);
+	act->setData(2);
+	actions << act;
+//	act = new QAction(tr("Copy URL"), &m);
+//	act->setData(3);
+//	actions << act;
+	m.addActions(actions);
+	QAction* ret = m.exec(QCursor::pos());
+	if(ret) {
+		switch(ret->data().toInt()) {
+		case 1:
+			netman->startSetPass(it);
+			break;
+		case 2:
+			netman->startRemovePass(it);
+			break;
+		case 3:
+			on_btnClipboard_clicked();
+			break;
+		default:
+			break;
+		}
+	}
+}
+
