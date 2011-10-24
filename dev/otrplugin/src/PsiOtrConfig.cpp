@@ -107,15 +107,15 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
     setLayout(layout);
 
 
-    int policyOption = m_optionHost->getPluginOption(PSI_CONFIG_POLICY,
-                                                     QVariant(OTR_POLICY_ENABLED)).toInt();
+    int policyOption = m_optionHost->getPluginOption(OPTION_POLICY,
+                                                     DEFAULT_POLICY).toInt();
     if ((policyOption < OTR_POLICY_OFF) || (policyOption > OTR_POLICY_REQUIRE))
     {
         policyOption = static_cast<int>(OTR_POLICY_ENABLED);
     }
 
-    bool endWhenOfflineOption = m_optionHost->getPluginOption(PSI_CONFIG_END_WHEN_OFFLINE,
-                                                              QVariant(false)).toBool();
+    bool endWhenOfflineOption = m_optionHost->getPluginOption(OPTION_END_WHEN_OFFLINE,
+                                                              DEFAULT_END_WHEN_OFFLINE).toBool();
 
     m_policy->button(policyOption)->setChecked(true);
 
@@ -136,8 +136,8 @@ void ConfigOtrWidget::updateOptions()
 {
     OtrPolicy policy = static_cast<OtrPolicy>(m_policy->checkedId());
     
-    m_optionHost->setPluginOption(PSI_CONFIG_POLICY, policy);
-    m_optionHost->setPluginOption(PSI_CONFIG_END_WHEN_OFFLINE,
+    m_optionHost->setPluginOption(OPTION_POLICY, policy);
+    m_optionHost->setPluginOption(OPTION_END_WHEN_OFFLINE,
                                   m_endWhenOffline->checkState() == Qt::Checked);
     m_otr->setPolicy(policy);
 }

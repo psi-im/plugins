@@ -152,7 +152,7 @@ QWidget* PsiOtrPlugin::options()
 
 bool PsiOtrPlugin::enable()
 {
-    QVariant policyOption = m_optionHost->getPluginOption(PSI_CONFIG_POLICY);
+    QVariant policyOption = m_optionHost->getPluginOption(OPTION_POLICY, DEFAULT_POLICY);
     m_otrConnection = new OtrMessaging(this,
                                        static_cast<OtrPolicy>(policyOption.toInt()));
     m_enabled = true;
@@ -357,7 +357,7 @@ void PsiOtrPlugin::setOptionAccessingHost(OptionAccessingHost* host)
 
 void PsiOtrPlugin::optionChanged(const QString&)
 {
-    QVariant policyOption = m_optionHost->getPluginOption(PSI_CONFIG_POLICY);
+    QVariant policyOption = m_optionHost->getPluginOption(OPTION_POLICY, DEFAULT_POLICY);
     m_otrConnection->setPolicy(static_cast<OtrPolicy>(policyOption.toInt()));
 }
 
@@ -418,7 +418,8 @@ bool PsiOtrPlugin::incomingStanza(int accountNo, const QDomElement& xml)
         if (m_onlineUsers.contains(account) && 
             m_onlineUsers.value(account).contains(contact))
         {
-            if (m_optionHost->getPluginOption(PSI_CONFIG_END_WHEN_OFFLINE).toBool())
+            if (m_optionHost->getPluginOption(OPTION_END_WHEN_OFFLINE,
+                                              DEFAULT_END_WHEN_OFFLINE).toBool())
             {
                 m_otrConnection->expireSession(account, contact);
             }
