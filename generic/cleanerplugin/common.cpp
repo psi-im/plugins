@@ -70,8 +70,6 @@ HistoryView::HistoryView(QString filename, QWidget *parent)
         :QDialog(parent, Qt::Window) {
 
         setAttribute(Qt::WA_DeleteOnClose);
-        QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-        QTextCodec::setCodecForLocale(codec);
          QFile file(filename);
          if(file.open(QIODevice::ReadOnly)) {
              setWindowTitle(filename.split(QDir::separator()).takeLast());
@@ -79,6 +77,7 @@ HistoryView::HistoryView(QString filename, QWidget *parent)
              QTextEdit *textWid = new QTextEdit();
              QString text;
              QTextStream in(&file);
+	     in.setCodec("UTF-8");
              text = in.readAll();
              textWid->setText(text);
              QTextCursor cur = textWid->textCursor();
@@ -106,8 +105,6 @@ vCardView::vCardView(QString filename, QWidget *parent)
         :QDialog(parent, Qt::Window) {
 
         setAttribute(Qt::WA_DeleteOnClose);
-        QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-        QTextCodec::setCodecForLocale(codec);
         QFile file(filename);
         if(file.open(QIODevice::ReadOnly)) {
              setWindowTitle(filename.split(QDir::separator()).takeLast());
@@ -126,6 +123,7 @@ vCardView::vCardView(QString filename, QWidget *parent)
              main->addWidget(new QLabel(tr("E-Mail:")), 3, 0);
              main->addWidget(email, 3, 1);
              QTextStream in(&file);
+	     in.setCodec("UTF-8");
              QDomDocument text;
              text.setContent(in.readAll());
              QDomElement VCard = text.documentElement();

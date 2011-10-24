@@ -143,8 +143,6 @@ Reminder::Reminder()
 	, soundFile("sound/reminder.wav")
 	, updateInProgress(false)
 {
-	QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-	QTextCodec::setCodecForLocale(codec);
 }
 
 QString Reminder::name() const {
@@ -244,6 +242,7 @@ bool Reminder::incomingStanza(int /*account*/, const QDomElement& stanza) {
 						QFile file(Dir + QDir::separator() + Jid);
 						if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 							QTextStream out(&file);
+							out.setCodec("UTF-8");
 							out.setGenerateByteOrderMark(false);
 							out << Date << "__" << Nick << endl;
 						}
@@ -332,6 +331,7 @@ void Reminder::UpdateVCard() {
 			QFile file(path + QDir::separator() + filename);
 			if(file.open(QIODevice::ReadOnly)) {
 				QTextStream in(&file);
+				in.setCodec("UTF-8");
 				QDomDocument doc;
 				doc.setContent(in.readAll());
 				QDomElement vCard = doc.documentElement();
@@ -347,6 +347,7 @@ void Reminder::UpdateVCard() {
 						QFile file(Dir + QDir::separator() + filename);
 						if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 							QTextStream out(&file);
+							out.setCodec("UTF-8");
 							out.setGenerateByteOrderMark(false);
 							out << Date << "__" << Nick << endl;
 						}
@@ -409,6 +410,7 @@ QString Reminder::CheckBirthdays() {
 			QFile file(Dir + QDir::separator() + jid);
 			if(file.open(QIODevice::ReadOnly)) {
 				QTextStream in(&file);
+				in.setCodec("UTF-8");
 				QString line = in.readLine();
 				QStringList fields = line.split("__");
 				QString Date = fields.takeFirst();

@@ -90,9 +90,6 @@ SkinsPlugin::SkinsPlugin() {
         enabled = false;        
         appInfo = 0;
         psiOptions = 0;
-        QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-        QTextCodec::setCodecForLocale(codec);
-
     }
 
 QString SkinsPlugin::name() const {
@@ -295,6 +292,7 @@ void SkinsPlugin::createSkin(QString name, QString author, QString version) {
 
     if(saveFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         QTextStream str(&saveFile);
+	str.setCodec("UTF-8");
         int indent = 4;
         str.setGenerateByteOrderMark(false);
         newDoc.save(str, indent);
@@ -335,6 +333,7 @@ void SkinsPlugin::applySkin() {
         QFile backUpFile(fileName);
 	if(backUpFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
             QTextStream str(&backUpFile);
+	    str.setCodec("UTF-8");
             int indent = 4;
             str.setGenerateByteOrderMark(false);
             backUp.save(str, indent);
@@ -439,6 +438,7 @@ void SkinsPlugin::overwrite() {
 					     elem.attribute("version"), skin->skinFolder());
     if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 	    QTextStream str(&file);
+	    str.setCodec("UTF-8");
             int indent = 4;
             str.setGenerateByteOrderMark(false);
 	    overwriteDoc.save(str, indent);

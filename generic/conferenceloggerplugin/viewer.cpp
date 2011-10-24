@@ -112,6 +112,7 @@ void Viewer::saveLog() {
 	}
 	if(file.open(QIODevice::ReadWrite)) {
 		QTextStream out(&file);
+		out.setCodec("UTF-8");
 		QString Text = textWid->toPlainText();
 		pages_.insert(currentPage_, Text);
 		for(int i = 0; i < pages_.size(); i++) {
@@ -134,6 +135,7 @@ bool Viewer::init()
 		QString page;
 		int numPage = 0;
 		QTextStream in(&file);
+		in.setCodec("UTF-8");
 		while(!in.atEnd()) {
 			page = "";
 			for(int i = 0; i < 500; i++) {

@@ -196,8 +196,6 @@ ExtendedOptions::ExtendedOptions()
 	, appInfo(0)
 	, enabled(false)
 {
-	QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-	QTextCodec::setCodecForLocale(codec);
 }
 
 QString ExtendedOptions::name() const
@@ -990,6 +988,7 @@ QString ExtendedOptions::readFile()
 	QFile file(profileDir() + QDir::separator() + QString("mucskipautojoin.txt"));
 	if(file.open(QIODevice::ReadOnly)) {
 		QTextStream in(&file);
+		in.setCodec("UTF-8");
 		return in.readAll();
 	}
 	return QString();
@@ -1003,6 +1002,7 @@ void ExtendedOptions::saveFile(const QString& text)
 			return;
 
 		QTextStream out(&file);
+		out.setCodec("UTF-8");
 		out.setGenerateByteOrderMark(false);
 		out << text << endl;
 	}

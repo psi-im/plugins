@@ -218,8 +218,6 @@ StopSpam::StopSpam()
 	, model_(0)
 	, options_(0)
 {
-	QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-	QTextCodec::setCodecForLocale(codec);
 }
 
 QString StopSpam::name() const {
@@ -714,6 +712,7 @@ void StopSpam::updateCounter(const QDomElement& stanza, bool b) {
 	if(file.open(QIODevice::WriteOnly | QIODevice::Append)) {
 		QString date = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
 		QTextStream out(&file);
+		out.setCodec("UTF-8");
 		//out.seek(file.size());
 		out.setGenerateByteOrderMark(false);
 		out << date << endl << stanza << endl;
@@ -798,6 +797,7 @@ void StopSpam::logHistory(const QDomElement& stanza) {
 		body = "subscribe";
 	QString outText = time + type + QString::fromUtf8("from|N---|") + body;
 	QTextStream out(&file);
+	out.setCodec("UTF-8");
 	//out.seek(file.size());
 	out.setGenerateByteOrderMark(false);
 	out << outText << endl;

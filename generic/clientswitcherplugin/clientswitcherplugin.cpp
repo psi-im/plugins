@@ -991,6 +991,7 @@ void ClientSwitcherPlugin::saveToLog(int account, QString to_jid, QString ver_st
 	if (file.open(QIODevice::WriteOnly | QIODevice::Append)) {
 		QString time_str = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
 		QTextStream out(&file);
+		out.setCodec("UTF-8");
 		out.setGenerateByteOrderMark(false);
 		out << time_str << "  " << to_jid << " <-- " << ver_str << endl;
 	}

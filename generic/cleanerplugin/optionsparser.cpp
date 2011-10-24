@@ -26,9 +26,6 @@ OptionsParser::OptionsParser(QString fileName, QObject *parent)
         : QObject(parent)
         , fileName_(fileName)
 {
-    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-    QTextCodec::setCodecForLocale(codec);
-
     QFile optionsFile(fileName_);
     QFile defaultsFile(":/cleanerplugin/default.xml");
     QDomDocument optionsDoc, defaultsDoc;
