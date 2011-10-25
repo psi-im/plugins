@@ -31,10 +31,10 @@
 
 class ClearingModel : public QAbstractTableModel
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-        ClearingModel(QString dir, QObject *parent = 0);
+	ClearingModel(const QString& dir, QObject *parent = 0);
         ~ClearingModel() {};
         virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
         virtual QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
@@ -48,7 +48,7 @@ public:
         QString fileDate(const QModelIndex & index) const;
         void deleteSelected();
         void reset();
-        void setDir(QString dir);
+	void setDir(const QString& dir);
         int selectedCount(const QModelIndex & parent = QModelIndex()) const;
         void selectAll();
         void unselectAll();
@@ -66,105 +66,105 @@ signals:
 
 class ClearingVcardModel : public ClearingModel
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    ClearingVcardModel(QString dir, QObject *parent = 0) : ClearingModel(dir, parent) {};
-    ~ClearingVcardModel() {};
-    virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
+	ClearingVcardModel(const QString& dir, QObject *parent = 0) : ClearingModel(dir, parent) {};
+	~ClearingVcardModel() {};
+	virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
 };
 
 
 
 class ClearingHistoryModel : public ClearingModel
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    ClearingHistoryModel(QString dir, QObject *parent = 0) : ClearingModel(dir, parent) {};
-    ~ClearingHistoryModel() {};
-    virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
+	ClearingHistoryModel(const QString& dir, QObject *parent = 0) : ClearingModel(dir, parent) {};
+	~ClearingHistoryModel() {};
+	virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
 };
 
 
 
 class ClearingProxyModel : public QSortFilterProxyModel
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    ClearingProxyModel(QObject *parent = 0);
-    bool filterAcceptsRow(int sourceRow, const QModelIndex &parent) const;
+	ClearingProxyModel(QObject *parent = 0);
+	bool filterAcceptsRow(int sourceRow, const QModelIndex &parent) const;
 };
 
 
 
 class ClearingAvatarModel : public QAbstractTableModel
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    ClearingAvatarModel(QStringList dir, QObject *parent = 0);
-    ~ClearingAvatarModel() {};
-    virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
-    virtual QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
-    virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
-    virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
-    virtual int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
-    virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
-    int fileSize(const QModelIndex & index) const;
-    QString filePass(const QModelIndex & index) const;
-    QString fileDate(const QModelIndex & index) const;
-    void deleteSelected();
-    void reset();
-    void setDir(QStringList dir);
-    int selectedCount(const QModelIndex & parent = QModelIndex()) const;
-    void selectAll();
-    void unselectAll();
+	ClearingAvatarModel(const QStringList& dir, QObject *parent = 0);
+	~ClearingAvatarModel() {};
+	virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
+	virtual QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
+	virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
+	virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
+	virtual int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
+	virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
+	int fileSize(const QModelIndex & index) const;
+	QString filePass(const QModelIndex & index) const;
+	QString fileDate(const QModelIndex & index) const;
+	void deleteSelected();
+	void reset();
+	void setDir(const QStringList& dir);
+	int selectedCount(const QModelIndex & parent = QModelIndex()) const;
+	void selectAll();
+	void unselectAll();
 
 
 
 private:
-    QStringList headers, files, dir_;
-    QSet<QString> selected;
+	QStringList headers, files, dir_;
+	QSet<QString> selected;
 
 signals:
-    void updateLabel(int);
+	void updateLabel(int);
 };
 
 
 
 class ClearingOptionsModel : public QAbstractTableModel
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    ClearingOptionsModel(QString fileName, QObject *parent = 0);
-    ~ClearingOptionsModel() {};
-    virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
-    virtual QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
-    virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
-    virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
-    virtual int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
-    virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
-    void deleteSelected();
-    void reset();
-    void setFile(QString fileName);
-    int selectedCount(const QModelIndex & parent = QModelIndex()) const;
-    void selectAll();
-    void unselectAll();
+	ClearingOptionsModel(const QString& fileName, QObject *parent = 0);
+	~ClearingOptionsModel() {};
+	virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
+	virtual QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
+	virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
+	virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
+	virtual int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
+	virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
+	void deleteSelected();
+	void reset();
+	void setFile(const QString& fileName);
+	int selectedCount(const QModelIndex & parent = QModelIndex()) const;
+	void selectAll();
+	void unselectAll();
 
 
 
 private:
-    QStringList headers, options;
-    QString fileName_;
-    QSet<QString> selected;
+	QStringList headers, options;
+	QString fileName_;
+	QSet<QString> selected;
 
-    OptionsParser *parser_;
+	OptionsParser *parser_;
 
 signals:
-    void updateLabel(int);
+	void updateLabel(int);
 };
 
 #endif // MODELS_H

@@ -24,26 +24,28 @@
 #include <QTableView>
 #include <QKeyEvent>
 #include <QItemDelegate>
-#include "iconfactoryaccessinghost.h"
+
+
+class IconFactoryAccessingHost;
 
 class ClearingViewer : public QTableView
 {
-    Q_OBJECT
+	Q_OBJECT
 
-    public:
+public:
         ClearingViewer(QWidget *parent = 0) : QTableView(parent) {};
-       // virtual ~ClearingViewer() {};
+	// virtual ~ClearingViewer() {};
         void init(IconFactoryAccessingHost *iconHost);
 
-    private:
+private:
         IconFactoryAccessingHost *iconHost_;
 
-   protected:
+protected:
         void keyPressEvent(QKeyEvent *e);
         void contextMenuEvent( QContextMenuEvent * e );
 
-   private slots:
-        void itemClicked(QModelIndex index);
+private slots:
+	void itemClicked(const QModelIndex& index);
 
 };
 
@@ -51,12 +53,12 @@ class ClearingViewer : public QTableView
 
 class AvatarDelegate : public QItemDelegate
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    AvatarDelegate(QObject *parent) : QItemDelegate(parent) {};
-    virtual QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
-    virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+	AvatarDelegate(QObject *parent) : QItemDelegate(parent) {};
+	virtual QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+	virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 
 };
 

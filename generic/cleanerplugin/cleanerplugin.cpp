@@ -21,55 +21,62 @@
 #include "cleanerplugin.h"
 #include "cleaner.h"
 
-#define constVersion "0.2.11"
+#define constVersion "0.3.0"
 
 #define constHeight "height"
 #define constWidth "width"
 
 Q_EXPORT_PLUGIN(CleanerPlugin);
 
-CleanerPlugin::CleanerPlugin() {
-    enabled = false;
-    psiOptions = 0;
-    appInfo = 0;
-    iconHost = 0;
-    cln = 0;
-    height = 650;
-    width = 900;
+CleanerPlugin::CleanerPlugin()
+	: enabled(false)
+	, appInfo(0)
+	, iconHost(0)
+	, psiOptions(0)
+	, cln(0)
+	, height(650)
+	, width(900)
+{
 }
 
-QString CleanerPlugin::name() const {
+QString CleanerPlugin::name() const
+{
         return "Cleaner Plugin";
 }
 
-QString CleanerPlugin::shortName() const {
+QString CleanerPlugin::shortName() const
+{
         return "cleaner";
 }
 
-QString CleanerPlugin::version() const {
+QString CleanerPlugin::version() const
+{
         return constVersion;
 }
 
-bool CleanerPlugin::enable() {
-    if(psiOptions) {
-        enabled = true;
-        height = psiOptions->getPluginOption(constHeight, QVariant(height)).toInt();
-        width = psiOptions->getPluginOption(constWidth, QVariant(width)).toInt();
-    }
+bool CleanerPlugin::enable()
+{
+	if(psiOptions) {
+		enabled = true;
+		height = psiOptions->getPluginOption(constHeight, QVariant(height)).toInt();
+		width = psiOptions->getPluginOption(constWidth, QVariant(width)).toInt();
+	}
 
-    return enabled;
+	return enabled;
 }
 
-bool CleanerPlugin::disable() {
-    if (cln) {
-        delete(cln);
-        cln = 0;
-    }
-    enabled = false;
-    return true;
+bool CleanerPlugin::disable()
+{
+	if (cln) {
+		delete cln;
+	}
+
+	enabled = false;
+	return true;
 }
 
-QWidget* CleanerPlugin::options() {
+QWidget* CleanerPlugin::options()
+{
         if (!enabled) {
 		return 0;
 	}
@@ -85,44 +92,54 @@ QWidget* CleanerPlugin::options() {
         hbox->addStretch();
         hbox->addWidget(wikiLink);
         connect(goButton, SIGNAL(released()), SLOT(start()));
+
         return options;
 }
 
-void CleanerPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost * host) {
-    appInfo = host;
+void CleanerPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost * host)
+{
+	appInfo = host;
 }
 
-void CleanerPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost* host) {
-    iconHost = host;
+void CleanerPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost* host)
+{
+	iconHost = host;
 }
 
-void CleanerPlugin::setOptionAccessingHost(OptionAccessingHost* host) {
-    psiOptions = host;
+void CleanerPlugin::setOptionAccessingHost(OptionAccessingHost* host)
+{
+	psiOptions = host;
 }
 
-void CleanerPlugin::start() {
-    if(!enabled) return;
+void CleanerPlugin::start()
+{
+	if(!enabled)
+		return;
 
-    if(!cln) {
-        cln = new CleanerMainWindow(this);
-        cln->resizeWindow(width, height);
-        cln->showCleaner();
-    } else
-        cln->raise();
+	if(!cln) {
+		cln = new CleanerMainWindow(this);
+		cln->resize(width, height);
+		cln->showCleaner();
+	}
+	else {
+		cln->raise();
+		cln->activateWindow();
+	}
 }
 
-void CleanerPlugin::deleteCln() {
-    height = cln->height();
-    psiOptions->setPluginOption(constHeight, QVariant(height));
-    width = cln->width();
-    psiOptions->setPluginOption(constWidth, QVariant(width));
-    delete(cln);
-    cln = 0;
+void CleanerPlugin::deleteCln()
+{
+	height = cln->height();
+	psiOptions->setPluginOption(constHeight, QVariant(height));
+	width = cln->width();
+	psiOptions->setPluginOption(constWidth, QVariant(width));
+	delete cln;
 }
 
-QString CleanerPlugin::pluginInfo() {
+QString CleanerPlugin::pluginInfo()
+{
 	return tr("Author: ") +  "Dealer_WeARE\n"
 			+ tr("Email: ") + "wadealer@gmail.com\n\n"
 			+ trUtf8("This plugin is designed to clear the avatar cache, saved local copies of vCards and history logs.\n"
-			 "You can preview items before deleting them from your hard drive.");
+				 "You can preview items before deleting them from your hard drive.");
 }

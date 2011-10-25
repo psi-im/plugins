@@ -21,68 +21,58 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+
+
 #include <QDialog>
-#include <QComboBox>
 #include "ui_clearingtab.h"
+
 
 class vCardView : public QDialog
 {
-     Q_OBJECT
+	Q_OBJECT
 
-    public:
-        vCardView(QString filename, QWidget *parent = 0);
+public:
+	vCardView(const QString& filename, QWidget *parent = 0);
 
 };
+
+
 
 class HistoryView : public QDialog
 {
-    Q_OBJECT
+	Q_OBJECT
 
-    public:
-        HistoryView(QString file, QWidget *parent = 0);
+public:
+	HistoryView(const QString& file, QWidget *parent = 0);
 
-    };
+};
 
-class ChooseProfile : public QDialog
-{
-    Q_OBJECT
 
-    public:
-        ChooseProfile(QString profDir, QWidget *parent = 0);
 
-    private:
-        QString tmpDir;
-        QComboBox *combo;
-
-    signals:
-        void changeProfile(QString);
-
-    private slots:
-        void pressOk();
-        void profileChanged(int);
-    };
 
 class ClearingTab : public QWidget, public Ui::ClearingTab
 {
-    Q_OBJECT
+	Q_OBJECT
 
-    public:
-    ClearingTab(QWidget * parent = 0) : QWidget(parent) { setupUi(this); };
+public:
+	ClearingTab(QWidget * parent = 0) : QWidget(parent) { setupUi(this); };
 };
+
+
 
 class AvatarView : public QDialog
 {
-     Q_OBJECT
+	Q_OBJECT
 
-    public:
+public:
         AvatarView(const QPixmap &pix, QWidget *parent = 0);
-        void setIcon(QIcon);
+	void setIcon(const QIcon&);
 
-    private:
+private:
         QPixmap pix_;
-        QPushButton *Save;
+	QPushButton *pbSave;
 
-    private slots:
+private slots:
         void save();
 
 };
