@@ -24,8 +24,7 @@
 #include <QTableView>
 #include <QKeyEvent>
 
-#include "iconfactoryaccessinghost.h"
-#include "delegate.h"
+class IconFactoryAccessingHost;
 
 class Viewer : public QTableView
 {
@@ -43,11 +42,11 @@ class Viewer : public QTableView
         void contextMenuEvent( QContextMenuEvent * e );
 
    private slots:
-        void itemClicked(QModelIndex index);
+	void itemClicked(const QModelIndex& index);
 
    signals:
-        void getSound(QModelIndex index);
-        void checkSound(QModelIndex index);
+	void getSound(const QModelIndex&);
+	void checkSound(const QModelIndex&);
 
 };
 

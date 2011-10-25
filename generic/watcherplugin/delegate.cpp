@@ -19,6 +19,7 @@
  */
 
 #include "delegate.h"
+#include "iconfactoryaccessinghost.h"
 
 #include <QLineEdit>
 

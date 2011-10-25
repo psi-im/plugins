@@ -19,9 +19,11 @@
  */
 
 #include "edititemdlg.h"
+#include "iconfactoryaccessinghost.h"
+#include "optionaccessinghost.h"
 #include <QFileDialog>
 
-const QString splitStr = "&split&";
+static const QString splitStr = "&split&";
 
 EditItemDlg::EditItemDlg(IconFactoryAccessingHost* icoHost, OptionAccessingHost *psiOptions_, QWidget *p)
 	: QDialog(p, Qt::Window)
@@ -64,7 +66,8 @@ void EditItemDlg::getFileName()
 	QString fileName = QFileDialog::getOpenFileName(0,tr("Choose a sound file"),
 							psiOptions->getPluginOption(constLastFile, QVariant("")).toString(),
 							tr("Sound (*.wav)"));
-	if(fileName.isEmpty()) return;
+	if(fileName.isEmpty())
+		return;
 	QFileInfo fi(fileName);
 	psiOptions->setPluginOption(constLastFile, QVariant(fi.absolutePath()));
 	ui_.le_sound->setText(fileName);
