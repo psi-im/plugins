@@ -21,7 +21,7 @@
 #include "cleanerplugin.h"
 #include "cleaner.h"
 
-#define constVersion "0.3.0"
+#define constVersion "0.3.1"
 
 #define constHeight "height"
 #define constWidth "width"

@@ -147,27 +147,54 @@ void CleanerMainWindow::setContent()
 	connect(ui_.pb_unselectAll, SIGNAL(released()), this, SLOT(unselectAll()));
 	connect(ui_.pb_close, SIGNAL(released()), this, SLOT(close()));
 
+	ui_.le_filter->installEventFilter(this);
+
 	ui_.tw_tab->setCurrentIndex(0);
 
 	updateStatusBar();
+}
+
+static QModelIndexList visibleIndexes(const QSortFilterProxyModel *const model)
+{
+	int count = model->rowCount();
+	QModelIndexList l;
+	for(int i = 0; i < count; i++) {
+		QModelIndex index = model->index(i, 0);
+		index = model->mapToSource(index);
+		l.append(index);
+	}
+
+	return l;
 }
 
 void CleanerMainWindow::selectAll()
 {
 	int tab = ui_.tw_tab->currentIndex();
 	switch(tab) {
-        case(0):
-		historyModel_->selectAll();
-		break;
-        case(1):
-		vcardsModel_->selectAll();
-		break;
-        case(2):
-		avatarModel_->selectAll();
-		break;
-        case(3):
-		optionsModel_->selectAll();
-		break;
+		case(0):
+		{
+			QSortFilterProxyModel *model = static_cast<QSortFilterProxyModel*>(ui_.tab_history->tv_table->model());
+			historyModel_->selectAll(visibleIndexes(model));
+			break;
+		}
+		case(1):
+		{
+			QSortFilterProxyModel *model = static_cast<QSortFilterProxyModel*>(ui_.tab_vcard->tv_table->model());
+			vcardsModel_->selectAll(visibleIndexes(model));
+			break;
+		}
+		case(2):
+		{
+			QSortFilterProxyModel *model = static_cast<QSortFilterProxyModel*>(ui_.tab_avatars->tv_table->model());
+			avatarModel_->selectAll(visibleIndexes(model));
+			break;
+		}
+		case(3):
+		{
+			QSortFilterProxyModel *model = static_cast<QSortFilterProxyModel*>(ui_.tab_options->tv_table->model());
+			optionsModel_->selectAll(visibleIndexes(model));
+			break;
+		}
 	}
 }
 
@@ -243,6 +270,7 @@ void CleanerMainWindow::deleteHistory()
 				       QMessageBox::Ok  | QMessageBox::Cancel);
 	if(ret == QMessageBox::Cancel) return;
 	historyModel_->deleteSelected();
+	updateStatusBar();
 }
 
 void CleanerMainWindow::deleteVcards()
@@ -252,6 +280,7 @@ void CleanerMainWindow::deleteVcards()
 				       QMessageBox::Ok  | QMessageBox::Cancel);
 	if(ret == QMessageBox::Cancel) return;
 	vcardsModel_->deleteSelected();
+	updateStatusBar();
 }
 
 void CleanerMainWindow::deleteAvatars()
@@ -262,6 +291,7 @@ void CleanerMainWindow::deleteAvatars()
 	if(ret == QMessageBox::Cancel) return;
 
 	avatarModel_->deleteSelected();
+	updateStatusBar();
 }
 
 void CleanerMainWindow::deleteOptions()
@@ -270,6 +300,7 @@ void CleanerMainWindow::deleteOptions()
 				       tr("Not supported yet!"),
 				       QMessageBox::Ok  | QMessageBox::Cancel);
 	Q_UNUSED(ret);
+	updateStatusBar();
 }
 
 void CleanerMainWindow::viewVcard(const QModelIndex& index)
@@ -311,20 +342,18 @@ void CleanerMainWindow::changeProfile(const QString& profDir)
 {
 	vCardDir_ = profilesCacheDir_ + QDir::separator() + profDir + QDir::separator() + "vcard";
 	historyDir_ = profilesDataDir_ + QDir::separator() + profDir + QDir::separator() + "history";
-	historyModel_->reset();
-	historyModel_->setDir(historyDir_);
-	vcardsModel_->reset();
-	vcardsModel_->setDir(vCardDir_);
-
-	avatarModel_->reset();
+	historyModel_->setDirs(QStringList() << historyDir_);
+	vcardsModel_->setDirs(QStringList() << vCardDir_);
+;
 	QStringList avatars;
 	avatars.append(avatarsDir());
 	avatars.append(picturesDir());
-	avatarModel_->setDir(avatars);
+	avatarModel_->setDirs(avatars);
 
-	optionsModel_->reset();
 	QString optionsFile = profilesConfigDir_ + "/" + currentProfileName() + "/options.xml";
 	optionsModel_->setFile(optionsFile);
+
+	updateStatusBar();
 }
 
 void CleanerMainWindow::clearJuick()
@@ -400,6 +429,18 @@ void CleanerMainWindow::closeEvent(QCloseEvent *e)
 {
 	e->ignore();
 	cleaner_->deleteCln();
+}
+
+bool CleanerMainWindow::eventFilter(QObject *o, QEvent *e)
+{
+	if(o == ui_.le_filter && e->type() == QEvent::KeyPress) {
+		QKeyEvent *ke = static_cast<QKeyEvent*>(e);
+		if(ke->key() == Qt::Key_Escape) {
+			ui_.le_filter->clear();
+			return true;
+		}
+	}
+	return QMainWindow::eventFilter(o, e);
 }
 
 QString CleanerMainWindow::avatarsDir() const

@@ -67,6 +67,7 @@ private slots:
 
 protected:
         void closeEvent(QCloseEvent * event);
+	bool eventFilter(QObject *o, QEvent *e);
 
 private:
 	QString vCardDir_, historyDir_, cacheDir_;

@@ -19,41 +19,50 @@
  */
 
 #include "models.h"
+#include "optionsparser.h"
+
 #include <QDateTime>
 #include <QDir>
 #include <QPixmap>
 
-//----------------------------------------
-//--ClearingModel-------------------------
-//----------------------------------------
-ClearingModel::ClearingModel(const QString& dir, QObject* parent)
-        :QAbstractTableModel(parent)
-	, dir_(dir)
-{
-	headers << tr("")
-			<< tr("Nick")
-			<< tr("Domain")
-			<< tr("Size")
-			<< tr("Creation Date");
 
-	QDir Dir(dir_);
-	files = Dir.entryList(QDir::Files);
-	selected.clear();
+//----------------------------------------
+//--BaseModel-----------------------------
+//----------------------------------------
+void BaseModel::reset()
+{
+	selected_.clear();
+	QAbstractTableModel::reset();
 }
 
-QVariant ClearingModel::headerData ( int section, Qt::Orientation orientation, int role) const
+int BaseModel::selectedCount(const QModelIndex &) const
 {
-	if (role == Qt::DisplayRole) {
-                if (orientation == Qt::Horizontal) {
-                        return headers.at(section);
-                } else {
-                        return section+1;
-                }
-        } else
-		return QVariant();
+	return selected_.size();
 }
 
-Qt::ItemFlags ClearingModel::flags ( const QModelIndex & index ) const
+void BaseModel::selectAll(const QModelIndexList& list)
+{
+	emit layoutAboutToBeChanged();
+	selected_.clear();
+	selected_ = list.toSet();
+	emit updateLabel(0);
+	emit layoutChanged();
+}
+
+void BaseModel::unselectAll()
+{
+	emit layoutAboutToBeChanged();
+	selected_.clear();
+	emit updateLabel(0);
+	emit layoutChanged();
+}
+
+bool BaseModel::isSelected(const QModelIndex &index) const
+{
+	return selected_.contains(index);
+}
+
+Qt::ItemFlags BaseModel::flags(const QModelIndex &index) const
 {
 	Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 
@@ -63,14 +72,159 @@ Qt::ItemFlags ClearingModel::flags ( const QModelIndex & index ) const
 	return flags;
 }
 
-int ClearingModel::columnCount(const QModelIndex & /*parent*/) const
+bool BaseModel::setData(const QModelIndex & index, const QVariant & value, int role)
+{
+	if(!index.isValid() || role != Qt::EditRole || index.column() != 0)
+		return false;
+
+	switch(value.toInt()) {
+	case(0):
+		if(selected_.contains(index))
+			selected_.remove(index);
+		break;
+	case(2):
+		if(!selected_.contains(index))
+			selected_ << index;
+		break;
+	case(3):
+		if(selected_.contains(index))
+			selected_.remove(index);
+		else
+			selected_ << index;
+		break;
+	}
+
+	emit dataChanged(index, index);
+	emit updateLabel(0);
+
+	return true;
+}
+
+QVariant BaseModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+	if (role == Qt::DisplayRole) {
+		if (orientation == Qt::Horizontal) {
+			return headers.at(section);
+		}
+		else {
+			return section+1;
+		}
+	} else
+		return QVariant();
+}
+
+int BaseModel::columnCount(const QModelIndex & /*parent*/) const
 {
 	return headers.size();
 }
 
-int ClearingModel::rowCount(const QModelIndex &/* parent*/) const
+
+//---------------------------------------
+//------BaseFileModel--------------------
+//---------------------------------------
+void BaseFileModel::reset()
 {
-	return files.size();
+	files_.clear();
+	BaseModel::reset();
+}
+
+
+int BaseFileModel::rowCount(const QModelIndex &/* parent*/) const
+{
+	return files_.size();
+}
+
+QString BaseFileModel::fileName(const QModelIndex & index) const
+{
+	if(!index.isValid())
+		return QString();
+
+	int i = index.row();
+	if(i < 0 || i >= files_.size())
+		return QString();
+
+	QString name = files_.at(i);
+	return name.split("/", QString::SkipEmptyParts).last();
+}
+
+QString BaseFileModel::filePass(const QModelIndex & index) const
+{
+	if(!index.isValid())
+		return QString();
+
+	int i = index.row();
+	if(i < 0 || i >= files_.size())
+		return QString();
+
+	return files_.at(i);
+}
+
+int BaseFileModel::fileSize(const QModelIndex & index) const
+{
+	if(!index.isValid())
+		return 0;
+
+	QFile file(filePass(index));
+
+	return file.size();
+}
+
+QString BaseFileModel::fileDate(const QModelIndex & index) const
+{
+	if(!index.isValid())
+		return QString();
+
+	return QFileInfo(filePass(index)).created().toString("yyyy-MM-dd");
+}
+
+void BaseFileModel::deleteSelected()
+{
+	emit layoutAboutToBeChanged ();
+
+	foreach(const QModelIndex& index, selected_) {
+		const QString fileName = filePass(index);
+		if(fileName.isEmpty())
+			continue;
+
+		QFile file(fileName);
+		if(file.open(QIODevice::ReadWrite)) {
+			file.remove();
+		}
+	}
+
+	setDirs(dirs_);
+
+	emit updateLabel(0);
+}
+
+void BaseFileModel::setDirs(const QStringList& dirs)
+{
+	reset();
+	dirs_ = dirs;
+	foreach(const QString& dirName, dirs_) {
+		QDir Dir(dirName);
+		foreach(const QString& fileName, Dir.entryList(QDir::Files)) {
+			files_.append(Dir.absoluteFilePath(fileName));
+		}
+	}
+
+	emit layoutChanged();
+}
+
+
+//----------------------------------------
+//--ClearingModel-------------------------
+//----------------------------------------
+ClearingModel::ClearingModel(const QString& dir, QObject* parent)
+	: BaseFileModel(parent)
+{
+	headers << tr("")
+			<< tr("Nick")
+			<< tr("Domain")
+			<< tr("Size")
+			<< tr("Creation Date");
+
+	setDirs(QStringList() << dir);
 }
 
 QVariant ClearingModel::data(const QModelIndex & index, int role) const
@@ -86,7 +240,7 @@ QVariant ClearingModel::data(const QModelIndex & index, int role) const
 	switch(i) {
 	case(0):
                 if (role == Qt::CheckStateRole) {
-                        return selected.contains(fileName(index)) ? 2:0;
+			return isSelected(index) ? 2:0;
                 } else if (role == Qt::TextAlignmentRole) {
                         return (int)(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::DisplayRole)
@@ -118,121 +272,6 @@ QVariant ClearingModel::data(const QModelIndex & index, int role) const
         }
 	return QVariant();
 }
-
-QString ClearingModel::fileName(const QModelIndex & index) const
-{
-	if(!index.isValid())
-		return QString();
-
-	return files.at(index.row());
-}
-
-QString ClearingModel::filePass(const QModelIndex & index) const
-{
-	if(!index.isValid())
-		return QString();
-
-	return dir_ + QDir::separator() + files.at(index.row());
-}
-
-int ClearingModel::fileSize(const QModelIndex & index) const
-{
-	if(!index.isValid())
-		return 0;
-
-	QFile file(filePass(index));
-
-	return file.size();
-}
-
-QString ClearingModel::fileDate(const QModelIndex & index) const
-{
-	if(!index.isValid())
-		return QString();
-
-	return QFileInfo(filePass(index)).created().toString("yyyy-MM-dd");
-}
-
-bool ClearingModel::setData(const QModelIndex & index, const QVariant & value, int role)
-{
-	if(!index.isValid() || role != Qt::EditRole || index.column() != 0)
-		return false;
-
-	QString file = fileName(index);
-	switch(value.toInt()) {
-        case(0):
-                if(selected.contains(file))
-			selected.remove(file);
-                break;
-        case(2):
-                if(!selected.contains(file))
-			selected << file;
-                break;
-        case(3):
-                if(selected.contains(file))
-			selected.remove(file);
-                else
-			selected << file;
-                break;
-	}
-
-	emit dataChanged(index, index);
-	emit updateLabel(0);
-
-	return false;
-}
-
-void ClearingModel::deleteSelected()
-{
-	emit layoutAboutToBeChanged ();
-
-	foreach(QString fileName, selected) {
-		QFile file(dir_+QDir::separator()+fileName);
-		if(file.open(QIODevice::ReadWrite)) {
-			file.remove();
-			files.removeAt(files.indexOf(fileName));
-		}
-	}
-	selected.clear();
-	emit layoutChanged();
-	emit updateLabel(0);
-}
-
-void ClearingModel::reset()
-{
-	selected.clear();
-	files.clear();
-	QAbstractTableModel::reset();
-}
-
-void ClearingModel::setDir(const QString& dir)
-{
-	dir_ = dir;
-	QDir Dir(dir_);
-	files = Dir.entryList(QDir::Files);
-	emit layoutChanged();
-}
-
-int ClearingModel::selectedCount(const QModelIndex &) const
-{
-	return selected.size();
-}
-
-void ClearingModel::selectAll()
-{
-	selected.clear();
-	selected = files.toSet();
-	emit updateLabel(0);
-	emit layoutChanged();
-}
-
-void ClearingModel::unselectAll()
-{
-	selected.clear();
-	emit updateLabel(0);
-	emit layoutChanged();
-}
-
 
 //----------------------------------------
 //--ClearingVcardModel--------------------
@@ -294,78 +333,19 @@ QVariant ClearingHistoryModel::data(const QModelIndex & index, int role) const
 }
 
 
-//----------------------------------------
-//--ClearingProxyModel--------------------
-//----------------------------------------
-ClearingProxyModel::ClearingProxyModel(QObject *parent)
-        : QSortFilterProxyModel(parent)
-{
-	setDynamicSortFilter(true);
-}
-
-bool ClearingProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &parent) const
-{
-	QModelIndex index1 = sourceModel()->index(sourceRow, 1, parent);
-	QModelIndex index2 = sourceModel()->index(sourceRow, 2, parent);
-	bool b = index1.data(Qt::DisplayRole).toString().contains(filterRegExp());
-	bool c = index2.data(Qt::DisplayRole).toString().contains(filterRegExp());
-	return (b | c);
-}
-
-
 
 //----------------------------------------
 //--ClearingAvatarModel-------------------
 //----------------------------------------
 ClearingAvatarModel::ClearingAvatarModel(const QStringList& dir, QObject* parent)
-	: QAbstractTableModel(parent)
-	, dir_(dir)
+	: BaseFileModel(parent)
 {
 	headers << tr("")
 			<< tr("Avatar")
 			<< tr("Size")
 			<< tr("Creation Date");
 
-	foreach(const QString& dirName, dir_){
-		QDir Dir(dirName);
-		foreach(const QString& fileName, Dir.entryList(QDir::Files)) {
-			files.append(Dir.absolutePath()+QDir::separator()+fileName);
-		}
-	}
-
-	selected.clear();
-}
-
-QVariant ClearingAvatarModel::headerData ( int section, Qt::Orientation orientation, int role) const
-{
-	if (role == Qt::DisplayRole) {
-                if (orientation == Qt::Horizontal) {
-                        return headers.at(section);
-                } else {
-                        return section+1;
-                }
-        } else
-		return QVariant();
-}
-
-Qt::ItemFlags ClearingAvatarModel::flags ( const QModelIndex & index ) const
-{
-	Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-
-	if(index.column() == 0)
-		flags |= Qt::ItemIsUserCheckable;
-
-	return flags;
-}
-
-int ClearingAvatarModel::columnCount(const QModelIndex & /*parent*/) const
-{
-	return headers.size();
-}
-
-int ClearingAvatarModel::rowCount(const QModelIndex &/* parent*/) const
-{
-	return files.size();
+	setDirs(dir);
 }
 
 QVariant ClearingAvatarModel::data(const QModelIndex & index, int role) const
@@ -378,7 +358,7 @@ QVariant ClearingAvatarModel::data(const QModelIndex & index, int role) const
 	switch(i) {
 	case(0):
                 if (role == Qt::CheckStateRole) {
-                        return selected.contains(filename) ? 2:0;
+			return isSelected(index) ? 2:0;
                 } else if (role == Qt::TextAlignmentRole) {
                         return (int)(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::DisplayRole)
@@ -406,125 +386,11 @@ QVariant ClearingAvatarModel::data(const QModelIndex & index, int role) const
 	return QVariant();
 }
 
-QString ClearingAvatarModel::filePass(const QModelIndex & index) const
-{
-	if(!index.isValid())
-		return QString();
-
-	return files.at(index.row());
-}
-
-int ClearingAvatarModel::fileSize(const QModelIndex & index) const
-{
-	if(!index.isValid())
-		return 0;
-
-	QFile file(filePass(index));
-
-	return file.size();
-}
-
-QString ClearingAvatarModel::fileDate(const QModelIndex & index) const
-{
-	if(!index.isValid())
-		return QString();
-
-	return QFileInfo(filePass(index)).created().toString("yyyy-MM-dd");
-}
-
-bool ClearingAvatarModel::setData(const QModelIndex & index, const QVariant & value, int role)
-{
-	if(!index.isValid() || role != Qt::EditRole || index.column() != 0)
-		return false;
-
-	QString file = filePass(index);
-	switch(value.toInt()) {
-        case(0):
-                if(selected.contains(file))
-			selected.remove(file);
-                break;
-        case(2):
-                if(!selected.contains(file))
-			selected << file;
-                break;
-        case(3):
-                if(selected.contains(file))
-			selected.remove(file);
-                else
-			selected << file;
-                break;
-	}
-
-	emit dataChanged(index, index);
-	emit updateLabel(0);
-
-	return false;
-}
-
-void ClearingAvatarModel::deleteSelected()
-{
-	emit layoutAboutToBeChanged ();
-
-	foreach(QString fileName, selected) {
-		QFile file(fileName);
-		if(file.open(QIODevice::ReadWrite)) {
-			file.remove();
-			files.removeAt(files.indexOf(fileName));
-		}
-	}
-	selected.clear();
-	emit layoutChanged();
-	emit updateLabel(0);
-}
-
-void ClearingAvatarModel::reset()
-{
-	selected.clear();
-	files.clear();
-	QAbstractTableModel::reset();
-}
-
-void ClearingAvatarModel::setDir(const QStringList& dir)
-{
-	dir_.clear();
-	dir_ = dir;
-	foreach(QString dirName, dir_){
-		QDir Dir(dirName);
-		foreach(QString fileName, Dir.entryList(QDir::Files)) {
-			files.append(Dir.absolutePath()+QDir::separator()+fileName);
-		}
-	}
-
-	emit layoutChanged();
-}
-
-int ClearingAvatarModel::selectedCount(const QModelIndex &) const
-{
-	return selected.size();
-}
-
-void ClearingAvatarModel::selectAll()
-{
-	selected.clear();
-	selected = files.toSet();
-	emit updateLabel(0);
-	emit layoutChanged();
-}
-
-void ClearingAvatarModel::unselectAll()
-{
-	selected.clear();
-	emit updateLabel(0);
-	emit layoutChanged();
-}
-
-
-
 //----------------------------------------
 //--ClearingOptionsModel------------------
 //----------------------------------------
 ClearingOptionsModel::ClearingOptionsModel(const QString& fileName, QObject* parent)
-	: QAbstractTableModel(parent)
+	: BaseModel(parent)
 	, fileName_(fileName)
 {
 	headers << tr("")
@@ -533,33 +399,6 @@ ClearingOptionsModel::ClearingOptionsModel(const QString& fileName, QObject* par
 
 	parser_ = new OptionsParser(fileName_, this);
 	options = parser_->getMissingNodesString();
-}
-
-QVariant ClearingOptionsModel::headerData ( int section, Qt::Orientation orientation, int role) const
-{
-	if (role == Qt::DisplayRole) {
-                if (orientation == Qt::Horizontal) {
-                        return headers.at(section);
-                } else {
-                        return section+1;
-                }
-        } else
-		return QVariant();
-}
-
-Qt::ItemFlags ClearingOptionsModel::flags ( const QModelIndex & index ) const
-{
-	Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-
-	if(index.column() == 0)
-		flags |= Qt::ItemIsUserCheckable;
-
-	return flags;
-}
-
-int ClearingOptionsModel::columnCount(const QModelIndex & /*parent*/) const
-{
-	return headers.size();
 }
 
 int ClearingOptionsModel::rowCount(const QModelIndex &/* parent*/) const
@@ -576,7 +415,7 @@ QVariant ClearingOptionsModel::data(const QModelIndex & index, int role) const
 	switch(i) {
 	case(0):
                 if (role == Qt::CheckStateRole) {
-                        return selected.contains(options.at(index.row())) ? 2:0;
+			return isSelected(index) ? 2:0;
                 } else if (role == Qt::TextAlignmentRole) {
                         return (int)(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::DisplayRole)
@@ -598,41 +437,10 @@ QVariant ClearingOptionsModel::data(const QModelIndex & index, int role) const
 	return QVariant();
 }
 
-bool ClearingOptionsModel::setData(const QModelIndex & index, const QVariant & value, int role)
-{
-	if(!index.isValid() || role != Qt::EditRole || index.column() != 0)
-		return false;
-
-	QString optionName = options.at(index.row());
-	switch(value.toInt()) {
-        case(0):
-                if(selected.contains(optionName))
-			selected.remove(optionName);
-                break;
-        case(2):
-                if(!selected.contains(optionName))
-			selected << optionName;
-                break;
-        case(3):
-                if(selected.contains(optionName))
-			selected.remove(optionName);
-                else
-			selected << optionName;
-                break;
-	}
-
-	emit dataChanged(index, index);
-	emit updateLabel(0);
-
-	return false;
-}
-
 void ClearingOptionsModel::deleteSelected()
 {
 	emit layoutAboutToBeChanged ();
 
-
-	reset();
 	setFile(fileName_);
 
 	emit updateLabel(0);
@@ -640,13 +448,15 @@ void ClearingOptionsModel::deleteSelected()
 
 void ClearingOptionsModel::reset()
 {
-	selected.clear();
 	options.clear();
-	QAbstractTableModel::reset();
+	BaseModel::reset();
 }
 
 void ClearingOptionsModel::setFile(const QString& fileName)
 {
+	emit layoutAboutToBeChanged ();
+
+	reset();
 	fileName_ = fileName;
 	delete parser_;
 	parser_ = new OptionsParser(fileName_, this);
@@ -655,22 +465,23 @@ void ClearingOptionsModel::setFile(const QString& fileName)
 	emit layoutChanged();
 }
 
-int ClearingOptionsModel::selectedCount(const QModelIndex &) const
+
+
+
+//----------------------------------------
+//--ClearingProxyModel--------------------
+//----------------------------------------
+ClearingProxyModel::ClearingProxyModel(QObject *parent)
+	: QSortFilterProxyModel(parent)
 {
-	return selected.size();
+	setDynamicSortFilter(true);
 }
 
-void ClearingOptionsModel::selectAll()
+bool ClearingProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &parent) const
 {
-	selected.clear();
-	selected = options.toSet();
-	emit updateLabel(0);
-	emit layoutChanged();
-}
-
-void ClearingOptionsModel::unselectAll()
-{
-	selected.clear();
-	emit updateLabel(0);
-	emit layoutChanged();
+	QModelIndex index1 = sourceModel()->index(sourceRow, 1, parent);
+	QModelIndex index2 = sourceModel()->index(sourceRow, 2, parent);
+	bool b = index1.data(Qt::DisplayRole).toString().contains(filterRegExp());
+	bool c = index2.data(Qt::DisplayRole).toString().contains(filterRegExp());
+	return (b | c);
 }
