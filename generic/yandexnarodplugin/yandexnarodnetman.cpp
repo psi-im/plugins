@@ -293,7 +293,7 @@ UploadManager::~UploadManager()
 void UploadManager::go(const QString& file)
 {
 	if (file.isEmpty()) {
-		emit statusText(tr("Canceled"));
+		emit statusText(O_M(MCancel));
 		emit uploaded();
 		return;
 	}
@@ -302,16 +302,16 @@ void UploadManager::go(const QString& file)
 
 	if(manager_->cookieJar()->cookiesForUrl(mainUrl).isEmpty()) {
 		AuthManager am;
-		emit statusText(tr("Authorizing..."));
+		emit statusText(O_M(MAuthStart));
 		bool auth = am.go(Options::instance()->getOption(CONST_LOGIN, "").toString(),
 				  Options::instance()->getOption(CONST_PASS, "").toString() );
 		if(auth) {
 			setCookies(am.cookies());
 			Options::instance()->saveCookies(am.cookies());
-			emit statusText(tr("Authorizing OK"));
+			emit statusText(O_M(MAuthOk));
 		}
 		else {
-			emit statusText(tr("Authorization failed"));
+			emit statusText(O_M(MAuthError));
 			emit uploaded();
 			return;
 		}
@@ -345,7 +345,7 @@ void UploadManager::getStorageFinished()
 		}
 	}
 	else {
-		emit statusText(tr("Error! %1").arg(reply->errorString()));
+		emit statusText(O_M(MError).arg(reply->errorString()));
 		emit uploaded();
 	}
 
@@ -416,7 +416,7 @@ void UploadManager::uploadFinished()
 		connect(netrp, SIGNAL(finished()), SLOT(verifyingFinished()));
 	}
 	else {
-		emit statusText(tr("Error! %1").arg(reply->errorString()));
+		emit statusText(O_M(MError).arg(reply->errorString()));
 		emit uploaded();
 	}
 
@@ -440,7 +440,7 @@ void UploadManager::verifyingFinished()
 		}
 	}
 	else {
-		emit statusText(tr("Error! %1").arg(reply->errorString()));
+		emit statusText(O_M(MError).arg(reply->errorString()));
 	}
 
 	emit uploaded();
@@ -468,15 +468,15 @@ yandexnarodNetMan::~yandexnarodNetMan()
 bool yandexnarodNetMan::startAuth(const QString& login, const QString& passwd)
 {
 	AuthManager am;
-	emit statusText(tr("Authorizing..."));
+	emit statusText(O_M(MAuthStart));
 	bool auth = am.go(login, passwd);
 	if(auth) {
 		netman->cookieJar()->setCookiesFromUrl(am.cookies(), mainUrl);
 		Options::instance()->saveCookies(am.cookies());
-		emit statusText(tr("Authorizing OK"));
+		emit statusText(O_M(MAuthOk));
 	}
 	else {
-		emit statusText(tr("Authorization failed"));
+		emit statusText(O_M(MAuthError));
 	}
 
 	return auth;
@@ -576,7 +576,7 @@ void yandexnarodNetMan::netmanDo(QList<FileItem> fileItems)
 				netman->post(nr, post);
 			}
 			else {
-				emit statusText(tr("Canceled"));
+				emit statusText(O_M(MCancel));
 				emit finished();
 			}
 			break;
@@ -699,7 +699,7 @@ void yandexnarodNetMan::netrpFinished(QNetworkReply* reply)
 		}
 	}
 	else {
-		emit statusText(tr("Error! %1").arg(reply->errorString()));
+		emit statusText(O_M(MError).arg(reply->errorString()));
 		emit finished();
 	}
 

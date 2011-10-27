@@ -31,7 +31,12 @@ class OptionAccessingHost;
 #define CONST_WIDTH "width"
 #define CONST_HEIGHT "height"
 #define POPUP_OPTION_NAME ".popupinterval"
-#define VERSION "0.0.7"
+#define VERSION "0.0.8"
+
+
+#define O_M(x) Options::message(x)
+
+enum MessageType { MAuthStart, MAuthOk, MAuthError, MCancel, MChooseFile, MUploading, MError, MRemoveCookie };
 
 class Options : public QObject
 {
@@ -39,6 +44,8 @@ class Options : public QObject
 public:
 	static Options * instance();
 	static void reset();
+	static QString message(MessageType type);
+
 	void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
 	void setOptionAccessingHost(OptionAccessingHost* host);
 	void setOption(const QString& name, const QVariant& value);

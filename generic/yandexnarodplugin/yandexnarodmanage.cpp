@@ -19,6 +19,8 @@
 #include <QListWidgetItem>
 #include <QMouseEvent>
 #include <QMenu>
+#include <QMessageBox>
+#include <QDesktopServices>
 
 #include "yandexnarodmanage.h"
 #include "uploaddialog.h"
@@ -120,6 +122,8 @@ yandexnarodManage::yandexnarodManage(QWidget* p)
 
 	ui_->btnProlong->hide(); // hide cos it doesnt work
 
+	ui_->btnOpenBrowser->setIcon(qApp->style()->standardIcon(QStyle::SP_BrowserReload));
+
 	newNetMan();
 
 	QPixmap iconimage(":/icons/yandexnarod-icons-files.png");
@@ -198,6 +202,10 @@ void yandexnarodManage::on_btnReload_clicked()
 
 void yandexnarodManage::on_btnDelete_clicked()
 {
+	int rez = QMessageBox::question(this, tr("Delete file(s)"), tr("Are you sure?"), QMessageBox::Ok | QMessageBox::Cancel);
+	if(rez == QMessageBox::Cancel)
+		return;
+
 	netmanPrepare();
 	foreach(QListWidgetItem* i, ui_->listWidget->selectedItems()) {
 		i->setIcon(fileicons[15]);
@@ -221,7 +229,12 @@ void yandexnarodManage::on_btnClearCookies_clicked()
 
 	newNetMan();
 	ui_->frameProgress->show();
-	ui_->labelStatus->setText(tr("Cookies are removed"));
+	ui_->labelStatus->setText(O_M(MRemoveCookie));
+}
+
+void yandexnarodManage::on_btnOpenBrowser_clicked()
+{
+	QDesktopServices::openUrl(QUrl("http://narod.yandex.ru"));
 }
 
 QList<yandexnarodNetMan::FileItem> yandexnarodManage::selectedItems() const
@@ -242,18 +255,22 @@ void yandexnarodManage::on_listWidget_pressed(QModelIndex)
 
 void yandexnarodManage::on_btnClipboard_clicked()
 {
-	QString text;
+	QStringList text;
 	foreach(QListWidgetItem* i, ui_->listWidget->selectedItems()) {
-		text += static_cast<ListWidgetItem*>(i)->fileItem().fileurl + "\n";
+		text << static_cast<ListWidgetItem*>(i)->fileItem().fileurl;
 	}
+	copyToClipboard(text.join("\n"));
+}
+
+void yandexnarodManage::copyToClipboard(const QString &text)
+{
 	QClipboard *clipboard = QApplication::clipboard();
 	clipboard->setText(text);
 }
 
-
 void yandexnarodManage::on_btnUpload_clicked()
 {
-	QString filepath = QFileDialog::getOpenFileName(this, tr("Choose file"), Options::instance()->getOption(CONST_LAST_FOLDER).toString());
+	QString filepath = QFileDialog::getOpenFileName(this, O_M(MChooseFile), Options::instance()->getOption(CONST_LAST_FOLDER).toString());
 
 	if (!filepath.isEmpty()) {
 		QFileInfo fi(filepath);
@@ -278,9 +295,9 @@ void yandexnarodManage::doMenu(const yandexnarodNetMan::FileItem &it)
 	act->setVisible(it.passset);
 	act->setData(2);
 	actions << act;
-//	act = new QAction(tr("Copy URL"), &m);
-//	act->setData(3);
-//	actions << act;
+	act = new QAction(tr("Copy URL"), &m);
+	act->setData(3);
+	actions << act;
 	m.addActions(actions);
 	QAction* ret = m.exec(QCursor::pos());
 	if(ret) {
@@ -292,7 +309,7 @@ void yandexnarodManage::doMenu(const yandexnarodNetMan::FileItem &it)
 			netman->startRemovePass(it);
 			break;
 		case 3:
-			on_btnClipboard_clicked();
+			copyToClipboard(it.fileurl);
 			break;
 		default:
 			break;

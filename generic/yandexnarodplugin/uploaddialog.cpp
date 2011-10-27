@@ -19,6 +19,7 @@
 
 #include "uploaddialog.h"
 #include "yandexnarodnetman.h"
+#include "options.h"
 
 uploadDialog::uploadDialog(QWidget *p)
 	: QDialog(p)
@@ -43,8 +44,8 @@ uploadDialog::~uploadDialog()
 
 void uploadDialog::setFilename(const QString& str)
 {
-	ui.labelFile->setText("File: " + str);
-	setWindowTitle(tr("Uploading") + " - " + str);
+	ui.labelFile->setText(tr("File: ") + str);
+	setWindowTitle(O_M(MUploading) + " - " + str);
 }
 
 void uploadDialog::start(const QString& fileName)
@@ -59,24 +60,24 @@ void uploadDialog::start(const QString& fileName)
 
 void uploadDialog::progress(qint64 cBytes, qint64 totalBytes)
 {
-	ui.labelStatus->setText("Uploading...");
-	ui.labelProgress->setText("Progress: "+QString::number(cBytes)+" / "+QString::number(totalBytes));
+	ui.labelStatus->setText(O_M(MUploading)+"...");
+	ui.labelProgress->setText(tr("Progress: ")  + QString::number(cBytes) + " /  " + QString::number(totalBytes));
 	ui.progressBar->setMaximum(totalBytes);
 	ui.progressBar->setValue(cBytes);
 
-	setWindowTitle("[" + ui.progressBar->text() + "] - Uploading...");
+	setWindowTitle("[" + ui.progressBar->text() + "] - " + O_M(MUploading)+"...");
 	
 	QTime etime(0,0,0);
 	int elapsed = utime.elapsed();
 	etime = etime.addMSecs(elapsed);
-	ui.labelETime->setText("Elapsed time: " + etime.toString("hh:mm:ss") );
+	ui.labelETime->setText(tr("Elapsed time: ") + etime.toString("hh:mm:ss") );
 	
 	float speed_kbsec = (elapsed == 0) ? 0 : (cBytes / (((float)elapsed)/1000))/1024;
 	if (speed_kbsec > 0)
-		ui.labelSpeed->setText("Speed: "+QString::number(speed_kbsec)+" kb/sec");
+		ui.labelSpeed->setText(tr("Speed: ")+QString::number(speed_kbsec)+tr(" kb/sec"));
 	
 	if (cBytes == totalBytes)
-		ui.labelStatus->setText("Upload complete.");
+		ui.labelStatus->setText(tr("Upload complete."));
 }
 
 void uploadDialog::setDone()

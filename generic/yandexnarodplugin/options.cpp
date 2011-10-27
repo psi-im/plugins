@@ -105,7 +105,6 @@ void Options::saveCookies(const QList<QNetworkCookie> &cooks)
 		QByteArray ba;
 		QDataStream ds(&ba, QIODevice::WriteOnly);
 		foreach(const QNetworkCookie& cookie, cooks) {
-			//qDebug() << cookie.toRawForm(QNetworkCookie::NameAndValueOnly);
 			ds << cookie.toRawForm(QNetworkCookie::NameAndValueOnly);
 		}
 		options->setPluginOption(CONST_COOKIES, ba);
@@ -122,7 +121,6 @@ QList<QNetworkCookie> Options::loadCookies()
 			QByteArray byte;
 			while(!ds.atEnd()) {
 				ds >> byte;
-				//qDebug() << byte;
 				QList<QNetworkCookie> list = QNetworkCookie::parseCookies(byte);
 				ret += list;
 			}
@@ -130,4 +128,28 @@ QList<QNetworkCookie> Options::loadCookies()
 	}
 
 	return ret;
+}
+
+QString Options::message(MessageType type)
+{
+	switch(type) {
+	case MAuthStart:
+		return tr("Authorizing...");
+	case MAuthOk:
+		return tr("Authorizing OK");
+	case MAuthError:
+		return tr("Authorization failed");
+	case MCancel:
+		return tr("Canceled");
+	case MChooseFile:
+		return tr("Choose file");
+	case MUploading:
+		return tr("Uploading");
+	case MError:
+		return tr("Error! %1");
+	case MRemoveCookie:
+		return tr("Cookies are removed");
+	}
+
+	return QString();
 }

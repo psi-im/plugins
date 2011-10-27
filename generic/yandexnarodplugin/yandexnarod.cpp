@@ -175,9 +175,9 @@ void yandexnarodPlugin::on_btnTest_clicked()
 		return;
 
 	AuthManager am;
-	settingswidget->setStatus(tr("Authorizing..."));
+	settingswidget->setStatus(O_M(MAuthStart));
 	bool auth = am.go(settingswidget->getLogin(), settingswidget->getPasswd());
-	QString rez = auth ? tr("Authorizing OK") : tr("Authorization failed");
+	QString rez = auth ? O_M(MAuthOk) : O_M(MAuthError);
 	settingswidget->setStatus(rez);
 	if(auth) {
 		Options::instance()->saveCookies(am.cookies());
@@ -188,7 +188,7 @@ void yandexnarodPlugin::actionStart()
 {
 	currentJid = sender()->property("jid").toString();
 	currentAccount = sender()->property("account").toInt();
-	QString filepath = QFileDialog::getOpenFileName(uploadwidget, tr("Choose file"),
+	QString filepath = QFileDialog::getOpenFileName(uploadwidget, O_M(MChooseFile),
 							psiOptions->getPluginOption(CONST_LAST_FOLDER).toString());
 
 	if (!filepath.isEmpty()) {

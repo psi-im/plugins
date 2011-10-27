@@ -55,6 +55,7 @@ private:
 	QList<yandexnarodNetMan::FileItem> selectedItems() const;
 	void newNetMan();
 	void netmanPrepare();
+	void copyToClipboard(const QString& text);
 
 private slots:
 	void newFileItem(yandexnarodNetMan::FileItem);
@@ -65,6 +66,7 @@ private slots:
 	void on_btnUpload_clicked();
 	void on_btnProlong_clicked();
 	void on_btnClearCookies_clicked();
+	void on_btnOpenBrowser_clicked();
 	void netmanFinished();
 	void doMenu(const yandexnarodNetMan::FileItem& item);
 

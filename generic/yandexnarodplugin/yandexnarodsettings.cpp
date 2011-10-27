@@ -58,5 +58,5 @@ void yandexnarodSettings::restoreSettings()
 void yandexnarodSettings::on_btnClearCookies_clicked()
 {
 	Options::instance()->saveCookies(QList<QNetworkCookie>());
-	setStatus(tr("Cookies are removed"));
+	setStatus(O_M(MRemoveCookie));
 }
