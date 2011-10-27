@@ -215,7 +215,7 @@ bool PsiOtrPlugin::processEvent(int accountNo, QDomElement& e)
         }
         else if (!plainBody.isNull())
         {
-            cyphertext = plainBody.firstChild().toText().nodeValue();
+            cyphertext = Qt::escape(plainBody.firstChild().toText().nodeValue());
         }
         else
         {
@@ -223,7 +223,7 @@ bool PsiOtrPlugin::processEvent(int accountNo, QDomElement& e)
         }
 
         QString decrypted;
-        if (m_otrConnection->decryptMessage(contact, account, Qt::escape(cyphertext),
+        if (m_otrConnection->decryptMessage(contact, account, cyphertext,
                                             decrypted))
         {
             if (m_onlineUsers.contains(account) && 
