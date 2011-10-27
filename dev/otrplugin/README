@@ -23,6 +23,14 @@ TODOs
 
 CHANGES
 
+  0.9.4pre
+    -Fix escaping of plaintext OTR messages
+    -Ignore incoming messages of type "error"
+    -Fix OtrInternal::account_name()
+    -Use radio boxes for policy settings
+    -Add option to close a session when a contact goes offline
+    -Enable sorting for fingerprint and key table
+
   0.9.3
     -Fix fetching private keys
     -Finish session when forgetting a fingerprint
