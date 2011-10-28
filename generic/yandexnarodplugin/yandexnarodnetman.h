@@ -88,6 +88,21 @@ public:
 
 	struct FileItem
 	{
+		FileItem()
+		{
+			deleted = false;
+		}
+
+		int prolong() const
+		{
+			int d = 1;
+			QRegExp re("(\\d+) \\S+");
+			if(re.indexIn(date) != -1) {
+				d = re.cap(1).toInt();
+			}
+			return d;
+		}
+
 		QString fileicon;
 		QString fileid;
 		QString filename;
@@ -97,6 +112,7 @@ public:
 		QString date;
 		QString passtoken;
 		bool passset;
+		bool deleted;
 	};
 
 	bool startAuth(const QString& login, const QString& pass);

@@ -293,7 +293,7 @@ line2</string>
           <bool>true</bool>
          </property>
          <property name="dragDropMode">
-          <enum>QAbstractItemView::DragOnly</enum>
+          <enum>QAbstractItemView::DragDrop</enum>
          </property>
          <property name="selectionMode">
           <enum>QAbstractItemView::ExtendedSelection</enum>

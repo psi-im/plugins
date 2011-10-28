@@ -31,7 +31,7 @@ class OptionAccessingHost;
 #define CONST_WIDTH "width"
 #define CONST_HEIGHT "height"
 #define POPUP_OPTION_NAME ".popupinterval"
-#define VERSION "0.0.8"
+#define VERSION "0.0.9"
 
 
 #define O_M(x) Options::message(x)

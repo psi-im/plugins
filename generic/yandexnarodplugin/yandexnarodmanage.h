@@ -36,9 +36,12 @@ protected:
 	virtual QStringList mimeTypes() const;
 	virtual QMimeData *mimeData(const QList<QListWidgetItem *> items) const;
 	virtual void mousePressEvent(QMouseEvent *event);
+	virtual void dragEnterEvent(QDragEnterEvent *event);
+	virtual void dropEvent(QDropEvent *event);
 
 signals:
 	void menu(const yandexnarodNetMan::FileItem&);
+	void uploadFile(const QString&);
 };
 
 
@@ -52,7 +55,6 @@ public:
 	~yandexnarodManage();
 
 private:
-	QList<yandexnarodNetMan::FileItem> selectedItems() const;
 	void newNetMan();
 	void netmanPrepare();
 	void copyToClipboard(const QString& text);
@@ -69,6 +71,7 @@ private slots:
 	void on_btnOpenBrowser_clicked();
 	void netmanFinished();
 	void doMenu(const yandexnarodNetMan::FileItem& item);
+	void uploadFile(const QString& path);
 
 private:
 	Ui::yandexnarodManageClass* ui_;

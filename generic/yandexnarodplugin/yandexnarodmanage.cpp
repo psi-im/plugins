@@ -103,7 +103,48 @@ void ListWidget::mousePressEvent(QMouseEvent *event)
 	}
 }
 
+static QStringList files(const QMimeData *md)
+{
+	QString str = QFile::decodeName(QByteArray::fromPercentEncoding(md->data("text/uri-list")));
+	QRegExp re("file://(.+)");
+	QStringList files;
+	int index = re.indexIn(str);
+	while(index != -1) {
+		files.append(re.cap(1).trimmed());
+		index = re.indexIn(str, index+1);
+	}
+	return files;
+}
 
+void ListWidget::dragEnterEvent(QDragEnterEvent *event)
+{
+	const QMimeData *md = event->mimeData();
+	QStringList list = files(md);
+	bool ok = false;
+	if(list.size() == 1) {
+		QFile file(list.takeFirst());
+		if(file.exists()) {
+			ok = true;
+		}
+	}
+	if(ok) {
+		event->acceptProposedAction();
+	}
+}
+
+void ListWidget::dropEvent(QDropEvent *event)
+{
+	QStringList list = files(event->mimeData());
+	if(list.size() == 1) {
+		const QString path = list.takeFirst();
+		QFile file(path);
+		if(file.exists())
+			emit uploadFile(path);
+	}
+
+	event->setDropAction(Qt::IgnoreAction);
+	event->accept();
+}
 
 
 //------------------------------------------
@@ -119,8 +160,6 @@ yandexnarodManage::yandexnarodManage(QWidget* p)
 	ui_->frameProgress->hide();
 	ui_->frameFileActions->hide();
 	ui_->listWidget->clear();
-
-	ui_->btnProlong->hide(); // hide cos it doesnt work
 
 	ui_->btnOpenBrowser->setIcon(qApp->style()->standardIcon(QStyle::SP_BrowserReload));
 
@@ -150,6 +189,7 @@ yandexnarodManage::yandexnarodManage(QWidget* p)
 	setAttribute(Qt::WA_DeleteOnClose, true);
 
 	connect(ui_->listWidget, SIGNAL(menu(yandexnarodNetMan::FileItem)), SLOT(doMenu(yandexnarodNetMan::FileItem)));
+	connect(ui_->listWidget, SIGNAL(uploadFile(QString)), this, SLOT(uploadFile(QString)), Qt::QueuedConnection);
 }
 
 yandexnarodManage::~yandexnarodManage()
@@ -202,22 +242,41 @@ void yandexnarodManage::on_btnReload_clicked()
 
 void yandexnarodManage::on_btnDelete_clicked()
 {
+	QList<yandexnarodNetMan::FileItem> out;
+	foreach(QListWidgetItem* i, ui_->listWidget->selectedItems()) {
+		ListWidgetItem* lwi = static_cast<ListWidgetItem*>(i);
+		yandexnarodNetMan::FileItem &f = const_cast<yandexnarodNetMan::FileItem&>(lwi->fileItem());
+		if(!f.deleted) {
+			out.append(f);
+			f.deleted = true;
+		}
+	}
+	if(out.isEmpty())
+		return;
+
 	int rez = QMessageBox::question(this, tr("Delete file(s)"), tr("Are you sure?"), QMessageBox::Ok | QMessageBox::Cancel);
 	if(rez == QMessageBox::Cancel)
 		return;
 
-	netmanPrepare();
 	foreach(QListWidgetItem* i, ui_->listWidget->selectedItems()) {
 		i->setIcon(fileicons[15]);
 	}
-
-	netman->startDelFiles(selectedItems());
+	netmanPrepare();
+	netman->startDelFiles(out);
 }
 
 void yandexnarodManage::on_btnProlong_clicked()
 {
 	netmanPrepare();
-	netman->startProlongFiles(selectedItems());
+	QList<yandexnarodNetMan::FileItem> out;
+	foreach(QListWidgetItem* i, ui_->listWidget->selectedItems()) {
+		ListWidgetItem* lwi = static_cast<ListWidgetItem*>(i);
+		yandexnarodNetMan::FileItem f = lwi->fileItem();
+		if(f.prolong() < 45) {
+			out.append(f);
+		}
+	}
+	netman->startProlongFiles(out);
 }
 
 void yandexnarodManage::on_btnClearCookies_clicked()
@@ -237,20 +296,20 @@ void yandexnarodManage::on_btnOpenBrowser_clicked()
 	QDesktopServices::openUrl(QUrl("http://narod.yandex.ru"));
 }
 
-QList<yandexnarodNetMan::FileItem> yandexnarodManage::selectedItems() const
-{
-	QList<yandexnarodNetMan::FileItem> items;
-	foreach(QListWidgetItem* i, ui_->listWidget->selectedItems()) {
-		items.append(static_cast<ListWidgetItem*>(i)->fileItem());
-	}
-
-	return items;
-}
-
 void yandexnarodManage::on_listWidget_pressed(QModelIndex)
 {
 	if (ui_->frameFileActions->isHidden())
 		ui_->frameFileActions->show();
+
+	bool prolong = false;
+	foreach(QListWidgetItem* i, ui_->listWidget->selectedItems()) {
+		ListWidgetItem* lwi = static_cast<ListWidgetItem*>(i);
+		if(lwi->fileItem().prolong() < 45) {
+			prolong = true;
+			break;
+		}
+	}
+	ui_->btnProlong->setEnabled(prolong);
 }
 
 void yandexnarodManage::on_btnClipboard_clicked()
@@ -270,19 +329,25 @@ void yandexnarodManage::copyToClipboard(const QString &text)
 
 void yandexnarodManage::on_btnUpload_clicked()
 {
-	QString filepath = QFileDialog::getOpenFileName(this, O_M(MChooseFile), Options::instance()->getOption(CONST_LAST_FOLDER).toString());
+	QString filePath = QFileDialog::getOpenFileName(this, O_M(MChooseFile), Options::instance()->getOption(CONST_LAST_FOLDER).toString());
 
-	if (!filepath.isEmpty()) {
-		QFileInfo fi(filepath);
+	if (!filePath.isEmpty()) {
+		QFileInfo fi(filePath);
 		Options::instance()->setOption(CONST_LAST_FOLDER, fi.dir().path());
 
-		uploadDialog* uploadwidget = new uploadDialog(this);
-		connect(uploadwidget, SIGNAL(canceled()), this, SLOT(netmanFinished()));
-		connect(uploadwidget, SIGNAL(finished()), this, SLOT(netmanFinished()));
-		uploadwidget->show();
-		uploadwidget->start(filepath);
+		uploadFile(filePath);
 	}
 }
+
+void yandexnarodManage::uploadFile(const QString &path)
+{
+	uploadDialog* uploadwidget = new uploadDialog(this);
+	connect(uploadwidget, SIGNAL(canceled()), this, SLOT(netmanFinished()));
+	connect(uploadwidget, SIGNAL(finished()), this, SLOT(netmanFinished()));
+	uploadwidget->show();
+	uploadwidget->start(path);
+}
+
 void yandexnarodManage::doMenu(const yandexnarodNetMan::FileItem &it)
 {
 	QMenu m;
@@ -298,6 +363,10 @@ void yandexnarodManage::doMenu(const yandexnarodNetMan::FileItem &it)
 	act = new QAction(tr("Copy URL"), &m);
 	act->setData(3);
 	actions << act;
+	act = new QAction(tr("Prolongate"), &m);
+	act->setData(4);
+	act->setEnabled(it.prolong() < 45);
+	actions << act;
 	m.addActions(actions);
 	QAction* ret = m.exec(QCursor::pos());
 	if(ret) {
@@ -311,6 +380,8 @@ void yandexnarodManage::doMenu(const yandexnarodNetMan::FileItem &it)
 		case 3:
 			copyToClipboard(it.fileurl);
 			break;
+		case 4:
+			netman->startProlongFiles(QList<yandexnarodNetMan::FileItem>() << it);
 		default:
 			break;
 		}
