@@ -259,10 +259,10 @@ QAction* PsiOtrClosure::getChatDlgMenu(QObject* parent)
 
 //-----------------------------------------------------------------------------
 
- void PsiOtrClosure::showMenu()
- {
-     m_chatDlgMenu->popup(QCursor::pos(), m_chatDlgAction);
- }
+void PsiOtrClosure::showMenu()
+{
+    m_chatDlgMenu->popup(QCursor::pos(), m_chatDlgAction);
+}
     
 //-----------------------------------------------------------------------------
 
