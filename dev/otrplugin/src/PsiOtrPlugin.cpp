@@ -170,10 +170,12 @@ bool PsiOtrPlugin::disable()
             m_otrConnection->endSession(account, jid);
             m_onlineUsers[account][jid]->updateMessageState();
             m_onlineUsers[account][jid]->disable();
+            delete m_onlineUsers[account][jid];
         }
+        m_onlineUsers[account].clear();
     }
+    m_onlineUsers.clear();
 
-    
     delete m_otrConnection;
     m_enabled = false;
     return true;
