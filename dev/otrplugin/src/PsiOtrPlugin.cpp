@@ -98,7 +98,6 @@ PsiOtrPlugin::PsiOtrPlugin()
     : m_enabled(false),
       m_otrConnection(NULL),
       m_onlineUsers(),
-      m_psiDataDir(),
       m_optionHost(NULL),
       m_senderHost(NULL),
       m_applicationInfo(NULL),

@@ -162,7 +162,6 @@ private:
     bool                                            m_enabled;
     OtrMessaging*                                   m_otrConnection;
     QHash<QString, QHash<QString, PsiOtrClosure*> > m_onlineUsers;
-    QString                                         m_psiDataDir;
     OptionAccessingHost*                            m_optionHost;
     StanzaSendingHost*                              m_senderHost;
     ApplicationInfoAccessingHost*                   m_applicationInfo;
