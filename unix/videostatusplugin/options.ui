@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>392</width>
-    <height>298</height>
+    <width>424</width>
+    <height>351</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,6 +49,13 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="cb_fullScreen">
+     <property name="text">
+      <string>Detect full screen applications</string>
+     </property>
     </widget>
    </item>
    <item>
