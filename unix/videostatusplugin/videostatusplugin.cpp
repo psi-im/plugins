@@ -18,14 +18,12 @@
  *
  */
 
-#include <QDBusArgument>
 #include <QDBusMessage>
 #include <QDBusConnection>
 #include <QDBusMetaType>
 #include <QDBusReply>
 #include <QDBusInterface>
 #include <QDBusConnectionInterface>
-#include <QDesktopWidget>
 
 #include "psiplugin.h"
 #include "plugininfoprovider.h"
@@ -41,7 +39,7 @@
 #include <QX11Info>
 #include <X11/Xlib.h>
 
-#define constVersion "0.1.0"
+#define constVersion "0.1.1"
 
 #define constPlayerVLC "vlcplayer"
 #define constPlayerTotem "totemplayer"
@@ -534,7 +532,7 @@ void VideoStatusChanger::fullSTTimeout()
 	int actual_format;
 	unsigned long nitems;
 	unsigned long bytes;
-	unsigned char *data;
+	unsigned char *data = 0;
 
 	if (XGetWindowProperty(display, w, state, 0, (~0L), False, AnyPropertyType,
 			       &actual_type, &actual_format, &nitems, &bytes, &data) == Success) {
