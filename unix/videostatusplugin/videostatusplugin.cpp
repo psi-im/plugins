@@ -41,7 +41,7 @@
 #include <QX11Info>
 #include <X11/Xlib.h>
 
-#define constVersion "0.0.9"
+#define constVersion "0.1.0"
 
 #define constPlayerVLC "vlcplayer"
 #define constPlayerTotem "totemplayer"
@@ -295,8 +295,13 @@ void VideoStatusChanger::applyOptions() {
 
 	setValidPlayers();
 
-	if(fullScreen)
+	if(fullScreen) {
 		fullST.start();
+	}
+	else if (fullST.isActive()) {
+		fullST.stop();
+	}
+
 }
 
 void VideoStatusChanger::restoreOptions() {
@@ -462,10 +467,12 @@ void VideoStatusChanger::disconnectFromBus(const QString &service_)
 void VideoStatusChanger::onPlayerStatusChange(const PlayerStatus &st)
 {
 	if (st.playStatus == StatusPlaying) {
+		fullST.stop();
 		setStatusTimer(setDelay, true);
 	}
 	else {
 		setStatusTimer(restoreDelay, false);
+		fullST.start();
 	}
 }
 
@@ -475,11 +482,13 @@ void VideoStatusChanger::timeOut() {
 		bool reply = sendDBusCall(gmplayerService,"/", gmplayerService,"GetPlayState");
 		if(reply) {
 			if(!isStatusSet) {
+				fullST.stop();
 				setStatusTimer(setDelay, true);
 			}
 		}
 		else if(isStatusSet) {
 			setStatusTimer(restoreDelay, false);
+			fullST.start();
 		}
 	}
 }
@@ -539,7 +548,6 @@ void VideoStatusChanger::fullSTTimeout()
 			}
 		}
 	}
-
 	if(data)
 		XFree(data);
 
@@ -551,7 +559,6 @@ void VideoStatusChanger::fullSTTimeout()
 	else if(isStatusSet) {
 		setStatusTimer(restoreDelay, false);
 	}
-
 }
 
 void VideoStatusChanger::delayTimeout() {
