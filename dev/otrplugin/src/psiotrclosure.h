@@ -26,6 +26,11 @@
 #define PSIOTRCLOSURE_H_
 
 #include <QObject>
+#include <QDialog>
+#include <QLineEdit>
+#include <QProgressBar>
+#include <QPushButton>
+#include <QMessageBox>
 
 class QAction;
 class QMenu;
@@ -37,7 +42,43 @@ class OtrMessaging;
 
 //-----------------------------------------------------------------------------
 
- class PsiOtrClosure : public QObject
+class AuthenticationDialog : public QDialog
+{
+    Q_OBJECT
+public:
+    AuthenticationDialog(OtrMessaging* otrc,
+                         const QString& account, const QString& jid,
+                         const QString& question, bool sender,
+                         QWidget *parent = 0);
+    ~AuthenticationDialog();
+    
+    void updateSMP(int progress);
+    void notify(const QMessageBox::Icon icon, const QString& message);
+    void reset();
+
+public slots:
+    void reject();
+
+private:
+    OtrMessaging* m_otr;
+    QString       m_account;
+    QString       m_jid;
+    bool          m_isSender;
+    bool          m_inProgress;
+
+    QLineEdit*    m_questionEdit;
+    QLineEdit*    m_answerEdit;
+    QProgressBar* m_progressBar;
+    QPushButton*  m_cancelButton;
+    QPushButton*  m_startButton;
+    
+private slots:
+    void startAuthentication();
+};
+
+//-----------------------------------------------------------------------------
+
+class PsiOtrClosure : public QObject
 {
     Q_OBJECT
 
@@ -51,6 +92,8 @@ public:
     void disable();
     QAction* getChatDlgMenu(QObject* parent);
     bool encrypted() const;
+    void receivedSMP(const QString& question);
+    void updateSMP(int progress);
 
 private:
     OtrMessaging* m_otr;
@@ -65,6 +108,7 @@ private:
     QAction*      m_endSessionAction;
     bool          m_isLoggedIn;
     QObject*      m_parentWidget;
+    AuthenticationDialog* m_authDialog;
 
 public slots:
     void initiateSession(bool b);
@@ -73,6 +117,7 @@ public slots:
     void sessionID(bool b);
     void fingerprint(bool b);
     void showMenu();
+    void finishSMP();
 };
 
 //-----------------------------------------------------------------------------

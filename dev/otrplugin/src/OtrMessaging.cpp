@@ -144,6 +144,29 @@ void OtrMessaging::expireSession(const QString& account, const QString& jid)
 
 //-----------------------------------------------------------------------------
 
+void OtrMessaging::startSMP(const QString& account, const QString& jid,
+                            const QString& question, const QString& secret)
+{
+    m_impl->startSMP(account, jid, question, secret);
+}
+
+//-----------------------------------------------------------------------------
+
+void OtrMessaging::continueSMP(const QString& account, const QString& jid,
+                               const QString& secret)
+{
+    m_impl->continueSMP(account, jid, secret);
+}
+
+//-----------------------------------------------------------------------------
+
+void OtrMessaging::abortSMP(const QString& account, const QString& jid)
+{
+    m_impl->abortSMP(account, jid);
+}
+
+//-----------------------------------------------------------------------------
+
 OtrMessageState OtrMessaging::getMessageState(const QString& thisJid,
                                               const QString& remoteJid)
 {
@@ -179,6 +202,13 @@ psiotr::Fingerprint OtrMessaging::getActiveFingerprint(const QString& thisJid,
 bool OtrMessaging::isVerified(const QString& thisJid, const QString& remoteJid)
 {
     return m_impl->isVerified(thisJid, remoteJid);
+}
+
+//-----------------------------------------------------------------------------
+
+bool OtrMessaging::smpSucceeded(const QString& thisJid, const QString& remoteJid)
+{
+    return m_impl->smpSucceeded(thisJid, remoteJid);
 }
 
 //-----------------------------------------------------------------------------

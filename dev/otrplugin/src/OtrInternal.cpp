@@ -26,6 +26,7 @@
 
 #include <assert.h>
 #include <QString>
+#include <QByteArray>
 #include <QtGui>
 #include <QFile>
 
@@ -203,19 +204,129 @@ bool OtrInternal::decryptMessage(const QString& from, const QString& to,
                                  const QString& cryptedMessage,
                                  QString& decrypted)
 {
+    QByteArray accArray  = to.toUtf8();
+    QByteArray userArray = from.toUtf8();
+    const char* accountName = accArray.constData();
+    const char* userName    = userArray.constData();
+    bool isOTR        = false;
     int ignoreMessage = 0;
-    char *newMessage = NULL;
+    char *newMessage  = NULL;
+    OtrlTLV *tlvs     = NULL;
+    OtrlTLV *tlv      = NULL;
 
     ignoreMessage = otrl_message_receiving(m_userstate, &m_uiOps, this,
-                                           to.toUtf8().constData(),
+                                           accountName,
                                            OTR_PROTOCOL_STRING,
-                                           from.toUtf8().constData(),
+                                           userName,
                                            cryptedMessage.toUtf8().constData(),
                                            &newMessage,
-                                           NULL, NULL, NULL);
+                                           &tlvs, NULL, NULL);
+
 
     if (ignoreMessage == 1) // internal protocol message
     {
+        // check for SMP messages
+        
+        ConnContext *context = otrl_context_find(m_userstate,
+                                                 userName, accountName,
+                                                 OTR_PROTOCOL_STRING,
+                                                 0, NULL, NULL, NULL);
+        if (context) {
+            NextExpectedSMP nextMsg = context->smstate->nextExpected;
+
+            if (context->smstate->sm_prog_state == OTRL_SMP_PROG_CHEATED) {
+                abortSMP(context);
+
+                context->smstate->nextExpected = OTRL_SMP_EXPECT1;
+                context->smstate->sm_prog_state = OTRL_SMP_PROG_OK;
+
+                // Report result to user
+                m_callback->updateSMP(accountName, userName, -2);
+            }
+            else
+            {
+                tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP1Q);
+                if (tlv) {
+                    if (nextMsg != OTRL_SMP_EXPECT1)
+                    {
+                        abortSMP(context);
+                    }
+                    else
+                    {
+                        char *question = (char *)tlv->data;
+                        char *eoq = static_cast<char*>(memchr(question, '\0', tlv->len));
+                        if (eoq) {
+                            m_callback->receivedSMP(accountName, userName,
+                                                    QString::fromUtf8(question));
+                        }
+                    }
+                }
+                tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP1);
+                if (tlv) {
+                    if (nextMsg != OTRL_SMP_EXPECT1)
+                    {
+                        abortSMP(context);
+                    }
+                    else
+                    {
+                        m_callback->receivedSMP(accountName, userName, QString());
+                    }
+                }
+                tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP2);
+                if (tlv) {
+                    if (nextMsg != OTRL_SMP_EXPECT2)
+                    {
+                        abortSMP(context);
+                    }
+                    else
+                    {
+                        // If we received TLV2, we will send TLV3 and expect TLV4
+                        context->smstate->nextExpected = OTRL_SMP_EXPECT4;
+                        // Report result to user
+                        m_callback->updateSMP(accountName, userName, 66);
+                    }
+                }
+                tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP3);
+                if (tlv) {
+                    if (nextMsg != OTRL_SMP_EXPECT3)
+                    {
+                        abortSMP(context);
+                    }
+                    else
+                    {
+                        // If we received TLV3, we will send TLV4
+                        // We will not expect more messages, so prepare for next SMP
+                        context->smstate->nextExpected = OTRL_SMP_EXPECT1;
+                        // Report result to user
+                        m_callback->updateSMP(accountName, userName, 100);
+                    }
+                }
+                tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP4);
+                if (tlv) {
+                    if (nextMsg != OTRL_SMP_EXPECT4)
+                    {
+                        abortSMP(context);
+                    }
+                    else
+                    {
+                        // We will not expect more messages, so prepare for next SMP
+                        context->smstate->nextExpected = OTRL_SMP_EXPECT1;
+                        // Report result to user
+                        m_callback->updateSMP(accountName, userName, 100);
+                    }
+                }
+                tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP_ABORT);
+                if (tlv) {
+                    // The message we are waiting for will not arrive, so reset
+                    // and prepare for the next SMP
+                    context->smstate->nextExpected = OTRL_SMP_EXPECT1;
+                    // Report result to user
+                    m_callback->updateSMP(accountName, userName, -1);
+                }
+            }
+        }
+
+
         OtrlMessageType type = otrl_proto_message_type(
                 cryptedMessage.toUtf8().constData());
 
@@ -230,24 +341,19 @@ bool OtrInternal::decryptMessage(const QString& from, const QString& to,
                                       + getSessionId(to, from));
         }
 
-        return true;
+        isOTR = true;
     }
-    else if (ignoreMessage == 0)
+    else if (ignoreMessage == 0 && newMessage != NULL)
     {
-        if (newMessage != NULL) // message has been decrypted. replace it
-        {
-            decrypted = QString::fromUtf8(newMessage);
-            otrl_message_free(newMessage);
-            return true;
-        }
-        else // received message was not an otr message
-        {
-            return false;
-        }
+        // message has been decrypted, replace it
+        decrypted = QString::fromUtf8(newMessage);
+        otrl_message_free(newMessage);
+        isOTR = true;
     }
 
-    assert(false);
-    return false;
+    otrl_tlv_free(tlvs);
+
+    return isOTR;
 }
 
 //-----------------------------------------------------------------------------
@@ -422,6 +528,77 @@ void OtrInternal::expireSession(const QString& account, const QString& jid)
 
 //-----------------------------------------------------------------------------
 
+void OtrInternal::startSMP(const QString& account, const QString& jid,
+                           const QString& question, const QString& secret)
+{
+    ConnContext* context = otrl_context_find(m_userstate,
+                                             jid.toUtf8().constData(),
+                                             account.toUtf8().constData(),
+                                             OTR_PROTOCOL_STRING, false,
+                                             NULL, NULL, NULL);
+    if (context)
+    {
+        startSMP(context, question, secret);
+    }
+}
+
+void OtrInternal::startSMP(ConnContext *context,
+                           const QString& question, const QString& secret)
+{
+    QByteArray  secretArray   = secret.toUtf8();
+    const char* secretPointer = secretArray.constData();
+    size_t      secretLength  = qstrlen(secretPointer);
+
+    otrl_message_initiate_smp_q(m_userstate, &m_uiOps, this, context,
+                                question.toUtf8().constData(),
+                                reinterpret_cast<const unsigned char*>(const_cast<char*>(secretPointer)),
+                                secretLength);
+}
+
+void OtrInternal::continueSMP(const QString& account, const QString& jid,
+                              const QString& secret)
+{
+    ConnContext* context = otrl_context_find(m_userstate,
+                                             jid.toUtf8().constData(),
+                                             account.toUtf8().constData(),
+                                             OTR_PROTOCOL_STRING, false,
+                                             NULL, NULL, NULL);
+    if (context)
+    {
+        continueSMP(context, secret);
+    }
+}
+
+void OtrInternal::continueSMP(ConnContext *context, const QString& secret)
+{
+    QByteArray  secretArray   = secret.toUtf8();
+    const char* secretPointer = secretArray.constData();
+    size_t      secretLength  = qstrlen(secretPointer);
+
+    otrl_message_respond_smp(m_userstate, &m_uiOps, this, context,
+                             reinterpret_cast<const unsigned char*>(secretPointer), secretLength);
+}
+
+void OtrInternal::abortSMP(const QString& account, const QString& jid)
+{
+    ConnContext* context = otrl_context_find(m_userstate,
+                                             jid.toUtf8().constData(),
+                                             account.toUtf8().constData(),
+                                             OTR_PROTOCOL_STRING, false,
+                                             NULL, NULL, NULL);
+    if (context)
+    {
+        abortSMP(context);
+    }
+}
+
+void OtrInternal::abortSMP(ConnContext *context)
+{
+    otrl_message_abort_smp(m_userstate, &m_uiOps, this, context);
+}
+
+//-----------------------------------------------------------------------------
+
 psiotr::OtrMessageState OtrInternal::getMessageState(const QString& thisJid,
                                                      const QString& remoteJid)
 {
@@ -556,7 +733,26 @@ bool OtrInternal::isVerified(const QString& thisJid,
     if ((context != NULL) &&
         (context->active_fingerprint != NULL))
     {
-        return (QString("verified") == context->active_fingerprint->trust);
+        return (context->active_fingerprint->trust &&
+                context->active_fingerprint->trust[0]);
+    }
+
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+
+bool OtrInternal::smpSucceeded(const QString& thisJid,
+                               const QString& remoteJid)
+{
+    ConnContext* context;
+    context = otrl_context_find(m_userstate, remoteJid.toUtf8().constData(),
+                                thisJid.toUtf8().constData(), OTR_PROTOCOL_STRING,
+                                false, NULL, NULL, NULL);
+
+    if (context != NULL)
+    {
+        return context->smstate->sm_prog_state == OTRL_SMP_PROG_SUCCEEDED;
     }
 
     return false;

@@ -87,6 +87,12 @@ public:
     virtual void notifyUser(const OtrNotifyType& type,
                             const QString& message) = 0;
 
+    virtual void receivedSMP(const QString& account, const QString& jid,
+                             const QString& question) = 0;
+
+    virtual void updateSMP(const QString& account, const QString& jid,
+                           int progress) = 0;
+
     virtual void stopMessages() = 0;
     virtual void startMessages() = 0;
 
@@ -229,6 +235,23 @@ public:
     void expireSession(const QString& account, const QString& jid);
 
     /**
+    * Start the SMP with an optional question
+    */
+    void startSMP(const QString& account, const QString& jid,
+                  const QString& question, const QString& secret);
+
+    /**
+    * Continue the SMP
+    */
+    void continueSMP(const QString& account, const QString& jid,
+                     const QString& secret);
+
+    /**
+    * Abort the SMP
+    */
+    void abortSMP(const QString& account, const QString& jid);
+
+    /**
     * Return the messageState of a context.
     * i.e. plaintext, encrypted, finished
     */
@@ -256,6 +279,11 @@ public:
     * Return true if the active fingerprint has been verified
     */
     bool isVerified(const QString& thisJid, const QString& remoteJid);
+
+    /** 
+    * Return true if Socialist Millionaires' Protocol succeeded
+    */
+    bool smpSucceeded(const QString& thisJid, const QString& remoteJid);
 
     /** 
     * Set the default OTR policy.

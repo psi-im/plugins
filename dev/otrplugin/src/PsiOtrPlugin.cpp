@@ -548,6 +548,31 @@ void PsiOtrPlugin::notifyUser(const OtrNotifyType& type, const QString& message)
 
 //-----------------------------------------------------------------------------
 
+void PsiOtrPlugin::receivedSMP(const QString& account, const QString& jid,
+                               const QString& question)
+{
+    if (m_onlineUsers.contains(account) && 
+        m_onlineUsers.value(account).contains(jid))
+    {
+        m_onlineUsers[account][jid]->receivedSMP(question);
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+void PsiOtrPlugin::updateSMP(const QString& account, const QString& jid,
+                             int progress)
+{
+    
+    if (m_onlineUsers.contains(account) && 
+        m_onlineUsers.value(account).contains(jid))
+    {
+        m_onlineUsers[account][jid]->updateSMP(progress);
+    }
+}
+
+//-----------------------------------------------------------------------------
+
 void PsiOtrPlugin::stopMessages()
 {
     m_enabled = false;

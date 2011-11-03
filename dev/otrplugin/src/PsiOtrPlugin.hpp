@@ -131,6 +131,10 @@ public:
                              const QString& message);
     virtual bool isLoggedIn(const QString& account, const QString& jid);
     virtual void notifyUser(const OtrNotifyType& type, const QString& message);
+    virtual void receivedSMP(const QString& account, const QString& jid,
+                             const QString& question);
+    virtual void updateSMP(const QString& account, const QString& jid,
+                           int progress);
     virtual void stopMessages();
     virtual void startMessages();
     virtual QString humanAccount(const QString& accountId);

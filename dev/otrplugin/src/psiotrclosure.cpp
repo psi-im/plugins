@@ -28,9 +28,205 @@
 #include <QAction>
 #include <QMenu>
 #include <QMessageBox>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QLabel>
 
 namespace psiotr
 {
+
+AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
+                                           const QString& account, const QString& jid,
+                                           const QString& question, bool sender, QWidget *parent)
+    : QDialog(parent),
+      m_otr(otrc),
+      m_account(account),
+      m_jid(jid),
+      m_isSender(sender)
+{
+    if (m_isSender)
+    {
+        setWindowTitle(tr("Authenticate %1").arg(jid));
+    }
+    else
+    {
+        setWindowTitle(tr("Authentication Request from %1").arg(jid));
+    }
+    setAttribute(Qt::WA_DeleteOnClose);
+    
+    m_questionEdit = new QLineEdit(this);
+    m_answerEdit   = new QLineEdit(this);
+    
+    m_questionEdit->setMinimumWidth(300);
+    m_answerEdit->setMinimumWidth(300);
+    
+    QLabel* questionLabel = new QLabel(tr("&Question:"), this);
+    questionLabel->setBuddy(m_questionEdit);
+    
+    QLabel* answerLabel = new QLabel(tr("&Answer:"), this);
+    answerLabel->setBuddy(m_answerEdit);
+    
+    m_progressBar  = new QProgressBar(this);
+    
+    m_cancelButton = new QPushButton(tr("&Cancel"), this);
+    m_startButton  = new QPushButton(tr("&Send"), this);
+    
+    m_startButton->setDefault(true);
+    
+    QHBoxLayout* buttonLayout = new QHBoxLayout;
+    buttonLayout->addWidget(m_cancelButton);
+    buttonLayout->addWidget(m_startButton);
+    
+    QVBoxLayout* mainLayout = new QVBoxLayout;
+    mainLayout->addSpacing(10);
+    mainLayout->addWidget(questionLabel);
+    mainLayout->addWidget(m_questionEdit);
+    mainLayout->addSpacing(10);
+    mainLayout->addWidget(answerLabel);
+    mainLayout->addWidget(m_answerEdit);
+    mainLayout->addSpacing(20);
+    mainLayout->addWidget(m_progressBar);
+    mainLayout->addSpacing(20);
+    mainLayout->addLayout(buttonLayout);
+    setLayout(mainLayout);
+    
+    
+    connect(m_cancelButton, SIGNAL(clicked()),
+            this, SLOT(reject()));
+    connect(m_startButton, SIGNAL(clicked()),
+            this, SLOT(startAuthentication()));
+
+    if (!m_isSender && !question.isEmpty())
+    {
+        m_questionEdit->setText(question);
+    }
+
+    reset();
+}
+
+AuthenticationDialog::~AuthenticationDialog()
+{
+    
+}
+
+void AuthenticationDialog::reject()
+{
+    if (m_inProgress)
+    {
+        m_otr->abortSMP(m_account, m_jid);
+    }
+    
+    QDialog::reject();
+}
+
+void AuthenticationDialog::reset()
+{
+    m_inProgress = !m_isSender;
+
+    m_questionEdit->setEnabled(m_isSender);
+    m_answerEdit->setEnabled(true);
+    m_progressBar->setEnabled(false);
+    m_startButton->setEnabled(true);
+    
+    m_progressBar->setValue(0);
+}
+
+void AuthenticationDialog::startAuthentication()
+{
+    if (m_answerEdit->text().isEmpty())
+    {
+        return;
+    }
+    
+    m_inProgress = true;
+    
+    m_questionEdit->setEnabled(false);
+    m_answerEdit->setEnabled(false);
+    m_progressBar->setEnabled(true);
+    m_startButton->setEnabled(false);
+    
+    if (m_isSender)
+    {
+        m_otr->startSMP(m_account, m_jid,
+                        m_questionEdit->text(), m_answerEdit->text());
+    }
+    else
+    {
+        m_otr->continueSMP(m_account, m_jid, m_answerEdit->text());
+    }
+
+    updateSMP(33);
+}
+
+void AuthenticationDialog::updateSMP(int progress)
+{
+    if (progress<0)
+    {
+        if (progress == -1)
+        {
+            notify(QMessageBox::Warning,
+                   tr("%1 has canceled the authentication process.")
+                     .arg(m_jid));
+        }
+        else
+        {
+            notify(QMessageBox::Warning,
+                   tr("An error occured during the authentication process."));
+        }
+
+        if (m_isSender)
+        {
+            reset();
+        }
+        else
+        {
+            close();
+        }
+
+        return;
+    }
+    
+    m_progressBar->setValue(progress);
+
+    if (progress == 100) {
+        m_inProgress = false;
+        if (m_otr->smpSucceeded(m_account, m_jid))
+        {
+            if (m_otr->isVerified(m_account, m_jid))
+            {
+                notify(QMessageBox::Information, tr("Authentication successful."));
+            }
+            else
+            {
+                notify(QMessageBox::Information,
+                       tr("You have been successfully authenticated.\n\n"
+                          "You should authenticate %1 as "
+                          "well by asking your own question.").arg(m_jid));
+            }
+            close();
+        } else {
+            notify(QMessageBox::Critical, tr("Authentication failed."));
+            if (m_isSender)
+            {
+                reset();
+            }
+            else
+            {
+                close();
+            }
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+void AuthenticationDialog::notify(const QMessageBox::Icon icon,
+                                  const QString& message)
+{
+    QMessageBox mb(icon, tr("Psi OTR"), message, QMessageBox::Ok, this,
+                   Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+    mb.exec();
+}
 
 //-----------------------------------------------------------------------------
 
@@ -47,7 +243,8 @@ PsiOtrClosure::PsiOtrClosure(const QString& account, const QString& toJid,
       m_startSessionAction(0),
       m_endSessionAction(0),
       m_isLoggedIn(false),
-      m_parentWidget(0)
+      m_parentWidget(0),
+      m_authDialog(0)
 {
 }
 
@@ -73,6 +270,21 @@ void PsiOtrClosure::initiateSession(bool b)
 
 void PsiOtrClosure::verifyFingerprint(bool)
 {
+    if (m_authDialog || !encrypted())
+    {
+        return;
+    }
+
+    m_authDialog = new AuthenticationDialog(m_otr,
+                                            m_myAccount, m_otherJid,
+                                            QString(), true);
+
+    connect(m_authDialog, SIGNAL(destroyed()),
+            this, SLOT(finishSMP()));
+
+    m_authDialog->show();
+
+    return;
 
     Fingerprint fingerprint = m_otr->getActiveFingerprint(m_myAccount,
                                                           m_otherJid);
@@ -102,6 +314,43 @@ void PsiOtrClosure::verifyFingerprint(bool)
         updateMessageState();
 
     }
+}
+
+//-----------------------------------------------------------------------------
+
+void PsiOtrClosure::receivedSMP(const QString& question)
+{
+    if (m_authDialog || !encrypted())
+    {
+        return;
+    }
+
+    m_authDialog = new AuthenticationDialog(m_otr, m_myAccount, m_otherJid, question, false);
+
+    connect(m_authDialog, SIGNAL(destroyed()),
+            this, SLOT(finishSMP()));
+
+    m_authDialog->show();
+}
+
+//-----------------------------------------------------------------------------
+
+void PsiOtrClosure::updateSMP(int progress)
+{
+    if (m_authDialog || !encrypted())
+    {
+        m_authDialog->updateSMP(progress);
+        m_authDialog->show();
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+void PsiOtrClosure::finishSMP()
+{
+    m_authDialog = 0;
+
+    updateMessageState();
 }
 
 //-----------------------------------------------------------------------------

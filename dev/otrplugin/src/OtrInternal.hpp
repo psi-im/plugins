@@ -70,11 +70,25 @@ public:
 
     void deleteKey(const QString& account);
 
+
     void startSession(const QString& account, const QString& jid);
     
     void endSession(const QString& account, const QString& jid);
 
     void expireSession(const QString& account, const QString& jid);
+
+
+    void startSMP(const QString& account, const QString& jid,
+                  const QString& question, const QString& secret);
+    void startSMP(ConnContext *context,
+                  const QString& question, const QString& secret);
+
+    void continueSMP(const QString& account, const QString& jid, const QString& secret);
+    void continueSMP(ConnContext *context, const QString& secret);
+    
+    void abortSMP(const QString& account, const QString& jid);
+    void abortSMP(ConnContext *context);
+
 
     psiotr::OtrMessageState getMessageState(const QString& thisJid,
                                             const QString& remoteJid);
@@ -88,6 +102,8 @@ public:
                                              const QString& remoteJid);
 
     bool isVerified(const QString& thisJid, const QString& remoteJid);
+
+    bool smpSucceeded(const QString& thisJid, const QString& remoteJid);
 
     void generateKey(const QString& account);
 
