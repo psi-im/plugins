@@ -61,9 +61,6 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
     m_methodBox->addItem(tr("Question and answer"));
     m_methodBox->addItem(tr("Fingerprint verification"));
     
-    connect(m_methodBox, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(changeMethod(int)));
-    
     m_questionEdit = new QLineEdit(this);
     m_answerEdit   = new QLineEdit(this);
     
@@ -91,31 +88,53 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
     qaLayout->addWidget(m_progressBar);
     m_methodWidget[0]->setLayout(qaLayout);
     
+    m_methodWidget[1] = NULL;
+    QLabel* authenticatedLabel = NULL;
     if (m_isSender)
     {
+        if (m_otr->isVerified(m_account, m_jid))
+        {
+            authenticatedLabel = new QLabel(tr("This contact is already authenticated."), this);
+        }
+        
+        QString ownFpr = m_otr->getPrivateKeys()
+                                .value(m_account,
+                                        tr("No private key for account \"%1\"")
+                                            .arg(m_otr->humanAccount(m_account)));
+        
         m_fpr = m_otr->getActiveFingerprint(m_account, m_jid);
 
-        QLabel* fprDescLabel = new QLabel(tr("Fingerprint:"), this);
-        QLabel* fprLabel     = new QLabel(m_fpr.fingerprintHuman, this);
+        QLabel* ownFprDescLabel = new QLabel(tr("Your fingerprint:"), this);
+        QLabel* ownFprLabel     = new QLabel(ownFpr, this);
+        QLabel* fprDescLabel    = new QLabel(tr("Fingerprint for %1:").arg(m_jid), this);
+        QLabel* fprLabel        = new QLabel(m_fpr.fingerprintHuman, this);
+        ownFprLabel->setFont(QFont("monospace"));
         fprLabel->setFont(QFont("monospace"));
 
         m_methodWidget[1] = new QWidget(this);
         QVBoxLayout* fprLayout = new QVBoxLayout;
+        fprLayout->addWidget(ownFprDescLabel);
+        fprLayout->addWidget(ownFprLabel);
+        fprLayout->addSpacing(10);
         fprLayout->addWidget(fprDescLabel);
         fprLayout->addWidget(fprLabel);
         m_methodWidget[1]->setLayout(fprLayout);
         m_methodWidget[1]->setVisible(false);
     }
-    
+
     QHBoxLayout* buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(m_cancelButton);
     buttonLayout->addWidget(m_startButton);
-
 
     QVBoxLayout* mainLayout = new QVBoxLayout;
     mainLayout->addSpacing(10);
     mainLayout->addWidget(m_methodBox);
     mainLayout->addSpacing(20);
+    if (authenticatedLabel)
+    {
+        mainLayout->addWidget(authenticatedLabel);
+        mainLayout->addSpacing(20);
+    }
     mainLayout->addWidget(m_methodWidget[0]);
     if (m_methodWidget[1])
         mainLayout->addWidget(m_methodWidget[1]);
@@ -124,6 +143,8 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
     setLayout(mainLayout);
     
     
+    connect(m_methodBox, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(changeMethod(int)));
     connect(m_cancelButton, SIGNAL(clicked()),
             this, SLOT(reject()));
     connect(m_startButton, SIGNAL(clicked()),
