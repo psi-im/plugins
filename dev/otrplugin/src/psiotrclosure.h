@@ -25,8 +25,11 @@
 #ifndef PSIOTRCLOSURE_H_
 #define PSIOTRCLOSURE_H_
 
+#include "OtrMessaging.hpp"
+
 #include <QObject>
 #include <QDialog>
+#include <QComboBox>
 #include <QLineEdit>
 #include <QProgressBar>
 #include <QPushButton>
@@ -61,11 +64,15 @@ public slots:
 
 private:
     OtrMessaging* m_otr;
+    int           m_method;
     QString       m_account;
     QString       m_jid;
     bool          m_isSender;
     bool          m_inProgress;
+    Fingerprint   m_fpr;
 
+    QWidget*      m_methodWidget[2];
+    QComboBox*    m_methodBox;
     QLineEdit*    m_questionEdit;
     QLineEdit*    m_answerEdit;
     QProgressBar* m_progressBar;
@@ -73,6 +80,7 @@ private:
     QPushButton*  m_startButton;
     
 private slots:
+    void changeMethod(int index);
     void startAuthentication();
 };
 
@@ -101,7 +109,7 @@ private:
     QString       m_otherJid;
     QMenu*        m_chatDlgMenu;
     QAction*      m_chatDlgAction;
-    QAction*      m_verifyAction;
+    QAction*      m_authenticateAction;
     QAction*      m_sessionIdAction;
     QAction*      m_fingerprintAction;
     QAction*      m_startSessionAction;
@@ -113,7 +121,7 @@ private:
 public slots:
     void initiateSession(bool b);
     void endSession(bool b);
-    void verifyFingerprint(bool b);
+    void authenticateContact(bool b);
     void sessionID(bool b);
     void fingerprint(bool b);
     void showMenu();

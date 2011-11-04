@@ -23,14 +23,13 @@
  */
 
 #include "psiotrclosure.h"
-#include "OtrMessaging.hpp"
 
 #include <QAction>
 #include <QMenu>
-#include <QMessageBox>
-#include <QHBoxLayout>
+#include <QWidget>
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QFont>
 
 namespace psiotr
 {
@@ -40,52 +39,86 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
                                            const QString& question, bool sender, QWidget *parent)
     : QDialog(parent),
       m_otr(otrc),
+      m_method(0),
       m_account(account),
       m_jid(jid),
       m_isSender(sender)
 {
+    setAttribute(Qt::WA_DeleteOnClose);
+
     if (m_isSender)
     {
         setWindowTitle(tr("Authenticate %1").arg(jid));
     }
     else
     {
-        setWindowTitle(tr("Authentication Request from %1").arg(jid));
+        setWindowTitle(tr("Authentication request from %1").arg(jid));
     }
-    setAttribute(Qt::WA_DeleteOnClose);
+    
+    m_methodBox = new QComboBox(this);
+    m_methodBox->setMinimumWidth(300);
+    
+    m_methodBox->addItem(tr("Question and answer"));
+    m_methodBox->addItem(tr("Fingerprint verification"));
+    
+    connect(m_methodBox, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(changeMethod(int)));
     
     m_questionEdit = new QLineEdit(this);
     m_answerEdit   = new QLineEdit(this);
     
-    m_questionEdit->setMinimumWidth(300);
-    m_answerEdit->setMinimumWidth(300);
-    
     QLabel* questionLabel = new QLabel(tr("&Question:"), this);
     questionLabel->setBuddy(m_questionEdit);
     
-    QLabel* answerLabel = new QLabel(tr("&Answer:"), this);
+    QLabel* answerLabel = new QLabel(tr("A&nswer:"), this);
     answerLabel->setBuddy(m_answerEdit);
     
     m_progressBar  = new QProgressBar(this);
     
     m_cancelButton = new QPushButton(tr("&Cancel"), this);
-    m_startButton  = new QPushButton(tr("&Send"), this);
+    m_startButton  = new QPushButton(tr("&Authenticate"), this);
     
     m_startButton->setDefault(true);
+    
+    m_methodWidget[0] = new QWidget(this);
+    QVBoxLayout* qaLayout = new QVBoxLayout;
+    qaLayout->addWidget(questionLabel);
+    qaLayout->addWidget(m_questionEdit);
+    qaLayout->addSpacing(10);
+    qaLayout->addWidget(answerLabel);
+    qaLayout->addWidget(m_answerEdit);
+    qaLayout->addSpacing(20);
+    qaLayout->addWidget(m_progressBar);
+    m_methodWidget[0]->setLayout(qaLayout);
+    
+    if (m_isSender)
+    {
+        m_fpr = m_otr->getActiveFingerprint(m_account, m_jid);
+
+        QLabel* fprDescLabel = new QLabel(tr("Fingerprint:"), this);
+        QLabel* fprLabel     = new QLabel(m_fpr.fingerprintHuman, this);
+        fprLabel->setFont(QFont("monospace"));
+
+        m_methodWidget[1] = new QWidget(this);
+        QVBoxLayout* fprLayout = new QVBoxLayout;
+        fprLayout->addWidget(fprDescLabel);
+        fprLayout->addWidget(fprLabel);
+        m_methodWidget[1]->setLayout(fprLayout);
+        m_methodWidget[1]->setVisible(false);
+    }
     
     QHBoxLayout* buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(m_cancelButton);
     buttonLayout->addWidget(m_startButton);
-    
+
+
     QVBoxLayout* mainLayout = new QVBoxLayout;
     mainLayout->addSpacing(10);
-    mainLayout->addWidget(questionLabel);
-    mainLayout->addWidget(m_questionEdit);
-    mainLayout->addSpacing(10);
-    mainLayout->addWidget(answerLabel);
-    mainLayout->addWidget(m_answerEdit);
+    mainLayout->addWidget(m_methodBox);
     mainLayout->addSpacing(20);
-    mainLayout->addWidget(m_progressBar);
+    mainLayout->addWidget(m_methodWidget[0]);
+    if (m_methodWidget[1])
+        mainLayout->addWidget(m_methodWidget[1]);
     mainLayout->addSpacing(20);
     mainLayout->addLayout(buttonLayout);
     setLayout(mainLayout);
@@ -123,6 +156,7 @@ void AuthenticationDialog::reset()
 {
     m_inProgress = !m_isSender;
 
+    m_methodBox->setEnabled(m_isSender);
     m_questionEdit->setEnabled(m_isSender);
     m_answerEdit->setEnabled(true);
     m_progressBar->setEnabled(false);
@@ -131,31 +165,64 @@ void AuthenticationDialog::reset()
     m_progressBar->setValue(0);
 }
 
+void AuthenticationDialog::changeMethod(int index)
+{
+    m_method = index;
+    for (int i=0; i<2; i++)
+    {
+        m_methodWidget[i]->setVisible(i == index);
+    }
+    adjustSize();
+}
+
 void AuthenticationDialog::startAuthentication()
 {
-    if (m_answerEdit->text().isEmpty())
+    if (m_method == 0)
     {
-        return;
-    }
-    
-    m_inProgress = true;
-    
-    m_questionEdit->setEnabled(false);
-    m_answerEdit->setEnabled(false);
-    m_progressBar->setEnabled(true);
-    m_startButton->setEnabled(false);
-    
-    if (m_isSender)
-    {
-        m_otr->startSMP(m_account, m_jid,
-                        m_questionEdit->text(), m_answerEdit->text());
+        if (m_answerEdit->text().isEmpty())
+        {
+            return;
+        }
+
+        m_inProgress = true;
+        
+        m_methodBox->setEnabled(false);
+        m_questionEdit->setEnabled(false);
+        m_answerEdit->setEnabled(false);
+        m_progressBar->setEnabled(true);
+        m_startButton->setEnabled(false);
+        
+        if (m_isSender)
+        {
+            m_otr->startSMP(m_account, m_jid,
+                            m_questionEdit->text(), m_answerEdit->text());
+        }
+        else
+        {
+            m_otr->continueSMP(m_account, m_jid, m_answerEdit->text());
+        }
+
+        updateSMP(33);
     }
     else
     {
-        m_otr->continueSMP(m_account, m_jid, m_answerEdit->text());
-    }
+        if (m_fpr.fingerprint != NULL)
+        {
+            QString msg(tr("Account: ") + m_otr->humanAccount(m_account) + "\n" +
+                        tr("User: ") + m_jid + "\n" +
+                        tr("Fingerprint: ") + m_fpr.fingerprintHuman + "\n\n" +
+                        tr("Have you verified that this is in fact the correct fingerprint?"));
 
-    updateSMP(33);
+            QMessageBox mb(QMessageBox::Information, tr("Psi OTR"),
+                           msg, QMessageBox::Yes | QMessageBox::No, this,
+                           Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+
+            m_otr->verifyFingerprint(m_fpr,
+                                     mb.exec() == QMessageBox::Yes);
+            
+            close();
+        }
+    }
 }
 
 void AuthenticationDialog::updateSMP(int progress)
@@ -237,7 +304,7 @@ PsiOtrClosure::PsiOtrClosure(const QString& account, const QString& toJid,
       m_otherJid(toJid),
       m_chatDlgMenu(0),
       m_chatDlgAction(0),
-      m_verifyAction(0),
+      m_authenticateAction(0),
       m_sessionIdAction(0),
       m_fingerprintAction(0),
       m_startSessionAction(0),
@@ -268,7 +335,7 @@ void PsiOtrClosure::initiateSession(bool b)
 
 //-----------------------------------------------------------------------------
 
-void PsiOtrClosure::verifyFingerprint(bool)
+void PsiOtrClosure::authenticateContact(bool)
 {
     if (m_authDialog || !encrypted())
     {
@@ -285,35 +352,6 @@ void PsiOtrClosure::verifyFingerprint(bool)
     m_authDialog->show();
 
     return;
-
-    Fingerprint fingerprint = m_otr->getActiveFingerprint(m_myAccount,
-                                                          m_otherJid);
-
-
-    if (fingerprint.fingerprint != NULL)
-    {
-        QString msg(tr("Account: ") + m_otr->humanAccount(m_myAccount) + "\n" +
-                    tr("User: ") + m_otherJid + "\n" +
-                    tr("Fingerprint: ") + fingerprint.fingerprintHuman + "\n\n" +
-                    tr("Have you verified that this is in fact the correct fingerprint?"));
-
-        QMessageBox mb(QMessageBox::Information, tr("Psi OTR"),
-                       msg, QMessageBox::Yes | QMessageBox::No,
-                       static_cast<QWidget*>(m_parentWidget),
-                       Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
-
-        if (mb.exec() == QMessageBox::Yes)
-        {
-            m_otr->verifyFingerprint(fingerprint, true);
-        }
-        else
-        {
-            m_otr->verifyFingerprint(fingerprint, false);
-        }
-
-        updateMessageState();
-
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -439,14 +477,14 @@ void PsiOtrClosure::updateMessageState()
 
         if (state == OTR_MESSAGESTATE_ENCRYPTED)
         {
-            m_verifyAction->setEnabled(true);
+            m_authenticateAction->setEnabled(true);
             m_sessionIdAction->setEnabled(true);
             m_startSessionAction->setEnabled(false);
             m_endSessionAction->setEnabled(true);
         }
         else if (state == OTR_MESSAGESTATE_PLAINTEXT)
         {
-            m_verifyAction->setEnabled(false);
+            m_authenticateAction->setEnabled(false);
             m_sessionIdAction->setEnabled(false);
             m_startSessionAction->setEnabled(true);
             m_endSessionAction->setEnabled(false);
@@ -455,7 +493,7 @@ void PsiOtrClosure::updateMessageState()
         {
             m_startSessionAction->setEnabled(true);
             m_endSessionAction->setEnabled(true);
-            m_verifyAction->setEnabled(false);
+            m_authenticateAction->setEnabled(false);
             m_sessionIdAction->setEnabled(false);
         }
             
@@ -486,9 +524,9 @@ QAction* PsiOtrClosure::getChatDlgMenu(QObject* parent)
 
     m_chatDlgMenu->insertSeparator(NULL);
 
-    m_verifyAction = m_chatDlgMenu->addAction(tr("Verify fingerprint"));
-    connect(m_verifyAction, SIGNAL(triggered(bool)),
-            this, SLOT(verifyFingerprint(bool)));
+    m_authenticateAction = m_chatDlgMenu->addAction(tr("Authenticate contact"));
+    connect(m_authenticateAction, SIGNAL(triggered(bool)),
+            this, SLOT(authenticateContact(bool)));
 
     m_sessionIdAction = m_chatDlgMenu->addAction(tr("Show secure session ID"));
     connect(m_sessionIdAction, SIGNAL(triggered(bool)),
