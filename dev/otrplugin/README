@@ -14,7 +14,6 @@ See http://www.cypherpunks.ca/otr/ for more information about OTR.
 
 
 TODOs
-* use Socialist Millionaires' Protocol
 * Configure OTR policy per contact
 * Documentation
 
@@ -24,6 +23,7 @@ TODOs
 CHANGES
 
   0.9.4pre
+    -Add authentication via Socialist Millionaires' Protocol
     -Fix escaping of plaintext OTR messages
     -Ignore incoming messages of type "error"
     -Fix OtrInternal::account_name()
