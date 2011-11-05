@@ -87,10 +87,10 @@ public:
     virtual void notifyUser(const OtrNotifyType& type,
                             const QString& message) = 0;
 
-    virtual void receivedSMP(const QString& account, const QString& jid,
+    virtual void receivedSMP(const QString& account, const QString& contact,
                              const QString& question) = 0;
 
-    virtual void updateSMP(const QString& account, const QString& jid,
+    virtual void updateSMP(const QString& account, const QString& contact,
                            int progress) = 0;
 
     virtual void stopMessages() = 0;
@@ -220,70 +220,70 @@ public:
     void deleteKey(const QString& account);
 
     /** 
-    * Send an OTR query message from account to jid.
+    * Send an OTR query message from account to contact.
     */
-    void startSession(const QString& account, const QString& jid);
+    void startSession(const QString& account, const QString& contact);
 
     /** 
     * Send otr-finished message to user.
     */
-    void endSession(const QString& account, const QString& jid);
+    void endSession(const QString& account, const QString& contact);
 
     /** 
     * Force a session to expire.
     */
-    void expireSession(const QString& account, const QString& jid);
+    void expireSession(const QString& account, const QString& contact);
 
     /**
     * Start the SMP with an optional question
     */
-    void startSMP(const QString& account, const QString& jid,
+    void startSMP(const QString& account, const QString& contact,
                   const QString& question, const QString& secret);
 
     /**
     * Continue the SMP
     */
-    void continueSMP(const QString& account, const QString& jid,
+    void continueSMP(const QString& account, const QString& contact,
                      const QString& secret);
 
     /**
     * Abort the SMP
     */
-    void abortSMP(const QString& account, const QString& jid);
+    void abortSMP(const QString& account, const QString& contact);
 
     /**
     * Return the messageState of a context.
     * i.e. plaintext, encrypted, finished
     */
-    OtrMessageState getMessageState(const QString& thisJid,
-                                    const QString& remoteJid);
+    OtrMessageState getMessageState(const QString& account,
+                                    const QString& contact);
 
     /** 
     * returns the messageState in human-readable string.
     */
-    QString getMessageStateString(const QString& thisJid,
-                                  const QString& remoteJid);
+    QString getMessageStateString(const QString& account,
+                                  const QString& contact);
 
     /** 
     * Return the secure session id (ssid) for a context
     */
-    QString getSessionId(const QString& thisJid, const QString& remoteJid);
+    QString getSessionId(const QString& account, const QString& contact);
 
     /** 
     * Return the active fingerprint for a context
     */
-    psiotr::Fingerprint getActiveFingerprint(const QString& thisJid,
-                                             const QString& remoteJid);
+    psiotr::Fingerprint getActiveFingerprint(const QString& account,
+                                             const QString& contact);
 
     /** 
     * Return true if the active fingerprint has been verified
     */
-    bool isVerified(const QString& thisJid, const QString& remoteJid);
+    bool isVerified(const QString& account, const QString& contact);
 
     /** 
     * Return true if Socialist Millionaires' Protocol succeeded
     */
-    bool smpSucceeded(const QString& thisJid, const QString& remoteJid);
+    bool smpSucceeded(const QString& account, const QString& contact);
 
     /** 
     * Set the default OTR policy.

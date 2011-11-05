@@ -167,48 +167,48 @@ void OtrMessaging::abortSMP(const QString& account, const QString& jid)
 
 //-----------------------------------------------------------------------------
 
-OtrMessageState OtrMessaging::getMessageState(const QString& thisJid,
-                                              const QString& remoteJid)
+OtrMessageState OtrMessaging::getMessageState(const QString& account,
+                                              const QString& contact)
 {
-    return m_impl->getMessageState(thisJid, remoteJid);
+    return m_impl->getMessageState(account, contact);
 }
 
 //-----------------------------------------------------------------------------
 
-QString OtrMessaging::getMessageStateString(const QString& thisJid,
-                                             const QString& remoteJid)
+QString OtrMessaging::getMessageStateString(const QString& account,
+                                            const QString& contact)
 {
-    return m_impl->getMessageStateString(thisJid, remoteJid);
+    return m_impl->getMessageStateString(account, contact);
 }
 
 //-----------------------------------------------------------------------------
 
-QString OtrMessaging::getSessionId(const QString& thisJid,
-                                   const QString& remoteJid)
+QString OtrMessaging::getSessionId(const QString& account,
+                                   const QString& contact)
 {
-    return m_impl->getSessionId(thisJid, remoteJid);
+    return m_impl->getSessionId(account, contact);
 }
 
 //-----------------------------------------------------------------------------
 
-psiotr::Fingerprint OtrMessaging::getActiveFingerprint(const QString& thisJid,
-                                                       const QString& remoteJid)
+psiotr::Fingerprint OtrMessaging::getActiveFingerprint(const QString& account,
+                                                       const QString& contact)
 {
-    return m_impl->getActiveFingerprint(thisJid, remoteJid);
+    return m_impl->getActiveFingerprint(account, contact);
 }
 
 //-----------------------------------------------------------------------------
 
-bool OtrMessaging::isVerified(const QString& thisJid, const QString& remoteJid)
+bool OtrMessaging::isVerified(const QString& account, const QString& contact)
 {
-    return m_impl->isVerified(thisJid, remoteJid);
+    return m_impl->isVerified(account, contact);
 }
 
 //-----------------------------------------------------------------------------
 
-bool OtrMessaging::smpSucceeded(const QString& thisJid, const QString& remoteJid)
+bool OtrMessaging::smpSucceeded(const QString& account, const QString& contact)
 {
-    return m_impl->smpSucceeded(thisJid, remoteJid);
+    return m_impl->smpSucceeded(account, contact);
 }
 
 //-----------------------------------------------------------------------------

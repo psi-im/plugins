@@ -595,12 +595,12 @@ void OtrInternal::abortSMP(ConnContext *context)
 
 //-----------------------------------------------------------------------------
 
-psiotr::OtrMessageState OtrInternal::getMessageState(const QString& thisJid,
-                                                     const QString& remoteJid)
+psiotr::OtrMessageState OtrInternal::getMessageState(const QString& account,
+                                                     const QString& contact)
 {
     ConnContext* context = otrl_context_find(m_userstate,
-                                             remoteJid.toUtf8().constData(),
-                                             thisJid.toUtf8().constData(),
+                                             contact.toUtf8().constData(),
+                                             account.toUtf8().constData(),
                                              OTR_PROTOCOL_STRING, false, NULL, NULL,
                                              NULL);
     if (context != NULL)
@@ -624,10 +624,10 @@ psiotr::OtrMessageState OtrInternal::getMessageState(const QString& thisJid,
 
 //-----------------------------------------------------------------------------
 
-QString OtrInternal::getMessageStateString(const QString& thisJid,
-                                           const QString& remoteJid)
+QString OtrInternal::getMessageStateString(const QString& account,
+                                           const QString& contact)
 {
-    psiotr::OtrMessageState state = getMessageState(thisJid, remoteJid);
+    psiotr::OtrMessageState state = getMessageState(account, contact);
 
     if (state == psiotr::OTR_MESSAGESTATE_PLAINTEXT)
     {
@@ -647,12 +647,12 @@ QString OtrInternal::getMessageStateString(const QString& thisJid,
 
 //-----------------------------------------------------------------------------
 
-QString OtrInternal::getSessionId(const QString& thisJid,
-                                  const QString& remoteJid)
+QString OtrInternal::getSessionId(const QString& account,
+                                  const QString& contact)
 {
     ConnContext* context;
-    context = otrl_context_find(m_userstate, remoteJid.toUtf8().constData(),
-                                thisJid.toUtf8().constData(), OTR_PROTOCOL_STRING,
+    context = otrl_context_find(m_userstate, contact.toUtf8().constData(),
+                                account.toUtf8().constData(), OTR_PROTOCOL_STRING,
                                 false, NULL, NULL, NULL);
     if ((context != NULL) &&
         (context->sessionid_len > 0))
@@ -693,12 +693,12 @@ QString OtrInternal::getSessionId(const QString& thisJid,
 
 //-----------------------------------------------------------------------------
 
-psiotr::Fingerprint OtrInternal::getActiveFingerprint(const QString& thisJid,
-                                                      const QString& remoteJid)
+psiotr::Fingerprint OtrInternal::getActiveFingerprint(const QString& account,
+                                                      const QString& contact)
 {
     ConnContext* context;
-    context = otrl_context_find(m_userstate, remoteJid.toUtf8().constData(),
-                                thisJid.toUtf8().constData(), OTR_PROTOCOL_STRING,
+    context = otrl_context_find(m_userstate, contact.toUtf8().constData(),
+                                account.toUtf8().constData(), OTR_PROTOCOL_STRING,
                                 false, NULL, NULL, NULL);
 
     if ((context != NULL) &&
@@ -718,12 +718,12 @@ psiotr::Fingerprint OtrInternal::getActiveFingerprint(const QString& thisJid,
 
 //-----------------------------------------------------------------------------
 
-bool OtrInternal::isVerified(const QString& thisJid,
-                             const QString& remoteJid)
+bool OtrInternal::isVerified(const QString& account,
+                             const QString& contact)
 {
     ConnContext* context;
-    context = otrl_context_find(m_userstate, remoteJid.toUtf8().constData(),
-                                thisJid.toUtf8().constData(), OTR_PROTOCOL_STRING,
+    context = otrl_context_find(m_userstate, contact.toUtf8().constData(),
+                                account.toUtf8().constData(), OTR_PROTOCOL_STRING,
                                 false, NULL, NULL, NULL);
 
     if ((context != NULL) &&
@@ -738,12 +738,12 @@ bool OtrInternal::isVerified(const QString& thisJid,
 
 //-----------------------------------------------------------------------------
 
-bool OtrInternal::smpSucceeded(const QString& thisJid,
-                               const QString& remoteJid)
+bool OtrInternal::smpSucceeded(const QString& account,
+                               const QString& contact)
 {
     ConnContext* context;
-    context = otrl_context_find(m_userstate, remoteJid.toUtf8().constData(),
-                                thisJid.toUtf8().constData(), OTR_PROTOCOL_STRING,
+    context = otrl_context_find(m_userstate, contact.toUtf8().constData(),
+                                account.toUtf8().constData(), OTR_PROTOCOL_STRING,
                                 false, NULL, NULL, NULL);
 
     if (context != NULL)

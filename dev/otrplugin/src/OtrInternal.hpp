@@ -90,20 +90,20 @@ public:
     void abortSMP(ConnContext *context);
 
 
-    psiotr::OtrMessageState getMessageState(const QString& thisJid,
-                                            const QString& remoteJid);
+    psiotr::OtrMessageState getMessageState(const QString& account,
+                                            const QString& contact);
 
-    QString getMessageStateString(const QString& thisJid,
-                                  const QString& remoteJid);
+    QString getMessageStateString(const QString& account,
+                                  const QString& contact);
 
-    QString getSessionId(const QString& thisJid, const QString& remoteJid);
+    QString getSessionId(const QString& account, const QString& contact);
 
-    psiotr::Fingerprint getActiveFingerprint(const QString& thisJid,
-                                             const QString& remoteJid);
+    psiotr::Fingerprint getActiveFingerprint(const QString& account,
+                                             const QString& contact);
 
-    bool isVerified(const QString& thisJid, const QString& remoteJid);
+    bool isVerified(const QString& account, const QString& contact);
 
-    bool smpSucceeded(const QString& thisJid, const QString& remoteJid);
+    bool smpSucceeded(const QString& account, const QString& contact);
 
     void generateKey(const QString& account);
 

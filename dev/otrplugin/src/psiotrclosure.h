@@ -50,7 +50,7 @@ class AuthenticationDialog : public QDialog
     Q_OBJECT
 public:
     AuthenticationDialog(OtrMessaging* otrc,
-                         const QString& account, const QString& jid,
+                         const QString& account, const QString& contact,
                          const QString& question, bool sender,
                          QWidget *parent = 0);
     ~AuthenticationDialog();
@@ -66,7 +66,7 @@ private:
     OtrMessaging* m_otr;
     int           m_method;
     QString       m_account;
-    QString       m_jid;
+    QString       m_contact;
     bool          m_isSender;
     bool          m_inProgress;
     Fingerprint   m_fpr;
@@ -91,7 +91,7 @@ class PsiOtrClosure : public QObject
     Q_OBJECT
 
 public:
-    PsiOtrClosure(const QString& account, const QString& toJid,
+    PsiOtrClosure(const QString& account, const QString& contact,
                   OtrMessaging* otrc);
     ~PsiOtrClosure();
     void updateMessageState();
@@ -105,8 +105,8 @@ public:
 
 private:
     OtrMessaging* m_otr;
-    QString       m_myAccount;
-    QString       m_otherJid;
+    QString       m_account;
+    QString       m_contact;
     QMenu*        m_chatDlgMenu;
     QAction*      m_chatDlgAction;
     QAction*      m_authenticateAction;
