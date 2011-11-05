@@ -210,9 +210,10 @@ bool OtrInternal::decryptMessage(const QString& from, const QString& to,
     const char* userName    = userArray.constData();
     bool isOTR        = false;
     int ignoreMessage = 0;
-    char *newMessage  = NULL;
-    OtrlTLV *tlvs     = NULL;
-    OtrlTLV *tlv      = NULL;
+    char* newMessage  = NULL;
+    OtrlTLV* tlvs     = NULL;
+    OtrlTLV* tlv      = NULL;
+    ConnContext* context;
 
     ignoreMessage = otrl_message_receiving(m_userstate, &m_uiOps, this,
                                            accountName,
@@ -222,114 +223,111 @@ bool OtrInternal::decryptMessage(const QString& from, const QString& to,
                                            &newMessage,
                                            &tlvs, NULL, NULL);
 
+    // Check for SMP data
+    context = otrl_context_find(m_userstate,
+                                userName, accountName,
+                                OTR_PROTOCOL_STRING,
+                                0, NULL, NULL, NULL);
+    if (context) {
+        NextExpectedSMP nextMsg = context->smstate->nextExpected;
 
-    if (ignoreMessage == 1) // internal protocol message
-    {
-        // check for SMP messages
-        
-        ConnContext *context = otrl_context_find(m_userstate,
-                                                 userName, accountName,
-                                                 OTR_PROTOCOL_STRING,
-                                                 0, NULL, NULL, NULL);
-        if (context) {
-            NextExpectedSMP nextMsg = context->smstate->nextExpected;
-
-            if (context->smstate->sm_prog_state == OTRL_SMP_PROG_CHEATED) {
-                abortSMP(context);
-
-                context->smstate->nextExpected = OTRL_SMP_EXPECT1;
-                context->smstate->sm_prog_state = OTRL_SMP_PROG_OK;
-
-                // Report result to user
-                m_callback->updateSMP(accountName, userName, -2);
+        if (context->smstate->sm_prog_state == OTRL_SMP_PROG_CHEATED) {
+            abortSMP(context);
+            // Reset state
+            context->smstate->nextExpected  = OTRL_SMP_EXPECT1;
+            context->smstate->sm_prog_state = OTRL_SMP_PROG_OK;
+            // Report result to user
+            m_callback->updateSMP(accountName, userName, -2);
+        }
+        else
+        {
+            tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP1Q);
+            if (tlv) {
+                if (nextMsg != OTRL_SMP_EXPECT1)
+                {
+                    abortSMP(context);
+                }
+                else
+                {
+                    char *question = (char *)tlv->data;
+                    char *eoq = static_cast<char*>(memchr(question, '\0', tlv->len));
+                    if (eoq) {
+                        m_callback->receivedSMP(accountName, userName,
+                                                QString::fromUtf8(question));
+                    }
+                }
             }
-            else
-            {
-                tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP1Q);
-                if (tlv) {
-                    if (nextMsg != OTRL_SMP_EXPECT1)
-                    {
-                        abortSMP(context);
-                    }
-                    else
-                    {
-                        char *question = (char *)tlv->data;
-                        char *eoq = static_cast<char*>(memchr(question, '\0', tlv->len));
-                        if (eoq) {
-                            m_callback->receivedSMP(accountName, userName,
-                                                    QString::fromUtf8(question));
-                        }
-                    }
+            tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP1);
+            if (tlv) {
+                if (nextMsg != OTRL_SMP_EXPECT1)
+                {
+                    abortSMP(context);
                 }
-                tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP1);
-                if (tlv) {
-                    if (nextMsg != OTRL_SMP_EXPECT1)
-                    {
-                        abortSMP(context);
-                    }
-                    else
-                    {
-                        m_callback->receivedSMP(accountName, userName, QString());
-                    }
+                else
+                {
+                    m_callback->receivedSMP(accountName, userName, QString());
                 }
-                tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP2);
-                if (tlv) {
-                    if (nextMsg != OTRL_SMP_EXPECT2)
-                    {
-                        abortSMP(context);
-                    }
-                    else
-                    {
-                        // If we received TLV2, we will send TLV3 and expect TLV4
-                        context->smstate->nextExpected = OTRL_SMP_EXPECT4;
-                        // Report result to user
-                        m_callback->updateSMP(accountName, userName, 66);
-                    }
+            }
+            tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP2);
+            if (tlv) {
+                if (nextMsg != OTRL_SMP_EXPECT2)
+                {
+                    abortSMP(context);
                 }
-                tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP3);
-                if (tlv) {
-                    if (nextMsg != OTRL_SMP_EXPECT3)
-                    {
-                        abortSMP(context);
-                    }
-                    else
-                    {
-                        // If we received TLV3, we will send TLV4
-                        // We will not expect more messages, so prepare for next SMP
-                        context->smstate->nextExpected = OTRL_SMP_EXPECT1;
-                        // Report result to user
-                        m_callback->updateSMP(accountName, userName, 100);
-                    }
+                else
+                {
+                    // If we received TLV2, we will send TLV3 and expect TLV4
+                    context->smstate->nextExpected = OTRL_SMP_EXPECT4;
+                    // Report result to user
+                    m_callback->updateSMP(accountName, userName, 66);
                 }
-                tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP4);
-                if (tlv) {
-                    if (nextMsg != OTRL_SMP_EXPECT4)
-                    {
-                        abortSMP(context);
-                    }
-                    else
-                    {
-                        // We will not expect more messages, so prepare for next SMP
-                        context->smstate->nextExpected = OTRL_SMP_EXPECT1;
-                        // Report result to user
-                        m_callback->updateSMP(accountName, userName, 100);
-                    }
+            }
+            tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP3);
+            if (tlv) {
+                if (nextMsg != OTRL_SMP_EXPECT3)
+                {
+                    abortSMP(context);
                 }
-                tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP_ABORT);
-                if (tlv) {
-                    // The message we are waiting for will not arrive, so reset
-                    // and prepare for the next SMP
+                else
+                {
+                    // SMP finished, reset
                     context->smstate->nextExpected = OTRL_SMP_EXPECT1;
                     // Report result to user
-                    m_callback->updateSMP(accountName, userName, -1);
+                    m_callback->updateSMP(accountName, userName, 100);
                 }
             }
+            tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP4);
+            if (tlv) {
+                if (nextMsg != OTRL_SMP_EXPECT4)
+                {
+                    abortSMP(context);
+                }
+                else
+                {
+                    // SMP finished, reset
+                    context->smstate->nextExpected = OTRL_SMP_EXPECT1;
+                    // Report result to user
+                    m_callback->updateSMP(accountName, userName, 100);
+                }
+            }
+            tlv = otrl_tlv_find(tlvs, OTRL_TLV_SMP_ABORT);
+            if (tlv) {
+                // SMP aborted, reset
+                context->smstate->nextExpected = OTRL_SMP_EXPECT1;
+                // Report result to user
+                m_callback->updateSMP(accountName, userName, -1);
+            }
         }
+    }
 
+    otrl_tlv_free(tlvs);
+
+    if (ignoreMessage == 1)
+    {
+        // Internal protocol message
 
         OtrlMessageType type = otrl_proto_message_type(
                 cryptedMessage.toUtf8().constData());
-
 
         decrypted = QObject::tr("Received %1 [%2]")
                                .arg(otrlMessageTypeToString(type))
@@ -338,20 +336,18 @@ bool OtrInternal::decryptMessage(const QString& from, const QString& to,
         if (getMessageState(to, from) == psiotr::OTR_MESSAGESTATE_ENCRYPTED)
         {
             decrypted.append("<br/>" + QObject::tr("Session ID: ")
-                                      + getSessionId(to, from));
+                                     + getSessionId(to, from));
         }
 
         isOTR = true;
     }
     else if (ignoreMessage == 0 && newMessage != NULL)
     {
-        // message has been decrypted, replace it
+        // Message has been decrypted, replace it
         decrypted = QString::fromUtf8(newMessage);
         otrl_message_free(newMessage);
         isOTR = true;
     }
-
-    otrl_tlv_free(tlvs);
 
     return isOTR;
 }
