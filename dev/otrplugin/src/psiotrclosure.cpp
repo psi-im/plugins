@@ -542,25 +542,25 @@ QAction* PsiOtrClosure::getChatDlgMenu(QObject* parent)
 
     m_chatDlgMenu = new QMenu();
 
-    m_startSessionAction = m_chatDlgMenu->addAction(tr("Start private conversation"));
+    m_startSessionAction = m_chatDlgMenu->addAction(tr("&Start private conversation"));
     connect(m_startSessionAction, SIGNAL(triggered(bool)),
             this, SLOT(initiateSession(bool)));
 
-    m_endSessionAction = m_chatDlgMenu->addAction(tr("End private conversation"));
+    m_endSessionAction = m_chatDlgMenu->addAction(tr("&End private conversation"));
     connect(m_endSessionAction, SIGNAL(triggered(bool)),
             this, SLOT(endSession(bool)));
 
     m_chatDlgMenu->insertSeparator(NULL);
 
-    m_authenticateAction = m_chatDlgMenu->addAction(tr("Authenticate contact"));
+    m_authenticateAction = m_chatDlgMenu->addAction(tr("&Authenticate contact"));
     connect(m_authenticateAction, SIGNAL(triggered(bool)),
             this, SLOT(authenticateContact(bool)));
 
-    m_sessionIdAction = m_chatDlgMenu->addAction(tr("Show secure session ID"));
+    m_sessionIdAction = m_chatDlgMenu->addAction(tr("Show secure session &ID"));
     connect(m_sessionIdAction, SIGNAL(triggered(bool)),
             this, SLOT(sessionID(bool)));
 
-    m_fingerprintAction = m_chatDlgMenu->addAction(tr("Show own fingerprint"));
+    m_fingerprintAction = m_chatDlgMenu->addAction(tr("Show own &fingerprint"));
     connect(m_fingerprintAction, SIGNAL(triggered(bool)),
             this, SLOT(fingerprint(bool)));
 
