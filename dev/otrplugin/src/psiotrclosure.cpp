@@ -52,7 +52,7 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
     }
     else
     {
-        setWindowTitle(tr("Authentication request from %1").arg(jid));
+        setWindowTitle(tr("Authenticate to %1").arg(jid));
     }
     
     m_methodBox = new QComboBox(this);
@@ -79,6 +79,7 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
     
     m_methodWidget[0] = new QWidget(this);
     QVBoxLayout* qaLayout = new QVBoxLayout;
+    qaLayout->setContentsMargins(0, 0, 0, 0);
     qaLayout->addWidget(questionLabel);
     qaLayout->addWidget(m_questionEdit);
     qaLayout->addSpacing(10);
@@ -94,7 +95,9 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
     {
         if (m_otr->isVerified(m_account, m_jid))
         {
-            authenticatedLabel = new QLabel(tr("This contact is already authenticated."), this);
+            authenticatedLabel = new QLabel(QString("<b>%1</b>")
+                                             .arg(tr("This contact is already "
+                                                     "authenticated.")), this);
         }
         
         QString ownFpr = m_otr->getPrivateKeys()
@@ -113,6 +116,7 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
 
         m_methodWidget[1] = new QWidget(this);
         QVBoxLayout* fprLayout = new QVBoxLayout;
+        fprLayout->setContentsMargins(0, 0, 0, 0);
         fprLayout->addWidget(ownFprDescLabel);
         fprLayout->addWidget(ownFprLabel);
         fprLayout->addSpacing(10);
@@ -123,21 +127,24 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
     }
 
     QHBoxLayout* buttonLayout = new QHBoxLayout;
+    buttonLayout->setContentsMargins(0, 0, 0, 0);
     buttonLayout->addWidget(m_cancelButton);
     buttonLayout->addWidget(m_startButton);
 
     QVBoxLayout* mainLayout = new QVBoxLayout;
-    mainLayout->addSpacing(10);
-    mainLayout->addWidget(m_methodBox);
-    mainLayout->addSpacing(20);
+    mainLayout->setContentsMargins(20, 20, 20, 20);
     if (authenticatedLabel)
     {
         mainLayout->addWidget(authenticatedLabel);
         mainLayout->addSpacing(20);
     }
+    mainLayout->addWidget(m_methodBox);
+    mainLayout->addSpacing(20);
     mainLayout->addWidget(m_methodWidget[0]);
     if (m_methodWidget[1])
+    {
         mainLayout->addWidget(m_methodWidget[1]);
+    }
     mainLayout->addSpacing(20);
     mainLayout->addLayout(buttonLayout);
     setLayout(mainLayout);
