@@ -598,7 +598,8 @@ void PsiOtrPlugin::goneSecure(const QString& account, const QString& contact,
                     getAccountIndexById(account), contact,
                     QString("<icon name=\"psi-otr/%1\"> %2")
                         .arg(verified? "otr_yes" : "otr_unverified")
-                        .arg(tr("Private conversation started")));
+                        .arg(verified? tr("Private conversation started")
+                                     : tr("Unverified conversation started")));
 }
 
 //-----------------------------------------------------------------------------
@@ -630,7 +631,8 @@ void PsiOtrPlugin::stillSecure(const QString& account, const QString& contact,
                     getAccountIndexById(account), contact,
                     QString("<icon name=\"psi-otr/%1\"> %2")
                         .arg(verified? "otr_yes" : "otr_unverified")
-                        .arg(tr("Private conversation refreshed")));
+                        .arg(verified? tr("Private conversation refreshed")
+                                     : tr("Unverified conversation refreshed")));
 }
 
 //-----------------------------------------------------------------------------
