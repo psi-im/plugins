@@ -184,8 +184,10 @@ bool PsiOtrPlugin::disable()
     {
         foreach(QString contact, m_onlineUsers.value(account).keys())
         {
-            m_otrConnection->endSession(account, contact);
-            m_onlineUsers[account][contact]->updateMessageState();
+            if (m_onlineUsers[account][contact]->encrypted())
+            {
+                m_otrConnection->endSession(account, contact);
+            }
             m_onlineUsers[account][contact]->disable();
             delete m_onlineUsers[account][contact];
         }
