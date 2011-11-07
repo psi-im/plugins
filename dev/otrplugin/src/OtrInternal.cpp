@@ -923,12 +923,11 @@ int OtrInternal::display_otr_message(const char *accountname,
                                      const char *username,
                                      const char *msg)
 {
-    Q_UNUSED(accountname);
     Q_UNUSED(protocol);
-    Q_UNUSED(username);
-    Q_UNUSED(msg);
-    
-    return -1; // use notify() or inline message
+
+    return m_callback->displayOtrMessage(QString::fromUtf8(accountname),
+                                         QString::fromUtf8(username),
+                                         QString::fromUtf8(msg))? 0 : -1;
 }
                 
 // ---------------------------------------------------------------------------
@@ -981,7 +980,8 @@ void OtrInternal::write_fingerprints()
 
 void OtrInternal::gone_secure(ConnContext *context)
 {
-    m_callback->goneSecure(context->accountname, context->username,
+    m_callback->goneSecure(QString::fromUtf8(context->accountname),
+                           QString::fromUtf8(context->username),
                            isVerified(context));
 }
 
@@ -989,18 +989,18 @@ void OtrInternal::gone_secure(ConnContext *context)
 
 void OtrInternal::gone_insecure(ConnContext *context)
 {
-    m_callback->goneInsecure(context->accountname, context->username);
+    m_callback->goneInsecure(QString::fromUtf8(context->accountname),
+                             QString::fromUtf8(context->username));
 }
     
 // ---------------------------------------------------------------------------
 
 void OtrInternal::still_secure(ConnContext *context, int is_reply)
 {
-    if (is_reply == 0)
-    {
-        m_callback->stillSecure(context->accountname, context->username,
-                                isVerified(context));
-    }
+    Q_UNUSED(is_reply);
+    m_callback->stillSecure(QString::fromUtf8(context->accountname),
+                            QString::fromUtf8(context->username),
+                            isVerified(context));
 }
 
 // ---------------------------------------------------------------------------

@@ -586,6 +586,16 @@ void PsiOtrPlugin::notifyUser(const OtrNotifyType& type, const QString& message)
 
 //-----------------------------------------------------------------------------
 
+bool PsiOtrPlugin::displayOtrMessage(const QString& account,
+                                             const QString& contact,
+                                             const QString& message)
+{
+    return m_accountHost->appendSysMsg(getAccountIndexById(account), contact,
+                                       message);
+}
+
+//-----------------------------------------------------------------------------
+
 void PsiOtrPlugin::goneSecure(const QString& account, const QString& contact,
                               bool verified)
 {

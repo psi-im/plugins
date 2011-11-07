@@ -96,6 +96,9 @@ public:
     virtual void notifyUser(const OtrNotifyType& type,
                             const QString& message) = 0;
 
+    virtual bool displayOtrMessage(const QString& account, const QString& contact,
+                                   const QString& message) = 0;
+
     virtual void goneSecure(const QString& account, const QString& contact,
                             bool verified) = 0;
 

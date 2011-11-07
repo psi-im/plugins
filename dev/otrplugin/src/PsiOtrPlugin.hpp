@@ -146,6 +146,8 @@ public:
     virtual bool isLoggedIn(const QString& account, const QString& contact);
     virtual void notifyUser(const OtrNotifyType& type, const QString& message);
 
+    virtual bool displayOtrMessage(const QString& account, const QString& contact,
+                                   const QString& message);
     virtual void goneSecure(const QString& account, const QString& contact,
                             bool verified);
     virtual void goneInsecure(const QString& account, const QString& contact);
