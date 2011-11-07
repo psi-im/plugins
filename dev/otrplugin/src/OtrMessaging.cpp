@@ -79,8 +79,10 @@ QString OtrMessaging::encryptMessage(const QString& from, const QString& to,
 
 //-----------------------------------------------------------------------------
 
-bool OtrMessaging::decryptMessage(const QString& from, const QString& to,
-                                  const QString& message, QString& decrypted)
+OtrMessageType OtrMessaging::decryptMessage(const QString& from,
+                                            const QString& to,
+                                            const QString& message,
+                                            QString& decrypted)
 {
     return m_impl->decryptMessage(from, to, message, decrypted);
 }

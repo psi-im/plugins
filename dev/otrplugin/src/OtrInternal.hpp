@@ -57,8 +57,10 @@ public:
     QString encryptMessage(const QString& from, const QString& to,
                            const QString& message);
 
-    bool decryptMessage(const QString& from, const QString& to,
-                        const QString& message, QString& decrypted);
+    psiotr::OtrMessageType decryptMessage(const QString& from,
+                                          const QString& to,
+                                          const QString& message,
+                                          QString& decrypted);
 
     QList<psiotr::Fingerprint> getFingerprints();
 
@@ -102,6 +104,7 @@ public:
                                              const QString& contact);
 
     bool isVerified(const QString& account, const QString& contact);
+    bool isVerified(ConnContext *context);
 
     bool smpSucceeded(const QString& account, const QString& contact);
 

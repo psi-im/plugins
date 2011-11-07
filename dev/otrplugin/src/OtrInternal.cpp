@@ -200,15 +200,16 @@ QString OtrInternal::encryptMessage(const QString& from, const QString& to,
 
 //-----------------------------------------------------------------------------
 
-bool OtrInternal::decryptMessage(const QString& from, const QString& to,
-                                 const QString& cryptedMessage,
-                                 QString& decrypted)
+psiotr::OtrMessageType OtrInternal::decryptMessage(const QString& from,
+                                                   const QString& to,
+                                                   const QString& cryptedMessage,
+                                                   QString& decrypted)
 {
     QByteArray accArray  = to.toUtf8();
     QByteArray userArray = from.toUtf8();
     const char* accountName = accArray.constData();
     const char* userName    = userArray.constData();
-    bool isOTR        = false;
+
     int ignoreMessage = 0;
     char* newMessage  = NULL;
     OtrlTLV* tlvs     = NULL;
@@ -222,6 +223,12 @@ bool OtrInternal::decryptMessage(const QString& from, const QString& to,
                                            cryptedMessage.toUtf8().constData(),
                                            &newMessage,
                                            &tlvs, NULL, NULL);
+
+
+    tlv = otrl_tlv_find(tlvs, OTRL_TLV_DISCONNECTED);
+    if (tlv) {
+        m_callback->goneInsecure(accountName, userName);
+    }
 
     // Check for SMP data
     context = otrl_context_find(m_userstate,
@@ -326,30 +333,17 @@ bool OtrInternal::decryptMessage(const QString& from, const QString& to,
     {
         // Internal protocol message
 
-        OtrlMessageType type = otrl_proto_message_type(
-                cryptedMessage.toUtf8().constData());
-
-        decrypted = QObject::tr("Received %1 [%2]")
-                               .arg(otrlMessageTypeToString(type))
-                               .arg(getMessageStateString(to, from));
-
-        if (getMessageState(to, from) == psiotr::OTR_MESSAGESTATE_ENCRYPTED)
-        {
-            decrypted.append("<br/>" + QObject::tr("Session ID: ")
-                                     + getSessionId(to, from));
-        }
-
-        isOTR = true;
+        return psiotr::OTR_MESSAGETYPE_IGNORE;
     }
     else if (ignoreMessage == 0 && newMessage != NULL)
     {
         // Message has been decrypted, replace it
         decrypted = QString::fromUtf8(newMessage);
         otrl_message_free(newMessage);
-        isOTR = true;
+        return psiotr::OTR_MESSAGETYPE_OTR;
     }
 
-    return isOTR;
+    return psiotr::OTR_MESSAGETYPE_NONE;
 }
 
 //-----------------------------------------------------------------------------
@@ -723,8 +717,17 @@ bool OtrInternal::isVerified(const QString& account,
 {
     ConnContext* context;
     context = otrl_context_find(m_userstate, contact.toUtf8().constData(),
-                                account.toUtf8().constData(), OTR_PROTOCOL_STRING,
+                                account.toUtf8().constData(),
+                                OTR_PROTOCOL_STRING,
                                 false, NULL, NULL, NULL);
+
+    return isVerified(context);
+}
+
+//-----------------------------------------------------------------------------
+
+bool OtrInternal::isVerified(ConnContext* context)
+{
 
     if ((context != NULL) &&
         (context->active_fingerprint != NULL))
@@ -976,22 +979,26 @@ void OtrInternal::write_fingerprints()
 
 void OtrInternal::gone_secure(ConnContext *context)
 {
-    Q_UNUSED(context);
+    m_callback->goneSecure(context->accountname, context->username,
+                           isVerified(context));
 }
 
 // ---------------------------------------------------------------------------
 
 void OtrInternal::gone_insecure(ConnContext *context)
 {
-    Q_UNUSED(context);
+    m_callback->goneInsecure(context->accountname, context->username);
 }
     
 // ---------------------------------------------------------------------------
 
 void OtrInternal::still_secure(ConnContext *context, int is_reply)
 {
-    Q_UNUSED(context);
-    Q_UNUSED(is_reply);
+    if (is_reply == 0)
+    {
+        m_callback->stillSecure(context->accountname, context->username,
+                                isVerified(context));
+    }
 }
 
 // ---------------------------------------------------------------------------

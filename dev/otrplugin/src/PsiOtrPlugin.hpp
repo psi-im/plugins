@@ -37,12 +37,16 @@
 #include "stanzasender.h"
 #include "stanzasendinghost.h"
 #include "applicationinfoaccessor.h"
+#include "psiaccountcontrollinghost.h"
+#include "psiaccountcontroller.h"
 #include "stanzafilter.h"
 #include "toolbariconaccessor.h"
 #include "accountinfoaccessinghost.h"
 #include "accountinfoaccessor.h"
 #include "contactinfoaccessinghost.h"
 #include "contactinfoaccessor.h"
+#include "iconfactoryaccessor.h"
+#include "iconfactoryaccessinghost.h"
 
 class ApplicationInfoAccessingHost;
 
@@ -60,10 +64,12 @@ class PsiOtrPlugin : public QObject,
                      public OptionAccessor,
                      public StanzaSender,
                      public ApplicationInfoAccessor,
+                     public PsiAccountController,
                      public StanzaFilter,
                      public ToolbarIconAccessor,
                      public AccountInfoAccessor,
                      public ContactInfoAccessor,
+                     public IconFactoryAccessor,
                      public OtrCallback
 {
 Q_OBJECT
@@ -72,10 +78,12 @@ Q_INTERFACES(PsiPlugin
              OptionAccessor
              StanzaSender
              ApplicationInfoAccessor
+             PsiAccountController
              StanzaFilter
              ToolbarIconAccessor
              AccountInfoAccessor
-             ContactInfoAccessor)
+             ContactInfoAccessor
+             IconFactoryAccessor)
 
 public:
     PsiOtrPlugin();
@@ -110,6 +118,9 @@ public:
     // ApplicationInfoAccessor
     virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
 
+    // PsiAccountController
+    virtual void setPsiAccountControllingHost(PsiAccountControllingHost* host);
+
     // StanzaFilter
     virtual bool incomingStanza(int accountIndex, const QDomElement& xml);
     virtual bool outgoingStanza(int accountIndex, QDomElement &xml);
@@ -124,6 +135,9 @@ public:
 
     // ContactInfoAccessor
     virtual void setContactInfoAccessingHost(ContactInfoAccessingHost* host);
+    
+    // IconFactoryAccessingHost
+    virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
 
     // OtrCallback
     virtual QString dataDir();
@@ -131,12 +145,21 @@ public:
                              const QString& message);
     virtual bool isLoggedIn(const QString& account, const QString& contact);
     virtual void notifyUser(const OtrNotifyType& type, const QString& message);
+
+    virtual void goneSecure(const QString& account, const QString& contact,
+                            bool verified);
+    virtual void goneInsecure(const QString& account, const QString& contact);
+    virtual void stillSecure(const QString& account, const QString& contact,
+                             bool verified);
+
     virtual void receivedSMP(const QString& account, const QString& contact,
                              const QString& question);
     virtual void updateSMP(const QString& account, const QString& contact,
                            int progress);
+
     virtual void stopMessages();
     virtual void startMessages();
+
     virtual QString humanAccount(const QString& accountId);
     virtual QString humanAccountPublic(const QString& accountId);
 
@@ -169,8 +192,10 @@ private:
     OptionAccessingHost*                            m_optionHost;
     StanzaSendingHost*                              m_senderHost;
     ApplicationInfoAccessingHost*                   m_applicationInfo;
+    PsiAccountControllingHost*                      m_accountHost;
     AccountInfoAccessingHost*                       m_accountInfo;
     ContactInfoAccessingHost*                       m_contactInfo;
+    IconFactoryAccessingHost*                       m_iconHost;
 };
 
 //-----------------------------------------------------------------------------

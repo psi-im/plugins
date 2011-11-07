@@ -46,6 +46,15 @@ enum OtrPolicy
 
 // ---------------------------------------------------------------------------
 
+enum OtrMessageType
+{
+    OTR_MESSAGETYPE_NONE,
+    OTR_MESSAGETYPE_IGNORE,
+    OTR_MESSAGETYPE_OTR
+};
+
+// ---------------------------------------------------------------------------
+
 enum OtrMessageState
 {
     OTR_MESSAGESTATE_UNKNOWN,
@@ -86,6 +95,14 @@ public:
 
     virtual void notifyUser(const OtrNotifyType& type,
                             const QString& message) = 0;
+
+    virtual void goneSecure(const QString& account, const QString& contact,
+                            bool verified) = 0;
+
+    virtual void goneInsecure(const QString& account, const QString& contact) = 0;
+
+    virtual void stillSecure(const QString& account, const QString& contact,
+                             bool verified) = 0;
 
     virtual void receivedSMP(const QString& account, const QString& contact,
                              const QString& question) = 0;
@@ -185,13 +202,13 @@ public:
     * 
     * @param from Sender of the message
     * @param to Account the message is send to.
-    * @param message the mesasge itself.
+    * @param message the message itself.
     * @param decrypted The decrypted message if the original message was
     *                  encrypted.
-    * @return true, if decrypted was set.
+    * @return type of message
     */
-    bool decryptMessage(const QString& from, const QString& to,
-                        const QString& message, QString& decrypted);
+    OtrMessageType decryptMessage(const QString& from, const QString& to,
+                                  const QString& message, QString& decrypted);
 
     /** 
     * Returns a list of known fingerprints.

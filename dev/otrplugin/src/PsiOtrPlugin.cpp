@@ -101,8 +101,10 @@ PsiOtrPlugin::PsiOtrPlugin()
       m_optionHost(NULL),
       m_senderHost(NULL),
       m_applicationInfo(NULL),
+      m_accountHost(NULL),
       m_accountInfo(NULL),
-      m_contactInfo(NULL)
+      m_contactInfo(NULL),
+      m_iconHost(NULL)
 {
 }
 
@@ -155,6 +157,22 @@ bool PsiOtrPlugin::enable()
     m_otrConnection = new OtrMessaging(this,
                                        static_cast<OtrPolicy>(policyOption.toInt()));
     m_enabled = true;
+    
+    QFile f(":/psi-otr/otr_yes.png");
+    f.open(QIODevice::ReadOnly);
+    m_iconHost->addIcon("psi-otr/otr_yes", f.readAll());
+    f.close();
+    
+    f.setFileName(":/psi-otr/otr_no.png");
+    f.open(QIODevice::ReadOnly);
+    m_iconHost->addIcon("psi-otr/otr_no", f.readAll());
+    f.close();
+    
+    f.setFileName(":/psi-otr/otr_unverified.png");
+    f.open(QIODevice::ReadOnly);
+    m_iconHost->addIcon("psi-otr/otr_unverified", f.readAll());
+    f.close();
+    
     return true;
 }
 
@@ -196,6 +214,8 @@ void PsiOtrPlugin::restoreOptions()
 
 bool PsiOtrPlugin::processEvent(int accountIndex, QDomElement& e)
 {
+    bool ignore = false;
+
     QDomElement messageElement = e.firstChildElement("message");
 
     if (m_enabled && e.attribute("type") == "MessageEvent" &&
@@ -224,68 +244,71 @@ bool PsiOtrPlugin::processEvent(int accountIndex, QDomElement& e)
         }
 
         QString decrypted;
-        if (m_otrConnection->decryptMessage(contact, account, cyphertext,
-                                            decrypted))
+        OtrMessageType messageType = m_otrConnection->decryptMessage(
+                                                        contact, account,
+                                                        cyphertext, decrypted);
+        switch (messageType)
         {
-            if (m_onlineUsers.contains(account) && 
-                m_onlineUsers.value(account).contains(contact))
-            {
-                m_onlineUsers[account][contact]->updateMessageState();
-            }
+            case OTR_MESSAGETYPE_NONE:
+                break;
+            case OTR_MESSAGETYPE_IGNORE:
+                ignore = true;
+                break;
+            case OTR_MESSAGETYPE_OTR:
+                QString bodyText;
 
-            QString bodyText;
+                bool isHTML = !htmlElement.isNull() ||
+                              Qt::mightBeRichText(decrypted);
 
-            bool isHTML = !htmlElement.isNull() ||
-                          Qt::mightBeRichText(decrypted);
-
-            if (!isHTML)
-            {
-                bodyText = decrypted;
-            }
-            else
-            {
-                HtmlTidy htmlTidy("<body xmlns=\"http://www.w3.org/1999/xhtml\">" +
-                                  decrypted + "</body>");
-                decrypted = htmlTidy.output();
-
-                bodyText = htmlToPlain(decrypted);
-
-                // replace html body
-                if (htmlElement.isNull())
+                if (!isHTML)
                 {
-                    htmlElement = e.ownerDocument().createElement("html");
-                    htmlElement.setAttribute("xmlns",
-                                             "http://jabber.org/protocol/xhtml-im");
-                    messageElement.appendChild(htmlElement);
+                    bodyText = decrypted;
                 }
                 else
                 {
-                    htmlElement.removeChild(htmlElement.firstChildElement("body"));
+                    HtmlTidy htmlTidy("<body xmlns=\"http://www.w3.org/1999/xhtml\">" +
+                                      decrypted + "</body>");
+                    decrypted = htmlTidy.output();
+
+                    bodyText = htmlToPlain(decrypted);
+
+                    // replace html body
+                    if (htmlElement.isNull())
+                    {
+                        htmlElement = e.ownerDocument().createElement("html");
+                        htmlElement.setAttribute("xmlns",
+                                                 "http://jabber.org/protocol/xhtml-im");
+                        messageElement.appendChild(htmlElement);
+                    }
+                    else
+                    {
+                        htmlElement.removeChild(htmlElement.firstChildElement("body"));
+                    }
+
+                    QDomDocument document;
+                    int errorLine = 0, errorColumn = 0;
+                    QString errorText;
+                    if (document.setContent(decrypted, true, &errorText, &errorLine,
+                                            &errorColumn))
+                    {
+                        htmlElement.appendChild(document.documentElement());
+                    }
+                    else
+                    {
+                        qWarning() << "---- parsing error:\n" << decrypted <<
+                                      "\n----\n" << errorText << " line:" <<
+                                      errorLine << " column:" << errorColumn;
+                        messageElement.removeChild(htmlElement);
+                    }
                 }
 
-                QDomDocument document;
-                int errorLine = 0, errorColumn = 0;
-                QString errorText;
-                if (document.setContent(decrypted, true, &errorText, &errorLine,
-                                        &errorColumn))
-                {
-                    htmlElement.appendChild(document.documentElement());
-                }
-                else
-                {
-                    qWarning() << "---- parsing error:\n" << decrypted <<
-                                  "\n----\n" << errorText << " line:" <<
-                                  errorLine << " column:" << errorColumn;
-                    messageElement.removeChild(htmlElement);
-                }
-            }
-
-            // replace plaintext body
-            plainBody.removeChild(plainBody.firstChild());
-            plainBody.appendChild(e.ownerDocument().createTextNode(unescape(bodyText)));
+                // replace plaintext body
+                plainBody.removeChild(plainBody.firstChild());
+                plainBody.appendChild(e.ownerDocument().createTextNode(unescape(bodyText)));
+                break;
         }
     }
-    return false;
+    return ignore;
 }
 
 //-----------------------------------------------------------------------------
@@ -378,6 +401,12 @@ void PsiOtrPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost*
 
 //-----------------------------------------------------------------------------
 
+void PsiOtrPlugin::setPsiAccountControllingHost(PsiAccountControllingHost* host) {
+    m_accountHost = host;
+}
+
+//-----------------------------------------------------------------------------
+
 void PsiOtrPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost *host)
 {
     m_accountInfo = host;
@@ -388,6 +417,13 @@ void PsiOtrPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost *host)
 void PsiOtrPlugin::setContactInfoAccessingHost(ContactInfoAccessingHost *host)
 {
     m_contactInfo = host;
+}
+
+//-----------------------------------------------------------------------------
+
+void PsiOtrPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost *host)
+{
+    m_iconHost = host;
 }
 
 //-----------------------------------------------------------------------------
@@ -544,6 +580,55 @@ void PsiOtrPlugin::notifyUser(const OtrNotifyType& type, const QString& message)
     QMessageBox mb(messageBoxIcon, tr("Psi OTR"), message, QMessageBox::Ok, NULL,
                    Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     mb.exec();
+}
+
+//-----------------------------------------------------------------------------
+
+void PsiOtrPlugin::goneSecure(const QString& account, const QString& contact,
+                              bool verified)
+{
+    if (m_onlineUsers.contains(account) && 
+        m_onlineUsers.value(account).contains(contact))
+    {
+        m_onlineUsers[account][contact]->updateMessageState();
+    }
+    m_accountHost->appendSysMsg(
+                    getAccountIndexById(account), contact,
+                    QString("<icon name=\"psi-otr/%1\"> %2")
+                        .arg(verified? "otr_yes" : "otr_unverified")
+                        .arg(tr("Private conversation started")));
+}
+
+//-----------------------------------------------------------------------------
+
+void PsiOtrPlugin::goneInsecure(const QString& account, const QString& contact)
+{
+    if (m_onlineUsers.contains(account) && 
+        m_onlineUsers.value(account).contains(contact))
+    {
+        m_onlineUsers[account][contact]->updateMessageState();
+    }
+    m_accountHost->appendSysMsg(
+                    getAccountIndexById(account), contact,
+                    QString("<icon name=\"psi-otr/otr_no\"> %2")
+                        .arg(tr("Private conversation closed")));
+}
+
+//-----------------------------------------------------------------------------
+
+void PsiOtrPlugin::stillSecure(const QString& account, const QString& contact,
+                               bool verified)
+{
+    if (m_onlineUsers.contains(account) && 
+        m_onlineUsers.value(account).contains(contact))
+    {
+        m_onlineUsers[account][contact]->updateMessageState();
+    }
+    m_accountHost->appendSysMsg(
+                    getAccountIndexById(account), contact,
+                    QString("<icon name=\"psi-otr/%1\"> %2")
+                        .arg(verified? "otr_yes" : "otr_unverified")
+                        .arg(tr("Private conversation refreshed")));
 }
 
 //-----------------------------------------------------------------------------
