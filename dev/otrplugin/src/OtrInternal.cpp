@@ -498,6 +498,7 @@ void OtrInternal::endSession(const QString& account, const QString& jid)
     otrl_message_disconnect(m_userstate, &m_uiOps, this, 
                             account.toUtf8().constData(), OTR_PROTOCOL_STRING,
                             jid.toUtf8().constData());
+    m_callback->goneInsecure(account, jid);
 }
 
 //-----------------------------------------------------------------------------
@@ -513,6 +514,7 @@ void OtrInternal::expireSession(const QString& account, const QString& jid)
         (context->msgstate == OTRL_MSGSTATE_ENCRYPTED))
     {
         otrl_context_force_finished(context);
+        m_callback->goneInsecure(account, jid);
     }
 }
 
