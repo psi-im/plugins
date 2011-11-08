@@ -495,10 +495,19 @@ void OtrInternal::startSession(const QString& account, const QString& jid)
 
 void OtrInternal::endSession(const QString& account, const QString& jid)
 {
+    ConnContext* context = otrl_context_find(m_userstate,
+                                             jid.toUtf8().constData(),
+                                             account.toUtf8().constData(),
+                                             OTR_PROTOCOL_STRING, false,
+                                             NULL, NULL, NULL);
+    if ((context != NULL) &&
+        (context->msgstate != OTRL_MSGSTATE_PLAINTEXT))
+    {
+        m_callback->goneInsecure(account, jid);
+    }
     otrl_message_disconnect(m_userstate, &m_uiOps, this, 
                             account.toUtf8().constData(), OTR_PROTOCOL_STRING,
                             jid.toUtf8().constData());
-    m_callback->goneInsecure(account, jid);
 }
 
 //-----------------------------------------------------------------------------
