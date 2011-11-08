@@ -587,11 +587,10 @@ void PsiOtrPlugin::notifyUser(const OtrNotifyType& type, const QString& message)
 //-----------------------------------------------------------------------------
 
 bool PsiOtrPlugin::displayOtrMessage(const QString& account,
-                                             const QString& contact,
-                                             const QString& message)
+                                     const QString& contact,
+                                     const QString& message)
 {
-    return m_accountHost->appendSysMsg(getAccountIndexById(account), contact,
-                                       message);
+    return appendSysMsg(account, contact, message);
 }
 
 //-----------------------------------------------------------------------------
@@ -604,12 +603,11 @@ void PsiOtrPlugin::goneSecure(const QString& account, const QString& contact,
     {
         m_onlineUsers[account][contact]->updateMessageState();
     }
-    m_accountHost->appendSysMsg(
-                    getAccountIndexById(account), contact,
-                    QString("<icon name=\"psi-otr/%1\"> %2")
-                        .arg(verified? "otr_yes" : "otr_unverified")
-                        .arg(verified? tr("Private conversation started")
-                                     : tr("Unverified conversation started")));
+    appendSysMsg(account, contact,
+                 verified? tr("Private conversation started")
+                         : tr("Unverified conversation started"),
+                 verified? "psi-otr/otr_yes"
+                         : "psi-otr/otr_unverified");
 }
 
 //-----------------------------------------------------------------------------
@@ -621,10 +619,9 @@ void PsiOtrPlugin::goneInsecure(const QString& account, const QString& contact)
     {
         m_onlineUsers[account][contact]->updateMessageState();
     }
-    m_accountHost->appendSysMsg(
-                    getAccountIndexById(account), contact,
-                    QString("<icon name=\"psi-otr/otr_no\"> %2")
-                        .arg(tr("Private conversation lost")));
+    appendSysMsg(account, contact,
+                 tr("Private conversation lost"),
+                 "psi-otr/otr_no");
 }
 
 //-----------------------------------------------------------------------------
@@ -636,10 +633,9 @@ void PsiOtrPlugin::closedSecure(const QString& account, const QString& contact)
     {
         m_onlineUsers[account][contact]->updateMessageState();
     }
-    m_accountHost->appendSysMsg(
-                    getAccountIndexById(account), contact,
-                    QString("<icon name=\"psi-otr/otr_no\"> %2")
-                        .arg(tr("Private conversation closed")));
+    appendSysMsg(account, contact,
+                 tr("Private conversation closed"),
+                 "psi-otr/otr_no");
 }
 
 //-----------------------------------------------------------------------------
@@ -651,12 +647,10 @@ void PsiOtrPlugin::remoteClosedSecure(const QString& account, const QString& con
     {
         m_onlineUsers[account][contact]->updateMessageState();
     }
-    m_accountHost->appendSysMsg(
-                    getAccountIndexById(account), contact,
-                    QString("<icon name=\"psi-otr/otr_no\"> %2")
-                        .arg(tr("%1 has ended the private conversation with "
-                                "you; you should do the same.")
-                                .arg(contact)));
+    appendSysMsg(account, contact,
+                 tr("%1 has ended the private conversation with you; "
+                    "you should do the same.").arg(contact),
+                 "psi-otr/otr_no");
 }
 
 //-----------------------------------------------------------------------------
@@ -669,12 +663,11 @@ void PsiOtrPlugin::stillSecure(const QString& account, const QString& contact,
     {
         m_onlineUsers[account][contact]->updateMessageState();
     }
-    m_accountHost->appendSysMsg(
-                    getAccountIndexById(account), contact,
-                    QString("<icon name=\"psi-otr/%1\"> %2")
-                        .arg(verified? "otr_yes" : "otr_unverified")
-                        .arg(verified? tr("Private conversation refreshed")
-                                     : tr("Unverified conversation refreshed")));
+    appendSysMsg(account, contact,
+                 verified? tr("Private conversation refreshed")
+                         : tr("Unverified conversation refreshed"),
+                 verified? "psi-otr/otr_yes"
+                         : "psi-otr/otr_unverified");
 }
 
 //-----------------------------------------------------------------------------
@@ -730,6 +723,22 @@ QString PsiOtrPlugin::humanAccount(const QString& accountId)
 QString PsiOtrPlugin::humanAccountPublic(const QString& accountId)
 {
     return getAccountJidById(accountId);
+}
+
+//-----------------------------------------------------------------------------
+
+bool PsiOtrPlugin::appendSysMsg(const QString& account,
+                                const QString& contact,
+                                const QString& message,
+                                const QString& icon)
+{
+    QString iconTag;
+    if (!icon.isEmpty())
+    {
+        iconTag = QString("<icon name=\"%1\"> ").arg(icon);
+    }
+    return m_accountHost->appendSysMsg(getAccountIndexById(account),
+                                       contact, iconTag + message);
 }
 
 // ---------------------------------------------------------------------------

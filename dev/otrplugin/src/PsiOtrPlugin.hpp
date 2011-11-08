@@ -167,6 +167,12 @@ public:
     virtual QString humanAccount(const QString& accountId);
     virtual QString humanAccountPublic(const QString& accountId);
 
+    /**
+     * Displays a rich text system message for (account, contact)
+     */
+    bool appendSysMsg(const QString& account, const QString& contact,
+                      const QString& message, const QString& icon = "");
+
     // Helper methods
     /**
      * Returns the index of the account identified by accountId or -1
