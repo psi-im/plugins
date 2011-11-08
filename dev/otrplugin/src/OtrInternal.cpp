@@ -227,7 +227,7 @@ psiotr::OtrMessageType OtrInternal::decryptMessage(const QString& from,
 
     tlv = otrl_tlv_find(tlvs, OTRL_TLV_DISCONNECTED);
     if (tlv) {
-        m_callback->goneInsecure(accountName, userName);
+        m_callback->remoteClosedSecure(accountName, userName);
     }
 
     // Check for SMP data
@@ -503,7 +503,7 @@ void OtrInternal::endSession(const QString& account, const QString& jid)
     if ((context != NULL) &&
         (context->msgstate != OTRL_MSGSTATE_PLAINTEXT))
     {
-        m_callback->goneInsecure(account, jid);
+        m_callback->closedSecure(account, jid);
     }
     otrl_message_disconnect(m_userstate, &m_uiOps, this, 
                             account.toUtf8().constData(), OTR_PROTOCOL_STRING,
@@ -523,7 +523,7 @@ void OtrInternal::expireSession(const QString& account, const QString& jid)
         (context->msgstate == OTRL_MSGSTATE_ENCRYPTED))
     {
         otrl_context_force_finished(context);
-        m_callback->goneInsecure(account, jid);
+        m_callback->closedSecure(account, jid);
     }
 }
 

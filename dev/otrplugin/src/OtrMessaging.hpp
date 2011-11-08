@@ -104,6 +104,10 @@ public:
 
     virtual void goneInsecure(const QString& account, const QString& contact) = 0;
 
+    virtual void closedSecure(const QString& account, const QString& contact) = 0;
+
+    virtual void remoteClosedSecure(const QString& account, const QString& contact) = 0;
+
     virtual void stillSecure(const QString& account, const QString& contact,
                              bool verified) = 0;
 

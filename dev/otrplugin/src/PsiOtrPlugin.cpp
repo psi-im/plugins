@@ -624,7 +624,39 @@ void PsiOtrPlugin::goneInsecure(const QString& account, const QString& contact)
     m_accountHost->appendSysMsg(
                     getAccountIndexById(account), contact,
                     QString("<icon name=\"psi-otr/otr_no\"> %2")
+                        .arg(tr("Private conversation lost")));
+}
+
+//-----------------------------------------------------------------------------
+
+void PsiOtrPlugin::closedSecure(const QString& account, const QString& contact)
+{
+    if (m_onlineUsers.contains(account) && 
+        m_onlineUsers.value(account).contains(contact))
+    {
+        m_onlineUsers[account][contact]->updateMessageState();
+    }
+    m_accountHost->appendSysMsg(
+                    getAccountIndexById(account), contact,
+                    QString("<icon name=\"psi-otr/otr_no\"> %2")
                         .arg(tr("Private conversation closed")));
+}
+
+//-----------------------------------------------------------------------------
+
+void PsiOtrPlugin::remoteClosedSecure(const QString& account, const QString& contact)
+{
+    if (m_onlineUsers.contains(account) && 
+        m_onlineUsers.value(account).contains(contact))
+    {
+        m_onlineUsers[account][contact]->updateMessageState();
+    }
+    m_accountHost->appendSysMsg(
+                    getAccountIndexById(account), contact,
+                    QString("<icon name=\"psi-otr/otr_no\"> %2")
+                        .arg(tr("%1 has ended the private conversation with "
+                                "you; you should do the same.")
+                                .arg(contact)));
 }
 
 //-----------------------------------------------------------------------------
