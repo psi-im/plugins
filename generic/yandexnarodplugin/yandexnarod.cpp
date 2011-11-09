@@ -18,6 +18,7 @@
 
 #include "yandexnarod.h"
 #include "yandexnarodmanage.h"
+#include "authmanager.h"
 #include "yandexnarodsettings.h"
 #include "uploaddialog.h"
 #include "options.h"

@@ -18,7 +18,7 @@
 #include <QFileInfo>
 
 #include "uploaddialog.h"
-#include "yandexnarodnetman.h"
+#include "uploadmanager.h"
 #include "options.h"
 
 uploadDialog::uploadDialog(QWidget *p)

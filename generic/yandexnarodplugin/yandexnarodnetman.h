@@ -2,6 +2,7 @@
 	yandexnarodNetMan
 
 	Copyright (c) 2009 by Alexander Kazarin <boiler@co.ru>
+			2011 by Evgeny Khryukin
 
  ***************************************************************************
  *                                                                         *
@@ -16,67 +17,10 @@
 #ifndef YANDEXNARODNETMAN_H
 #define YANDEXNARODNETMAN_H
 
-#include <QNetworkCookie>
 #include <QStringList>
 
 class QNetworkAccessManager;
 class QNetworkReply;
-class QEventLoop;
-class QTimer;
-
-
-class AuthManager : public QObject
-{
-	Q_OBJECT
-public:
-	AuthManager(QObject* p = 0);
-	~AuthManager();
-
-	bool go(const QString& login, const QString& pass, const QString& captcha = "");
-	QList<QNetworkCookie> cookies() const;
-
-private slots:
-	void timeout();
-	void replyFinished(QNetworkReply* r);
-
-private:
-	bool authorized_;
-	QString narodLogin, narodPass;
-	QNetworkAccessManager *manager_;
-	QEventLoop *loop_;
-	QTimer *timer_;
-};
-
-
-class UploadManager : public QObject
-{
-	Q_OBJECT
-public:
-	UploadManager(QObject* p = 0);
-	~UploadManager();
-	void go(const QString& file);
-	void setCookies(const QList<QNetworkCookie>& cookies);
-	bool success() const { return success_; };
-
-signals:
-	void transferProgress(qint64, qint64);
-	void uploaded();
-	void statusText(const QString&);
-	void uploadFileURL(const QString&);
-
-private slots:
-	void getStorageFinished();
-	void uploadFinished();
-	void verifyingFinished();
-
-private:
-	void doUpload(const QUrl& url);
-
-private:
-	QNetworkAccessManager* manager_;
-	QString fileName_;
-	bool success_;
-};
 
 class yandexnarodNetMan : public QObject
 {

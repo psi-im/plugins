@@ -2,6 +2,7 @@
     yandexnarodManage
 
 	Copyright (c) 2009 by Alexander Kazarin <boiler@co.ru>
+			2011 by Evgeny Khryukin
 
  ***************************************************************************
  *                                                                         *
