@@ -50,10 +50,6 @@ public:
 		appendData(mpData);
 
 		QFile *device = new QFile(fileName_, this);
-		if(!device->open(QIODevice::ReadOnly)) {
-			qDebug("HttpDevice: error opening file");
-			return;
-		}
 
 		Range r;
 		r.start = totalSize;
@@ -81,6 +77,19 @@ public:
 		ioIndex = pos;
 		lastIndex = 0;
 		return QIODevice::seek(pos);
+	}
+
+	virtual bool open(QIODevice::OpenMode mode)
+	{
+		if(mode != QIODevice::ReadOnly)
+			return false;
+
+		for(int i = 0; i < ioDevices.size(); i++) {
+			if(!ioDevices.at(i).second->open(mode))
+				return false;
+		}
+
+		return QIODevice::open(mode);
 	}
 
 protected:
@@ -150,7 +159,6 @@ private:
 	{
 		QBuffer * buffer = new QBuffer(this);
 		buffer->setData(data);
-		buffer->open(QBuffer::ReadOnly);
 
 		Range r;
 		r.start = totalSize;
@@ -250,19 +258,14 @@ void UploadManager::getStorageFinished()
 
 void UploadManager::doUpload(const QUrl &url)
 {
-	QFile file(fileName_);
-	if(!file.open(QFile::ReadOnly)) {
-		emit statusText(tr("Error opening file!"));
-		emit uploaded();
-		return;
-	}
-	file.close();
-
 	emit statusText(tr("Starting upload..."));
 
-
 	hd_ = new HttpDevice(fileName_, this);
-	hd_->open(QIODevice::ReadOnly);
+	if(!hd_->open(QIODevice::ReadOnly)) {
+		       emit statusText(tr("Error opening file!"));
+		       emit uploaded();
+		       return;
+	}
 
 	QNetworkRequest nr = newRequest();
 	nr.setUrl(url);

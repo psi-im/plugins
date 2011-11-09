@@ -22,7 +22,7 @@
 #include "options.h"
 
 uploadDialog::uploadDialog(QWidget *p)
-	: QDialog(p)
+	: QDialog(p, Qt::MSWindowsFixedSizeDialogHint)
 {
 	ui.setupUi(this);
 	ui.progressBar->setValue(0);
@@ -35,6 +35,7 @@ uploadDialog::uploadDialog(QWidget *p)
 	connect(netman, SIGNAL(transferProgress(qint64,qint64)),this, SLOT(progress(qint64,qint64)));
 	connect(netman, SIGNAL(uploadFileURL(QString)), this, SIGNAL(fileUrl(QString)));
 	connect(netman, SIGNAL(uploaded()), this, SLOT(setDone()));
+	connect(netman, SIGNAL(uploadFileURL(QString)), this, SLOT(setLink(QString)));
 }
 
 uploadDialog::~uploadDialog() 
@@ -54,6 +55,7 @@ void uploadDialog::start(const QString& fileName)
 	setFilename(fi.fileName());
 
 	ui.progressBar->setValue(0);
+	ui.labelLink->setVisible(false);
 	utime.start();
 	netman->go(fileName);
 }
@@ -88,4 +90,10 @@ void uploadDialog::setDone()
 		ui.btnUploadCancel->setText(tr("Close"));
 
 	emit finished();
+}
+
+void uploadDialog::setLink(const QString &link)
+{
+	ui.labelLink->setVisible(true);
+	ui.labelLink->setText(tr("Link: <a href=\"%1\">%2</a>").arg(link, link.left(30)+"..."));
 }

@@ -49,6 +49,7 @@ private slots:
 	void progress(qint64, qint64);
 	void setStatus(const QString& str) { ui.labelStatus->setText(str); }
 	void setDone();
+	void setLink(const QString& link);
 
 };
 #endif
