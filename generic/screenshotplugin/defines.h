@@ -21,7 +21,7 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-#define cVersion "0.6.0"
+#define cVersion "0.6.1"
 
 #define constName "Screenshot Plugin"
 #define constVersionOption "version"
@@ -37,5 +37,8 @@
 #define constWindowY "geometry.y"
 #define constWindowWidth "geometry.width"
 #define constWindowHeight "geometry.height"
+#define constDefaultAction "default-action"
+
+enum DefaultAction { Desktop, Area, Window };
 
 #endif // DEFINES_H

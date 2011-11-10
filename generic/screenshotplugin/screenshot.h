@@ -39,6 +39,7 @@ public:
 	~Screenshot();
 
 	void setProxy(const Proxy& p);
+	void action(int action);
 
 protected:
 	void closeEvent(QCloseEvent *);
@@ -71,6 +72,7 @@ private slots:
 	void doOptions();
 	//void doProxySettings();
 	void settingsChanged(const QString& option, const QVariant& value);
+	void copyUrl();
 
 private:
 	void updateScreenshotLabel();

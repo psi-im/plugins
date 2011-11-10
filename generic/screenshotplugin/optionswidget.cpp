@@ -149,6 +149,7 @@ OptionsWidget::OptionsWidget(QWidget* p)
 	format = o->getOption(constFormat, QVariant(format)).toString();
 	fileName = o->getOption(constFileName, QVariant(fileName)).toString();
 	servers = o->getOption(constServerList).toStringList();
+	defaultAction = o->getOption(constDefaultAction, QVariant(Desktop)).toInt();
 
 	connect(ui_.pb_add, SIGNAL(clicked()), this, SLOT(addServer()));
 	connect(ui_.pb_del, SIGNAL(clicked()), this, SLOT(delServer()));
@@ -220,6 +221,12 @@ void OptionsWidget::applyOptions()
 		servers.append(s->settingsToString());
 	}
 	o->setOption(constServerList, QVariant(servers));
+	DefaultAction act;
+	if(ui_.rb_desktop->isChecked())
+		act = Desktop;
+	else
+		act = Area;
+	o->setOption(constDefaultAction, act);
 
 }
 
@@ -237,6 +244,8 @@ void OptionsWidget::restoreOptions()
 		s->setFromString(settings);
 		s->setText(s->displayName());
 	}
+	ui_.rb_desktop->setChecked(defaultAction == Desktop);
+	ui_.rb_area->setChecked(defaultAction == Area);
 }
 
 void OptionsWidget::requstNewShortcut()

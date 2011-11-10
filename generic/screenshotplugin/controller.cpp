@@ -75,6 +75,7 @@ Controller::Controller(ApplicationInfoAccessingHost* appInfo)
 		o->setOption(constFileName, QVariant("pic-yyyyMMdd-hhmmss"));
 		o->setOption(constDelay, QVariant(0));
 		o->setOption(constVersionOption, cVersion);
+		o->setOption(constDefaultAction, QVariant(Desktop));
 	}
 
 	QStringList servers = vServers.toStringList();
@@ -113,7 +114,7 @@ void Controller::onShortCutActivated()
 		screenshot->setProxy(appInfo_->getProxyFor(constName));
 	}
 
-	screenshot->shootScreen();
+	screenshot->action(Options::instance()->getOption(constDefaultAction).toInt());
 }
 
 void Controller::openImage()

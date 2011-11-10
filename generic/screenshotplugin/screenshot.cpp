@@ -219,7 +219,7 @@ Screenshot::Screenshot()
 	ui_.setupUi(this);
 
 	updateWidgets(false);
-	ui_.lb_url->setVisible(false);
+	ui_.urlFrame->setVisible(false);
 
 	refreshSettings();
 	history_ = Options::instance()->getOption(constHistory).toStringList();
@@ -233,6 +233,7 @@ Screenshot::Screenshot()
 	ui_.pb_save->setIcon(icoHost->getIcon("psi/download"));
 	ui_.pb_print->setIcon(icoHost->getIcon("psi/print"));
 	ui_.pb_new_screenshot->setIcon(icoHost->getIcon("screenshotplugin/screenshot"));
+	ui_.tb_copyUrl->setIcon(qApp->style()->standardIcon(QStyle::SP_DialogSaveButton));
 
 	ui_.pb_save->setShortcut(QKeySequence("Ctrl+s"));
 	ui_.pb_upload->setShortcut(QKeySequence("Ctrl+u"));
@@ -252,6 +253,7 @@ Screenshot::Screenshot()
 	connect(ui_.lb_pixmap, SIGNAL(adjusted()), this, SLOT(pixmapAdjusted()));
 	connect(ui_.lb_pixmap, SIGNAL(settingsChanged(QString,QVariant)), SLOT(settingsChanged(QString, QVariant)));
 	connect(ui_.lb_pixmap, SIGNAL(modified(bool)), this, SLOT(setModified(bool)));
+	connect(ui_.tb_copyUrl, SIGNAL(clicked()), this, SLOT(copyUrl()));
 
 	setWindowIcon(icoHost->getIcon("screenshotplugin/screenshot"));
 }
@@ -277,6 +279,19 @@ void Screenshot::connectMenu()
 	//connect(ui_.actionProxy_Settings, SIGNAL(triggered()), SLOT(doProxySettings()));
 	connect(ui_.actionSave, SIGNAL(triggered()), SLOT(saveScreenshot()));
 	connect(ui_.actionUpload, SIGNAL(triggered()), SLOT(uploadScreenshot()));
+}
+
+void Screenshot::action(int action)
+{
+	switch(action) {
+	case Area:
+		captureArea(Options::instance()->getOption(constDelay).toInt());
+		break;
+	case Desktop:
+	default:
+		shootScreen();
+		break;
+	}
 }
 
 void Screenshot::setupStatusBar()
@@ -469,7 +484,7 @@ void Screenshot::screenshotCanceled()
 void Screenshot::refreshWindow()
 {
 	ui_.pb_new_screenshot->setEnabled(true);
-	ui_.lb_url->setVisible(false);
+	ui_.urlFrame->setVisible(false);
 	updateScreenshotLabel();
 	bringToFront();
 	setModified(false);
@@ -542,8 +557,6 @@ void Screenshot::captureDesktop(int delay)
 void Screenshot::shootScreen()
 {
 	qApp->beep();
-	originalPixmap = QPixmap(); // clear image for low memory situations
-				// on embedded devices.
 	originalPixmap = QPixmap::grabWindow(QApplication::desktop()->winId());
 
 	refreshWindow();
@@ -568,6 +581,18 @@ void Screenshot::saveScreenshot()
 	}
 	ui_.pb_save->setEnabled(true);
 	modified = false;
+}
+
+void Screenshot::copyUrl()
+{
+	QString url = ui_.lb_url->text();
+	if(!url.isEmpty()) {
+		QRegExp re("<a href=\".+\">([^<]+)</a>");
+		if(re.indexIn(url) != -1) {
+			url = re.cap(1);
+			qApp->clipboard()->setText(url);
+		}
+	}
 }
 
 void Screenshot::dataTransferProgress(qint64 done, qint64 total)
@@ -647,7 +672,7 @@ void Screenshot::uploadFtp()
 
 	ui_.progressBar->setValue(0);
 	ui_.progressBar->show();
-	ui_.lb_url->setVisible(false);
+	ui_.urlFrame->setVisible(false);
 
 	QNetworkReply *reply = manager->put(QNetworkRequest(u), ba);
 
@@ -720,7 +745,7 @@ void Screenshot::uploadHttp()
 
 	ui_.progressBar->setValue(0);
 	ui_.progressBar->show();
-	ui_.lb_url->setVisible(false);
+	ui_.urlFrame->setVisible(false);
 
 	QNetworkReply* reply = manager->post(netreq, ba);
 	connect(reply, SIGNAL(uploadProgress(qint64 , qint64)), this, SLOT(dataTransferProgress(qint64 , qint64)));
@@ -731,7 +756,7 @@ void Screenshot::uploadHttp()
 void Screenshot::ftpReplyFinished()
 {
 	QNetworkReply *reply = (QNetworkReply*)sender();
-	ui_.lb_url->setVisible(true);
+	ui_.urlFrame->setVisible(true);
 	if(reply->error() == QNetworkReply::NoError) {
 		const QString url = reply->url().toString(QUrl::RemoveUserInfo | QUrl::StripTrailingSlash);
 		ui_.lb_url->setText(QString("<a href=\"%1\">%1</a>").arg(url));
@@ -752,7 +777,7 @@ void Screenshot::ftpReplyFinished()
 void Screenshot::httpReplyFinished(QNetworkReply *reply)
 {
 	if(reply->error() != QNetworkReply::NoError) {
-		ui_.lb_url->setVisible(true);
+		ui_.urlFrame->setVisible(true);
 		ui_.lb_url->setText(reply->errorString());
 		updateWidgets(false);
 		reply->close();
@@ -786,7 +811,7 @@ void Screenshot::httpReplyFinished(QNetworkReply *reply)
 //
 
 		QRegExp rx(s->servRegexp());
-		ui_.lb_url->setVisible(true);
+		ui_.urlFrame->setVisible(true);
 		if (rx.indexIn(page) != -1) {
 			QString imageurl = rx.cap(1);
 			ui_.lb_url->setText(QString("<a href=\"%1\">%1</a>").arg(imageurl));
