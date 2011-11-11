@@ -221,12 +221,12 @@ void OptionsWidget::applyOptions()
 		servers.append(s->settingsToString());
 	}
 	o->setOption(constServerList, QVariant(servers));
-	DefaultAction act;
+
 	if(ui_.rb_desktop->isChecked())
-		act = Desktop;
+		defaultAction = Desktop;
 	else
-		act = Area;
-	o->setOption(constDefaultAction, act);
+		defaultAction = Area;
+	o->setOption(constDefaultAction, defaultAction);
 
 }
 

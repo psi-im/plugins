@@ -46,7 +46,7 @@ Options::~Options()
 
 void Options::reset()
 {
-	instance_->deleteLater();
+	delete instance_;
 	instance_ = 0;
 }
 
