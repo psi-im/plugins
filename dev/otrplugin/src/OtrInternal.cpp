@@ -523,7 +523,7 @@ void OtrInternal::expireSession(const QString& account, const QString& jid)
         (context->msgstate == OTRL_MSGSTATE_ENCRYPTED))
     {
         otrl_context_force_finished(context);
-        m_callback->closedSecure(account, jid);
+        m_callback->goneInsecure(account, jid);
     }
 }
 
