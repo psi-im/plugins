@@ -975,14 +975,19 @@ void OtrInternal::new_fingerprint(OtrlUserState us, const char *accountname,
                                   unsigned char fingerprint[20])
 {
     Q_UNUSED(us);
-    Q_UNUSED(accountname);
     Q_UNUSED(protocol);
 
-    m_callback->notifyUser(psiotr::OTR_NOTIFY_INFO,
-                           QObject::tr("You have received a new "
-                                       "fingerprint from %1:\n%2")
-                                       .arg(QString::fromUtf8(username))
-                                       .arg(humanFingerprint(fingerprint)));
+    QString account = QString::fromUtf8(accountname);
+    QString contact = QString::fromUtf8(username);
+    QString message = QObject::tr("You have received a new "
+                                  "fingerprint from %1:\n%2")
+                                 .arg(m_callback->humanContact(account, contact))
+                                 .arg(humanFingerprint(fingerprint));
+
+    if (!m_callback->displayOtrMessage(account, contact, message))
+    {
+        m_callback->notifyUser(psiotr::OTR_NOTIFY_INFO, message);
+    }
 }
             
 // ---------------------------------------------------------------------------
