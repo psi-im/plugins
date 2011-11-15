@@ -482,7 +482,7 @@ void OtrInternal::startSession(const QString& account, const QString& jid)
                                              OTR_PROTOCOL_STRING, false,
                                              NULL, NULL, NULL);
     m_callback->goingSecure(account, jid, (context != NULL) &&
-                            (context->msgstate != OTRL_MSGSTATE_PLAINTEXT));
+                            (context->msgstate == OTRL_MSGSTATE_ENCRYPTED));
 
     char fingerprint[45];
     if (!otrl_privkey_fingerprint(m_userstate, fingerprint,
