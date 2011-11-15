@@ -99,6 +99,9 @@ public:
     virtual bool displayOtrMessage(const QString& account, const QString& contact,
                                    const QString& message) = 0;
 
+    virtual void goingSecure(const QString& account, const QString& contact,
+                             bool refreshing) = 0;
+
     virtual void goneSecure(const QString& account, const QString& contact,
                             bool verified) = 0;
 

@@ -595,6 +595,24 @@ bool PsiOtrPlugin::displayOtrMessage(const QString& account,
 
 //-----------------------------------------------------------------------------
 
+void PsiOtrPlugin::goingSecure(const QString& account, const QString& contact,
+                               bool refreshing)
+{
+    if (m_onlineUsers.contains(account) && 
+        m_onlineUsers.value(account).contains(contact))
+    {
+        m_onlineUsers[account][contact]->updateMessageState();
+    }
+    appendSysMsg(account, contact,
+                 (refreshing? tr("Attempting to refresh the "
+                                 "private conversation with %1")
+                            : tr("Attempting to start a "
+                                 "private conversation with %1"))
+                            .arg(humanContact(account, contact)));
+}
+
+//-----------------------------------------------------------------------------
+
 void PsiOtrPlugin::goneSecure(const QString& account, const QString& contact,
                               bool verified)
 {

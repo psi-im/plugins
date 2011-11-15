@@ -476,6 +476,14 @@ void OtrInternal::deleteKey(const QString& account)
 
 void OtrInternal::startSession(const QString& account, const QString& jid)
 {
+    ConnContext* context = otrl_context_find(m_userstate,
+                                             jid.toUtf8().constData(),
+                                             account.toUtf8().constData(),
+                                             OTR_PROTOCOL_STRING, false,
+                                             NULL, NULL, NULL);
+    m_callback->goingSecure(account, jid, (context != NULL) &&
+                            (context->msgstate != OTRL_MSGSTATE_PLAINTEXT));
+
     char fingerprint[45];
     if (!otrl_privkey_fingerprint(m_userstate, fingerprint,
                                   account.toUtf8().constData(), 
