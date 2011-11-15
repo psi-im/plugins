@@ -505,26 +505,28 @@ void PsiOtrClosure::updateMessageState()
 
         if (state == OTR_MESSAGESTATE_ENCRYPTED)
         {
+            m_startSessionAction->setText(tr("Refre&sh private conversation"));
             m_authenticateAction->setEnabled(true);
             m_sessionIdAction->setEnabled(true);
-            m_startSessionAction->setEnabled(false);
             m_endSessionAction->setEnabled(true);
         }
-        else if (state == OTR_MESSAGESTATE_PLAINTEXT)
+        else
         {
-            m_authenticateAction->setEnabled(false);
-            m_sessionIdAction->setEnabled(false);
-            m_startSessionAction->setEnabled(true);
-            m_endSessionAction->setEnabled(false);
+            m_startSessionAction->setText(tr("&Start private conversation"));
+            if (state == OTR_MESSAGESTATE_PLAINTEXT)
+            {
+                m_authenticateAction->setEnabled(false);
+                m_sessionIdAction->setEnabled(false);
+                m_endSessionAction->setEnabled(false);
+            }
+            else // finished, unknown
+            {
+                m_endSessionAction->setEnabled(true);
+                m_authenticateAction->setEnabled(false);
+                m_sessionIdAction->setEnabled(false);
+            }
         }
-        else // finished, unknown
-        {
-            m_startSessionAction->setEnabled(true);
-            m_endSessionAction->setEnabled(true);
-            m_authenticateAction->setEnabled(false);
-            m_sessionIdAction->setEnabled(false);
-        }
-            
+
         if (m_otr->getPolicy() < OTR_POLICY_ENABLED)
         {
             m_startSessionAction->setEnabled(false);
@@ -538,11 +540,11 @@ void PsiOtrClosure::updateMessageState()
 QAction* PsiOtrClosure::getChatDlgMenu(QObject* parent)
 {
     m_parentWidget = parent;
-    m_chatDlgAction = new QAction("", this);
+    m_chatDlgAction = new QAction(QString(), this);
 
     m_chatDlgMenu = new QMenu();
 
-    m_startSessionAction = m_chatDlgMenu->addAction(tr("&Start private conversation"));
+    m_startSessionAction = m_chatDlgMenu->addAction(QString());
     connect(m_startSessionAction, SIGNAL(triggered(bool)),
             this, SLOT(initiateSession(bool)));
 
