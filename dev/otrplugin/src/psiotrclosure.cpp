@@ -403,7 +403,7 @@ void PsiOtrClosure::receivedSMP(const QString& question)
 
 void PsiOtrClosure::updateSMP(int progress)
 {
-    if (m_authDialog || !encrypted())
+    if (m_authDialog)
     {
         m_authDialog->updateSMP(progress);
         m_authDialog->show();
