@@ -166,6 +166,8 @@ public:
 
     virtual QString humanAccount(const QString& accountId);
     virtual QString humanAccountPublic(const QString& accountId);
+    virtual QString humanContact(const QString& accountId,
+                                 const QString& contact);
 
     /**
      * Displays a rich text system message for (account, contact)

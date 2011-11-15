@@ -122,6 +122,8 @@ public:
 
     virtual QString humanAccount(const QString& accountId) = 0;
     virtual QString humanAccountPublic(const QString& accountId) = 0;
+    virtual QString humanContact(const QString& accountId,
+                                 const QString& contact) = 0;
 };
 
 // ---------------------------------------------------------------------------
@@ -329,7 +331,12 @@ public:
      * Return a human-readable representation
      * of an account identified by accountId
      */
-    QString humanAccount(const QString accountId);
+    QString humanAccount(const QString& accountId);
+
+    /**
+     * Return the name of a contact
+     */
+    QString humanContact(const QString& accountId, const QString& contact);
 
 private:
     OtrPolicy    m_otrPolicy;

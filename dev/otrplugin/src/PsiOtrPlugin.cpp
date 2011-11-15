@@ -649,7 +649,8 @@ void PsiOtrPlugin::remoteClosedSecure(const QString& account, const QString& con
     }
     appendSysMsg(account, contact,
                  tr("%1 has ended the private conversation with you; "
-                    "you should do the same.").arg(contact),
+                    "you should do the same.")
+                    .arg(humanContact(account, contact)),
                  "psi-otr/otr_no");
 }
 
@@ -723,6 +724,14 @@ QString PsiOtrPlugin::humanAccount(const QString& accountId)
 QString PsiOtrPlugin::humanAccountPublic(const QString& accountId)
 {
     return getAccountJidById(accountId);
+}
+
+//-----------------------------------------------------------------------------
+
+QString PsiOtrPlugin::humanContact(const QString& accountId,
+                                   const QString& contact)
+{
+    return m_contactInfo->name(getAccountIndexById(accountId), contact);
 }
 
 //-----------------------------------------------------------------------------

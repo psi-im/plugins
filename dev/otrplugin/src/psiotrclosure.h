@@ -67,6 +67,7 @@ private:
     int           m_method;
     QString       m_account;
     QString       m_contact;
+    QString       m_contactName;
     bool          m_isSender;
     bool          m_inProgress;
     Fingerprint   m_fpr;

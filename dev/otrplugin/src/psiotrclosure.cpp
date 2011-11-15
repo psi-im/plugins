@@ -46,13 +46,15 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
 {
     setAttribute(Qt::WA_DeleteOnClose);
 
+    m_contactName = m_otr->humanContact(m_account, m_contact);
+
     if (m_isSender)
     {
-        setWindowTitle(tr("Authenticate %1").arg(contact));
+        setWindowTitle(tr("Authenticate %1").arg(m_contactName));
     }
     else
     {
-        setWindowTitle(tr("Authenticate to %1").arg(contact));
+        setWindowTitle(tr("Authenticate to %1").arg(m_contactName));
     }
     
     m_methodBox = new QComboBox(this);
@@ -109,7 +111,8 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
 
         QLabel* ownFprDescLabel = new QLabel(tr("Your fingerprint:"), this);
         QLabel* ownFprLabel     = new QLabel(ownFpr, this);
-        QLabel* fprDescLabel    = new QLabel(tr("Fingerprint for %1:").arg(m_contact), this);
+        QLabel* fprDescLabel    = new QLabel(tr("Fingerprint for %1:")
+                                                .arg(m_contactName), this);
         QLabel* fprLabel        = new QLabel(m_fpr.fingerprintHuman, this);
         ownFprLabel->setFont(QFont("monospace"));
         fprLabel->setFont(QFont("monospace"));
@@ -261,7 +264,7 @@ void AuthenticationDialog::updateSMP(int progress)
         {
             notify(QMessageBox::Warning,
                    tr("%1 has canceled the authentication process.")
-                     .arg(m_contact));
+                     .arg(m_contactName));
         }
         else
         {
@@ -289,14 +292,16 @@ void AuthenticationDialog::updateSMP(int progress)
         {
             if (m_otr->isVerified(m_account, m_contact))
             {
-                notify(QMessageBox::Information, tr("Authentication successful."));
+                notify(QMessageBox::Information,
+                       tr("Authentication successful."));
             }
             else
             {
                 notify(QMessageBox::Information,
                        tr("You have been successfully authenticated.\n\n"
                           "You should authenticate %1 as "
-                          "well by asking your own question.").arg(m_contact));
+                          "well by asking your own question.")
+                          .arg(m_contactName));
             }
             close();
         } else {
