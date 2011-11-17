@@ -22,6 +22,10 @@ TODOs
 
 CHANGES
 
+  0.9.5pre
+    -Ignore internal messages, report state changes and notifications
+     via system messages
+
   0.9.4
     -Add authentication via Socialist Millionaires' Protocol
     -Fix escaping of plaintext OTR messages
@@ -52,7 +56,8 @@ CHANGES
     -Output accounts by name
     -Auto-resize table columns in options
     -Don't send empty messages
-    -Handle multiple selections in the fingerprint widget, fix selections made without mouse
+    -Handle multiple selections in the fingerprint widget,
+     fix selections made without mouse
 
   0.9.1
     -OTR data is now stored in the data directory of the current profile
