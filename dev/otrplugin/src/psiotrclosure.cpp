@@ -48,13 +48,25 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
 
     m_contactName = m_otr->humanContact(m_account, m_contact);
 
+    QString qaExplanation;
+    QString fprExplanation;
     if (m_isSender)
     {
         setWindowTitle(tr("Authenticate %1").arg(m_contactName));
+        qaExplanation = tr("To authenticate via question and answer, "
+                           "ask a question whose answer is only known "
+                           "to you and %1.").arg(m_contactName);
+        fprExplanation = tr("To authenticate manually, exchange your "
+                            "fingerprints over an authenticated channel "
+                            "and compare each other's fingerprint with the one "
+                            "listed beneath.");
     }
     else
     {
         setWindowTitle(tr("Authenticate to %1").arg(m_contactName));
+        qaExplanation = tr("%1 wants to authenticate you. To authenticate, "
+		                   "answer the question asked below.")
+                           .arg(m_contactName);
     }
     
     m_methodBox = new QComboBox(this);
@@ -63,6 +75,9 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
     m_methodBox->addItem(tr("Question and answer"));
     m_methodBox->addItem(tr("Fingerprint verification"));
     
+    QLabel* qaExplanationLabel = new QLabel(qaExplanation, this);
+    qaExplanationLabel->setWordWrap(true);
+
     m_questionEdit = new QLineEdit(this);
     m_answerEdit   = new QLineEdit(this);
     
@@ -82,6 +97,8 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
     m_methodWidget[0] = new QWidget(this);
     QVBoxLayout* qaLayout = new QVBoxLayout;
     qaLayout->setContentsMargins(0, 0, 0, 0);
+    qaLayout->addWidget(qaExplanationLabel);
+    qaLayout->addSpacing(20);
     qaLayout->addWidget(questionLabel);
     qaLayout->addWidget(m_questionEdit);
     qaLayout->addSpacing(10);
@@ -109,6 +126,9 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
         
         m_fpr = m_otr->getActiveFingerprint(m_account, m_contact);
 
+        QLabel* fprExplanationLabel = new QLabel(fprExplanation, this);
+        fprExplanationLabel->setWordWrap(true);
+
         QLabel* ownFprDescLabel = new QLabel(tr("Your fingerprint:"), this);
         QLabel* ownFprLabel     = new QLabel(ownFpr, this);
         QLabel* fprDescLabel    = new QLabel(tr("Fingerprint for %1:")
@@ -120,6 +140,8 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
         m_methodWidget[1] = new QWidget(this);
         QVBoxLayout* fprLayout = new QVBoxLayout;
         fprLayout->setContentsMargins(0, 0, 0, 0);
+        fprLayout->addWidget(fprExplanationLabel);
+        fprLayout->addSpacing(20);
         fprLayout->addWidget(ownFprDescLabel);
         fprLayout->addWidget(ownFprLabel);
         fprLayout->addSpacing(10);
