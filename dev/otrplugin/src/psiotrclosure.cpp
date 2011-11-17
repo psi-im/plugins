@@ -409,6 +409,7 @@ void PsiOtrClosure::receivedSMP(const QString& question)
 {
     if (m_authDialog || !encrypted())
     {
+        m_otr->abortSMP(m_account, m_contact);
         return;
     }
 
