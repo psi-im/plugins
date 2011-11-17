@@ -2,7 +2,7 @@
 Off-The-Record-Messaging plugin for Psi
 
 This is a Off-The-Record-Messaging plugin for the Psi+ instant
-messanger. Psi+ (aka Psi-dev) is a collection of patches for Psi. Psi+
+messenger. Psi+ (aka Psi-dev) is a collection of patches for Psi. Psi+
 is available from http://code.google.com/p/psi-dev/.
 
 See the file INSTALL for instructions how to build the plugin.
@@ -22,7 +22,7 @@ TODOs
 
 CHANGES
 
-  0.9.4pre
+  0.9.4
     -Add authentication via Socialist Millionaires' Protocol
     -Fix escaping of plaintext OTR messages
     -Ignore incoming messages of type "error"
