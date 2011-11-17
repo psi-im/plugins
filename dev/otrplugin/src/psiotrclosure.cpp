@@ -193,7 +193,7 @@ AuthenticationDialog::~AuthenticationDialog()
 
 void AuthenticationDialog::reject()
 {
-    if (m_inProgress)
+    if (m_state == AUTH_IN_PROGRESS)
     {
         m_otr->abortSMP(m_account, m_contact);
     }
@@ -203,7 +203,7 @@ void AuthenticationDialog::reject()
 
 void AuthenticationDialog::reset()
 {
-    m_inProgress = !m_isSender;
+    m_state = m_isSender? AUTH_READY : AUTH_IN_PROGRESS;
 
     m_methodBox->setEnabled(m_isSender);
     m_questionEdit->setEnabled(m_isSender);
@@ -212,6 +212,11 @@ void AuthenticationDialog::reset()
     m_startButton->setEnabled(true);
     
     m_progressBar->setValue(0);
+}
+
+bool AuthenticationDialog::finished()
+{
+    return m_state == AUTH_FINISHED;
 }
 
 void AuthenticationDialog::changeMethod(int index)
@@ -233,7 +238,7 @@ void AuthenticationDialog::startAuthentication()
             return;
         }
 
-        m_inProgress = true;
+        m_state = AUTH_IN_PROGRESS;
         
         m_methodBox->setEnabled(false);
         m_questionEdit->setEnabled(false);
@@ -305,9 +310,9 @@ void AuthenticationDialog::updateSMP(int progress)
     m_progressBar->setValue(progress);
 
     if (progress == 100) {
-        m_inProgress = false;
         if (m_otr->smpSucceeded(m_account, m_contact))
         {
+            m_state = AUTH_FINISHED;
             if (m_otr->isVerified(m_account, m_contact))
             {
                 notify(QMessageBox::Information, tr("Authentication successful."));
@@ -321,6 +326,7 @@ void AuthenticationDialog::updateSMP(int progress)
             }
             close();
         } else {
+            m_state = m_isSender? AUTH_READY : AUTH_FINISHED;
             notify(QMessageBox::Critical, tr("Authentication failed."));
             if (m_isSender)
             {
@@ -399,18 +405,21 @@ void PsiOtrClosure::authenticateContact(bool)
             this, SLOT(finishSMP()));
 
     m_authDialog->show();
-
-    return;
 }
 
 //-----------------------------------------------------------------------------
 
 void PsiOtrClosure::receivedSMP(const QString& question)
 {
-    if (m_authDialog || !encrypted())
+    if ((m_authDialog && !m_authDialog->finished()) || !encrypted())
     {
         m_otr->abortSMP(m_account, m_contact);
         return;
+    }
+    if (m_authDialog)
+    {
+        disconnect(m_authDialog, SIGNAL(destroyed()),
+                   this, SLOT(finishSMP()));
     }
 
     m_authDialog = new AuthenticationDialog(m_otr, m_account, m_contact, question, false);

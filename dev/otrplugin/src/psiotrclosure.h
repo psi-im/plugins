@@ -54,21 +54,24 @@ public:
                          const QString& question, bool sender,
                          QWidget *parent = 0);
     ~AuthenticationDialog();
-    
+
+    void reset();
+    bool finished();
     void updateSMP(int progress);
     void notify(const QMessageBox::Icon icon, const QString& message);
-    void reset();
 
 public slots:
     void reject();
 
 private:
+    enum AuthState {AUTH_READY, AUTH_IN_PROGRESS, AUTH_FINISHED};
+
     OtrMessaging* m_otr;
     int           m_method;
     QString       m_account;
     QString       m_contact;
     bool          m_isSender;
-    bool          m_inProgress;
+    AuthState     m_state;
     Fingerprint   m_fpr;
 
     QWidget*      m_methodWidget[2];
