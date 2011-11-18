@@ -1,4 +1,3 @@
-
 /*
  * psi-otr.h - off-the-record messaging plugin for psi
  *
@@ -40,6 +39,10 @@
 #include "applicationinfoaccessor.h"
 #include "stanzafilter.h"
 #include "toolbariconaccessor.h"
+#include "accountinfoaccessinghost.h"
+#include "accountinfoaccessor.h"
+#include "contactinfoaccessinghost.h"
+#include "contactinfoaccessor.h"
 
 class ApplicationInfoAccessingHost;
 
@@ -59,6 +62,8 @@ class PsiOtrPlugin : public QObject,
                      public ApplicationInfoAccessor,
                      public StanzaFilter,
                      public ToolbarIconAccessor,
+                     public AccountInfoAccessor,
+                     public ContactInfoAccessor,
                      public OtrCallback
 {
 Q_OBJECT
@@ -68,7 +73,9 @@ Q_INTERFACES(PsiPlugin
              StanzaSender
              ApplicationInfoAccessor
              StanzaFilter
-             ToolbarIconAccessor)
+             ToolbarIconAccessor
+             AccountInfoAccessor
+             ContactInfoAccessor)
 
 public:
     PsiOtrPlugin();
@@ -85,13 +92,13 @@ public:
     virtual void restoreOptions();
 
     // EventFilter
-    virtual bool processEvent(int account, QDomElement& e);
-    virtual bool processMessage(int account, const QString& fromJid,
+    virtual bool processEvent(int accountIndex, QDomElement& e);
+    virtual bool processMessage(int accountIndex, const QString& contact,
                                 const QString& body, const QString& subject);
-    virtual bool processOutgoingMessage(int account, const QString& toJid,
+    virtual bool processOutgoingMessage(int accountIndex, const QString& contact,
                                         QString& body, const QString& type,
                                         QString& subject);
-    virtual void logout(int account);
+    virtual void logout(int accountIndex);
 
     // OptionAccessor
     virtual void setOptionAccessingHost(OptionAccessingHost* host);
@@ -104,30 +111,66 @@ public:
     virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
 
     // StanzaFilter
-    virtual bool incomingStanza(int account, const QDomElement& xml);
-    virtual bool outgoingStanza(int account, QDomElement &xml);
+    virtual bool incomingStanza(int accountIndex, const QDomElement& xml);
+    virtual bool outgoingStanza(int accountIndex, QDomElement &xml);
 
     // ToolbarIconAccessor
     virtual QList<QVariantHash> getButtonParam();
-    virtual QAction* getAction(QObject* parent, int account,
+    virtual QAction* getAction(QObject* parent, int accountIndex,
                                const QString& contact);
+
+    // AccountInfoAccessor
+    virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+
+    // ContactInfoAccessor
+    virtual void setContactInfoAccessingHost(ContactInfoAccessingHost* host);
+
     // OtrCallback
     virtual QString dataDir();
-    virtual void sendMessage(const QString& account, const QString& toJid,
+    virtual void sendMessage(const QString& account, const QString& contact,
                              const QString& message);
-    virtual bool isLoggedIn(const QString& account, const QString& jid);
+    virtual bool isLoggedIn(const QString& account, const QString& contact);
     virtual void notifyUser(const OtrNotifyType& type, const QString& message);
+    virtual void receivedSMP(const QString& account, const QString& contact,
+                             const QString& question);
+    virtual void updateSMP(const QString& account, const QString& contact,
+                           int progress);
     virtual void stopMessages();
     virtual void startMessages();
+    virtual QString humanAccount(const QString& accountId);
+    virtual QString humanAccountPublic(const QString& accountId);
+
+    // Helper methods
+    /**
+     * Returns the index of the account identified by accountId or -1
+     */
+    int getAccountIndexById(const QString& accountId);
+
+    /**
+     * Returns the name of the account identified by accountId or ""
+     */
+    QString getAccountNameById(const QString& accountId);
+
+    /**
+     * Returns the Jid of the account identified by accountId or "-1"
+     */
+    QString getAccountJidById(const QString& accountId);
 
 private:
+    /**
+     * Returns full Jid for private contacts,
+     * bare Jid for non-private contacts.
+     */
+    QString getCorrectJid(int accountIndex, const QString& fullJid);
+
     bool                                            m_enabled;
     OtrMessaging*                                   m_otrConnection;
     QHash<QString, QHash<QString, PsiOtrClosure*> > m_onlineUsers;
-    QString                                         m_psiDataDir;
     OptionAccessingHost*                            m_optionHost;
     StanzaSendingHost*                              m_senderHost;
     ApplicationInfoAccessingHost*                   m_applicationInfo;
+    AccountInfoAccessingHost*                       m_accountInfo;
+    ContactInfoAccessingHost*                       m_contactInfo;
 };
 
 //-----------------------------------------------------------------------------

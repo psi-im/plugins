@@ -35,6 +35,7 @@ extern "C"
 #include <libotr/proto.h>
 #include <libotr/message.h>
 #include <libotr/privkey.h>
+#include "otrl_extensions.h"
 }
 
 class QString;
@@ -67,19 +68,46 @@ public:
 
     QHash<QString, QString> getPrivateKeys();
 
+    void deleteKey(const QString& account);
+
+
     void startSession(const QString& account, const QString& jid);
     
     void endSession(const QString& account, const QString& jid);
 
-    psiotr::OtrMessageState getMessageState(const QString& thisJid,
-                                            const QString& remoteJid);
+    void expireSession(const QString& account, const QString& jid);
 
-    QString getMessageStateString(const QString& thisJid,
-                                  const QString& remoteJid);
 
-    QString getSessionId(const QString& thisJid, const QString& remoteJid);
+    void startSMP(const QString& account, const QString& jid,
+                  const QString& question, const QString& secret);
+    void startSMP(ConnContext *context,
+                  const QString& question, const QString& secret);
+
+    void continueSMP(const QString& account, const QString& jid, const QString& secret);
+    void continueSMP(ConnContext *context, const QString& secret);
+    
+    void abortSMP(const QString& account, const QString& jid);
+    void abortSMP(ConnContext *context);
+
+
+    psiotr::OtrMessageState getMessageState(const QString& account,
+                                            const QString& contact);
+
+    QString getMessageStateString(const QString& account,
+                                  const QString& contact);
+
+    QString getSessionId(const QString& account, const QString& contact);
+
+    psiotr::Fingerprint getActiveFingerprint(const QString& account,
+                                             const QString& contact);
+
+    bool isVerified(const QString& account, const QString& contact);
+
+    bool smpSucceeded(const QString& account, const QString& contact);
 
     void generateKey(const QString& account);
+
+    static QString humanFingerprint(const unsigned char *fingerprint);
 
     /*** otr callback functions ***/
     OtrlPolicy policy(ConnContext *context);
@@ -104,6 +132,10 @@ public:
     void gone_insecure(ConnContext *context);
     void still_secure(ConnContext *context, int is_reply);
     void log_message(const char *message);
+
+    const char* account_name(const char *account,
+                             const char *protocol);
+    void account_name_free(const char *account_name);
 
 
     /*** static otr callback wrapper-functions ***/
@@ -134,6 +166,8 @@ public:
     static void cb_still_secure(void *opdata, ConnContext *context, int is_reply);
     static void cb_log_message(void *opdata, const char *message);
     
+    static const char* cb_account_name(void *opdata, const char *account, const char *protocol);
+    static void cb_account_name_free(void *opdata, const char *account_name);
 private:
 
     /** 

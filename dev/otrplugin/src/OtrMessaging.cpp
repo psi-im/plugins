@@ -24,11 +24,41 @@
 namespace psiotr
 {
 
+Fingerprint::Fingerprint()
+    : fingerprint(NULL)
+{
+
+}
+
+Fingerprint::Fingerprint(const Fingerprint &fp)
+    : fingerprint(fp.fingerprint),
+      account(fp.account),
+      username(fp.username),
+      fingerprintHuman(fp.fingerprintHuman),
+      trust(fp.trust),
+      messageState(fp.messageState)
+{
+
+}
+
+Fingerprint::Fingerprint(unsigned char* fingerprint,
+                         QString account, QString username,
+                         QString trust, QString messageState)
+    : fingerprint(fingerprint),
+      account(account),
+      username(username),
+      trust(trust),
+      messageState(messageState)
+{
+    fingerprintHuman = OtrInternal::humanFingerprint(fingerprint);
+}
+
 //-----------------------------------------------------------------------------
 
 OtrMessaging::OtrMessaging(OtrCallback* callback, OtrPolicy policy)
     : m_otrPolicy(policy),
-      m_impl(new OtrInternal(callback, m_otrPolicy))
+      m_impl(new OtrInternal(callback, m_otrPolicy)),
+      m_callback(callback)
 {
 }
 
@@ -86,6 +116,13 @@ QHash<QString, QString> OtrMessaging::getPrivateKeys()
 
 //-----------------------------------------------------------------------------
 
+void OtrMessaging::deleteKey(const QString& account)
+{
+    m_impl->deleteKey(account);
+}
+
+//-----------------------------------------------------------------------------
+
 void OtrMessaging::startSession(const QString& account, const QString& jid)
 {
     m_impl->startSession(account, jid);
@@ -97,28 +134,81 @@ void OtrMessaging::endSession(const QString& account, const QString& jid)
 {
     m_impl->endSession(account, jid);
 }
+
 //-----------------------------------------------------------------------------
 
-OtrMessageState OtrMessaging::getMessageState(const QString& thisJid,
-                                              const QString& remoteJid)
+void OtrMessaging::expireSession(const QString& account, const QString& jid)
 {
-    return m_impl->getMessageState(thisJid, remoteJid);
+    m_impl->expireSession(account, jid);
 }
 
 //-----------------------------------------------------------------------------
 
-QString OtrMessaging::getMessageStateString(const QString& thisJid,
-                                             const QString& remoteJid)
+void OtrMessaging::startSMP(const QString& account, const QString& jid,
+                            const QString& question, const QString& secret)
 {
-    return m_impl->getMessageStateString(thisJid, remoteJid);
+    m_impl->startSMP(account, jid, question, secret);
 }
 
 //-----------------------------------------------------------------------------
 
-QString OtrMessaging::getSessionId(const QString& thisJid,
-                                   const QString& remoteJid)
+void OtrMessaging::continueSMP(const QString& account, const QString& jid,
+                               const QString& secret)
 {
-    return m_impl->getSessionId(thisJid, remoteJid);
+    m_impl->continueSMP(account, jid, secret);
+}
+
+//-----------------------------------------------------------------------------
+
+void OtrMessaging::abortSMP(const QString& account, const QString& jid)
+{
+    m_impl->abortSMP(account, jid);
+}
+
+//-----------------------------------------------------------------------------
+
+OtrMessageState OtrMessaging::getMessageState(const QString& account,
+                                              const QString& contact)
+{
+    return m_impl->getMessageState(account, contact);
+}
+
+//-----------------------------------------------------------------------------
+
+QString OtrMessaging::getMessageStateString(const QString& account,
+                                            const QString& contact)
+{
+    return m_impl->getMessageStateString(account, contact);
+}
+
+//-----------------------------------------------------------------------------
+
+QString OtrMessaging::getSessionId(const QString& account,
+                                   const QString& contact)
+{
+    return m_impl->getSessionId(account, contact);
+}
+
+//-----------------------------------------------------------------------------
+
+psiotr::Fingerprint OtrMessaging::getActiveFingerprint(const QString& account,
+                                                       const QString& contact)
+{
+    return m_impl->getActiveFingerprint(account, contact);
+}
+
+//-----------------------------------------------------------------------------
+
+bool OtrMessaging::isVerified(const QString& account, const QString& contact)
+{
+    return m_impl->isVerified(account, contact);
+}
+
+//-----------------------------------------------------------------------------
+
+bool OtrMessaging::smpSucceeded(const QString& account, const QString& contact)
+{
+    return m_impl->smpSucceeded(account, contact);
 }
 
 //-----------------------------------------------------------------------------
@@ -140,6 +230,13 @@ OtrPolicy OtrMessaging::getPolicy()
 void OtrMessaging::generateKey(const QString& account)
 {
     m_impl->generateKey(account);
+}
+
+//-----------------------------------------------------------------------------
+
+QString OtrMessaging::humanAccount(const QString accountId)
+{
+    return m_callback->humanAccount(accountId);
 }
 
 //-----------------------------------------------------------------------------

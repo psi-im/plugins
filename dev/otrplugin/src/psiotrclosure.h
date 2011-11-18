@@ -25,7 +25,15 @@
 #ifndef PSIOTRCLOSURE_H_
 #define PSIOTRCLOSURE_H_
 
+#include "OtrMessaging.hpp"
+
 #include <QObject>
+#include <QDialog>
+#include <QComboBox>
+#include <QLineEdit>
+#include <QProgressBar>
+#include <QPushButton>
+#include <QMessageBox>
 
 class QAction;
 class QMenu;
@@ -37,12 +45,56 @@ class OtrMessaging;
 
 //-----------------------------------------------------------------------------
 
- class PsiOtrClosure : public QObject
+class AuthenticationDialog : public QDialog
+{
+    Q_OBJECT
+public:
+    AuthenticationDialog(OtrMessaging* otrc,
+                         const QString& account, const QString& contact,
+                         const QString& question, bool sender,
+                         QWidget *parent = 0);
+    ~AuthenticationDialog();
+
+    void reset();
+    bool finished();
+    void updateSMP(int progress);
+    void notify(const QMessageBox::Icon icon, const QString& message);
+
+public slots:
+    void reject();
+
+private:
+    enum AuthState {AUTH_READY, AUTH_IN_PROGRESS, AUTH_FINISHED};
+
+    OtrMessaging* m_otr;
+    int           m_method;
+    QString       m_account;
+    QString       m_contact;
+    bool          m_isSender;
+    AuthState     m_state;
+    Fingerprint   m_fpr;
+
+    QWidget*      m_methodWidget[2];
+    QComboBox*    m_methodBox;
+    QLineEdit*    m_questionEdit;
+    QLineEdit*    m_answerEdit;
+    QProgressBar* m_progressBar;
+    QPushButton*  m_cancelButton;
+    QPushButton*  m_startButton;
+    
+private slots:
+    void changeMethod(int index);
+    void startAuthentication();
+};
+
+//-----------------------------------------------------------------------------
+
+class PsiOtrClosure : public QObject
 {
     Q_OBJECT
 
 public:
-    PsiOtrClosure(const QString& account, const QString& toJid,
+    PsiOtrClosure(const QString& account, const QString& contact,
                   OtrMessaging* otrc);
     ~PsiOtrClosure();
     void updateMessageState();
@@ -51,28 +103,32 @@ public:
     void disable();
     QAction* getChatDlgMenu(QObject* parent);
     bool encrypted() const;
+    void receivedSMP(const QString& question);
+    void updateSMP(int progress);
 
 private:
     OtrMessaging* m_otr;
-    QString       m_myAccount;
-    QString       m_otherJid;
+    QString       m_account;
+    QString       m_contact;
     QMenu*        m_chatDlgMenu;
     QAction*      m_chatDlgAction;
-    QAction*      m_verifyAction;
+    QAction*      m_authenticateAction;
     QAction*      m_sessionIdAction;
     QAction*      m_fingerprintAction;
     QAction*      m_startSessionAction;
     QAction*      m_endSessionAction;
     bool          m_isLoggedIn;
     QObject*      m_parentWidget;
+    AuthenticationDialog* m_authDialog;
 
 public slots:
     void initiateSession(bool b);
     void endSession(bool b);
-    void verifyFingerprint(bool b);
+    void authenticateContact(bool b);
     void sessionID(bool b);
     void fingerprint(bool b);
     void showMenu();
+    void finishSMP();
 };
 
 //-----------------------------------------------------------------------------

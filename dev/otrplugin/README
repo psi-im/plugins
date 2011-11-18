@@ -2,7 +2,7 @@
 Off-The-Record-Messaging plugin for Psi
 
 This is a Off-The-Record-Messaging plugin for the Psi+ instant
-messanger. Psi+ (aka Psi-dev) is a collection of patches for Psi. Psi+
+messenger. Psi+ (aka Psi-dev) is a collection of patches for Psi. Psi+
 is available from http://code.google.com/p/psi-dev/.
 
 See the file INSTALL for instructions how to build the plugin.
@@ -14,15 +14,54 @@ See http://www.cypherpunks.ca/otr/ for more information about OTR.
 
 
 TODOs
-* use Socialist Millionaires' Protocol
 * Configure OTR policy per contact
-* Generate key on user request.
 * Documentation
 
 
 
 
 CHANGES
+
+  0.9.4
+    -Add authentication via Socialist Millionaires' Protocol
+    -Fix escaping of plaintext OTR messages
+    -Ignore incoming messages of type "error"
+    -Fix OtrInternal::account_name()
+    -Use radio boxes for policy settings
+    -Add option to close a session when a contact goes offline
+    -Enable sorting for fingerprint and key table
+
+  0.9.3
+    -Fix fetching private keys
+    -Finish session when forgetting a fingerprint
+    -Enforce Unix line feeds
+    -Don't quote non-breaking spaces
+    -Use JID instead of account ID in libotr messages
+    -Remove HTML from outgoing libotr messages
+    -Add key generation and deletion to options
+    -Add context menu to fingerprint and private key widget
+    -Fix file path encoding for non-UTF-8 systems
+
+  0.9.2
+    -Encode strings as UTF-8 before passing them to libotr
+    -Fix fingerprint verification and deletion
+    -Only handle decrypted messages as HTML if they look like HTML
+    -Escape XML entities before encrypting
+    -Change options namespace and short name
+    -Identify accounts by ID, not by index
+    -Output accounts by name
+    -Auto-resize table columns in options
+    -Don't send empty messages
+    -Handle multiple selections in the fingerprint widget, fix selections made without mouse
+
+  0.9.1
+    -OTR data is now stored in the data directory of the current profile
+    -Fix OTR for private messages
+    -Fix fingerprint verification
+    -Add indication for unverified sessions
+    -New Icons
+    -Improved HTML to plaintext conversion
+    -Make strings translatable
 
   0.9
     -update to Psi+ revision 3961.

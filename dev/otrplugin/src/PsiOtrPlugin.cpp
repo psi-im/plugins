@@ -26,6 +26,7 @@
 #include "psiotrclosure.h"
 #include "PsiOtrConfig.hpp"
 #include "applicationinfoaccessinghost.h"
+#include "HtmlTidy.hpp"
 
 namespace psiotr
 {
@@ -57,6 +58,38 @@ QString removeResource(const QString& aJid)
 
 // ---------------------------------------------------------------------------
 
+/**
+ * Reverts Qt::escape()
+ */
+QString unescape(const QString& escaped)
+{
+    QString plain(escaped);
+    plain.replace("&lt;", "<")
+         .replace("&gt;", ">")
+         .replace("&quot;", "\"")
+         .replace("&amp;", "&");
+    return plain;
+}
+
+// ---------------------------------------------------------------------------
+
+/**
+ * Converts HTML to plaintext
+ */
+QString htmlToPlain(const QString& html)
+{
+    QString plain(html);
+    plain.replace(QRegExp(" ?\\n"), " ")
+         .replace(QRegExp("<br(?:\\s[^>]*)?/>"), "\n")
+         .replace(QRegExp("<b(?:\\s[^>]*)?>([^<]+)</b>"), "*\\1*")
+         .replace(QRegExp("<i(?:\\s[^>]*)?>([^<]+)</i>"), "/\\1/")
+         .replace(QRegExp("<u(?:\\s[^>]*)?>([^<]+)</u>"), "_\\1_")
+         .remove(QRegExp("<[^>]*>"));
+    return plain;
+}
+
+// ---------------------------------------------------------------------------
+
 } // namespace
 
 // ===========================================================================
@@ -65,10 +98,11 @@ PsiOtrPlugin::PsiOtrPlugin()
     : m_enabled(false),
       m_otrConnection(NULL),
       m_onlineUsers(),
-      m_psiDataDir(),
       m_optionHost(NULL),
       m_senderHost(NULL),
-      m_applicationInfo(NULL)
+      m_applicationInfo(NULL),
+      m_accountInfo(NULL),
+      m_contactInfo(NULL)
 {
 }
 
@@ -89,14 +123,14 @@ QString PsiOtrPlugin::name() const
 
 QString PsiOtrPlugin::shortName() const
 {
-    return "psi-otr";
+    return "otr";
 }
 
 // ---------------------------------------------------------------------------
 
 QString PsiOtrPlugin::version() const
 {
-    return "0.9";
+    return "0.9.4";
 }
 
 // ---------------------------------------------------------------------------
@@ -109,7 +143,7 @@ QWidget* PsiOtrPlugin::options()
     }
     else
     {
-        return new ConfigDialog(m_otrConnection, m_optionHost);
+        return new ConfigDialog(m_otrConnection, m_optionHost, m_accountInfo);
     }
 } 
 
@@ -117,7 +151,7 @@ QWidget* PsiOtrPlugin::options()
 
 bool PsiOtrPlugin::enable()
 {
-    QVariant policyOption = m_optionHost->getGlobalOption(PSI_CONFIG_POLICY);
+    QVariant policyOption = m_optionHost->getPluginOption(OPTION_POLICY, DEFAULT_POLICY);
     m_otrConnection = new OtrMessaging(this,
                                        static_cast<OtrPolicy>(policyOption.toInt()));
     m_enabled = true;
@@ -130,15 +164,17 @@ bool PsiOtrPlugin::disable()
 {
     foreach (QString account, m_onlineUsers.keys())
     {
-        foreach(QString jid, m_onlineUsers.value(account).keys())
+        foreach(QString contact, m_onlineUsers.value(account).keys())
         {
-            m_otrConnection->endSession(account, jid);
-            m_onlineUsers[account][jid]->updateMessageState();
-            m_onlineUsers[account][jid]->disable();
+            m_otrConnection->endSession(account, contact);
+            m_onlineUsers[account][contact]->updateMessageState();
+            m_onlineUsers[account][contact]->disable();
+            delete m_onlineUsers[account][contact];
         }
+        m_onlineUsers[account].clear();
     }
+    m_onlineUsers.clear();
 
-    
     delete m_otrConnection;
     m_enabled = false;
     return true;
@@ -158,14 +194,17 @@ void PsiOtrPlugin::restoreOptions()
 
 //-----------------------------------------------------------------------------
 
-bool PsiOtrPlugin::processEvent(int accountNo, QDomElement& e)
+bool PsiOtrPlugin::processEvent(int accountIndex, QDomElement& e)
 {
+    QDomElement messageElement = e.firstChildElement("message");
+
     if (m_enabled && e.attribute("type") == "MessageEvent" &&
-        !e.firstChildElement("message").isNull())
+        !messageElement.isNull() &&
+        messageElement.attribute("type") != "error")
     {
-        QDomElement messageElement = e.firstChildElement("message");
-        QString contact = removeResource(messageElement.attribute("from"));
-        QString account = QString::number(accountNo);
+        QString contact = getCorrectJid(accountIndex,
+                                        messageElement.attribute("from"));
+        QString account = m_accountInfo->getId(accountIndex);
 
         QDomElement htmlElement = messageElement.firstChildElement("html");
         QDomElement plainBody   = messageElement.firstChildElement("body");
@@ -177,7 +216,7 @@ bool PsiOtrPlugin::processEvent(int accountNo, QDomElement& e)
         }
         else if (!plainBody.isNull())
         {
-            cyphertext = plainBody.firstChild().toText().nodeValue();
+            cyphertext = Qt::escape(plainBody.firstChild().toText().nodeValue());
         }
         else
         {
@@ -193,40 +232,57 @@ bool PsiOtrPlugin::processEvent(int accountNo, QDomElement& e)
             {
                 m_onlineUsers[account][contact]->updateMessageState();
             }
-            
-            // replace plaintext body
-            plainBody.removeChild(plainBody.firstChild());
-            QString bodyText = decrypted;
-            bodyText.remove(QRegExp("<[^>]*>")); bodyText.remove("\n");
-            plainBody.appendChild(e.ownerDocument().createTextNode(bodyText));
 
-            // replace html body
-            if (htmlElement.isNull())
+            QString bodyText;
+
+            bool isHTML = !htmlElement.isNull() ||
+                          Qt::mightBeRichText(decrypted);
+
+            if (!isHTML)
             {
-                htmlElement = e.ownerDocument().createElement("html");
-                htmlElement.setAttribute("xmlns",
-                                         "http://jabber.org/protocol/xhtml-im");
-                messageElement.appendChild(htmlElement);
+                bodyText = decrypted;
             }
             else
             {
-                htmlElement.removeChild(htmlElement.firstChildElement("body"));
+                HtmlTidy htmlTidy("<body xmlns=\"http://www.w3.org/1999/xhtml\">" +
+                                  decrypted + "</body>");
+                decrypted = htmlTidy.output();
+
+                bodyText = htmlToPlain(decrypted);
+
+                // replace html body
+                if (htmlElement.isNull())
+                {
+                    htmlElement = e.ownerDocument().createElement("html");
+                    htmlElement.setAttribute("xmlns",
+                                             "http://jabber.org/protocol/xhtml-im");
+                    messageElement.appendChild(htmlElement);
+                }
+                else
+                {
+                    htmlElement.removeChild(htmlElement.firstChildElement("body"));
+                }
+
+                QDomDocument document;
+                int errorLine = 0, errorColumn = 0;
+                QString errorText;
+                if (document.setContent(decrypted, true, &errorText, &errorLine,
+                                        &errorColumn))
+                {
+                    htmlElement.appendChild(document.documentElement());
+                }
+                else
+                {
+                    qWarning() << "---- parsing error:\n" << decrypted <<
+                                  "\n----\n" << errorText << " line:" <<
+                                  errorLine << " column:" << errorColumn;
+                    messageElement.removeChild(htmlElement);
+                }
             }
 
-            QDomDocument document;
-            int errorLine = 0, errorColumn = 0;
-            QString errorText;
-            if (!document.setContent(decrypted, true, &errorText, &errorLine,
-                                     &errorColumn))
-            {
-                qWarning() << "---- parsing error:\n" << decrypted <<
-                              "\n----\n" << errorText << " line:" <<
-                              errorLine << " column:" << errorColumn;
-                QDomElement domBody = e.ownerDocument().createElement("body");
-                domBody.appendChild(e.ownerDocument().createTextNode(bodyText));
-                htmlElement.appendChild(domBody);
-            }
-            htmlElement.appendChild(document.documentElement());
+            // replace plaintext body
+            plainBody.removeChild(plainBody.firstChild());
+            plainBody.appendChild(e.ownerDocument().createTextNode(unescape(bodyText)));
         }
     }
     return false;
@@ -242,7 +298,7 @@ bool PsiOtrPlugin::processMessage(int, const QString&, const QString&,
 
 //-----------------------------------------------------------------------------
 
-bool PsiOtrPlugin::processOutgoingMessage(int account, const QString& toJid,
+bool PsiOtrPlugin::processOutgoingMessage(int accountIndex, const QString& contact,
                                           QString& body, const QString& type,
                                           QString&)
 {
@@ -250,35 +306,43 @@ bool PsiOtrPlugin::processOutgoingMessage(int account, const QString& toJid,
     {
         return false;
     }
-    
-    QString encrypted = m_otrConnection->encryptMessage(
-        QString::number(account),
-        removeResource(toJid),
-        body);
 
-    body = encrypted;
+    QString account = m_accountInfo->getId(accountIndex);
+
+    QString encrypted = m_otrConnection->encryptMessage(
+        account,
+        getCorrectJid(accountIndex, contact),
+        Qt::escape(body));
+
+    //if there has been an error, drop the message
+    if (encrypted.isEmpty())
+    {
+        return true;
+    }
+
+    body = unescape(encrypted);
 
     return false;
 }
 
 // ---------------------------------------------------------------------------
 
-void PsiOtrPlugin::logout(int accountNo)
+void PsiOtrPlugin::logout(int accountIndex)
 {
     if (!m_enabled)
     {
         return;
     }
     
-    QString account = QString::number(accountNo);
+    QString account = m_accountInfo->getId(accountIndex);
 
     if (m_onlineUsers.contains(account))
     {
-        foreach(QString jid, m_onlineUsers.value(account).keys())
+        foreach(QString contact, m_onlineUsers.value(account).keys())
         {
-            m_otrConnection->endSession(account, jid);
-            m_onlineUsers[account][jid]->setIsLoggedIn(false);
-            m_onlineUsers[account][jid]->updateMessageState();
+            m_otrConnection->endSession(account, contact);
+            m_onlineUsers[account][contact]->setIsLoggedIn(false);
+            m_onlineUsers[account][contact]->updateMessageState();
         }
     }
 }
@@ -294,7 +358,7 @@ void PsiOtrPlugin::setOptionAccessingHost(OptionAccessingHost* host)
 
 void PsiOtrPlugin::optionChanged(const QString&)
 {
-    QVariant policyOption = m_optionHost->getGlobalOption(PSI_CONFIG_POLICY);
+    QVariant policyOption = m_optionHost->getPluginOption(OPTION_POLICY, DEFAULT_POLICY);
     m_otrConnection->setPolicy(static_cast<OtrPolicy>(policyOption.toInt()));
 }
 
@@ -314,15 +378,29 @@ void PsiOtrPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost*
 
 //-----------------------------------------------------------------------------
 
-bool PsiOtrPlugin::incomingStanza(int accountNo, const QDomElement& xml)
+void PsiOtrPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost *host)
+{
+    m_accountInfo = host;
+}
+
+//-----------------------------------------------------------------------------
+
+void PsiOtrPlugin::setContactInfoAccessingHost(ContactInfoAccessingHost *host)
+{
+    m_contactInfo = host;
+}
+
+//-----------------------------------------------------------------------------
+
+bool PsiOtrPlugin::incomingStanza(int accountIndex, const QDomElement& xml)
 {
     if (!m_enabled || xml.nodeName() != "presence")
     {
         return false;
     }
     
-    QString account = QString::number(accountNo);
-    QString contact = removeResource(xml.attribute("from"));
+    QString account = m_accountInfo->getId(accountIndex);
+    QString contact = getCorrectJid(accountIndex, xml.attribute("from"));
     QString type = xml.attribute("type", "available");
     
     if (type == "available")
@@ -341,6 +419,11 @@ bool PsiOtrPlugin::incomingStanza(int accountNo, const QDomElement& xml)
         if (m_onlineUsers.contains(account) && 
             m_onlineUsers.value(account).contains(contact))
         {
+            if (m_optionHost->getPluginOption(OPTION_END_WHEN_OFFLINE,
+                                              DEFAULT_END_WHEN_OFFLINE).toBool())
+            {
+                m_otrConnection->expireSession(account, contact);
+            }
             m_onlineUsers[account][contact]->setIsLoggedIn(false);
             m_onlineUsers[account][contact]->updateMessageState();
         }
@@ -351,24 +434,24 @@ bool PsiOtrPlugin::incomingStanza(int accountNo, const QDomElement& xml)
 
 //-----------------------------------------------------------------------------
 
-bool PsiOtrPlugin::outgoingStanza(int accountNo, QDomElement& xml)
+bool PsiOtrPlugin::outgoingStanza(int accountIndex, QDomElement& xml)
 {
     if (!m_enabled || xml.nodeName() != "message")
     {
         return false;
     }
 
-    QString account = QString::number(accountNo);
-    QString toJid = removeResource(xml.attribute("to"));
-        
-    if (!m_onlineUsers.value(account).contains(toJid))
+    QString account = m_accountInfo->getId(accountIndex);
+    QString contact = getCorrectJid(accountIndex, xml.attribute("to"));
+
+    if (!m_onlineUsers.value(account).contains(contact))
     {
-        m_onlineUsers[account][toJid] = new PsiOtrClosure(account, toJid,
-                                                          m_otrConnection);
+        m_onlineUsers[account][contact] = new PsiOtrClosure(account, contact,
+                                                            m_otrConnection);
     }
 
     QDomElement htmlElement = xml.firstChildElement("html");
-    if (m_onlineUsers[account][toJid]->encrypted() && !htmlElement.isNull())
+    if (m_onlineUsers[account][contact]->encrypted() && !htmlElement.isNull())
     {
         xml.removeChild(htmlElement);
     }
@@ -385,7 +468,7 @@ QList<QVariantHash> PsiOtrPlugin::getButtonParam()
 
 //-----------------------------------------------------------------------------
 
-QAction* PsiOtrPlugin::getAction(QObject* parent, int accountNo,
+QAction* PsiOtrPlugin::getAction(QObject* parent, int accountIndex,
                                  const QString& contactJid)
 {
     if (!m_enabled)
@@ -393,8 +476,8 @@ QAction* PsiOtrPlugin::getAction(QObject* parent, int accountNo,
         return 0;
     }
 
-    QString contact = removeResource(contactJid);
-    QString account = QString::number(accountNo);
+    QString contact = getCorrectJid(accountIndex, contactJid);
+    QString account = m_accountInfo->getId(accountIndex);
     
     if (!m_onlineUsers.value(account).contains(contact))
     {
@@ -410,26 +493,31 @@ QAction* PsiOtrPlugin::getAction(QObject* parent, int accountNo,
 
 QString PsiOtrPlugin::dataDir()
 {
-    return m_applicationInfo->appHomeDir(
-        ApplicationInfoAccessingHost::ConfigLocation);
+    return m_applicationInfo->appCurrentProfileDir(
+    ApplicationInfoAccessingHost::DataLocation);
 }
     
 //-----------------------------------------------------------------------------
 
-void PsiOtrPlugin::sendMessage(const QString& account, const QString& toJid,
+void PsiOtrPlugin::sendMessage(const QString& account, const QString& contact,
                                const QString& message)
 {
-    m_senderHost->sendMessage(account.toInt(), toJid, message, "", "chat");
+    int accountIndex = getAccountIndexById(account);
+    if (accountIndex != -1)
+    {
+        m_senderHost->sendMessage(accountIndex, contact,
+                                  htmlToPlain(message), "", "chat");
+    }
 }
 
 //-----------------------------------------------------------------------------
 
-bool PsiOtrPlugin::isLoggedIn(const QString& account, const QString& jid)
+bool PsiOtrPlugin::isLoggedIn(const QString& account, const QString& contact)
 {
     if (m_onlineUsers.contains(account) &&
-        m_onlineUsers.value(account).contains(jid))
+        m_onlineUsers.value(account).contains(contact))
     {
-        return m_onlineUsers.value(account).value(jid)->isLoggedIn();
+        return m_onlineUsers.value(account).value(contact)->isLoggedIn();
     }
 
     return false;
@@ -453,9 +541,34 @@ void PsiOtrPlugin::notifyUser(const OtrNotifyType& type, const QString& message)
         messageBoxIcon = QMessageBox::Information;
     }
 
-    QMessageBox mb(messageBoxIcon, "psi-otr", message, QMessageBox::Ok, NULL,
+    QMessageBox mb(messageBoxIcon, tr("Psi OTR"), message, QMessageBox::Ok, NULL,
                    Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     mb.exec();
+}
+
+//-----------------------------------------------------------------------------
+
+void PsiOtrPlugin::receivedSMP(const QString& account, const QString& contact,
+                               const QString& question)
+{
+    if (m_onlineUsers.contains(account) && 
+        m_onlineUsers.value(account).contains(contact))
+    {
+        m_onlineUsers[account][contact]->receivedSMP(question);
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+void PsiOtrPlugin::updateSMP(const QString& account, const QString& contact,
+                             int progress)
+{
+    
+    if (m_onlineUsers.contains(account) && 
+        m_onlineUsers.value(account).contains(contact))
+    {
+        m_onlineUsers[account][contact]->updateSMP(progress);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -470,6 +583,73 @@ void PsiOtrPlugin::stopMessages()
 void PsiOtrPlugin::startMessages()
 {
     m_enabled = true;
+}
+
+//-----------------------------------------------------------------------------
+
+QString PsiOtrPlugin::humanAccount(const QString& accountId)
+{
+    QString human(getAccountNameById(accountId));
+
+    return human.isEmpty()? accountId : human;
+}
+
+//-----------------------------------------------------------------------------
+
+QString PsiOtrPlugin::humanAccountPublic(const QString& accountId)
+{
+    return getAccountJidById(accountId);
+}
+
+// ---------------------------------------------------------------------------
+
+int PsiOtrPlugin::getAccountIndexById(const QString& accountId)
+{
+    QString id;
+    int accountIndex = 0;
+    while (((id = m_accountInfo->getId(accountIndex)) != "-1") &&
+           (id != accountId))
+    {
+        accountIndex++;
+    }
+    return (id == "-1")? -1 : accountIndex;
+}
+
+// ---------------------------------------------------------------------------
+
+QString PsiOtrPlugin::getAccountNameById(const QString& accountId)
+{
+    return m_accountInfo->getName(getAccountIndexById(accountId));
+}
+
+// ---------------------------------------------------------------------------
+
+QString PsiOtrPlugin::getAccountJidById(const QString& accountId)
+{
+    return m_accountInfo->getJid(getAccountIndexById(accountId));
+}
+
+// ---------------------------------------------------------------------------
+
+QString PsiOtrPlugin::getCorrectJid(int accountIndex, const QString& fullJid)
+{
+    QString correctJid;
+    if (m_contactInfo->isPrivate(accountIndex, fullJid))
+    {
+        correctJid = fullJid;
+    }
+    else
+    {
+        correctJid = removeResource(fullJid);
+
+        // If the contact is private but not (yet) in the roster,
+        // it will not be known as private.
+        // Therefore, check if the bare Jid is a conference.
+        if (m_contactInfo->isConference(accountIndex, correctJid)) {
+            correctJid = fullJid;
+        }
+    }
+    return correctJid;
 }
 
 //-----------------------------------------------------------------------------

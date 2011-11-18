@@ -25,8 +25,14 @@
 
 #include <QWidget>
 #include <QModelIndex>
+#include <QButtonGroup>
+#include <QCheckBox>
+#include <QRadioButton>
+#include <QComboBox>
+#include <QPoint>
 
 class OptionAccessingHost;
+class AccountInfoAccessingHost;
 class QCheckBox;
 class QStandardItemModel;
 class QTableView;
@@ -38,7 +44,10 @@ namespace psiotr
 
 // ---------------------------------------------------------------------------
 
-const QString PSI_CONFIG_POLICY = "plugins.psi-otr.otr-policy";
+const QString  OPTION_POLICY            = "otr-policy";
+const QVariant DEFAULT_POLICY           = QVariant(OTR_POLICY_ENABLED);
+const QString  OPTION_END_WHEN_OFFLINE  = "end-session-when-offline";
+const QVariant DEFAULT_END_WHEN_OFFLINE = QVariant(false);
 
 // ---------------------------------------------------------------------------
 
@@ -51,11 +60,13 @@ Q_OBJECT
 
 public:
     ConfigDialog(OtrMessaging* otr, OptionAccessingHost* optionHost,
+                 AccountInfoAccessingHost* accountInfo,
                  QWidget* parent = 0);
 
 private:
-    OtrMessaging*        m_otr;
-    OptionAccessingHost* m_optionHost;
+    OtrMessaging*             m_otr;
+    OptionAccessingHost*      m_optionHost;
+    AccountInfoAccessingHost* m_accountInfo;
 };
 
 // ---------------------------------------------------------------------------
@@ -76,12 +87,12 @@ private:
     OptionAccessingHost* m_optionHost;
     OtrMessaging*        m_otr;
 
-    QCheckBox*   m_polEnable;
-    QCheckBox*   m_polAuto;
-    QCheckBox*   m_polRequire;
+    QButtonGroup*        m_policy;
+
+    QCheckBox*           m_endWhenOffline;
 
 private slots:
-    void handlePolicyChange();
+    void updateOptions();
 };
 
 // ---------------------------------------------------------------------------
@@ -103,13 +114,13 @@ private:
     OtrMessaging*       m_otr;
     QTableView*         m_table;
     QStandardItemModel* m_tableModel;
-    QModelIndex         m_selectIndex;
     QList<Fingerprint>  m_fingerprints;
 
 private slots:
-    void forgetFingerprint();
+    void deleteFingerprint();
     void verifyFingerprint();
-    void tableClicked(const QModelIndex& index);
+    void copyFingerprint();
+    void contextMenu(const QPoint& pos);
 };
 
 // ---------------------------------------------------------------------------
@@ -122,10 +133,25 @@ class PrivKeyWidget : public QWidget
 Q_OBJECT
 
 public:
-    PrivKeyWidget(OtrMessaging* otr, QWidget* parent);
+    PrivKeyWidget(AccountInfoAccessingHost* accountInfo,
+                  OtrMessaging* otr, QWidget* parent);
+
+protected:
+    void updateData();
 
 private:
-    OtrMessaging* m_otr;
+    AccountInfoAccessingHost* m_accountInfo;
+    OtrMessaging*             m_otr;
+    QTableView*               m_table;
+    QStandardItemModel*       m_tableModel;
+    QHash<QString, QString>   m_keys;
+    QComboBox*                m_accountBox;
+
+private slots:
+    void deleteKey();
+    void generateKey();
+    void copyFingerprint();
+    void contextMenu(const QPoint& pos);
 };
 
 //-----------------------------------------------------------------------------
