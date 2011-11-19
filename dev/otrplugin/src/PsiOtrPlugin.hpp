@@ -148,15 +148,8 @@ public:
 
     virtual bool displayOtrMessage(const QString& account, const QString& contact,
                                    const QString& message);
-    virtual void goingSecure(const QString& account, const QString& contact,
-                             bool refreshing);
-    virtual void goneSecure(const QString& account, const QString& contact,
-                            bool verified);
-    virtual void goneInsecure(const QString& account, const QString& contact);
-    virtual void closedSecure(const QString& account, const QString& contact);
-    virtual void remoteClosedSecure(const QString& account, const QString& contact);
-    virtual void stillSecure(const QString& account, const QString& contact,
-                             bool verified);
+    virtual void stateChange(const QString& account, const QString& contact,
+                             OtrStateChange change);
 
     virtual void receivedSMP(const QString& account, const QString& contact,
                              const QString& question);

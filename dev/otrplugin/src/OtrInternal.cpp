@@ -227,7 +227,8 @@ psiotr::OtrMessageType OtrInternal::decryptMessage(const QString& from,
 
     tlv = otrl_tlv_find(tlvs, OTRL_TLV_DISCONNECTED);
     if (tlv) {
-        m_callback->remoteClosedSecure(accountName, userName);
+        m_callback->stateChange(accountName, userName,
+                                psiotr::OTR_STATECHANGE_REMOTECLOSE);
     }
 
     // Check for SMP data
@@ -402,10 +403,17 @@ void OtrInternal::verifyFingerprint(const psiotr::Fingerprint& fingerprint,
             {
                 otrl_context_set_trust(fp, "");
             }
+
+            write_fingerprints();
+
+            if (context->active_fingerprint == fp)
+            {
+                m_callback->stateChange(QString::fromUtf8(context->accountname),
+                                        QString::fromUtf8(context->username),
+                                        psiotr::OTR_STATECHANGE_TRUST);
+            }
         }
     }
-
-    write_fingerprints();
 }
 
 //-----------------------------------------------------------------------------
@@ -476,13 +484,7 @@ void OtrInternal::deleteKey(const QString& account)
 
 void OtrInternal::startSession(const QString& account, const QString& jid)
 {
-    ConnContext* context = otrl_context_find(m_userstate,
-                                             jid.toUtf8().constData(),
-                                             account.toUtf8().constData(),
-                                             OTR_PROTOCOL_STRING, false,
-                                             NULL, NULL, NULL);
-    m_callback->goingSecure(account, jid, (context != NULL) &&
-                            (context->msgstate == OTRL_MSGSTATE_ENCRYPTED));
+    m_callback->stateChange(account, jid, psiotr::OTR_STATECHANGE_GOINGSECURE);
 
     char fingerprint[45];
     if (!otrl_privkey_fingerprint(m_userstate, fingerprint,
@@ -511,7 +513,7 @@ void OtrInternal::endSession(const QString& account, const QString& jid)
     if ((context != NULL) &&
         (context->msgstate != OTRL_MSGSTATE_PLAINTEXT))
     {
-        m_callback->closedSecure(account, jid);
+        m_callback->stateChange(account, jid, psiotr::OTR_STATECHANGE_CLOSE);
     }
     otrl_message_disconnect(m_userstate, &m_uiOps, this, 
                             account.toUtf8().constData(), OTR_PROTOCOL_STRING,
@@ -531,7 +533,8 @@ void OtrInternal::expireSession(const QString& account, const QString& jid)
         (context->msgstate == OTRL_MSGSTATE_ENCRYPTED))
     {
         otrl_context_force_finished(context);
-        m_callback->goneInsecure(account, jid);
+        m_callback->stateChange(account, jid,
+                                psiotr::OTR_STATECHANGE_GONEINSECURE);
     }
 }
 
@@ -1002,17 +1005,18 @@ void OtrInternal::write_fingerprints()
 
 void OtrInternal::gone_secure(ConnContext *context)
 {
-    m_callback->goneSecure(QString::fromUtf8(context->accountname),
-                           QString::fromUtf8(context->username),
-                           isVerified(context));
+    m_callback->stateChange(QString::fromUtf8(context->accountname),
+                            QString::fromUtf8(context->username),
+                            psiotr::OTR_STATECHANGE_GONESECURE);
 }
 
 // ---------------------------------------------------------------------------
 
 void OtrInternal::gone_insecure(ConnContext *context)
 {
-    m_callback->goneInsecure(QString::fromUtf8(context->accountname),
-                             QString::fromUtf8(context->username));
+    m_callback->stateChange(QString::fromUtf8(context->accountname),
+                            QString::fromUtf8(context->username),
+                            psiotr::OTR_STATECHANGE_GONEINSECURE);
 }
     
 // ---------------------------------------------------------------------------
@@ -1020,9 +1024,9 @@ void OtrInternal::gone_insecure(ConnContext *context)
 void OtrInternal::still_secure(ConnContext *context, int is_reply)
 {
     Q_UNUSED(is_reply);
-    m_callback->stillSecure(QString::fromUtf8(context->accountname),
+    m_callback->stateChange(QString::fromUtf8(context->accountname),
                             QString::fromUtf8(context->username),
-                            isVerified(context));
+                            psiotr::OTR_STATECHANGE_STILLSECURE);
 }
 
 // ---------------------------------------------------------------------------

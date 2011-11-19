@@ -131,7 +131,7 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
 
         QLabel* ownFprDescLabel = new QLabel(tr("Your fingerprint:"), this);
         QLabel* ownFprLabel     = new QLabel(ownFpr, this);
-        QLabel* fprDescLabel    = new QLabel(tr("Fingerprint for %1:")
+        QLabel* fprDescLabel    = new QLabel(tr("%1's fingerprint:")
                                                 .arg(m_contactName), this);
         QLabel* fprLabel        = new QLabel(m_fpr.fingerprintHuman, this);
         ownFprLabel->setFont(QFont("monospace"));
@@ -314,6 +314,11 @@ void AuthenticationDialog::updateSMP(int progress)
     m_progressBar->setValue(progress);
 
     if (progress == 100) {
+        if (m_isSender)
+        {
+            m_otr->stateChange(m_account, m_contact,
+                               psiotr::OTR_STATECHANGE_TRUST);
+        }
         if (m_otr->smpSucceeded(m_account, m_contact))
         {
             m_state = AUTH_FINISHED;
@@ -408,7 +413,7 @@ void PsiOtrClosure::authenticateContact(bool)
                                             QString(), true);
 
     connect(m_authDialog, SIGNAL(destroyed()),
-            this, SLOT(finishSMP()));
+            this, SLOT(finishAuth()));
 
     m_authDialog->show();
 }
@@ -425,13 +430,14 @@ void PsiOtrClosure::receivedSMP(const QString& question)
     if (m_authDialog)
     {
         disconnect(m_authDialog, SIGNAL(destroyed()),
-                   this, SLOT(finishSMP()));
+                   this, SLOT(finishAuth()));
+        finishAuth();
     }
 
     m_authDialog = new AuthenticationDialog(m_otr, m_account, m_contact, question, false);
 
     connect(m_authDialog, SIGNAL(destroyed()),
-            this, SLOT(finishSMP()));
+            this, SLOT(finishAuth()));
 
     m_authDialog->show();
 }
@@ -449,7 +455,7 @@ void PsiOtrClosure::updateSMP(int progress)
 
 //-----------------------------------------------------------------------------
 
-void PsiOtrClosure::finishSMP()
+void PsiOtrClosure::finishAuth()
 {
     m_authDialog = 0;
 

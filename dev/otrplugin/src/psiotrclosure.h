@@ -129,7 +129,7 @@ public slots:
     void sessionID(bool b);
     void fingerprint(bool b);
     void showMenu();
-    void finishSMP();
+    void finishAuth();
 };
 
 //-----------------------------------------------------------------------------

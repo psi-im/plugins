@@ -236,6 +236,14 @@ void OtrMessaging::generateKey(const QString& account)
 
 //-----------------------------------------------------------------------------
 
+void OtrMessaging::stateChange(const QString& account, const QString& contact,
+                               OtrStateChange change)
+{
+    return m_callback->stateChange(account, contact, change);
+}
+
+//-----------------------------------------------------------------------------
+
 QString OtrMessaging::humanAccount(const QString& accountId)
 {
     return m_callback->humanAccount(accountId);

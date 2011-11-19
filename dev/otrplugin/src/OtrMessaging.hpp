@@ -65,6 +65,19 @@ enum OtrMessageState
 
 // ---------------------------------------------------------------------------
 
+enum OtrStateChange
+{
+    OTR_STATECHANGE_GOINGSECURE,
+    OTR_STATECHANGE_GONESECURE,
+    OTR_STATECHANGE_GONEINSECURE,
+    OTR_STATECHANGE_STILLSECURE,
+    OTR_STATECHANGE_CLOSE,
+    OTR_STATECHANGE_REMOTECLOSE,
+    OTR_STATECHANGE_TRUST
+};
+
+// ---------------------------------------------------------------------------
+
 enum OtrNotifyType
 {
     OTR_NOTIFY_INFO,
@@ -99,20 +112,8 @@ public:
     virtual bool displayOtrMessage(const QString& account, const QString& contact,
                                    const QString& message) = 0;
 
-    virtual void goingSecure(const QString& account, const QString& contact,
-                             bool refreshing) = 0;
-
-    virtual void goneSecure(const QString& account, const QString& contact,
-                            bool verified) = 0;
-
-    virtual void goneInsecure(const QString& account, const QString& contact) = 0;
-
-    virtual void closedSecure(const QString& account, const QString& contact) = 0;
-
-    virtual void remoteClosedSecure(const QString& account, const QString& contact) = 0;
-
-    virtual void stillSecure(const QString& account, const QString& contact,
-                             bool verified) = 0;
+    virtual void stateChange(const QString& account, const QString& contact,
+                             OtrStateChange change) = 0;
 
     virtual void receivedSMP(const QString& account, const QString& contact,
                              const QString& question) = 0;
@@ -329,6 +330,12 @@ public:
     * This function blocks until keys are available.
     */
     void generateKey(const QString& account);
+
+    /**
+     * Report a change of state
+     */
+    void stateChange(const QString& account, const QString& contact,
+                     OtrStateChange change);
 
     /**
      * Return a human-readable representation

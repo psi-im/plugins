@@ -595,98 +595,69 @@ bool PsiOtrPlugin::displayOtrMessage(const QString& account,
 
 //-----------------------------------------------------------------------------
 
-void PsiOtrPlugin::goingSecure(const QString& account, const QString& contact,
-                               bool refreshing)
+void PsiOtrPlugin::stateChange(const QString& account, const QString& contact,
+                               OtrStateChange change)
 {
+    bool verified  = m_otrConnection->isVerified(account, contact);
+    bool encrypted = false;
     if (m_onlineUsers.contains(account) && 
         m_onlineUsers.value(account).contains(contact))
     {
         m_onlineUsers[account][contact]->updateMessageState();
+        encrypted = m_onlineUsers[account][contact]->encrypted();
     }
-    appendSysMsg(account, contact,
-                 (refreshing? tr("Attempting to refresh the "
-                                 "private conversation with %1")
-                            : tr("Attempting to start a "
-                                 "private conversation with %1"))
-                            .arg(humanContact(account, contact)));
-}
 
-//-----------------------------------------------------------------------------
+    QString msg;
+    QString icon;
 
-void PsiOtrPlugin::goneSecure(const QString& account, const QString& contact,
-                              bool verified)
-{
-    if (m_onlineUsers.contains(account) && 
-        m_onlineUsers.value(account).contains(contact))
+    switch (change)
     {
-        m_onlineUsers[account][contact]->updateMessageState();
+        case OTR_STATECHANGE_GOINGSECURE:
+            msg = encrypted?
+                      tr("Attempting to refresh the private conversation")
+                    : tr("Attempting to start a private conversation");
+            break;
+
+        case OTR_STATECHANGE_GONESECURE:
+            msg  = verified? tr("Private conversation started")
+                           : tr("Unverified conversation started");
+            icon = verified? "psi-otr/otr_yes"
+                           : "psi-otr/otr_unverified";
+            break;
+
+        case OTR_STATECHANGE_GONEINSECURE:
+            msg  = tr("Private conversation lost");
+            icon = "psi-otr/otr_no";
+            break;
+
+        case OTR_STATECHANGE_CLOSE:
+            msg  = tr("Private conversation closed");
+            icon = "psi-otr/otr_no";
+            break;
+
+        case OTR_STATECHANGE_REMOTECLOSE:
+            msg  = tr("%1 has ended the private conversation with you; "
+                      "you should do the same.")
+                      .arg(humanContact(account, contact));
+            icon = "psi-otr/otr_no";
+            break;
+
+        case OTR_STATECHANGE_STILLSECURE:
+            msg  = verified? tr("Private conversation refreshed")
+                           : tr("Unverified conversation refreshed");
+            icon = verified? "psi-otr/otr_yes"
+                           : "psi-otr/otr_unverified";
+            break;
+
+        case OTR_STATECHANGE_TRUST:
+            msg  = verified? tr("Contact authenticated")
+                           : tr("Contact not authenticated");
+            icon = verified? "psi-otr/otr_yes"
+                           : "psi-otr/otr_unverified";
+            break;
     }
-    appendSysMsg(account, contact,
-                 verified? tr("Private conversation started")
-                         : tr("Unverified conversation started"),
-                 verified? "psi-otr/otr_yes"
-                         : "psi-otr/otr_unverified");
-}
 
-//-----------------------------------------------------------------------------
-
-void PsiOtrPlugin::goneInsecure(const QString& account, const QString& contact)
-{
-    if (m_onlineUsers.contains(account) && 
-        m_onlineUsers.value(account).contains(contact))
-    {
-        m_onlineUsers[account][contact]->updateMessageState();
-    }
-    appendSysMsg(account, contact,
-                 tr("Private conversation lost"),
-                 "psi-otr/otr_no");
-}
-
-//-----------------------------------------------------------------------------
-
-void PsiOtrPlugin::closedSecure(const QString& account, const QString& contact)
-{
-    if (m_onlineUsers.contains(account) && 
-        m_onlineUsers.value(account).contains(contact))
-    {
-        m_onlineUsers[account][contact]->updateMessageState();
-    }
-    appendSysMsg(account, contact,
-                 tr("Private conversation closed"),
-                 "psi-otr/otr_no");
-}
-
-//-----------------------------------------------------------------------------
-
-void PsiOtrPlugin::remoteClosedSecure(const QString& account, const QString& contact)
-{
-    if (m_onlineUsers.contains(account) && 
-        m_onlineUsers.value(account).contains(contact))
-    {
-        m_onlineUsers[account][contact]->updateMessageState();
-    }
-    appendSysMsg(account, contact,
-                 tr("%1 has ended the private conversation with you; "
-                    "you should do the same.")
-                    .arg(humanContact(account, contact)),
-                 "psi-otr/otr_no");
-}
-
-//-----------------------------------------------------------------------------
-
-void PsiOtrPlugin::stillSecure(const QString& account, const QString& contact,
-                               bool verified)
-{
-    if (m_onlineUsers.contains(account) && 
-        m_onlineUsers.value(account).contains(contact))
-    {
-        m_onlineUsers[account][contact]->updateMessageState();
-    }
-    appendSysMsg(account, contact,
-                 verified? tr("Private conversation refreshed")
-                         : tr("Unverified conversation refreshed"),
-                 verified? "psi-otr/otr_yes"
-                         : "psi-otr/otr_unverified");
+    appendSysMsg(account, contact, msg, icon);
 }
 
 //-----------------------------------------------------------------------------
