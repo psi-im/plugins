@@ -1,6 +1,9 @@
 /*
  * OtrMessaging.hpp - interface to libotr
- * Copyright (C) 2007  Timo Engel (timo-e@freenet.de)
+ *
+ * Off-the-Record Messaging plugin for Psi+
+ * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
+ *                    2011  Florian Fieber
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -13,8 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -66,9 +68,8 @@ enum OtrNotifyType
 // ---------------------------------------------------------------------------
 
 /**
-* Interface for callbacks from libotr to application
-*
-*/
+ * Interface for callbacks from libotr to application
+ */
 class OtrCallback
 {
 public:
@@ -103,38 +104,38 @@ public:
 // ---------------------------------------------------------------------------
 
 /** 
-* This struct contains all data shown in the table of 'Known Fingerprints'.
-*/
+ * This struct contains all data shown in the table of 'Known Fingerprints'.
+ */
 struct Fingerprint
 {
     /** 
-    * Pointer to fingerprint in libotr struct. Binary format.
-    */
+     * Pointer to fingerprint in libotr struct. Binary format.
+     */
     unsigned char* fingerprint; 
 
     /** 
-    * own account
-    */
+     * own account
+     */
     QString account;
 
     /** 
-    * owner of the fingerprint
-    */
+     * owner of the fingerprint
+     */
     QString username;
 
     /** 
-    * The fingerprint in a human-readable format
-    */
+     * The fingerprint in a human-readable format
+     */
     QString fingerprintHuman;
 
     /** 
-    * the level of trust 
-    */
+     * the level of trust 
+     */
     QString trust;
 
     /** 
-    * The messageState of the context (i.e. plaintext, encrypted, finished)
-    */
+     * The messageState of the context (i.e. plaintext, encrypted, finished)
+     */
     QString messageState;
 
     Fingerprint();
@@ -147,158 +148,157 @@ struct Fingerprint
 // ---------------------------------------------------------------------------
 
 /** 
-* This class it the interface to the off the record messaging library.
-* See the libotr documentation for more information.
-*
-*/
+ * This class it the interface to the off the record messaging library.
+ * See the libotr documentation for more information.
+ */
 class OtrMessaging
 {
 public:
 
     /** 
-    * Constructor
-    * 
-    * @param plugin Pointer to the plugin, used for sending messages.
-    * @param policy The default OTR policy
-    */
+     * Constructor
+     * 
+     * @param plugin Pointer to the plugin, used for sending messages.
+     * @param policy The default OTR policy
+     */
     OtrMessaging(OtrCallback* callback, OtrPolicy policy);
 
     /** 
-    * Deconstructor
-    */
+     * Deconstructor
+     */
     ~OtrMessaging();
 
     /** 
-    * Process an outgoing message.
-    * 
-    * @param from Account the message is send from
-    * @param to Recipient of message
-    * @param message The message itself.
-    * 
-    * @return The encrypted message.
-    */
+     * Process an outgoing message.
+     * 
+     * @param from Account the message is send from
+     * @param to Recipient of message
+     * @param message The message itself.
+     * 
+     * @return The encrypted message.
+     */
     QString encryptMessage(const QString& from, const QString& to,
                            const QString& message);
 
     /** 
-    * Decrypt an incoming message
-    * 
-    * @param from Sender of the message
-    * @param to Account the message is send to.
-    * @param message the mesasge itself.
-    * @param decrypted The decrypted message if the original message was
-    *                  encrypted.
-    * @return true, if decrypted was set.
-    */
+     * Decrypt an incoming message
+     * 
+     * @param from Sender of the message
+     * @param to Account the message is send to.
+     * @param message the mesasge itself.
+     * @param decrypted The decrypted message if the original message was
+     *                  encrypted.
+     * @return true, if decrypted was set.
+     */
     bool decryptMessage(const QString& from, const QString& to,
                         const QString& message, QString& decrypted);
 
     /** 
-    * Returns a list of known fingerprints.
-    */
+     * Returns a list of known fingerprints.
+     */
     QList<Fingerprint> getFingerprints();
 
     /** 
-    * Set fingerprint verified/not verified.
-    */
+     * Set fingerprint verified/not verified.
+     */
     void verifyFingerprint(const Fingerprint& fingerprint, bool verified);
 
     /** 
-    * Delete a known fingerprint.
-    */
+     * Delete a known fingerprint.
+     */
     void deleteFingerprint(const Fingerprint& fingerprint);
 
     /** 
-    * Get hash of fingerprints of own private keys.
-    * Account -> KeyFingerprint
-    */
+     * Get hash of fingerprints of own private keys.
+     * Account -> KeyFingerprint
+     */
     QHash<QString, QString> getPrivateKeys();
 
     /** 
-    * Delete a private key.
-    */
+     * Delete a private key.
+     */
     void deleteKey(const QString& account);
 
     /** 
-    * Send an OTR query message from account to contact.
-    */
+     * Send an OTR query message from account to contact.
+     */
     void startSession(const QString& account, const QString& contact);
 
     /** 
-    * Send otr-finished message to user.
-    */
+     * Send otr-finished message to user.
+     */
     void endSession(const QString& account, const QString& contact);
 
     /** 
-    * Force a session to expire.
-    */
+     * Force a session to expire.
+     */
     void expireSession(const QString& account, const QString& contact);
 
     /**
-    * Start the SMP with an optional question
-    */
+     * Start the SMP with an optional question
+     */
     void startSMP(const QString& account, const QString& contact,
                   const QString& question, const QString& secret);
 
     /**
-    * Continue the SMP
-    */
+     * Continue the SMP
+     */
     void continueSMP(const QString& account, const QString& contact,
                      const QString& secret);
 
     /**
-    * Abort the SMP
-    */
+     * Abort the SMP
+     */
     void abortSMP(const QString& account, const QString& contact);
 
     /**
-    * Return the messageState of a context.
-    * i.e. plaintext, encrypted, finished
-    */
+     * Return the messageState of a context.
+     * i.e. plaintext, encrypted, finished
+     */
     OtrMessageState getMessageState(const QString& account,
                                     const QString& contact);
 
     /** 
-    * returns the messageState in human-readable string.
-    */
+     * returns the messageState in human-readable string.
+     */
     QString getMessageStateString(const QString& account,
                                   const QString& contact);
 
     /** 
-    * Return the secure session id (ssid) for a context
-    */
+     * Return the secure session id (ssid) for a context
+     */
     QString getSessionId(const QString& account, const QString& contact);
 
     /** 
-    * Return the active fingerprint for a context
-    */
+     * Return the active fingerprint for a context
+     */
     psiotr::Fingerprint getActiveFingerprint(const QString& account,
                                              const QString& contact);
 
     /** 
-    * Return true if the active fingerprint has been verified
-    */
+     * Return true if the active fingerprint has been verified
+     */
     bool isVerified(const QString& account, const QString& contact);
 
     /** 
-    * Return true if Socialist Millionaires' Protocol succeeded
-    */
+     * Return true if Socialist Millionaires' Protocol succeeded
+     */
     bool smpSucceeded(const QString& account, const QString& contact);
 
     /** 
-    * Set the default OTR policy.
-    */
+     * Set the default OTR policy.
+     */
     void setPolicy(OtrPolicy policy);
 
     /** 
-    * @return The default OTR policy
-    */
+     * @return The default OTR policy
+     */
     OtrPolicy getPolicy();
 
     /**
-    * Generate own keys.
-    * This function blocks until keys are available.
-    */
+     * Generate own keys.
+     * This function blocks until keys are available.
+     */
     void generateKey(const QString& account);
 
     /**
