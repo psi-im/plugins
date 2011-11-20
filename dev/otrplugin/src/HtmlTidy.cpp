@@ -37,8 +37,8 @@ HtmlTidy::HtmlTidy(const QString& html)
     tidyOptSetBool (m_tidyDoc, TidyQuoteNbsp,    no);
     tidyOptSetBool (m_tidyDoc, TidyForceOutput,  yes);
 
-    tidySetErrorBuffer(m_tidyDoc, &m_errorOutput);  
-            
+    tidySetErrorBuffer(m_tidyDoc, &m_errorOutput);
+
     tidyParseString(m_tidyDoc, m_input.toUtf8().data());
     tidyCleanAndRepair(m_tidyDoc);
 }
