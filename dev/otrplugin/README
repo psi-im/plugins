@@ -74,14 +74,14 @@ CHANGES
   0.7
     -Use icons for otr button.
     -Fixed update of message state on button.
-    -Default policy is now 'enabled'. 
+    -Default policy is now 'enabled'.
     -Problem related to key generation fixed.
     -Enabling and disabling of plugin fixed.
     -Adapted to Psi+ interface changes.
 
   0.6
     -adapt to Psi+ plugin interface
-    -use HtmlTidy for invalid XHTML in encrypted messages 
+    -use HtmlTidy for invalid XHTML in encrypted messages
     -changed handling of callbacks
     -several bugfixes
 
@@ -97,7 +97,7 @@ CHANGES
     -menu in chatdialog to start OTR session, etc.
     -incoming messages with invalid html markup were discarded in
      previous versions.
-    -problem with 'status' information of known fingerprints resolved 
+    -problem with 'status' information of known fingerprints resolved
 
   0.3
     -character encoding in tagged-plaintext-messages
@@ -105,7 +105,7 @@ CHANGES
     -resolved problems with configuration widget
 
   0.2
-    -character encoding in encrypted messages  
+    -character encoding in encrypted messages
 
 
 

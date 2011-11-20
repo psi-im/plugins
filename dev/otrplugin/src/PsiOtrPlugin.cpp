@@ -41,7 +41,7 @@ namespace
 // ---------------------------------------------------------------------------
 
 /**
- * Removes the resource from a given JID. 
+ * Removes the resource from a given JID.
  * Example:
  * removeResource("user@jabber.org/Home")
  * returns "user@jabber.org"
@@ -147,7 +147,7 @@ QWidget* PsiOtrPlugin::options()
     {
         return new ConfigDialog(m_otrConnection, m_optionHost, m_accountInfo);
     }
-} 
+}
 
 // ---------------------------------------------------------------------------
 
@@ -229,7 +229,7 @@ bool PsiOtrPlugin::processEvent(int accountIndex, QDomElement& e)
         if (m_otrConnection->decryptMessage(contact, account, cyphertext,
                                             decrypted))
         {
-            if (m_onlineUsers.contains(account) && 
+            if (m_onlineUsers.contains(account) &&
                 m_onlineUsers.value(account).contains(contact))
             {
                 m_onlineUsers[account][contact]->updateMessageState();
@@ -335,7 +335,7 @@ void PsiOtrPlugin::logout(int accountIndex)
     {
         return;
     }
-    
+
     QString account = m_accountInfo->getId(accountIndex);
 
     if (m_onlineUsers.contains(account))
@@ -400,11 +400,11 @@ bool PsiOtrPlugin::incomingStanza(int accountIndex, const QDomElement& xml)
     {
         return false;
     }
-    
+
     QString account = m_accountInfo->getId(accountIndex);
     QString contact = getCorrectJid(accountIndex, xml.attribute("from"));
     QString type = xml.attribute("type", "available");
-    
+
     if (type == "available")
     {
         if (!m_onlineUsers.value(account).contains(contact))
@@ -413,12 +413,12 @@ bool PsiOtrPlugin::incomingStanza(int accountIndex, const QDomElement& xml)
                                                                 contact,
                                                                 m_otrConnection);
         }
-        
+
         m_onlineUsers[account][contact]->setIsLoggedIn(true);
     }
     else if (type == "unavailable")
     {
-        if (m_onlineUsers.contains(account) && 
+        if (m_onlineUsers.contains(account) &&
             m_onlineUsers.value(account).contains(contact))
         {
             if (m_optionHost->getPluginOption(OPTION_END_WHEN_OFFLINE,
@@ -480,7 +480,7 @@ QAction* PsiOtrPlugin::getAction(QObject* parent, int accountIndex,
 
     QString contact = getCorrectJid(accountIndex, contactJid);
     QString account = m_accountInfo->getId(accountIndex);
-    
+
     if (!m_onlineUsers.value(account).contains(contact))
     {
         m_onlineUsers[account][contact] = new PsiOtrClosure(account,
@@ -498,7 +498,7 @@ QString PsiOtrPlugin::dataDir()
     return m_applicationInfo->appCurrentProfileDir(
     ApplicationInfoAccessingHost::DataLocation);
 }
-    
+
 //-----------------------------------------------------------------------------
 
 void PsiOtrPlugin::sendMessage(const QString& account, const QString& contact,
@@ -532,7 +532,7 @@ void PsiOtrPlugin::notifyUser(const OtrNotifyType& type, const QString& message)
     QMessageBox::Icon messageBoxIcon;
     if (type == OTR_NOTIFY_ERROR)
     {
-        messageBoxIcon = QMessageBox::Critical; 
+        messageBoxIcon = QMessageBox::Critical;
     }
     else if (type == OTR_NOTIFY_WARNING)
     {
@@ -553,7 +553,7 @@ void PsiOtrPlugin::notifyUser(const OtrNotifyType& type, const QString& message)
 void PsiOtrPlugin::receivedSMP(const QString& account, const QString& contact,
                                const QString& question)
 {
-    if (m_onlineUsers.contains(account) && 
+    if (m_onlineUsers.contains(account) &&
         m_onlineUsers.value(account).contains(contact))
     {
         m_onlineUsers[account][contact]->receivedSMP(question);
@@ -565,8 +565,8 @@ void PsiOtrPlugin::receivedSMP(const QString& account, const QString& contact,
 void PsiOtrPlugin::updateSMP(const QString& account, const QString& contact,
                              int progress)
 {
-    
-    if (m_onlineUsers.contains(account) && 
+
+    if (m_onlineUsers.contains(account) &&
         m_onlineUsers.value(account).contains(contact))
     {
         m_onlineUsers[account][contact]->updateSMP(progress);

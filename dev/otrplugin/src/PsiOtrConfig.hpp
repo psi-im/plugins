@@ -53,7 +53,7 @@ const QVariant DEFAULT_END_WHEN_OFFLINE = QVariant(false);
 
 // ---------------------------------------------------------------------------
 
-/** 
+/**
  * This dialog appears in the 'Plugins' section of the Psi configuration.
  */
 class ConfigDialog : public QWidget
@@ -73,7 +73,7 @@ private:
 
 // ---------------------------------------------------------------------------
 
-/** 
+/**
  * Configure OTR policy.
  */
 class ConfigOtrWidget : public QWidget
@@ -99,7 +99,7 @@ private slots:
 
 // ---------------------------------------------------------------------------
 
-/** 
+/**
  * Show fingerprint of your contacts.
  */
 class FingerprintWidget : public QWidget
@@ -127,7 +127,7 @@ private slots:
 
 // ---------------------------------------------------------------------------
 
-/** 
+/**
  * Display a table with account and fingerprint of private key.
  */
 class PrivKeyWidget : public QWidget

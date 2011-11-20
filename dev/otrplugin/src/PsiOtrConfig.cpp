@@ -137,7 +137,7 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
 void ConfigOtrWidget::updateOptions()
 {
     OtrPolicy policy = static_cast<OtrPolicy>(m_policy->checkedId());
-    
+
     m_optionHost->setPluginOption(OPTION_POLICY, policy);
     m_optionHost->setPluginOption(OPTION_END_WHEN_OFFLINE,
                                   m_endWhenOffline->checkState() == Qt::Checked);

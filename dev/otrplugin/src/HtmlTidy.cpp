@@ -65,7 +65,7 @@ QString HtmlTidy::writeOutput()
 #endif
     sink.sinkData = this;
     tidySaveSink(m_tidyDoc, &sink);
-    
+
     return QString::fromUtf8(m_output);
 }
 
@@ -88,7 +88,7 @@ QDomElement HtmlTidy::output(QDomDocument& document)
     int errorLine = 0;
     int errorColumn = 0;
     QString errorText;
-        
+
     QString html = writeOutput();
     if (!document.setContent(html, true, &errorText,
                             &errorLine, &errorColumn))
@@ -112,7 +112,7 @@ void HtmlTidy::putByte(void* sinkData, byte bt)
 }
 
 //-----------------------------------------------------------------------------
-    
+
 void HtmlTidy::putByte(byte bt)
 {
     m_output.append(bt);

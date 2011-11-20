@@ -53,7 +53,7 @@ namespace psiotr
 
 class ConfigDlg;
 class PsiOtrClosure;
-    
+
 //-----------------------------------------------------------------------------
 
 class PsiOtrPlugin : public QObject,
@@ -87,7 +87,7 @@ public:
     virtual QString name() const;
     virtual QString shortName() const;
     virtual QString version() const;
-    virtual QWidget* options(); 
+    virtual QWidget* options();
     virtual bool enable();
     virtual bool disable();
     virtual void applyOptions();

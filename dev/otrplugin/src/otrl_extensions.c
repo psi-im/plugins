@@ -44,7 +44,7 @@ static gcry_error_t sexp_write(FILE *privf, gcry_sexp_t sexp)
         return gcry_error(GPG_ERR_ENOMEM);
     }
     gcry_sexp_sprint(sexp, GCRYSEXP_FMT_ADVANCED, buf, buflen);
-    
+
     fprintf(privf, "%s", buf);
     free(buf);
 
@@ -52,7 +52,7 @@ static gcry_error_t sexp_write(FILE *privf, gcry_sexp_t sexp)
 }
 
 static gcry_error_t account_write(FILE *privf, const char *accountname,
-	const char *protocol, gcry_sexp_t privkey)
+    const char *protocol, gcry_sexp_t privkey)
 {
     gcry_error_t err;
     gcry_sexp_t names, protos;

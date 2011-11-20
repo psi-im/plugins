@@ -36,13 +36,13 @@ public:
     QString output();
     QDomElement output(QDomDocument& document);
     static void putByte(void* sinkData, byte bt);
-    
+
 
 protected:
     void putByte(byte bt);
     QString writeOutput();
-    
-    
+
+
 private:
     TidyDoc     m_tidyDoc;
     TidyBuffer  m_errorOutput;

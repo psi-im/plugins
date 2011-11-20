@@ -83,7 +83,7 @@ private:
     QProgressBar* m_progressBar;
     QPushButton*  m_cancelButton;
     QPushButton*  m_startButton;
-    
+
 private slots:
     void changeMethod(int index);
     void startAuthentication();
