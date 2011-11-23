@@ -196,6 +196,43 @@ void PsiOtrPlugin::restoreOptions()
 
 //-----------------------------------------------------------------------------
 
+QString PsiOtrPlugin::pluginInfo() {
+	return QString("<b>%1</b><br>"
+                   "%2<br><br>"
+                   "%3"
+                   "<dl>"
+                   "<dt>%4</dt><dd>%5</dd>"
+                   "<dt>%6</dt><dd>%7</dd>"
+                   "<dt>%8</dt><dd>%9</dd>"
+                   "<dt>%10</dt><dd>%11</dd>"
+                   "</dl>"
+                   "%12")
+           .arg(tr("Off-the-Record Messaging plugin for Psi+"))
+           .arg(tr("Authors: %1")
+                  .arg("Timo Engel, Florian Fieber"))
+           .arg(tr("Off-the-Record (OTR) Messaging allows you to have private "
+                   "conversations over instant messaging by providing:"))
+           .arg(tr("Encryption"))
+           .arg(tr("No one else can read your instant messages."))
+           .arg(tr("Authentication"))
+           .arg(tr("You are assured the correspondent is who you think it is."))
+           .arg(tr("Deniability"))
+           .arg(tr("The messages you send do not have digital signatures that "
+                   "are checkable by a third party. Anyone can forge messages "
+                   "after a conversation to make them look like they came from "
+                   "you. However, during a conversation, your correspondent is "
+                   "assured the messages he sees are authentic and unmodified."))
+           .arg(tr("Perfect forward secrecy"))
+           .arg(tr("If you lose control of your private keys, no previous "
+                   "conversation is compromised."))
+           .arg(tr("For further information, see %1.")
+                  .arg("<a href=\"http://www.cypherpunks.ca/otr/\">"
+                       "http://www.cypherpunks.ca/otr/"
+                       "</a>"));
+}
+
+//-----------------------------------------------------------------------------
+
 bool PsiOtrPlugin::processEvent(int accountIndex, QDomElement& e)
 {
     QDomElement messageElement = e.firstChildElement("message");

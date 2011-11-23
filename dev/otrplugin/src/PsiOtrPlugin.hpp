@@ -33,6 +33,7 @@
 
 #include "OtrMessaging.hpp"
 #include "psiplugin.h"
+#include "plugininfoprovider.h"
 #include "eventfilter.h"
 #include "optionaccessinghost.h"
 #include "optionaccessor.h"
@@ -58,6 +59,7 @@ class PsiOtrClosure;
 
 class PsiOtrPlugin : public QObject,
                      public PsiPlugin,
+                     public PluginInfoProvider,
                      public EventFilter,
                      public OptionAccessor,
                      public StanzaSender,
@@ -70,6 +72,7 @@ class PsiOtrPlugin : public QObject,
 {
 Q_OBJECT
 Q_INTERFACES(PsiPlugin
+             PluginInfoProvider
              EventFilter
              OptionAccessor
              StanzaSender
@@ -92,6 +95,9 @@ public:
     virtual bool disable();
     virtual void applyOptions();
     virtual void restoreOptions();
+
+    // PluginInfoProvider
+    virtual QString pluginInfo();
 
     // EventFilter
     virtual bool processEvent(int accountIndex, QDomElement& e);
