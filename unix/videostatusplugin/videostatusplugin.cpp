@@ -39,7 +39,7 @@
 #include <QX11Info>
 #include <X11/Xlib.h>
 
-#define constVersion "0.1.1"
+#define constVersion "0.1.2"
 
 #define constPlayerVLC "vlcplayer"
 #define constPlayerTotem "totemplayer"
