@@ -284,4 +284,4 @@ void VideoStatusChanger::setPsiGlobalStatus(const bool set) {
 		++account;
 	}
 }
-#include "videostatusplugin.moc"
+#include "videostatuspluginwin.moc"
