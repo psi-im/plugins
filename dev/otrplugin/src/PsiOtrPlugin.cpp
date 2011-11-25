@@ -1,9 +1,12 @@
 /*
- * psi-otr.cpp - off-the-record messaging plugin for psi
+ * PsiOtrPlugin.cpp
  *
- * Copyright (C) Timo Engel (timo-e@freenet.de), Berlin 2007.
- * This program was written as part of a diplom thesis advised by 
- * Prof. Dr. Ruediger Weis (PST Labor)
+ * Off-the-Record Messaging plugin for Psi+
+ * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
+ *                    2011  Florian Fieber
+ *
+ * This program was originally written as part of a diplom thesis
+ * advised by Prof. Dr. Ruediger Weis (PST Labor)
  * at the Technical University of Applied Sciences Berlin.
  *
  * This program is free software; you can redistribute it and/or
@@ -17,8 +20,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -39,7 +41,7 @@ namespace
 // ---------------------------------------------------------------------------
 
 /**
- * Removes the resource from a given JID. 
+ * Removes the resource from a given JID.
  * Example:
  * removeResource("user@jabber.org/Home")
  * returns "user@jabber.org"
@@ -147,7 +149,7 @@ QWidget* PsiOtrPlugin::options()
     {
         return new ConfigDialog(m_otrConnection, m_optionHost, m_accountInfo);
     }
-} 
+}
 
 // ---------------------------------------------------------------------------
 
@@ -157,22 +159,22 @@ bool PsiOtrPlugin::enable()
     m_otrConnection = new OtrMessaging(this,
                                        static_cast<OtrPolicy>(policyOption.toInt()));
     m_enabled = true;
-    
+
     QFile f(":/psi-otr/otr_yes.png");
     f.open(QIODevice::ReadOnly);
     m_iconHost->addIcon("psi-otr/otr_yes", f.readAll());
     f.close();
-    
+
     f.setFileName(":/psi-otr/otr_no.png");
     f.open(QIODevice::ReadOnly);
     m_iconHost->addIcon("psi-otr/otr_no", f.readAll());
     f.close();
-    
+
     f.setFileName(":/psi-otr/otr_unverified.png");
     f.open(QIODevice::ReadOnly);
     m_iconHost->addIcon("psi-otr/otr_unverified", f.readAll());
     f.close();
-    
+
     return true;
 }
 
@@ -210,6 +212,43 @@ void PsiOtrPlugin::applyOptions()
 
 void PsiOtrPlugin::restoreOptions()
 {
+}
+
+//-----------------------------------------------------------------------------
+
+QString PsiOtrPlugin::pluginInfo() {
+    return QString("<b>%1</b><br>"
+                   "%2<br><br>"
+                   "%3"
+                   "<dl>"
+                   "<dt>%4</dt><dd>%5</dd>"
+                   "<dt>%6</dt><dd>%7</dd>"
+                   "<dt>%8</dt><dd>%9</dd>"
+                   "<dt>%10</dt><dd>%11</dd>"
+                   "</dl>"
+                   "%12")
+           .arg(tr("Off-the-Record Messaging plugin for Psi+"))
+           .arg(tr("Authors: %1")
+                  .arg("Timo Engel, Florian Fieber"))
+           .arg(tr("Off-the-Record (OTR) Messaging allows you to have private "
+                   "conversations over instant messaging by providing:"))
+           .arg(tr("Encryption"))
+           .arg(tr("No one else can read your instant messages."))
+           .arg(tr("Authentication"))
+           .arg(tr("You are assured the correspondent is who you think it is."))
+           .arg(tr("Deniability"))
+           .arg(tr("The messages you send do not have digital signatures that "
+                   "are checkable by a third party. Anyone can forge messages "
+                   "after a conversation to make them look like they came from "
+                   "you. However, during a conversation, your correspondent is "
+                   "assured the messages he sees are authentic and unmodified."))
+           .arg(tr("Perfect forward secrecy"))
+           .arg(tr("If you lose control of your private keys, no previous "
+                   "conversation is compromised."))
+           .arg(tr("For further information, see %1.")
+                  .arg("<a href=\"http://www.cypherpunks.ca/otr/\">"
+                       "http://www.cypherpunks.ca/otr/"
+                       "</a>"));
 }
 
 //-----------------------------------------------------------------------------
@@ -358,7 +397,7 @@ void PsiOtrPlugin::logout(int accountIndex)
     {
         return;
     }
-    
+
     QString account = m_accountInfo->getId(accountIndex);
 
     if (m_onlineUsers.contains(account))
@@ -436,11 +475,11 @@ bool PsiOtrPlugin::incomingStanza(int accountIndex, const QDomElement& xml)
     {
         return false;
     }
-    
+
     QString account = m_accountInfo->getId(accountIndex);
     QString contact = getCorrectJid(accountIndex, xml.attribute("from"));
     QString type = xml.attribute("type", "available");
-    
+
     if (type == "available")
     {
         if (!m_onlineUsers.value(account).contains(contact))
@@ -449,12 +488,12 @@ bool PsiOtrPlugin::incomingStanza(int accountIndex, const QDomElement& xml)
                                                                 contact,
                                                                 m_otrConnection);
         }
-        
+
         m_onlineUsers[account][contact]->setIsLoggedIn(true);
     }
     else if (type == "unavailable")
     {
-        if (m_onlineUsers.contains(account) && 
+        if (m_onlineUsers.contains(account) &&
             m_onlineUsers.value(account).contains(contact))
         {
             if (m_optionHost->getPluginOption(OPTION_END_WHEN_OFFLINE,
@@ -516,7 +555,7 @@ QAction* PsiOtrPlugin::getAction(QObject* parent, int accountIndex,
 
     QString contact = getCorrectJid(accountIndex, contactJid);
     QString account = m_accountInfo->getId(accountIndex);
-    
+
     if (!m_onlineUsers.value(account).contains(contact))
     {
         m_onlineUsers[account][contact] = new PsiOtrClosure(account,
@@ -534,7 +573,7 @@ QString PsiOtrPlugin::dataDir()
     return m_applicationInfo->appCurrentProfileDir(
     ApplicationInfoAccessingHost::DataLocation);
 }
-    
+
 //-----------------------------------------------------------------------------
 
 void PsiOtrPlugin::sendMessage(const QString& account, const QString& contact,
@@ -568,7 +607,7 @@ void PsiOtrPlugin::notifyUser(const OtrNotifyType& type, const QString& message)
     QMessageBox::Icon messageBoxIcon;
     if (type == OTR_NOTIFY_ERROR)
     {
-        messageBoxIcon = QMessageBox::Critical; 
+        messageBoxIcon = QMessageBox::Critical;
     }
     else if (type == OTR_NOTIFY_WARNING)
     {
@@ -600,7 +639,7 @@ void PsiOtrPlugin::stateChange(const QString& account, const QString& contact,
 {
     bool verified  = m_otrConnection->isVerified(account, contact);
     bool encrypted = false;
-    if (m_onlineUsers.contains(account) && 
+    if (m_onlineUsers.contains(account) &&
         m_onlineUsers.value(account).contains(contact))
     {
         m_onlineUsers[account][contact]->updateMessageState();
@@ -665,7 +704,7 @@ void PsiOtrPlugin::stateChange(const QString& account, const QString& contact,
 void PsiOtrPlugin::receivedSMP(const QString& account, const QString& contact,
                                const QString& question)
 {
-    if (m_onlineUsers.contains(account) && 
+    if (m_onlineUsers.contains(account) &&
         m_onlineUsers.value(account).contains(contact))
     {
         m_onlineUsers[account][contact]->receivedSMP(question);
@@ -677,8 +716,8 @@ void PsiOtrPlugin::receivedSMP(const QString& account, const QString& contact,
 void PsiOtrPlugin::updateSMP(const QString& account, const QString& contact,
                              int progress)
 {
-    
-    if (m_onlineUsers.contains(account) && 
+
+    if (m_onlineUsers.contains(account) &&
         m_onlineUsers.value(account).contains(contact))
     {
         m_onlineUsers[account][contact]->updateSMP(progress);

@@ -1,4 +1,3 @@
-
 Off-The-Record-Messaging plugin for Psi
 
 This is a Off-The-Record-Messaging plugin for the Psi+ instant
@@ -80,14 +79,14 @@ CHANGES
   0.7
     -Use icons for otr button.
     -Fixed update of message state on button.
-    -Default policy is now 'enabled'. 
+    -Default policy is now 'enabled'.
     -Problem related to key generation fixed.
     -Enabling and disabling of plugin fixed.
     -Adapted to Psi+ interface changes.
 
   0.6
     -adapt to Psi+ plugin interface
-    -use HtmlTidy for invalid XHTML in encrypted messages 
+    -use HtmlTidy for invalid XHTML in encrypted messages
     -changed handling of callbacks
     -several bugfixes
 
@@ -103,7 +102,7 @@ CHANGES
     -menu in chatdialog to start OTR session, etc.
     -incoming messages with invalid html markup were discarded in
      previous versions.
-    -problem with 'status' information of known fingerprints resolved 
+    -problem with 'status' information of known fingerprints resolved
 
   0.3
     -character encoding in tagged-plaintext-messages
@@ -111,7 +110,7 @@ CHANGES
     -resolved problems with configuration widget
 
   0.2
-    -character encoding in encrypted messages  
+    -character encoding in encrypted messages
 
 
 
@@ -124,6 +123,30 @@ for UTF8 patches, Hannes Mehnert <hannes@mehnert.org> for chatdialog.
 Rolf Wuerdemann <rowue@digitalis.org> for configure patch and several
 bugfixes. Thanks to wadealer from Psi+ for adapting and including the
 patches into Psi+.
+
+
+
+
+LICENSE
+
+The Off-the-Record Messaging plugin for Psi+ is covered by the following
+(GPL) license:
+
+    Off-the-Record Messaging plugin for Psi+
+    Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
+                       2011  Florian Fieber
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of version 2 of the GNU General Public License as
+    published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 

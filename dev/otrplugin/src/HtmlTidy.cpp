@@ -1,3 +1,25 @@
+/*
+ * HtmlTidy.cpp - tidy html with libtidy
+ *
+ * Off-the-Record Messaging plugin for Psi+
+ * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
+ *                    2011  Florian Fieber
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "HtmlTidy.hpp"
 #include <string>
 
@@ -9,14 +31,14 @@ HtmlTidy::HtmlTidy(const QString& html)
       m_output(),
       m_input(html)
 {
-    tidyOptSetBool(m_tidyDoc, TidyXmlOut, yes);
+    tidyOptSetBool (m_tidyDoc, TidyXmlOut,       yes);
     tidyOptSetValue(m_tidyDoc, TidyCharEncoding, "utf8");
-    tidyOptSetInt(m_tidyDoc, TidyNewline, TidyLF);
-    tidyOptSetBool(m_tidyDoc, TidyQuoteNbsp, no);
-    tidyOptSetBool(m_tidyDoc, TidyForceOutput, yes);
+    tidyOptSetInt  (m_tidyDoc, TidyNewline,      TidyLF);
+    tidyOptSetBool (m_tidyDoc, TidyQuoteNbsp,    no);
+    tidyOptSetBool (m_tidyDoc, TidyForceOutput,  yes);
 
-    tidySetErrorBuffer(m_tidyDoc, &m_errorOutput);  
-            
+    tidySetErrorBuffer(m_tidyDoc, &m_errorOutput);
+
     tidyParseString(m_tidyDoc, m_input.toUtf8().data());
     tidyCleanAndRepair(m_tidyDoc);
 }
@@ -43,7 +65,7 @@ QString HtmlTidy::writeOutput()
 #endif
     sink.sinkData = this;
     tidySaveSink(m_tidyDoc, &sink);
-    
+
     return QString::fromUtf8(m_output);
 }
 
@@ -66,7 +88,7 @@ QDomElement HtmlTidy::output(QDomDocument& document)
     int errorLine = 0;
     int errorColumn = 0;
     QString errorText;
-        
+
     QString html = writeOutput();
     if (!document.setContent(html, true, &errorText,
                             &errorLine, &errorColumn))
@@ -90,7 +112,7 @@ void HtmlTidy::putByte(void* sinkData, byte bt)
 }
 
 //-----------------------------------------------------------------------------
-    
+
 void HtmlTidy::putByte(byte bt)
 {
     m_output.append(bt);

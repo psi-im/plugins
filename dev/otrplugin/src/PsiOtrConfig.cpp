@@ -1,6 +1,9 @@
 /*
- * PsiOtrConfig.cpp - configuration dialogs for Psi OTR plugin
- * Copyright (C) 2007  Timo Engel (timo-e@freenet.de)
+ * PsiOtrConfig.cpp - configuration dialogs
+ *
+ * Off-the-Record Messaging plugin for Psi+
+ * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
+ *                    2011  Florian Fieber
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -13,8 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -135,7 +137,7 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
 void ConfigOtrWidget::updateOptions()
 {
     OtrPolicy policy = static_cast<OtrPolicy>(m_policy->checkedId());
-    
+
     m_optionHost->setPluginOption(OPTION_POLICY, policy);
     m_optionHost->setPluginOption(OPTION_END_WHEN_OFFLINE,
                                   m_endWhenOffline->checkState() == Qt::Checked);

@@ -5,8 +5,8 @@
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
  *                    2011  Florian Fieber
  *
- * This program was originally written as part of a diplom thesis
- * advised by Prof. Dr. Ruediger Weis (PST Labor)
+ * This program was written as part of a diplom thesis advised by
+ * Prof. Dr. Ruediger Weis (PST Labor)
  * at the Technical University of Applied Sciences Berlin.
  *
  * This program is free software; you can redistribute it and/or
@@ -20,7 +20,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
 
@@ -408,12 +409,9 @@ void OtrInternal::verifyFingerprint(const psiotr::Fingerprint& fingerprint,
 
             write_fingerprints();
 
-            if (context->active_fingerprint == fp)
-            {
-                m_callback->stateChange(QString::fromUtf8(context->accountname),
-                                        QString::fromUtf8(context->username),
-                                        psiotr::OTR_STATECHANGE_TRUST);
-            }
+            m_callback->stateChange(QString::fromUtf8(context->accountname),
+                                    QString::fromUtf8(context->username),
+                                    psiotr::OTR_STATECHANGE_TRUST);
         }
     }
 }
@@ -507,6 +505,9 @@ void OtrInternal::startSession(const QString& account, const QString& jid)
 
 void OtrInternal::endSession(const QString& account, const QString& jid)
 {
+<<<<<<< HEAD
+    otrl_message_disconnect(m_userstate, &m_uiOps, this,
+=======
     ConnContext* context = otrl_context_find(m_userstate,
                                              jid.toUtf8().constData(),
                                              account.toUtf8().constData(),
@@ -517,7 +518,8 @@ void OtrInternal::endSession(const QString& account, const QString& jid)
     {
         m_callback->stateChange(account, jid, psiotr::OTR_STATECHANGE_CLOSE);
     }
-    otrl_message_disconnect(m_userstate, &m_uiOps, this,
+    otrl_message_disconnect(m_userstate, &m_uiOps, this, 
+>>>>>>> sysmsg
                             account.toUtf8().constData(), OTR_PROTOCOL_STRING,
                             jid.toUtf8().constData());
 }
@@ -946,10 +948,17 @@ int OtrInternal::display_otr_message(const char *accountname,
                                      const char *msg)
 {
     Q_UNUSED(protocol);
+<<<<<<< HEAD
+    Q_UNUSED(username);
+    Q_UNUSED(msg);
+
+    return -1; // use notify() or inline message
+=======
 
     return m_callback->displayOtrMessage(QString::fromUtf8(accountname),
                                          QString::fromUtf8(username),
                                          QString::fromUtf8(msg))? 0 : -1;
+>>>>>>> sysmsg
 }
 
 // ---------------------------------------------------------------------------

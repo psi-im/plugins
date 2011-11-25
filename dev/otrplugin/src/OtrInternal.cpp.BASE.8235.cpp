@@ -1,12 +1,9 @@
 /*
- * OtrInternal.cpp - manages the OTR connection
+ * OtrInternal.cpp - manages the otr connection.
  *
- * Off-the-Record Messaging plugin for Psi+
- * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
- *                    2011  Florian Fieber
- *
- * This program was originally written as part of a diplom thesis
- * advised by Prof. Dr. Ruediger Weis (PST Labor)
+ * Copyright (C) Timo Engel (timo-e@freenet.de), Berlin 2007.
+ * This program was written as part of a diplom thesis advised by 
+ * Prof. Dr. Ruediger Weis (PST Labor)
  * at the Technical University of Applied Sciences Berlin.
  *
  * This program is free software; you can redistribute it and/or
@@ -20,7 +17,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
 
@@ -105,7 +103,7 @@ public:
       m_protocol(protocol)
     {
     }
-
+    
     void run()
     {
         otrl_privkey_generate(m_userstate, QFile::encodeName(m_keysFile).constData(),
@@ -182,7 +180,7 @@ QString OtrInternal::encryptMessage(const QString& from, const QString& to,
                                NULL, &encMessage, NULL, NULL);
     if (err != 0)
     {
-        m_callback->notifyUser(psiotr::OTR_NOTIFY_ERROR,
+        m_callback->notifyUser(psiotr::OTR_NOTIFY_ERROR, 
                                QObject::tr("Encrypting message to %1 "
                                            "failed.\nThe message was not sent.")
                                            .arg(to));
@@ -202,16 +200,15 @@ QString OtrInternal::encryptMessage(const QString& from, const QString& to,
 
 //-----------------------------------------------------------------------------
 
-psiotr::OtrMessageType OtrInternal::decryptMessage(const QString& from,
-                                                   const QString& to,
-                                                   const QString& cryptedMessage,
-                                                   QString& decrypted)
+bool OtrInternal::decryptMessage(const QString& from, const QString& to,
+                                 const QString& cryptedMessage,
+                                 QString& decrypted)
 {
     QByteArray accArray  = to.toUtf8();
     QByteArray userArray = from.toUtf8();
     const char* accountName = accArray.constData();
     const char* userName    = userArray.constData();
-
+    bool isOTR        = false;
     int ignoreMessage = 0;
     char* newMessage  = NULL;
     OtrlTLV* tlvs     = NULL;
@@ -225,13 +222,6 @@ psiotr::OtrMessageType OtrInternal::decryptMessage(const QString& from,
                                            cryptedMessage.toUtf8().constData(),
                                            &newMessage,
                                            &tlvs, NULL, NULL);
-
-
-    tlv = otrl_tlv_find(tlvs, OTRL_TLV_DISCONNECTED);
-    if (tlv) {
-        m_callback->stateChange(accountName, userName,
-                                psiotr::OTR_STATECHANGE_REMOTECLOSE);
-    }
 
     // Check for SMP data
     context = otrl_context_find(m_userstate,
@@ -336,17 +326,30 @@ psiotr::OtrMessageType OtrInternal::decryptMessage(const QString& from,
     {
         // Internal protocol message
 
-        return psiotr::OTR_MESSAGETYPE_IGNORE;
+        OtrlMessageType type = otrl_proto_message_type(
+                cryptedMessage.toUtf8().constData());
+
+        decrypted = QObject::tr("Received %1 [%2]")
+                               .arg(otrlMessageTypeToString(type))
+                               .arg(getMessageStateString(to, from));
+
+        if (getMessageState(to, from) == psiotr::OTR_MESSAGESTATE_ENCRYPTED)
+        {
+            decrypted.append("<br/>" + QObject::tr("Session ID: ")
+                                     + getSessionId(to, from));
+        }
+
+        isOTR = true;
     }
     else if (ignoreMessage == 0 && newMessage != NULL)
     {
         // Message has been decrypted, replace it
         decrypted = QString::fromUtf8(newMessage);
         otrl_message_free(newMessage);
-        return psiotr::OTR_MESSAGETYPE_OTR;
+        isOTR = true;
     }
 
-    return psiotr::OTR_MESSAGETYPE_NONE;
+    return isOTR;
 }
 
 //-----------------------------------------------------------------------------
@@ -405,17 +408,10 @@ void OtrInternal::verifyFingerprint(const psiotr::Fingerprint& fingerprint,
             {
                 otrl_context_set_trust(fp, "");
             }
-
-            write_fingerprints();
-
-            if (context->active_fingerprint == fp)
-            {
-                m_callback->stateChange(QString::fromUtf8(context->accountname),
-                                        QString::fromUtf8(context->username),
-                                        psiotr::OTR_STATECHANGE_TRUST);
-            }
         }
     }
+
+    write_fingerprints();
 }
 
 //-----------------------------------------------------------------------------
@@ -486,11 +482,9 @@ void OtrInternal::deleteKey(const QString& account)
 
 void OtrInternal::startSession(const QString& account, const QString& jid)
 {
-    m_callback->stateChange(account, jid, psiotr::OTR_STATECHANGE_GOINGSECURE);
-
     char fingerprint[45];
     if (!otrl_privkey_fingerprint(m_userstate, fingerprint,
-                                  account.toUtf8().constData(),
+                                  account.toUtf8().constData(), 
                                   OTR_PROTOCOL_STRING))
     {
         create_privkey(account.toUtf8().constData(), OTR_PROTOCOL_STRING);
@@ -507,17 +501,7 @@ void OtrInternal::startSession(const QString& account, const QString& jid)
 
 void OtrInternal::endSession(const QString& account, const QString& jid)
 {
-    ConnContext* context = otrl_context_find(m_userstate,
-                                             jid.toUtf8().constData(),
-                                             account.toUtf8().constData(),
-                                             OTR_PROTOCOL_STRING, false,
-                                             NULL, NULL, NULL);
-    if ((context != NULL) &&
-        (context->msgstate != OTRL_MSGSTATE_PLAINTEXT))
-    {
-        m_callback->stateChange(account, jid, psiotr::OTR_STATECHANGE_CLOSE);
-    }
-    otrl_message_disconnect(m_userstate, &m_uiOps, this,
+    otrl_message_disconnect(m_userstate, &m_uiOps, this, 
                             account.toUtf8().constData(), OTR_PROTOCOL_STRING,
                             jid.toUtf8().constData());
 }
@@ -535,8 +519,6 @@ void OtrInternal::expireSession(const QString& account, const QString& jid)
         (context->msgstate == OTRL_MSGSTATE_ENCRYPTED))
     {
         otrl_context_force_finished(context);
-        m_callback->stateChange(account, jid,
-                                psiotr::OTR_STATECHANGE_GONEINSECURE);
     }
 }
 
@@ -659,7 +641,7 @@ QString OtrInternal::getMessageStateString(const QString& account,
     {
         return QObject::tr("finished");
     }
-
+        
     return QObject::tr("unknown");
 }
 
@@ -741,17 +723,8 @@ bool OtrInternal::isVerified(const QString& account,
 {
     ConnContext* context;
     context = otrl_context_find(m_userstate, contact.toUtf8().constData(),
-                                account.toUtf8().constData(),
-                                OTR_PROTOCOL_STRING,
+                                account.toUtf8().constData(), OTR_PROTOCOL_STRING,
                                 false, NULL, NULL, NULL);
-
-    return isVerified(context);
-}
-
-//-----------------------------------------------------------------------------
-
-bool OtrInternal::isVerified(ConnContext* context)
-{
 
     if ((context != NULL) &&
         (context->active_fingerprint != NULL))
@@ -816,9 +789,9 @@ OtrlPolicy OtrInternal::policy(ConnContext*)
     }
     else if (m_otrPolicy == psiotr::OTR_POLICY_REQUIRE)
     {
-        return OTRL_POLICY_ALWAYS; // require private messaging
+        return OTRL_POLICY_ALWAYS; // require private messaging 
     }
-
+    
     return OTRL_POLICY_NEVER;
 }
 
@@ -828,11 +801,11 @@ void OtrInternal::create_privkey(const char *accountname,
                                  const char *protocol)
 {
     m_callback->stopMessages();
-
+    
     KeyGeneratorThread keyGenerator(m_userstate, m_keysFile,
                                     accountname, protocol);
     keyGenerator.start();
-
+    
     QMessageBox infoMb(QMessageBox::Information, QObject::tr("Psi OTR"),
                        QObject::tr("Generating keys for account \"%1\"."
                                    "\nThis may take a while.")
@@ -897,7 +870,7 @@ int OtrInternal::is_logged_in(const char *accountname, const char *protocol,
 }
 
 // ---------------------------------------------------------------------------
-
+                    
 void OtrInternal::inject_message(const char *accountname,
                                  const char *protocol, const char *recipient,
                                  const char *message)
@@ -908,7 +881,7 @@ void OtrInternal::inject_message(const char *accountname,
                             QString::fromUtf8(recipient),
                             QString::fromUtf8(message));
 }
-
+                
 // ---------------------------------------------------------------------------
 
 void OtrInternal::notify(OtrlNotifyLevel level, const char *accountname,
@@ -937,21 +910,22 @@ void OtrInternal::notify(OtrlNotifyLevel level, const char *accountname,
 
     m_callback->notifyUser(type, QString(primary) + "\n" + QString(secondary));
 }
-
+        
 // ---------------------------------------------------------------------------
-
+    
 int OtrInternal::display_otr_message(const char *accountname,
                                      const char *protocol,
                                      const char *username,
                                      const char *msg)
 {
+    Q_UNUSED(accountname);
     Q_UNUSED(protocol);
-
-    return m_callback->displayOtrMessage(QString::fromUtf8(accountname),
-                                         QString::fromUtf8(username),
-                                         QString::fromUtf8(msg))? 0 : -1;
+    Q_UNUSED(username);
+    Q_UNUSED(msg);
+    
+    return -1; // use notify() or inline message
 }
-
+                
 // ---------------------------------------------------------------------------
 
 void OtrInternal::update_context_list()
@@ -980,21 +954,16 @@ void OtrInternal::new_fingerprint(OtrlUserState us, const char *accountname,
                                   unsigned char fingerprint[20])
 {
     Q_UNUSED(us);
+    Q_UNUSED(accountname);
     Q_UNUSED(protocol);
 
-    QString account = QString::fromUtf8(accountname);
-    QString contact = QString::fromUtf8(username);
-    QString message = QObject::tr("You have received a new "
-                                  "fingerprint from %1:\n%2")
-                                 .arg(m_callback->humanContact(account, contact))
-                                 .arg(humanFingerprint(fingerprint));
-
-    if (!m_callback->displayOtrMessage(account, contact, message))
-    {
-        m_callback->notifyUser(psiotr::OTR_NOTIFY_INFO, message);
-    }
+    m_callback->notifyUser(psiotr::OTR_NOTIFY_INFO,
+                           QObject::tr("You have received a new "
+                                       "fingerprint from %1:\n%2")
+                                       .arg(QString::fromUtf8(username))
+                                       .arg(humanFingerprint(fingerprint)));
 }
-
+            
 // ---------------------------------------------------------------------------
 
 void OtrInternal::write_fingerprints()
@@ -1007,28 +976,22 @@ void OtrInternal::write_fingerprints()
 
 void OtrInternal::gone_secure(ConnContext *context)
 {
-    m_callback->stateChange(QString::fromUtf8(context->accountname),
-                            QString::fromUtf8(context->username),
-                            psiotr::OTR_STATECHANGE_GONESECURE);
+    Q_UNUSED(context);
 }
 
 // ---------------------------------------------------------------------------
 
 void OtrInternal::gone_insecure(ConnContext *context)
 {
-    m_callback->stateChange(QString::fromUtf8(context->accountname),
-                            QString::fromUtf8(context->username),
-                            psiotr::OTR_STATECHANGE_GONEINSECURE);
+    Q_UNUSED(context);
 }
-
+    
 // ---------------------------------------------------------------------------
 
 void OtrInternal::still_secure(ConnContext *context, int is_reply)
 {
+    Q_UNUSED(context);
     Q_UNUSED(is_reply);
-    m_callback->stateChange(QString::fromUtf8(context->accountname),
-                            QString::fromUtf8(context->username),
-                            psiotr::OTR_STATECHANGE_STILLSECURE);
 }
 
 // ---------------------------------------------------------------------------
@@ -1057,15 +1020,15 @@ void OtrInternal::account_name_free(const char *account_name)
 
 // ---------------------------------------------------------------------------
 /*** static wrapper functions ***/
-
+    
 OtrlPolicy OtrInternal::cb_policy(void *opdata, ConnContext *context) {
     return static_cast<OtrInternal*>(opdata)->policy(context);
 }
-
+    
 void OtrInternal::cb_create_privkey(void *opdata, const char *accountname, const char *protocol) {
     static_cast<OtrInternal*>(opdata)->create_privkey(accountname, protocol);
-}
-
+}             
+                        
 int OtrInternal::cb_is_logged_in(void *opdata, const char *accountname, const char *protocol, const char *recipient) {
     return static_cast<OtrInternal*>(opdata)->is_logged_in(accountname, protocol, recipient);
 }
@@ -1077,19 +1040,19 @@ void OtrInternal::cb_inject_message(void *opdata, const char *accountname, const
 void OtrInternal::cb_notify(void *opdata, OtrlNotifyLevel level, const char *accountname, const char *protocol, const char *username, const char *title, const char *primary, const char *secondary) {
     static_cast<OtrInternal*>(opdata)->notify(level, accountname, protocol, username, title, primary, secondary);
 }
-
+    
 int OtrInternal::cb_display_otr_message(void *opdata, const char *accountname, const char *protocol, const char *username, const char *msg) {
     return static_cast<OtrInternal*>(opdata)->display_otr_message(accountname, protocol, username, msg);
 }
-
+                   
 void OtrInternal::cb_update_context_list(void *opdata) {
     static_cast<OtrInternal*>(opdata)->update_context_list();
 }
-
+        
 const char* OtrInternal::cb_protocol_name(void *opdata, const char *protocol) {
     return static_cast<OtrInternal*>(opdata)->protocol_name(protocol);
 }
-
+    
 void OtrInternal::cb_protocol_name_free(void *opdata, const char *protocol_name) {
     static_cast<OtrInternal*>(opdata)->protocol_name(protocol_name);
 }
@@ -1097,11 +1060,11 @@ void OtrInternal::cb_protocol_name_free(void *opdata, const char *protocol_name)
 void OtrInternal::cb_new_fingerprint(void *opdata, OtrlUserState us, const char *accountname, const char *protocol, const char *username, unsigned char fingerprint[20]) {
     static_cast<OtrInternal*>(opdata)->new_fingerprint(us, accountname, protocol, username, fingerprint);
 }
-
+            
 void OtrInternal::cb_write_fingerprints(void *opdata) {
     static_cast<OtrInternal*>(opdata)->write_fingerprints();
 }
-
+    
 void OtrInternal::cb_gone_secure(void *opdata, ConnContext *context) {
     static_cast<OtrInternal*>(opdata)->gone_secure(context);
 }
@@ -1109,11 +1072,11 @@ void OtrInternal::cb_gone_secure(void *opdata, ConnContext *context) {
 void OtrInternal::cb_gone_insecure(void *opdata, ConnContext *context) {
     static_cast<OtrInternal*>(opdata)->gone_insecure(context);
 }
-
+    
 void OtrInternal::cb_still_secure(void *opdata, ConnContext *context, int is_reply) {
     static_cast<OtrInternal*>(opdata)->still_secure(context, is_reply);
 }
-
+    
 void OtrInternal::cb_log_message(void *opdata, const char *message) {
     static_cast<OtrInternal*>(opdata)->log_message(message);
 }

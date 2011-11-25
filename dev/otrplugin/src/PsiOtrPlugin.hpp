@@ -1,9 +1,12 @@
 /*
- * psi-otr.h - off-the-record messaging plugin for psi
+ * PsiOtrPlugin.hpp
  *
- * Copyright (C) Timo Engel (timo-e@freenet.de), Berlin 2007.
- * This program was written as part of a diplom thesis advised by 
- * Prof. Dr. Ruediger Weis (PST Labor)
+ * Off-the-Record Messaging plugin for Psi+
+ * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
+ *                    2011  Florian Fieber
+ *
+ * This program was originally written as part of a diplom thesis
+ * advised by Prof. Dr. Ruediger Weis (PST Labor)
  * at the Technical University of Applied Sciences Berlin.
  *
  * This program is free software; you can redistribute it and/or
@@ -17,8 +20,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -31,6 +33,7 @@
 
 #include "OtrMessaging.hpp"
 #include "psiplugin.h"
+#include "plugininfoprovider.h"
 #include "eventfilter.h"
 #include "optionaccessinghost.h"
 #include "optionaccessor.h"
@@ -55,11 +58,12 @@ namespace psiotr
 
 class ConfigDlg;
 class PsiOtrClosure;
-    
+
 //-----------------------------------------------------------------------------
 
 class PsiOtrPlugin : public QObject,
                      public PsiPlugin,
+                     public PluginInfoProvider,
                      public EventFilter,
                      public OptionAccessor,
                      public StanzaSender,
@@ -74,6 +78,7 @@ class PsiOtrPlugin : public QObject,
 {
 Q_OBJECT
 Q_INTERFACES(PsiPlugin
+             PluginInfoProvider
              EventFilter
              OptionAccessor
              StanzaSender
@@ -93,11 +98,14 @@ public:
     virtual QString name() const;
     virtual QString shortName() const;
     virtual QString version() const;
-    virtual QWidget* options(); 
+    virtual QWidget* options();
     virtual bool enable();
     virtual bool disable();
     virtual void applyOptions();
     virtual void restoreOptions();
+
+    // PluginInfoProvider
+    virtual QString pluginInfo();
 
     // EventFilter
     virtual bool processEvent(int accountIndex, QDomElement& e);
@@ -135,7 +143,7 @@ public:
 
     // ContactInfoAccessor
     virtual void setContactInfoAccessingHost(ContactInfoAccessingHost* host);
-    
+
     // IconFactoryAccessingHost
     virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
 
