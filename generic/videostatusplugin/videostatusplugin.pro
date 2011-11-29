@@ -1,13 +1,10 @@
 CONFIG += release
 include(../../psiplugin.pri)
 
+SOURCES += videostatusplugin.cpp
+FORMS += options.ui
+
 unix {
-    SOURCES += videostatusplugin.cpp
-    FORMS += options.ui
     CONFIG += X11
     QT += dbus
-}
-win32 {
-    SOURCES += videostatuspluginwin.cpp
-    FORMS += winoptions.ui
 }

@@ -17,14 +17,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  */
-
-#include <QDBusMessage>
-#include <QDBusConnection>
-#include <QDBusMetaType>
-#include <QDBusReply>
-#include <QDBusInterface>
-#include <QDBusConnectionInterface>
-
 #include "psiplugin.h"
 #include "plugininfoprovider.h"
 #include "optionaccessinghost.h"
@@ -36,25 +28,30 @@
 
 #include "ui_options.h"
 
+#ifdef Q_WS_WIN
+#include "w32api.h"
+#include "windows.h"
+#elif defined (Q_WS_X11)
+#include <QDBusMessage>
+#include <QDBusConnection>
+#include <QDBusMetaType>
+#include <QDBusReply>
+#include <QDBusInterface>
+#include <QDBusConnectionInterface>
 #include <QX11Info>
 #include <X11/Xlib.h>
-
-#define constVersion "0.1.2"
 
 #define constPlayerVLC "vlcplayer"
 #define constPlayerTotem "totemplayer"
 #define constPlayerGMPlayer "gmplayer"
 #define constPlayerKaffeine "kaffeineplayer"
-#define constStatus "status"
-#define constStatusMessage "statusmessage"
-#define constSetOnline "setonline"
-#define constRestoreDelay "restoredelay"
-#define constSetDelay "setdelay"
-#define constFullScreen "fullscreen"
 #define vlcService "org.mpris.vlc"
 #define totemService "org.mpris.Totem"
 #define gmplayerService "com.gnome.mplayer"
 #define kaffeineService "org.mpris.kaffeine"
+
+static const int StatusPlaying = 0;
+static const QString busName = "Session";
 
 typedef QList<Window> WindowList;
 
@@ -86,11 +83,18 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 	arg.endStructure();
 	return arg;
 }
+#endif
 
-static const int StatusPlaying = 0;
+#define constVersion "0.1.3"
+
+#define constStatus "status"
+#define constStatusMessage "statusmessage"
+#define constSetOnline "setonline"
+#define constRestoreDelay "restoredelay"
+#define constSetDelay "setdelay"
+#define constFullScreen "fullscreen"
 
 static const int timeout = 10000;
-static const QString busName = "Session";
 
 class VideoStatusChanger : public QObject, public PsiPlugin, public PluginInfoProvider, public OptionAccessor
 			, public PsiAccountController, public AccountInfoAccessor
@@ -118,17 +122,25 @@ private:
 	OptionAccessingHost* psiOptions;
 	AccountInfoAccessingHost* accInfo;
 	PsiAccountControllingHost* accControl;
-	bool playerVLC, playerTotem, playerGMPlayer, playerKaffeine; //настройки пользователя, следим за проигрывателем или нет
 	QString status, statusMessage;
 	Ui::OptionsWidget ui_;
+#ifdef Q_WS_X11
+	bool playerVLC, playerTotem, playerGMPlayer, playerKaffeine; //настройки пользователя, следим за проигрывателем или нет
 	QPointer<QTimer> checkTimer; //Таймер Gnome Mplayer
+	QStringList validPlayers_; //список включенных плееров
+	QStringList players_; //очередь плееров которые слушает плагин
+	bool sendDBusCall(const QString &service, const QString &path, const QString &interface, const QString &command);
+	void connectToBus(const QString &service_);
+	void disconnectFromBus(const QString &service_);
+	void startCheckTimer();
+	void setValidPlayers();
+	bool isPlayerValid(const QString &service);
+#endif
 	QTimer fullST;
 	bool isStatusSet; // здесь храним информацию, установлен ли уже статус (чтобы не устанавливать повторно при каждом срабатывании таймера)
 	bool setOnline;
 	int restoreDelay; //задержка восстановления статуса
 	int setDelay; //задержка установки статуса
-	QStringList validPlayers_; //список включенных плееров
-	QStringList players_; //очередь плееров которые слушает плагин
 	bool fullScreen;
 
 	struct StatusString {
@@ -136,21 +148,20 @@ private:
 		QString message;
 	};
 	QHash<int, StatusString> statuses_;
-
-	bool sendDBusCall(const QString &service, const QString &path, const QString &interface, const QString &command);
-	void connectToBus(const QString &service_);
-	void disconnectFromBus(const QString &service_);
+#ifdef Q_WS_WIN
+	bool isFullscreenWindow();
+#endif
 	void setPsiGlobalStatus(const bool set);
-	void startCheckTimer();
 	void setStatusTimer(const int delay, const bool isStart);
-	void setValidPlayers();
-	bool isPlayerValid(const QString &service);
 
 private slots:
+#ifdef Q_WS_X11
 	void checkMprisService(const QString &name, const QString &oldOwner, const QString &newOwner);
-	void timeOut(); //здесь проверяем проигрыватели
-	void delayTimeout();
 	void onPlayerStatusChange(const PlayerStatus &ps);
+	void timeOut(); //здесь проверяем проигрыватель Gnome Mplayer
+#endif
+
+	void delayTimeout();
 	void fullSTTimeout();
 
 };
@@ -159,10 +170,12 @@ Q_EXPORT_PLUGIN(VideoStatusChanger);
 
 VideoStatusChanger::VideoStatusChanger() {
 	enabled = false;
+#ifdef Q_WS_X11
 	playerVLC = false;
 	playerTotem = false;
 	playerGMPlayer = false;
 	playerKaffeine = false;
+#endif
 	status = "dnd";
 	statusMessage = "";
 	psiOptions = 0;
@@ -202,11 +215,13 @@ void VideoStatusChanger::setPsiAccountControllingHost(PsiAccountControllingHost*
 bool VideoStatusChanger::enable() {
 	if(psiOptions) {
 		enabled = true;
+#ifdef Q_WS_X11
 		playerVLC = psiOptions->getPluginOption(constPlayerVLC, QVariant(playerVLC)).toBool();
 		playerTotem = psiOptions->getPluginOption(constPlayerTotem, QVariant(playerTotem)).toBool();
 		playerGMPlayer = psiOptions->getPluginOption(constPlayerGMPlayer, QVariant(playerGMPlayer)).toBool();
 		playerKaffeine = psiOptions->getPluginOption(constPlayerKaffeine, QVariant(playerKaffeine)).toBool();
 		setValidPlayers();
+#endif
 		statuses_.clear();
 		status = psiOptions->getPluginOption(constStatus, QVariant(status)).toString();
 		statusMessage = psiOptions->getPluginOption(constStatusMessage, QVariant(statusMessage)).toString();
@@ -214,6 +229,7 @@ bool VideoStatusChanger::enable() {
 		restoreDelay = psiOptions->getPluginOption(constRestoreDelay, QVariant(restoreDelay)).toInt();
 		setDelay = psiOptions->getPluginOption(constSetDelay, QVariant(setDelay)).toInt();
 		fullScreen = psiOptions->getPluginOption(constFullScreen, fullScreen).toBool();
+#ifdef Q_WS_X11
 		qDBusRegisterMetaType<PlayerStatus>();
 		//подключаемся к сессионной шине с соединением по имени busName
 		QDBusConnection::connectToBus(QDBusConnection::SessionBus, busName);
@@ -231,7 +247,7 @@ bool VideoStatusChanger::enable() {
 			    QLatin1String("NameOwnerChanged"),
 			    this,
 			    SLOT(checkMprisService(QString, QString, QString)));
-
+#endif
 		fullST.setInterval(timeout);
 		connect(&fullST, SIGNAL(timeout()), SLOT(fullSTTimeout()));
 		if(fullScreen)
@@ -243,6 +259,7 @@ bool VideoStatusChanger::enable() {
 bool VideoStatusChanger::disable(){
 	enabled = false;
 	fullST.stop();
+#ifdef Q_WS_X11
 	//отключаем прослушку активных плееров
 	foreach(const QString &player, players_) {
 		disconnectFromBus(player);
@@ -261,10 +278,12 @@ bool VideoStatusChanger::disable(){
 		disconnect(checkTimer, SIGNAL(timeout()), this, SLOT(timeOut()));
 		delete(checkTimer);
 	}
+#endif
 	return true;
 }
 
 void VideoStatusChanger::applyOptions() {
+#ifdef Q_WS_X11
 	playerVLC = ui_.cb_vlc->isChecked();
 	psiOptions->setPluginOption(constPlayerVLC, QVariant(playerVLC));
 
@@ -277,6 +296,8 @@ void VideoStatusChanger::applyOptions() {
 	playerKaffeine = ui_.cb_kaffeine->isChecked();
 	psiOptions->setPluginOption(constPlayerKaffeine, QVariant(playerKaffeine));
 
+	setValidPlayers();
+#endif
 	status = ui_.cb_status->currentText();
 	psiOptions->setPluginOption(constStatus, QVariant(status));
 	statusMessage = ui_.le_message->text();
@@ -291,8 +312,6 @@ void VideoStatusChanger::applyOptions() {
 	fullScreen = ui_.cb_fullScreen->isChecked();
 	psiOptions->setPluginOption(constFullScreen, fullScreen);
 
-	setValidPlayers();
-
 	if(fullScreen) {
 		fullST.start();
 	}
@@ -303,10 +322,14 @@ void VideoStatusChanger::applyOptions() {
 }
 
 void VideoStatusChanger::restoreOptions() {
+#ifdef Q_WS_X11
 	ui_.cb_vlc->setChecked(playerVLC);
 	ui_.cb_totem->setChecked(playerTotem);
 	ui_.cb_gmp->setChecked(playerGMPlayer);
 	ui_.cb_kaffeine->setChecked(playerKaffeine);
+#elif defined (Q_WS_WIN)
+	ui_.groupBox->hide();
+#endif
 	QStringList list;
 	list << "away" << "xa" << "dnd";
 	ui_.cb_status->addItems(list);
@@ -331,14 +354,17 @@ QWidget* VideoStatusChanger::options(){
 
 QString VideoStatusChanger::pluginInfo() {
 	return tr("Authors: ") +  "Dealer_WeARE, KukuRuzo\n\n"
-			+ trUtf8("This plugin is designed to set the custom status when you see the video in selected video player. \n"
-				 "Note: This plugin is designed to work in Linux family operating systems ONLY. \n\n"
+			+ trUtf8("This plugin is designed to set the custom status when you watching the video in selected video players. \n"
+				 "Note: This plugin is designed to work in Linux family operating systems and in Windows OS. \n\n"
+				 "In Linux plugin uses DBUS to work with video players and X11 functions to detect fullscreen applications. \n"
+				 "In Windows plugin uses WinAPI functions to detect fullscreen applications. \n\n"
 				 "To work with Totem player you need to enable appropriate plugin in this player (Edit\\Plugins\\D-Bus);\n\n"
 				 "To work with VLC player you need to enable the option \"Control Interface D-Bus\" in the Advanced Settings tab on \"Interface\\Control Interface\" section of the player settings; \n\n"
 				 "To work with Kaffeine player you must have player version (>= 1.0), additional configuration is not needed; \n\n"
 				 "To work with GNOME MPlayer additional configuration is not needed.");
 }
 
+#ifdef Q_WS_X11
 void VideoStatusChanger::setValidPlayers()
 {
 	//функция работы со списком разрешенных плееров - ?
@@ -415,15 +441,6 @@ void VideoStatusChanger::startCheckTimer()
 		disconnect(checkTimer);
 		delete(checkTimer);
 		setStatusTimer(restoreDelay, false);
-	}
-}
-
-void VideoStatusChanger::setStatusTimer(const int delay, const bool isStart)
-{
-	//запуск таймера установки / восстановления статуса
-	if ((isStart | setOnline) != 0) {
-		QTimer::singleShot(delay*1000, this, SLOT(delayTimeout()));
-		isStatusSet = isStart;
 	}
 }
 
@@ -521,48 +538,6 @@ static Window activeWindow()
 	return getWindows(net_active).value(0);
 }
 
-void VideoStatusChanger::fullSTTimeout()
-{
-	Window w = activeWindow();
-	Display  *display = QX11Info::display();
-	bool full = false;
-	static Atom state = XInternAtom(display, "_NET_WM_STATE", False);
-	static Atom  fullScreen = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);
-	Atom actual_type;
-	int actual_format;
-	unsigned long nitems;
-	unsigned long bytes;
-	unsigned char *data = 0;
-
-	if (XGetWindowProperty(display, w, state, 0, (~0L), False, AnyPropertyType,
-			       &actual_type, &actual_format, &nitems, &bytes, &data) == Success) {
-		if(nitems != 0) {
-			Atom *atom = reinterpret_cast<Atom*>(data);
-			for (ulong i = 0; i < nitems; i++) {
-				if(atom[i] == fullScreen) {
-					full = true;
-					break;
-				}
-			}
-		}
-	}
-	if(data)
-		XFree(data);
-
-	if(full) {
-		if(!isStatusSet) {
-			setStatusTimer(setDelay, true);
-		}
-	}
-	else if(isStatusSet) {
-		setStatusTimer(restoreDelay, false);
-	}
-}
-
-void VideoStatusChanger::delayTimeout() {
-	setPsiGlobalStatus(!isStatusSet);
-}
-
 bool VideoStatusChanger::sendDBusCall(const QString &service, const QString &path, const QString &interface, const QString &command){
 	//qDebug("Checking service %s", qPrintable(service));
 	QDBusInterface player(service, path, interface);
@@ -588,6 +563,82 @@ bool VideoStatusChanger::sendDBusCall(const QString &service, const QString &pat
 	}
 	return false;
 }
+#endif
+
+void VideoStatusChanger::fullSTTimeout()
+{
+#ifdef Q_WS_X11
+	Window w = activeWindow();
+	Display  *display = QX11Info::display();
+	bool full = false;
+	static Atom state = XInternAtom(display, "_NET_WM_STATE", False);
+	static Atom  fullScreen = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);
+	Atom actual_type;
+	int actual_format;
+	unsigned long nitems;
+	unsigned long bytes;
+	unsigned char *data = 0;
+
+	if (XGetWindowProperty(display, w, state, 0, (~0L), False, AnyPropertyType,
+			       &actual_type, &actual_format, &nitems, &bytes, &data) == Success) {
+		if(nitems != 0) {
+			Atom *atom = reinterpret_cast<Atom*>(data);
+			for (ulong i = 0; i < nitems; i++) {
+				if(atom[i] == fullScreen) {
+					full = true;
+					break;
+				}
+			}
+		}
+	}
+	if(data)
+		XFree(data);
+#elif defined (Q_WS_WIN)
+	bool full = isFullscreenWindow();
+#endif
+	if(full) {
+		if(!isStatusSet) {
+			setStatusTimer(setDelay, true);
+		}
+	}
+	else if(isStatusSet) {
+		setStatusTimer(restoreDelay, false);
+	}
+}
+
+#ifdef Q_WS_WIN
+bool VideoStatusChanger::isFullscreenWindow()
+{
+	HWND topWindow = GetForegroundWindow();
+	HWND desktop = GetDesktopWindow();
+	RECT windowRect;
+	RECT desktopRect;
+	if (GetWindowRect(topWindow, &windowRect) && GetWindowRect(desktop, &desktopRect)) {
+		if ((windowRect.right - windowRect.left) == (desktopRect.right - desktopRect.left)
+		    && (windowRect.bottom - windowRect.top) == (desktopRect.bottom - desktopRect.top)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	return false;
+}
+#endif
+
+void VideoStatusChanger::setStatusTimer(const int delay, const bool isStart)
+{
+	//запуск таймера установки / восстановления статуса
+	if ((isStart | setOnline) != 0) {
+		QTimer::singleShot(delay*1000, this, SLOT(delayTimeout()));
+		isStatusSet = isStart;
+	}
+}
+
+void VideoStatusChanger::delayTimeout() {
+	setPsiGlobalStatus(!isStatusSet);
+}
+
 
 void VideoStatusChanger::setPsiGlobalStatus(const bool set) {
 	if (!enabled) return;
