@@ -29,6 +29,7 @@
 #include "ui_options.h"
 
 #ifdef Q_WS_WIN
+#define _WIN32_WINNT 0x0500
 #include "w32api.h"
 #include "windows.h"
 #elif defined (Q_WS_X11)
@@ -47,6 +48,7 @@
 #define constPlayerKaffeine "kaffeineplayer"
 #define vlcService "org.mpris.vlc"
 #define totemService "org.mpris.Totem"
+#define totemNewService "org.mpris.MediaPlayer2.Totem"
 #define gmplayerService "com.gnome.mplayer"
 #define kaffeineService "org.mpris.kaffeine"
 
@@ -85,7 +87,7 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 }
 #endif
 
-#define constVersion "0.1.3"
+#define constVersion "0.1.4"
 
 #define constStatus "status"
 #define constStatusMessage "statusmessage"
@@ -150,6 +152,10 @@ private:
 	QHash<int, StatusString> statuses_;
 #ifdef Q_WS_WIN
 	bool isFullscreenWindow();
+
+	int desktopWidth;
+	int desktopHeight;
+	HWND shell_;
 #endif
 	void setPsiGlobalStatus(const bool set);
 	void setStatusTimer(const int delay, const bool isStart);
@@ -158,6 +164,7 @@ private slots:
 #ifdef Q_WS_X11
 	void checkMprisService(const QString &name, const QString &oldOwner, const QString &newOwner);
 	void onPlayerStatusChange(const PlayerStatus &ps);
+	void onPropertyChange(const QDBusMessage &msg);
 	void timeOut(); //здесь проверяем проигрыватель Gnome Mplayer
 #endif
 
@@ -247,6 +254,17 @@ bool VideoStatusChanger::enable() {
 			    QLatin1String("NameOwnerChanged"),
 			    this,
 			    SLOT(checkMprisService(QString, QString, QString)));
+#elif defined (Q_WS_WIN)
+		RECT dSize;
+		if (GetWindowRect(GetDesktopWindow(), &dSize)) {
+			desktopWidth = abs(dSize.right - dSize.left);
+			desktopHeight = abs(dSize.bottom - dSize.top);
+		}
+		else{
+			desktopWidth = GetSystemMetrics(SM_CXFULLSCREEN);
+			desktopHeight = GetSystemMetrics(SM_CYFULLSCREEN);
+		}
+		shell_ = GetShellWindow();
 #endif
 		fullST.setInterval(timeout);
 		connect(&fullST, SIGNAL(timeout()), SLOT(fullSTTimeout()));
@@ -376,12 +394,18 @@ void VideoStatusChanger::setValidPlayers()
 		index = validPlayers_.indexOf(vlcService);
 		validPlayers_.removeAt(index);
 	}
-	if (playerTotem && !isPlayerValid(totemService)) {
-		validPlayers_ << totemService;
+	if (playerTotem && (!isPlayerValid(totemService) || !isPlayerValid(totemNewService))) {
+		validPlayers_ << totemService << totemNewService;
 	}
-	else if (!playerTotem && isPlayerValid(totemService)) {
+	else if (!playerTotem && (isPlayerValid(totemService) || isPlayerValid(totemNewService))) {
 		index = validPlayers_.indexOf(totemService);
-		validPlayers_.removeAt(index);
+		if (index != -1) {
+			validPlayers_.removeAt(index);
+		}
+		index = validPlayers_.indexOf(totemNewService);
+		if (index != -1) {
+			validPlayers_.removeAt(index);
+		}
 	}
 	if (playerKaffeine && !isPlayerValid(kaffeineService)) {
 		validPlayers_ << kaffeineService;
@@ -446,7 +470,7 @@ void VideoStatusChanger::startCheckTimer()
 
 void VideoStatusChanger::connectToBus(const QString &service_)
 {
-	if (service_.contains("org.mpris")) {
+	if (service_.contains("org.mpris") && !service_.contains("org.mpris.MediaPlayer2")) {
 		QDBusConnection(busName).connect(service_,
 			    QLatin1String("/Player"),
 			    QLatin1String("org.freedesktop.MediaPlayer"),
@@ -455,6 +479,14 @@ void VideoStatusChanger::connectToBus(const QString &service_)
 			    this,
 			    SLOT(onPlayerStatusChange(PlayerStatus)));
 	}
+	else if (service_.contains("org.mpris.MediaPlayer2")) {
+		QDBusConnection(busName).connect(service_,
+			    QLatin1String("/org/mpris/MediaPlayer2"),
+			    QLatin1String("org.freedesktop.DBus.Properties"),
+			    QLatin1String("PropertiesChanged"),
+			    this,
+			    SLOT(onPropertyChange(QDBusMessage)));
+	}
 	else if (service_.contains(gmplayerService)) {
 		startCheckTimer();
 	}
@@ -462,7 +494,7 @@ void VideoStatusChanger::connectToBus(const QString &service_)
 
 void VideoStatusChanger::disconnectFromBus(const QString &service_)
 {
-	if (service_.contains("org.mpris")) {
+	if (service_.contains("org.mpris") && !service_.contains("org.mpris.MediaPlayer2")) {
 		QDBusConnection(busName).disconnect(service_,
 			       QLatin1String("/Player"),
 			       QLatin1String("org.freedesktop.MediaPlayer"),
@@ -473,6 +505,13 @@ void VideoStatusChanger::disconnectFromBus(const QString &service_)
 		if (isStatusSet) {
 			setStatusTimer(restoreDelay, false);
 		}
+	}
+	else if (service_.contains("org.mpris.MediaPlayer2")) {
+		QDBusConnection(busName).disconnect(service_,QLatin1String("/org/mpris/MediaPlayer2"),
+						   QLatin1String("org.freedesktop.DBus.Properties"),
+						   QLatin1String("PropertiesChanged"),
+						   this,
+						   SLOT(onPropertyChange(QDBusMessage)));
 	}
 	else if (service_.contains(gmplayerService)) {
 		startCheckTimer();
@@ -489,6 +528,24 @@ void VideoStatusChanger::onPlayerStatusChange(const PlayerStatus &st)
 		setStatusTimer(restoreDelay, false);
 		fullST.start();
 	}
+}
+
+void VideoStatusChanger::onPropertyChange(const QDBusMessage &msg)
+{
+	QDBusArgument arg = msg.arguments().at(1).value<QDBusArgument>();
+	QVariantMap map = qdbus_cast<QVariantMap>(arg);
+	QVariant v = map.value(QLatin1String("PlaybackStatus"));
+	if (v.isValid()) {
+		if (v.toString() == QLatin1String("Playing")) {
+			fullST.stop();
+			setStatusTimer(setDelay, true);
+		}
+		else if (v.toString() == QLatin1String("Paused") || v.toString() == QLatin1String("Stopped")) {
+			setStatusTimer(restoreDelay, false);
+			fullST.start();
+		}
+	}
+
 }
 
 void VideoStatusChanger::timeOut() {
@@ -610,12 +667,11 @@ void VideoStatusChanger::fullSTTimeout()
 bool VideoStatusChanger::isFullscreenWindow()
 {
 	HWND topWindow = GetForegroundWindow();
-	HWND desktop = GetDesktopWindow();
 	RECT windowRect;
-	RECT desktopRect;
-	if (GetWindowRect(topWindow, &windowRect) && GetWindowRect(desktop, &desktopRect)) {
-		if ((windowRect.right - windowRect.left) == (desktopRect.right - desktopRect.left)
-		    && (windowRect.bottom - windowRect.top) == (desktopRect.bottom - desktopRect.top)) {
+	if (GetClientRect(topWindow, &windowRect)
+	    && topWindow != shell_) {
+		if (windowRect.right >= desktopWidth
+		    && windowRect.bottom >= desktopHeight){
 			return true;
 		}
 		else {
