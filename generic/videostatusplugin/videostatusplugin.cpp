@@ -48,7 +48,7 @@
 #define constPlayerKaffeine "kaffeineplayer"
 #define vlcService "org.mpris.vlc"
 #define totemService "org.mpris.Totem"
-#define totemNewService "org.mpris.MediaPlayer2.Totem"
+#define totemNewService "org.mpris.MediaPlayer2.totem"
 #define gmplayerService "com.gnome.mplayer"
 #define kaffeineService "org.mpris.kaffeine"
 
