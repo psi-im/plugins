@@ -29,8 +29,6 @@
 #include "ui_options.h"
 
 #ifdef Q_WS_WIN
-#define _WIN32_WINNT 0x0500
-#include "w32api.h"
 #include "windows.h"
 #elif defined (Q_WS_X11)
 #include <QDBusMessage>
@@ -87,7 +85,7 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 }
 #endif
 
-#define constVersion "0.1.4"
+#define constVersion "0.1.5"
 
 #define constStatus "status"
 #define constStatusMessage "statusmessage"
@@ -151,11 +149,11 @@ private:
 	};
 	QHash<int, StatusString> statuses_;
 #ifdef Q_WS_WIN
+	void getDesktopSize();
 	bool isFullscreenWindow();
 
 	int desktopWidth;
 	int desktopHeight;
-	HWND shell_;
 #endif
 	void setPsiGlobalStatus(const bool set);
 	void setStatusTimer(const int delay, const bool isStart);
@@ -254,17 +252,6 @@ bool VideoStatusChanger::enable() {
 			    QLatin1String("NameOwnerChanged"),
 			    this,
 			    SLOT(checkMprisService(QString, QString, QString)));
-#elif defined (Q_WS_WIN)
-		RECT dSize;
-		if (GetWindowRect(GetDesktopWindow(), &dSize)) {
-			desktopWidth = abs(dSize.right - dSize.left);
-			desktopHeight = abs(dSize.bottom - dSize.top);
-		}
-		else{
-			desktopWidth = GetSystemMetrics(SM_CXFULLSCREEN);
-			desktopHeight = GetSystemMetrics(SM_CYFULLSCREEN);
-		}
-		shell_ = GetShellWindow();
 #endif
 		fullST.setInterval(timeout);
 		connect(&fullST, SIGNAL(timeout()), SLOT(fullSTTimeout()));
@@ -664,18 +651,39 @@ void VideoStatusChanger::fullSTTimeout()
 }
 
 #ifdef Q_WS_WIN
+
+void VideoStatusChanger::getDesktopSize()
+{
+	RECT dSize;
+	if (GetWindowRect(GetDesktopWindow(), &dSize)) {
+		desktopWidth = abs(dSize.right - dSize.left);
+		desktopHeight = abs(dSize.bottom - dSize.top);
+	}
+	else{
+		desktopWidth = GetSystemMetrics(SM_CXSCREEN);
+		desktopHeight = GetSystemMetrics(SM_CYSCREEN);
+	}
+}
+
 bool VideoStatusChanger::isFullscreenWindow()
 {
 	HWND topWindow = GetForegroundWindow();
-	RECT windowRect;
-	if (GetClientRect(topWindow, &windowRect)
-	    && topWindow != shell_) {
-		if (windowRect.right >= desktopWidth
-		    && windowRect.bottom >= desktopHeight){
+	bool isDesktop = ((GetWindow(GetWindow(GetDesktopWindow(), GW_CHILD),
+				    GW_HWNDLAST)) == topWindow);
+	getDesktopSize();
+	WINDOWINFO info;
+	memset(&info, 0, sizeof(WINDOWINFO));
+	if (GetWindowInfo(topWindow, &info)) {
+		int x = info.rcWindow.left;
+		int y = info.rcWindow.top;
+		int wWidth = info.rcClient.right;
+		int wHeight = info.rcClient.bottom;
+		if (x == 0
+		    && y == 0
+		    && wWidth >= desktopWidth
+		    && wHeight >= desktopHeight
+		    && !isDesktop) {
 			return true;
-		}
-		else {
-			return false;
 		}
 	}
 	return false;
