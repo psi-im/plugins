@@ -85,7 +85,7 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 }
 #endif
 
-#define constVersion "0.1.5"
+#define constVersion "0.1.6"
 
 #define constStatus "status"
 #define constStatusMessage "statusmessage"
@@ -668,22 +668,35 @@ void VideoStatusChanger::getDesktopSize()
 bool VideoStatusChanger::isFullscreenWindow()
 {
 	HWND topWindow = GetForegroundWindow();
-	bool isDesktop = ((GetWindow(GetWindow(GetDesktopWindow(), GW_CHILD),
-				    GW_HWNDLAST)) == topWindow);
-	getDesktopSize();
-	WINDOWINFO info;
-	memset(&info, 0, sizeof(WINDOWINFO));
-	if (GetWindowInfo(topWindow, &info)) {
-		int x = info.rcWindow.left;
-		int y = info.rcWindow.top;
-		int wWidth = info.rcClient.right;
-		int wHeight = info.rcClient.bottom;
-		if (x == 0
-		    && y == 0
-		    && wWidth >= desktopWidth
-		    && wHeight >= desktopHeight
-		    && !isDesktop) {
-			return true;
+	if (topWindow != NULL) {
+		//check for Progman window by GetWindow method
+		bool isDesktop = (GetWindow(GetWindow(GetDesktopWindow(), GW_CHILD), GW_HWNDLAST) == topWindow);
+		if (!isDesktop) {
+			//check for Progman and WorkerW by the name of the windows class
+			QByteArray ba(4 * sizeof(wchar_t), 0);
+			if (GetClassNameW(topWindow, (wchar_t*)ba.data(), ba.size()) > 0) {
+				QString className = QString::fromWCharArray((wchar_t*)ba.data(), ba.size());
+				if (className.contains("Progman", Qt::CaseInsensitive)
+				    || className.contains("WorkerW", Qt::CaseInsensitive)) {
+					isDesktop = true;
+				}
+			}
+		}
+		getDesktopSize();
+		WINDOWINFO info;
+		memset(&info, 0, sizeof(WINDOWINFO));
+		if (GetWindowInfo(topWindow, &info)) {
+			int x = info.rcWindow.left;
+			int y = info.rcWindow.top;
+			int wWidth = info.rcClient.right;
+			int wHeight = info.rcClient.bottom;
+			if (x == 0
+			    && y == 0
+			    && wWidth >= desktopWidth
+			    && wHeight >= desktopHeight
+			    && !isDesktop) {
+				return true;
+			}
 		}
 	}
 	return false;
