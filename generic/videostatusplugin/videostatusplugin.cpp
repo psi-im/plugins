@@ -85,7 +85,7 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 }
 #endif
 
-#define constVersion "0.1.6"
+#define constVersion "0.1.7"
 
 #define constStatus "status"
 #define constStatusMessage "statusmessage"
