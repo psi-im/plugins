@@ -1,3 +1,8 @@
+2011-12-15
+v0.3.6
+  - удалена продублированная опция options.html.chat.render (Использовать формат текста отправителя)
+
+
 2011-08-26
 v0.3.5
   + добавлены опции options.ui.message.enabled, options.ui.chat.scaled-message-icons

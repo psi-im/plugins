@@ -28,7 +28,7 @@
 #include "plugininfoprovider.h"
 
 
-#define constVersion "0.3.5"
+#define constVersion "0.3.6"
 
 class ExtToolButton : public QToolButton
 {
@@ -74,7 +74,7 @@ private:
 	QPointer<QWidget> options_;
 
         //Chats-----
-        QCheckBox *htmlRender;
+       // QCheckBox *htmlRender;
         QCheckBox *centralToolbar;
         QCheckBox *confirmClearing;
         QCheckBox *messageIcons;
@@ -266,7 +266,7 @@ QWidget* ExtendedOptions::options()
 	area->setWidgetResizable(true);
 
         //Chats-----
-        htmlRender = new QCheckBox(tr("Enable HTML rendering in chat window"));
+      //  htmlRender = new QCheckBox(tr("Enable HTML rendering in chat window"));
         centralToolbar = new QCheckBox(tr("Enable central toolbar"));
         confirmClearing = new QCheckBox(tr("Ask for confirmation before clearing chat window"));
         messageIcons = new QCheckBox(tr("Enable icons in chat"));
@@ -302,7 +302,7 @@ QWidget* ExtendedOptions::options()
 
 	tab1Layout->addWidget(new QLabel(tr("Chat window caption:")));
 	tab1Layout->addWidget(chat_caption);
-        tab1Layout->addWidget(htmlRender);
+       // tab1Layout->addWidget(htmlRender);
         tab1Layout->addWidget(centralToolbar);
         tab1Layout->addWidget(confirmClearing);
         tab1Layout->addWidget(messageIcons);
@@ -691,7 +691,7 @@ void ExtendedOptions::applyOptions()
 		return;
 
 	//Chats-----
-	psiOptions->setGlobalOption("options.html.chat.render",QVariant(htmlRender->isChecked()));
+	//psiOptions->setGlobalOption("options.html.chat.render",QVariant(htmlRender->isChecked()));
 	psiOptions->setGlobalOption("options.ui.chat.central-toolbar",QVariant(centralToolbar->isChecked()));
 	psiOptions->setGlobalOption("options.ui.chat.warn-before-clear",QVariant(confirmClearing->isChecked()));
 	psiOptions->setGlobalOption("options.ui.chat.use-message-icons",QVariant(messageIcons->isChecked()));
@@ -816,7 +816,7 @@ void ExtendedOptions::restoreOptions()
 		return;
 
 	//Chats-----
-        htmlRender->setChecked(psiOptions->getGlobalOption("options.html.chat.render").toBool());
+       // htmlRender->setChecked(psiOptions->getGlobalOption("options.html.chat.render").toBool());
         centralToolbar->setChecked(psiOptions->getGlobalOption("options.ui.chat.central-toolbar").toBool());
         confirmClearing->setChecked(psiOptions->getGlobalOption("options.ui.chat.warn-before-clear").toBool());
         messageIcons->setChecked(psiOptions->getGlobalOption("options.ui.chat.use-message-icons").toBool());
@@ -1011,8 +1011,8 @@ void ExtendedOptions::saveFile(const QString& text)
 void ExtendedOptions::hack()
 {
 	//Enable "Apply" button
-	htmlRender->toggle();
-	htmlRender->toggle();
+	centralToolbar->toggle();
+	centralToolbar->toggle();
 }
 
 QString ExtendedOptions::profileDir()
