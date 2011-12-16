@@ -63,6 +63,22 @@ void Utils::requestSharedStatusesList(AccountSettings *as, StanzaSendingHost *st
 	stanzaSender->sendStanza(acc, str);
 }
 
+void Utils::requestExtendedContactAttributes(AccountSettings *as, StanzaSendingHost *stanzaSender, AccountInfoAccessingHost *accInfo)
+{
+	int acc = as->account;
+	if(!checkAccount(acc, accInfo))
+		return;
+
+	if(!as->isAttributesEnabled || !as->isAttributesSupported)
+		return;
+
+	QString id = stanzaSender->uniqueId(acc);
+	QString str = QString("<iq type='get' id='%1'>"
+			      "<query xmlns='jabber:iq:roster' xmlns:gr='google:roster' gr:ext='2'/></iq>")
+			.arg(id);
+	stanzaSender->sendStanza(acc, str);
+}
+
 void Utils::updateSharedStatus(AccountSettings *as, StanzaSendingHost *stanzaSender, AccountInfoAccessingHost *accInfo)
 {
 	int acc = as->account;
