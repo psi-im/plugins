@@ -84,11 +84,9 @@ public:
 
     void startSMP(const QString& account, const QString& jid,
                   const QString& question, const QString& secret);
-    void startSMP(ConnContext *context,
-                  const QString& question, const QString& secret);
 
-    void continueSMP(const QString& account, const QString& jid, const QString& secret);
-    void continueSMP(ConnContext *context, const QString& secret);
+    void continueSMP(const QString& account, const QString& jid,
+                     const QString& secret);
 
     void abortSMP(const QString& account, const QString& jid);
     void abortSMP(ConnContext *context);

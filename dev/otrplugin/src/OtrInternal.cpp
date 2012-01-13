@@ -3,7 +3,7 @@
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
- *                    2011  Florian Fieber
+ *               2011-2012  Florian Fieber
  *
  * This program was originally written as part of a diplom thesis
  * advised by Prof. Dr. Ruediger Weis (PST Labor)
@@ -552,29 +552,23 @@ void OtrInternal::startSMP(const QString& account, const QString& jid,
                                              NULL, NULL, NULL);
     if (context)
     {
-        startSMP(context, question, secret);
-    }
-}
+        QByteArray  secretArray   = secret.toUtf8();
+        const char* secretPointer = secretArray.constData();
+        size_t      secretLength  = qstrlen(secretPointer);
 
-void OtrInternal::startSMP(ConnContext *context,
-                           const QString& question, const QString& secret)
-{
-    QByteArray  secretArray   = secret.toUtf8();
-    const char* secretPointer = secretArray.constData();
-    size_t      secretLength  = qstrlen(secretPointer);
-
-    if (question.isEmpty())
-    {
-        otrl_message_initiate_smp(m_userstate, &m_uiOps, this, context,
-                                  reinterpret_cast<const unsigned char*>(const_cast<char*>(secretPointer)),
-                                  secretLength);
-    }
-    else
-    {
-        otrl_message_initiate_smp_q(m_userstate, &m_uiOps, this, context,
-                                    question.toUtf8().constData(),
-                                    reinterpret_cast<const unsigned char*>(const_cast<char*>(secretPointer)),
-                                    secretLength);
+        if (question.isEmpty())
+        {
+            otrl_message_initiate_smp(m_userstate, &m_uiOps, this, context,
+                                      reinterpret_cast<const unsigned char*>(const_cast<char*>(secretPointer)),
+                                      secretLength);
+        }
+        else
+        {
+            otrl_message_initiate_smp_q(m_userstate, &m_uiOps, this, context,
+                                        question.toUtf8().constData(),
+                                        reinterpret_cast<const unsigned char*>(const_cast<char*>(secretPointer)),
+                                        secretLength);
+        }
     }
 }
 
@@ -588,18 +582,14 @@ void OtrInternal::continueSMP(const QString& account, const QString& jid,
                                              NULL, NULL, NULL);
     if (context)
     {
-        continueSMP(context, secret);
+        QByteArray  secretArray   = secret.toUtf8();
+        const char* secretPointer = secretArray.constData();
+        size_t      secretLength  = qstrlen(secretPointer);
+
+        otrl_message_respond_smp(m_userstate, &m_uiOps, this, context,
+                                 reinterpret_cast<const unsigned char*>(secretPointer),
+                                 secretLength);
     }
-}
-
-void OtrInternal::continueSMP(ConnContext *context, const QString& secret)
-{
-    QByteArray  secretArray   = secret.toUtf8();
-    const char* secretPointer = secretArray.constData();
-    size_t      secretLength  = qstrlen(secretPointer);
-
-    otrl_message_respond_smp(m_userstate, &m_uiOps, this, context,
-                             reinterpret_cast<const unsigned char*>(secretPointer), secretLength);
 }
 
 void OtrInternal::abortSMP(const QString& account, const QString& jid)
