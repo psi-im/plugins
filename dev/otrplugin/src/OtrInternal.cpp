@@ -563,10 +563,19 @@ void OtrInternal::startSMP(ConnContext *context,
     const char* secretPointer = secretArray.constData();
     size_t      secretLength  = qstrlen(secretPointer);
 
-    otrl_message_initiate_smp_q(m_userstate, &m_uiOps, this, context,
-                                question.toUtf8().constData(),
-                                reinterpret_cast<const unsigned char*>(const_cast<char*>(secretPointer)),
-                                secretLength);
+    if (question.isEmpty())
+    {
+        otrl_message_initiate_smp(m_userstate, &m_uiOps, this, context,
+                                  reinterpret_cast<const unsigned char*>(const_cast<char*>(secretPointer)),
+                                  secretLength);
+    }
+    else
+    {
+        otrl_message_initiate_smp_q(m_userstate, &m_uiOps, this, context,
+                                    question.toUtf8().constData(),
+                                    reinterpret_cast<const unsigned char*>(const_cast<char*>(secretPointer)),
+                                    secretLength);
+    }
 }
 
 void OtrInternal::continueSMP(const QString& account, const QString& jid,

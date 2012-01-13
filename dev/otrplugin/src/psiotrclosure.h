@@ -3,7 +3,7 @@
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
- *                    2011  Florian Fieber
+ *               2011-2012  Florian Fieber
  *
  * This program was originally written as part of a diplom thesis
  * advised by Prof. Dr. Ruediger Weis (PST Labor)
@@ -67,9 +67,10 @@ public slots:
 
 private:
     enum AuthState {AUTH_READY, AUTH_IN_PROGRESS, AUTH_FINISHED};
+    enum Method {METHOD_QUESTION, METHOD_SHARED_SECRET, METHOD_FINGERPRINT};
 
     OtrMessaging* m_otr;
-    int           m_method;
+    Method        m_method;
     QString       m_account;
     QString       m_contact;
     QString       m_contactName;
@@ -77,16 +78,18 @@ private:
     AuthState     m_state;
     Fingerprint   m_fpr;
 
-    QWidget*      m_methodWidget[2];
+    QWidget*      m_methodWidget[3];
     QComboBox*    m_methodBox;
     QLineEdit*    m_questionEdit;
     QLineEdit*    m_answerEdit;
+    QLineEdit*    m_sharedSecretEdit;
     QProgressBar* m_progressBar;
     QPushButton*  m_cancelButton;
     QPushButton*  m_startButton;
 
 private slots:
     void changeMethod(int index);
+    void checkRequirements();
     void startAuthentication();
 };
 
