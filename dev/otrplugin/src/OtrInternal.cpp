@@ -484,10 +484,8 @@ void OtrInternal::deleteKey(const QString& account)
 
 void OtrInternal::startSession(const QString& account, const QString& jid)
 {
-    char fingerprint[45];
-    if (!otrl_privkey_fingerprint(m_userstate, fingerprint,
-                                  account.toUtf8().constData(),
-                                  OTR_PROTOCOL_STRING))
+    if (!otrl_privkey_find(m_userstate, account.toUtf8().constData(),
+                           OTR_PROTOCOL_STRING))
     {
         create_privkey(account.toUtf8().constData(), OTR_PROTOCOL_STRING);
     }
