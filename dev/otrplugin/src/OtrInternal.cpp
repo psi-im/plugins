@@ -501,6 +501,8 @@ void OtrInternal::startSession(const QString& account, const QString& jid)
                                              OTRL_POLICY_DEFAULT);
 
     m_callback->sendMessage(account, jid, QString::fromUtf8(msg));
+
+    delete [] msg;
 }
 
 //-----------------------------------------------------------------------------
