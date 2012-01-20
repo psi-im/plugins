@@ -830,7 +830,15 @@ void OtrInternal::create_privkey(const char *accountname,
 
     char fingerprint[45];
     if (otrl_privkey_fingerprint(m_userstate, fingerprint, accountname,
-                                 protocol) == NULL)
+                                 protocol))
+    {
+        infoMb.setText(QObject::tr("Fingerprint for account \"%1\":\n%2")
+                                   .arg(m_callback->humanAccount(
+                                            QString::fromUtf8(accountname)))
+                                   .arg(QString(fingerprint)));
+        infoMb.exec();
+    }
+    else
     {
         QMessageBox failMb(QMessageBox::Critical, QObject::tr("Psi OTR"),
                            QObject::tr("Failed to generate keys for account \"%1\"."
@@ -841,14 +849,6 @@ void OtrInternal::create_privkey(const char *accountname,
                            Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
         failMb.exec();
     }
-    else
-    {
-        infoMb.setText(QObject::tr("Fingerprint for account \"%1\":\n%2")
-                                   .arg(m_callback->humanAccount(
-                                            QString::fromUtf8(accountname)))
-                                   .arg(QString(fingerprint)));
-    }
-    infoMb.exec();
 
     m_callback->startMessages();
 }
