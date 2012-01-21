@@ -500,7 +500,7 @@ void OtrInternal::startSession(const QString& account, const QString& jid)
 
     m_callback->sendMessage(account, jid, QString::fromUtf8(msg));
 
-    delete [] msg;
+    free(msg);
 }
 
 //-----------------------------------------------------------------------------
