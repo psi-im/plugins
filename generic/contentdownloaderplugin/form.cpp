@@ -39,7 +39,7 @@
 #include "applicationinfoaccessinghost.h"
 #include "ui_form.h"
 
-#define LIST_URL "http://psi-dev.googlecode.com/svn/trunk/resources/content.list"
+#define LIST_URL "https://raw.github.com/psi-plus/resources/master/contentlist/content.list"
 
 Form::Form(QWidget *parent)
 	: QWidget(parent)
