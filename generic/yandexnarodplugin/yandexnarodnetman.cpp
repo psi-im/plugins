@@ -281,7 +281,7 @@ void yandexnarodNetMan::netrpFinished(QNetworkReply* reply)
 					QRegExp rx("class=\"\\S+icon\\s(\\S+)\"[^<]+<img[^<]+</i[^<]+</td[^<]+<td[^<]+<input[^v]+value=\"(\\d+)\" data-token=\"(\\S+)\""
 						   "[^<]+</td[^<]+<td[^<]+<span\\sclass='b-fname'><a\\shref=\"(\\S+)\">([^<]+)</a>.*"
 						   "<td class=\"size\">(\\S+)</td>.*data-token=\"(\\S+)\".*<i class=\"([^\"]+)\".*"
-						   "<td class=\"date prolongate\"><nobr>(\\S+ \\S+)</nobr></td>");
+						   "<td class=\"date prolongate\"><nobr>([^>]+)</nobr></td>");
 					rx.setMinimal(true);
 					cpos = rx.indexIn(page);
 					while (cpos != -1) {
