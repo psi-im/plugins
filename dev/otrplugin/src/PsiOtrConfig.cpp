@@ -208,7 +208,8 @@ void FingerprintWidget::updateData()
         row.append(new QStandardItem(fp.username));
         row.append(new QStandardItem(fp.fingerprintHuman));
         row.append(new QStandardItem(fp.trust));
-        row.append(new QStandardItem(fp.messageState));
+        row.append(new QStandardItem(m_otr->getMessageStateString(fp.account,
+                                                                  fp.username)));
 
         m_tableModel->appendRow(row);
 

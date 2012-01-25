@@ -37,20 +37,18 @@ Fingerprint::Fingerprint(const Fingerprint &fp)
       account(fp.account),
       username(fp.username),
       fingerprintHuman(fp.fingerprintHuman),
-      trust(fp.trust),
-      messageState(fp.messageState)
+      trust(fp.trust)
 {
 
 }
 
 Fingerprint::Fingerprint(unsigned char* fingerprint,
                          QString account, QString username,
-                         QString trust, QString messageState)
+                         QString trust)
     : fingerprint(fingerprint),
       account(account),
       username(username),
-      trust(trust),
-      messageState(messageState)
+      trust(trust)
 {
     fingerprintHuman = OtrInternal::humanFingerprint(fingerprint);
 }

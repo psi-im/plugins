@@ -371,12 +371,7 @@ QList<psiotr::Fingerprint> OtrInternal::getFingerprints()
             psiotr::Fingerprint fp (fingerprint->fingerprint,
                                     QString::fromUtf8(context->accountname),
                                     QString::fromUtf8(context->username),
-                                    QString::fromUtf8(fingerprint->trust),
-                                    (fingerprint == context->active_fingerprint)?
-                                        getMessageStateString(
-                                            QString::fromUtf8(context->accountname),
-                                            QString::fromUtf8(context->username)) :
-                                        QString());
+                                    QString::fromUtf8(fingerprint->trust));
 
             fpList.append(fp);
             fingerprint = fingerprint->next;
@@ -709,10 +704,7 @@ psiotr::Fingerprint OtrInternal::getActiveFingerprint(const QString& account,
         return psiotr::Fingerprint(context->active_fingerprint->fingerprint,
                                    QString::fromUtf8(context->accountname),
                                    QString::fromUtf8(context->username),
-                                   QString::fromUtf8(context->active_fingerprint->trust),
-                                   getMessageStateString(
-                                        QString::fromUtf8(context->accountname),
-                                        QString::fromUtf8(context->username)));
+                                   QString::fromUtf8(context->active_fingerprint->trust));
     }
 
     return psiotr::Fingerprint();
