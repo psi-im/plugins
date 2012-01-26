@@ -43,7 +43,7 @@
 #include "ui_options.h"
 #include "deferredstanzasender.h"
 
-#define cVer "0.5.3"
+#define cVer "0.5.4"
 #define constQuestion "qstn"
 #define constAnswer "answr"
 #define constUnblocked "UnblockedList"
@@ -96,7 +96,7 @@ public:
         virtual void applyOptions();
         virtual void restoreOptions();
         virtual void setOptionAccessingHost(OptionAccessingHost* host);
-	virtual void optionChanged(const QString& ) {};
+	virtual void optionChanged(const QString& ) {}
         virtual void setStanzaSendingHost(StanzaSendingHost *host);
         virtual bool incomingStanza(int account, const QDomElement& xml);
 	virtual bool outgoingStanza(int account, QDomElement& xml);
@@ -108,9 +108,9 @@ public:
 	virtual QString pluginInfo();
 
 	virtual bool processEvent(int , QDomElement& ) { return false; }
-	virtual bool processMessage(int , const QString& , const QString& , const QString& ) { return false; };
+	virtual bool processMessage(int , const QString& , const QString& , const QString& ) { return false; }
 	virtual bool processOutgoingMessage(int account, const QString& fromJid, QString& body, const QString& type, QString& subject);
-	virtual void logout(int ) {};
+	virtual void logout(int ) {}
 
 private slots:
 	void resetCounter();
@@ -980,8 +980,11 @@ void StopSpam::addRow() {
 
 void StopSpam::removeRow() {
 	if(model_->rowCount() > 1) {
-		model_->deleteRow();
-		hack();
+		QModelIndex index = ui_.tv_rules->currentIndex();
+		if(index.isValid()) {
+			model_->deleteRow(index.row());
+			hack();
+		}
 	}
 }
 
