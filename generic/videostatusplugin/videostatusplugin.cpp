@@ -85,7 +85,7 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 }
 #endif
 
-#define constVersion "0.1.7"
+#define constVersion "0.1.8"
 
 #define constStatus "status"
 #define constStatusMessage "statusmessage"
@@ -502,6 +502,9 @@ void VideoStatusChanger::disconnectFromBus(const QString &service_)
 	}
 	else if (service_.contains(gmplayerService)) {
 		startCheckTimer();
+	}
+	if (!fullST.isActive()) {
+		fullST.start();
 	}
 }
 
