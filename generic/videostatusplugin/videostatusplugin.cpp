@@ -503,7 +503,7 @@ void VideoStatusChanger::disconnectFromBus(const QString &service_)
 	else if (service_.contains(gmplayerService)) {
 		startCheckTimer();
 	}
-	if (!fullST.isActive()) {
+	if (!fullST.isActive() && fullScreen) {
 		fullST.start();
 	}
 }
