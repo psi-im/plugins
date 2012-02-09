@@ -305,7 +305,7 @@ void Form::downloadHtmlFinished()
 			for(int i = 0; i < imgs.size(); i++) {
 				QDomElement el = imgs.at(i).toElement();
 				QString urlStr(el.attribute("src"));
-				if(!urlStr.isEmpty() && !urlStr.startsWith("http://")) {
+				if(!urlStr.isEmpty() && !urlStr.startsWith("https://")) {
 					urlStr = reply->url().toString().section('/', 0, -2) + '/' + urlStr;
 				}
 

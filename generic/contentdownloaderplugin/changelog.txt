@@ -1,3 +1,7 @@
+2012-02-09
+v0.2.2
+  * ещё поправка после переезда
+
 2012-01-24  zet
 v0.2.1
   * проект переехал с http://psi-dev.googlecode.com/svn/trunk/ на https://github.com/psi-plus/
