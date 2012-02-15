@@ -347,8 +347,8 @@ QWidget* ExtendedOptions::options()
 	accept_defaults = new QCheckBox(tr("Automatically accept the default room configuration"));
 	accept_defaults->setToolTip(tr("Automatically accept the default room configuration when a new room is created"));
 	auto_configure = new QCheckBox(tr("Automatically open the configuration dialog when a new room is created"));
-	auto_configure->setToolTip("Automatically open the configuration dialog when a new room is created.\n"
-				   "This option only has effect if accept-defaults is false.");
+	auto_configure->setToolTip(tr("Automatically open the configuration dialog when a new room is created.\n"
+				   "This option only has effect if accept-defaults is false."));
 
         bookmarksListSkip = new QTextEdit();
         bookmarksListSkip->setMaximumWidth(300);
