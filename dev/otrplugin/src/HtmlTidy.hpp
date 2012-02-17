@@ -24,8 +24,8 @@
 #define HTMLTIDY_HPP_
 
 #include <string>
-#include <tidy/tidy.h>
-#include <tidy/buffio.h>
+#include <tidy.h>
+#include <buffio.h>
 #include <QtXml>
 
 class HtmlTidy
