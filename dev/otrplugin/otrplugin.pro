@@ -3,6 +3,9 @@ include(../../psiplugin.pri)
 CONFIG += release
 LIBS += -lotr -ltidy -lgcrypt -L/usr/local/lib
 RESOURCES = psi-otr.qrc
+unix {
+	INCLUDEPATH += /usr/include/tidy
+}
 
 HEADERS += src/PsiOtrPlugin.hpp
 HEADERS += src/OtrMessaging.hpp
