@@ -55,7 +55,7 @@
 
 #define POPUP_OPTION "Gmail Service Plugin"
 
-#define PLUGIN_VERSION "0.7.2"
+#define PLUGIN_VERSION "0.7.3"
 
 
 class GmailNotifyPlugin : public QObject, public PsiPlugin, public AccountInfoAccessor,
@@ -145,6 +145,7 @@ private:
 	typedef QList<MailItem> MailItemsList;
 	QList<MailItemsList> mailItems_;
 	QStringList id_;
+	int popupId;
 	Ui::Options ui_;
 };
 

@@ -37,6 +37,7 @@ GmailNotifyPlugin::GmailNotifyPlugin()
 	, sound_(0)
 	, soundFile("sound/email.wav")
 	, actions_(0)
+	, popupId(0)
 {
 }
 
@@ -98,7 +99,7 @@ bool GmailNotifyPlugin::enable()
 	loadLists();
 
 	int interval = psiOptions->getPluginOption(OPTION_INTERVAL, QVariant(4000)).toInt()/1000;
-	popup->registerOption(POPUP_OPTION, interval, "plugins.options."+shortName()+"."+OPTION_INTERVAL);
+	popupId = popup->registerOption(POPUP_OPTION, interval, "plugins.options."+shortName()+"."+OPTION_INTERVAL);
 
 	//Update features
 	bool end = false;
@@ -133,6 +134,7 @@ bool GmailNotifyPlugin::disable()
 
 	delete mailViewer_;
 
+	popup->unregisterOption(POPUP_OPTION);
 	enabled = false;
 	return true;
 }
@@ -782,12 +784,7 @@ void GmailNotifyPlugin::showPopup(const QString& text)
 	if(!interval)
 		return;
 
-	QVariant delay_ = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.delays.status");
-	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", QVariant(interval*1000));
-
-	popup->initPopup(text, name());
-
-	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", delay_);
+	popup->initPopup(text, name(), "gmailnotify/menu", popupId);
 }
 
 void GmailNotifyPlugin::updateSharedStatus(AccountSettings* as)
