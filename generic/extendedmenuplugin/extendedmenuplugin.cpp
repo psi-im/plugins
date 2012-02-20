@@ -42,7 +42,7 @@
 
 #include "ui_options.h"
 
-#define cVer "0.1.0"
+#define cVer "0.1.1"
 
 #define constInterval "intrvl"
 #define constAction "action"
@@ -105,6 +105,7 @@ private:
 	ContactInfoAccessingHost* contactInfo;
 	StanzaSendingHost* stanzaSender;
 	bool enableMenu, enableAction;
+	int popupId;
 
 	Ui::Options ui_;
 
@@ -146,6 +147,7 @@ ExtendedMenuPlugin::ExtendedMenuPlugin()
 	, stanzaSender(0)
 	, enableMenu(true)
 	, enableAction(false)
+	, popupId(0)
 {
 }
 
@@ -176,7 +178,7 @@ bool ExtendedMenuPlugin::enable()
 	enableMenu = psiOptions->getPluginOption(constMenu, enableMenu).toBool();
 	enableAction = psiOptions->getPluginOption(constAction, enableAction).toBool();
 	int interval = psiOptions->getPluginOption(constInterval, QVariant(5000)).toInt()/1000;
-	popup->registerOption(POPUP_OPTION_NAME, interval, "plugins.options."+shortName()+"."+constInterval);
+	popupId = popup->registerOption(POPUP_OPTION_NAME, interval, "plugins.options."+shortName()+"."+constInterval);
 
 	QFile f(":/icons/icons/ping.png");
 	f.open(QIODevice::ReadOnly);
@@ -210,6 +212,8 @@ bool ExtendedMenuPlugin::disable()
 {
         enabled = false;
 	requestList_.clear();
+
+	popup->unregisterOption(POPUP_OPTION_NAME);
 
 	return true;
 }
@@ -438,14 +442,9 @@ bool ExtendedMenuPlugin::incomingStanza(int account, const QDomElement &xml)
 
 void ExtendedMenuPlugin::showPopup(const QString &text, const QString &title)
 {
-	int interval = popup->popupDuration(POPUP_OPTION_NAME)*1000;
+	int interval = popup->popupDuration(POPUP_OPTION_NAME);
 	if(interval) {
-		QVariant delay_ = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.delays.status");
-		psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", interval);
-
-		popup->initPopup(text, title);
-
-		psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", delay_);
+		popup->initPopup(text, title, "psi/headline", popupId);
 	}
 }
 
