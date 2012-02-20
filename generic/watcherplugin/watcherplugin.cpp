@@ -48,7 +48,7 @@
 #include "soundaccessor.h"
 
 
-#define constVersion "0.4.0"
+#define constVersion "0.4.1"
 
 #define constSoundFile "sndfl"
 #define constInterval "intrvl"
@@ -116,6 +116,7 @@ private:
 	bool isSndEnable;
 	bool disableSnd;
 	bool disablePopupDnd;
+	bool popupId;
 
 	bool checkWatchedItem(const QString& from, const QString& body, WatchedItem *wi);
 
@@ -156,6 +157,7 @@ Watcher::Watcher()
 	, isSndEnable(false)
 	, disableSnd(true)
 	, disablePopupDnd(true)
+	, popupId(0)
 {
 }
 
@@ -179,7 +181,7 @@ bool Watcher::enable() {
 		disablePopupDnd = psiOptions->getPluginOption(constDisablePopupDnd, QVariant(disablePopupDnd)).toBool();
 
 		int interval = psiOptions->getPluginOption(constInterval, QVariant(3000)).toInt()/1000;
-		popup->registerOption(POPUP_OPTION_NAME, interval, "plugins.options."+shortName()+"."+constInterval);
+		popupId = popup->registerOption(POPUP_OPTION_NAME, interval, "plugins.options."+shortName()+"."+constInterval);
 
 		QStringList jids = psiOptions->getPluginOption(constJids, QVariant(QStringList())).toStringList();
 		QStringList soundFiles = psiOptions->getPluginOption(constSndFiles, QVariant(QStringList())).toStringList();
@@ -214,6 +216,7 @@ bool Watcher::disable() {
 	qDeleteAll(items_);
 	items_.clear();
 
+	popup->unregisterOption(POPUP_OPTION_NAME);
 	enabled = false;
         return true;
 }
@@ -496,23 +499,18 @@ void Watcher::checkSound(QModelIndex index) {
 }
 
 void Watcher::showPopup(int account, const QString& jid, QString text) {
-	if(disablePopupDnd && accInfo->getStatus(account) == "dnd") {
-		return;
-	}
+	QVariant suppressDnd = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd");
+	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd", disablePopupDnd);
 
-	int interval = popup->popupDuration(POPUP_OPTION_NAME)*1000;
+	int interval = popup->popupDuration(POPUP_OPTION_NAME);
 	if(interval) {
-		QVariant delay_ = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.delays.status");
-		psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", interval);
-
 		const QString statusMes = contactInfo->statusMessage(account, jid);
 		if(!statusMes.isEmpty()) {
 			text += tr("<br>Status Message: %1").arg(statusMes);
 		}
-		popup->initPopupForJid(account, jid, text, tr("Watcher Plugin"), "psi/search");
-
-		psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", delay_);
+		popup->initPopupForJid(account, jid, text, tr("Watcher Plugin"), "psi/search", popupId);
 	}
+	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd", suppressDnd);
 }
 
 void Watcher::Hack() {

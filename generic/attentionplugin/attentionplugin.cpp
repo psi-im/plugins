@@ -266,9 +266,8 @@ bool AttentionPlugin::incomingStanza(int account, const QDomElement& stanza) {
 				psiOptions->setGlobalOption(optAway, false);
 				popup->setPopupDuration(POPUP_OPTION, -1);
 			}
-			if(!disableDnd) {
-				psiOptions->setGlobalOption(optDnd, false);
-			}
+			psiOptions->setGlobalOption(optDnd, disableDnd);
+
 			showPopup(account, from.split("/").first(), from + tr(" sends Attention message to you!"));
 			psiOptions->setGlobalOption(optAway, suppressAway);
 			psiOptions->setGlobalOption(optDnd, suppressDnd);

@@ -474,9 +474,8 @@ void PepPlugin::checkSound()
 void PepPlugin::showPopup(const QString &title, const QString &text, const QString& icon)
 {
 	QVariant suppressDnd = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd");
-	if(!disableDnd) {
-		psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd", false);
-	}
+	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd", disableDnd);
+
 	int interval = popup->popupDuration(POPUP_OPTION_NAME);
 	if(interval) {
 		popup->initPopup(Qt::escape(text), Qt::escape(title), icon, popupId);
