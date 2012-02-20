@@ -40,7 +40,7 @@
 
 #include "ui_options.h"
 
-#define cVer "0.3.3"
+#define cVer "0.3.4"
 #define constLastCheck "lstchck"
 #define constDays "days"
 #define constInterval "intrvl"
@@ -105,6 +105,7 @@ private:
 	int updateInterval;
 	QString soundFile;
 	bool updateInProgress;
+	int popupId;
 
 	QPointer<QWidget> options_;
 	Ui::Options ui_;
@@ -142,6 +143,7 @@ Reminder::Reminder()
 	, updateInterval(30)
 	, soundFile("sound/reminder.wav")
 	, updateInProgress(false)
+	, popupId(0)
 {
 }
 
@@ -182,7 +184,7 @@ bool Reminder::enable() {
 	soundFile = psiOptions->getPluginOption(constSoundFile, QVariant(soundFile)).toString();
 
 	int timeout = psiOptions->getPluginOption(constTimeout, QVariant(15000)).toInt()/1000;
-	popup->registerOption(POPUP_OPTION_NAME, timeout, "plugins.options."+shortName()+"."+constTimeout);
+	popupId = popup->registerOption(POPUP_OPTION_NAME, timeout, "plugins.options."+shortName()+"."+constTimeout);
 
 	Dir = appInfoHost->appVCardDir() + QDir::separator() + "Birthdays";
 	QDir BirthDay(Dir);
@@ -200,7 +202,8 @@ bool Reminder::enable() {
 }
 
 bool Reminder::disable() {
-	enabled = false;        
+	enabled = false;
+	popup->unregisterOption(POPUP_OPTION_NAME);
 	return true;
 }
 
@@ -479,17 +482,10 @@ bool Reminder::Check() {
 	if(psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool())
 		playSound(soundFile);
 
+	text = text.replace("\n", "<br>");
+	popup->initPopup(text, tr("Birthday Reminder"), "reminder/birthdayicon", popupId);
 
-	int timeout = popup->popupDuration(POPUP_OPTION_NAME)*1000;
-	if(timeout) {
-		QVariant delay_ = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.delays.status");
-		psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", timeout);
 
-		text = text.replace("\n", "<br>");
-		popup->initPopup(text, tr("Birthday Reminder"), "reminder/birthdayicon");
-
-		psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", delay_);
-	}
 	return true;
 }
 
