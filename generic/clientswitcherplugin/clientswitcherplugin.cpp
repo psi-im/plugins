@@ -71,7 +71,7 @@ ClientSwitcherPlugin::ClientSwitcherPlugin() :
 }
 
 ClientSwitcherPlugin::~ClientSwitcherPlugin() {
-	disable();
+	//disable();
 }
 
 QString ClientSwitcherPlugin::name() const
