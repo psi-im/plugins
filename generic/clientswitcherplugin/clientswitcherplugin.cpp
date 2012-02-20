@@ -32,7 +32,7 @@
 
 Q_EXPORT_PLUGIN(ClientSwitcherPlugin);
 
-#define cVer                    "0.0.11"
+#define cVer                    "0.0.12"
 #define constPluginShortName    "clientswitcher"
 #define constPluginName         "Client Switcher Plugin"
 #define constForAllAcc          "for_all_acc"
@@ -61,7 +61,8 @@ ClientSwitcherPlugin::ClientSwitcherPlugin() :
 		def_caps_version(""),
 		heightLogsView(500),
 		widthLogsView(600),
-		lastLogItem("")
+		lastLogItem(""),
+		popupId(0)
 
 {
 	settingsList.clear();
@@ -123,7 +124,7 @@ bool ClientSwitcherPlugin::enable()
 	QStringList sett_list = psiOptions->getPluginOption(constAccSettingList, QVariant()).toStringList();
 	// Get and register popup option
 	int popup_duration = psiOptions->getPluginOption(constPopupDuration, QVariant(5000)).toInt() / 1000;
-	psiPopup->registerOption(constPluginName, popup_duration, "plugins.options." + shortName() + "." + constPopupDuration);
+	popupId = psiPopup->registerOption(constPluginName, popup_duration, "plugins.options." + shortName() + "." + constPopupDuration);
 	// Формируем структуры
 	int cnt = sett_list.size();
 	for (int i = 0; i < cnt; i++) {
@@ -156,6 +157,7 @@ bool ClientSwitcherPlugin::disable()
 			delete as;
 	}
 	enabled = false;
+	psiPopup->unregisterOption(constPluginName);
 	return true;
 }
 
@@ -636,24 +638,15 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 		}
 		// Showing popup if it is necessary
 		if (is_version_query && as->show_requ_mode != 0 && (as->show_requ_mode == 2 || is_version_replaced)) {
-			// Устанавливаем свои настройки POPUP
-			int msecs = psiPopup->popupDuration(constPluginName) * 1000;
+			int msecs = psiPopup->popupDuration(constPluginName);
 			if (msecs > 0) {
-				int delay_ = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.delays.status").toInt();
-				if (delay_ != msecs) {
-					psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", QVariant(msecs));
-				}
 				// Вызываем popup
 				QString s_nick = "";
 				if (psiContactInfo)
 					s_nick = psiContactInfo->name(account, s_to/*.split("/").first().toLower()*/);
 				if (s_nick.isEmpty())
 				s_nick = s_to;
-				psiPopup->initPopup(tr("%1 has requested your version").arg(s_nick), constPluginName);
-				// Восстанавливаем настройки
-				if (delay_ != msecs) {
-					psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", QVariant(delay_));
-				}
+				psiPopup->initPopup(tr("%1 has requested your version").arg(s_nick), constPluginName, "psi/headline", popupId);
 			}
 		}
 		// Write log if it is necessary

@@ -129,6 +129,7 @@ private:
 	int heightLogsView;
 	int widthLogsView;
 	QString lastLogItem;
+	int popupId;
 	//--
 
 	int getOsTemplateIndex(QString&);
