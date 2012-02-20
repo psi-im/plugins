@@ -14,3 +14,6 @@ HEADERS += notes.h \
     tagsmodel.h \
     notesviewdelegate.h \
     notescontroller.h
+
+RESOURCES += \
+    storagenotesplugin.qrc

@@ -42,7 +42,7 @@ Notes::Notes(StorageNotesPlugin *storageNotes, int acc, QWidget *parent)
 
 	setWindowTitle(tr("Notebook") + " - " + storageNotes_->accInfo->getJid(account_));
 
-	setWindowIcon(storageNotes_->iconHost->getIcon("loggerplugin/openlog"));
+	setWindowIcon(storageNotes_->iconHost->getIcon("storagenotes/storagenotes"));
 	ui_.pb_add->setIcon(storageNotes_->iconHost->getIcon("psi/action_templates_edit"));
 	ui_.pb_delete->setIcon(storageNotes_->iconHost->getIcon("psi/remove"));
 	ui_.pb_edit->setIcon(storageNotes_->iconHost->getIcon("psi/options"));
@@ -236,7 +236,7 @@ void Notes::selectTag()
 void Notes::error()
 {
 	storageNotes_->popup->initPopup(tr("Error! Perhaps the function is not implemented on the server."),
-					tr("Storage Notes Plugin"), "loggerplugin/openlog");
+					tr("Storage Notes Plugin"), "storagenotes/storagenotes");
 }
 
 QString Notes::replaceSymbols(const QString& str)

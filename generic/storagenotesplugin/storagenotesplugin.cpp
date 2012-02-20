@@ -24,7 +24,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
-#define constVersion "0.1.6"
+#define constVersion "0.1.7"
 
 static const QString id = "strnotes_1";
 
@@ -56,6 +56,12 @@ QString StorageNotesPlugin::version() const
 bool StorageNotesPlugin::enable()
 {
 	enabled = true;
+
+	QFile file(":/storagenotes/storagenotes.png");
+	file.open(QIODevice::ReadOnly);
+	QByteArray image = file.readAll();
+	iconHost->addIcon("storagenotes/storagenotes",image);
+	file.close();
 	controller_ = new NotesController(this);
 
 	return enabled;
@@ -148,7 +154,7 @@ void StorageNotesPlugin::start()
 QList < QVariantHash > StorageNotesPlugin::getAccountMenuParam()
 {
 	QVariantHash hash;
-        hash["icon"] = QVariant(QString("loggerplugin/openlog"));
+	hash["icon"] = QVariant(QString("storagenotes/storagenotes"));
         hash["name"] = QVariant(tr("Storage Notes"));
         hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
         hash["slot"] = QVariant(SLOT(start()));
