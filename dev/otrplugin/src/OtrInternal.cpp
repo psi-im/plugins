@@ -397,18 +397,10 @@ void OtrInternal::verifyFingerprint(const psiotr::Fingerprint& fingerprint,
                                                           0, NULL);
         if (fp != NULL)
         {
-            if (verified)
-            {
-                otrl_context_set_trust(fp, "verified");
-            }
-            else
-            {
-                otrl_context_set_trust(fp, "");
-            }
+            otrl_context_set_trust(fp, verified? "verified" : "");
+            write_fingerprints();
         }
     }
-
-    write_fingerprints();
 }
 
 //-----------------------------------------------------------------------------
