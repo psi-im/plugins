@@ -45,6 +45,7 @@
 #define constPlayerGMPlayer "gmplayer"
 #define constPlayerKaffeine "kaffeineplayer"
 #define vlcService "org.mpris.vlc"
+#define vlcNewService "org.mpris.MediaPlayer2.vlc"
 #define totemService "org.mpris.Totem"
 #define totemNewService "org.mpris.MediaPlayer2.totem"
 #define gmplayerService "com.gnome.mplayer"
@@ -85,7 +86,7 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 }
 #endif
 
-#define constVersion "0.1.8"
+#define constVersion "0.1.9"
 
 #define constStatus "status"
 #define constStatusMessage "statusmessage"
@@ -374,12 +375,18 @@ void VideoStatusChanger::setValidPlayers()
 {
 	//функция работы со списком разрешенных плееров - ?
 	int index;
-	if (playerVLC && !isPlayerValid(vlcService)) {
-		validPlayers_ << vlcService;
+	if (playerVLC && (!isPlayerValid(vlcService) || !isPlayerValid(vlcNewService))) {
+		validPlayers_ << vlcService << vlcNewService;
 	}
-	else if (!playerVLC && isPlayerValid(vlcService)) {
+	else if (!playerVLC && (isPlayerValid(vlcService) || isPlayerValid(vlcNewService))) {
 		index = validPlayers_.indexOf(vlcService);
-		validPlayers_.removeAt(index);
+		if (index != -1) {
+			validPlayers_.removeAt(index);
+		}
+		index = validPlayers_.indexOf(vlcNewService);
+		if (index != -1) {
+			validPlayers_.removeAt(index);
+		}
 	}
 	if (playerTotem && (!isPlayerValid(totemService) || !isPlayerValid(totemNewService))) {
 		validPlayers_ << totemService << totemNewService;
