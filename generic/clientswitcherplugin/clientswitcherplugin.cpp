@@ -32,7 +32,7 @@
 
 Q_EXPORT_PLUGIN(ClientSwitcherPlugin);
 
-#define cVer                    "0.0.12"
+#define cVer                    "0.0.13"
 #define constPluginShortName    "clientswitcher"
 #define constPluginName         "Client Switcher Plugin"
 #define constForAllAcc          "for_all_acc"
