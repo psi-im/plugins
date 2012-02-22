@@ -32,6 +32,7 @@ yandexnarodPlugin::yandexnarodPlugin()
 	, popup(0)
 	, enabled(false)
 	, currentAccount(-1)
+	, popupId(0)
 {
 }
 
@@ -74,7 +75,7 @@ bool yandexnarodPlugin::enable()
 	Options::instance()->setApplicationInfoAccessingHost(appInfo);
 	Options::instance()->setOptionAccessingHost(psiOptions);
 
-	popup->registerOption(name(), 3, "plugins.options." + shortName() + POPUP_OPTION_NAME);
+	popupId = popup->registerOption(name(), 3, "plugins.options." + shortName() + POPUP_OPTION_NAME);
 
 	return enabled;
 }
@@ -90,6 +91,7 @@ bool yandexnarodPlugin::disable()
 		delete uploadwidget;
 	}
 
+	popup->unregisterOption(name());
 	Options::reset();
 
 	return true;
@@ -223,14 +225,8 @@ void yandexnarodPlugin::onFileURL(const QString& url)
 
 void yandexnarodPlugin::showPopup(int/* account*/, const QString&/* jid*/, const QString& text)
 {
-	int interval = popup->popupDuration(name())*1000;
-	if(interval) {
-		QVariant delay_ = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.delays.status");
-		psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", interval);
-
-		popup->initPopup(text, tr("Yandex Narod Plugin"), "yandexnarod/logo");
-
-		psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", delay_);
+	if(popup->popupDuration(name())) {
+		popup->initPopup(text, tr("Yandex Narod Plugin"), "yandexnarod/logo", popupId);
 	}
 }
 

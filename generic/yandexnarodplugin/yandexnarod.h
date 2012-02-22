@@ -86,6 +86,7 @@ private:
 	bool enabled;
 	QString currentJid;
 	int currentAccount;
+	int popupId;
 
 	QPointer<uploadDialog> uploadwidget;
 	QPointer<yandexnarodSettings> settingswidget;

@@ -81,6 +81,8 @@ bool AuthManager::go(const QString& login, const QString& pass, const QString& c
 		post += "&twoweeks=yes";
 		QNetworkRequest nr = newRequest();
 		nr.setUrl(authUrl);
+		nr.setHeader(QNetworkRequest::ContentLengthHeader, post.length());
+		nr.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 		manager_->post(nr, post);
 
 		if(!loop_->isRunning()) {
@@ -115,14 +117,14 @@ void AuthManager::timeout()
 
 void AuthManager::replyFinished(QNetworkReply* reply)
 {
-	QString replycookstr = reply->rawHeader("Set-Cookie");
-	if (!replycookstr.isEmpty()) {
-		QNetworkCookieJar *netcookjar = manager_->cookieJar();
-		QList<QNetworkCookie> cooks = netcookjar->cookiesForUrl(mainUrl);
+	QVariant cooks = reply->header(QNetworkRequest::SetCookieHeader);
+	if (!cooks.isNull()) {
 		bool found = false;
-		foreach (QNetworkCookie netcook, cooks) {
-			if (netcook.name() == "yandex_login" && !netcook.value().isEmpty())
+		foreach (const QNetworkCookie& netcook, qVariantValue< QList<QNetworkCookie> >(cooks)) {
+			if (netcook.name() == "yandex_login" && !netcook.value().isEmpty()) {
 				found = true;
+				break;
+			}
 		}
 		if (!found) {
 			QRegExp rx("<input type=\"?submit\"?[^>]+name=\"no\"");
@@ -133,6 +135,8 @@ void AuthManager::replyFinished(QNetworkReply* reply)
 					QByteArray post = "idkey=" + rx1.cap(1).toAscii() + "&filled=yes";
 					QNetworkRequest nr = newRequest();
 					nr.setUrl(authUrl);
+					nr.setHeader(QNetworkRequest::ContentLengthHeader, post.length());
+					nr.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 					manager_->post(nr, post);
 					reply->deleteLater();
 					return;
