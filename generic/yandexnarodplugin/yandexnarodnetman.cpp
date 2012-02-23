@@ -184,7 +184,7 @@ void yandexnarodNetMan::netmanDo(QList<FileItem> fileItems)
 	QList<QNetworkCookie> cookList = netcookjar->cookiesForUrl(mainUrl);
 	if (cookList.isEmpty()) {
 		bool auth = startAuth(Options::instance()->getOption(CONST_LOGIN, "").toString(),
-			      Options::instance()->getOption(CONST_PASS, "").toString() );
+				      Options::decodePassword(Options::instance()->getOption(CONST_PASS, "").toString()) );
 
 		if(!auth)
 			return;
@@ -292,7 +292,9 @@ void yandexnarodNetMan::netrpFinished(QNetworkReply* reply)
 					cpos = rx.indexIn(page);
 					while (cpos != -1) {
 						FileItem fileitem;
-						fileitem.filename = QString::fromUtf8(rx.cap(5).toLatin1());
+						QTextDocument doc;
+						doc.setHtml(QString::fromUtf8(rx.cap(5).toLatin1()));
+						fileitem.filename = doc.toPlainText();
 						fileitem.fileid = rx.cap(2);
 						fileitem.token = rx.cap(3);
 						fileitem.fileurl = rx.cap(4);

@@ -79,7 +79,7 @@ void uploadDialog::progress(qint64 cBytes, qint64 totalBytes)
 		ui.labelSpeed->setText(tr("Speed: ")+QString::number(speed_kbsec)+tr(" kb/sec"));
 	
 	if (cBytes == totalBytes)
-		ui.labelStatus->setText(tr("Upload complete."));
+		ui.labelStatus->setText(tr("Upload completed. Waiting for verification."));
 }
 
 void uploadDialog::setDone()

@@ -294,7 +294,7 @@ void yandexnarodManage::on_btnClearCookies_clicked()
 
 void yandexnarodManage::on_btnOpenBrowser_clicked()
 {
-	QDesktopServices::openUrl(QUrl("http://narod.yandex.ru"));
+	QDesktopServices::openUrl(QUrl("http://narod.yandex.ru/disk/all/"));
 }
 
 void yandexnarodManage::on_listWidget_pressed(QModelIndex)

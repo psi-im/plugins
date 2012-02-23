@@ -39,7 +39,7 @@ void yandexnarodSettings::saveSettings()
 {
 	Options* o = Options::instance();
 	o->setOption(CONST_LOGIN, ui.editLogin->text());
-	o->setOption(CONST_PASS, ui.editPasswd->text());
+	o->setOption(CONST_PASS, Options::encodePassword(ui.editPasswd->text()));
 	o->setOption(CONST_TEMPLATE,  ui.textTpl->toPlainText());
 }
 
@@ -52,7 +52,7 @@ void yandexnarodSettings::restoreSettings()
 {
 	Options* o = Options::instance();
 	ui.editLogin->setText(o->getOption(CONST_LOGIN).toString());
-	ui.editPasswd->setText(o->getOption(CONST_PASS).toString());
+	ui.editPasswd->setText(Options::decodePassword(o->getOption(CONST_PASS).toString()));
 	ui.textTpl->setText(o->getOption(CONST_TEMPLATE, QVariant("File sent: %N (%S bytes)\n%U")).toString());
 }
 

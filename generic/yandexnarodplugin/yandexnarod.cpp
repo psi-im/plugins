@@ -75,6 +75,13 @@ bool yandexnarodPlugin::enable()
 	Options::instance()->setApplicationInfoAccessingHost(appInfo);
 	Options::instance()->setOptionAccessingHost(psiOptions);
 
+	//remove old password option
+	QString oldPass = Options::instance()->getOption(CONST_PASS_OLD).toString();
+	if(!oldPass.isEmpty()) {
+		Options::instance()->setOption(CONST_PASS_OLD, QVariant(""));
+		Options::instance()->setOption(CONST_PASS, Options::encodePassword(oldPass));
+	}
+
 	popupId = popup->registerOption(name(), 3, "plugins.options." + shortName() + POPUP_OPTION_NAME);
 
 	return enabled;

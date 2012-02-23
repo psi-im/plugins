@@ -66,7 +66,7 @@ bool AuthManager::go(const QString& login, const QString& pass, const QString& c
 			narodPass = authdialog.getPasswd();
 			if (authdialog.getRemember()) {
 				o->setOption(CONST_LOGIN, narodLogin);
-				o->setOption(CONST_PASS, narodPass);
+				o->setOption(CONST_PASS, Options::encodePassword(narodPass));
 			}
 			post = "login=" + narodLogin.toLatin1() + "&passwd=" + narodPass.toLatin1();
 		}

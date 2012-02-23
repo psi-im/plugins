@@ -19,6 +19,10 @@
 #include "applicationinfoaccessinghost.h"
 #include "optionaccessinghost.h"
 
+
+static const QString passwordKey = "yandexnarodpluginkey";
+
+
 Options * Options ::instance_ = 0;
 
 
@@ -152,4 +156,52 @@ QString Options::message(MessageType type)
 	}
 
 	return QString();
+}
+
+QString Options::encodePassword(const QString &pass)
+{
+	QString result;
+	int n1, n2;
+
+	if (passwordKey.length() == 0) {
+		return pass;
+	}
+
+	for (n1 = 0, n2 = 0; n1 < pass.length(); ++n1) {
+		ushort x = pass.at(n1).unicode() ^ passwordKey.at(n2++).unicode();
+		QString hex;
+		hex.sprintf("%04x", x);
+		result += hex;
+		if(n2 >= passwordKey.length()) {
+			n2 = 0;
+		}
+	}
+	return result;
+}
+
+QString Options::decodePassword(const QString &pass)
+{
+	QString result;
+	int n1, n2;
+
+	if (passwordKey.length() == 0) {
+		return pass;
+	}
+
+	for(n1 = 0, n2 = 0; n1 < pass.length(); n1 += 4) {
+		ushort x = 0;
+		if(n1 + 4 > pass.length()) {
+			break;
+		}
+		x += QString(pass.at(n1)).toInt(NULL,16)*4096;
+		x += QString(pass.at(n1+1)).toInt(NULL,16)*256;
+		x += QString(pass.at(n1+2)).toInt(NULL,16)*16;
+		x += QString(pass.at(n1+3)).toInt(NULL,16);
+		QChar c(x ^ passwordKey.at(n2++).unicode());
+		result += c;
+		if(n2 >= passwordKey.length()) {
+			n2 = 0;
+		}
+	}
+	return result;
 }
