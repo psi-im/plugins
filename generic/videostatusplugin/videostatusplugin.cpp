@@ -46,7 +46,7 @@ static const QString MPRIS2_PREFIX = "org.mpris.MediaPlayer2";
 static const QString GMP_PREFIX = "com.gnome";
 
 static const int StatusPlaying = 0;
-static const QString busName = "Session";
+static const int gmpStatusPlaying = 3;
 
 typedef QList<Window> WindowList;
 typedef QPair<QString, QString> StringMap;
@@ -89,7 +89,7 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 }
 #endif
 
-#define constVersion "0.2.0"
+#define constVersion "0.2.1"
 
 #define constStatus "status"
 #define constStatusMessage "statusmessage"
@@ -129,7 +129,7 @@ private:
 	QString status, statusMessage;
 	Ui::OptionsWidget ui_;
 #ifdef Q_WS_X11
-	bool playerGMPlayer; //только для не MPRIS плеера GMPlayer
+	bool playerGMPlayer_; //только для не MPRIS плеера GMPlayer
 	QHash<QString, bool> playerDictList;
 	QPointer<QTimer> checkTimer; //Таймер Gnome Mplayer
 	QStringList validPlayers_; //список включенных плееров
@@ -181,7 +181,7 @@ VideoStatusChanger::VideoStatusChanger()
 {
 	enabled = false;
 #ifdef Q_WS_X11
-	playerGMPlayer = false;
+	playerGMPlayer_ = false;
 	foreach (StringMap item, players) {
 		playerDictList.insert(item.first, false);
 	}
@@ -236,13 +236,13 @@ bool VideoStatusChanger::enable()
 		qDBusRegisterMetaType<PlayerStatus>();
 		services_ = QDBusConnection::sessionBus().interface()->registeredServiceNames().value();
 		//проверка на наличие уже запущенных плееров
-		foreach (const QString item, playerDictList.keys()) {
+		foreach (const QString& item, playerDictList.keys()) {
 			bool option = psiOptions->getPluginOption(item, QVariant(playerDictList.value(item))).toBool();
 			playerDictList[item] = option;
 			if (item.contains("mplayer")) {
-				playerGMPlayer = option;
+				playerGMPlayer_ = option;
 			}
-			foreach (const QString service, services_){
+			foreach (const QString& service, services_){
 				if (service.contains(item, Qt::CaseInsensitive)) {
 					connectToBus(service);
 				}
@@ -259,11 +259,11 @@ bool VideoStatusChanger::enable()
 #ifdef Q_WS_X11
 		//цепляем сигнал появления новых плееров
 		QDBusConnection::sessionBus().connect(QLatin1String("org.freedesktop.DBus"),
-			    QLatin1String("/org/freedesktop/DBus"),
-			    QLatin1String("org.freedesktop.DBus"),
-			    QLatin1String("NameOwnerChanged"),
-			    this,
-			    SLOT(checkMprisService(QString, QString, QString)));
+						      QLatin1String("/org/freedesktop/DBus"),
+						      QLatin1String("org.freedesktop.DBus"),
+						      QLatin1String("NameOwnerChanged"),
+						      this,
+						      SLOT(checkMprisService(QString, QString, QString)));
 #endif
 		fullST.setInterval(timeout);
 		connect(&fullST, SIGNAL(timeout()), SLOT(fullSTTimeout()));
@@ -279,16 +279,16 @@ bool VideoStatusChanger::disable()
 	fullST.stop();
 #ifdef Q_WS_X11
 	//отключаем прослушку активных плееров
-	foreach(const QString &player, services_) {
+	foreach(const QString& player, services_) {
 		disconnectFromBus(player);
 	}
 	//отключаеся от шины
 	QDBusConnection::sessionBus().disconnect(QLatin1String("org.freedesktop.DBus"),
-		       QLatin1String("/org/freedesktop/DBus"),
-		       QLatin1String("org.freedesktop.DBus"),
-		       QLatin1String("NameOwnerChanged"),
-		       this,
-		       SLOT(checkMprisService(QString, QString, QString)));
+						 QLatin1String("/org/freedesktop/DBus"),
+						 QLatin1String("org.freedesktop.DBus"),
+						 QLatin1String("NameOwnerChanged"),
+						 this,
+						 SLOT(checkMprisService(QString, QString, QString)));
 	//убиваем таймер если он есть
 	if(checkTimer) {
 		checkTimer->stop();
@@ -304,12 +304,12 @@ void VideoStatusChanger::applyOptions()
 #ifdef Q_WS_X11
 	//читаем состояние плееров
 	if (playerDictList.size() > 0) {
-		foreach (const QString item, playerDictList.keys()) {
+		foreach (const QString& item, playerDictList.keys()) {
 			QCheckBox *cb = ui_.groupBox->findChild<QCheckBox *>(item);
 			if (cb) {
 				playerDictList[item] = cb->isChecked();
 				if (item.contains("mplayer")) {
-					playerGMPlayer = cb->isChecked();
+					playerGMPlayer_ = cb->isChecked();
 				}
 			}
 			psiOptions->setPluginOption(item, QVariant(cb->isChecked()));
@@ -344,7 +344,7 @@ void VideoStatusChanger::restoreOptions()
 #ifdef Q_WS_X11
 	//читаем состояние плееров
 	if (playerDictList.size() > 0) {
-		foreach (const QString item, playerDictList.keys()) {
+		foreach (const QString& item, playerDictList.keys()) {
 			bool option = psiOptions->getPluginOption(item, QVariant(playerDictList.value(item))).toBool();
 			QCheckBox *cb = ui_.groupBox->findChild<QCheckBox *>(item);
 			if (cb) {
@@ -376,8 +376,8 @@ QWidget* VideoStatusChanger::options()
 #ifdef Q_WS_X11
 	//добавляем чекбоксы плееров
 	int i = 0;
-	int rows = 2;
-	int columns = 2;
+	int rows = 2; //при добавлении нового плеера изменить в соответствии с кол-вом плееров
+	int columns = 2; //при добавлении нового плеера изменить в соответствии с кол-вом плееров
 	foreach (StringMap item, players) {
 		i = players.indexOf(item);
 		if (i != -1) {
@@ -409,7 +409,7 @@ QString VideoStatusChanger::pluginInfo()
 #ifdef Q_WS_X11
 bool VideoStatusChanger::isPlayerValid(const QString &service) //проверка является ли плеер разрешенным
 {
-	foreach (const QString item, playerDictList.keys()) {
+	foreach (const QString& item, playerDictList.keys()) {
 		if (service.contains(item, Qt::CaseInsensitive) && playerDictList.value(item)) {
 			return true;
 		}
@@ -543,7 +543,7 @@ void VideoStatusChanger::onPropertyChange(const QDBusMessage &msg)
 
 void VideoStatusChanger::timeOut()
 {
-	if(playerGMPlayer) {
+	if(playerGMPlayer_) {
 		QString gmplayerService = GMP_PREFIX + ".mplayer";
 		QDBusMessage msg = QDBusMessage::createMethodCall(gmplayerService, "/", gmplayerService, "GetPlayState");
 		QDBusPendingCall call = QDBusConnection::sessionBus().asyncCall(msg);
@@ -585,7 +585,7 @@ static Window activeWindow()
 
 void VideoStatusChanger::asyncCallFinished(QDBusPendingCallWatcher *watcher)
 {
-	int stat = 2;
+	watcher->deleteLater();
 	QDBusMessage msg = watcher->reply();
 	if (msg.type() == QDBusMessage::InvalidMessage || msg.arguments().isEmpty()) {
 		return;
@@ -595,17 +595,15 @@ void VideoStatusChanger::asyncCallFinished(QDBusPendingCallWatcher *watcher)
 		return;
 	}
 	else {
-		stat = reply.toInt();
-	}
-	if (stat == 3 || stat == 6 ) {
-		if(!isStatusSet) {
+		int stat = reply.toInt();
+		if (stat == gmpStatusPlaying && (!isStatusSet)) {
 			fullST.stop();
 			setStatusTimer(setDelay, true);
 		}
-	}
-	else if(isStatusSet) {
-		setStatusTimer(restoreDelay, false);
-		fullST.start();
+		if(stat != gmpStatusPlaying && isStatusSet) {
+			setStatusTimer(restoreDelay, false);
+			fullST.start();
+		}
 	}
 }
 
