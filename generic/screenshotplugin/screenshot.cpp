@@ -848,7 +848,7 @@ void Screenshot::newRequest(const QNetworkReply *const old, const QString &link)
 void Screenshot::closeEvent(QCloseEvent *e)
 {
 	if(modified) {
-		int ret = QMessageBox::question(this, tr("Close Screenshot"), tr("Are your sure?"),
+		int ret = QMessageBox::question(this, tr("Close Screenshot"), tr("Are you sure?"),
 						QMessageBox::Ok | QMessageBox::Cancel);
 		if(ret == QMessageBox::Ok) {
 			e->accept();
