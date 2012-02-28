@@ -21,6 +21,7 @@
 #include <QtGui>
 #include <QApplication>
 #include <QMap>
+#include <QAction>
 #include "psiplugin.h"
 #include "shortcutaccessor.h"
 #include "shortcutaccessinghost.h"
@@ -34,7 +35,7 @@
 #define constNew "newsymbol"
 #define constShortCut "shortcut"
 #define constNotTranslate "nottranslate"
-#define constVersion "0.4.0"
+#define constVersion "0.4.1"
 
 class TranslatePlugin : public QObject, public PsiPlugin, public OptionAccessor, public ShortcutAccessor, public ActiveTabAccessor, public PluginInfoProvider
 {
@@ -42,7 +43,7 @@ class TranslatePlugin : public QObject, public PsiPlugin, public OptionAccessor,
 	Q_INTERFACES(PsiPlugin OptionAccessor ShortcutAccessor ActiveTabAccessor PluginInfoProvider)
 
 public:
-	TranslatePlugin();
+			TranslatePlugin();
 
         virtual QString name() const;
         virtual QString shortName() const;
@@ -90,6 +91,7 @@ private:
         QCheckBox *check_button;
         QString storage;
 	QPointer<QWidget> options_;
+	QAction *action_;
 
 };
 
@@ -105,6 +107,7 @@ TranslatePlugin::TranslatePlugin()
 	, activeTab(0)
 	, shortCut("Alt+Ctrl+t")
 	, check_button(0)
+	, action_(0)
 {
 	map.insert("~",QString::fromUtf8("Ё")); map.insert(QString::fromUtf8("Ё"),"~");
 	map.insert("`",QString::fromUtf8("ё")); map.insert(QString::fromUtf8("ё"),"`");
@@ -273,7 +276,18 @@ bool TranslatePlugin::enable()
 
 	shortCut = psiOptions->getPluginOption(constShortCut, shortCut).toString();
 	notTranslate = psiOptions->getPluginOption(constNotTranslate, notTranslate).toBool();
-        psiShortcuts->connectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
+//        psiShortcuts->connectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
+
+	foreach(QWidget *w, qApp->allWidgets()) {
+		if(w->objectName() == "MainWin") {
+			action_ = new QAction(this);
+			w->addAction(action_);
+			action_->setShortcut(QKeySequence(shortCut));
+			action_->setShortcutContext(Qt::ApplicationShortcut);
+			connect(action_, SIGNAL(triggered()), SLOT(trans()));
+			break;
+		}
+	}
 
 	QStringList oldList = psiOptions->getPluginOption(constOld, QStringList(map.keys())).toStringList();
 	QStringList newList = psiOptions->getPluginOption(constNew, QStringList(map.values())).toStringList();
@@ -289,7 +303,18 @@ bool TranslatePlugin::enable()
 bool TranslatePlugin::disable()
 {
         enabled_ = false;
-        psiShortcuts->disconnectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
+	if(action_) {
+		foreach(QWidget *w, qApp->allWidgets()) {
+			if(w->objectName() == "MainWin") {
+				w->removeAction(action_);
+				break;
+			}
+		}
+		action_->disconnect(this, SLOT(trans()));
+		delete action_;
+		action_ = 0;
+	}
+//        psiShortcuts->disconnectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
         return true;
 }
 
@@ -373,9 +398,9 @@ void TranslatePlugin::setShortcutAccessingHost(ShortcutAccessingHost* host)
 
 void TranslatePlugin::setShortcuts()
 {
-	if (enabled_) {
-		psiShortcuts->connectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
-	}
+//	if (enabled_) {
+//		psiShortcuts->connectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
+//	}
 }
 
 void TranslatePlugin::applyOptions()
@@ -383,10 +408,12 @@ void TranslatePlugin::applyOptions()
 	if (!options_)
 		return;
 
-	psiShortcuts->disconnectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
+//	psiShortcuts->disconnectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
 	shortCut = shortCutWidget->text();
 	psiOptions->setPluginOption(constShortCut, shortCut);
-        psiShortcuts->connectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
+	if(action_)
+		action_->setShortcut(QKeySequence(shortCut));
+//        psiShortcuts->connectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
 
 	notTranslate = check_button->isChecked();
 	psiOptions->setPluginOption(constNotTranslate, notTranslate);
