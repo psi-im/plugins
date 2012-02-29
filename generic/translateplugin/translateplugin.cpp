@@ -30,21 +30,26 @@
 #include "activetabaccessor.h"
 #include "activetabaccessinghost.h"
 #include "plugininfoprovider.h"
+#include "toolbariconaccessor.h"
+#include "gctoolbariconaccessor.h"
 
 #define constOld "oldsymbol"
 #define constNew "newsymbol"
 #define constShortCut "shortcut"
 #define constNotTranslate "nottranslate"
-#define constVersion "0.4.1"
+#define constVersion "0.4.2"
+
+static const QString mucData = "groupchat";
+static const QString chatData = "chat";
 
 class TranslatePlugin : public QObject, public PsiPlugin, public OptionAccessor, public ShortcutAccessor, public ActiveTabAccessor, public PluginInfoProvider
+		, public ToolbarIconAccessor, public GCToolbarIconAccessor
 {
         Q_OBJECT
-	Q_INTERFACES(PsiPlugin OptionAccessor ShortcutAccessor ActiveTabAccessor PluginInfoProvider)
+	Q_INTERFACES(PsiPlugin OptionAccessor ShortcutAccessor ActiveTabAccessor PluginInfoProvider ToolbarIconAccessor GCToolbarIconAccessor)
 
 public:
-			TranslatePlugin();
-
+	TranslatePlugin();
         virtual QString name() const;
         virtual QString shortName() const;
         virtual QString version() const;
@@ -64,6 +69,12 @@ public:
 	virtual void setShortcuts();
         //ActiveTabAccessor
         virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
+	//Toolbars
+	virtual QList < QVariantHash > getButtonParam() { return QList < QVariantHash >(); }
+	virtual QAction* getAction(QObject* parent, int account, const QString& contact);
+
+	virtual QList < QVariantHash > getGCButtonParam() { return QList < QVariantHash >(); }
+	virtual QAction* getGCAction(QObject* parent, int account, const QString& contact);
 
 	virtual QString pluginInfo();
 
@@ -77,6 +88,7 @@ private slots:
         void storeItem(QTableWidgetItem*);
         void restoreMap();
 	void hack();
+	void actionDestroyed(QObject* obj);
 private:
         bool enabled_;
         bool notTranslate;
@@ -91,8 +103,7 @@ private:
         QCheckBox *check_button;
         QString storage;
 	QPointer<QWidget> options_;
-	QAction *action_;
-
+	QList<QAction *> actions_;
 };
 
 Q_EXPORT_PLUGIN(TranslatePlugin);
@@ -107,7 +118,6 @@ TranslatePlugin::TranslatePlugin()
 	, activeTab(0)
 	, shortCut("Alt+Ctrl+t")
 	, check_button(0)
-	, action_(0)
 {
 	map.insert("~",QString::fromUtf8("Ё")); map.insert(QString::fromUtf8("Ё"),"~");
 	map.insert("`",QString::fromUtf8("ё")); map.insert(QString::fromUtf8("ё"),"`");
@@ -278,15 +288,8 @@ bool TranslatePlugin::enable()
 	notTranslate = psiOptions->getPluginOption(constNotTranslate, notTranslate).toBool();
 //        psiShortcuts->connectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
 
-	foreach(QWidget *w, qApp->allWidgets()) {
-		if(w->objectName() == "MainWin") {
-			action_ = new QAction(this);
-			w->addAction(action_);
-			action_->setShortcut(QKeySequence(shortCut));
-			action_->setShortcutContext(Qt::ApplicationShortcut);
-			connect(action_, SIGNAL(triggered()), SLOT(trans()));
-			break;
-		}
+	foreach(QAction* act, actions_) {
+		act->setShortcut(QKeySequence(shortCut));
 	}
 
 	QStringList oldList = psiOptions->getPluginOption(constOld, QStringList(map.keys())).toStringList();
@@ -303,34 +306,35 @@ bool TranslatePlugin::enable()
 bool TranslatePlugin::disable()
 {
         enabled_ = false;
-	if(action_) {
-		foreach(QWidget *w, qApp->allWidgets()) {
-			if(w->objectName() == "MainWin") {
-				w->removeAction(action_);
-				break;
-			}
-		}
-		action_->disconnect(this, SLOT(trans()));
-		delete action_;
-		action_ = 0;
+	foreach(QAction* act, actions_) {
+		act->disconnect(this, SLOT(trans()));
 	}
+
 //        psiShortcuts->disconnectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
         return true;
 }
 
 void TranslatePlugin::trans()
 {
+	if(!enabled_)
+		return;
+
 	QTextEdit * ed = activeTab->getEditBox();
 	if (!ed) {
 		return;
 	}
+
+	bool isMuc = false;
+	QAction* act = dynamic_cast<QAction*>(sender());
+	if(act && act->data().toString() == mucData)
+		isMuc = true;
 
 	QString toReverse = ed->textCursor().selectedText();
 	bool isSelect = true;
 	QString nick("");
 	if (toReverse.isEmpty()) {
 		toReverse = ed->toPlainText();
-		if (notTranslate) {
+		if (notTranslate && isMuc) {
 			int index = toReverse.indexOf(":") + 1;
 			nick = toReverse.left(index);
 			toReverse = toReverse.right(toReverse.size() - index);
@@ -411,8 +415,10 @@ void TranslatePlugin::applyOptions()
 //	psiShortcuts->disconnectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
 	shortCut = shortCutWidget->text();
 	psiOptions->setPluginOption(constShortCut, shortCut);
-	if(action_)
-		action_->setShortcut(QKeySequence(shortCut));
+	foreach(QAction* act, actions_) {
+		act->setShortcut(QKeySequence(shortCut));
+	}
+
 //        psiShortcuts->connectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
 
 	notTranslate = check_button->isChecked();
@@ -509,6 +515,38 @@ void TranslatePlugin::hack()
 {
 	check_button->toggle();
 	check_button->toggle();
+}
+
+QAction* TranslatePlugin::getAction(QObject* parent, int /*account*/, const QString& /*contact*/)
+{
+	QAction* act = new QAction(parent);
+	((QWidget*)parent)->addAction(act);
+	act->setData(chatData);
+	act->setShortcut(QKeySequence(shortCut));
+	act->setShortcutContext(Qt::WindowShortcut);
+	connect(act, SIGNAL(triggered()), SLOT(trans()));
+	connect(act, SIGNAL(destroyed(QObject*)), SLOT(actionDestroyed(QObject*)));
+	actions_.append(act);
+	return 0; //we dont want this action will be visible
+}
+
+QAction* TranslatePlugin::getGCAction(QObject* parent, int /*account*/, const QString& /*contact*/)
+{
+	QAction* act = new QAction(parent);
+	((QWidget*)parent)->addAction(act);
+	act->setData(mucData);
+	act->setShortcut(QKeySequence(shortCut));
+	act->setShortcutContext(Qt::WindowShortcut);
+	connect(act, SIGNAL(triggered()), SLOT(trans()));
+	connect(act, SIGNAL(destroyed(QObject*)), SLOT(actionDestroyed(QObject*)));
+	actions_.append(act);
+	return 0; //we dont want this action will be visible
+}
+
+void TranslatePlugin::actionDestroyed(QObject *obj)
+{
+	QAction* act = static_cast<QAction*>(obj);
+	actions_.removeAll(act);
 }
 
 QString TranslatePlugin::pluginInfo()
