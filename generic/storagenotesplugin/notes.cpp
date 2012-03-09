@@ -98,7 +98,6 @@ void Notes::keyPressEvent(QKeyEvent *e)
 	if(e->key() == Qt::Key_Escape) {
 		e->ignore();
 		close();
-		close();
 	}
 	else {
 		QDialog::keyPressEvent(e);

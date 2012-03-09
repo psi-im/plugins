@@ -34,7 +34,7 @@ class Notes : public QDialog
         Q_OBJECT
 public:
 	Notes(StorageNotesPlugin *storageNotes, int acc, QWidget *parent = 0);
-        ~Notes();
+	~Notes();
 	void incomingNotes(const QList<QDomElement>& notes);
 	void error();
 	void saved();
@@ -55,7 +55,7 @@ private slots:
         void edit();
 	void addNote(const QDomElement& note);
 	void noteEdited(const QDomElement& note, const QModelIndex& index);
-        void selectTag();
+	void selectTag();
 	void updateTags();
 
 protected:
