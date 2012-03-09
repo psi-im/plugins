@@ -38,6 +38,7 @@ public:
 	void incomingNotes(int account, const QList<QDomElement>& notes);
 	void start(int account);
 	void error(int account);
+	void saved(int account);
 
 private slots:
 	void notesDeleted(int account);

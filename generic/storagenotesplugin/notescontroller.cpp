@@ -75,6 +75,15 @@ void NotesController::error(int account)
 	}
 }
 
+void NotesController::saved(int account)
+{
+	if(notesList_.contains(account)) {
+		Notes* note = notesList_.value(account);
+		if(note)
+			note->saved();
+	}
+}
+
 void NotesController::notesDeleted(int account)
 {
 	if(notesList_.contains(account)) {

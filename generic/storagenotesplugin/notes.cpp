@@ -25,7 +25,6 @@
 
 #include <QMessageBox>
 
-static const QString id = "strnotes_1";
 
 Notes::Notes(StorageNotesPlugin *storageNotes, int acc, QWidget *parent)
 	: QDialog(parent, Qt::Window)
@@ -34,7 +33,9 @@ Notes::Notes(StorageNotesPlugin *storageNotes, int acc, QWidget *parent)
 	, tagModel_(new TagModel(this))
 	, noteModel_(new NoteModel(this))
 	, proxyModel_(new ProxyModel(this))
+	, updateTagsTimer_(new QTimer(this))
 	, newNotes(false)
+	, waitForSave(false)
 
 {
 	setModal(false);
@@ -64,6 +65,12 @@ Notes::Notes(StorageNotesPlugin *storageNotes, int acc, QWidget *parent)
 	connect(ui_.pb_add, SIGNAL(released()), this, SLOT(add()));
 	connect(ui_.pb_delete, SIGNAL(released()), this, SLOT(del()));
 	connect(ui_.pb_edit, SIGNAL(released()), this, SLOT(edit()));
+
+	ui_.tv_tags->installEventFilter(this);
+
+	updateTagsTimer_->setSingleShot(true);
+	updateTagsTimer_->setInterval(100);
+	connect(updateTagsTimer_, SIGNAL(timeout()), this, SLOT(updateTags()));
 }
 
 Notes::~Notes()
@@ -91,6 +98,7 @@ void Notes::keyPressEvent(QKeyEvent *e)
 	if(e->key() == Qt::Key_Escape) {
 		e->ignore();
 		close();
+		close();
 	}
 	else {
 		QDialog::keyPressEvent(e);
@@ -98,11 +106,20 @@ void Notes::keyPressEvent(QKeyEvent *e)
 	}
 }
 
+bool Notes::eventFilter(QObject *obj, QEvent *e)
+{
+	if(obj == ui_.tv_tags && e->type() == QEvent::KeyPress)	{
+		QTimer::singleShot(0, this, SLOT(selectTag()));
+	}
+
+	return QDialog::eventFilter(obj, e);
+}
+
 void Notes::save()
 {
 	QList<QDomElement> notesList = noteModel_->getAllNotes();
 	QString notes;
-	foreach(QDomElement note, notesList) {
+	foreach(const QDomElement& note, notesList) {
 		QString tag = note.attribute("tags");
 		QString text = note.firstChildElement("text").text();
 		QString title = note.firstChildElement("title").text();
@@ -116,16 +133,21 @@ void Notes::save()
 	}
 	QString xml = QString("<iq type=\"set\" id=\"%2\"><query xmlns=\"jabber:iq:private\"><storage xmlns=\"http://miranda-im.org/storage#notes\">%1</storage></query></iq>")
 		      .arg(notes)
-		      .arg(id);
+		      .arg(NOTES_ID);
 
 	storageNotes_->stanzaSender->sendStanza(account_, xml);
 
 	newNotes = false;
+	waitForSave = true;
 }
 
 void Notes::add()
 {
-	EditNote *editNote = new EditNote(this);
+	QString tag = ui_.tv_tags->currentIndex().data(Qt::DisplayRole).toString();
+	if(tag == TagModel::allTagsName())
+		tag = QString();
+
+	EditNote *editNote = new EditNote(this, tag);
 	connect(editNote, SIGNAL(newNote(QDomElement)), this, SLOT(addNote(QDomElement)));
 	editNote->show();
 
@@ -135,7 +157,7 @@ void Notes::add()
 void Notes::del()
 {    
 	noteModel_->delNote(proxyModel_->mapToSource(ui_.lv_notes->currentIndex()));
-	updateTags();
+	updateTagsTimer_->start();
 
 	newNotes = true;
 }
@@ -147,7 +169,7 @@ void Notes::updateTags()
 
 	tagModel_->clear();
 
-	foreach(QString tag, tags) {
+	foreach(const QString& tag, tags) {
 		if(!tag.isEmpty())
 			tagModel_->addTag(tag);
 	}
@@ -179,7 +201,7 @@ void Notes::edit()
 void Notes::noteEdited(const QDomElement& note, const QModelIndex& index)
 {
 	noteModel_->editNote(note, index);
-	updateTags();
+	updateTagsTimer_->start();
 
 	newNotes = true;
 }
@@ -203,7 +225,7 @@ void Notes::load()
 	selectTag();
 	noteModel_->clear();
 	QString str = QString("<iq type=\"get\" id=\"%1\"><query xmlns=\"jabber:iq:private\"><storage xmlns=\"%2\" /></query></iq>")
-		      .arg(id).arg("http://miranda-im.org/storage#notes");
+		      .arg(NOTES_ID).arg("http://miranda-im.org/storage#notes");
 	storageNotes_->stanzaSender->sendStanza(account_, str);
 
 	newNotes = false;
@@ -211,21 +233,16 @@ void Notes::load()
 
 void Notes::incomingNotes(const QList<QDomElement>& notes)
 {
-	foreach(QDomElement note, notes) {
+	foreach(const QDomElement& note, notes) {
 		addNote(note);
 	}
-	ui_.tv_tags->expandToDepth(2);
 }
 
 void Notes::addNote(const QDomElement& note)
 {
 	QString tag = note.attribute("tags");
 	noteModel_->addNote(note);
-
-	foreach(QString t, tag.split(" ")) {
-		if(!t.isEmpty())
-			tagModel_->addTag(t);
-	}
+	updateTagsTimer_->start();
 }
 
 void Notes::selectTag()
@@ -236,7 +253,19 @@ void Notes::selectTag()
 void Notes::error()
 {
 	storageNotes_->popup->initPopup(tr("Error! Perhaps the function is not implemented on the server."),
-					tr("Storage Notes Plugin"), "storagenotes/storagenotes");
+					tr("Storage Notes Plugin"), "storagenotes/storagenotes", 7); // 7 - AlertHeadline
+	close();
+}
+
+void Notes::saved()
+{
+	if(!waitForSave)
+		return;
+
+	storageNotes_->popup->initPopup(tr("Notes has been saved."),
+					tr("Storage Notes Plugin"), "storagenotes/storagenotes", 7); // 7 - AlertHeadline
+
+	waitForSave = false;
 }
 
 QString Notes::replaceSymbols(const QString& str)

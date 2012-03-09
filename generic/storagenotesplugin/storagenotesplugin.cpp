@@ -24,9 +24,6 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
-#define constVersion "0.1.7"
-
-static const QString id = "strnotes_1";
 
 StorageNotesPlugin::StorageNotesPlugin()
 	: stanzaSender(0)
@@ -98,7 +95,7 @@ bool StorageNotesPlugin::incomingStanza(int account, const QDomElement& xml)
 	if(!enabled)
 		return false;
 
-	if(xml.tagName() == "iq" && xml.attribute("id") == id) {
+	if(xml.tagName() == "iq" && xml.attribute("id") == NOTES_ID) {
 		if(xml.attribute("type") == "error") {
 			controller_->error(account);
 		}
@@ -110,6 +107,9 @@ bool StorageNotesPlugin::incomingStanza(int account, const QDomElement& xml)
 
 			if(!notes.isEmpty()) {
 				controller_->incomingNotes(account, notes);
+			}
+			else {
+				controller_->saved(account);
 			}
 		}
 		return true;
@@ -176,4 +176,4 @@ QString StorageNotesPlugin::pluginInfo() {
 				 "The plugin is designed to keep notes on the jabber server with the ability to access them from anywhere using Psi+ or Miranda IM.");
 }
 
-Q_EXPORT_PLUGIN(StorageNotesPlugin);
+Q_EXPORT_PLUGIN(StorageNotesPlugin)
