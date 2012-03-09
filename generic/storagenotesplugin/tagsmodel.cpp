@@ -136,7 +136,7 @@ QModelIndex TagModel::createAllTagsIndex() const
 
 QString TagModel::allTagsName()
 {
-    return allTags;
+	return allTags;
 }
 
 

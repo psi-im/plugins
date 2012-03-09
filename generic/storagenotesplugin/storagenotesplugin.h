@@ -43,7 +43,7 @@ class Notes;
 #define NOTES_ID "strnotes_1"
 
 class StorageNotesPlugin : public QObject, public PsiPlugin, public StanzaSender, public IconFactoryAccessor, public PluginInfoProvider,
-public AccountInfoAccessor, public StanzaFilter, public PopupAccessor, public MenuAccessor
+		public AccountInfoAccessor, public StanzaFilter, public PopupAccessor, public MenuAccessor
 {
         Q_OBJECT
 	Q_INTERFACES(PsiPlugin StanzaSender IconFactoryAccessor AccountInfoAccessor StanzaFilter PopupAccessor MenuAccessor PluginInfoProvider)

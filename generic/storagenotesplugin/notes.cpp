@@ -127,13 +127,13 @@ void Notes::save()
 		text = replaceSymbols(text);
 		title = replaceSymbols(title);
 		notes+=QString("<note tags=\"%1\"><title>%2</title><text>%3</text></note>")
-		       .arg(tag)
-		       .arg(title)
-		       .arg(text);
+				.arg(tag)
+				.arg(title)
+				.arg(text);
 	}
 	QString xml = QString("<iq type=\"set\" id=\"%2\"><query xmlns=\"jabber:iq:private\"><storage xmlns=\"http://miranda-im.org/storage#notes\">%1</storage></query></iq>")
-		      .arg(notes)
-		      .arg(NOTES_ID);
+			.arg(notes)
+			.arg(NOTES_ID);
 
 	storageNotes_->stanzaSender->sendStanza(account_, xml);
 
@@ -225,7 +225,7 @@ void Notes::load()
 	selectTag();
 	noteModel_->clear();
 	QString str = QString("<iq type=\"get\" id=\"%1\"><query xmlns=\"jabber:iq:private\"><storage xmlns=\"%2\" /></query></iq>")
-		      .arg(NOTES_ID).arg("http://miranda-im.org/storage#notes");
+			.arg(NOTES_ID).arg("http://miranda-im.org/storage#notes");
 	storageNotes_->stanzaSender->sendStanza(account_, str);
 
 	newNotes = false;
