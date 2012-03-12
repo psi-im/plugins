@@ -89,7 +89,7 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 }
 #endif
 
-#define constVersion "0.2.1"
+#define constVersion "0.2.2"
 
 #define constStatus "status"
 #define constStatusMessage "statusmessage"
@@ -311,8 +311,8 @@ void VideoStatusChanger::applyOptions()
 				if (item.contains("mplayer")) {
 					playerGMPlayer_ = cb->isChecked();
 				}
+				psiOptions->setPluginOption(item, QVariant(cb->isChecked()));
 			}
-			psiOptions->setPluginOption(item, QVariant(cb->isChecked()));
 		}
 	}
 #endif
