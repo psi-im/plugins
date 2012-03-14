@@ -37,7 +37,7 @@
 #define constNew "newsymbol"
 #define constShortCut "shortcut"
 #define constNotTranslate "nottranslate"
-#define constVersion "0.4.2"
+#define constVersion "0.4.3"
 
 static const QString mucData = "groupchat";
 static const QString chatData = "chat";
@@ -286,7 +286,7 @@ bool TranslatePlugin::enable()
 
 	shortCut = psiOptions->getPluginOption(constShortCut, shortCut).toString();
 	notTranslate = psiOptions->getPluginOption(constNotTranslate, notTranslate).toBool();
-//        psiShortcuts->connectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
+//	psiShortcuts->connectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
 
 	foreach(QAction* act, actions_) {
 		act->setShortcut(QKeySequence(shortCut));
@@ -310,7 +310,7 @@ bool TranslatePlugin::disable()
 		act->disconnect(this, SLOT(trans()));
 	}
 
-//        psiShortcuts->disconnectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
+//	psiShortcuts->disconnectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
         return true;
 }
 
@@ -324,12 +324,16 @@ void TranslatePlugin::trans()
 		return;
 	}
 
+	QTextCursor c = ed->textCursor();
+	static QRegExp link("(xmpp:|mailto:|http://|https://|ftp://|news://|ed2k://|www.|ftp.)\\S+", Qt::CaseInsensitive);
+	QStringList newStrings;
+
 	bool isMuc = false;
 	QAction* act = dynamic_cast<QAction*>(sender());
 	if(act && act->data().toString() == mucData)
 		isMuc = true;
 
-	QString toReverse = ed->textCursor().selectedText();
+	QString toReverse = c.selectedText();
 	bool isSelect = true;
 	QString nick("");
 	if (toReverse.isEmpty()) {
@@ -341,28 +345,49 @@ void TranslatePlugin::trans()
 		}
 		isSelect = false;
 	}
+	if(!nick.isEmpty())
+		newStrings.append(nick);
+
 	//запоминаем позицию курсора
-	int pos = ed->textCursor().position();
-	QString newString = "";
-	foreach(QString symbol, toReverse){
-		newString.append(map.value(symbol,symbol));
+	int pos = c.position();
+
+	int index = link.indexIn(toReverse);
+	while(index != -1 && !isSelect) {
+		QString newStr;
+		QString oldStr = toReverse.left(index);
+		foreach(const QString& symbol, oldStr) {
+			newStr.append(map.value(symbol,symbol));
+		}
+		newStrings << newStr << link.cap();
+		toReverse = toReverse.right(toReverse.size() - (index + link.matchedLength()));
+		index = link.indexIn(toReverse);
 	}
+
+	QString newStr;
+	foreach(const QString& symbol, toReverse) {
+		newStr.append(map.value(symbol,symbol));
+	}
+	newStrings << newStr;
+
+	QString newString = newStrings.join("");
+
 	if (!isSelect) {
-		ed->setPlainText(nick + newString);
+		ed->setPlainText(newString);
 		//восстанавливаем позицию курсора
-		QTextCursor c = ed->textCursor();
 		c.setPosition( pos );
 		ed->setTextCursor( c );
-	} else {
-		int end = ed->textCursor().selectionEnd();
-		int start = ed->textCursor().selectionStart();
+	}
+	else {
+		int end = c.selectionEnd();
+		int start = c.selectionStart();
 		ed->textCursor().clearSelection();
 		ed->textCursor().insertText(newString);
-		QTextCursor c = ed->textCursor();
-		if ( pos == start) {
+		c = ed->textCursor();
+		if (pos == start) {
 			c.setPosition(end);
 			c.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor, end-start);
-		} else {
+		}
+		else {
 			c.setPosition(start);
 			c.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, end-start);
 		}
@@ -419,7 +444,7 @@ void TranslatePlugin::applyOptions()
 		act->setShortcut(QKeySequence(shortCut));
 	}
 
-//        psiShortcuts->connectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
+//	psiShortcuts->connectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
 
 	notTranslate = check_button->isChecked();
 	psiOptions->setPluginOption(constNotTranslate, notTranslate);
@@ -440,7 +465,6 @@ void TranslatePlugin::restoreOptions()
 {
 	if (!options_)
 		return;
-
 
 	shortCutWidget->setText(shortCut);
 	check_button->setChecked(notTranslate);
