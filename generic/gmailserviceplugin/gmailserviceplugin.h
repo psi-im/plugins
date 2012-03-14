@@ -52,10 +52,11 @@
 #define OPTION_LISTS "lists"
 #define OPTION_INTERVAL "interval"
 #define OPTION_SOUND "sound"
+#define OPTION_PROG "program"
 
 #define POPUP_OPTION "Gmail Service Plugin"
 
-#define PLUGIN_VERSION "0.7.3"
+#define PLUGIN_VERSION "0.7.4"
 
 
 class GmailNotifyPlugin : public QObject, public PsiPlugin, public AccountInfoAccessor,
@@ -107,6 +108,7 @@ private slots:
 	void checkSound();
 	void getSound();
 	void blockActionTriggered(bool);
+	void getProg();
 
 private:
 	AccountSettings* findAccountSettings(const QString& jid);
@@ -146,6 +148,7 @@ private:
 	QList<MailItemsList> mailItems_;
 	QStringList id_;
 	int popupId;
+	QString program_;
 	Ui::Options ui_;
 };
 

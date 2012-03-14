@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>399</width>
-    <height>596</height>
+    <width>344</width>
+    <height>440</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -152,26 +152,55 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
+       <layout class="QGridLayout" name="gridLayout" columnstretch="0,2,0,0,0">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Start program:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
          <widget class="QLabel" name="label_2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string>Play sound:</string>
           </property>
          </widget>
         </item>
-        <item>
+        <item row="2" column="1" colspan="2">
          <widget class="QLineEdit" name="le_sound"/>
         </item>
-        <item>
+        <item row="2" column="3">
          <widget class="QToolButton" name="tb_open">
           <property name="text">
            <string/>
           </property>
          </widget>
         </item>
-        <item>
+        <item row="2" column="4">
          <widget class="QToolButton" name="tb_check">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="3">
+         <widget class="QLineEdit" name="le_program"/>
+        </item>
+        <item row="0" column="4">
+         <widget class="QToolButton" name="tb_open_prog">
           <property name="text">
            <string/>
           </property>

@@ -19,6 +19,7 @@
  */
 
 #include <QFileDialog>
+#include <QProcess>
 #include "gmailserviceplugin.h"
 #include "common.h"
 
@@ -67,10 +68,12 @@ QWidget* GmailNotifyPlugin::options()
 
 	ui_.tb_check->setIcon(iconHost->getIcon("psi/play"));
 	ui_.tb_open->setIcon(iconHost->getIcon("psi/browse"));
+	ui_.tb_open_prog->setIcon(iconHost->getIcon("psi/browse"));
 
 	connect(ui_.tb_check, SIGNAL(clicked()), SLOT(checkSound()));
 	connect(ui_.tb_open, SIGNAL(clicked()), SLOT(getSound()));
 	connect(ui_.cb_accounts, SIGNAL(currentIndexChanged(int)), SLOT(updateOptions(int)));
+	connect(ui_.tb_open_prog, SIGNAL(clicked()), SLOT(getProg()));
 
 	return options_;
 }
@@ -100,6 +103,7 @@ bool GmailNotifyPlugin::enable()
 
 	int interval = psiOptions->getPluginOption(OPTION_INTERVAL, QVariant(4000)).toInt()/1000;
 	popupId = popup->registerOption(POPUP_OPTION, interval, "plugins.options."+shortName()+"."+OPTION_INTERVAL);
+	program_ = psiOptions->getPluginOption(OPTION_PROG).toString();
 
 	//Update features
 	bool end = false;
@@ -148,6 +152,9 @@ void GmailNotifyPlugin::applyOptions()
 
 	soundFile = ui_.le_sound->text();
 	psiOptions->setPluginOption(OPTION_SOUND, soundFile);
+
+	program_ = ui_.le_program->text();
+	psiOptions->setPluginOption(OPTION_PROG, program_);
 
 	int index = ui_.cb_accounts->currentIndex();
 	if(accounts.size() <= index || index == -1)
@@ -217,6 +224,7 @@ void GmailNotifyPlugin::restoreOptions()
 	ui_.cb_shared_statuses->setVisible(true);
 	ui_.cb_nosave->setVisible(true);
 	ui_.le_sound->setText(soundFile);
+	ui_.le_program->setText(program_);
 
 	ui_.cb_accounts->setEnabled(true);
 	ui_.cb_accounts->clear();
@@ -896,6 +904,13 @@ void GmailNotifyPlugin::incomingMail(int account, const QDomElement &xml)
 		}
 	}
 	psiOptions->setGlobalOption("options.ui.notifications.sounds.enable", soundEnabled);
+
+	if(!program_.isEmpty()) {
+		QStringList prog = program_.split(" ");
+		QProcess *p = new QProcess(this);
+		p->startDetached(prog.takeFirst(), prog);
+		p->deleteLater();
+	}
 }
 
 void GmailNotifyPlugin::mailEventActivated()
@@ -933,6 +948,14 @@ void GmailNotifyPlugin::getSound()
 	if(fileName.isEmpty())
 		return;
 	ui_.le_sound->setText(fileName);
+}
+
+void GmailNotifyPlugin::getProg()
+{
+	QString fileName = QFileDialog::getOpenFileName(0,tr("Choose a program"),"","");
+	if(fileName.isEmpty())
+		return;
+	ui_.le_program->setText(fileName);
 }
 
 QAction* GmailNotifyPlugin::getContactAction(QObject *parent, int account, const QString &contact)
