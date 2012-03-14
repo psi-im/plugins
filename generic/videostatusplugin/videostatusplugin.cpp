@@ -89,7 +89,7 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 }
 #endif
 
-#define constVersion "0.2.2"
+#define constVersion "0.2.3"
 
 #define constStatus "status"
 #define constStatusMessage "statusmessage"
@@ -376,8 +376,8 @@ QWidget* VideoStatusChanger::options()
 #ifdef Q_WS_X11
 	//добавляем чекбоксы плееров
 	int i = 0;
-	int rows = 2; //при добавлении нового плеера изменить в соответствии с кол-вом плееров
-	int columns = 2; //при добавлении нового плеера изменить в соответствии с кол-вом плееров
+	int columns = (players.length() < 5) ? 2 : 3;
+	int rows = (players.length() + columns - 1) / columns;
 	foreach (StringMap item, players) {
 		i = players.indexOf(item);
 		if (i != -1) {
