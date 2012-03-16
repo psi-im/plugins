@@ -75,6 +75,9 @@ private slots:
 	void settingsChanged(const QString& option, const QVariant& value);
 	void copyUrl();
 
+protected:
+	bool eventFilter(QObject *o, QEvent *e);
+
 private:
 	void updateScreenshotLabel();
 	void refreshWindow();

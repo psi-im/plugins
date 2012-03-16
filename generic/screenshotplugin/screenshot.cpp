@@ -257,6 +257,8 @@ Screenshot::Screenshot()
 	connect(ui_.tb_copyUrl, SIGNAL(clicked()), this, SLOT(copyUrl()));
 
 	setWindowIcon(icoHost->getIcon("screenshotplugin/screenshot"));
+
+	ui_.lb_pixmap->installEventFilter(this);
 }
 
 Screenshot::~Screenshot()
@@ -903,6 +905,19 @@ void Screenshot::saveGeometry()
 	o->setOption(constWindowY, y());
 	o->setOption(constWindowWidth, width());
 	o->setOption(constWindowHeight, height());
+}
+
+bool Screenshot::eventFilter(QObject *o, QEvent *e)
+{
+	if(o == ui_.lb_pixmap && e->type() == QEvent::MouseMove) {
+		QMouseEvent *me = static_cast<QMouseEvent*>(e);
+		if(me->buttons() == Qt::LeftButton) {
+			QPoint pos = me->pos();
+			ui_.scrollArea->ensureVisible(pos.x(), pos.y(), 10, 10);
+		}
+	}
+
+	return QMainWindow::eventFilter(o, e);
 }
 
 #include "screenshot.moc"

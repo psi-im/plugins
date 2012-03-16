@@ -100,7 +100,7 @@ void SelectionRect::clear()
 	setWidth(-1);
 }
 
-SelectionRect::CornerType SelectionRect::cornerUnderMouse(QPoint pos) const
+SelectionRect::CornerType SelectionRect::cornerUnderMouse(const QPoint& pos) const
 {
 	if(!isValid()) {
 		return NoCorner;
@@ -211,7 +211,7 @@ void PixmapWidget::newWidth(int w)
 	settingsChanged(constPenWidth, QVariant(w));
 }
 
-void PixmapWidget::setPixmap(QPixmap pix)
+void PixmapWidget::setPixmap(const QPixmap& pix)
 {
 	mainPixmap = QPixmap();
 	mainPixmap = pix;	
@@ -228,6 +228,91 @@ void PixmapWidget::cut()
 	saveUndoPixmap();
 	setPixmap(mainPixmap.copy((QRect)*selectionRect));
 	emit adjusted();
+}
+
+static QImage blurred(const QImage& image, const QRect& rect, int radius, bool alphaOnly = false)
+{
+	int tab[] = { 14, 10, 8, 6, 5, 5, 4, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2 };
+	int alpha = (radius < 1)  ? 16 : (radius > 17) ? 1 : tab[radius-1];
+
+	QImage result = image.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+	int r1 = rect.top();
+	int r2 = rect.bottom();
+	int c1 = rect.left();
+	int c2 = rect.right();
+
+	int bpl = result.bytesPerLine();
+	int rgba[4];
+	unsigned char* p;
+
+	int i1 = 0;
+	int i2 = 3;
+
+	if (alphaOnly)
+		i1 = i2 = (QSysInfo::ByteOrder == QSysInfo::BigEndian ? 0 : 3);
+
+	for (int col = c1; col <= c2; col++) {
+		p = result.scanLine(r1) + col * 4;
+		for (int i = i1; i <= i2; i++)
+			rgba[i] = p[i] << 4;
+
+		p += bpl;
+		for (int j = r1; j < r2; j++, p += bpl)
+			for (int i = i1; i <= i2; i++)
+				p[i] = (rgba[i] += ((p[i] << 4) - rgba[i]) * alpha / 16) >> 4;
+	}
+
+	for (int row = r1; row <= r2; row++) {
+		p = result.scanLine(row) + c1 * 4;
+		for (int i = i1; i <= i2; i++)
+			rgba[i] = p[i] << 4;
+
+		p += 4;
+		for (int j = c1; j < c2; j++, p += 4)
+			for (int i = i1; i <= i2; i++)
+				p[i] = (rgba[i] += ((p[i] << 4) - rgba[i]) * alpha / 16) >> 4;
+	}
+
+	for (int col = c1; col <= c2; col++) {
+		p = result.scanLine(r2) + col * 4;
+		for (int i = i1; i <= i2; i++)
+			rgba[i] = p[i] << 4;
+
+		p -= bpl;
+		for (int j = r1; j < r2; j++, p -= bpl)
+			for (int i = i1; i <= i2; i++)
+				p[i] = (rgba[i] += ((p[i] << 4) - rgba[i]) * alpha / 16) >> 4;
+	}
+
+	for (int row = r1; row <= r2; row++) {
+		p = result.scanLine(row) + c2 * 4;
+		for (int i = i1; i <= i2; i++)
+			rgba[i] = p[i] << 4;
+
+		p -= 4;
+		for (int j = c1; j < c2; j++, p -= 4)
+			for (int i = i1; i <= i2; i++)
+				p[i] = (rgba[i] += ((p[i] << 4) - rgba[i]) * alpha / 16) >> 4;
+	}
+
+	return result;
+}
+
+
+void PixmapWidget::blur()
+{
+	if(selectionRect->x() == -1)
+		return;
+
+	saveUndoPixmap();
+	bool ok = false;
+	int radius = QInputDialog::getInteger(this, tr("Input radius"), tr("Radius"), 5, 1, 100, 1, &ok);
+	if(!ok)
+		return;
+
+	QImage im = mainPixmap.toImage();
+	mainPixmap = QPixmap::fromImage(blurred(im, *selectionRect, radius));
+	update();
 }
 
 void PixmapWidget::copy()
@@ -257,11 +342,16 @@ void PixmapWidget::paintEvent(QPaintEvent *)
 	QPainter p(this);
 	p.setClipRect(rect());
 	p.drawPixmap(QPoint(0, 0), mainPixmap/*.scaled(size(), Qt::KeepAspectRatio, Qt::SmoothTransformation)*/);
-	if((type_ == ToolBar::ButtonSelect || type_ == ToolBar::ButtonText) && p2.x() != -1) {
+	if((type_ == ToolBar::ButtonSelect || type_ == ToolBar::ButtonText)) {
 		p.setPen(draftPen);
-		int w = (p2.x() - p1.x());
-		int h = (p2.y() - p1.y());
-		p.drawRect(p1.x(), p1.y(), w, h);
+		if(p2.x() != -1) {
+			int w = (p2.x() - p1.x());
+			int h = (p2.y() - p1.y());
+			p.drawRect(p1.x(), p1.y(), w, h);
+		}
+		else {
+			p.drawRect(selectionRect->x(), selectionRect->y(), selectionRect->width(), selectionRect->height());
+		}
 	}
 }
 
@@ -301,6 +391,7 @@ void PixmapWidget::mousePressEvent(QMouseEvent *e)
 		QMenu m;
 		m.addAction(tr("Cut"), this, SLOT(cut()));
 		m.addAction(tr("Copy"), this, SLOT(copy()));
+		m.addAction(tr("Blur"), this, SLOT(blur()));
 		m.exec(e->globalPos());
 	}
 	e->accept();
