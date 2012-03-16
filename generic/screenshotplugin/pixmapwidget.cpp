@@ -429,11 +429,26 @@ void PixmapWidget::mouseReleaseEvent(QMouseEvent *e)
 	else if(type_ == ToolBar::ButtonSelect && p1 != e->pos() && p1.x() != -1) {
 		selectionRect->setCoords(qMin(p1.x(), p2.x()), qMin(p1.y(), p2.y()),
 					 qMax(p1.x(), p2.x()), qMax(p1.y(), p2.y()));
+
+		int rw = selectionRect->width();
+		int rh = selectionRect->height();
+		if(selectionRect->x()+rw > width()) {
+			selectionRect->setWidth(rw - (selectionRect->x()+rw - width() + 1));
+		}
+		if(selectionRect->y()+rh > height()) {
+			selectionRect->setHeight(rh - (selectionRect->y()+rh - height() + 1));
+		}
+		if(selectionRect->x() < 1)
+			selectionRect->setX(1);
+		if(selectionRect->y() < 1)
+			selectionRect->setY(1);
 	}
 
 	p1 = QPoint(-1, -1);
 	p2 = QPoint(-1, -1);
 	e->accept();
+
+	update();
 }
 
 void PixmapWidget::mouseMoveEvent(QMouseEvent *e)
