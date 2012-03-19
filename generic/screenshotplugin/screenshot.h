@@ -59,9 +59,9 @@ private slots:
 	void ftpReplyFinished();
 	void httpReplyFinished(QNetworkReply*);
 	void captureDesktop(int);
-	//void captureWindow(int);
+	void captureWindow(int);
 	void captureArea(int);	
-	//void shootWindow();
+	void shootWindow();
 	void shootArea();
 	void screenshotCanceled();
 	void pixmapAdjusted();

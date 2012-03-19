@@ -224,6 +224,8 @@ void OptionsWidget::applyOptions()
 
 	if(ui_.rb_desktop->isChecked())
 		defaultAction = Desktop;
+	else if(ui_.rb_window->isChecked())
+		defaultAction = Window;
 	else
 		defaultAction = Area;
 	o->setOption(constDefaultAction, defaultAction);
@@ -246,6 +248,7 @@ void OptionsWidget::restoreOptions()
 	}
 	ui_.rb_desktop->setChecked(defaultAction == Desktop);
 	ui_.rb_area->setChecked(defaultAction == Area);
+	ui_.rb_window->setChecked(defaultAction == Window);
 }
 
 void OptionsWidget::requstNewShortcut()

@@ -40,6 +40,7 @@ public:
 		ButtonUndo,
 		ButtonRotate,
 		ButtonCopy,
+		ButtonInsert,
 		ButtonNoButton
 	};
 

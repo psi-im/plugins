@@ -28,7 +28,6 @@ ScreenshotOptions::ScreenshotOptions(int delay, QWidget *parent)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 	ui_.setupUi(this);
-	ui_.rb_capture_window->setVisible(false); ///FIXME!!!!!!
 	ui_.sb_delay->setValue(delay);
 
 	connect(ui_.buttonBox, SIGNAL(accepted()), SLOT(okPressed()));

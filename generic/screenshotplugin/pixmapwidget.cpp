@@ -22,6 +22,7 @@
 
 #include "pixmapwidget.h"
 #include "options.h"
+#include "defines.h"
 
 #define ACCURACY 5
 
@@ -197,6 +198,9 @@ void PixmapWidget::buttonClicked(ToolBar::ButtonType t)
 	case ToolBar::ButtonCopy:
 		copy();
 		return;
+	case ToolBar::ButtonInsert:
+		insert();
+		break;
 	default:
 		break;
 	}
@@ -306,13 +310,25 @@ void PixmapWidget::blur()
 
 	saveUndoPixmap();
 	bool ok = false;
-	int radius = QInputDialog::getInteger(this, tr("Input radius"), tr("Radius"), 5, 1, 100, 1, &ok);
+	int radius = Options::instance()->getOption(constRadius, 5).toInt();
+	radius = QInputDialog::getInteger(this, tr("Input radius"), tr("Radius"), radius, 1, 100, 1, &ok);
 	if(!ok)
 		return;
 
+	Options::instance()->setOption(constRadius, radius);
 	QImage im = mainPixmap.toImage();
 	mainPixmap = QPixmap::fromImage(blurred(im, *selectionRect, radius));
 	update();
+}
+
+void PixmapWidget::insert()
+{
+	const QPixmap pix = qApp->clipboard()->pixmap();
+	if(!pix.isNull()) {
+		saveUndoPixmap();
+		setPixmap(pix);
+		emit adjusted();
+	}
 }
 
 void PixmapWidget::copy()

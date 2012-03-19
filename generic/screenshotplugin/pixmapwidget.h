@@ -61,6 +61,7 @@ private slots:
 	void copy();
 	void selectFont();
 	void blur();
+	void insert();
 
 protected:
 	void mousePressEvent(QMouseEvent *e);

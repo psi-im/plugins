@@ -43,6 +43,8 @@
 #include "proxysettingsdlg.h"
 #include "defines.h"
 
+#include "qxtwindowsystem.h"
+
 #define PROTOCOL_FTP "ftp"
 #define PROTOCOL_HTTP "http"
 #define MAX_HISTORY_SIZE 10
@@ -234,7 +236,7 @@ Screenshot::Screenshot()
 	ui_.pb_save->setIcon(icoHost->getIcon("psi/download"));
 	ui_.pb_print->setIcon(icoHost->getIcon("psi/print"));
 	ui_.pb_new_screenshot->setIcon(icoHost->getIcon("screenshotplugin/screenshot"));
-	ui_.tb_copyUrl->setIcon(qApp->style()->standardIcon(QStyle::SP_DialogSaveButton));
+	ui_.tb_copyUrl->setIcon(icoHost->getIcon("psi/action_paste_and_send"));
 
 	ui_.pb_save->setShortcut(QKeySequence("Ctrl+s"));
 	ui_.pb_upload->setShortcut(QKeySequence("Ctrl+u"));
@@ -290,6 +292,9 @@ void Screenshot::action(int action)
 	switch(action) {
 	case Area:
 		captureArea(0);
+		break;
+	case Window:
+		captureWindow(0);
 		break;
 	case Desktop:
 	default:
@@ -467,7 +472,7 @@ void Screenshot::newScreenshot()
 {
 	so_ = new ScreenshotOptions(Options::instance()->getOption(constDelay).toInt());
 	connect(so_, SIGNAL(captureArea(int)), SLOT(captureArea(int)));
-	//connect(so, SIGNAL(captureWindow(int)), this, SLOT(captureWindow(int)));
+	connect(so_, SIGNAL(captureWindow(int)), this, SLOT(captureWindow(int)));
 	connect(so_, SIGNAL(captureDesktop(int)), SLOT(captureDesktop(int)));
 	connect(so_, SIGNAL(screenshotCanceled()), SLOT(screenshotCanceled()));
 	saveGeometry();
@@ -526,30 +531,18 @@ void Screenshot::shootArea()
 	refreshWindow();
 }
 
-/*void Screenshot::captureWindow(int delay)
+void Screenshot::captureWindow(int delay)
 {
 	QTimer::singleShot(delay*1000, this, SLOT(shootWindow()));
 }
 
 void Screenshot::shootWindow()
-{	
-
-	Window *w = reinterpret_cast<ulong *>(property(QX11Info::appRootWindow(),
-						       NET_ACTIVE_WINDOW, XA_WINDOW));
-
-	if(!w) {
-		shootScreen();
-		return;
-	}
-
+{
 	qApp->beep();
-	originalPixmap = QPixmap();
-	originalPixmap = QPixmap::grabWindow(w);
-	updateScreenshotLabel();
+	originalPixmap = QPixmap::grabWindow(QxtWindowSystem::activeWindow());
 
-	ui_.pb_new_screenshot->setEnabled(true);
-	bringToFront();
-}*/
+	refreshWindow();
+}
 
 void Screenshot::captureDesktop(int delay)
 {

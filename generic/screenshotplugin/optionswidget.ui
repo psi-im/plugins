@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>409</width>
-    <height>469</height>
+    <width>549</width>
+    <height>394</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -72,6 +72,13 @@
        <widget class="QRadioButton" name="rb_desktop">
         <property name="text">
          <string>Capture the desktop</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="rb_window">
+        <property name="text">
+         <string>Capture active window</string>
         </property>
        </widget>
       </item>

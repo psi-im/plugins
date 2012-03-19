@@ -21,7 +21,7 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-#define cVersion "0.6.3"
+#define cVersion "0.6.4"
 
 #define constName "Screenshot Plugin"
 #define constVersionOption "version"
@@ -38,6 +38,7 @@
 #define constWindowWidth "geometry.width"
 #define constWindowHeight "geometry.height"
 #define constDefaultAction "default-action"
+#define constRadius "radius"
 
 enum DefaultAction { Desktop, Area, Window };
 
