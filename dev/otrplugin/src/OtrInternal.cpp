@@ -946,9 +946,20 @@ int OtrInternal::display_otr_message(const char *accountname,
 {
     Q_UNUSED(protocol);
 
-    return m_callback->displayOtrMessage(QString::fromUtf8(accountname),
-                                         QString::fromUtf8(username),
-                                         QString::fromUtf8(msg))? 0 : -1;
+    QString message = QString::fromUtf8(msg);
+
+    if (QRegExp("^<b>The following message received "
+                "from .+ was <i>not</i> encrypted: "
+                "\\[</b>.+<b>\\]</b>$").exactMatch(message))
+    {
+        return -1;
+    }
+    else
+    {
+        return m_callback->displayOtrMessage(QString::fromUtf8(accountname),
+                                             QString::fromUtf8(username),
+                                             message)? 0 : -1;
+    }
 }
 
 // ---------------------------------------------------------------------------
