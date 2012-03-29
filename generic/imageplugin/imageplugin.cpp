@@ -40,6 +40,9 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QVBoxLayout>
+#include <QMenu>
+#include <QApplication>
+#include <QClipboard>
 
 #define constVersion "0.1.2"
 
@@ -81,7 +84,7 @@ public:
 	virtual QString pluginInfo();
 
 private slots:
-	void fileSelect();
+	void actionActivated();
 
 private:
 	IconFactoryAccessingHost* iconHost;
@@ -161,7 +164,7 @@ QList< QVariantHash > ImagePlugin::getButtonParam()
 	hash["tooltip"] = QVariant(tr("Send Image"));
 	hash["icon"] = QVariant(QString("imageplugin/icon"));
 	hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
-	hash["slot"] = QVariant(SLOT(fileSelect()));
+	hash["slot"] = QVariant(SLOT(actionActivated()));
 	QList< QVariantHash > l;
 	l.push_back(hash);
 	return l;
@@ -202,7 +205,7 @@ void ImagePlugin::setActiveTabAccessingHost(ActiveTabAccessingHost* host)
 	activeTab = host;
 }
 
-void ImagePlugin::fileSelect()
+void ImagePlugin::actionActivated()
 {
 	if (!enabled)
 		return;
@@ -217,54 +220,82 @@ void ImagePlugin::fileSelect()
 		if (tmpJid == "-1")
 			return;
 	}
+
+	QMenu m;
+	QList<QAction*> list;
+	list << new QAction(tr("Open file"), &m)
+	     << new QAction(tr("From clipboard"), &m);
+	QAction *act = m.exec(list, QCursor::pos());
+	if(!act)
+		return;
+
 	if ("offline" == accInfo->getStatus(account)) {
 		return;
 	}
-	const QString lastPath = psiOptions->getPluginOption(CONST_LAST_FOLDER, QDir::homePath()).toString();
-	fileName = QFileDialog::getOpenFileName(0, tr("Open Image"), lastPath, tr("Images (*.png *.gif *.jpg *.jpeg *.ico)"));
-	if (!fileName.isEmpty()) {
+
+	QPixmap pix;
+	QString imageName;
+	if(list.indexOf(act) == 1) {
+		if(!QApplication::clipboard()->mimeData()->hasImage())
+			return;
+
+		pix = QPixmap::fromImage(QApplication::clipboard()->image());
+		imageName = QApplication::clipboard()->text();
+	}
+	else {
+		const QString lastPath = psiOptions->getPluginOption(CONST_LAST_FOLDER, QDir::homePath()).toString();
+		fileName = QFileDialog::getOpenFileName(0, tr("Open Image"), lastPath, tr("Images (*.png *.gif *.jpg *.jpeg *.ico)"));
+		if (fileName.isEmpty())
+			return;
+
 		QFile file(fileName);
 		if ( file.open(QIODevice::ReadOnly) ) {
-			QByteArray image = file.readAll();
-			QPixmap pix = QPixmap::fromImage(QImage::fromData(image));
-			if(pix.height() > MAX_SIZE || pix.width() > MAX_SIZE) {
-				pix = pix.scaled(MAX_SIZE, MAX_SIZE, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-			}
-			image.clear();
-			QBuffer b(&image);
-			pix.save(&b, "jpg");
-			QString imageBase64(QUrl::toPercentEncoding(image.toBase64()));
-			int length = image.length();
-			if(length > 61440) {
-				QMessageBox::information(0, tr("The image size is too large."),
-							 tr("Image size must be less than 60 kb"));
-			}
+			pix = QPixmap::fromImage(QImage::fromData(file.readAll()));
+			imageName = QFileInfo(file).fileName();
 
-			QString mType = QLatin1String(sender()->parent()->metaObject()->className()) == "PsiChatDlg"? "chat" : "groupchat";
-			QString body = tr("Image %1 bytes received.").arg(QString::number(length));
-			QString msgHtml = QString("<message type=\"%1\" to=\"%2\" id=\"%3\" >"
-						  "<body>%4</body>"
-						  "<html xmlns=\"http://jabber.org/protocol/xhtml-im\">"
-						  "<body xmlns=\"http://www.w3.org/1999/xhtml\">"
-						  "<br/><img src=\"data:image/%5;base64,%6\" alt=\"img\"/> "
-						  "</body></html></message>")
-					.arg(mType)
-					.arg(jidToSend)
-					.arg(stanzaSender->uniqueId(account))
-					.arg(body)
-					.arg(fileName.right(fileName.length() - fileName.lastIndexOf(".") - 1))
-					.arg(imageBase64);
-
-			stanzaSender->sendStanza(account, msgHtml);
-			file.close();
-			psiController->appendSysMsg(account, jidToSend, tr("Image %1 sent <br/><img src=\"data:image/%2;base64,%3\" alt=\"img\"/> ")
-						    .arg(QFileInfo(file).fileName())
-						    .arg(fileName.right(fileName.length() - fileName.lastIndexOf(".") - 1))
-						    .arg(imageBase64));
-
-			psiOptions->setPluginOption(CONST_LAST_FOLDER, QFileInfo(file).path());
 		}
+		else {
+			return;
+		}
+		psiOptions->setPluginOption(CONST_LAST_FOLDER, QFileInfo(file).path());
 	}
+
+	QByteArray image;
+	if(pix.height() > MAX_SIZE || pix.width() > MAX_SIZE) {
+		pix = pix.scaled(MAX_SIZE, MAX_SIZE, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+	}
+	QBuffer b(&image);
+	pix.save(&b, "jpg");
+	QString imageBase64(QUrl::toPercentEncoding(image.toBase64()));
+	int length = image.length();
+	if(length > 61440) {
+		QMessageBox::information(0, tr("The image size is too large."),
+					 tr("Image size must be less than 60 kb"));
+	}
+	QString mType = QLatin1String(sender()->parent()->metaObject()->className()) == "PsiChatDlg"? "chat" : "groupchat";
+	QString body = tr("Image %1 bytes received.").arg(QString::number(length));
+	QString msgHtml = QString("<message type=\"%1\" to=\"%2\" id=\"%3\" >"
+				  "<body>%4</body>"
+				  "<html xmlns=\"http://jabber.org/protocol/xhtml-im\">"
+				  "<body xmlns=\"http://www.w3.org/1999/xhtml\">"
+				  "<br/><img src=\"data:image/%5;base64,%6\" alt=\"img\"/> "
+				  "</body></html></message>")
+			.arg(mType)
+			.arg(jidToSend)
+			.arg(stanzaSender->uniqueId(account))
+			.arg(body)
+			.arg(fileName.right(fileName.length() - fileName.lastIndexOf(".") - 1))
+			.arg(imageBase64);
+
+	stanzaSender->sendStanza(account, msgHtml);
+	psiController->appendSysMsg(account, jidToSend, tr("Image %1 sent <br/><img src=\"data:image/%2;base64,%3\" alt=\"img\"/> ")
+				    .arg(imageName)
+				    .arg(fileName.right(fileName.length() - fileName.lastIndexOf(".") - 1))
+				    .arg(imageBase64));
+
+
+
+
 }
 
 QString ImagePlugin::pluginInfo()
