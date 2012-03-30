@@ -32,17 +32,13 @@
 #define gnome3Service "org.gnome.SessionManager"
 #define gnome3Interface "org.gnome.SessionManager.Presence"
 #define gnome3Path "/org/gnome/SessionManager/Presence"
-#define available 0
-#define invisible 1
-#define busy 2
-#define idle 3
 
-static const QString busName = "Session";
+static const QStringList statuses = QStringList() << "online" << "invisible" << "dnd" << "away";
 
-#define constVersion "0.0.1"
+#define constVersion "0.0.2"
 
-class Gnome3StatusWatcher : public QObject, public PsiPlugin, public PluginInfoProvider, public OptionAccessor
-			, public PsiAccountController, public AccountInfoAccessor
+class Gnome3StatusWatcher : public QObject, public PsiPlugin, public PluginInfoProvider, public OptionAccessor,
+		public PsiAccountController, public AccountInfoAccessor
 {
 	Q_OBJECT
 	Q_INTERFACES(PsiPlugin PluginInfoProvider OptionAccessor PsiAccountController AccountInfoAccessor)
@@ -68,6 +64,7 @@ private:
 	AccountInfoAccessingHost* accInfo;
 	PsiAccountControllingHost* accControl;
 	QString status, statusMessage;
+	bool isDBUSConnected;
 	void connectToBus(const QString &service_);
 	void disconnectFromBus(const QString &service_);
 	void setPsiGlobalStatus(const QString &status);
@@ -110,11 +107,10 @@ void Gnome3StatusWatcher::setPsiAccountControllingHost(PsiAccountControllingHost
 }
 
 bool Gnome3StatusWatcher::enable() {
-	if(psiOptions) {
+	if (psiOptions) {
 		enabled = true;
-		//подключаемся к сессионной шине с соединением по имени busName
-		QDBusConnection bus = QDBusConnection::connectToBus(QDBusConnection::SessionBus,busName);
-		QStringList services = QDBusConnection(busName).interface()->registeredServiceNames().value();
+		isDBUSConnected = false;
+		QStringList services = QDBusConnection::sessionBus().interface()->registeredServiceNames().value();
 		if (services.contains(gnome3Service, Qt::CaseInsensitive)) {
 			connectToBus(gnome3Service);
 		}
@@ -124,8 +120,9 @@ bool Gnome3StatusWatcher::enable() {
 
 bool Gnome3StatusWatcher::disable(){
 	enabled = false;
-	disconnectFromBus(gnome3Service);
-	QDBusConnection::disconnectFromBus(busName);
+	if (isDBUSConnected) {
+		disconnectFromBus(gnome3Service);
+	}
 	return true;
 }
 
@@ -141,48 +138,40 @@ QString Gnome3StatusWatcher::pluginInfo() {
 
 void Gnome3StatusWatcher::connectToBus(const QString &service_)
 {
-	QDBusConnection(busName).connect(service_,
-					 QLatin1String(gnome3Path),
-					 QLatin1String(gnome3Interface),
-					 QLatin1String("StatusChanged"),
-					 this,
-					 SLOT(onGnome3StatusChange(uint)));
+	isDBUSConnected = QDBusConnection::sessionBus().connect(service_,
+															QLatin1String(gnome3Path),
+															QLatin1String(gnome3Interface),
+															QLatin1String("StatusChanged"),
+															this,
+															SLOT(onGnome3StatusChange(uint)));
 }
 
 void Gnome3StatusWatcher::disconnectFromBus(const QString &service_)
 {
-	QDBusConnection(busName).disconnect(service_,
-					    QLatin1String(gnome3Path),
-					    QLatin1String(gnome3Interface),
-					    QLatin1String("StatusChanged"),
-					    this,
-					    SLOT(onGnome3StatusChange(uint)));
+	QDBusConnection::sessionBus().disconnect(service_,
+											QLatin1String(gnome3Path),
+											QLatin1String(gnome3Interface),
+											QLatin1String("StatusChanged"),
+											this,
+											SLOT(onGnome3StatusChange(uint)));
 }
 
-void Gnome3StatusWatcher::onGnome3StatusChange(const uint &status)
+void Gnome3StatusWatcher::onGnome3StatusChange(const uint &status_)
 {
-	if (status == available) {
-		setPsiGlobalStatus("online");
-	}
-	else if (status == invisible) {
-		setPsiGlobalStatus("invisible");
-	}
-	else if (status == busy) {
-		setPsiGlobalStatus("dnd");
-	}
-	else if (status == idle) {
-		setPsiGlobalStatus("away");
+	int i = (int)status_;
+	if (i != -1 && i < statuses.length()) {
+		setPsiGlobalStatus(statuses[i]);
 	}
 }
 
-void Gnome3StatusWatcher::setPsiGlobalStatus(const QString &status)
+void Gnome3StatusWatcher::setPsiGlobalStatus(const QString &status_)
 {
 	if (!enabled) return;
 	int account = 0;
 	while (accInfo->getJid(account) != "-1") {
 		QString accStatus = accInfo->getStatus(account);
-		if(accStatus != "offline" && accStatus != "invisible" && accStatus != status) {
-			accControl->setStatus(account, status, "");
+		if (accStatus != "offline" && accStatus != "invisible" && accStatus != status_) {
+			accControl->setStatus(account, status_, "");
 		}
 		++account;
 	}
