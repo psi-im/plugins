@@ -71,6 +71,10 @@ void PstoPlugin::messageColorChanged(QColor c) {
     new_message_color = c;
 }
 
+void PstoPlugin::onOptionsClose() {
+
+}
+
 void PstoPlugin::applyOptions() {
     username_color = new_username_color;
     psiOptions->setPluginOption(USERNAME_COLOR, username_color);
