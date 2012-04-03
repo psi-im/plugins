@@ -1,3 +1,9 @@
+2012-04-03
+v0.3.7
+  + добавлены опции "options.service-discovery.last-activity", "options.ui.notifications.sounds.notify-every-muc-message",
+	"options.ui.notifications.passive-popups.suppress-while-dnd", "options.ui.notifications.passive-popups.suppress-while-away"
+
+
 2011-12-15
 v0.3.6
   - удалена продублированная опция options.html.chat.render (Использовать формат текста отправителя)

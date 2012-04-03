@@ -28,7 +28,7 @@
 #include "plugininfoprovider.h"
 
 
-#define constVersion "0.3.6"
+#define constVersion "0.3.7"
 
 class ExtToolButton : public QToolButton
 {
@@ -182,14 +182,17 @@ private:
 	QCheckBox *canCloseTab;
 	QComboBox* mouseDoubleclick;
 
-
 	//Misc
 	QCheckBox *flash_windows;
 	QCheckBox *account_single;
-	QCheckBox *xml_console_enable_at_login;        
+	QCheckBox *xml_console_enable_at_login;
+	QCheckBox *lastActivity;
+	QCheckBox *sndMucNotify;
+	QCheckBox *popupsSuppressDnd;
+	QCheckBox *popupsSuppressAway;
 };
 
-Q_EXPORT_PLUGIN(ExtendedOptions);
+Q_EXPORT_PLUGIN(ExtendedOptions)
 
 ExtendedOptions::ExtendedOptions()
 	: psiOptions(0)
@@ -666,11 +669,22 @@ QWidget* ExtendedOptions::options()
 	flash_windows = new QCheckBox(tr("Enable windows flashing"));
 	account_single = new QCheckBox(tr("Enable \"Single Account\" mode"));
 	xml_console_enable_at_login = new QCheckBox(tr("Enable XML-console on login"));
+	lastActivity = new QCheckBox(tr("Enable last activity server"));
+	sndMucNotify = new QCheckBox(tr("Enable sound notifications for every MUC message"));
+	popupsSuppressDnd = new QCheckBox(tr("Disable popup notifications if status is DND"));
+	popupsSuppressAway = new QCheckBox(tr("Disable popup notifications if status is Away"));
 
+	QGroupBox *ngb = new QGroupBox(tr("Notifications"));
+	QVBoxLayout *nvbl = new QVBoxLayout(ngb);
+	nvbl->addWidget(flash_windows);
+	nvbl->addWidget(sndMucNotify);
+	nvbl->addWidget(popupsSuppressDnd);
+	nvbl->addWidget(popupsSuppressAway);
 
 	tab8Layout->addWidget(account_single);
-	tab8Layout->addWidget(flash_windows);
 	tab8Layout->addWidget(xml_console_enable_at_login);
+	tab8Layout->addWidget(lastActivity);
+	tab8Layout->addWidget(ngb);
 	tab8Layout->addStretch();
 
 
@@ -808,6 +822,10 @@ void ExtendedOptions::applyOptions()
 	psiOptions->setGlobalOption("options.ui.flash-windows", QVariant(flash_windows->isChecked()));
 	psiOptions->setGlobalOption("options.ui.account.single", QVariant(account_single->isChecked()));
 	psiOptions->setGlobalOption("options.xml-console.enable-at-login", QVariant(xml_console_enable_at_login->isChecked()));
+	psiOptions->setGlobalOption("options.service-discovery.last-activity", QVariant(lastActivity->isChecked()));
+	psiOptions->setGlobalOption("options.ui.notifications.sounds.notify-every-muc-message", QVariant(sndMucNotify->isChecked()));
+	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd", QVariant(popupsSuppressDnd->isChecked()));
+	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-away", QVariant(popupsSuppressAway->isChecked()));
 }
 
 void ExtendedOptions::restoreOptions()
@@ -952,6 +970,10 @@ void ExtendedOptions::restoreOptions()
 	flash_windows->setChecked(psiOptions->getGlobalOption("options.ui.flash-windows").toBool());
 	account_single->setChecked(psiOptions->getGlobalOption("options.ui.account.single").toBool());
 	xml_console_enable_at_login->setChecked(psiOptions->getGlobalOption("options.xml-console.enable-at-login").toBool());
+	lastActivity->setChecked(psiOptions->getGlobalOption("options.service-discovery.last-activity").toBool());
+	sndMucNotify->setChecked(psiOptions->getGlobalOption("options.ui.notifications.sounds.notify-every-muc-message").toBool());
+	popupsSuppressDnd->setChecked(psiOptions->getGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd").toBool());
+	popupsSuppressAway->setChecked(psiOptions->getGlobalOption("options.ui.notifications.passive-popups.suppress-while-away").toBool());
 }
 
 
