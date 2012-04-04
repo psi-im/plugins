@@ -172,7 +172,7 @@ struct Fingerprint
     Fingerprint(const Fingerprint &fp);
     Fingerprint(unsigned char* fingerprint,
                 QString account, QString username,
-                QString trust, QString messageState);
+                QString trust);
 };
 
 // ---------------------------------------------------------------------------

@@ -366,12 +366,7 @@ QList<psiotr::Fingerprint> OtrInternal::getFingerprints()
             psiotr::Fingerprint fp (fingerprint->fingerprint,
                                     QString::fromUtf8(context->accountname),
                                     QString::fromUtf8(context->username),
-                                    QString::fromUtf8(fingerprint->trust),
-                                    (fingerprint == context->active_fingerprint)?
-                                        getMessageStateString(
-                                            QString::fromUtf8(context->accountname),
-                                            QString::fromUtf8(context->username)) :
-                                        QString());
+                                    QString::fromUtf8(fingerprint->trust));
 
             fpList.append(fp);
             fingerprint = fingerprint->next;
@@ -397,15 +392,7 @@ void OtrInternal::verifyFingerprint(const psiotr::Fingerprint& fingerprint,
                                                           0, NULL);
         if (fp != NULL)
         {
-            if (verified)
-            {
-                otrl_context_set_trust(fp, "verified");
-            }
-            else
-            {
-                otrl_context_set_trust(fp, "");
-            }
-
+            otrl_context_set_trust(fp, verified? "verified" : "");
             write_fingerprints();
 
             if (context->active_fingerprint == fp)
@@ -724,10 +711,7 @@ psiotr::Fingerprint OtrInternal::getActiveFingerprint(const QString& account,
         return psiotr::Fingerprint(context->active_fingerprint->fingerprint,
                                    QString::fromUtf8(context->accountname),
                                    QString::fromUtf8(context->username),
-                                   QString::fromUtf8(context->active_fingerprint->trust),
-                                   getMessageStateString(
-                                        QString::fromUtf8(context->accountname),
-                                        QString::fromUtf8(context->username)));
+                                   QString::fromUtf8(context->active_fingerprint->trust));
     }
 
     return psiotr::Fingerprint();
