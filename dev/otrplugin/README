@@ -19,11 +19,22 @@ TODOs
 
 
 
+KNOWN ISSUES
+* Currently only works for top priority resources
+* System messages are only displayed for existing chat windows, might be
+  displayed in wrong order (needs to be fixed in Psi+)
+
+
+
+
 CHANGES
 
   0.9.5pre
     -Ignore internal messages, report state changes and notifications
      via system messages
+    -The authentication dialog now differs between 'question and answer'
+     and 'shared secret', enabling mutual authentication for the latter.
+    -Add plugin info
 
   0.9.4
     -Add authentication via Socialist Millionaires' Protocol
@@ -134,7 +145,7 @@ The Off-the-Record Messaging plugin for Psi+ is covered by the following
 
     Off-the-Record Messaging plugin for Psi+
     Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
-                       2011  Florian Fieber
+                  2011-2012  Florian Fieber
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of version 2 of the GNU General Public License as
