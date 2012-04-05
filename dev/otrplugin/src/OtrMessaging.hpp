@@ -98,7 +98,7 @@ public:
     virtual QString dataDir() = 0;
 
     /**
-     * Sends a message from the Account account to the user toJid.
+     * Sends a message from the Account account to the user recipient.
      * The method is called from the OtrConnection to send messages
      * during key-exchange.
      */
@@ -173,7 +173,7 @@ struct Fingerprint
 // ---------------------------------------------------------------------------
 
 /**
- * This class it the interface to the off the record messaging library.
+ * This class is the interface to the Off the Record Messaging library.
  * See the libotr documentation for more information.
  */
 class OtrMessaging
@@ -206,7 +206,7 @@ public:
                            const QString& message);
 
     /**
-     * Decrypt an incoming message
+     * Decrypt an incoming message.
      *
      * @param from Sender of the message
      * @param to Account the message is send to.
@@ -260,53 +260,53 @@ public:
     void expireSession(const QString& account, const QString& contact);
 
     /**
-     * Start the SMP with an optional question
+     * Start the SMP with an optional question.
      */
     void startSMP(const QString& account, const QString& contact,
                   const QString& question, const QString& secret);
 
     /**
-     * Continue the SMP
+     * Continue the SMP.
      */
     void continueSMP(const QString& account, const QString& contact,
                      const QString& secret);
 
     /**
-     * Abort the SMP
+     * Abort the SMP.
      */
     void abortSMP(const QString& account, const QString& contact);
 
     /**
-     * Return the messageState of a context.
-     * i.e. plaintext, encrypted, finished
+     * Return the messageState of a context,
+     * i.e. plaintext, encrypted, finished.
      */
     OtrMessageState getMessageState(const QString& account,
                                     const QString& contact);
 
     /**
-     * returns the messageState in human-readable string.
+     * Return the messageState as human-readable string.
      */
     QString getMessageStateString(const QString& account,
                                   const QString& contact);
 
     /**
-     * Return the secure session id (ssid) for a context
+     * Return the secure session id (ssid) for a context.
      */
     QString getSessionId(const QString& account, const QString& contact);
 
     /**
-     * Return the active fingerprint for a context
+     * Return the active fingerprint for a context.
      */
     psiotr::Fingerprint getActiveFingerprint(const QString& account,
                                              const QString& contact);
 
     /**
-     * Return true if the active fingerprint has been verified
+     * Return true if the active fingerprint has been verified.
      */
     bool isVerified(const QString& account, const QString& contact);
 
     /**
-     * Return true if Socialist Millionaires' Protocol succeeded
+     * Return true if Socialist Millionaires' Protocol succeeded.
      */
     bool smpSucceeded(const QString& account, const QString& contact);
 
@@ -316,7 +316,7 @@ public:
     void setPolicy(OtrPolicy policy);
 
     /**
-     * @return The default OTR policy
+     * Return the default OTR policy.
      */
     OtrPolicy getPolicy();
 
@@ -327,19 +327,19 @@ public:
     void generateKey(const QString& account);
 
     /**
-     * Report a change of state
+     * Report a change of state.
      */
     void stateChange(const QString& account, const QString& contact,
                      OtrStateChange change);
 
     /**
      * Return a human-readable representation
-     * of an account identified by accountId
+     * of an account identified by accountId.
      */
     QString humanAccount(const QString& accountId);
 
     /**
-     * Return the name of a contact
+     * Return the name of a contact.
      */
     QString humanContact(const QString& accountId, const QString& contact);
 
