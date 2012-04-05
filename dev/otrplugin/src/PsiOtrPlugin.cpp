@@ -635,15 +635,16 @@ bool PsiOtrPlugin::displayOtrMessage(const QString& account,
 void PsiOtrPlugin::stateChange(const QString& account, const QString& contact,
                                OtrStateChange change)
 {
-    bool verified  = m_otrConnection->isVerified(account, contact);
-    bool encrypted = false;
-    if (m_onlineUsers.contains(account) &&
-        m_onlineUsers.value(account).contains(contact))
+    if (!m_onlineUsers.value(account).contains(contact))
     {
-        m_onlineUsers[account][contact]->updateMessageState();
-        encrypted = m_onlineUsers[account][contact]->encrypted();
+        m_onlineUsers[account][contact] = new PsiOtrClosure(account, contact,
+                                                            m_otrConnection);
     }
 
+    m_onlineUsers[account][contact]->updateMessageState();
+
+    bool verified  = m_otrConnection->isVerified(account, contact);
+    bool encrypted = m_onlineUsers[account][contact]->encrypted();
     QString msg;
     QString icon;
 
