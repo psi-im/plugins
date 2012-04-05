@@ -163,11 +163,6 @@ struct Fingerprint
      */
     QString trust;
 
-    /**
-     * The messageState of the context (i.e. plaintext, encrypted, finished)
-     */
-    QString messageState;
-
     Fingerprint();
     Fingerprint(const Fingerprint &fp);
     Fingerprint(unsigned char* fingerprint,
