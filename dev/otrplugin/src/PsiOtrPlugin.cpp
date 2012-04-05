@@ -245,10 +245,8 @@ QString PsiOtrPlugin::pluginInfo() {
            .arg(tr("Perfect forward secrecy"))
            .arg(tr("If you lose control of your private keys, no previous "
                    "conversation is compromised."))
-           .arg(tr("For further information, see %1.")
-                  .arg("<a href=\"http://www.cypherpunks.ca/otr/\">"
-                       "http://www.cypherpunks.ca/otr/"
-                       "</a>"));
+           .arg(tr("For further information, see "
+                   "&lt;http://www.cypherpunks.ca/otr/&gt;."));
 }
 
 //-----------------------------------------------------------------------------
