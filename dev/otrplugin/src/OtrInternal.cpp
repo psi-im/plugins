@@ -30,6 +30,7 @@
 #include <QString>
 #include <QByteArray>
 #include <QtGui>
+#include <QDir>
 #include <QFile>
 
 //-----------------------------------------------------------------------------
@@ -126,10 +127,13 @@ OtrInternal::OtrInternal(psiotr::OtrCallback* callback,
     : m_userstate(),
       m_uiOps(),
       m_callback(callback),
-      m_keysFile(callback->dataDir() + "/" + OTR_KEYS_FILE),
-      m_fingerprintFile(callback->dataDir() + "/" + OTR_FINGERPRINTS_FILE),
       m_otrPolicy(policy)
 {
+    QDir profileDir(callback->dataDir());
+
+    m_keysFile        = profileDir.filePath(OTR_KEYS_FILE);
+    m_fingerprintFile = profileDir.filePath(OTR_FINGERPRINTS_FILE);
+
     OTRL_INIT;
     m_userstate                 = otrl_userstate_create();
     m_uiOps.policy              = (*OtrInternal::cb_policy);
