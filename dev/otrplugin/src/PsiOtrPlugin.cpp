@@ -27,8 +27,16 @@
 #include "PsiOtrPlugin.hpp"
 #include "psiotrclosure.h"
 #include "PsiOtrConfig.hpp"
-#include "applicationinfoaccessinghost.h"
 #include "HtmlTidy.hpp"
+#include "applicationinfoaccessinghost.h"
+#include "psiaccountcontrollinghost.h"
+#include "accountinfoaccessinghost.h"
+#include "contactinfoaccessinghost.h"
+#include "iconfactoryaccessinghost.h"
+
+#include <QtGui>
+#include <QDomElement>
+#include <QAction>
 
 namespace psiotr
 {

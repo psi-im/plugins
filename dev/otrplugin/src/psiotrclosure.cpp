@@ -26,11 +26,18 @@
 
 #include "psiotrclosure.h"
 
-#include <QAction>
-#include <QMenu>
+#include <QObject>
+#include <QDialog>
 #include <QWidget>
 #include <QVBoxLayout>
+#include <QMessageBox>
+#include <QMenu>
+#include <QAction>
 #include <QLabel>
+#include <QComboBox>
+#include <QLineEdit>
+#include <QProgressBar>
+#include <QPushButton>
 #include <QFont>
 
 namespace psiotr

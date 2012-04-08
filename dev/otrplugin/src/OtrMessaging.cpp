@@ -23,6 +23,10 @@
 #include "OtrMessaging.hpp"
 #include "OtrInternal.hpp"
 
+#include <QString>
+#include <QList>
+#include <QHash>
+
 namespace psiotr
 {
 

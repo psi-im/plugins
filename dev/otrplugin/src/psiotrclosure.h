@@ -31,19 +31,17 @@
 
 #include <QObject>
 #include <QDialog>
-#include <QComboBox>
-#include <QLineEdit>
-#include <QProgressBar>
-#include <QPushButton>
 #include <QMessageBox>
 
 class QAction;
 class QMenu;
+class QComboBox;
+class QLineEdit;
+class QProgressBar;
+class QPushButton;
 
 namespace psiotr
 {
-class PsiOtrPlugin;
-class OtrMessaging;
 
 //-----------------------------------------------------------------------------
 
