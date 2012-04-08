@@ -41,7 +41,6 @@ extern "C"
 }
 
 class QString;
-namespace psiotr { class PsiOtrPlugin; }
 
 // ---------------------------------------------------------------------------
 

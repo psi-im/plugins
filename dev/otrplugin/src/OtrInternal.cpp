@@ -27,9 +27,16 @@
 #include "OtrInternal.hpp"
 
 #include <assert.h>
+#include <Qt>
+#include <QCoreApplication>
+#include <QMessageBox>
+#include <QAbstractButton>
+#include <QThread>
 #include <QString>
 #include <QByteArray>
-#include <QtGui>
+#include <QRegExp>
+#include <QList>
+#include <QHash>
 #include <QFile>
 
 //-----------------------------------------------------------------------------

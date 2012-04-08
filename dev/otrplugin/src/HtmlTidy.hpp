@@ -26,7 +26,12 @@
 #include <string>
 #include <tidy.h>
 #include <buffio.h>
-#include <QtXml>
+
+#include <QString>
+#include <QByteArray>
+
+class QDomDocument;
+class QDomElement;
 
 class HtmlTidy
 {

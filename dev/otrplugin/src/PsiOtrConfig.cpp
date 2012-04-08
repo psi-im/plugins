@@ -24,17 +24,26 @@
 #include "optionaccessinghost.h"
 #include "accountinfoaccessinghost.h"
 
+
+#include <QWidget>
+#include <QVariant>
 #include <QGroupBox>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QTableView>
 #include <QHeaderView>
 #include <QStandardItem>
+#include <QModelIndex>
 #include <QMessageBox>
+#include <QButtonGroup>
 #include <QPushButton>
+#include <QComboBox>
+#include <QCheckBox>
+#include <QRadioButton>
 #include <QMenu>
 #include <QClipboard>
 #include <QApplication>
+#include <QPoint>
 
 //-----------------------------------------------------------------------------
 

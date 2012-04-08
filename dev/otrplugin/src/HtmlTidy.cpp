@@ -21,7 +21,17 @@
  */
 
 #include "HtmlTidy.hpp"
+
 #include <string>
+#include <tidy.h>
+#include <buffio.h>
+
+#include <QDomDocument>
+#include <QDomElement>
+#include <QTextStream>
+#include <QDebug>
+#include <QString>
+#include <QByteArray>
 
 //-----------------------------------------------------------------------------
 

@@ -26,18 +26,16 @@
 #include "OtrMessaging.hpp"
 
 #include <QWidget>
-#include <QModelIndex>
-#include <QButtonGroup>
-#include <QCheckBox>
-#include <QRadioButton>
-#include <QComboBox>
-#include <QPoint>
+#include <QVariant>
 
 class OptionAccessingHost;
 class AccountInfoAccessingHost;
+class QButtonGroup;
+class QComboBox;
 class QCheckBox;
 class QStandardItemModel;
 class QTableView;
+class QPoint;
 
 // ---------------------------------------------------------------------------
 

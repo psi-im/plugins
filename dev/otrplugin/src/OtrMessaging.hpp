@@ -23,9 +23,10 @@
 #ifndef OTRMESSAGING_HPP_
 #define OTRMESSAGING_HPP_
 
-#include <QString>
 #include <QList>
 #include <QHash>
+
+class QString;
 
 class OtrInternal;
 
@@ -33,8 +34,6 @@ class OtrInternal;
 
 namespace psiotr
 {
-
-class PsiOtrPlugin;
 
 // ---------------------------------------------------------------------------
 

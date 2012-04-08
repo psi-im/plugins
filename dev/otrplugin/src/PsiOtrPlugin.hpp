@@ -28,8 +28,6 @@
 #define PSIOTRPLUGIN_HPP_
 
 #include <QObject>
-#include <QtGui>
-#include <QDomElement>
 
 #include "OtrMessaging.hpp"
 #include "psiplugin.h"
@@ -40,23 +38,26 @@
 #include "stanzasender.h"
 #include "stanzasendinghost.h"
 #include "applicationinfoaccessor.h"
-#include "psiaccountcontrollinghost.h"
 #include "psiaccountcontroller.h"
 #include "stanzafilter.h"
 #include "toolbariconaccessor.h"
-#include "accountinfoaccessinghost.h"
 #include "accountinfoaccessor.h"
-#include "contactinfoaccessinghost.h"
 #include "contactinfoaccessor.h"
 #include "iconfactoryaccessor.h"
-#include "iconfactoryaccessinghost.h"
 
 class ApplicationInfoAccessingHost;
+class PsiAccountControllingHost;
+class AccountInfoAccessingHost;
+class ContactInfoAccessingHost;
+class IconFactoryAccessingHost;
+
+class QDomElement;
+class QString;
+class QAction;
 
 namespace psiotr
 {
 
-class ConfigDlg;
 class PsiOtrClosure;
 
 //-----------------------------------------------------------------------------
