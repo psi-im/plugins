@@ -1,5 +1,5 @@
 /*
- * otrl_extensions.h - Off-the-Record Messaging library extensions
+ * otrlextensions.h - Off-the-Record Messaging library extensions
  *
  * Strongly based on parts of the Off-the-Record Messaging library,
  * Copyright (C) 2004-2008  Ian Goldberg, Chris Alexander, Nikita Borisov
@@ -26,10 +26,10 @@
 #include <libotr/userstate.h>
 
 /* Store all keys of an OtrlUserState. */
-gcry_error_t otrl_privkey_write(OtrlUserState us, const char *filename);
+gcry_error_t otrl_privkey_write(OtrlUserState us, const char* filename);
 
 /* Store all keys of an OtrlUserState.
  * The FILE* must be open for reading and writing. */
-gcry_error_t otrl_privkey_write_FILEp(OtrlUserState us, FILE *privf);
+gcry_error_t otrl_privkey_write_FILEp(OtrlUserState us, FILE* privf);
 
 #endif

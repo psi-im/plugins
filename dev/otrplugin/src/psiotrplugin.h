@@ -1,5 +1,5 @@
 /*
- * PsiOtrPlugin.hpp
+ * psiotrplugin.h
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
@@ -24,12 +24,12 @@
  *
  */
 
-#ifndef PSIOTRPLUGIN_HPP_
-#define PSIOTRPLUGIN_HPP_
+#ifndef PSIOTRPLUGIN_H_
+#define PSIOTRPLUGIN_H_
 
 #include <QObject>
 
-#include "OtrMessaging.hpp"
+#include "otrmessaging.h"
 #include "psiplugin.h"
 #include "plugininfoprovider.h"
 #include "eventfilter.h"
@@ -122,7 +122,7 @@ public:
     virtual void optionChanged(const QString& option);
 
     // StanzaSender
-    virtual void setStanzaSendingHost(StanzaSendingHost *host);
+    virtual void setStanzaSendingHost(StanzaSendingHost* host);
 
     // ApplicationInfoAccessor
     virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
@@ -132,7 +132,7 @@ public:
 
     // StanzaFilter
     virtual bool incomingStanza(int accountIndex, const QDomElement& xml);
-    virtual bool outgoingStanza(int accountIndex, QDomElement &xml);
+    virtual bool outgoingStanza(int accountIndex, QDomElement& xml);
 
     // ToolbarIconAccessor
     virtual QList<QVariantHash> getButtonParam();
@@ -146,7 +146,7 @@ public:
     virtual void setContactInfoAccessingHost(ContactInfoAccessingHost* host);
 
     // IconFactoryAccessingHost
-    virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
+    virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
 
     // OtrCallback
     virtual QString dataDir();

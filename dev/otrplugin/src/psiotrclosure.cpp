@@ -47,7 +47,7 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
                                            const QString& account,
                                            const QString& contact,
                                            const QString& question,
-                                           bool sender, QWidget *parent)
+                                           bool sender, QWidget* parent)
     : QDialog(parent),
       m_otr(otrc),
       m_method(METHOD_QUESTION),
@@ -363,7 +363,7 @@ void AuthenticationDialog::startAuthentication()
             break;
 
         case METHOD_FINGERPRINT:
-            if (m_fpr.fingerprint != NULL)
+            if (m_fpr.fingerprint)
             {
                 QString msg(tr("Account: ") + m_otr->humanAccount(m_account) + "\n" +
                             tr("User: ") + m_contact + "\n" +
@@ -621,7 +621,7 @@ void PsiOtrClosure::fingerprint(bool)
 
 void PsiOtrClosure::updateMessageState()
 {
-    if (m_chatDlgAction != 0)
+    if (m_chatDlgAction)
     {
         OtrMessageState state = m_otr->getMessageState(m_account, m_contact);
 
@@ -632,17 +632,17 @@ void PsiOtrClosure::updateMessageState()
         {
             if (m_otr->isVerified(m_account, m_contact))
             {
-                m_chatDlgAction->setIcon(QIcon(":/psi-otr/otr_yes.png"));
+                m_chatDlgAction->setIcon(QIcon(":/otrplugin/otr_yes.png"));
             }
             else
             {
-                m_chatDlgAction->setIcon(QIcon(":/psi-otr/otr_unverified.png"));
+                m_chatDlgAction->setIcon(QIcon(":/otrplugin/otr_unverified.png"));
                 stateString += ", " + tr("unverified");
             }
         }
         else
         {
-            m_chatDlgAction->setIcon(QIcon(":/psi-otr/otr_no.png"));
+            m_chatDlgAction->setIcon(QIcon(":/otrplugin/otr_no.png"));
         }
 
         m_chatDlgAction->setText(tr("OTR Messaging [%1]").arg(stateString));
@@ -743,7 +743,7 @@ bool PsiOtrClosure::isLoggedIn() const
 
 void PsiOtrClosure::disable()
 {
-    if (m_chatDlgAction != 0)
+    if (m_chatDlgAction)
     {
         m_chatDlgAction->setEnabled(false);
     }

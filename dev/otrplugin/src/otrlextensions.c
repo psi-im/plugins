@@ -1,5 +1,5 @@
 /*
- * otrl_extensions.c - Off-the-Record Messaging library extensions
+ * otrlextensions.c - Off-the-Record Messaging library extensions
  *
  * Strongly based on parts of the Off-the-Record Messaging library,
  * Copyright (C) 2004-2008  Ian Goldberg, Chris Alexander, Nikita Borisov
@@ -31,12 +31,12 @@
 /* libotr headers */
 #include <libotr/privkey.h>
 
-#include "otrl_extensions.h"
+#include "otrlextensions.h"
 
-static gcry_error_t sexp_write(FILE *privf, gcry_sexp_t sexp)
+static gcry_error_t sexp_write(FILE* privf, gcry_sexp_t sexp)
 {
     size_t buflen;
-    char *buf;
+    char* buf;
 
     buflen = gcry_sexp_sprint(sexp, GCRYSEXP_FMT_ADVANCED, NULL, 0);
     buf = malloc(buflen);
@@ -51,8 +51,8 @@ static gcry_error_t sexp_write(FILE *privf, gcry_sexp_t sexp)
     return gcry_error(GPG_ERR_NO_ERROR);
 }
 
-static gcry_error_t account_write(FILE *privf, const char *accountname,
-    const char *protocol, gcry_sexp_t privkey)
+static gcry_error_t account_write(FILE* privf, const char* accountname,
+    const char* protocol, gcry_sexp_t privkey)
 {
     gcry_error_t err;
     gcry_sexp_t names, protos;
@@ -78,9 +78,9 @@ static gcry_error_t account_write(FILE *privf, const char *accountname,
 
 /* Store all keys of an OtrlUserState.
  * The FILE* must be open for reading and writing. */
-gcry_error_t otrl_privkey_write_FILEp(OtrlUserState us, FILE *privf)
+gcry_error_t otrl_privkey_write_FILEp(OtrlUserState us, FILE* privf)
 {
-    OtrlPrivKey *p;
+    OtrlPrivKey* p;
 
     /* Output the other keys we know */
     fprintf(privf, "(privkeys\n");
@@ -97,10 +97,10 @@ gcry_error_t otrl_privkey_write_FILEp(OtrlUserState us, FILE *privf)
 }
 
 /* Store all keys of an OtrlUserState. */
-gcry_error_t otrl_privkey_write(OtrlUserState us, const char *filename)
+gcry_error_t otrl_privkey_write(OtrlUserState us, const char* filename)
 {
     gcry_error_t err;
-    FILE *privf;
+    FILE* privf;
 #ifndef WIN32
     mode_t oldmask;
 #endif

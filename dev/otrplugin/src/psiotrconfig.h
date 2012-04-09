@@ -1,5 +1,5 @@
 /*
- * PsiOtrConfig.hpp - configuration dialogs
+ * psiotrconfig.h - Configuration dialogs
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
@@ -20,10 +20,10 @@
  *
  */
 
-#ifndef PSIOTRCONFIG_HPP_
-#define PSIOTRCONFIG_HPP_
+#ifndef PSIOTRCONFIG_H_
+#define PSIOTRCONFIG_H_
 
-#include "OtrMessaging.hpp"
+#include "otrmessaging.h"
 
 #include <QWidget>
 #include <QVariant>

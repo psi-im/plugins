@@ -1,5 +1,5 @@
 /*
- * OtrMessaging.cpp - interface to libotr
+ * otrmessaging.cpp - Interface to libotr
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
@@ -20,8 +20,8 @@
  *
  */
 
-#include "OtrMessaging.hpp"
-#include "OtrInternal.hpp"
+#include "otrmessaging.h"
+#include "otrinternal.h"
 
 #include <QString>
 #include <QList>
@@ -75,20 +75,20 @@ OtrMessaging::~OtrMessaging()
 
 //-----------------------------------------------------------------------------
 
-QString OtrMessaging::encryptMessage(const QString& from, const QString& to,
+QString OtrMessaging::encryptMessage(const QString& account, const QString& contact,
                                      const QString& message)
 {
-    return m_impl->encryptMessage(from, to, message);
+    return m_impl->encryptMessage(account, contact, message);
 }
 
 //-----------------------------------------------------------------------------
 
-OtrMessageType OtrMessaging::decryptMessage(const QString& from,
-                                            const QString& to,
+OtrMessageType OtrMessaging::decryptMessage(const QString& account,
+                                            const QString& contact,
                                             const QString& message,
                                             QString& decrypted)
 {
-    return m_impl->decryptMessage(from, to, message, decrypted);
+    return m_impl->decryptMessage(account, contact, message, decrypted);
 }
 
 //-----------------------------------------------------------------------------
@@ -129,46 +129,46 @@ void OtrMessaging::deleteKey(const QString& account)
 
 //-----------------------------------------------------------------------------
 
-void OtrMessaging::startSession(const QString& account, const QString& jid)
+void OtrMessaging::startSession(const QString& account, const QString& contact)
 {
-    m_impl->startSession(account, jid);
+    m_impl->startSession(account, contact);
 }
 
 //-----------------------------------------------------------------------------
 
-void OtrMessaging::endSession(const QString& account, const QString& jid)
+void OtrMessaging::endSession(const QString& account, const QString& contact)
 {
-    m_impl->endSession(account, jid);
+    m_impl->endSession(account, contact);
 }
 
 //-----------------------------------------------------------------------------
 
-void OtrMessaging::expireSession(const QString& account, const QString& jid)
+void OtrMessaging::expireSession(const QString& account, const QString& contact)
 {
-    m_impl->expireSession(account, jid);
+    m_impl->expireSession(account, contact);
 }
 
 //-----------------------------------------------------------------------------
 
-void OtrMessaging::startSMP(const QString& account, const QString& jid,
+void OtrMessaging::startSMP(const QString& account, const QString& contact,
                             const QString& question, const QString& secret)
 {
-    m_impl->startSMP(account, jid, question, secret);
+    m_impl->startSMP(account, contact, question, secret);
 }
 
 //-----------------------------------------------------------------------------
 
-void OtrMessaging::continueSMP(const QString& account, const QString& jid,
+void OtrMessaging::continueSMP(const QString& account, const QString& contact,
                                const QString& secret)
 {
-    m_impl->continueSMP(account, jid, secret);
+    m_impl->continueSMP(account, contact, secret);
 }
 
 //-----------------------------------------------------------------------------
 
-void OtrMessaging::abortSMP(const QString& account, const QString& jid)
+void OtrMessaging::abortSMP(const QString& account, const QString& contact)
 {
-    m_impl->abortSMP(account, jid);
+    m_impl->abortSMP(account, contact);
 }
 
 //-----------------------------------------------------------------------------

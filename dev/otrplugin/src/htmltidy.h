@@ -1,5 +1,5 @@
 /*
- * HtmlTidy.hpp - tidy html with libtidy
+ * htmltidy.h - Tidy html with libtidy
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef HTMLTIDY_HPP_
-#define HTMLTIDY_HPP_
+#ifndef HTMLTIDY_H_
+#define HTMLTIDY_H_
 
 #include <string>
 #include <tidy.h>

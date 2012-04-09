@@ -1,5 +1,5 @@
 /*
- * OtrMessaging.hpp - interface to libotr
+ * otrmessaging.h - Interface to libotr
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef OTRMESSAGING_HPP_
-#define OTRMESSAGING_HPP_
+#ifndef OTRMESSAGING_H_
+#define OTRMESSAGING_H_
 
 #include <QList>
 #include <QHash>
@@ -97,14 +97,14 @@ public:
     virtual QString dataDir() = 0;
 
     /**
-     * Sends a message from the Account account to the user recipient.
+     * Sends a message from the Account account to the user contact.
      * The method is called from the OtrConnection to send messages
      * during key-exchange.
      */
-    virtual void sendMessage(const QString& account, const QString& recipient,
+    virtual void sendMessage(const QString& account, const QString& contact,
                              const QString& message) = 0;
 
-    virtual bool isLoggedIn(const QString& account, const QString& recipient) = 0;
+    virtual bool isLoggedIn(const QString& account, const QString& contact) = 0;
 
     virtual void notifyUser(const OtrNotifyType& type,
                             const QString& message) = 0;
@@ -195,26 +195,26 @@ public:
     /**
      * Process an outgoing message.
      *
-     * @param from Account the message is send from
-     * @param to Recipient of message
-     * @param message The message itself.
+     * @param account Account the message is send from
+     * @param contact Recipient of the message
+     * @param message The message itself
      *
-     * @return The encrypted message.
+     * @return The encrypted message
      */
-    QString encryptMessage(const QString& from, const QString& to,
+    QString encryptMessage(const QString& account, const QString& contact,
                            const QString& message);
 
     /**
      * Decrypt an incoming message.
      *
-     * @param from Sender of the message
-     * @param to Account the message is send to.
-     * @param message the message itself.
+     * @param account Account the message is send to
+     * @param contact Sender of the message
+     * @param message The message itself
      * @param decrypted The decrypted message if the original message was
-     *                  encrypted.
-     * @return type of message
+     *                  encrypted
+     * @return Type of incoming message
      */
-    OtrMessageType decryptMessage(const QString& from, const QString& to,
+    OtrMessageType decryptMessage(const QString& account, const QString& contact,
                                   const QString& message, QString& decrypted);
 
     /**

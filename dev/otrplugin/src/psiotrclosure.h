@@ -1,5 +1,5 @@
 /*
- * psiotrclosure.hpp
+ * psiotrclosure.h
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
@@ -27,7 +27,7 @@
 #ifndef PSIOTRCLOSURE_H_
 #define PSIOTRCLOSURE_H_
 
-#include "OtrMessaging.hpp"
+#include "otrmessaging.h"
 
 #include <QObject>
 #include <QDialog>
@@ -52,7 +52,7 @@ public:
     AuthenticationDialog(OtrMessaging* otrc,
                          const QString& account, const QString& contact,
                          const QString& question, bool sender,
-                         QWidget *parent = 0);
+                         QWidget* parent = 0);
     ~AuthenticationDialog();
 
     void reset();

@@ -1,5 +1,5 @@
 /*
- * PsiOtrPlugin.cpp
+ * psiotrplugin.cpp
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
@@ -24,10 +24,10 @@
  *
  */
 
-#include "PsiOtrPlugin.hpp"
+#include "psiotrplugin.h"
 #include "psiotrclosure.h"
-#include "PsiOtrConfig.hpp"
-#include "HtmlTidy.hpp"
+#include "psiotrconfig.h"
+#include "htmltidy.h"
 #include "applicationinfoaccessinghost.h"
 #include "psiaccountcontrollinghost.h"
 #include "accountinfoaccessinghost.h"
@@ -61,7 +61,6 @@ QString removeResource(const QString& aJid)
     if (pos > -1)
     {
         addr.truncate(pos);
-        return addr;
     }
     return addr;
 }
@@ -168,19 +167,19 @@ bool PsiOtrPlugin::enable()
                                        static_cast<OtrPolicy>(policyOption.toInt()));
     m_enabled = true;
 
-    QFile f(":/psi-otr/otr_yes.png");
+    QFile f(":/otrplugin/otr_yes.png");
     f.open(QIODevice::ReadOnly);
-    m_iconHost->addIcon("psi-otr/otr_yes", f.readAll());
+    m_iconHost->addIcon("otrplugin/otr_yes", f.readAll());
     f.close();
 
-    f.setFileName(":/psi-otr/otr_no.png");
+    f.setFileName(":/otrplugin/otr_no.png");
     f.open(QIODevice::ReadOnly);
-    m_iconHost->addIcon("psi-otr/otr_no", f.readAll());
+    m_iconHost->addIcon("otrplugin/otr_no", f.readAll());
     f.close();
 
-    f.setFileName(":/psi-otr/otr_unverified.png");
+    f.setFileName(":/otrplugin/otr_unverified.png");
     f.open(QIODevice::ReadOnly);
-    m_iconHost->addIcon("psi-otr/otr_unverified", f.readAll());
+    m_iconHost->addIcon("otrplugin/otr_unverified", f.readAll());
     f.close();
 
     return true;
@@ -190,7 +189,7 @@ bool PsiOtrPlugin::enable()
 
 bool PsiOtrPlugin::disable()
 {
-    foreach (QString account, m_onlineUsers.keys())
+    foreach(QString account, m_onlineUsers.keys())
     {
         foreach(QString contact, m_onlineUsers.value(account).keys())
         {
@@ -292,7 +291,7 @@ bool PsiOtrPlugin::processEvent(int accountIndex, QDomElement& e)
 
         QString decrypted;
         OtrMessageType messageType = m_otrConnection->decryptMessage(
-                                                        contact, account,
+                                                        account, contact,
                                                         cyphertext, decrypted);
         switch (messageType)
         {
@@ -434,7 +433,7 @@ void PsiOtrPlugin::optionChanged(const QString&)
 
 //-----------------------------------------------------------------------------
 
-void PsiOtrPlugin::setStanzaSendingHost(StanzaSendingHost *host)
+void PsiOtrPlugin::setStanzaSendingHost(StanzaSendingHost* host)
 {
     m_senderHost = host;
 }
@@ -454,21 +453,21 @@ void PsiOtrPlugin::setPsiAccountControllingHost(PsiAccountControllingHost* host)
 
 //-----------------------------------------------------------------------------
 
-void PsiOtrPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost *host)
+void PsiOtrPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost* host)
 {
     m_accountInfo = host;
 }
 
 //-----------------------------------------------------------------------------
 
-void PsiOtrPlugin::setContactInfoAccessingHost(ContactInfoAccessingHost *host)
+void PsiOtrPlugin::setContactInfoAccessingHost(ContactInfoAccessingHost* host)
 {
     m_contactInfo = host;
 }
 
 //-----------------------------------------------------------------------------
 
-void PsiOtrPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost *host)
+void PsiOtrPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost* host)
 {
     m_iconHost = host;
 }
@@ -667,39 +666,39 @@ void PsiOtrPlugin::stateChange(const QString& account, const QString& contact,
         case OTR_STATECHANGE_GONESECURE:
             msg  = verified? tr("Private conversation started")
                            : tr("Unverified conversation started");
-            icon = verified? "psi-otr/otr_yes"
-                           : "psi-otr/otr_unverified";
+            icon = verified? "otrplugin/otr_yes"
+                           : "otrplugin/otr_unverified";
             break;
 
         case OTR_STATECHANGE_GONEINSECURE:
             msg  = tr("Private conversation lost");
-            icon = "psi-otr/otr_no";
+            icon = "otrplugin/otr_no";
             break;
 
         case OTR_STATECHANGE_CLOSE:
             msg  = tr("Private conversation closed");
-            icon = "psi-otr/otr_no";
+            icon = "otrplugin/otr_no";
             break;
 
         case OTR_STATECHANGE_REMOTECLOSE:
             msg  = tr("%1 has ended the private conversation with you; "
                       "you should do the same.")
                       .arg(humanContact(account, contact));
-            icon = "psi-otr/otr_no";
+            icon = "otrplugin/otr_no";
             break;
 
         case OTR_STATECHANGE_STILLSECURE:
             msg  = verified? tr("Private conversation refreshed")
                            : tr("Unverified conversation refreshed");
-            icon = verified? "psi-otr/otr_yes"
-                           : "psi-otr/otr_unverified";
+            icon = verified? "otrplugin/otr_yes"
+                           : "otrplugin/otr_unverified";
             break;
 
         case OTR_STATECHANGE_TRUST:
             msg  = verified? tr("Contact authenticated")
                            : tr("Contact not authenticated");
-            icon = verified? "psi-otr/otr_yes"
-                           : "psi-otr/otr_unverified";
+            icon = verified? "otrplugin/otr_yes"
+                           : "otrplugin/otr_unverified";
             break;
     }
 
