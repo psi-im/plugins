@@ -1,8 +1,8 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
      <qresource prefix="/otrplugin">
-          <file>otr_yes.png</file>
-          <file>otr_no.png</file>
-          <file>otr_unverified.png</file>
+          <file alias="otr_yes.png">resources/otr_yes.png</file>
+          <file alias="otr_no.png">resources/otr_no.png</file>
+          <file alias="otr_unverified.png">resources/otr_unverified.png</file>
      </qresource>
 </RCC>
