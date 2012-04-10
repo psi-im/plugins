@@ -20,6 +20,7 @@
 #include <QtGui>
 #include <QtCore>
 #include <QMap>
+#include <QDomElement>
 
 #include "psiplugin.h"
 #include "optionaccessor.h"

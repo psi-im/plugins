@@ -21,6 +21,8 @@
 #ifndef GMAILSERVICEPLUGIN_H
 #define GMAILSERVICEPLUGIN_H
 
+class QDomElement;
+
 #include "actionslist.h"
 
 #include "psiplugin.h"

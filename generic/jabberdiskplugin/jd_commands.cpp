@@ -21,6 +21,7 @@
 #include <QTimer>
 #include <QEventLoop>
 #include <QStringList>
+#include <QDomElement>
 
 #include "jd_commands.h"
 #include "jabberdiskcontroller.h"

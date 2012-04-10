@@ -22,6 +22,7 @@
 #define JABBERDISKPLUGIN_H
 
 class QAction;
+class QDomElement;
 
 #include "psiplugin.h"
 #include "iconfactoryaccessor.h"

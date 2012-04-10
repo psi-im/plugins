@@ -19,8 +19,9 @@
  */
 
 #include <QMenu>
-#include "QClipboard"
+#include <QClipboard>
 #include <QApplication>
+#include <QDomElement>
 
 #include "psiplugin.h"
 #include "accountinfoaccessor.h"
