@@ -20,6 +20,7 @@
 
 #include <QtCore>
 #include <QtGui>
+#include <QDomElement>
 #include <stdlib.h>
 #include <time.h>
 

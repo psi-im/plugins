@@ -28,6 +28,7 @@
 
 #include <QtGui>
 #include <QtCore>
+#include <QDomElement>
 
 #include "ui_options.h"
 

@@ -18,6 +18,8 @@
  *
  */
 
+#include <QDomElement>
+
 #include "jabberdiskcontroller.h"
 #include "jd_mainwin.h"
 

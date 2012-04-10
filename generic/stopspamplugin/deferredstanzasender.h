@@ -24,6 +24,7 @@
 
 #include <QPair>
 #include <QTimer>
+#include <QDomElement>
 #include "stanzasendinghost.h"
 
 class DefferedStanzaSender : public QObject
