@@ -19,6 +19,7 @@
  */
 
 #include <QtGui>
+#include <QDomElement>
 
 #include "psiplugin.h"
 #include "stanzafilter.h"

@@ -20,6 +20,7 @@
 
 #include <QFileDialog>
 #include <QProcess>
+#include <QDomElement>
 #include "gmailserviceplugin.h"
 #include "common.h"
 

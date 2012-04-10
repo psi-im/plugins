@@ -24,6 +24,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QDomElement>
 
 #include "psiplugin.h"
 #include "stanzafilter.h"

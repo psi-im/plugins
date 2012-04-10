@@ -20,6 +20,7 @@
 
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QDomElement>
 
 #include "psiplugin.h"
 #include "accountinfoaccessor.h"
