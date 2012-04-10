@@ -43,7 +43,7 @@
 #include "ui_options.h"
 #include "deferredstanzasender.h"
 
-#define cVer "0.5.3"
+#define cVer "0.5.5"
 #define constQuestion "qstn"
 #define constAnswer "answr"
 #define constUnblocked "UnblockedList"
@@ -96,7 +96,7 @@ public:
         virtual void applyOptions();
         virtual void restoreOptions();
         virtual void setOptionAccessingHost(OptionAccessingHost* host);
-	virtual void optionChanged(const QString& ) {};
+	virtual void optionChanged(const QString& ) {}
         virtual void setStanzaSendingHost(StanzaSendingHost *host);
         virtual bool incomingStanza(int account, const QDomElement& xml);
 	virtual bool outgoingStanza(int account, QDomElement& xml);
@@ -108,9 +108,9 @@ public:
 	virtual QString pluginInfo();
 
 	virtual bool processEvent(int , QDomElement& ) { return false; }
-	virtual bool processMessage(int , const QString& , const QString& , const QString& ) { return false; };
+	virtual bool processMessage(int , const QString& , const QString& , const QString& ) { return false; }
 	virtual bool processOutgoingMessage(int account, const QString& fromJid, QString& body, const QString& type, QString& subject);
-	virtual void logout(int ) {};
+	virtual void logout(int ) {}
 
 private slots:
 	void resetCounter();
@@ -150,7 +150,6 @@ private:
 	int Width;
 	QString Congratulation; // поздравление
 	bool DefaultAct; // выключить, если не подошло ни одно правило
-	int Interval; // время, которое показывается попап, секунды
 	int Times; // сколько раз слать
 	int ResetTime; // через сколько сбросить счетчик
 	bool LogHistory; // логировать в историю
@@ -178,6 +177,7 @@ private:
 	QVector<MucUser> mucUsers_;
 	QPointer<QWidget> options_;
 	Ui::Options ui_;
+	int popupId;
 };
 
 Q_EXPORT_PLUGIN(StopSpam);
@@ -199,7 +199,6 @@ StopSpam::StopSpam()
 	, Width(600)
 	, Congratulation("Congratulations! Now you can chat!")
 	, DefaultAct(false)
-	, Interval(5)
 	, Times(2)
 	, ResetTime(5)
 	, LogHistory(false)
@@ -217,9 +216,8 @@ StopSpam::StopSpam()
 	, viewer(0)
 	, model_(0)
 	, options_(0)
+	, popupId(0)
 {
-	QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-	QTextCodec::setCodecForLocale(codec);
 }
 
 QString StopSpam::name() const {
@@ -252,7 +250,6 @@ bool StopSpam::enable() {
 		DefaultAct = psiOptions->getPluginOption(constDefaultAct, QVariant(DefaultAct)).toBool();
 		Height = psiOptions->getPluginOption(constHeight, QVariant(Height)).toInt();
 		Width = psiOptions->getPluginOption(constWidth, QVariant(Width)).toInt();
-		Interval = psiOptions->getPluginOption(constInterval, QVariant(Interval)).toInt()/1000;
 		Times = psiOptions->getPluginOption(constTimes, QVariant(Times)).toInt();
 		ResetTime = psiOptions->getPluginOption(constResetTime, QVariant(ResetTime)).toInt();
 		LogHistory = psiOptions->getPluginOption(constLogHistory, QVariant(LogHistory)).toBool();
@@ -283,7 +280,8 @@ bool StopSpam::enable() {
 		connect(model_, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(hack()));
 
 		//register popup option
-		popup->registerOption(POPUP_OPTION, Interval, "plugins.options."+shortName()+"."+constInterval);
+		int interval = psiOptions->getPluginOption(constInterval, QVariant(5000)).toInt()/1000;
+		popupId = popup->registerOption(POPUP_OPTION, interval, "plugins.options."+shortName()+"."+constInterval);
 	}
 	return enabled;
 }
@@ -296,6 +294,7 @@ bool StopSpam::disable() {
 	delete stanzaHost;
 	stanzaHost = 0;
 
+	popup->unregisterOption(POPUP_OPTION);
 	enabled = false;        
 	return true;
 }
@@ -714,30 +713,23 @@ void StopSpam::updateCounter(const QDomElement& stanza, bool b) {
 	if(file.open(QIODevice::WriteOnly | QIODevice::Append)) {
 		QString date = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
 		QTextStream out(&file);
+		out.setCodec("UTF-8");
 		//out.seek(file.size());
 		out.setGenerateByteOrderMark(false);
 		out << date << endl << stanza << endl;
 	}
 
-	Interval = popup->popupDuration(POPUP_OPTION);
-	if(!Interval)
+	if(!popup->popupDuration(POPUP_OPTION))
 		return;
-
-	QVariant delay(Interval*1000);
-	const int delay_ = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.delays.status").toInt();
-	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", delay);
 
 	if(!b) {
 		QString popupText = tr("Block stanza from ") + stanza.attribute("from");
-		popup->initPopup(popupText, "Stop Spam Plugin");
+		popup->initPopup(popupText, tr("Stop Spam Plugin"), "psi/cancel", popupId);
 	}
 	else {
 		QString popupText =  stanza.attribute("from") + tr(" pass the test");
-		popup->initPopup(popupText, "Stop Spam Plugin");
+		popup->initPopup(popupText, tr("Stop Spam Plugin"), "psi/headline", popupId);
 	}
-
-	delay = QVariant(delay_);
-	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", delay);	
 }
 
 bool StopSpam::findAcc(int account, const QString& Jid, int &i) {
@@ -798,6 +790,7 @@ void StopSpam::logHistory(const QDomElement& stanza) {
 		body = "subscribe";
 	QString outText = time + type + QString::fromUtf8("from|N---|") + body;
 	QTextStream out(&file);
+	out.setCodec("UTF-8");
 	//out.seek(file.size());
 	out.setGenerateByteOrderMark(false);
 	out << outText << endl;
@@ -980,8 +973,11 @@ void StopSpam::addRow() {
 
 void StopSpam::removeRow() {
 	if(model_->rowCount() > 1) {
-		model_->deleteRow();
-		hack();
+		QModelIndex index = ui_.tv_rules->currentIndex();
+		if(index.isValid()) {
+			model_->deleteRow(index.row());
+			hack();
+		}
 	}
 }
 

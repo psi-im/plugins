@@ -84,7 +84,7 @@ QVariant Model::data(const QModelIndex & index, int role) const
                         return (int)(Qt::AlignRight | Qt::AlignVCenter);
                 else if (role == Qt::DisplayRole)
                         return QVariant("");
-             case(1):
+	case(1):
                 if (role == Qt::TextAlignmentRole)
                         return (int)(Qt::AlignRight | Qt::AlignVCenter);
                 else if (role == Qt::DisplayRole)
@@ -144,9 +144,12 @@ void Model::addRow()
 	endInsertRows();
 }
 
-void Model::deleteRow()
+void Model::deleteRow(int row)
 {
-	QString jid_ = tmpJids_.takeLast();
+	if(tmpJids_.isEmpty() || tmpJids_.size() <= row || row < 0)
+		return;
+
+	QString jid_ = tmpJids_.takeAt(row);
 	if(selected.contains(jid_))
 		selected.remove(jid_);
 
@@ -158,7 +161,7 @@ void Model::apply()
 	Jids =  tmpJids_;
 }
 
-int Model::indexByJid(QString jid) const
+int Model::indexByJid(const QString& jid) const
 {
 	return Jids.indexOf(jid);
 }

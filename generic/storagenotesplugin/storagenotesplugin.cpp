@@ -24,9 +24,6 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
-#define constVersion "0.1.6"
-
-static const QString id = "strnotes_1";
 
 StorageNotesPlugin::StorageNotesPlugin()
 	: stanzaSender(0)
@@ -56,6 +53,12 @@ QString StorageNotesPlugin::version() const
 bool StorageNotesPlugin::enable()
 {
 	enabled = true;
+
+	QFile file(":/storagenotes/storagenotes.png");
+	file.open(QIODevice::ReadOnly);
+	QByteArray image = file.readAll();
+	iconHost->addIcon("storagenotes/storagenotes",image);
+	file.close();
 	controller_ = new NotesController(this);
 
 	return enabled;
@@ -92,7 +95,7 @@ bool StorageNotesPlugin::incomingStanza(int account, const QDomElement& xml)
 	if(!enabled)
 		return false;
 
-	if(xml.tagName() == "iq" && xml.attribute("id") == id) {
+	if(xml.tagName() == "iq" && xml.attribute("id") == NOTES_ID) {
 		if(xml.attribute("type") == "error") {
 			controller_->error(account);
 		}
@@ -104,6 +107,9 @@ bool StorageNotesPlugin::incomingStanza(int account, const QDomElement& xml)
 
 			if(!notes.isEmpty()) {
 				controller_->incomingNotes(account, notes);
+			}
+			else {
+				controller_->saved(account);
 			}
 		}
 		return true;
@@ -148,7 +154,7 @@ void StorageNotesPlugin::start()
 QList < QVariantHash > StorageNotesPlugin::getAccountMenuParam()
 {
 	QVariantHash hash;
-        hash["icon"] = QVariant(QString("loggerplugin/openlog"));
+	hash["icon"] = QVariant(QString("storagenotes/storagenotes"));
         hash["name"] = QVariant(tr("Storage Notes"));
         hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
         hash["slot"] = QVariant(SLOT(start()));
@@ -170,4 +176,4 @@ QString StorageNotesPlugin::pluginInfo() {
 				 "The plugin is designed to keep notes on the jabber server with the ability to access them from anywhere using Psi+ or Miranda IM.");
 }
 
-Q_EXPORT_PLUGIN(StorageNotesPlugin);
+Q_EXPORT_PLUGIN(StorageNotesPlugin)

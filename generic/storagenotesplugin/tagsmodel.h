@@ -33,7 +33,7 @@ class TagModel : public QAbstractItemModel
 public:
 	TagModel(QObject *parent = 0);
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const { return 1; };
+	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const { return 1; }
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 	QModelIndex index(int row, int column = 0, const QModelIndex& parent = QModelIndex()) const;
 	QModelIndex parent(const QModelIndex& index) const;
@@ -42,6 +42,8 @@ public:
 	void removeTag(const QString& tag);
 	void clear();
 	QModelIndex indexByTag(const QString& tag) const;
+
+	static QString allTagsName();
 
 private:
 	QModelIndex createAllTagsIndex() const;
@@ -85,7 +87,7 @@ class ProxyModel : public QSortFilterProxyModel
 	Q_OBJECT
 
 public:
-	ProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent) {};
+	ProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent) {}
 	bool filterAcceptsRow(int sourceRow, const QModelIndex &parent) const;
 };
 #endif // TAGSMODEL_H

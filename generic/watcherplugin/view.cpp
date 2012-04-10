@@ -23,6 +23,9 @@
 #include <QHeaderView>
 #include <QMenu>
 
+#include "iconfactoryaccessinghost.h"
+#include "delegate.h"
+
 void Viewer::init(IconFactoryAccessingHost *iconHost)
 {
         iconHost_ = iconHost;
@@ -85,7 +88,7 @@ void Viewer::contextMenuEvent( QContextMenuEvent * e )
         delete popup;
 }
 
-void Viewer::itemClicked(QModelIndex index)
+void Viewer::itemClicked(const QModelIndex& index)
 {
 	if(index.column() == 0) {
 		model()->setData(currentIndex(), 3); //invert

@@ -1,5 +1,6 @@
+!mac {
 CONFIG += release
 include(../../psiplugin.pri)
-SOURCES += videostatusplugin.cpp
-FORMS += options.ui
+SOURCES += gnome3supportplugin.cpp
 QT += dbus
+}

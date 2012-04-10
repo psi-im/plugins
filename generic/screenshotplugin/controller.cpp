@@ -33,10 +33,10 @@ static const QString pixacadem = "Pix.Academ.org&split&http://pix.academ.org/&sp
 static const QString kachalka = "Kachalka.com&split&http://www.kachalka.com/upload.php&split&&split&&split&&split&userfile[]&split&name=\"option\" value=\"(http://www.kachalka.com/[^\"]+)\" /></td>&split&true";
 static const QString flashtux = "Img.Flashtux.org&split&http://img.flashtux.org/index.php&split&&split&&split&postimg=1&split&filename&split&<br />Link: <a href=\"(http://img.flashtux.org/[^\"]+)\">&split&true";
 static const QString smages = "Smages.com&split&http://smages.com/&split&&split&&split&&split&fileup&split&<div class=\"codex\"><a href=\"(http://smages.com/[^\"]+)\" target=\"_blank\">URL:</a></div>&split&true";
-static const QString ompldr = "Ompldr.org&split&http://ompldr.org/upload&split&&split&&split&&split&file1&split&<div class=\"left\">File:</div><div class=\"right\"><a href=\"[^\"]+\">(http://ompldr.org/[^\"]+)</a></div>&split&true";
+static const QString ompldr = "Omploader.org&split&http://ompldr.org/upload&split&&split&&split&&split&file1&split&<div class=\"left\">File:</div><div class=\"right\"><a href=\"[^\"]+\">(http://ompldr.org/[^\"]+)</a></div>&split&true";
 static const QString ipicture = "Ipicture.ru&split&http://ipicture.ru/Upload/&split&&split&&split&method=file&split&userfile&split&value=\"(http://[^\"]+)\">&split&true";
 
-static const QStringList staticHostsList = QStringList() << imageShack << pixacadem << radikal
+static const QStringList staticHostsList = QStringList() /*<< imageShack*/ << pixacadem << radikal
 					 << kachalka << flashtux << smages << ompldr << ipicture;
 
 
@@ -75,6 +75,7 @@ Controller::Controller(ApplicationInfoAccessingHost* appInfo)
 		o->setOption(constFileName, QVariant("pic-yyyyMMdd-hhmmss"));
 		o->setOption(constDelay, QVariant(0));
 		o->setOption(constVersionOption, cVersion);
+		o->setOption(constDefaultAction, QVariant(Desktop));
 	}
 
 	QStringList servers = vServers.toStringList();
@@ -84,9 +85,10 @@ Controller::Controller(ApplicationInfoAccessingHost* appInfo)
 	}
 
 	if(o->getOption(constVersionOption).toString() != cVersion) {
-		foreach(const QString& host, staticHostsList) {
-			updateServer(&servers, host);
-		}
+//		foreach(const QString& host, staticHostsList) {
+//			updateServer(&servers, host);
+//		}
+		updateServer(&servers, ompldr);
 
 		doUpdate();
 		o->setOption(constVersionOption, cVersion);
@@ -113,7 +115,7 @@ void Controller::onShortCutActivated()
 		screenshot->setProxy(appInfo_->getProxyFor(constName));
 	}
 
-	screenshot->shootScreen();
+	screenshot->action(Options::instance()->getOption(constDefaultAction).toInt());
 }
 
 void Controller::openImage()

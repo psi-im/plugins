@@ -115,9 +115,6 @@ ConferenceLogger::ConferenceLogger() {
         Height = 500;
         Width = 600;
         lastItem = "";
-        QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-        QTextCodec::setCodecForLocale(codec);
-
 }
 
 QString ConferenceLogger::name() const {
@@ -250,6 +247,7 @@ void ConferenceLogger::Logger(QString room, QString from, QString MyJid, QString
 	if(file.open(QIODevice::WriteOnly | QIODevice::Append)) {
 		QTextStream out(&file);
 		//out.seek(file.size());
+		out.setCodec("UTF-8");
 		out.setGenerateByteOrderMark(false);
 		out << Stamp << "  " << from << ": " << Text << endl;
 	}

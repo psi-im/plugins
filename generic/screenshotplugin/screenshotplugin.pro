@@ -2,6 +2,12 @@ include(../../psiplugin.pri)
 CONFIG += release
 QT += network
 
+DEPENDPATH += . qxt/core qxt/gui
+INCLUDEPATH += . qxt/gui qxt/core
+
+MOC_DIR = tmp/
+OBJECTS_DIR = tmp/
+
 HEADERS = screenshot.h \
     server.h \
     editserverdlg.h \
@@ -35,3 +41,25 @@ FORMS += optionswidget.ui \
     optionsdlg.ui \
     proxysettingsdlg.ui
 RESOURCES += screenshotplugin.qrc
+
+#QXT
+HEADERS  +=	qxt/core/qxtglobal.h \
+		qxt/gui/qxtwindowsystem.h
+
+SOURCES  +=	qxt/core/qxtglobal.cpp \
+		qxt/gui/qxtwindowsystem.cpp
+
+unix:!macx {
+	CONFIG += X11
+	SOURCES += qxt/gui/qxtwindowsystem_x11.cpp
+}
+macx {
+	SOURCES += qxt/gui/qxtwindowsystem_mac.cpp
+
+	HEADERS  += qxt/gui/qxtwindowsystem_mac.h
+
+	QMAKE_LFLAGS += -framework Carbon -framework CoreFoundation
+}
+win32 {
+	SOURCES += qxt/gui/qxtwindowsystem_win.cpp
+}

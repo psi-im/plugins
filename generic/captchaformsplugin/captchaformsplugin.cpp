@@ -33,9 +33,11 @@
 #include "stanzasendinghost.h"
 #include "accountinfoaccessinghost.h"
 #include "accountinfoaccessor.h"
+#include "applicationinfoaccessinghost.h"
+#include "applicationinfoaccessor.h"
 
 
-#define constVersion "0.0.9"
+#define constVersion "0.1.0"
 #define constProxyHost "host"
 #define constProxyPort "port"
 #define constProxyUser "user"
@@ -46,10 +48,10 @@
 static const QStringList methods = QStringList() << "qa" << "ocr" << "picture_q" << "picture_recog";
 
 class CaptchaFormsPlugin : public QObject, public PsiPlugin, public OptionAccessor, public PluginInfoProvider, public EventCreator,
-			   public StanzaFilter, public StanzaSender, public AccountInfoAccessor
+			   public StanzaFilter, public StanzaSender, public AccountInfoAccessor, public ApplicationInfoAccessor
 {
         Q_OBJECT
-	Q_INTERFACES(PsiPlugin OptionAccessor PluginInfoProvider EventCreator StanzaFilter StanzaSender AccountInfoAccessor)
+	Q_INTERFACES(PsiPlugin OptionAccessor PluginInfoProvider EventCreator StanzaFilter StanzaSender AccountInfoAccessor ApplicationInfoAccessor)
 public:
 	CaptchaFormsPlugin();
         virtual QString name() const;
@@ -67,6 +69,7 @@ public:
 	virtual bool outgoingStanza(int account, QDomElement& xml);
 	virtual void setStanzaSendingHost(StanzaSendingHost *host);
 	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
 	virtual QString pluginInfo();
 
 private:
@@ -74,10 +77,9 @@ private:
 	EventCreatingHost *psiEvent;
 	StanzaSendingHost *stanzaSender;
 	AccountInfoAccessingHost* accInfo;
+	ApplicationInfoAccessingHost* appInfo;
 	bool enabled;
 	int id;
-	QString proxyHost, proxyUser, proxyPass;
-	int proxyPort;
 	bool autopopup, useProxy;
 	QList< QHash<QString, QString> > challenges_;
 	QHash< QString, QPointer<CaptchaDialog> > dialogs_;
@@ -91,7 +93,6 @@ private slots:
 	void eventActivated(const QString&);
 	void submitChallenge(const QString&, const QString&);
 	void cancelChallenge(const QString&);
-	void activateProxy(bool act);
 	void loaderData(const QString& id, const QByteArray& data);
 	void loaderError(const QString& id);
 };
@@ -104,12 +105,9 @@ CaptchaFormsPlugin::CaptchaFormsPlugin()
 	, psiEvent(0)
 	, stanzaSender(0)
 	, accInfo(0)
+	, appInfo(0)
 	, enabled(false)
 	, id(111)
-	, proxyHost("")
-	, proxyUser("")
-	, proxyPass("")
-	, proxyPort(3128)
 	, autopopup(true)
 	, useProxy(false)
 
@@ -133,12 +131,11 @@ bool CaptchaFormsPlugin::enable()
     if(psiOptions) {
 	enabled = true;
 	id = 111;
-	proxyHost = psiOptions->getPluginOption(constProxyHost, QVariant(proxyHost)).toString();
-	proxyUser = psiOptions->getPluginOption(constProxyUser, QVariant(proxyUser)).toString();
-	proxyPass = psiOptions->getPluginOption(constProxyPass, QVariant(proxyPass)).toString();
-	proxyPort = psiOptions->getPluginOption(constProxyPort, QVariant(proxyPort)).toInt();
 	useProxy = psiOptions->getPluginOption(constUseProxy, QVariant(useProxy)).toBool();
 	autopopup = psiOptions->getPluginOption(constAutopopup, QVariant(autopopup)).toBool();
+
+	if(!useProxy)
+		appInfo->getProxyFor(name()); //register proxy
     }
     return enabled;
 }
@@ -157,47 +154,25 @@ QWidget* CaptchaFormsPlugin::options()
         QWidget *options = new QWidget();
 	ui_.setupUi(options);
 
-	connect(ui_.cb_use_proxy, SIGNAL(toggled(bool)), SLOT(activateProxy(bool)));
-
 	restoreOptions();
 	return options;
 }
 
 void CaptchaFormsPlugin::applyOptions()
 {
-	proxyHost = ui_.le_host->text();
-	psiOptions->setPluginOption(constProxyHost, QVariant(proxyHost));
-	proxyPort = ui_.le_port->text().toInt();
-	psiOptions->setPluginOption(constProxyPort, QVariant(proxyPort));
-	proxyUser = ui_.le_user->text();
-	psiOptions->setPluginOption(constProxyUser, QVariant(proxyUser));
-	proxyPass = ui_.le_password->text();
-	psiOptions->setPluginOption(constProxyPass, QVariant(proxyPass));
 	useProxy = ui_.cb_use_proxy->isChecked();
 	psiOptions->setPluginOption(constUseProxy, QVariant(useProxy));
 	autopopup = ui_.cb_autopopup->isChecked();
 	psiOptions->setPluginOption(constAutopopup, QVariant(autopopup));
+
+	if(!useProxy)
+		appInfo->getProxyFor(name()); //register proxy
 }
 
 void CaptchaFormsPlugin::restoreOptions()
 {
-	ui_.le_host->setText(proxyHost);
-	ui_.le_port->setText(QString::number(proxyPort));
-	ui_.le_user->setText(proxyUser);
-	ui_.le_password->setText(proxyPass);
 	ui_.cb_autopopup->setChecked(autopopup);
 	ui_.cb_use_proxy->setChecked(useProxy);
-
-	activateProxy(useProxy);
-}
-
-void CaptchaFormsPlugin::activateProxy(bool act)
-{
-	act = !act;
-	ui_.le_host->setEnabled(act);
-	ui_.le_port->setEnabled(act);
-	ui_.le_user->setEnabled(act);
-	ui_.le_password->setEnabled(act);
 }
 
 void CaptchaFormsPlugin::setOptionAccessingHost(OptionAccessingHost *host)
@@ -213,6 +188,11 @@ void CaptchaFormsPlugin::setEventCreatingHost(EventCreatingHost *host)
 void CaptchaFormsPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost *host)
 {
 	accInfo = host;
+}
+
+void CaptchaFormsPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host)
+{
+	appInfo = host;
 }
 
 void CaptchaFormsPlugin::setStanzaSendingHost(StanzaSendingHost *host)
@@ -278,8 +258,9 @@ void CaptchaFormsPlugin::eventActivated(const QString& from)
 				ld->setProxy(host_, accInfo->proxyPort(acc), accInfo->proxyUser(acc), accInfo->proxyPassword(acc));
 			}
 		}
-		else if(!proxyHost.isEmpty()) {
-			ld->setProxy(proxyHost, proxyPort, proxyUser, proxyPass);
+		else {
+			Proxy p = appInfo->getProxyFor(name());
+			ld->setProxy(p.host, p.port, p.user, p.pass);
 		}
 		QString url = dataFields.value("uri");
 		if(url.isEmpty()) {

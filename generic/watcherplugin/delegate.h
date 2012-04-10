@@ -24,7 +24,8 @@
 #include <QItemDelegate>
 #include <QPainter>
 
-#include "iconfactoryaccessinghost.h"
+class IconFactoryAccessingHost;
+
 
 class IconDelegate : public QItemDelegate
 {

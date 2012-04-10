@@ -27,6 +27,7 @@
 
 class Server;
 class GrabAreaWidget;
+class ScreenshotOptions;
 class QNetworkAccessManager;
 class QNetworkReply;
 
@@ -39,6 +40,7 @@ public:
 	~Screenshot();
 
 	void setProxy(const Proxy& p);
+	void action(int action);
 
 protected:
 	void closeEvent(QCloseEvent *);
@@ -57,9 +59,9 @@ private slots:
 	void ftpReplyFinished();
 	void httpReplyFinished(QNetworkReply*);
 	void captureDesktop(int);
-	//void captureWindow(int);
+	void captureWindow(int);
 	void captureArea(int);	
-	//void shootWindow();
+	void shootWindow();
 	void shootArea();
 	void screenshotCanceled();
 	void pixmapAdjusted();
@@ -71,6 +73,10 @@ private slots:
 	void doOptions();
 	//void doProxySettings();
 	void settingsChanged(const QString& option, const QVariant& value);
+	void copyUrl();
+
+protected:
+	bool eventFilter(QObject *o, QEvent *e);
 
 private:
 	void updateScreenshotLabel();
@@ -100,6 +106,7 @@ private:
 	QStringList history_;
 	GrabAreaWidget* grabAreaWidget_;
 	QLabel *sbLbSize;
+	QPointer<ScreenshotOptions> so_;
 
 	Ui::Screenshot ui_;
 };

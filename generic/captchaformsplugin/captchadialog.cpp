@@ -18,9 +18,10 @@
  *
  */
 
+#include <QKeyEvent>
 #include "captchadialog.h"
 
-CaptchaDialog::CaptchaDialog(QString id, QWidget *p)
+CaptchaDialog::CaptchaDialog(const QString& id, QWidget *p)
 	: QDialog(p)
 	, id_(id)
 {
@@ -31,6 +32,8 @@ CaptchaDialog::CaptchaDialog(QString id, QWidget *p)
 	connect(ui_.buttonBox, SIGNAL(accepted()), SLOT(okPressed()));
 	connect(ui_.buttonBox, SIGNAL(rejected()), SLOT(cancelPressed()));
 	connect(ui_.cb_message, SIGNAL(toggled(bool)), SLOT(toggleTEVisible(bool)));
+
+	ui_.le_answer->installEventFilter(this);
 }
 
 void CaptchaDialog::setQuestion(const QString &quest)
@@ -78,4 +81,21 @@ void CaptchaDialog::cancelPressed()
 {
 	emit cancel(id_);
 	close();
+}
+
+bool CaptchaDialog::eventFilter(QObject *o, QEvent *e)
+{
+	if(o == ui_.le_answer && e->type() == QEvent::KeyPress) {
+		QKeyEvent *ke = static_cast<QKeyEvent*>(e);
+		if(ke->key() == Qt::Key_Escape) {
+			cancelPressed();
+			return true;
+		}
+		else if(ke->key() == Qt::Key_Enter) {
+			okPressed();
+			return true;
+		}
+	}
+
+	return QDialog::eventFilter(o,e);
 }

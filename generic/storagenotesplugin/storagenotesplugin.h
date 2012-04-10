@@ -39,8 +39,11 @@ class QAction;
 class NotesController;
 class Notes;
 
+#define constVersion "0.1.8"
+#define NOTES_ID "strnotes_1"
+
 class StorageNotesPlugin : public QObject, public PsiPlugin, public StanzaSender, public IconFactoryAccessor, public PluginInfoProvider,
-public AccountInfoAccessor, public StanzaFilter, public PopupAccessor, public MenuAccessor
+		public AccountInfoAccessor, public StanzaFilter, public PopupAccessor, public MenuAccessor
 {
         Q_OBJECT
 	Q_INTERFACES(PsiPlugin StanzaSender IconFactoryAccessor AccountInfoAccessor StanzaFilter PopupAccessor MenuAccessor PluginInfoProvider)
@@ -53,8 +56,8 @@ public:
         virtual bool enable();
         virtual bool disable();
 
-        virtual void applyOptions() {};
-        virtual void restoreOptions() {};
+	virtual void applyOptions() {}
+	virtual void restoreOptions() {}
         virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
         virtual void setStanzaSendingHost(StanzaSendingHost *host);
         virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
@@ -63,10 +66,12 @@ public:
         virtual void setPopupAccessingHost(PopupAccessingHost* host);
 	virtual QList < QVariantHash > getAccountMenuParam();
 	virtual QList < QVariantHash > getContactMenuParam();
-	virtual QAction* getContactAction(QObject* , int , const QString& ) { return 0; };
-	virtual QAction* getAccountAction(QObject* , int ) { return 0; };
+	virtual QAction* getContactAction(QObject* , int , const QString& ) { return 0; }
+	virtual QAction* getAccountAction(QObject* , int ) { return 0; }
 	virtual QString pluginInfo();
 
+private slots:
+	void start();
 
 private:
         StanzaSendingHost* stanzaSender;
@@ -77,10 +82,6 @@ private:
 	NotesController* controller_;
 
 	friend class Notes;
-
-private slots:
-        void start();
-
 };
 
 #endif // STORAGENOTESPLUGIN_H

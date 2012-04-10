@@ -21,6 +21,7 @@
 #include <QtGui>
 #include <QApplication>
 #include <QMap>
+#include <QAction>
 #include "psiplugin.h"
 #include "shortcutaccessor.h"
 #include "shortcutaccessinghost.h"
@@ -29,21 +30,26 @@
 #include "activetabaccessor.h"
 #include "activetabaccessinghost.h"
 #include "plugininfoprovider.h"
+#include "toolbariconaccessor.h"
+#include "gctoolbariconaccessor.h"
 
 #define constOld "oldsymbol"
 #define constNew "newsymbol"
 #define constShortCut "shortcut"
 #define constNotTranslate "nottranslate"
-#define constVersion "0.4.0"
+#define constVersion "0.4.3"
+
+static const QString mucData = "groupchat";
+static const QString chatData = "chat";
 
 class TranslatePlugin : public QObject, public PsiPlugin, public OptionAccessor, public ShortcutAccessor, public ActiveTabAccessor, public PluginInfoProvider
+		, public ToolbarIconAccessor, public GCToolbarIconAccessor
 {
         Q_OBJECT
-	Q_INTERFACES(PsiPlugin OptionAccessor ShortcutAccessor ActiveTabAccessor PluginInfoProvider)
+	Q_INTERFACES(PsiPlugin OptionAccessor ShortcutAccessor ActiveTabAccessor PluginInfoProvider ToolbarIconAccessor GCToolbarIconAccessor)
 
 public:
 	TranslatePlugin();
-
         virtual QString name() const;
         virtual QString shortName() const;
         virtual QString version() const;
@@ -63,6 +69,12 @@ public:
 	virtual void setShortcuts();
         //ActiveTabAccessor
         virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
+	//Toolbars
+	virtual QList < QVariantHash > getButtonParam() { return QList < QVariantHash >(); }
+	virtual QAction* getAction(QObject* parent, int account, const QString& contact);
+
+	virtual QList < QVariantHash > getGCButtonParam() { return QList < QVariantHash >(); }
+	virtual QAction* getGCAction(QObject* parent, int account, const QString& contact);
 
 	virtual QString pluginInfo();
 
@@ -76,6 +88,7 @@ private slots:
         void storeItem(QTableWidgetItem*);
         void restoreMap();
 	void hack();
+	void actionDestroyed(QObject* obj);
 private:
         bool enabled_;
         bool notTranslate;
@@ -90,7 +103,7 @@ private:
         QCheckBox *check_button;
         QString storage;
 	QPointer<QWidget> options_;
-
+	QList<QAction *> actions_;
 };
 
 Q_EXPORT_PLUGIN(TranslatePlugin);
@@ -273,7 +286,11 @@ bool TranslatePlugin::enable()
 
 	shortCut = psiOptions->getPluginOption(constShortCut, shortCut).toString();
 	notTranslate = psiOptions->getPluginOption(constNotTranslate, notTranslate).toBool();
-        psiShortcuts->connectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
+//	psiShortcuts->connectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
+
+	foreach(QAction* act, actions_) {
+		act->setShortcut(QKeySequence(shortCut));
+	}
 
 	QStringList oldList = psiOptions->getPluginOption(constOld, QStringList(map.keys())).toStringList();
 	QStringList newList = psiOptions->getPluginOption(constNew, QStringList(map.values())).toStringList();
@@ -289,51 +306,88 @@ bool TranslatePlugin::enable()
 bool TranslatePlugin::disable()
 {
         enabled_ = false;
-        psiShortcuts->disconnectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
+	foreach(QAction* act, actions_) {
+		act->disconnect(this, SLOT(trans()));
+	}
+
+//	psiShortcuts->disconnectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
         return true;
 }
 
 void TranslatePlugin::trans()
 {
+	if(!enabled_)
+		return;
+
 	QTextEdit * ed = activeTab->getEditBox();
 	if (!ed) {
 		return;
 	}
 
-	QString toReverse = ed->textCursor().selectedText();
+	QTextCursor c = ed->textCursor();
+	static QRegExp link("(xmpp:|mailto:|http://|https://|ftp://|news://|ed2k://|www.|ftp.)\\S+", Qt::CaseInsensitive);
+	QStringList newStrings;
+
+	bool isMuc = false;
+	QAction* act = dynamic_cast<QAction*>(sender());
+	if(act && act->data().toString() == mucData)
+		isMuc = true;
+
+	QString toReverse = c.selectedText();
 	bool isSelect = true;
 	QString nick("");
 	if (toReverse.isEmpty()) {
 		toReverse = ed->toPlainText();
-		if (notTranslate) {
+		if (notTranslate && isMuc) {
 			int index = toReverse.indexOf(":") + 1;
 			nick = toReverse.left(index);
 			toReverse = toReverse.right(toReverse.size() - index);
 		}
 		isSelect = false;
 	}
+	if(!nick.isEmpty())
+		newStrings.append(nick);
+
 	//запоминаем позицию курсора
-	int pos = ed->textCursor().position();
-	QString newString = "";
-	foreach(QString symbol, toReverse){
-		newString.append(map.value(symbol,symbol));
+	int pos = c.position();
+
+	int index = link.indexIn(toReverse);
+	while(index != -1 && !isSelect) {
+		QString newStr;
+		QString oldStr = toReverse.left(index);
+		foreach(const QString& symbol, oldStr) {
+			newStr.append(map.value(symbol,symbol));
+		}
+		newStrings << newStr << link.cap();
+		toReverse = toReverse.right(toReverse.size() - (index + link.matchedLength()));
+		index = link.indexIn(toReverse);
 	}
+
+	QString newStr;
+	foreach(const QString& symbol, toReverse) {
+		newStr.append(map.value(symbol,symbol));
+	}
+	newStrings << newStr;
+
+	QString newString = newStrings.join("");
+
 	if (!isSelect) {
-		ed->setPlainText(nick + newString);
+		ed->setPlainText(newString);
 		//восстанавливаем позицию курсора
-		QTextCursor c = ed->textCursor();
 		c.setPosition( pos );
 		ed->setTextCursor( c );
-	} else {
-		int end = ed->textCursor().selectionEnd();
-		int start = ed->textCursor().selectionStart();
+	}
+	else {
+		int end = c.selectionEnd();
+		int start = c.selectionStart();
 		ed->textCursor().clearSelection();
 		ed->textCursor().insertText(newString);
-		QTextCursor c = ed->textCursor();
-		if ( pos == start) {
+		c = ed->textCursor();
+		if (pos == start) {
 			c.setPosition(end);
 			c.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor, end-start);
-		} else {
+		}
+		else {
 			c.setPosition(start);
 			c.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, end-start);
 		}
@@ -373,9 +427,9 @@ void TranslatePlugin::setShortcutAccessingHost(ShortcutAccessingHost* host)
 
 void TranslatePlugin::setShortcuts()
 {
-	if (enabled_) {
-		psiShortcuts->connectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
-	}
+//	if (enabled_) {
+//		psiShortcuts->connectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
+//	}
 }
 
 void TranslatePlugin::applyOptions()
@@ -383,10 +437,14 @@ void TranslatePlugin::applyOptions()
 	if (!options_)
 		return;
 
-	psiShortcuts->disconnectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
+//	psiShortcuts->disconnectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
 	shortCut = shortCutWidget->text();
 	psiOptions->setPluginOption(constShortCut, shortCut);
-        psiShortcuts->connectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
+	foreach(QAction* act, actions_) {
+		act->setShortcut(QKeySequence(shortCut));
+	}
+
+//	psiShortcuts->connectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
 
 	notTranslate = check_button->isChecked();
 	psiOptions->setPluginOption(constNotTranslate, notTranslate);
@@ -407,7 +465,6 @@ void TranslatePlugin::restoreOptions()
 {
 	if (!options_)
 		return;
-
 
 	shortCutWidget->setText(shortCut);
 	check_button->setChecked(notTranslate);
@@ -482,6 +539,38 @@ void TranslatePlugin::hack()
 {
 	check_button->toggle();
 	check_button->toggle();
+}
+
+QAction* TranslatePlugin::getAction(QObject* parent, int /*account*/, const QString& /*contact*/)
+{
+	QAction* act = new QAction(parent);
+	((QWidget*)parent)->addAction(act);
+	act->setData(chatData);
+	act->setShortcut(QKeySequence(shortCut));
+	act->setShortcutContext(Qt::WindowShortcut);
+	connect(act, SIGNAL(triggered()), SLOT(trans()));
+	connect(act, SIGNAL(destroyed(QObject*)), SLOT(actionDestroyed(QObject*)));
+	actions_.append(act);
+	return 0; //we dont want this action will be visible
+}
+
+QAction* TranslatePlugin::getGCAction(QObject* parent, int /*account*/, const QString& /*contact*/)
+{
+	QAction* act = new QAction(parent);
+	((QWidget*)parent)->addAction(act);
+	act->setData(mucData);
+	act->setShortcut(QKeySequence(shortCut));
+	act->setShortcutContext(Qt::WindowShortcut);
+	connect(act, SIGNAL(triggered()), SLOT(trans()));
+	connect(act, SIGNAL(destroyed(QObject*)), SLOT(actionDestroyed(QObject*)));
+	actions_.append(act);
+	return 0; //we dont want this action will be visible
+}
+
+void TranslatePlugin::actionDestroyed(QObject *obj)
+{
+	QAction* act = static_cast<QAction*>(obj);
+	actions_.removeAll(act);
 }
 
 QString TranslatePlugin::pluginInfo()

@@ -43,6 +43,8 @@
 #include "proxysettingsdlg.h"
 #include "defines.h"
 
+#include "qxtwindowsystem.h"
+
 #define PROTOCOL_FTP "ftp"
 #define PROTOCOL_HTTP "http"
 #define MAX_HISTORY_SIZE 10
@@ -214,12 +216,13 @@ Screenshot::Screenshot()
 	, modified(false)
 	, lastFolder(QDir::home().absolutePath())
 	, grabAreaWidget_(0)
+	, so_(0)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 	ui_.setupUi(this);
 
 	updateWidgets(false);
-	ui_.lb_url->setVisible(false);
+	ui_.urlFrame->setVisible(false);
 
 	refreshSettings();
 	history_ = Options::instance()->getOption(constHistory).toStringList();
@@ -233,6 +236,7 @@ Screenshot::Screenshot()
 	ui_.pb_save->setIcon(icoHost->getIcon("psi/download"));
 	ui_.pb_print->setIcon(icoHost->getIcon("psi/print"));
 	ui_.pb_new_screenshot->setIcon(icoHost->getIcon("screenshotplugin/screenshot"));
+	ui_.tb_copyUrl->setIcon(icoHost->getIcon("psi/action_paste_and_send"));
 
 	ui_.pb_save->setShortcut(QKeySequence("Ctrl+s"));
 	ui_.pb_upload->setShortcut(QKeySequence("Ctrl+u"));
@@ -252,8 +256,11 @@ Screenshot::Screenshot()
 	connect(ui_.lb_pixmap, SIGNAL(adjusted()), this, SLOT(pixmapAdjusted()));
 	connect(ui_.lb_pixmap, SIGNAL(settingsChanged(QString,QVariant)), SLOT(settingsChanged(QString, QVariant)));
 	connect(ui_.lb_pixmap, SIGNAL(modified(bool)), this, SLOT(setModified(bool)));
+	connect(ui_.tb_copyUrl, SIGNAL(clicked()), this, SLOT(copyUrl()));
 
 	setWindowIcon(icoHost->getIcon("screenshotplugin/screenshot"));
+
+	ui_.lb_pixmap->installEventFilter(this);
 }
 
 Screenshot::~Screenshot()
@@ -262,6 +269,7 @@ Screenshot::~Screenshot()
 	servers.clear();
 	saveGeometry();
 	delete grabAreaWidget_;
+	delete so_;
 }
 
 void Screenshot::connectMenu()
@@ -277,6 +285,22 @@ void Screenshot::connectMenu()
 	//connect(ui_.actionProxy_Settings, SIGNAL(triggered()), SLOT(doProxySettings()));
 	connect(ui_.actionSave, SIGNAL(triggered()), SLOT(saveScreenshot()));
 	connect(ui_.actionUpload, SIGNAL(triggered()), SLOT(uploadScreenshot()));
+}
+
+void Screenshot::action(int action)
+{
+	switch(action) {
+	case Area:
+		captureArea(0);
+		break;
+	case Window:
+		captureWindow(0);
+		break;
+	case Desktop:
+	default:
+		shootScreen();
+		break;
+	}
 }
 
 void Screenshot::setupStatusBar()
@@ -446,17 +470,17 @@ void Screenshot::bringToFront()
 
 void Screenshot::newScreenshot()
 {
-	ScreenshotOptions *so = new ScreenshotOptions(Options::instance()->getOption(constDelay).toInt(), this);
-	connect(so, SIGNAL(captureArea(int)), SLOT(captureArea(int)));
-	//connect(so, SIGNAL(captureWindow(int)), this, SLOT(captureWindow(int)));
-	connect(so, SIGNAL(captureDesktop(int)), SLOT(captureDesktop(int)));
-	connect(so, SIGNAL(screenshotCanceled()), SLOT(screenshotCanceled()));
+	so_ = new ScreenshotOptions(Options::instance()->getOption(constDelay).toInt());
+	connect(so_, SIGNAL(captureArea(int)), SLOT(captureArea(int)));
+	connect(so_, SIGNAL(captureWindow(int)), this, SLOT(captureWindow(int)));
+	connect(so_, SIGNAL(captureDesktop(int)), SLOT(captureDesktop(int)));
+	connect(so_, SIGNAL(screenshotCanceled()), SLOT(screenshotCanceled()));
 	saveGeometry();
-	setWindowState(Qt::WindowMinimized);
 	ui_.pb_new_screenshot->setEnabled(false);
-	so->show();
-	so->raise();
-	so->activateWindow();
+	setWindowState(Qt::WindowMinimized);
+	so_->show();
+	so_->raise();
+	so_->activateWindow();
 }
 
 void Screenshot::screenshotCanceled()
@@ -469,7 +493,7 @@ void Screenshot::screenshotCanceled()
 void Screenshot::refreshWindow()
 {
 	ui_.pb_new_screenshot->setEnabled(true);
-	ui_.lb_url->setVisible(false);
+	ui_.urlFrame->setVisible(false);
 	updateScreenshotLabel();
 	bringToFront();
 	setModified(false);
@@ -477,7 +501,6 @@ void Screenshot::refreshWindow()
 
 void Screenshot::captureArea(int delay)
 {
-	Options::instance()->setOption(constDelay, delay);
 	grabAreaWidget_ = new GrabAreaWidget();
 	if(grabAreaWidget_->exec() == QDialog::Accepted) {
 		QTimer::singleShot(delay*1000, this, SLOT(shootArea()));
@@ -508,42 +531,27 @@ void Screenshot::shootArea()
 	refreshWindow();
 }
 
-/*void Screenshot::captureWindow(int delay)
+void Screenshot::captureWindow(int delay)
 {
 	QTimer::singleShot(delay*1000, this, SLOT(shootWindow()));
 }
 
 void Screenshot::shootWindow()
-{	
-
-	Window *w = reinterpret_cast<ulong *>(property(QX11Info::appRootWindow(),
-						       NET_ACTIVE_WINDOW, XA_WINDOW));
-
-	if(!w) {
-		shootScreen();
-		return;
-	}
-
+{
 	qApp->beep();
-	originalPixmap = QPixmap();
-	originalPixmap = QPixmap::grabWindow(w);
-	updateScreenshotLabel();
+	originalPixmap = QPixmap::grabWindow(QxtWindowSystem::activeWindow());
 
-	ui_.pb_new_screenshot->setEnabled(true);
-	bringToFront();
-}*/
+	refreshWindow();
+}
 
 void Screenshot::captureDesktop(int delay)
 {
-	Options::instance()->setOption(constDelay, delay);
 	QTimer::singleShot(delay*1000, this, SLOT(shootScreen()));
 }
 
 void Screenshot::shootScreen()
 {
 	qApp->beep();
-	originalPixmap = QPixmap(); // clear image for low memory situations
-				// on embedded devices.
 	originalPixmap = QPixmap::grabWindow(QApplication::desktop()->winId());
 
 	refreshWindow();
@@ -568,6 +576,18 @@ void Screenshot::saveScreenshot()
 	}
 	ui_.pb_save->setEnabled(true);
 	modified = false;
+}
+
+void Screenshot::copyUrl()
+{
+	QString url = ui_.lb_url->text();
+	if(!url.isEmpty()) {
+		QRegExp re("<a href=\".+\">([^<]+)</a>");
+		if(re.indexIn(url) != -1) {
+			url = re.cap(1);
+			qApp->clipboard()->setText(url);
+		}
+	}
 }
 
 void Screenshot::dataTransferProgress(qint64 done, qint64 total)
@@ -647,7 +667,7 @@ void Screenshot::uploadFtp()
 
 	ui_.progressBar->setValue(0);
 	ui_.progressBar->show();
-	ui_.lb_url->setVisible(false);
+	ui_.urlFrame->setVisible(false);
 
 	QNetworkReply *reply = manager->put(QNetworkRequest(u), ba);
 
@@ -720,7 +740,7 @@ void Screenshot::uploadHttp()
 
 	ui_.progressBar->setValue(0);
 	ui_.progressBar->show();
-	ui_.lb_url->setVisible(false);
+	ui_.urlFrame->setVisible(false);
 
 	QNetworkReply* reply = manager->post(netreq, ba);
 	connect(reply, SIGNAL(uploadProgress(qint64 , qint64)), this, SLOT(dataTransferProgress(qint64 , qint64)));
@@ -731,7 +751,7 @@ void Screenshot::uploadHttp()
 void Screenshot::ftpReplyFinished()
 {
 	QNetworkReply *reply = (QNetworkReply*)sender();
-	ui_.lb_url->setVisible(true);
+	ui_.urlFrame->setVisible(true);
 	if(reply->error() == QNetworkReply::NoError) {
 		const QString url = reply->url().toString(QUrl::RemoveUserInfo | QUrl::StripTrailingSlash);
 		ui_.lb_url->setText(QString("<a href=\"%1\">%1</a>").arg(url));
@@ -752,7 +772,7 @@ void Screenshot::ftpReplyFinished()
 void Screenshot::httpReplyFinished(QNetworkReply *reply)
 {
 	if(reply->error() != QNetworkReply::NoError) {
-		ui_.lb_url->setVisible(true);
+		ui_.urlFrame->setVisible(true);
 		ui_.lb_url->setText(reply->errorString());
 		updateWidgets(false);
 		reply->close();
@@ -786,7 +806,7 @@ void Screenshot::httpReplyFinished(QNetworkReply *reply)
 //
 
 		QRegExp rx(s->servRegexp());
-		ui_.lb_url->setVisible(true);
+		ui_.urlFrame->setVisible(true);
 		if (rx.indexIn(page) != -1) {
 			QString imageurl = rx.cap(1);
 			ui_.lb_url->setText(QString("<a href=\"%1\">%1</a>").arg(imageurl));
@@ -823,7 +843,7 @@ void Screenshot::newRequest(const QNetworkReply *const old, const QString &link)
 void Screenshot::closeEvent(QCloseEvent *e)
 {
 	if(modified) {
-		int ret = QMessageBox::question(this, tr("Close Screenshot"), tr("Are your sure?"),
+		int ret = QMessageBox::question(this, tr("Close Screenshot"), tr("Are you sure?"),
 						QMessageBox::Ok | QMessageBox::Cancel);
 		if(ret == QMessageBox::Ok) {
 			e->accept();
@@ -878,6 +898,19 @@ void Screenshot::saveGeometry()
 	o->setOption(constWindowY, y());
 	o->setOption(constWindowWidth, width());
 	o->setOption(constWindowHeight, height());
+}
+
+bool Screenshot::eventFilter(QObject *o, QEvent *e)
+{
+	if(o == ui_.lb_pixmap && e->type() == QEvent::MouseMove) {
+		QMouseEvent *me = static_cast<QMouseEvent*>(e);
+		if(me->buttons() == Qt::LeftButton) {
+			QPoint pos = me->pos();
+			ui_.scrollArea->ensureVisible(pos.x(), pos.y(), 10, 10);
+		}
+	}
+
+	return QMainWindow::eventFilter(o, e);
 }
 
 #include "screenshot.moc"

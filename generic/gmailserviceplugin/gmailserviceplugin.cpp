@@ -19,6 +19,7 @@
  */
 
 #include <QFileDialog>
+#include <QProcess>
 #include "gmailserviceplugin.h"
 #include "common.h"
 
@@ -37,6 +38,7 @@ GmailNotifyPlugin::GmailNotifyPlugin()
 	, sound_(0)
 	, soundFile("sound/email.wav")
 	, actions_(0)
+	, popupId(0)
 {
 }
 
@@ -66,10 +68,12 @@ QWidget* GmailNotifyPlugin::options()
 
 	ui_.tb_check->setIcon(iconHost->getIcon("psi/play"));
 	ui_.tb_open->setIcon(iconHost->getIcon("psi/browse"));
+	ui_.tb_open_prog->setIcon(iconHost->getIcon("psi/browse"));
 
 	connect(ui_.tb_check, SIGNAL(clicked()), SLOT(checkSound()));
 	connect(ui_.tb_open, SIGNAL(clicked()), SLOT(getSound()));
 	connect(ui_.cb_accounts, SIGNAL(currentIndexChanged(int)), SLOT(updateOptions(int)));
+	connect(ui_.tb_open_prog, SIGNAL(clicked()), SLOT(getProg()));
 
 	return options_;
 }
@@ -98,7 +102,8 @@ bool GmailNotifyPlugin::enable()
 	loadLists();
 
 	int interval = psiOptions->getPluginOption(OPTION_INTERVAL, QVariant(4000)).toInt()/1000;
-	popup->registerOption(POPUP_OPTION, interval, "plugins.options."+shortName()+"."+OPTION_INTERVAL);
+	popupId = popup->registerOption(POPUP_OPTION, interval, "plugins.options."+shortName()+"."+OPTION_INTERVAL);
+	program_ = psiOptions->getPluginOption(OPTION_PROG).toString();
 
 	//Update features
 	bool end = false;
@@ -133,6 +138,7 @@ bool GmailNotifyPlugin::disable()
 
 	delete mailViewer_;
 
+	popup->unregisterOption(POPUP_OPTION);
 	enabled = false;
 	return true;
 }
@@ -146,6 +152,9 @@ void GmailNotifyPlugin::applyOptions()
 
 	soundFile = ui_.le_sound->text();
 	psiOptions->setPluginOption(OPTION_SOUND, soundFile);
+
+	program_ = ui_.le_program->text();
+	psiOptions->setPluginOption(OPTION_PROG, program_);
 
 	int index = ui_.cb_accounts->currentIndex();
 	if(accounts.size() <= index || index == -1)
@@ -215,6 +224,7 @@ void GmailNotifyPlugin::restoreOptions()
 	ui_.cb_shared_statuses->setVisible(true);
 	ui_.cb_nosave->setVisible(true);
 	ui_.le_sound->setText(soundFile);
+	ui_.le_program->setText(program_);
 
 	ui_.cb_accounts->setEnabled(true);
 	ui_.cb_accounts->clear();
@@ -282,6 +292,9 @@ bool GmailNotifyPlugin::incomingStanza(int account, const QDomElement& stanza)
 					return true;
 
 				if(checkNoSave(account, stanza, query))
+					return true;
+
+				if(checkAttributes(account, stanza, query))
 					return true;
 			}
 		}
@@ -384,6 +397,13 @@ bool GmailNotifyPlugin::checkFeatures(int account, const QDomElement &stanza, co
 				updateActions(as);
 				if(as->isNoSaveEnbaled)
 					Utils::updateNoSaveState(as, stanzaSender, accInfo);
+				foundGoogleExt = true;
+			}
+			else if(feature.attribute("var") == "google:roster" && feature.attribute("node").isEmpty()) {
+				AccountSettings *as = create(account, jid);
+				as->isAttributesSupported = true;
+				if(as->isAttributesEnabled)
+					Utils::requestExtendedContactAttributes(as, stanzaSender, accInfo);
 				foundGoogleExt = true;
 			}
 
@@ -617,6 +637,54 @@ bool GmailNotifyPlugin::checkNoSave(int account, const QDomElement &stanza, cons
 	return found;
 }
 
+bool GmailNotifyPlugin::checkAttributes(int account, const QDomElement &stanza, const QDomElement &query)
+{
+	bool found = false;
+	if(query.tagName() == "query"
+	   && query.attribute("xmlns") == "jabber:iq:roster"
+	   && query.attribute("ext") == "2")
+	{
+		const QString jid = stanza.attribute("to").split("/").at(0);
+		const QString server = stanza.attribute("from").toLower();
+		if(!server.isEmpty() && jid.toLower() != server) {
+			return false;
+		}
+		AccountSettings *as = findAccountSettings(jid);
+		if(!as || as->account != account) {
+			return true;
+		}
+
+		found = true;
+
+		const QString type = stanza.attribute("type");
+		if(type == "set") {
+			const QString str = QString("<iq to='%1' type='result' id='%2' />").arg(accInfo->getJid(account), stanza.attribute("id"));
+			stanzaSender->sendStanza(account, str);
+		}
+
+		for(QDomNode child = query.firstChild(); !child.isNull(); child = child.nextSibling()) {
+			QDomElement itemElem = child.toElement();
+			if(itemElem.isNull() || itemElem.tagName() != "item")
+				continue;
+
+			const QString jid = itemElem.attribute("jid");
+			const QString descr = itemElem.attribute("t");
+
+			Attributes atr;
+			if(as->attributes.contains(jid)) {
+				atr = as->attributes.value(jid);
+			}
+			if(atr.t != descr && type == "set") {
+				showPopup(tr("Attributes for contact %1 are changed").arg(jid));
+			}
+			atr.t = descr;
+			as->attributes.insert(jid, atr);
+		}
+	}
+
+	return found;
+}
+
 AccountSettings* GmailNotifyPlugin::findAccountSettings(const QString &jid)
 {
 	if(!jid.isEmpty()) {
@@ -724,12 +792,7 @@ void GmailNotifyPlugin::showPopup(const QString& text)
 	if(!interval)
 		return;
 
-	QVariant delay_ = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.delays.status");
-	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", QVariant(interval*1000));
-
-	popup->initPopup(text, name());
-
-	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", delay_);
+	popup->initPopup(text, name(), "gmailnotify/menu", popupId);
 }
 
 void GmailNotifyPlugin::updateSharedStatus(AccountSettings* as)
@@ -841,6 +904,13 @@ void GmailNotifyPlugin::incomingMail(int account, const QDomElement &xml)
 		}
 	}
 	psiOptions->setGlobalOption("options.ui.notifications.sounds.enable", soundEnabled);
+
+	if(!program_.isEmpty()) {
+		QStringList prog = program_.split(" ");
+		QProcess *p = new QProcess(this);
+		p->startDetached(prog.takeFirst(), prog);
+		p->deleteLater();
+	}
 }
 
 void GmailNotifyPlugin::mailEventActivated()
@@ -878,6 +948,44 @@ void GmailNotifyPlugin::getSound()
 	if(fileName.isEmpty())
 		return;
 	ui_.le_sound->setText(fileName);
+}
+
+void GmailNotifyPlugin::getProg()
+{
+	QString fileName = QFileDialog::getOpenFileName(0,tr("Choose a program"),"","");
+	if(fileName.isEmpty())
+		return;
+	ui_.le_program->setText(fileName);
+}
+
+QAction* GmailNotifyPlugin::getContactAction(QObject *parent, int account, const QString &contact)
+{
+	QAction *act = 0;
+	AccountSettings* as = findAccountSettings(accInfo->getJid(account));
+	if(as && as->isAttributesEnabled && as->isAttributesSupported) {
+		act = new QAction(iconHost->getIcon("psi/stop"), tr("Block gmail contact"), parent);
+		act->setCheckable(true);
+		if(as->attributes.contains(contact) && as->attributes.value(contact).t == "B")
+			act->setChecked(true);
+		act->setProperty("jid", contact);
+		act->setProperty("account", account);
+		connect(act, SIGNAL(triggered(bool)), SLOT(blockActionTriggered(bool)));
+	}
+
+	return act;
+}
+
+void GmailNotifyPlugin::blockActionTriggered(bool block)
+{
+	QAction* act = static_cast<QAction*>(sender());
+	const QString jid = act->property("jid").toString();
+	int acc = act->property("account").toInt();
+	QString str = QString("<iq type='set' id='%1'>"
+				"<query xmlns='jabber:iq:roster' xmlns:gr='google:roster' gr:ext='2'>"
+				"<item jid='%2' gr:t='%3'/></query></iq>")
+			.arg(stanzaSender->uniqueId(acc))
+			.arg(jid, block ? "B" : "");
+	stanzaSender->sendStanza(acc, str);
 }
 
 QString GmailNotifyPlugin::pluginInfo()

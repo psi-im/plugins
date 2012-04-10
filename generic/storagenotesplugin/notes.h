@@ -27,18 +27,19 @@
 #include <QKeyEvent>
 
 class StorageNotesPlugin;
+class QTimer;
 
 class Notes : public QDialog
 {
         Q_OBJECT
 public:
 	Notes(StorageNotesPlugin *storageNotes, int acc, QWidget *parent = 0);
-        ~Notes();
+	~Notes();
 	void incomingNotes(const QList<QDomElement>& notes);
 	void error();
+	void saved();
 
 private:
-        void updateTags();
 	QString replaceSymbols(const QString& str);
 
 signals:
@@ -54,11 +55,13 @@ private slots:
         void edit();
 	void addNote(const QDomElement& note);
 	void noteEdited(const QDomElement& note, const QModelIndex& index);
-        void selectTag();
+	void selectTag();
+	void updateTags();
 
 protected:
         void closeEvent(QCloseEvent * event);
         void keyPressEvent(QKeyEvent *e);
+	bool eventFilter(QObject *obj, QEvent *e);
 
 private:
 	Ui::Notes ui_;
@@ -67,7 +70,9 @@ private:
 	TagModel *tagModel_;
 	NoteModel *noteModel_;
 	ProxyModel *proxyModel_;
+	QTimer* updateTagsTimer_;
 	bool newNotes;
+	bool waitForSave;
 };
 
 

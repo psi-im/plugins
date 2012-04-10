@@ -29,41 +29,24 @@
 
 class CleanerMainWindow : public QMainWindow
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
         CleanerMainWindow(CleanerPlugin *cleaner);
         virtual ~CleanerMainWindow() {};
-        int height_;
-        int width_;
+	void showCleaner();
 
 private:
-        QString vCardDir_, historyDir_, cacheDir_;
-	QString profilesConfigDir_, profilesDataDir_, profilesCacheDir_;
-        QAction *findHistory, *findVcards;
-        void setContent();
-        QLabel *sb1, *sb2, *sb3;
-        bool clearDir(QString path);
-        CleanerPlugin *cleaner_;
-        Ui::CleanerMainWindow ui_;
-
-        void createStatusBar();
-        void updateStatusBar();
-        void createMainMenu();
-        QString picturesDir();
-        QString avatarsDir();
-        QString currentProfileDir();
-
-        ClearingHistoryModel *historyModel_;
-        ClearingVcardModel *vcardsModel_;
-        ClearingAvatarModel *avatarModel_;
-        ClearingOptionsModel *optionsModel_;
-        ClearingProxyModel *proxyHistoryModel_, *proxyVcardsModel_;
-        QSortFilterProxyModel *proxyAvatarModel_, *proxyOptionsModel_;
-
-public slots:
-        void resizeWindow(int, int);
-        void showCleaner();
+	void setContent();
+	void changeProfile(const QString&);
+	void createStatusBar();
+	void updateStatusBar();
+	void createMainMenu();
+	QString picturesDir() const;
+	QString avatarsDir() const;
+	QString currentProfileDir() const;
+	QString currentProfileName() const;
+	bool clearDir(const QString& path);
 
 private slots:
         void deleteButtonPressed();
@@ -72,11 +55,10 @@ private slots:
         void deleteAvatars();
         void deleteOptions();
         void filterEvent();
-        void viewVcard(QModelIndex index);
-        void viewHistory(QModelIndex index);
-        void viewAvatar(QModelIndex index);
+	void viewVcard(const QModelIndex& index);
+	void viewHistory(const QModelIndex& index);
+	void viewAvatar(const QModelIndex& index);
         void chooseProfileAct();
-        void changeProfile(QString);
         void clearJuick();
         void clearBirhday();
         void currentTabChanged(int tab);
@@ -85,6 +67,21 @@ private slots:
 
 protected:
         void closeEvent(QCloseEvent * event);
+	bool eventFilter(QObject *o, QEvent *e);
+
+private:
+	QString vCardDir_, historyDir_, cacheDir_;
+	QString profilesConfigDir_, profilesDataDir_, profilesCacheDir_;
+	QAction *findHistory, *findVcards;
+	QLabel *sb1, *sb2, *sb3;
+	CleanerPlugin *cleaner_;
+	Ui::CleanerMainWindow ui_;
+	ClearingHistoryModel *historyModel_;
+	ClearingVcardModel *vcardsModel_;
+	ClearingAvatarModel *avatarModel_;
+	ClearingOptionsModel *optionsModel_;
+	ClearingProxyModel *proxyHistoryModel_, *proxyVcardsModel_;
+	QSortFilterProxyModel *proxyAvatarModel_, *proxyOptionsModel_;
 };
 
 

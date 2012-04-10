@@ -34,6 +34,7 @@ public:
 	static void updateSharedStatus(AccountSettings* as, StanzaSendingHost* stanzaSender, AccountInfoAccessingHost* accInfo);
 	static void getUserSettings(AccountSettings* as, StanzaSendingHost* stanzaSender, AccountInfoAccessingHost* accInfo);
 	static void updateNoSaveState(AccountSettings* as, StanzaSendingHost* stanzaSender, AccountInfoAccessingHost* accInfo);
+	static void requestExtendedContactAttributes(AccountSettings* as, StanzaSendingHost* stanzaSender, AccountInfoAccessingHost* accInfo);
 
 	static bool checkAccount(int account, AccountInfoAccessingHost* accInfo);
 };

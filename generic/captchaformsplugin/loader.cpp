@@ -20,10 +20,11 @@
 
 #include "loader.h"
 
+#include <QNetworkAccessManager>
 #include <QNetworkProxy>
 
 
-Loader::Loader(QString id, QObject *p)
+Loader::Loader(const QString& id, QObject *p)
 	: QObject(p)
 	, id_(id)
 
@@ -35,7 +36,7 @@ Loader::~Loader()
 {
 }
 
-void Loader::setProxy(QString host, int port, QString user, QString pass)
+void Loader::setProxy(const QString& host, int port, const QString& user, const QString& pass)
 {
 	if(host.isEmpty())
 		return;
@@ -59,6 +60,7 @@ void Loader::onRequestFinish(QNetworkReply *reply)
 	else
 		emit error(id_);
 
+	reply->deleteLater();
 	deleteLater();
 }
 

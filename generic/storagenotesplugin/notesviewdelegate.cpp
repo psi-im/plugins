@@ -46,12 +46,12 @@ void NotesViewDelegate::paint ( QPainter * painter, const QStyleOptionViewItem &
 
 	QPalette palette = option.palette;
 	QColor c = (option.state & QStyle::State_Selected) ?
-		   palette.color(QPalette::Highlight) : palette.color(QPalette::Base);
+				palette.color(QPalette::Highlight) : palette.color(QPalette::Base);
 
 	painter->fillRect(rect, c);
 
 	QPalette::ColorGroup cg = option.state & QStyle::State_Enabled
-                                  ? QPalette::Normal : QPalette::Disabled;
+			? QPalette::Normal : QPalette::Disabled;
 
 
 	if (option.state & QStyle::State_Selected) {

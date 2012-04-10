@@ -68,13 +68,13 @@ private:
 	struct Item {
 		Item(ItemType t, XmlStanzaItem x)
 			: type(t)
-			, xmlItem(x) {};
+			, xmlItem(x) {}
 		Item(ItemType t, StringStanzaItem s)
 			: type(t)
-			, stringItem(s) {};
+			, stringItem(s) {}
 		Item(ItemType t, MessageItem m)
 			: type(t)
-			, messageItem(m) {};
+			, messageItem(m) {}
 
 		ItemType type;
 

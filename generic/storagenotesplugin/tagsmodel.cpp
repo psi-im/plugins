@@ -20,7 +20,7 @@
 
 #include "tagsmodel.h"
 
-const QString allTags = QObject::tr("All Tags");
+static const QString allTags = QObject::tr("All Tags");
 
 TagModel::TagModel(QObject *parent)
 	: QAbstractItemModel(parent)
@@ -134,6 +134,11 @@ QModelIndex TagModel::createAllTagsIndex() const
 	return pIndex;
 }
 
+QString TagModel::allTagsName()
+{
+	return allTags;
+}
+
 
 
 
@@ -236,7 +241,7 @@ QList<QDomElement> NoteModel::getAllNotes() const
 QStringList NoteModel::getAllTags() const
 {
 	QStringList tagsList;
-	foreach(QDomElement note, notesList) {
+	foreach(const QDomElement& note, notesList) {
 		QStringList tags = note.attribute("tags").split(" ", QString::SkipEmptyParts);
 		tagsList += tags;
 	}

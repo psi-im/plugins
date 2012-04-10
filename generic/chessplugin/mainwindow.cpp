@@ -212,14 +212,13 @@ void ChessWindow::createMenu() {
 }
 
 void ChessWindow::load() {
-	QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-	QTextCodec::setCodecForLocale(codec);
 	QString fileName = QFileDialog::getOpenFileName(0,tr("Load game"), "", tr("*.chs"));
 	if(fileName.isEmpty()) return;
 
 	QFile file(fileName);
 	if(file.open(QIODevice::ReadOnly)) {
 		QTextStream in(&file);
+		in.setCodec("UTF-8");
 		QString settings = in.readAll();
 		model_->loadSettings(settings);
 		if(model_->gameType_ == Figure::WhitePlayer)
@@ -245,8 +244,6 @@ void ChessWindow::loadRequest(const QString& settings) {
 }
 
 void ChessWindow::save() {
-	QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-	QTextCodec::setCodecForLocale(codec);
 	QString fileName = QFileDialog::getSaveFileName(0,tr("Save game"), "", tr("*.chs"));
 	if(fileName.isEmpty())
 		return;
@@ -256,6 +253,7 @@ void ChessWindow::save() {
 	QFile file(fileName);
 	if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 		QTextStream out(&file);
+		out.setCodec("UTF-8");
 		out.setGenerateByteOrderMark(false);
 		out << model_->saveString();
 	}

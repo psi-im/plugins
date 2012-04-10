@@ -39,7 +39,7 @@
 #include "applicationinfoaccessinghost.h"
 #include "ui_form.h"
 
-#define LIST_URL "http://psi-dev.googlecode.com/svn/trunk/resources/content.list"
+#define LIST_URL "https://raw.github.com/psi-plus/contentdownloader/master/content.list"
 
 Form::Form(QWidget *parent)
 	: QWidget(parent)
@@ -305,7 +305,7 @@ void Form::downloadHtmlFinished()
 			for(int i = 0; i < imgs.size(); i++) {
 				QDomElement el = imgs.at(i).toElement();
 				QString urlStr(el.attribute("src"));
-				if(!urlStr.isEmpty() && !urlStr.startsWith("http://")) {
+				if(!urlStr.isEmpty() && !(urlStr.startsWith("http://") || urlStr.startsWith("http://"))) {
 					urlStr = reply->url().toString().section('/', 0, -2) + '/' + urlStr;
 				}
 

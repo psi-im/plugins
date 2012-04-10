@@ -22,7 +22,6 @@
 
 #include "view.h"
 #include "model.h"
-#include "tooltip.h"
 #include "ui_options.h"
 #include "watcheditem.h"
 #include "edititemdlg.h"
@@ -49,7 +48,7 @@
 #include "soundaccessor.h"
 
 
-#define constVersion "0.3.9"
+#define constVersion "0.4.1"
 
 #define constSoundFile "sndfl"
 #define constInterval "intrvl"
@@ -89,7 +88,7 @@ public:
         virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
 	QList < QVariantHash > getAccountMenuParam();
 	QList < QVariantHash > getContactMenuParam();
-	virtual QAction* getContactAction(QObject* , int , const QString& ) { return 0; };
+	virtual QAction* getContactAction(QObject* , int , const QString& );
 	virtual QAction* getAccountAction(QObject* , int ) { return 0; };
         virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
 	virtual QString pluginInfo();
@@ -101,8 +100,8 @@ public:
 private:
         OptionAccessingHost *psiOptions;
         PopupAccessingHost* popup;
-        IconFactoryAccessingHost* IcoHost;
-        ApplicationInfoAccessingHost* AppInfoHost;
+	IconFactoryAccessingHost* icoHost;
+	ApplicationInfoAccessingHost* appInfoHost;
 	ActiveTabAccessingHost* activeTab;
 	ContactInfoAccessingHost* contactInfo;
 	AccountInfoAccessingHost* accInfo;
@@ -117,6 +116,7 @@ private:
 	bool isSndEnable;
 	bool disableSnd;
 	bool disablePopupDnd;
+	bool popupId;
 
 	bool checkWatchedItem(const QString& from, const QString& body, WatchedItem *wi);
 
@@ -127,16 +127,15 @@ private slots:
         void delSelected();
         void Hack();
         void onOptionsClose();
-        void addJidFromMenu();
-	void checked(const QString& jid, bool check);
+	void addJidFromMenu(bool);
 	void playSound(const QString& soundFile);
 	void showPopup(int account, const QString& jid, QString text);
 
 	void addItemAct();
 	void delItemAct();
 	void editItemAct();
-	void addNewItem(QString settings);
-	void editCurrentItem(QString setting);
+	void addNewItem(const QString& settings);
+	void editCurrentItem(const QString& setting);
 	void timeOut();
 };
 
@@ -145,8 +144,8 @@ Q_EXPORT_PLUGIN(Watcher);
 Watcher::Watcher()
 	: psiOptions(0)
 	, popup(0)
-	, IcoHost(0)
-	, AppInfoHost(0)
+	, icoHost(0)
+	, appInfoHost(0)
 	, activeTab(0)
 	, contactInfo(0)
 	, accInfo(0)
@@ -158,6 +157,7 @@ Watcher::Watcher()
 	, isSndEnable(false)
 	, disableSnd(true)
 	, disablePopupDnd(true)
+	, popupId(0)
 {
 }
 
@@ -181,7 +181,7 @@ bool Watcher::enable() {
 		disablePopupDnd = psiOptions->getPluginOption(constDisablePopupDnd, QVariant(disablePopupDnd)).toBool();
 
 		int interval = psiOptions->getPluginOption(constInterval, QVariant(3000)).toInt()/1000;
-		popup->registerOption(POPUP_OPTION_NAME, interval, "plugins.options."+shortName()+"."+constInterval);
+		popupId = popup->registerOption(POPUP_OPTION_NAME, interval, "plugins.options."+shortName()+"."+constInterval);
 
 		QStringList jids = psiOptions->getPluginOption(constJids, QVariant(QStringList())).toStringList();
 		QStringList soundFiles = psiOptions->getPluginOption(constSndFiles, QVariant(QStringList())).toStringList();
@@ -193,7 +193,7 @@ bool Watcher::enable() {
 
 		items_.clear();
 		QStringList list = psiOptions->getPluginOption(constWatchedItems).toStringList();
-		foreach(QString settings, list) {
+		foreach(const QString& settings, list) {
 			WatchedItem* wi = new WatchedItem();
 			wi->setSettings(settings);
 			items_.push_back(wi);
@@ -201,7 +201,8 @@ bool Watcher::enable() {
 				wi->setText(wi->jid());
 			else if(!wi->watchedText().isEmpty())
 				wi->setText(wi->watchedText());
-			else wi->setText(tr("Empty item"));
+			else
+				wi->setText(tr("Empty item"));
 		}
 	}
 
@@ -215,6 +216,7 @@ bool Watcher::disable() {
 	qDeleteAll(items_);
 	items_.clear();
 
+	popup->unregisterOption(POPUP_OPTION_NAME);
 	enabled = false;
         return true;
 }
@@ -231,16 +233,16 @@ QWidget* Watcher::options() {
 	restoreOptions();
 
 	ui_.cb_hack->setVisible(false);
-	ui_.tb_open->setIcon(IcoHost->getIcon("psi/browse"));
-	ui_.tb_test->setIcon(IcoHost->getIcon("psi/play"));
-	ui_.pb_add->setIcon(IcoHost->getIcon("psi/addContact"));
-	ui_.pb_del->setIcon(IcoHost->getIcon("psi/remove"));
-	ui_.pb_add_item->setIcon(IcoHost->getIcon("psi/addContact"));
-	ui_.pb_delete_item->setIcon(IcoHost->getIcon("psi/remove"));
-	ui_.pb_edit_item->setIcon(IcoHost->getIcon("psi/action_templates_edit"));
+	ui_.tb_open->setIcon(icoHost->getIcon("psi/browse"));
+	ui_.tb_test->setIcon(icoHost->getIcon("psi/play"));
+	ui_.pb_add->setIcon(icoHost->getIcon("psi/addContact"));
+	ui_.pb_del->setIcon(icoHost->getIcon("psi/remove"));
+	ui_.pb_add_item->setIcon(icoHost->getIcon("psi/addContact"));
+	ui_.pb_delete_item->setIcon(icoHost->getIcon("psi/remove"));
+	ui_.pb_edit_item->setIcon(icoHost->getIcon("psi/action_templates_edit"));
 
 	ui_.tableView->setModel(model_);
-	ui_.tableView->init(IcoHost);
+	ui_.tableView->init(icoHost);
 
 	connect(ui_.tableView, SIGNAL(checkSound(QModelIndex)), this, SLOT(checkSound(QModelIndex)));
 	connect(ui_.tableView, SIGNAL(getSound(QModelIndex)), this, SLOT(getSound(QModelIndex)));
@@ -274,8 +276,8 @@ void Watcher::applyOptions() {
 	disableSnd = ui_.cb_disable_snd->isChecked();
 	psiOptions->setPluginOption(constDisableSnd, QVariant(disableSnd));
 
-//	Interval = ui_.sb_delay->value();
-//	psiOptions->setPluginOption(constInterval,QVariant(Interval));
+	//	Interval = ui_.sb_delay->value();
+	//	psiOptions->setPluginOption(constInterval,QVariant(Interval));
 
 	disablePopupDnd = ui_.cb_disableDnd->isChecked();
 	psiOptions->setPluginOption(constDisablePopupDnd, QVariant(disablePopupDnd));
@@ -300,7 +302,7 @@ void Watcher::applyOptions() {
 
 void Watcher::restoreOptions() {
 	ui_.le_sound->setText(soundFile);
-//	ui_.sb_delay->setValue(Interval);
+	//	ui_.sb_delay->setValue(Interval);
 	ui_.cb_disable_snd->setChecked(disableSnd);
 	ui_.cb_disableDnd->setChecked(disablePopupDnd);
 	model_->reset();
@@ -432,7 +434,7 @@ void Watcher::setPopupAccessingHost(PopupAccessingHost* host) {
 }
 
 void Watcher::setIconFactoryAccessingHost(IconFactoryAccessingHost* host) {
-	IcoHost = host;
+	icoHost = host;
 }
 
 void Watcher::setActiveTabAccessingHost(ActiveTabAccessingHost *host) {
@@ -444,7 +446,7 @@ void Watcher::setOptionAccessingHost(OptionAccessingHost *host) {
 }
 
 void Watcher::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host) {
-	AppInfoHost = host;
+	appInfoHost = host;
 }
 
 void Watcher::setContactInfoAccessingHost(ContactInfoAccessingHost *host) {
@@ -497,23 +499,18 @@ void Watcher::checkSound(QModelIndex index) {
 }
 
 void Watcher::showPopup(int account, const QString& jid, QString text) {
-	if(disablePopupDnd && accInfo->getStatus(account) == "dnd") {
-			return;
-	}
+	QVariant suppressDnd = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd");
+	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd", disablePopupDnd);
 
-	int interval = popup->popupDuration(POPUP_OPTION_NAME)*1000;
+	int interval = popup->popupDuration(POPUP_OPTION_NAME);
 	if(interval) {
-		QVariant delay_ = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.delays.status");
-		psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", interval);
-
 		const QString statusMes = contactInfo->statusMessage(account, jid);
 		if(!statusMes.isEmpty()) {
 			text += tr("<br>Status Message: %1").arg(statusMes);
 		}
-		popup->initPopupForJid(account, jid, text, tr("Watcher Plugin"), "psi/search");
-
-		psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", delay_);
+		popup->initPopupForJid(account, jid, text, tr("Watcher Plugin"), "psi/search", popupId);
 	}
+	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd", suppressDnd);
 }
 
 void Watcher::Hack() {
@@ -529,27 +526,26 @@ QList < QVariantHash > Watcher::getAccountMenuParam() {
 }
 
 QList < QVariantHash > Watcher::getContactMenuParam() {
-	QVariantHash hash;
-        hash["icon"] = QVariant(QString("psi/search"));
-        hash["name"] = QVariant(tr("Watch for JID"));
-        hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
-        hash["slot"] = QVariant(SLOT(addJidFromMenu()));
-	QList< QVariantHash > l;
-	l.push_back(hash);
-        return l;
+	return QList < QVariantHash >();
 }
 
-void Watcher::addJidFromMenu() {
-	QString jid = sender()->property("jid").toString();
-	bool checked = model_->getWatchedJids().contains(jid);
-	ToolTip *tooltip = new ToolTip(jid, checked, sender());
-	connect(tooltip, SIGNAL(check(QString,bool)), this, SLOT(checked(QString,bool)));
-	tooltip->show();
+QAction* Watcher::getContactAction(QObject *p, int /*account*/, const QString &jid) {
+	if(!enabled)
+		return 0;
+
+	QAction *act = new QAction(icoHost->getIcon("psi/search"), tr("Watch for JID"), p);
+	act->setCheckable(true);
+	act->setChecked(model_->getWatchedJids().contains(jid));
+	act->setProperty("jid", jid);
+	connect(act, SIGNAL(triggered(bool)), SLOT(addJidFromMenu(bool)));
+	return act;
 }
 
-void Watcher::checked(const QString& jid, bool check) {
+void Watcher::addJidFromMenu(bool check) {
 	if(!enabled)
 		return;
+
+	const QString jid = sender()->property("jid").toString();
 
 	if(check)
 		model_->addRow(jid);
@@ -561,20 +557,21 @@ void Watcher::checked(const QString& jid, bool check) {
 }
 
 void Watcher::addItemAct() {
-	EditItemDlg *eid = new EditItemDlg(IcoHost, psiOptions, optionsWid);
+	EditItemDlg *eid = new EditItemDlg(icoHost, psiOptions, optionsWid);
 	connect(eid, SIGNAL(testSound(QString)), this, SLOT(playSound(QString)));
 	connect(eid, SIGNAL(dlgAccepted(QString)), this, SLOT(addNewItem(QString)));
 	eid->show();
 }
 
-void Watcher::addNewItem(QString settings) {
+void Watcher::addNewItem(const QString& settings) {
 	WatchedItem *wi = new WatchedItem(ui_.listWidget);
 	wi->setSettings(settings);
 	if(!wi->jid().isEmpty())
 		wi->setText(wi->jid());
 	else if(!wi->watchedText().isEmpty())
 		wi->setText(wi->watchedText());
-	else wi->setText(tr("Empty item"));
+	else
+		wi->setText(tr("Empty item"));
 	Hack();
 }
 
@@ -593,7 +590,7 @@ void Watcher::delItemAct() {
 void Watcher::editItemAct() {
 	WatchedItem *wi = (WatchedItem*)ui_.listWidget->currentItem();
 	if(wi) {
-		EditItemDlg *eid = new EditItemDlg(IcoHost, psiOptions, optionsWid);
+		EditItemDlg *eid = new EditItemDlg(icoHost, psiOptions, optionsWid);
 		eid->init(wi->settingsString());
 		connect(eid, SIGNAL(testSound(QString)), this, SLOT(playSound(QString)));
 		connect(eid, SIGNAL(dlgAccepted(QString)), this, SLOT(editCurrentItem(QString)));		
@@ -601,7 +598,7 @@ void Watcher::editItemAct() {
 	}
 }
 
-void Watcher::editCurrentItem(QString settings) {
+void Watcher::editCurrentItem(const QString& settings) {
 	WatchedItem *wi = (WatchedItem*)ui_.listWidget->currentItem();
 	if(wi) {
 		wi->setSettings(settings);
@@ -609,7 +606,8 @@ void Watcher::editCurrentItem(QString settings) {
 			wi->setText(wi->jid());
 		else if(!wi->watchedText().isEmpty())
 			wi->setText(wi->watchedText());
-		else wi->setText(tr("Empty item"));
+		else
+			wi->setText(tr("Empty item"));
 		Hack();
 	}
 }

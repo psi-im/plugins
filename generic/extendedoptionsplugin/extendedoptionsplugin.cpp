@@ -28,7 +28,7 @@
 #include "plugininfoprovider.h"
 
 
-#define constVersion "0.3.4"
+#define constVersion "0.3.7"
 
 class ExtToolButton : public QToolButton
 {
@@ -69,12 +69,12 @@ private:
         ApplicationInfoAccessingHost* appInfo;
 	bool enabled;
         QString readFile();
-        void saveFile(QString text);
+	void saveFile(const QString& text);
         QString profileDir();
 	QPointer<QWidget> options_;
 
         //Chats-----
-        QCheckBox *htmlRender;
+       // QCheckBox *htmlRender;
         QCheckBox *centralToolbar;
         QCheckBox *confirmClearing;
         QCheckBox *messageIcons;
@@ -91,6 +91,7 @@ private:
 	QTextEdit *default_jid_mode_ignorelist;
 	QCheckBox *show_status_changes;
 	QCheckBox *chat_status_with_priority;
+	QCheckBox *scaledIcons;
 
 
         //MUC-----
@@ -147,6 +148,7 @@ private:
         QCheckBox *chat;
         QCheckBox *invis;
         QCheckBox *xa;
+	QCheckBox *enableMessages;
 
 
         //Look-----
@@ -180,23 +182,23 @@ private:
 	QCheckBox *canCloseTab;
 	QComboBox* mouseDoubleclick;
 
-
 	//Misc
 	QCheckBox *flash_windows;
 	QCheckBox *account_single;
 	QCheckBox *xml_console_enable_at_login;
-        
+	QCheckBox *lastActivity;
+	QCheckBox *sndMucNotify;
+	QCheckBox *popupsSuppressDnd;
+	QCheckBox *popupsSuppressAway;
 };
 
-Q_EXPORT_PLUGIN(ExtendedOptions);
+Q_EXPORT_PLUGIN(ExtendedOptions)
 
 ExtendedOptions::ExtendedOptions()
 	: psiOptions(0)
 	, appInfo(0)
 	, enabled(false)
 {
-	QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-	QTextCodec::setCodecForLocale(codec);
 }
 
 QString ExtendedOptions::name() const
@@ -234,10 +236,11 @@ QWidget* ExtendedOptions::options()
 		return 0;
 	}
 
-	options_ = new QWidget();
+	options_ = new QWidget;
 	QVBoxLayout *mainLayout = new QVBoxLayout(options_);
+	QScrollArea* area = new QScrollArea;
         QTabWidget *tabs = new QTabWidget;
-        QWidget *tab1 = new QWidget;
+	QWidget *tab1 = new QWidget;
         QWidget *tab2 = new QWidget;
         QWidget *tab3 = new QWidget;
         QWidget *tab4 = new QWidget;
@@ -262,11 +265,15 @@ QWidget* ExtendedOptions::options()
         tabs->addTab(tab7, tr("CSS"));
 	tabs->addTab(tab8, tr("Misc"));
 
+	area->setWidget(tabs);
+	area->setWidgetResizable(true);
+
         //Chats-----
-        htmlRender = new QCheckBox(tr("Enable HTML rendering in chat window"));
+      //  htmlRender = new QCheckBox(tr("Enable HTML rendering in chat window"));
         centralToolbar = new QCheckBox(tr("Enable central toolbar"));
         confirmClearing = new QCheckBox(tr("Ask for confirmation before clearing chat window"));
         messageIcons = new QCheckBox(tr("Enable icons in chat"));
+	scaledIcons = new QCheckBox(tr("Scaled message icons"));
 
 	/* altnSwitch = new QCheckBox(tr("Switch tabs with \"ALT+(1-9)\""));
         altnSwitch->setChecked(psiOptions->getGlobalOption("options.ui.tabs.alt-n-switch").toBool());*/
@@ -298,10 +305,11 @@ QWidget* ExtendedOptions::options()
 
 	tab1Layout->addWidget(new QLabel(tr("Chat window caption:")));
 	tab1Layout->addWidget(chat_caption);
-        tab1Layout->addWidget(htmlRender);
+       // tab1Layout->addWidget(htmlRender);
         tab1Layout->addWidget(centralToolbar);
         tab1Layout->addWidget(confirmClearing);
         tab1Layout->addWidget(messageIcons);
+	tab1Layout->addWidget(scaledIcons);
         //tab1Layout->addWidget(altnSwitch);
         tab1Layout->addWidget(disablePastSend);
 	tab1Layout->addWidget(disableSend);
@@ -342,8 +350,8 @@ QWidget* ExtendedOptions::options()
 	accept_defaults = new QCheckBox(tr("Automatically accept the default room configuration"));
 	accept_defaults->setToolTip(tr("Automatically accept the default room configuration when a new room is created"));
 	auto_configure = new QCheckBox(tr("Automatically open the configuration dialog when a new room is created"));
-	auto_configure->setToolTip("Automatically open the configuration dialog when a new room is created.\n"
-				   "This option only has effect if accept-defaults is false.");
+	auto_configure->setToolTip(tr("Automatically open the configuration dialog when a new room is created.\n"
+				   "This option only has effect if accept-defaults is false."));
 
         bookmarksListSkip = new QTextEdit();
         bookmarksListSkip->setMaximumWidth(300);
@@ -469,7 +477,9 @@ QWidget* ExtendedOptions::options()
         chat = new QCheckBox(tr("Show \"Chat\" option in status menu"));
         invis = new QCheckBox(tr("Show \"Invisible\" option in status menu"));
         xa = new QCheckBox(tr("Show \"XA\" option in status menu"));
+	enableMessages = new QCheckBox(tr("Enable single messages"));
 
+	tab4Layout->addWidget(enableMessages);
         tab4Layout->addWidget(admin);
         tab4Layout->addWidget(activeChats);
         tab4Layout->addWidget(pgpKey);
@@ -659,17 +669,29 @@ QWidget* ExtendedOptions::options()
 	flash_windows = new QCheckBox(tr("Enable windows flashing"));
 	account_single = new QCheckBox(tr("Enable \"Single Account\" mode"));
 	xml_console_enable_at_login = new QCheckBox(tr("Enable XML-console on login"));
+	lastActivity = new QCheckBox(tr("Enable last activity server"));
+	sndMucNotify = new QCheckBox(tr("Enable sound notifications for every MUC message"));
+	popupsSuppressDnd = new QCheckBox(tr("Disable popup notifications if status is DND"));
+	popupsSuppressAway = new QCheckBox(tr("Disable popup notifications if status is Away"));
+
+	QGroupBox *ngb = new QGroupBox(tr("Notifications"));
+	QVBoxLayout *nvbl = new QVBoxLayout(ngb);
+	nvbl->addWidget(flash_windows);
+	nvbl->addWidget(sndMucNotify);
+	nvbl->addWidget(popupsSuppressDnd);
+	nvbl->addWidget(popupsSuppressAway);
 
 	tab8Layout->addWidget(account_single);
-	tab8Layout->addWidget(flash_windows);
 	tab8Layout->addWidget(xml_console_enable_at_login);
+	tab8Layout->addWidget(lastActivity);
+	tab8Layout->addWidget(ngb);
 	tab8Layout->addStretch();
 
 
         QLabel *wikiLink = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/plugins#extended_options_plugin\">Wiki (Online)</a>"));
 	wikiLink->setOpenExternalLinks(true);
 
-        mainLayout->addWidget(tabs);
+	mainLayout->addWidget(area);
         mainLayout->addWidget(wikiLink);
 
 	restoreOptions();
@@ -683,10 +705,11 @@ void ExtendedOptions::applyOptions()
 		return;
 
 	//Chats-----
-	psiOptions->setGlobalOption("options.html.chat.render",QVariant(htmlRender->isChecked()));
+	//psiOptions->setGlobalOption("options.html.chat.render",QVariant(htmlRender->isChecked()));
 	psiOptions->setGlobalOption("options.ui.chat.central-toolbar",QVariant(centralToolbar->isChecked()));
 	psiOptions->setGlobalOption("options.ui.chat.warn-before-clear",QVariant(confirmClearing->isChecked()));
 	psiOptions->setGlobalOption("options.ui.chat.use-message-icons",QVariant(messageIcons->isChecked()));
+	psiOptions->setGlobalOption("options.ui.chat.scaled-message-icons",QVariant(scaledIcons->isChecked()));
 	//psiOptions->setGlobalOption("options.ui.tabs.alt-n-switch",QVariant(altnSwitch->isChecked()));
 	psiOptions->setGlobalOption("options.ui.chat.avatars.show",QVariant(showAvatar->isChecked()));
 	psiOptions->setGlobalOption("options.ui.chat.disable-paste-send",QVariant(disablePastSend->isChecked()));
@@ -771,6 +794,7 @@ void ExtendedOptions::applyOptions()
 	psiOptions->setGlobalOption("options.ui.menu.status.chat",QVariant(chat->isChecked()));
 	psiOptions->setGlobalOption("options.ui.menu.status.invisible",QVariant(invis->isChecked()));
 	psiOptions->setGlobalOption("options.ui.menu.status.xa",QVariant(xa->isChecked()));
+	psiOptions->setGlobalOption("options.ui.message.enabled", QVariant(enableMessages->isChecked()));
 
 	//Look----
 	psiOptions->setGlobalOption("options.ui.look.colors.passive-popup.border", QVariant(popupBorder->property("psi_color").value<QColor>()));
@@ -798,7 +822,10 @@ void ExtendedOptions::applyOptions()
 	psiOptions->setGlobalOption("options.ui.flash-windows", QVariant(flash_windows->isChecked()));
 	psiOptions->setGlobalOption("options.ui.account.single", QVariant(account_single->isChecked()));
 	psiOptions->setGlobalOption("options.xml-console.enable-at-login", QVariant(xml_console_enable_at_login->isChecked()));
-
+	psiOptions->setGlobalOption("options.service-discovery.last-activity", QVariant(lastActivity->isChecked()));
+	psiOptions->setGlobalOption("options.ui.notifications.sounds.notify-every-muc-message", QVariant(sndMucNotify->isChecked()));
+	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd", QVariant(popupsSuppressDnd->isChecked()));
+	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-away", QVariant(popupsSuppressAway->isChecked()));
 }
 
 void ExtendedOptions::restoreOptions()
@@ -807,10 +834,11 @@ void ExtendedOptions::restoreOptions()
 		return;
 
 	//Chats-----
-        htmlRender->setChecked(psiOptions->getGlobalOption("options.html.chat.render").toBool());
+       // htmlRender->setChecked(psiOptions->getGlobalOption("options.html.chat.render").toBool());
         centralToolbar->setChecked(psiOptions->getGlobalOption("options.ui.chat.central-toolbar").toBool());
         confirmClearing->setChecked(psiOptions->getGlobalOption("options.ui.chat.warn-before-clear").toBool());
         messageIcons->setChecked(psiOptions->getGlobalOption("options.ui.chat.use-message-icons").toBool());
+	scaledIcons->setChecked(psiOptions->getGlobalOption("options.ui.chat.scaled-message-icons").toBool());
 	// altnSwitch->setChecked(psiOptions->getGlobalOption("options.ui.tabs.alt-n-switch").toBool());
         showAvatar->setChecked(psiOptions->getGlobalOption("options.ui.chat.avatars.show").toBool());
         avatarSize->setValue(psiOptions->getGlobalOption("options.ui.chat.avatars.size").toInt());
@@ -892,6 +920,7 @@ void ExtendedOptions::restoreOptions()
         chat->setChecked(psiOptions->getGlobalOption("options.ui.menu.status.chat").toBool());
         invis->setChecked(psiOptions->getGlobalOption("options.ui.menu.status.invisible").toBool());
         xa->setChecked(psiOptions->getGlobalOption("options.ui.menu.status.xa").toBool());
+	enableMessages->setChecked(psiOptions->getGlobalOption("options.ui.message.enabled").toBool());
 
         //Look----
         QColor color;
@@ -941,6 +970,10 @@ void ExtendedOptions::restoreOptions()
 	flash_windows->setChecked(psiOptions->getGlobalOption("options.ui.flash-windows").toBool());
 	account_single->setChecked(psiOptions->getGlobalOption("options.ui.account.single").toBool());
 	xml_console_enable_at_login->setChecked(psiOptions->getGlobalOption("options.xml-console.enable-at-login").toBool());
+	lastActivity->setChecked(psiOptions->getGlobalOption("options.service-discovery.last-activity").toBool());
+	sndMucNotify->setChecked(psiOptions->getGlobalOption("options.ui.notifications.sounds.notify-every-muc-message").toBool());
+	popupsSuppressDnd->setChecked(psiOptions->getGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd").toBool());
+	popupsSuppressAway->setChecked(psiOptions->getGlobalOption("options.ui.notifications.passive-popups.suppress-while-away").toBool());
 }
 
 
@@ -977,27 +1010,31 @@ QString ExtendedOptions::readFile()
 	QFile file(profileDir() + QDir::separator() + QString("mucskipautojoin.txt"));
 	if(file.open(QIODevice::ReadOnly)) {
 		QTextStream in(&file);
+		in.setCodec("UTF-8");
 		return in.readAll();
 	}
 	return QString();
 }
 
-void ExtendedOptions::saveFile(QString text)
+void ExtendedOptions::saveFile(const QString& text)
 {
 	QFile file(profileDir() + QDir::separator() + QString("mucskipautojoin.txt"));
 	if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+		if(text.isEmpty())
+			return;
+
 		QTextStream out(&file);
+		out.setCodec("UTF-8");
 		out.setGenerateByteOrderMark(false);
 		out << text << endl;
-		file.close();
 	}
 }
 
 void ExtendedOptions::hack()
 {
 	//Enable "Apply" button
-	htmlRender->toggle();
-	htmlRender->toggle();
+	centralToolbar->toggle();
+	centralToolbar->toggle();
 }
 
 QString ExtendedOptions::profileDir()

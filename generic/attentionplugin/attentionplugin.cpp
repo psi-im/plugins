@@ -44,7 +44,7 @@
 
 #include "ui_options.h"
 
-#define cVer "0.1.8"
+#define cVer "0.1.9"
 #define constSoundFile "sndfl"
 #define constInterval "intrvl"
 #define constInfPopup "infPopup"
@@ -106,11 +106,11 @@ private:
 	QString soundFile;
 	int timeout_;
 	bool infPopup, disableDnd;
-	int interval;
 	QTimer *nudgeTimer_;
 	QPointer<QWidget> nudgeWindow_;
 	QPoint oldPoint_;
 	QPointer<QWidget> options_;
+	int popupId;
 
 
         struct Blocked {
@@ -155,8 +155,8 @@ AttentionPlugin::AttentionPlugin()
 	, timeout_(30)
 	, infPopup(false)
 	, disableDnd(false)
-	, interval(4)
 	, nudgeTimer_(0)
+	, popupId(0)
 {
 }
 
@@ -189,8 +189,8 @@ bool AttentionPlugin::enable() {
 		timeout_ = psiOptions->getPluginOption(constTimeout, QVariant(timeout_)).toInt();
 		infPopup = psiOptions->getPluginOption(constInfPopup, QVariant(infPopup)).toBool();
 		disableDnd = psiOptions->getPluginOption(constDisableDnd, QVariant(disableDnd)).toBool();
-		interval = psiOptions->getPluginOption(constInterval, QVariant(4000)).toInt()/1000;
-		popup->registerOption(POPUP_OPTION, interval, "plugins.options."+shortName()+"."+constInterval);
+		popupId = popup->registerOption(POPUP_OPTION,  psiOptions->getPluginOption(constInterval, QVariant(4000)).toInt()/1000,
+						"plugins.options."+shortName()+"."+constInterval);
 
 		QWidgetList wl = qApp->allWidgets();
 		foreach(QWidget *w, wl) {
@@ -211,6 +211,7 @@ bool AttentionPlugin::disable() {
 	nudgeTimer_->stop();
 	delete nudgeTimer_;
 	nudgeTimer_ = 0;
+	popup->unregisterOption(POPUP_OPTION);
 	return true;
 }
 
@@ -256,13 +257,22 @@ bool AttentionPlugin::incomingStanza(int account, const QDomElement& stanza) {
 				blockedJids_ << B;
 			}
 
-			interval = popup->popupDuration(POPUP_OPTION);
-			if(interval) {
-				if(infPopup && (accInfoHost->getStatus(account) == "away" || accInfoHost->getStatus(account) == "xa")) {
-					interval = -1;
-				}
-				showPopup(account, from.split("/").first(), from + tr(" sends Attention message to you!"));
+			const QString optAway = "options.ui.notifications.passive-popups.suppress-while-away";
+			QVariant suppressAway = psiOptions->getGlobalOption(optAway);
+			const QString optDnd = "options.ui.notifications.passive-popups.suppress-while-dnd";
+			QVariant suppressDnd = psiOptions->getGlobalOption(optDnd);
+			int interval = popup->popupDuration(POPUP_OPTION);
+			if(infPopup && (accInfoHost->getStatus(account) == "away" || accInfoHost->getStatus(account) == "xa")) {
+				psiOptions->setGlobalOption(optAway, false);
+				popup->setPopupDuration(POPUP_OPTION, -1);
 			}
+			psiOptions->setGlobalOption(optDnd, disableDnd);
+
+			showPopup(account, from.split("/").first(), from + tr(" sends Attention message to you!"));
+			psiOptions->setGlobalOption(optAway, suppressAway);
+			psiOptions->setGlobalOption(optDnd, suppressDnd);
+			popup->setPopupDuration(POPUP_OPTION, interval);
+
 			if(psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool())
 				playSound(soundFile);
 
@@ -421,29 +431,23 @@ void AttentionPlugin::checkSound() {
 }
 
 void AttentionPlugin::showPopup(int account, const QString &jid, const QString &text) {
-	QVariant delay_ = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.delays.status");
-	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", interval*1000);
-
 	if(account == FakeAccount) {
-		popup->initPopup(text, tr("Attention Plugin"));
+		popup->initPopup(text, tr("Attention Plugin"), "attentionplugin/attention", popupId);
 	}
 	else {
-		popup->initPopupForJid(account, jid, text, tr("Attention Plugin"));
+		popup->initPopupForJid(account, jid, text, tr("Attention Plugin"), "attentionplugin/attention", popupId);
 	}
-
-	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", delay_);
 }
 
 void AttentionPlugin::sendAttention(int account, const QString& yourJid, const QString& jid) {
 
-	if(accInfoHost->getStatus(account) == "offline") return;
+	if(accInfoHost->getStatus(account) == "offline")
+		return;
 
 	QString msg = QString("<message from=\"%1\" to=\"%2\" type=\"headline\"><attention xmlns='urn:xmpp:attention:0'/></message>").arg(yourJid).arg(jid);
 	stanzaSender->sendStanza(account, msg);
 
-	interval = popup->popupDuration(POPUP_OPTION);
-	if(interval)
-		showPopup(FakeAccount, QString(), tr("You sent Attention message to %1").arg(jid));
+	showPopup(FakeAccount, QString(), tr("You sent Attention message to %1").arg(jid));
 }
 
 void AttentionPlugin::sendAttentionFromTab() {

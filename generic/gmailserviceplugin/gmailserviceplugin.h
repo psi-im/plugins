@@ -43,6 +43,7 @@
 #include "eventcreator.h"
 #include "soundaccessinghost.h"
 #include "soundaccessor.h"
+#include "menuaccessor.h"
 
 #include "ui_options.h"
 #include "accountsettings.h"
@@ -51,21 +52,22 @@
 #define OPTION_LISTS "lists"
 #define OPTION_INTERVAL "interval"
 #define OPTION_SOUND "sound"
+#define OPTION_PROG "program"
 
 #define POPUP_OPTION "Gmail Service Plugin"
 
-#define PLUGIN_VERSION "0.7.1"
+#define PLUGIN_VERSION "0.7.4"
 
 
 class GmailNotifyPlugin : public QObject, public PsiPlugin, public AccountInfoAccessor,
 	public StanzaFilter, public StanzaSender, public OptionAccessor, public PluginInfoProvider,
 	public PopupAccessor, public PsiAccountController, public IconFactoryAccessor,
-	public ToolbarIconAccessor, public EventCreator, public SoundAccessor
+	public ToolbarIconAccessor, public EventCreator, public SoundAccessor, public MenuAccessor
 {
 	Q_OBJECT
 	Q_INTERFACES(PsiPlugin StanzaFilter StanzaSender /*EventFilter*/ OptionAccessor PluginInfoProvider
 		     AccountInfoAccessor PopupAccessor PsiAccountController IconFactoryAccessor
-		     ToolbarIconAccessor EventCreator SoundAccessor)
+		     ToolbarIconAccessor EventCreator SoundAccessor MenuAccessor)
 public:
 	GmailNotifyPlugin();
 	virtual QString name() const;
@@ -75,12 +77,12 @@ public:
 	virtual bool enable();
 	virtual bool disable();
 	virtual void setOptionAccessingHost(OptionAccessingHost* host);
-	virtual void optionChanged(const QString& /*option*/){};
+	virtual void optionChanged(const QString& /*option*/){}
 	virtual void applyOptions();
 	virtual void restoreOptions();
 	virtual bool incomingStanza(int account, const QDomElement& stanza);
 	virtual bool outgoingStanza(int account, QDomElement& stanza);
-	virtual void logout(int ) {};
+	virtual void logout(int ) {}
 	virtual void setStanzaSendingHost(StanzaSendingHost *host);
 	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
 	virtual void setPopupAccessingHost(PopupAccessingHost* host);
@@ -90,6 +92,10 @@ public:
 	virtual void setSoundAccessingHost(SoundAccessingHost* host);
 	virtual QList < QVariantHash > getButtonParam();
 	virtual QAction* getAction(QObject* parent, int account, const QString& contact);
+	virtual QList < QVariantHash > getAccountMenuParam() { return QList < QVariantHash > (); }
+	virtual QList < QVariantHash > getContactMenuParam() { return QList < QVariantHash > (); }
+	virtual QAction* getContactAction(QObject* parent, int account, const QString& contact);
+	virtual QAction* getAccountAction(QObject* /*parent*/, int /*account*/) { return 0; }
 
 	virtual QString pluginInfo();
 
@@ -101,6 +107,8 @@ private slots:
 	void mailEventActivated();
 	void checkSound();
 	void getSound();
+	void blockActionTriggered(bool);
+	void getProg();
 
 private:
 	AccountSettings* findAccountSettings(const QString& jid);
@@ -112,6 +120,7 @@ private:
 	bool checkSettings(int account, const QDomElement& stanza, const QDomElement& query);
 	bool checkSharedStatus(int account, const QDomElement& stanza, const QDomElement& query);
 	bool checkNoSave(int account, const QDomElement& stanza, const QDomElement& query);
+	bool checkAttributes(int account, const QDomElement& stanza, const QDomElement& query);
 	void saveLists();
 	void loadLists();
 	void showPopup(const QString& text);
@@ -138,6 +147,8 @@ private:
 	typedef QList<MailItem> MailItemsList;
 	QList<MailItemsList> mailItems_;
 	QStringList id_;
+	int popupId;
+	QString program_;
 	Ui::Options ui_;
 };
 

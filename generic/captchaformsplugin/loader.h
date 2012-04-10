@@ -21,24 +21,25 @@
 #ifndef LOADER_H
 #define LOADER_H
 
-#include <QNetworkAccessManager>
 #include <QNetworkReply>
+
+class QNetworkAccessManager;
 
 class Loader : public QObject
 {
 	Q_OBJECT
 public:
-	Loader(QString id, QObject *p);
+	Loader(const QString& id, QObject *p);
 	~Loader();
 	void start(const QString& url);
-	void setProxy(QString host, int port, QString user = QString(), QString pass = QString());
+	void setProxy(const QString& host, int port, const QString& user = QString(), const QString& pass = QString());
 
 private slots:
 	void onRequestFinish(QNetworkReply*);
 
 signals:
-	void error(QString);
-	void data(QString, QByteArray);
+	void error(const QString&);
+	void data(const QString&, const QByteArray&);
 
 private:
 	QNetworkAccessManager* manager_;

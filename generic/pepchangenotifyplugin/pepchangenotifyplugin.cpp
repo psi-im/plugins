@@ -40,7 +40,7 @@
 
 #include "ui_options.h"
 
-#define cVer "0.0.8"
+#define cVer "0.0.9"
 #define constSoundFile "sndfl"
 #define constInterval "intrvl"
 #define constTune "tune"
@@ -100,6 +100,7 @@ private:
 	int delay;
 	bool showMood, showTune, showActivity;//, showGeoloc;
 	bool disableDnd;
+	int popupId;
 	QPointer<QWidget> options_;
 	Ui::Options ui_;
 
@@ -159,6 +160,7 @@ PepPlugin::PepPlugin()
 	, showActivity(false)
 //	, showGeoloc(false)
 	, disableDnd(false)
+	, popupId(0)
 {
 }
 
@@ -193,7 +195,7 @@ bool PepPlugin::enable()
 		delay = psiOptions->getPluginOption(constContactDelay, QVariant(delay)).toInt();
 
 		int interval = psiOptions->getPluginOption(constInterval, QVariant(5000)).toInt()/1000;
-		popup->registerOption(POPUP_OPTION_NAME, interval, "plugins.options."+shortName()+"."+constInterval);
+		popupId = popup->registerOption(POPUP_OPTION_NAME, interval, "plugins.options."+shortName()+"."+constInterval);
 	}
 	return enabled;
 }
@@ -203,6 +205,7 @@ bool PepPlugin::disable()
 	states_.clear();
 	lastConnectionTime_.clear();
 	contactsOnlineTime_.clear();
+	popup->unregisterOption(POPUP_OPTION_NAME);
 	enabled = false;
 	return true;
 }
@@ -470,15 +473,14 @@ void PepPlugin::checkSound()
 
 void PepPlugin::showPopup(const QString &title, const QString &text, const QString& icon)
 {
-	int interval = popup->popupDuration(POPUP_OPTION_NAME)*1000;
+	QVariant suppressDnd = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd");
+	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd", disableDnd);
+
+	int interval = popup->popupDuration(POPUP_OPTION_NAME);
 	if(interval) {
-		QVariant delay_ = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.delays.status");
-		psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", interval);
-
-		popup->initPopup(Qt::escape(text), Qt::escape(title), icon);
-
-		psiOptions->setGlobalOption("options.ui.notifications.passive-popups.delays.status", delay_);
+		popup->initPopup(Qt::escape(text), Qt::escape(title), icon, popupId);
 	}
+	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd", suppressDnd);
 }
 
 void PepPlugin::doNotification(const QString &title, const QString &text, const QString &icon)

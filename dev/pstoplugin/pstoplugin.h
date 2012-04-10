@@ -134,6 +134,8 @@ private slots:
     void quoteColorChanged(QColor);
     void messageColorChanged(QColor);
 
+    void onOptionsClose();
+
 };
 
 

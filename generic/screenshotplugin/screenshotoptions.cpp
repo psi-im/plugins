@@ -19,6 +19,8 @@
  */
 
 #include "screenshotoptions.h"
+#include "options.h"
+#include "defines.h"
 #include <QTimer>
 
 ScreenshotOptions::ScreenshotOptions(int delay, QWidget *parent)
@@ -26,7 +28,6 @@ ScreenshotOptions::ScreenshotOptions(int delay, QWidget *parent)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 	ui_.setupUi(this);
-	ui_.rb_capture_window->setVisible(false); ///FIXME!!!!!!
 	ui_.sb_delay->setValue(delay);
 
 	connect(ui_.buttonBox, SIGNAL(accepted()), SLOT(okPressed()));
@@ -45,12 +46,18 @@ void ScreenshotOptions::okPressed()
 void ScreenshotOptions::hideTimeout()
 {
 	int delay = ui_.sb_delay->value();
+	Options::instance()->setOption(constDelay, delay);
+
+	void(ScreenshotOptions::*signal)(int) = 0;
 	if(ui_.rb_capture_desktop->isChecked())
-		emit captureDesktop(delay);
+		signal =  &ScreenshotOptions::captureDesktop;
 	else if(ui_.rb_capture_window->isChecked())
-		emit captureWindow(delay);
+		signal =  &ScreenshotOptions::captureWindow;
 	else if(ui_.rb_capture_area->isChecked())
-		emit captureArea(delay);
+		signal = &ScreenshotOptions::captureArea;
+
+	if(signal)
+		emit (this->*signal)(delay);
 	deleteLater();
 }
 

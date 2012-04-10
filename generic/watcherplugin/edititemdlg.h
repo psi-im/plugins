@@ -22,8 +22,9 @@
 #define EDITITEMDLG_H
 
 #include "ui_edititemdlg.h"
-#include "iconfactoryaccessinghost.h"
-#include "optionaccessinghost.h"
+
+class OptionAccessingHost;
+class IconFactoryAccessingHost;
 
 #define constLastFile "lastfile"
 
@@ -35,8 +36,8 @@ public:
 	void init(const QString &settings);
 
 signals:
-	void dlgAccepted(QString);
-	void testSound(QString);
+	void dlgAccepted(const QString&);
+	void testSound(const QString&);
 
 private slots:
 	void accept();

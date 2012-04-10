@@ -19,7 +19,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  */
 
@@ -417,6 +417,7 @@ void PluginWindow::saveGame()
 	QFile file(fileName);
 	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 		QTextStream out(&file);
+		out.setCodec("UTF-8");
 		out.setGenerateByteOrderMark(false);
 		out << bmodel->saveToString();
 	}
@@ -433,6 +434,7 @@ void PluginWindow::loadGame()
 	QFile file(fileName);
 	if(file.open(QIODevice::ReadOnly)) {
 		QTextStream in(&file);
+		in.setCodec("UTF-8");
 		QString saved_str = in.readAll();
 		saved_str.replace("\n", "");
 		if (tryLoadGame(saved_str, true)) {

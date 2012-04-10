@@ -28,7 +28,7 @@ class CaptchaDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	CaptchaDialog(QString id, QWidget *p = 0);
+	CaptchaDialog(const QString& id, QWidget *p = 0);
 	void setPixmap(const QPixmap &pix);
 	void setQuestion(const QString &quest);
 	void setBody(const QString &body);
@@ -39,9 +39,12 @@ private slots:
 	void cancelPressed();
 	void toggleTEVisible(bool);
 
+protected:
+	bool eventFilter(QObject *o, QEvent *e);
+
 signals:
-	void ok(QString, QString);
-	void cancel(QString);
+	void ok(const QString&, const QString&);
+	void cancel(const QString&);
 
 private:
 	Ui::CaptchaDialog ui_;

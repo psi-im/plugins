@@ -88,6 +88,9 @@ void ToolBar::init()
 	buttons_.append(new Button(tr("Copy"), icoHost->getIcon("psi/action_paste_and_send"), ToolBar::ButtonCopy, false,this) );
 	buttons_.last()->setShortcut(QKeySequence("Ctrl+c"));
 
+	buttons_.append(new Button(tr("Paste"), icoHost->getIcon("psi/cm_import"), ToolBar::ButtonInsert, false,this) );
+	buttons_.last()->setShortcut(QKeySequence("Ctrl+v"));
+
 	buttons_.append(new Button(tr("Rotate"), icoHost->getIcon("psi/rotate"), ToolBar::ButtonRotate, false,this) );
 	buttons_.append(new Button(tr("Insert Text"), icoHost->getIcon("psi/text"), ToolBar::ButtonText, true,this) );	
 	buttons_.append(new Button(tr("Undo"), icoHost->getIcon("psi/undo"), ToolBar::ButtonUndo, false,this) );
@@ -105,8 +108,10 @@ void ToolBar::init()
 void ToolBar::enableButton(bool enable, ToolBar::ButtonType type)
 {
 	foreach(Button *b, buttons_) {
-		if(b->type() == type)
+		if(b->type() == type) {
 			b->setEnabled(enable);
+			break;
+		}
 	}
 }
 
@@ -115,6 +120,7 @@ void ToolBar::checkButton(ToolBar::ButtonType type)
 	foreach(Button *b, buttons_) {
 		if(b->type() == type && b->isCheckable()) {
 			b->setChecked(true);
+			break;
 		}
 	}
 	emit checkedButtonChanged(type);
@@ -154,6 +160,7 @@ void ToolBar::setColorForColorButton(const QColor &color)
 			QPixmap pix(16,16);
 			pix.fill(color);
 			b->setIcon(QIcon(pix));
+			break;
 		}
 	}
 }

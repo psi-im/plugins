@@ -20,7 +20,7 @@
 
 #include "model.h"
 
-Model::Model(QStringList watchedJids_, QStringList Sounds_, QObject* parent)
+Model::Model(const QStringList& watchedJids_, const QStringList& Sounds_, QObject* parent)
         : QAbstractTableModel(parent)
         , watchedJids(watchedJids_)
         , sounds(Sounds_)

@@ -233,7 +233,8 @@ QString ScreenshotPlugin::pluginInfo()
 			 "* Shortcut -- hotkey to make the screenshot (by default, Ctrl+Alt+P)\n"
 			 "* Format -- the file format in which the screenshot will be stored (default: .jpg)\n"
 			 "* File Name -- format of the filename (default: pic-yyyyMMdd-hhmmss, where yyyyMMdd=YYYYMMDD, and hhmmss are current date in the format yearmonthday-hourminutesecond)\n"
-		     "The address of FTP server is specified as ftp://ftp.domain.tld/path1/path2");
+		     "The address of FTP server is specified as ftp://ftp.domain.tld/path1/path2")
+		     + tr("\n\nSettings for authorization on some hostings can be found here: http://code.google.com/p/qscreenshot/wiki/Authorization");
 }
 
 #include "screenshotplugin.moc"

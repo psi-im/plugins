@@ -35,6 +35,8 @@ AccountSettings::AccountSettings(int acc, QString j)
 	, lastMailTid("")
 	, isSharedStatusEnabled(false)
 	, isSharedStatusSupported(false)
+	, isAttributesSupported(false)
+	, isAttributesEnabled(true)
 	, status("offline")
 	, message("")
 	, listMax(3)
@@ -60,9 +62,11 @@ void AccountSettings::fromString(const QString& settings)
 		isSharedStatusEnabled = (list.takeFirst() == "true");
 	if(!list.isEmpty())
 		isNoSaveEnbaled = (list.takeFirst() == "true");
+	if(!list.isEmpty())
+		isAttributesEnabled = (list.takeFirst() == "true");
 }
 
-QString AccountSettings::toString()
+QString AccountSettings::toString() const
 {
 	QStringList list;
 	list <<  jid
@@ -70,6 +74,7 @@ QString AccountSettings::toString()
 	     << lastMailTid
 	     << (notifyAllUnread ? "true" : "false")
 	     << (isSharedStatusEnabled ? "true" : "false")
-	     << (isNoSaveEnbaled ? "true" : "false");
+	     << (isNoSaveEnbaled ? "true" : "false")
+	     << (isAttributesEnabled ? "true" : "false");
 	     return list.join(splitString);
 }

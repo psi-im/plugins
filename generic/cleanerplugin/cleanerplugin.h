@@ -21,7 +21,7 @@
 #ifndef CLEANERPLUGIN_H
 #define CLEANERPLUGIN_H
 
-#include <QWidget>
+
 #include "psiplugin.h"
 #include "applicationinfoaccessor.h"
 #include "applicationinfoaccessinghost.h"
@@ -34,12 +34,12 @@
 class CleanerMainWindow;
 
 class CleanerPlugin : public QObject, public PsiPlugin, public ApplicationInfoAccessor,
-		    public IconFactoryAccessor, public OptionAccessor, public PluginInfoProvider
+public IconFactoryAccessor, public OptionAccessor, public PluginInfoProvider
 {
         Q_OBJECT
 	Q_INTERFACES(PsiPlugin ApplicationInfoAccessor IconFactoryAccessor OptionAccessor PluginInfoProvider)
 public:
-        CleanerPlugin();
+	CleanerPlugin();
         virtual QString name() const;
         virtual QString shortName() const;
         virtual QString version() const;
@@ -56,10 +56,10 @@ public:
 	virtual QString pluginInfo();
 
 private:
+	bool enabled;
         ApplicationInfoAccessingHost *appInfo;
         IconFactoryAccessingHost* iconHost;
         OptionAccessingHost* psiOptions;
-        bool enabled;
 	QPointer<CleanerMainWindow> cln;
         friend class CleanerMainWindow;
         int height, width;
@@ -68,6 +68,6 @@ private slots:
         void start();
         void deleteCln();
 
-    };
+};
 
 #endif // CLEANERPLUGIN_H

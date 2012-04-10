@@ -25,6 +25,8 @@
 #include <QPainter>
 #include <QStyleOptionViewItem>
 
+#include "iconfactoryaccessinghost.h"
+
 
 
 //------------------------------------------
@@ -70,26 +72,26 @@ void ClearingViewer::contextMenuEvent( QContextMenuEvent * e )
                 iresult = actions.indexOf(result);
                 foreach(const QModelIndex &check, selectionModel()->selectedRows(0)) {
                         switch (iresult) {
-                                case 0: //check
-                                        model()->setData(check, QVariant(2));
-                                        break;
-                                case 1: //uncheck
-                                        model()->setData(check, QVariant(0));
-                                        break;
-                                case 2: //invert
-                                        model()->setData(check, QVariant(3));
-                                        break;
+			case 0: //check
+				model()->setData(check, QVariant(2));
+				break;
+			case 1: //uncheck
+				model()->setData(check, QVariant(0));
+				break;
+			case 2: //invert
+				model()->setData(check, QVariant(3));
+				break;
                         }
                 }
         }
         delete popup;
 }
 
-void ClearingViewer::itemClicked(QModelIndex index)
+void ClearingViewer::itemClicked(const QModelIndex& index)
 {
-    if(index.column() == 0) {
-        model()->setData(currentIndex(), 3); //invert
-    }
+	if(index.column() == 0) {
+		model()->setData(currentIndex(), 3); //invert
+	}
 }
 
 
@@ -100,38 +102,38 @@ void ClearingViewer::itemClicked(QModelIndex index)
 //------------------------------------------
 QSize AvatarDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, const QModelIndex & index) const
 {
-    if(!index.isValid())
-        return QSize(0,0);
+	if(!index.isValid())
+		return QSize(0,0);
 
-    return QSize(300, 120);
+	return QSize(300, 120);
 }
 
 void AvatarDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
-    QPalette palette = option.palette;
-    QRect r = option.rect;
-    QColor c = (option.state & QStyle::State_Selected) ? palette.color(QPalette::Highlight) : palette.color(QPalette::Base);
-    painter->fillRect(r, c);
+	QPalette palette = option.palette;
+	QRect r = option.rect;
+	QColor c = (option.state & QStyle::State_Selected) ? palette.color(QPalette::Highlight) : palette.color(QPalette::Base);
+	painter->fillRect(r, c);
 
-    QPixmap pix = qVariantValue<QPixmap>(index.data(Qt::DisplayRole));
-    pix = pix.scaled(100,100, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    painter->save();
-    painter->setClipRect(r);
-    if(!pix.isNull()) {
-        r.translate(10,10);
-        r.setSize(pix.size());
-        painter->drawPixmap(r, pix);
-    } else {
-        QPalette::ColorGroup cg = option.state & QStyle::State_Enabled
-                                  ? QPalette::Normal : QPalette::Disabled;
-        if (option.state & QStyle::State_Selected) {
-                painter->setPen(option.palette.color(cg, QPalette::HighlightedText));
-        }
-        else {
-                painter->setPen(option.palette.color(cg, QPalette::Text));
-        }
-        r.translate(20,50);
-        painter->drawText(r, tr("Empty file"));
-    }
-    painter->restore();
+	QPixmap pix = qVariantValue<QPixmap>(index.data(Qt::DisplayRole));
+	painter->save();
+	painter->setClipRect(r);
+	if(!pix.isNull()) {
+		pix = pix.scaled(100,100, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+		r.translate(10,10);
+		r.setSize(pix.size());
+		painter->drawPixmap(r, pix);
+	} else {
+		QPalette::ColorGroup cg = option.state & QStyle::State_Enabled
+					  ? QPalette::Normal : QPalette::Disabled;
+		if (option.state & QStyle::State_Selected) {
+			painter->setPen(option.palette.color(cg, QPalette::HighlightedText));
+		}
+		else {
+			painter->setPen(option.palette.color(cg, QPalette::Text));
+		}
+		r.translate(20,50);
+		painter->drawText(r, tr("Empty file"));
+	}
+	painter->restore();
 }

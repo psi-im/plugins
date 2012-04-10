@@ -30,73 +30,106 @@
 #include "accountinfoaccessinghost.h"
 #include "accountinfoaccessor.h"
 #include "plugininfoprovider.h"
+#include "psiaccountcontroller.h"
+#include "psiaccountcontrollinghost.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
 #include <QByteArray>
 #include <QFile>
 #include <QFileDialog>
 #include <QLabel>
 #include <QMessageBox>
 #include <QVBoxLayout>
+#include <QMenu>
+#include <QApplication>
+#include <QClipboard>
 
-#define constVersion "0.1.1"
+#define constVersion "0.1.2"
+
+#define CONST_LAST_FOLDER "lastfolder"
+
+const int MAX_SIZE = 400;
 
 class ImagePlugin : public QObject, public PsiPlugin, public ToolbarIconAccessor
-, public GCToolbarIconAccessor, public StanzaSender, public IconFactoryAccessor
-, public ActiveTabAccessor, public PluginInfoProvider, public AccountInfoAccessor
+		, public GCToolbarIconAccessor, public StanzaSender, public IconFactoryAccessor
+		, public ActiveTabAccessor, public PluginInfoProvider, public AccountInfoAccessor
+		, public PsiAccountController, public OptionAccessor
 {
-        Q_OBJECT
-        Q_INTERFACES(PsiPlugin ToolbarIconAccessor GCToolbarIconAccessor
-	StanzaSender ActiveTabAccessor
-	IconFactoryAccessor AccountInfoAccessor PluginInfoProvider)
+	Q_OBJECT
+	Q_INTERFACES(PsiPlugin ToolbarIconAccessor GCToolbarIconAccessor
+		     StanzaSender ActiveTabAccessor PsiAccountController OptionAccessor
+		     IconFactoryAccessor AccountInfoAccessor PluginInfoProvider)
 public:
-        virtual QString name() const;
-        virtual QString shortName() const;
-        virtual QString version() const;
-        virtual QWidget* options();
-        virtual bool enable();
-        virtual bool disable();
+	ImagePlugin();
+	virtual QString name() const;
+	virtual QString shortName() const;
+	virtual QString version() const;
+	virtual QWidget* options();
+	virtual bool enable();
+	virtual bool disable();
 
-        virtual void applyOptions() {};
-        virtual void restoreOptions() {};
+	virtual void applyOptions() {}
+	virtual void restoreOptions() {}
 	virtual QList < QVariantHash > getButtonParam();
-	virtual QAction* getAction(QObject* , int , const QString& ) { return 0; };
+	virtual QAction* getAction(QObject* , int , const QString& ) { return 0; }
 	virtual QList < QVariantHash > getGCButtonParam();
-	virtual QAction* getGCAction(QObject* , int , const QString& ) { return 0; };
-        virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
-        virtual void setStanzaSendingHost(StanzaSendingHost *host);
-        virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
-        virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+	virtual QAction* getGCAction(QObject* , int , const QString& ) { return 0; }
+	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
+	virtual void setStanzaSendingHost(StanzaSendingHost *host);
+	virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
+	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+	virtual void setPsiAccountControllingHost(PsiAccountControllingHost *host);
+	virtual void setOptionAccessingHost(OptionAccessingHost *host);
+	virtual void optionChanged(const QString &) {}
 	virtual QString pluginInfo();
 
-private:
-        IconFactoryAccessingHost* iconhost;
-        StanzaSendingHost* stanzaSender;
-        ActiveTabAccessingHost* activeTab;
-        AccountInfoAccessingHost* accInfo;
-	bool enabled;
-        QHash<QString,int> accounts_;
 private slots:
-        void fileSelect();
-        
+	void actionActivated();
+
+private:
+	IconFactoryAccessingHost* iconHost;
+	StanzaSendingHost* stanzaSender;
+	ActiveTabAccessingHost* activeTab;
+	AccountInfoAccessingHost* accInfo;
+	PsiAccountControllingHost *psiController;
+	OptionAccessingHost *psiOptions;
+	bool enabled;
+	QHash<QString,int> accounts_;
 };
 
-Q_EXPORT_PLUGIN(ImagePlugin);
+Q_EXPORT_PLUGIN(ImagePlugin)
 
+ImagePlugin::ImagePlugin()
+	: iconHost(0)
+	, stanzaSender(0)
+	, activeTab(0)
+	, accInfo(0)
+	, psiController(0)
+	, psiOptions(0)
+	, enabled(false)
+{
+}
 
-QString ImagePlugin::name() const {
+QString ImagePlugin::name() const
+{
 	return "Image Plugin";
 }
 
-QString ImagePlugin::shortName() const {
-        return "image";
+QString ImagePlugin::shortName() const
+{
+	return "image";
 }
-QString ImagePlugin::version() const {
-        return constVersion;
+QString ImagePlugin::version() const
+{
+	return constVersion;
 }
-bool ImagePlugin::enable(){
+
+bool ImagePlugin::enable()
+{
 	QFile file(":/imageplugin/imageplugin.gif");
 	if ( file.open(QIODevice::ReadOnly) ) {
 		QByteArray image = file.readAll();
-		iconhost->addIcon("imageplugin/icon",image);
+		iconHost->addIcon("imageplugin/icon",image);
 		file.close();
 		enabled = true;
 	} else {
@@ -104,96 +137,173 @@ bool ImagePlugin::enable(){
 	}
 	return enabled;
 }
-bool ImagePlugin::disable(){
+
+bool ImagePlugin::disable()
+{
 	enabled = false;
-        return true;
-}
-QWidget* ImagePlugin::options(){
-        if (!enabled) {
-		return 0;
-	}
-        QWidget *optionsWid = new QWidget();
-        QVBoxLayout *vbox= new QVBoxLayout(optionsWid);
-        QLabel *wikiLink = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/plugins#image_plugin\">Wiki (Online)</a>"),optionsWid);
-	wikiLink->setOpenExternalLinks(true);
-        vbox->addWidget(wikiLink);
-        vbox->addStretch();
-        return optionsWid;
+	return true;
 }
 
-QList< QVariantHash > ImagePlugin::getButtonParam(){
+QWidget* ImagePlugin::options()
+{
+	if (!enabled) {
+		return 0;
+	}
+	QWidget *optionsWid = new QWidget();
+	QVBoxLayout *vbox= new QVBoxLayout(optionsWid);
+	QLabel *wikiLink = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/plugins#image_plugin\">Wiki (Online)</a>"),optionsWid);
+	wikiLink->setOpenExternalLinks(true);
+	vbox->addWidget(wikiLink);
+	vbox->addStretch();
+	return optionsWid;
+}
+
+QList< QVariantHash > ImagePlugin::getButtonParam()
+{
 	QVariantHash hash;
 	hash["tooltip"] = QVariant(tr("Send Image"));
 	hash["icon"] = QVariant(QString("imageplugin/icon"));
 	hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
-	hash["slot"] = QVariant(SLOT(fileSelect()));
+	hash["slot"] = QVariant(SLOT(actionActivated()));
 	QList< QVariantHash > l;
 	l.push_back(hash);
 	return l;
 }
 
-QList< QVariantHash > ImagePlugin::getGCButtonParam(){
+QList< QVariantHash > ImagePlugin::getGCButtonParam()
+{
 	return getButtonParam();
 }
 
-void ImagePlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost* host){
-    accInfo = host;
+void ImagePlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost* host)
+{
+	accInfo = host;
 }
 
-void ImagePlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost* host){
-        iconhost = host;
+void ImagePlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost* host)
+{
+	iconHost = host;
 }
 
-void ImagePlugin::setStanzaSendingHost(StanzaSendingHost *host){
-        stanzaSender = host;
+void ImagePlugin::setPsiAccountControllingHost(PsiAccountControllingHost *host)
+{
+	psiController = host;
 }
 
-void ImagePlugin::setActiveTabAccessingHost(ActiveTabAccessingHost* host){
-        activeTab = host;
+void ImagePlugin::setOptionAccessingHost(OptionAccessingHost *host)
+{
+	psiOptions = host;
 }
 
-void ImagePlugin::fileSelect(){
-    if (!enabled) return;
-    QString fileName("");
-    QString jid = activeTab->getYourJid();
-    QString jidToSend = activeTab->getJid();
-    int account = 0;
-    QString tmpJid("");
-    while (jid != (tmpJid = accInfo->getJid(account))){
-        ++account;
-        if (tmpJid == "-1") return;
-    }
-    if ("offline" == accInfo->getStatus(account)){return;}
-    fileName = QFileDialog::getOpenFileName(0,tr("Open Image"),"",tr("Images (*.png *.gif *.jpg *.jpeg *.ico)"));
-    if ("" != fileName){
-	QFile file(fileName);
-	if ( file.open(QIODevice::ReadOnly) ) {
-	    QByteArray image = file.readAll();
-            QString imageBase64(QUrl::toPercentEncoding(image.toBase64()));
-            if(image.length()>61440){
-                QMessageBox msgBox;
-                msgBox.setText(tr("The image size is too large."));
-                msgBox.setInformativeText("image size must be less than 60 kb");
-                msgBox.exec();
-                return;
-            }
-	    QString mType = QLatin1String(sender()->parent()->metaObject()->className()) == "PsiChatDlg"? "chat" : "groupchat";
-            QString msgHtml = "<message type=\""+mType+"\" to=\""+jidToSend+"\" id=\""+stanzaSender->uniqueId(account)+"\" ><body>"+tr("Image :)")+"</body><html xmlns=\"http://jabber.org/protocol/xhtml-im\">";
-            msgHtml +="<body xmlns=\"http://www.w3.org/1999/xhtml\">";
-            msgHtml += "<br/><img src=\"data:image/"+fileName.right(fileName.length() - fileName.lastIndexOf(".") - 1)+";base64,"+
-                    imageBase64+"\" alt=\"img\"/> ";
-            msgHtml += "</body></html></message>";
-            stanzaSender->sendStanza(account, msgHtml);
-	    file.close();
-        }
-    }
+void ImagePlugin::setStanzaSendingHost(StanzaSendingHost *host)
+{
+	stanzaSender = host;
 }
 
-QString ImagePlugin::pluginInfo() {
-	return tr("Author: ") +  "VampiRUS\n\n"
+void ImagePlugin::setActiveTabAccessingHost(ActiveTabAccessingHost* host)
+{
+	activeTab = host;
+}
+
+void ImagePlugin::actionActivated()
+{
+	if (!enabled)
+		return;
+
+	QString fileName("");
+	QString jid = activeTab->getYourJid();
+	QString jidToSend = activeTab->getJid();
+	int account = 0;
+	QString tmpJid("");
+	while (jid != (tmpJid = accInfo->getJid(account))) {
+		++account;
+		if (tmpJid == "-1")
+			return;
+	}
+
+	QMenu m;
+	QList<QAction*> list;
+	list << new QAction(tr("Open file"), &m)
+	     << new QAction(tr("From clipboard"), &m);
+	QAction *act = m.exec(list, QCursor::pos());
+	if(!act)
+		return;
+
+	if ("offline" == accInfo->getStatus(account)) {
+		return;
+	}
+
+	QPixmap pix;
+	QString imageName;
+	if(list.indexOf(act) == 1) {
+		if(!QApplication::clipboard()->mimeData()->hasImage())
+			return;
+
+		pix = QPixmap::fromImage(QApplication::clipboard()->image());
+		imageName = QApplication::clipboard()->text();
+	}
+	else {
+		const QString lastPath = psiOptions->getPluginOption(CONST_LAST_FOLDER, QDir::homePath()).toString();
+		fileName = QFileDialog::getOpenFileName(0, tr("Open Image"), lastPath, tr("Images (*.png *.gif *.jpg *.jpeg *.ico)"));
+		if (fileName.isEmpty())
+			return;
+
+		QFile file(fileName);
+		if ( file.open(QIODevice::ReadOnly) ) {
+			pix = QPixmap::fromImage(QImage::fromData(file.readAll()));
+			imageName = QFileInfo(file).fileName();
+
+		}
+		else {
+			return;
+		}
+		psiOptions->setPluginOption(CONST_LAST_FOLDER, QFileInfo(file).path());
+	}
+
+	QByteArray image;
+	if(pix.height() > MAX_SIZE || pix.width() > MAX_SIZE) {
+		pix = pix.scaled(MAX_SIZE, MAX_SIZE, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+	}
+	QBuffer b(&image);
+	pix.save(&b, "jpg");
+	QString imageBase64(QUrl::toPercentEncoding(image.toBase64()));
+	int length = image.length();
+	if(length > 61440) {
+		QMessageBox::information(0, tr("The image size is too large."),
+					 tr("Image size must be less than 60 kb"));
+	}
+	QString mType = QLatin1String(sender()->parent()->metaObject()->className()) == "PsiChatDlg"? "chat" : "groupchat";
+	QString body = tr("Image %1 bytes received.").arg(QString::number(length));
+	QString msgHtml = QString("<message type=\"%1\" to=\"%2\" id=\"%3\" >"
+				  "<body>%4</body>"
+				  "<html xmlns=\"http://jabber.org/protocol/xhtml-im\">"
+				  "<body xmlns=\"http://www.w3.org/1999/xhtml\">"
+				  "<br/><img src=\"data:image/%5;base64,%6\" alt=\"img\"/> "
+				  "</body></html></message>")
+			.arg(mType)
+			.arg(jidToSend)
+			.arg(stanzaSender->uniqueId(account))
+			.arg(body)
+			.arg(fileName.right(fileName.length() - fileName.lastIndexOf(".") - 1))
+			.arg(imageBase64);
+
+	stanzaSender->sendStanza(account, msgHtml);
+	psiController->appendSysMsg(account, jidToSend, tr("Image %1 sent <br/><img src=\"data:image/%2;base64,%3\" alt=\"img\"/> ")
+				    .arg(imageName)
+				    .arg(fileName.right(fileName.length() - fileName.lastIndexOf(".") - 1))
+				    .arg(imageBase64));
+
+
+
+
+}
+
+QString ImagePlugin::pluginInfo()
+{
+	return tr("Authors: ") +  "VampiRUS, Dealer_WeARE\n\n"
 			+ trUtf8("This plugin is designed to send images to roster contacts.\n"
-			 "Your contact's client must be support XEP-0071: XHTML-IM and support the data:URI scheme.\n"
-			 "Note: To work correctly, the option options.ui.chat.central-toolbar  must be set to true.");
+				 "Your contact's client must be support XEP-0071: XHTML-IM and support the data:URI scheme.\n"
+				 "Note: To work correctly, the option options.ui.chat.central-toolbar  must be set to true.");
 }
 
 #include "imageplugin.moc"
