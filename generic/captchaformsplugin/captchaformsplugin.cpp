@@ -18,6 +18,8 @@
  *
  */
 
+#include <QDomElement>
+
 #include "captchadialog.h"
 #include "loader.h"
 #include "ui_options.h"

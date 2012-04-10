@@ -23,6 +23,7 @@
 
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QDomElement>
 
 
 StorageNotesPlugin::StorageNotesPlugin()

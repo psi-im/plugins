@@ -19,6 +19,7 @@
  */
 
 #include <QFileDialog>
+#include <QDomElement>
 
 #include "view.h"
 #include "model.h"

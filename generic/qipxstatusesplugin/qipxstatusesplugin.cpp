@@ -22,6 +22,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QDomElement>
 
 #include "psiplugin.h"
 #include "stanzafilter.h"

@@ -19,6 +19,7 @@
  */
 
 #include <QFileDialog>
+#include <QDomElement>
 
 #include "psiplugin.h"
 #include "stanzafilter.h"

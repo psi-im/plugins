@@ -18,6 +18,8 @@
  *
  */
 
+#include <QDomElement>
+
 #include "jabberdiskplugin.h"
 #include "jabberdiskcontroller.h"
 

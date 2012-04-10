@@ -18,6 +18,8 @@
  *
  */
 
+#include <QDomElement>
+
 #include "psiplugin.h"
 #include "optionaccessor.h"
 #include "optionaccessinghost.h"
