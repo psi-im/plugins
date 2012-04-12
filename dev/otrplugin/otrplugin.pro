@@ -2,23 +2,23 @@ include(../../psiplugin.pri)
 
 CONFIG += release
 LIBS += -lotr -ltidy -lgcrypt -L/usr/local/lib
-RESOURCES = psi-otr.qrc
+RESOURCES = otrplugin.qrc
 unix {
 	INCLUDEPATH += /usr/include/tidy
 }
 
-HEADERS += src/PsiOtrPlugin.hpp
-HEADERS += src/OtrMessaging.hpp
-HEADERS += src/OtrInternal.hpp
-HEADERS += src/PsiOtrConfig.hpp
+HEADERS += src/psiotrplugin.h
+HEADERS += src/otrmessaging.h
+HEADERS += src/otrinternal.h
+HEADERS += src/psiotrconfig.h
 HEADERS += src/psiotrclosure.h
-HEADERS += src/HtmlTidy.hpp
-HEADERS += src/otrl_extensions.h
+HEADERS += src/htmltidy.h
+HEADERS += src/otrlextensions.h
 
-SOURCES += src/PsiOtrPlugin.cpp
-SOURCES += src/OtrMessaging.cpp
-SOURCES += src/OtrInternal.cpp
-SOURCES += src/PsiOtrConfig.cpp
+SOURCES += src/psiotrplugin.cpp
+SOURCES += src/otrmessaging.cpp
+SOURCES += src/otrinternal.cpp
+SOURCES += src/psiotrconfig.cpp
 SOURCES += src/psiotrclosure.cpp
-SOURCES += src/HtmlTidy.cpp
-SOURCES += src/otrl_extensions.c
+SOURCES += src/htmltidy.cpp
+SOURCES += src/otrlextensions.c

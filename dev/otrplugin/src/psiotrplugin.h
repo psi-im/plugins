@@ -1,9 +1,12 @@
 /*
- * psi-otr.h - off-the-record messaging plugin for psi
+ * psiotrplugin.h
  *
- * Copyright (C) Timo Engel (timo-e@freenet.de), Berlin 2007.
- * This program was written as part of a diplom thesis advised by 
- * Prof. Dr. Ruediger Weis (PST Labor)
+ * Off-the-Record Messaging plugin for Psi+
+ * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
+ *                    2011  Florian Fieber
+ *
+ * This program was originally written as part of a diplom thesis
+ * advised by Prof. Dr. Ruediger Weis (PST Labor)
  * at the Technical University of Applied Sciences Berlin.
  *
  * This program is free software; you can redistribute it and/or
@@ -17,65 +20,76 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
-#ifndef PSIOTRPLUGIN_HPP_
-#define PSIOTRPLUGIN_HPP_
+#ifndef PSIOTRPLUGIN_H_
+#define PSIOTRPLUGIN_H_
 
 #include <QObject>
-#include <QtGui>
-#include <QDomElement>
 
-#include "OtrMessaging.hpp"
+#include "otrmessaging.h"
 #include "psiplugin.h"
+#include "plugininfoprovider.h"
 #include "eventfilter.h"
 #include "optionaccessinghost.h"
 #include "optionaccessor.h"
 #include "stanzasender.h"
 #include "stanzasendinghost.h"
 #include "applicationinfoaccessor.h"
+#include "psiaccountcontroller.h"
 #include "stanzafilter.h"
 #include "toolbariconaccessor.h"
-#include "accountinfoaccessinghost.h"
 #include "accountinfoaccessor.h"
-#include "contactinfoaccessinghost.h"
 #include "contactinfoaccessor.h"
+#include "iconfactoryaccessor.h"
 
 class ApplicationInfoAccessingHost;
+class PsiAccountControllingHost;
+class AccountInfoAccessingHost;
+class ContactInfoAccessingHost;
+class IconFactoryAccessingHost;
+
+class QDomElement;
+class QString;
+class QAction;
 
 namespace psiotr
 {
 
-class ConfigDlg;
 class PsiOtrClosure;
-    
+
 //-----------------------------------------------------------------------------
 
 class PsiOtrPlugin : public QObject,
                      public PsiPlugin,
+                     public PluginInfoProvider,
                      public EventFilter,
                      public OptionAccessor,
                      public StanzaSender,
                      public ApplicationInfoAccessor,
+                     public PsiAccountController,
                      public StanzaFilter,
                      public ToolbarIconAccessor,
                      public AccountInfoAccessor,
                      public ContactInfoAccessor,
+                     public IconFactoryAccessor,
                      public OtrCallback
 {
 Q_OBJECT
 Q_INTERFACES(PsiPlugin
+             PluginInfoProvider
              EventFilter
              OptionAccessor
              StanzaSender
              ApplicationInfoAccessor
+             PsiAccountController
              StanzaFilter
              ToolbarIconAccessor
              AccountInfoAccessor
-             ContactInfoAccessor)
+             ContactInfoAccessor
+             IconFactoryAccessor)
 
 public:
     PsiOtrPlugin();
@@ -85,11 +99,14 @@ public:
     virtual QString name() const;
     virtual QString shortName() const;
     virtual QString version() const;
-    virtual QWidget* options(); 
+    virtual QWidget* options();
     virtual bool enable();
     virtual bool disable();
     virtual void applyOptions();
     virtual void restoreOptions();
+
+    // PluginInfoProvider
+    virtual QString pluginInfo();
 
     // EventFilter
     virtual bool processEvent(int accountIndex, QDomElement& e);
@@ -105,14 +122,17 @@ public:
     virtual void optionChanged(const QString& option);
 
     // StanzaSender
-    virtual void setStanzaSendingHost(StanzaSendingHost *host);
+    virtual void setStanzaSendingHost(StanzaSendingHost* host);
 
     // ApplicationInfoAccessor
     virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
 
+    // PsiAccountController
+    virtual void setPsiAccountControllingHost(PsiAccountControllingHost* host);
+
     // StanzaFilter
     virtual bool incomingStanza(int accountIndex, const QDomElement& xml);
-    virtual bool outgoingStanza(int accountIndex, QDomElement &xml);
+    virtual bool outgoingStanza(int accountIndex, QDomElement& xml);
 
     // ToolbarIconAccessor
     virtual QList<QVariantHash> getButtonParam();
@@ -125,20 +145,39 @@ public:
     // ContactInfoAccessor
     virtual void setContactInfoAccessingHost(ContactInfoAccessingHost* host);
 
+    // IconFactoryAccessingHost
+    virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
+
     // OtrCallback
     virtual QString dataDir();
     virtual void sendMessage(const QString& account, const QString& contact,
                              const QString& message);
     virtual bool isLoggedIn(const QString& account, const QString& contact);
     virtual void notifyUser(const OtrNotifyType& type, const QString& message);
+
+    virtual bool displayOtrMessage(const QString& account, const QString& contact,
+                                   const QString& message);
+    virtual void stateChange(const QString& account, const QString& contact,
+                             OtrStateChange change);
+
     virtual void receivedSMP(const QString& account, const QString& contact,
                              const QString& question);
     virtual void updateSMP(const QString& account, const QString& contact,
                            int progress);
+
     virtual void stopMessages();
     virtual void startMessages();
+
     virtual QString humanAccount(const QString& accountId);
     virtual QString humanAccountPublic(const QString& accountId);
+    virtual QString humanContact(const QString& accountId,
+                                 const QString& contact);
+
+    /**
+     * Displays a rich text system message for (account, contact)
+     */
+    bool appendSysMsg(const QString& account, const QString& contact,
+                      const QString& message, const QString& icon = "");
 
     // Helper methods
     /**
@@ -169,8 +208,10 @@ private:
     OptionAccessingHost*                            m_optionHost;
     StanzaSendingHost*                              m_senderHost;
     ApplicationInfoAccessingHost*                   m_applicationInfo;
+    PsiAccountControllingHost*                      m_accountHost;
     AccountInfoAccessingHost*                       m_accountInfo;
     ContactInfoAccessingHost*                       m_contactInfo;
+    IconFactoryAccessingHost*                       m_iconHost;
 };
 
 //-----------------------------------------------------------------------------

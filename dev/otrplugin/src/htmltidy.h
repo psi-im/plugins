@@ -1,6 +1,9 @@
 /*
- * HtmlTidy.hpp - tidy html with libtidy
- * Copyright (C) 2010  Timo Engel (timo-e@freenet.de)
+ * htmltidy.h - Tidy html with libtidy
+ *
+ * Off-the-Record Messaging plugin for Psi+
+ * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
+ *                    2011  Florian Fieber
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -13,18 +16,22 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
-#ifndef HTMLTIDY_HPP_
-#define HTMLTIDY_HPP_
+#ifndef HTMLTIDY_H_
+#define HTMLTIDY_H_
 
 #include <string>
 #include <tidy.h>
 #include <buffio.h>
-#include <QtXml>
+
+#include <QString>
+#include <QByteArray>
+
+class QDomDocument;
+class QDomElement;
 
 class HtmlTidy
 {
@@ -34,13 +41,13 @@ public:
     QString output();
     QDomElement output(QDomDocument& document);
     static void putByte(void* sinkData, byte bt);
-    
+
 
 protected:
     void putByte(byte bt);
     QString writeOutput();
-    
-    
+
+
 private:
     TidyDoc     m_tidyDoc;
     TidyBuffer  m_errorOutput;

@@ -1,9 +1,12 @@
 /*
- * psiotrclosure.hpp
+ * psiotrclosure.h
  *
- * Copyright (C) Timo Engel (timo-e@freenet.de), Berlin 2007.
- * This program was written as part of a diplom thesis advised by 
- * Prof. Dr. Ruediger Weis (PST Labor)
+ * Off-the-Record Messaging plugin for Psi+
+ * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
+ *               2011-2012  Florian Fieber
+ *
+ * This program was originally written as part of a diplom thesis
+ * advised by Prof. Dr. Ruediger Weis (PST Labor)
  * at the Technical University of Applied Sciences Berlin.
  *
  * This program is free software; you can redistribute it and/or
@@ -17,31 +20,28 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
 #ifndef PSIOTRCLOSURE_H_
 #define PSIOTRCLOSURE_H_
 
-#include "OtrMessaging.hpp"
+#include "otrmessaging.h"
 
 #include <QObject>
 #include <QDialog>
-#include <QComboBox>
-#include <QLineEdit>
-#include <QProgressBar>
-#include <QPushButton>
 #include <QMessageBox>
 
 class QAction;
 class QMenu;
+class QComboBox;
+class QLineEdit;
+class QProgressBar;
+class QPushButton;
 
 namespace psiotr
 {
-class PsiOtrPlugin;
-class OtrMessaging;
 
 //-----------------------------------------------------------------------------
 
@@ -52,7 +52,7 @@ public:
     AuthenticationDialog(OtrMessaging* otrc,
                          const QString& account, const QString& contact,
                          const QString& question, bool sender,
-                         QWidget *parent = 0);
+                         QWidget* parent = 0);
     ~AuthenticationDialog();
 
     void reset();
@@ -65,25 +65,29 @@ public slots:
 
 private:
     enum AuthState {AUTH_READY, AUTH_IN_PROGRESS, AUTH_FINISHED};
+    enum Method {METHOD_QUESTION, METHOD_SHARED_SECRET, METHOD_FINGERPRINT};
 
     OtrMessaging* m_otr;
-    int           m_method;
+    Method        m_method;
     QString       m_account;
     QString       m_contact;
+    QString       m_contactName;
     bool          m_isSender;
     AuthState     m_state;
     Fingerprint   m_fpr;
 
-    QWidget*      m_methodWidget[2];
+    QWidget*      m_methodWidget[3];
     QComboBox*    m_methodBox;
     QLineEdit*    m_questionEdit;
     QLineEdit*    m_answerEdit;
+    QLineEdit*    m_sharedSecretEdit;
     QProgressBar* m_progressBar;
     QPushButton*  m_cancelButton;
     QPushButton*  m_startButton;
-    
+
 private slots:
     void changeMethod(int index);
+    void checkRequirements();
     void startAuthentication();
 };
 
@@ -128,7 +132,7 @@ public slots:
     void sessionID(bool b);
     void fingerprint(bool b);
     void showMenu();
-    void finishSMP();
+    void finishAuth();
 };
 
 //-----------------------------------------------------------------------------

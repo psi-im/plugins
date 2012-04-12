@@ -1,6 +1,9 @@
 /*
- * PsiOtrConfig.hpp - configuration dialogs for Psi OTR plugin
- * Copyright (C) 2007  Timo Engel (timo-e@freenet.de)
+ * psiotrconfig.h - Configuration dialogs
+ *
+ * Off-the-Record Messaging plugin for Psi+
+ * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
+ *                    2011  Florian Fieber
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -13,29 +16,26 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
-#ifndef PSIOTRCONFIG_HPP_
-#define PSIOTRCONFIG_HPP_
+#ifndef PSIOTRCONFIG_H_
+#define PSIOTRCONFIG_H_
 
-#include "OtrMessaging.hpp"
+#include "otrmessaging.h"
 
 #include <QWidget>
-#include <QModelIndex>
-#include <QButtonGroup>
-#include <QCheckBox>
-#include <QRadioButton>
-#include <QComboBox>
-#include <QPoint>
+#include <QVariant>
 
 class OptionAccessingHost;
 class AccountInfoAccessingHost;
+class QButtonGroup;
+class QComboBox;
 class QCheckBox;
 class QStandardItemModel;
 class QTableView;
+class QPoint;
 
 // ---------------------------------------------------------------------------
 
@@ -51,9 +51,9 @@ const QVariant DEFAULT_END_WHEN_OFFLINE = QVariant(false);
 
 // ---------------------------------------------------------------------------
 
-/** 
-* This dialog appears in the 'Plugins' section of the Psi configuration.
-*/
+/**
+ * This dialog appears in the 'Plugins' section of the Psi configuration.
+ */
 class ConfigDialog : public QWidget
 {
 Q_OBJECT
@@ -71,9 +71,9 @@ private:
 
 // ---------------------------------------------------------------------------
 
-/** 
-* Configure OTR policy.
-*/
+/**
+ * Configure OTR policy.
+ */
 class ConfigOtrWidget : public QWidget
 {
 Q_OBJECT
@@ -97,9 +97,9 @@ private slots:
 
 // ---------------------------------------------------------------------------
 
-/** 
-* Show fingerprint of your contacts.
-*/
+/**
+ * Show fingerprint of your contacts.
+ */
 class FingerprintWidget : public QWidget
 {
 Q_OBJECT
@@ -125,9 +125,9 @@ private slots:
 
 // ---------------------------------------------------------------------------
 
-/** 
-* Display a table with account and fingerprint of private key.
-*/
+/**
+ * Display a table with account and fingerprint of private key.
+ */
 class PrivKeyWidget : public QWidget
 {
 Q_OBJECT

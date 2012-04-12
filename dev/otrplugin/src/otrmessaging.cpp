@@ -1,6 +1,9 @@
 /*
- * OtrMessaging.cpp - interface to libotr
- * Copyright (C) 2007  Timo Engel (timo-e@freenet.de)
+ * otrmessaging.cpp - Interface to libotr
+ *
+ * Off-the-Record Messaging plugin for Psi+
+ * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
+ *                    2011  Florian Fieber
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -13,13 +16,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
-#include "OtrMessaging.hpp"
-#include "OtrInternal.hpp"
+#include "otrmessaging.h"
+#include "otrinternal.h"
+
+#include <QString>
+#include <QList>
+#include <QHash>
 
 namespace psiotr
 {
@@ -35,20 +41,18 @@ Fingerprint::Fingerprint(const Fingerprint &fp)
       account(fp.account),
       username(fp.username),
       fingerprintHuman(fp.fingerprintHuman),
-      trust(fp.trust),
-      messageState(fp.messageState)
+      trust(fp.trust)
 {
 
 }
 
 Fingerprint::Fingerprint(unsigned char* fingerprint,
                          QString account, QString username,
-                         QString trust, QString messageState)
+                         QString trust)
     : fingerprint(fingerprint),
       account(account),
       username(username),
-      trust(trust),
-      messageState(messageState)
+      trust(trust)
 {
     fingerprintHuman = OtrInternal::humanFingerprint(fingerprint);
 }
@@ -71,18 +75,20 @@ OtrMessaging::~OtrMessaging()
 
 //-----------------------------------------------------------------------------
 
-QString OtrMessaging::encryptMessage(const QString& from, const QString& to,
+QString OtrMessaging::encryptMessage(const QString& account, const QString& contact,
                                      const QString& message)
 {
-    return m_impl->encryptMessage(from, to, message);
+    return m_impl->encryptMessage(account, contact, message);
 }
 
 //-----------------------------------------------------------------------------
 
-bool OtrMessaging::decryptMessage(const QString& from, const QString& to,
-                                  const QString& message, QString& decrypted)
+OtrMessageType OtrMessaging::decryptMessage(const QString& account,
+                                            const QString& contact,
+                                            const QString& message,
+                                            QString& decrypted)
 {
-    return m_impl->decryptMessage(from, to, message, decrypted);
+    return m_impl->decryptMessage(account, contact, message, decrypted);
 }
 
 //-----------------------------------------------------------------------------
@@ -123,46 +129,46 @@ void OtrMessaging::deleteKey(const QString& account)
 
 //-----------------------------------------------------------------------------
 
-void OtrMessaging::startSession(const QString& account, const QString& jid)
+void OtrMessaging::startSession(const QString& account, const QString& contact)
 {
-    m_impl->startSession(account, jid);
+    m_impl->startSession(account, contact);
 }
 
 //-----------------------------------------------------------------------------
 
-void OtrMessaging::endSession(const QString& account, const QString& jid)
+void OtrMessaging::endSession(const QString& account, const QString& contact)
 {
-    m_impl->endSession(account, jid);
+    m_impl->endSession(account, contact);
 }
 
 //-----------------------------------------------------------------------------
 
-void OtrMessaging::expireSession(const QString& account, const QString& jid)
+void OtrMessaging::expireSession(const QString& account, const QString& contact)
 {
-    m_impl->expireSession(account, jid);
+    m_impl->expireSession(account, contact);
 }
 
 //-----------------------------------------------------------------------------
 
-void OtrMessaging::startSMP(const QString& account, const QString& jid,
+void OtrMessaging::startSMP(const QString& account, const QString& contact,
                             const QString& question, const QString& secret)
 {
-    m_impl->startSMP(account, jid, question, secret);
+    m_impl->startSMP(account, contact, question, secret);
 }
 
 //-----------------------------------------------------------------------------
 
-void OtrMessaging::continueSMP(const QString& account, const QString& jid,
+void OtrMessaging::continueSMP(const QString& account, const QString& contact,
                                const QString& secret)
 {
-    m_impl->continueSMP(account, jid, secret);
+    m_impl->continueSMP(account, contact, secret);
 }
 
 //-----------------------------------------------------------------------------
 
-void OtrMessaging::abortSMP(const QString& account, const QString& jid)
+void OtrMessaging::abortSMP(const QString& account, const QString& contact)
 {
-    m_impl->abortSMP(account, jid);
+    m_impl->abortSMP(account, contact);
 }
 
 //-----------------------------------------------------------------------------
@@ -234,9 +240,25 @@ void OtrMessaging::generateKey(const QString& account)
 
 //-----------------------------------------------------------------------------
 
-QString OtrMessaging::humanAccount(const QString accountId)
+void OtrMessaging::stateChange(const QString& account, const QString& contact,
+                               OtrStateChange change)
+{
+    return m_callback->stateChange(account, contact, change);
+}
+
+//-----------------------------------------------------------------------------
+
+QString OtrMessaging::humanAccount(const QString& accountId)
 {
     return m_callback->humanAccount(accountId);
+}
+
+//-----------------------------------------------------------------------------
+
+QString OtrMessaging::humanContact(const QString& accountId,
+                                   const QString& contact)
+{
+    return m_callback->humanContact(accountId, contact);
 }
 
 //-----------------------------------------------------------------------------

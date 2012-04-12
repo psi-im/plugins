@@ -1,6 +1,9 @@
 /*
- * PsiOtrConfig.cpp - configuration dialogs for Psi OTR plugin
- * Copyright (C) 2007  Timo Engel (timo-e@freenet.de)
+ * psiotrconfig.cpp - Configuration dialogs
+ *
+ * Off-the-Record Messaging plugin for Psi+
+ * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
+ *                    2011  Florian Fieber
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -13,26 +16,34 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
-#include "PsiOtrConfig.hpp"
+#include "psiotrconfig.h"
 #include "optionaccessinghost.h"
 #include "accountinfoaccessinghost.h"
 
+
+#include <QWidget>
+#include <QVariant>
 #include <QGroupBox>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QTableView>
 #include <QHeaderView>
 #include <QStandardItem>
+#include <QModelIndex>
 #include <QMessageBox>
+#include <QButtonGroup>
 #include <QPushButton>
+#include <QComboBox>
+#include <QCheckBox>
+#include <QRadioButton>
 #include <QMenu>
 #include <QClipboard>
 #include <QApplication>
+#include <QPoint>
 
 //-----------------------------------------------------------------------------
 
@@ -49,7 +60,7 @@ ConfigDialog::ConfigDialog(OtrMessaging* otr, OptionAccessingHost* optionHost,
       m_optionHost(optionHost),
       m_accountInfo(accountInfo)
 {
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
     QTabWidget* tabWidget = new QTabWidget(this);
 
     tabWidget->addTab(new FingerprintWidget(m_otr, tabWidget),
@@ -135,7 +146,7 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
 void ConfigOtrWidget::updateOptions()
 {
     OtrPolicy policy = static_cast<OtrPolicy>(m_policy->checkedId());
-    
+
     m_optionHost->setPluginOption(OPTION_POLICY, policy);
     m_optionHost->setPluginOption(OPTION_END_WHEN_OFFLINE,
                                   m_endWhenOffline->checkState() == Qt::Checked);
@@ -206,7 +217,8 @@ void FingerprintWidget::updateData()
         row.append(new QStandardItem(fp.username));
         row.append(new QStandardItem(fp.fingerprintHuman));
         row.append(new QStandardItem(fp.trust));
-        row.append(new QStandardItem(fp.messageState));
+        row.append(new QStandardItem(m_otr->getMessageStateString(fp.account,
+                                                                  fp.username)));
 
         m_tableModel->appendRow(row);
 
@@ -295,7 +307,7 @@ void FingerprintWidget::copyFingerprint()
         }
         text += m_fingerprints[fpIndex].fingerprintHuman;
     }
-    QClipboard *clipboard = QApplication::clipboard();
+    QClipboard* clipboard = QApplication::clipboard();
     clipboard->setText(text);
 }
 
@@ -309,10 +321,10 @@ void FingerprintWidget::contextMenu(const QPoint& pos)
         return;
     }
 
-    QMenu *menu = new QMenu(this);
+    QMenu* menu = new QMenu(this);
 
     menu->addAction(QIcon::fromTheme("edit-delete"), tr("Delete"), this, SLOT(deleteFingerprint()));
-    menu->addAction(QIcon(":/psi-otr/otr_unverified.png"), tr("Verify fingerprint"), this, SLOT(verifyFingerprint()));
+    menu->addAction(QIcon(":/otrplugin/otr_unverified.png"), tr("Verify fingerprint"), this, SLOT(verifyFingerprint()));
     menu->addAction(QIcon::fromTheme("edit-copy"), tr("Copy fingerprint"), this, SLOT(copyFingerprint()));
 
     menu->exec(QCursor::pos());
@@ -486,7 +498,7 @@ void PrivKeyWidget::copyFingerprint()
         }
         text += m_tableModel->item(selectIndex.row(), 1)->text();
     }
-    QClipboard *clipboard = QApplication::clipboard();
+    QClipboard* clipboard = QApplication::clipboard();
     clipboard->setText(text);
 }
 
@@ -500,7 +512,7 @@ void PrivKeyWidget::contextMenu(const QPoint& pos)
         return;
     }
 
-    QMenu *menu = new QMenu(this);
+    QMenu* menu = new QMenu(this);
 
     menu->addAction(QIcon::fromTheme("edit-delete"), tr("Delete"), this, SLOT(deleteKey()));
     menu->addAction(QIcon::fromTheme("edit-copy"), tr("Copy fingerprint"), this, SLOT(copyFingerprint()));
