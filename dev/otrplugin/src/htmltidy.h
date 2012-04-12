@@ -23,12 +23,17 @@
 #ifndef HTMLTIDY_H_
 #define HTMLTIDY_H_
 
-#include <string>
-#include <tidy.h>
-#include <buffio.h>
-
 #include <QString>
 #include <QByteArray>
+
+#include <string>
+#ifndef Q_WS_WIN
+#include <tidy.h>
+#include <buffio.h>
+#else
+#include <tidy/tidy.h>
+#include <tidy/buffio.h>
+#endif
 
 class QDomDocument;
 class QDomElement;
