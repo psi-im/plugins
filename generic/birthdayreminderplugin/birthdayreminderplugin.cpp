@@ -267,14 +267,14 @@ bool Reminder::incomingStanza(int account, const QDomElement& stanza) {
 		}
 
 		if(stanza.tagName() == "presence") {
-			long cur = QDateTime::currentDateTime().toString("yyyyMMddhh").toLong();
-			if((lastCheck.toLong() + interval) <= cur) {
+			QDateTime cur = QDateTime::currentDateTime();
+			if((lastCheck.toLong() + interval) <= cur.toString("yyyyMMddhh").toLong()) {
 				lastCheck = QDateTime::currentDateTime().toString("yyyyMMddhh");
 				psiOptions->setPluginOption(constLastCheck, QVariant(lastCheck));
 				check();
 			}
 			if(updateInterval) {
-				if((lastUpdate.toLong() + updateInterval) <= cur) {
+				if((lastUpdate.toLong() + updateInterval) <= cur.toString("yyyyMMdd").toLong()) {
 					lastUpdate = QDateTime::currentDateTime().toString("yyyyMMdd");
 					psiOptions->setPluginOption(constLastUpdate, QVariant(lastUpdate));
 					updateVCard();
