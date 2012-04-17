@@ -38,10 +38,12 @@
 #include "plugininfoprovider.h"
 #include "soundaccessinghost.h"
 #include "soundaccessor.h"
+#include "contactinfoaccessor.h"
+#include "contactinfoaccessinghost.h"
 
 #include "ui_options.h"
 
-#define cVer "0.3.4"
+#define cVer "0.4.0"
 #define constLastCheck "lstchck"
 #define constDays "days"
 #define constInterval "intrvl"
@@ -54,15 +56,16 @@
 
 #define POPUP_OPTION_NAME  "Birthday Reminder Plugin"
 
-static const QString id = "111aaa222bbb";
+static const QString id = "bdreminder_1";
+static const QString dirName = "Birthdays";
 
 class Reminder : public QObject, public PsiPlugin, public StanzaFilter, public AccountInfoAccessor, public ApplicationInfoAccessor,
 		public StanzaSender, public OptionAccessor, public PopupAccessor, public IconFactoryAccessor,
-		public PluginInfoProvider, public SoundAccessor
+		public PluginInfoProvider, public SoundAccessor, public ContactInfoAccessor
 {
 	Q_OBJECT
 	Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor ApplicationInfoAccessor StanzaSender OptionAccessor
-		     PopupAccessor IconFactoryAccessor PluginInfoProvider SoundAccessor)
+		     PopupAccessor IconFactoryAccessor PluginInfoProvider SoundAccessor ContactInfoAccessor)
 
 public:
 	Reminder();
@@ -80,22 +83,37 @@ public:
         virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
         virtual void setStanzaSendingHost(StanzaSendingHost *host);
         virtual void setOptionAccessingHost(OptionAccessingHost* host);
-	virtual void optionChanged(const QString& ){};
+	virtual void optionChanged(const QString& ){}
         virtual void setPopupAccessingHost(PopupAccessingHost* host);
         virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
 	virtual void setSoundAccessingHost(SoundAccessingHost* host);
+	virtual void setContactInfoAccessingHost(ContactInfoAccessingHost *host);
 	virtual QString pluginInfo();
 
+
 private:
-        bool enabled;
-        OptionAccessingHost *psiOptions;
+	QString checkBirthdays();
+	QString bdaysDir() const;
+
+private slots:
+	void updateVCard();
+	bool check();
+	void clearCache();
+	void getSound();
+	void checkSound();
+	void playSound(const QString&);
+	void timeoutStopUpdate();
+
+private:
+	bool enabled;
+	OptionAccessingHost *psiOptions;
 	AccountInfoAccessingHost *accInfoHost;
 	ApplicationInfoAccessingHost *appInfoHost;
 	StanzaSendingHost *stanzaHost;
-        PopupAccessingHost* popup;
+	PopupAccessingHost* popup;
 	IconFactoryAccessingHost* icoHost;
 	SoundAccessingHost* sound_;
-        QString Dir;        
+	ContactInfoAccessingHost* contactInfo;
 	QString lastCheck;
 	int days_;
 	int interval;
@@ -110,20 +128,9 @@ private:
 
 	QPointer<QWidget> options_;
 	Ui::Options ui_;
-
-	QString CheckBirthdays();
-
-private slots:
-	void UpdateVCard();
-	bool Check();
-	void clearCache();
-	void getSound();
-	void checkSound();
-	void playSound(const QString&);
-	void timeoutStopUpdate();
 };
 
-Q_EXPORT_PLUGIN(Reminder);
+Q_EXPORT_PLUGIN(Reminder)
 
 Reminder::Reminder()
 	: enabled(false)
@@ -133,7 +140,6 @@ Reminder::Reminder()
 	, stanzaHost(0)
 	, popup(0)
 	, icoHost(0)
-	, Dir("")
 	, lastCheck("1901010101")
 	, days_(5)
 	, interval(24)
@@ -187,16 +193,16 @@ bool Reminder::enable() {
 	int timeout = psiOptions->getPluginOption(constTimeout, QVariant(15000)).toInt()/1000;
 	popupId = popup->registerOption(POPUP_OPTION_NAME, timeout, "plugins.options."+shortName()+"."+constTimeout);
 
-	Dir = appInfoHost->appVCardDir() + QDir::separator() + "Birthdays";
-	QDir BirthDay(Dir);
-	if(!BirthDay.exists(Dir)) {
-		BirthDay.mkdir(Dir);
+	QDir dir(bdaysDir());
+	if(!dir.exists()) {
+		dir.cdUp();
+		dir.mkdir(dirName);
 		return enabled;
 	}
 	if(startCheck) {
 		lastCheck = QDateTime::currentDateTime().toString("yyyyMMddhh");
 		psiOptions->setPluginOption(constLastCheck, QVariant(lastCheck));
-		QTimer::singleShot(4000, this, SLOT(Check())); //необходимо для инициализации приложения
+		QTimer::singleShot(4000, this, SLOT(check())); //необходимо для инициализации приложения
 	}
 
 	return enabled;
@@ -206,6 +212,11 @@ bool Reminder::disable() {
 	enabled = false;
 	popup->unregisterOption(POPUP_OPTION_NAME);
 	return true;
+}
+
+QString Reminder::bdaysDir() const {
+	static QString dir(appInfoHost->appVCardDir() + QDir::separator() + dirName);
+	return dir;
 }
 
 QWidget* Reminder::options() {
@@ -218,10 +229,9 @@ QWidget* Reminder::options() {
 	ui_.tb_get->setIcon(icoHost->getIcon("psi/browse"));
 	ui_.tb_check->setIcon(icoHost->getIcon("psi/play"));
 
-	restoreOptions();
 
-	connect(ui_.pb_update, SIGNAL(clicked()), SLOT(UpdateVCard()));
-	connect(ui_.pb_check, SIGNAL(clicked()), SLOT(Check()));
+	connect(ui_.pb_update, SIGNAL(clicked()), SLOT(updateVCard()));
+	connect(ui_.pb_check, SIGNAL(clicked()), SLOT(check()));
 	connect(ui_.pb_clear_cache, SIGNAL(clicked()), SLOT(clearCache()));
 	connect(ui_.tb_check, SIGNAL(clicked()), SLOT(checkSound()));
 	connect(ui_.tb_get, SIGNAL(clicked()), SLOT(getSound()));
@@ -231,42 +241,43 @@ QWidget* Reminder::options() {
 	return options_;
 }
 
-bool Reminder::incomingStanza(int /*account*/, const QDomElement& stanza) {
+bool Reminder::incomingStanza(int account, const QDomElement& stanza) {
 	if (enabled) {
-		if(stanza.tagName() == "iq") {
-			if(stanza.attribute("id") == id) {
-				QDomNode VCard = stanza.firstChild();
-				QDomElement BDay = VCard.firstChildElement("BDAY");
-				if(!BDay.isNull()) {
-					QString Jid = stanza.attribute("from");
-					QString Nick = VCard.firstChildElement("NICKNAME").text();
-					QString Date = BDay.text();
-					if(Date != "") {
-						Jid.replace("@", "_at_");
-						QFile file(Dir + QDir::separator() + Jid);
-						if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-							QTextStream out(&file);
-							out.setCodec("UTF-8");
-							out.setGenerateByteOrderMark(false);
-							out << Date << "__" << Nick << endl;
-						}
+		if(stanza.tagName() == "iq" && stanza.attribute("id") == id) {
+			QDomNode VCard = stanza.firstChild();
+			QDomElement BDay = VCard.firstChildElement("BDAY");
+			if(!BDay.isNull()) {
+				QString Jid = stanza.attribute("from");
+				QString Nick = contactInfo->name(account, Jid);
+				if(Nick == Jid)
+					Nick = VCard.firstChildElement("NICKNAME").text();
+				QString Date = BDay.text();
+				if(!Date.isEmpty()) {
+					Jid.replace("@", "_at_");
+					QFile file(bdaysDir() + QDir::separator() + Jid);
+					if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+						QTextStream out(&file);
+						out.setCodec("UTF-8");
+						out.setGenerateByteOrderMark(false);
+						out << Date << "__" << Nick << endl;
 					}
 				}
-				return true;
 			}
+			return true;
 		}
 
 		if(stanza.tagName() == "presence") {
-			if((lastCheck.toLong() + interval) <= QDateTime::currentDateTime().toString("yyyyMMddhh").toLong()) {
+			long cur = QDateTime::currentDateTime().toString("yyyyMMddhh").toLong();
+			if((lastCheck.toLong() + interval) <= cur) {
 				lastCheck = QDateTime::currentDateTime().toString("yyyyMMddhh");
 				psiOptions->setPluginOption(constLastCheck, QVariant(lastCheck));
-				Check();
+				check();
 			}
 			if(updateInterval) {
-				if((lastUpdate.toLong() + updateInterval) <= QDateTime::currentDateTime().toString("yyyyMMdd").toLong()) {
+				if((lastUpdate.toLong() + updateInterval) <= cur) {
 					lastUpdate = QDateTime::currentDateTime().toString("yyyyMMdd");
 					psiOptions->setPluginOption(constLastUpdate, QVariant(lastUpdate));
-					UpdateVCard();
+					updateVCard();
 				}
 			}
 		}
@@ -274,8 +285,7 @@ bool Reminder::incomingStanza(int /*account*/, const QDomElement& stanza) {
 	return false;
 }
 
-bool Reminder::outgoingStanza(int /*account*/, QDomElement& /*xml*/)
-{
+bool Reminder::outgoingStanza(int /*account*/, QDomElement& /*xml*/) {
 	return false;
 }
 
@@ -326,10 +336,10 @@ void Reminder::setStanzaSendingHost(StanzaSendingHost *host) {
 	stanzaHost = host;
 }
 
-void Reminder::UpdateVCard() {
+void Reminder::updateVCard() {
 	if(enabled && !updateInProgress) {
 		updateInProgress = true;
-		QString path = appInfoHost->appVCardDir();
+		const QString path = appInfoHost->appVCardDir();
 		QDir dir(path);
 		foreach (QString filename, dir.entryList(QDir::Files)) {
 			QFile file(path + QDir::separator() + filename);
@@ -343,12 +353,12 @@ void Reminder::UpdateVCard() {
 				if(!BDay.isNull()) {
 					QString Nick = vCard.firstChildElement("NICKNAME").text();
 					QString Date = BDay.text();
-					if(Date != "") {
+					if(!Date.isEmpty()) {
 						filename.replace("%5f", "_");
 						filename.replace("%2d", "-");
 						filename.replace("%25", "%");
 						filename.remove(".xml");
-						QFile file(Dir + QDir::separator() + filename);
+						QFile file(bdaysDir() + QDir::separator() + filename);
 						if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 							QTextStream out(&file);
 							out.setCodec("UTF-8");
@@ -361,19 +371,17 @@ void Reminder::UpdateVCard() {
 		}
 
 		int accs = -1;
-		bool b = true;
-		while(b) {
+		while(1) {
 			QStringList Jids = accInfoHost->getRoster(++accs);
 			if(!Jids.isEmpty()) {
 				if(Jids.first() == "-1") {
-					b = false;
+					break;
 				}
-				else {
-					if(accInfoHost->getStatus(accs) != "offline") {
-						foreach(QString Jid, Jids) {
-							QString text = "<iq type=\"get\" to=\"" + Jid + "\" id=\"" + id + "\"><vCard xmlns=\"vcard-temp\" version=\"2.0\" prodid=\"-//HandGen//NONSGML vGen v1.0//EN\" /></iq>";
-							stanzaHost->sendStanza(accs, text);
-						}
+				else if(accInfoHost->getStatus(accs) != "offline") {
+					QString text = "<iq type=\"get\" to=\"%1\" id=\"%2\">"
+							"<vCard xmlns=\"vcard-temp\" /></iq>";
+					foreach(const QString& Jid, Jids) {
+						stanzaHost->sendStanza(accs, text.arg(Jid, id));
 					}
 				}
 			}
@@ -386,19 +394,18 @@ void Reminder::timeoutStopUpdate() {
 	updateInProgress = false;
 }
 
-QString Reminder::CheckBirthdays() {
+QString Reminder::checkBirthdays() {
 	if(!enabled)
 		return QString();
 
 	QSet<QString> Roster_;
 	if(checkFromRoster) {
 		int accs = -1;
-		bool b = true;
-		while(b) {
+		while(1) {
 			QStringList Jids = accInfoHost->getRoster(++accs);
 			if(!Jids.isEmpty()) {
 				if(Jids.first() == "-1") {
-					b = false;
+					break;
 				}
 				else {
 					Roster_ += Jids.toSet();
@@ -408,10 +415,9 @@ QString Reminder::CheckBirthdays() {
 	}
 
 	QString CheckResult;
-	QDir dir(Dir);
-	foreach(QString jid, dir.entryList(QDir::Files)) {
+	foreach(QString jid, QDir(bdaysDir()).entryList(QDir::Files)) {
 		if(jid.contains("_at_")) {
-			QFile file(Dir + QDir::separator() + jid);
+			QFile file(bdaysDir() + QDir::separator() + jid);
 			if(file.open(QIODevice::ReadOnly)) {
 				QTextStream in(&file);
 				in.setCodec("UTF-8");
@@ -425,14 +431,12 @@ QString Reminder::CheckBirthdays() {
 				QDate Birthday = QDate::currentDate();
 				if(Date.contains("-")) {
 					Birthday = QDate::fromString(Date, "yyyy-MM-dd");
-				} else {
-					if(Date.contains(".")) {
-						Birthday = QDate::fromString(Date, "d.MM.yyyy");
-					} else {
-						if(Date.contains("/")) {
-							Birthday = QDate::fromString(Date, "d/MM/yyyy");
-						}
-					}
+				}
+				else if(Date.contains(".")) {
+					Birthday = QDate::fromString(Date, "d.MM.yyyy");
+				}
+				else if(Date.contains("/")) {
+					Birthday = QDate::fromString(Date, "d/MM/yyyy");
 				}
 				QDate current = QDate::currentDate();
 				if(current != Birthday) {
@@ -445,14 +449,12 @@ QString Reminder::CheckBirthdays() {
 					if(!checkFromRoster || Roster_.contains(jid)) {
 						if(daysTo == 0) {
 							CheckResult += Nick + " (" + jid + ") " + tr("celebrates birthday today!""\n");
-						} else {
-							if(daysTo <= days_ && daysTo > 0) {
-								CheckResult += Nick + " (" + jid + ") " + tr("celebrates birthday in %n day(s)\n", "", daysTo);
-							} else {
-								if(daysTo == -1) {
-									CheckResult += Nick + " (" + jid + ") " + tr("celebrates birthday yesterday.\n");
-								}
-							}
+						}
+						else if(daysTo <= days_ && daysTo > 0) {
+							CheckResult += Nick + " (" + jid + ") " + tr("celebrates birthday in %n day(s)\n", "", daysTo);
+						}
+						else if(daysTo == -1) {
+							CheckResult += Nick + " (" + jid + ") " + tr("celebrates birthday yesterday.\n");
 						}
 					}
 				}
@@ -474,8 +476,12 @@ void Reminder::setSoundAccessingHost(SoundAccessingHost *host) {
 	sound_ = host;
 }
 
-bool Reminder::Check() {
-	QString text = CheckBirthdays();
+void Reminder::setContactInfoAccessingHost(ContactInfoAccessingHost *host) {
+	contactInfo = host;
+}
+
+bool Reminder::check() {
+	QString text = checkBirthdays();
 	if(text.isEmpty())
 		return false;
 	text.chop(1);
@@ -491,9 +497,9 @@ bool Reminder::Check() {
 }
 
 void Reminder::clearCache() {
-	QDir dir(Dir);
-	foreach(QString file, dir.entryList(QDir::Files)) {
-		QFile File(Dir + QDir::separator() + file);
+	QDir dir(bdaysDir());
+	foreach(const QString& file, dir.entryList(QDir::Files)) {
+		QFile File(bdaysDir() + QDir::separator() + file);
 		if(File.open(QIODevice::ReadWrite)) {
 			File.remove();
 		}
