@@ -78,19 +78,19 @@ public:
         virtual void restoreOptions();
 	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
 	virtual void setOptionAccessingHost(OptionAccessingHost* host);
-	virtual void optionChanged(const QString& ) {};
+	virtual void optionChanged(const QString& ) {}
 	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
 	virtual void setPopupAccessingHost(PopupAccessingHost* host);
 	virtual QList < QVariantHash > getAccountMenuParam();
 	virtual QList < QVariantHash > getContactMenuParam();
 	virtual QAction* getContactAction(QObject* , int , const QString& );
-	virtual QAction* getAccountAction(QObject* , int ) { return 0; };
+	virtual QAction* getAccountAction(QObject* , int ) { return 0; }
 	virtual QList < QVariantHash > getButtonParam();
 	virtual QAction* getAction(QObject* parent, int account, const QString& contact);
 	virtual void setContactInfoAccessingHost(ContactInfoAccessingHost* host);
 	virtual void setStanzaSendingHost(StanzaSendingHost *host);
 	virtual bool incomingStanza(int account, const QDomElement& xml);
-	virtual bool outgoingStanza(int , QDomElement &) { return false; };
+	virtual bool outgoingStanza(int , QDomElement &) { return false; }
 	virtual QString pluginInfo();
 
 private slots:
@@ -136,7 +136,7 @@ private:
 	void doCommand(int account, const QString &jid, const QString& command, ActionType type_);
 };
 
-Q_EXPORT_PLUGIN(ExtendedMenuPlugin);
+Q_EXPORT_PLUGIN(ExtendedMenuPlugin)
 
 ExtendedMenuPlugin::ExtendedMenuPlugin()
 	: enabled(false)
@@ -411,7 +411,7 @@ bool ExtendedMenuPlugin::incomingStanza(int account, const QDomElement &xml)
 									QDomElement utc = time.firstChildElement("utc");
 									if(!utc.isNull()) {
 										QString zone = time.firstChildElement("tzo").text();
-										QDateTime dt = QDateTime::fromString(utc.text(), "yyyy-MM-ddThh:mm:ssZ");
+										QDateTime dt = QDateTime::fromString(utc.text(), Qt::ISODate);
 										dt = dt.addSecs(stringToInt(zone)*3600);
 										showPopup(tr("%1 time is %2").arg(jid, dt.toString("yyyy-MM-dd hh:mm:ss")), title);
 									}
