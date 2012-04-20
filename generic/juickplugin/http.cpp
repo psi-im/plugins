@@ -45,7 +45,7 @@ void Http::setHost(const QString &host)
 	url_.setScheme("http");
 }
 
-QByteArray Http::get(const QString &path)
+QByteArray Http::get(const QString &path, bool sync)
 {
 	url_.setPath(path);
 	QNetworkRequest request;
@@ -53,8 +53,10 @@ QByteArray Http::get(const QString &path)
 	request.setRawHeader("User-Agent", "Juick Plugin (PSI+)");
 	manager_->get(request);
 
-	timer_->start(DOWNLOAD_TIMEOUT);
-	eloop_->exec();
+	if(sync) {
+		timer_->start(DOWNLOAD_TIMEOUT);
+		eloop_->exec();
+	}
 
 	return ba_;
 }
@@ -87,9 +89,12 @@ void Http::requestFinished(QNetworkReply *reply)
 {
 	if (reply->error() == QNetworkReply::NoError ) {
 		ba_ = reply->readAll();
+		emit dataReady(ba_);
 	}
-	else
+	else {
 		qDebug() << reply->errorString();
+		deleteLater();
+	}
 
 	timer_->stop();
 	reply->deleteLater();

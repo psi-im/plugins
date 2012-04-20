@@ -1,6 +1,6 @@
 /*
  * juickplugin.cpp - plugin
- * Copyright (C) 2009-2010 Kravtsov Nikolai, Khryukin Evgeny
+ * Copyright (C) 2009-2012 Kravtsov Nikolai, Khryukin Evgeny
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,9 +21,8 @@
 #include <QtCore>
 #include <QtGui>
 #include <QDomElement>
-#include <stdlib.h>
-#include <time.h>
-
+#include <QtWebKit/QWebView>
+#include <QtWebKit/QWebFrame>
 
 #include "psiplugin.h"
 #include "eventfilter.h"
@@ -35,6 +34,7 @@
 #include "applicationinfoaccessor.h"
 #include "applicationinfoaccessinghost.h"
 #include "plugininfoprovider.h"
+#include "toolbariconaccessor.h"
 
 #include "http.h"
 #include "juickjidlist.h"
@@ -65,18 +65,20 @@
 #define constWorkInGroupchat "workingroupchat"
 
 
-#define constVersion "0.10.6"
+#define constVersion "0.11.0"
 #define constPluginName "Juick Plugin"
 
+static const int avatarsUpdateInterval = 10;
+
 class JuickPlugin : public QObject, public PsiPlugin, public EventFilter, public OptionAccessor, public ActiveTabAccessor,
-					public StanzaFilter, public ApplicationInfoAccessor, public PluginInfoProvider
+					public StanzaFilter, public ApplicationInfoAccessor, public PluginInfoProvider, public ToolbarIconAccessor
 {
 	Q_OBJECT
 	Q_INTERFACES(PsiPlugin EventFilter OptionAccessor ActiveTabAccessor StanzaFilter
-				 ApplicationInfoAccessor PluginInfoProvider)
+				 ApplicationInfoAccessor PluginInfoProvider ToolbarIconAccessor)
 
-		public:
-		JuickPlugin();
+public:
+	JuickPlugin();
 	virtual QString name() const;
 	virtual QString shortName() const;
 	virtual QString version() const;
@@ -86,196 +88,117 @@ class JuickPlugin : public QObject, public PsiPlugin, public EventFilter, public
 	virtual void applyOptions();
 	virtual void restoreOptions();
 	virtual bool processEvent(int account, QDomElement& e);
-	virtual bool processMessage(int account, const QString& fromJid, const QString& body, const QString& subject);
+	virtual bool processMessage(int , const QString& , const QString& , const QString& ) { return false; }
 	virtual bool processOutgoingMessage(int , const QString& , QString& , const QString& , QString& ) { return false; }
-	virtual void logout(int ) {};
+	virtual void logout(int ) {}
 	// OptionAccessor
 	virtual void setOptionAccessingHost(OptionAccessingHost* host);
-	virtual void optionChanged(const QString& option);
+	virtual void optionChanged(const QString& ) {}
 	//ActiveTabAccessor
 	virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
 	//ApplicationInfoAccessor
 	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
 	virtual QString pluginInfo();
 	//virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+	virtual QList < QVariantHash > getButtonParam() { return QList < QVariantHash >(); }
+	virtual QAction* getAction(QObject* parent, int account, const QString& contact);
 
 	virtual bool incomingStanza(int account, const QDomElement& stanza);
-	virtual bool outgoingStanza(int account, QDomElement& stanza);
-	void elementFromString(QDomElement& body,QDomDocument e, QString& msg, QString jid, QString resource = "");
-	void nl2br(QDomElement& body,QDomDocument e, QString msg);
-	void addPlus(QDomElement& body,QDomDocument e, QString msg, QString jid, QString resource = "");
-	void addSubscribe(QDomElement& body,QDomDocument e, QString msg, QString jid, QString resource = "");
-	void addHttpLink(QDomElement& body,QDomDocument e, QString msg);
-	void addTagLink(QDomElement& body,QDomDocument e, QString tag, QString jid);
-	void addUserLink(QDomElement& body,QDomDocument e, QString nick, QString altText, QString pattern, QString jid);
-	void addMessageId(QDomElement& body,QDomDocument e, QString mId, QString altText,QString pattern, QString jid, QString resource = "");
-	void addUnsubscribe(QDomElement& body,QDomDocument e, QString msg, QString jid, QString resource = "");
-	void addDelete(QDomElement& body,QDomDocument e, QString msg, QString jid, QString resource = "");
-	void addFavorite(QDomElement& body,QDomDocument e, QString msg, QString jid, QString resource = "");
-private:
-	bool enabled;
-	QCheckBox *ubButton;
-	QCheckBox *uiButton;
-	QCheckBox *uuButton;
-	QCheckBox *tbButton;
-	QCheckBox *tiButton;
-	QCheckBox *tuButton;
-	QCheckBox *mbButton;
-	QCheckBox *miButton;
-	QCheckBox *muButton;
-	QCheckBox *qbButton;
-	QCheckBox *qiButton;
-	QCheckBox *quButton;
-	QCheckBox *lbButton;
-	QCheckBox *liButton;
-	QCheckBox *luButton;
-	QToolButton *ucButton;
-	QToolButton *tcButton;
-	QToolButton *mcButton;
-	QToolButton *qcButton;
-	QToolButton *lcButton;
-	QColor userColor;
-	QColor tagColor;
-	QColor msgColor;
-	QColor quoteColor;
-	QColor lineColor;
-	QCheckBox *asResourceButton;
-	QCheckBox *showPhotoButton;
-	QCheckBox *showAvatarsButton;
-	QCheckBox *groupChatButton;
-	OptionAccessingHost* psiOptions;
-	ActiveTabAccessingHost* activeTab;
-	ApplicationInfoAccessingHost* applicationInfo;
-	bool userBold;
-	bool tagBold;
-	bool msgBold;
-	bool quoteBold;
-	bool lineBold;
-	bool userItalic;
-	bool tagItalic;
-	bool msgItalic;
-	bool quoteItalic;
-	bool lineItalic;
-	bool userUnderline;
-	bool tagUnderline;
-	bool msgUnderline;
-	bool quoteUnderline;
-	bool lineUnderline;
-	QString juick;
-	QString jubo;
-	QString idStyle;
-	QString userStyle;
-	QString tagStyle;
-	QString quoteStyle;
-	QString linkStyle;
-	QRegExp tagRx;
-	QRegExp pmRx;
-	QRegExp postRx;
-	QRegExp replyRx;
-	QRegExp regx;
-	QRegExp rpostRx;
-	QRegExp threadRx;
-	QRegExp userRx;
-	QRegExp singleMsgRx;
-	QRegExp lastMsgRx;
-	QRegExp juboRx;
-	QRegExp msgPostRx;
-	QRegExp delMsgRx;
-	QRegExp delReplyRx;
-	QRegExp idRx;
-	QRegExp nickRx;
-	QRegExp recomendRx;
-	QString userLinkPattern;
-	QString messageLinkPattern;
-	QString altTextUser;
-	QString altTextMsg;
-	QString commonLinkColor;
-	bool idAsResource;
-	bool showPhoto;
-	bool showAvatars;
-	bool workInGroupChat;
-	QString showAllmsgString;
-	QString replyMsgString;
-	QString userInfoString;
-	QString subscribeString;
-	QString showLastTenString;
-	QString unsubscribeString;
-	QStringList jidList_;
-	QPointer<QWidget> optionsWid;
+	virtual bool outgoingStanza(int , QDomElement& ) { return false; }
+	void elementFromString(QDomElement* body, QDomDocument* e, const QString &msg, const QString &jid, const QString &resource = "");
+	void nl2br(QDomElement* body, QDomDocument* e,const QString& msg);
+	void addPlus(QDomElement* body, QDomDocument* e, const QString &msg, const QString &jid, const QString &resource = "");
+	void addSubscribe(QDomElement* body, QDomDocument* e, const QString &msg, const QString &jid, const QString &resource = "");
+	void addHttpLink(QDomElement* body, QDomDocument* e, const QString &msg);
+	void addTagLink(QDomElement* body, QDomDocument* e, const QString &tag, const QString &jid);
+	void addUserLink(QDomElement* body, QDomDocument* e, const QString& nick, const QString& altText, const QString& pattern, const QString& jid);
+	void addMessageId(QDomElement* body, QDomDocument* e, const QString& mId, const QString& altText, const QString& pattern, const QString& jid, const QString& resource = "");
+	void addUnsubscribe(QDomElement* body, QDomDocument* e, const QString &msg, const QString &jid, const QString &resource = "");
+	void addDelete(QDomElement* body ,QDomDocument* e, const QString& msg, const QString& jid, const QString& resource = "");
+	void addFavorite(QDomElement* body, QDomDocument* e, const QString &msg, const QString &jid, const QString &resource = "");
 
 private slots:
 	void chooseColor(QAbstractButton*);
 	void clearCache();
-	void updateJidList(QStringList jids);
+	void updateJidList(const QStringList& jids);
 	void requestJidList();
+	void getAvatar(const QString& uid, const QString &unick);
+	void photoReady(const QByteArray& ba);
+	void removeWidget();
+
+private:
+	void createAvatarsDir();
+	void getPhoto(const QUrl &url);
+
+private:
+	bool enabled;
+	OptionAccessingHost* psiOptions;
+	ActiveTabAccessingHost* activeTab;
+	ApplicationInfoAccessingHost* applicationInfo;
+	QCheckBox *ubButton, *uiButton, *uuButton, *tbButton, *tiButton, *tuButton;
+	QCheckBox *mbButton, *miButton, *muButton, *qbButton, *qiButton, *quButton;
+	QCheckBox *lbButton, *liButton, *luButton;
+	QToolButton *ucButton, *tcButton, *mcButton, *qcButton, *lcButton;
+	QColor userColor, tagColor, msgColor, quoteColor, lineColor;
+	QCheckBox *asResourceButton, *showPhotoButton, *showAvatarsButton, *groupChatButton;
+	bool userBold,tagBold,msgBold,quoteBold,lineBold;
+	bool userItalic,tagItalic,msgItalic,quoteItalic,lineItalic;
+	bool userUnderline,tagUnderline,msgUnderline,quoteUnderline,lineUnderline;
+	QString juick,jubo;
+	QString idStyle,userStyle,tagStyle,quoteStyle,linkStyle;
+	QRegExp tagRx,pmRx,postRx,replyRx,regx,rpostRx,threadRx,userRx;
+	QRegExp singleMsgRx,lastMsgRx,juboRx,msgPostRx,delMsgRx,delReplyRx,idRx,nickRx,recomendRx;
+	QString userLinkPattern,messageLinkPattern,altTextUser,altTextMsg,commonLinkColor;
+	bool idAsResource,showPhoto,showAvatars,workInGroupChat;
+	QString showAllmsgString,replyMsgString,userInfoString,subscribeString,showLastTenString,unsubscribeString;
+	QStringList jidList_;
+	QPointer<QWidget> optionsWid;
+	QList<QWidget*> logs_;
 };
 
-Q_EXPORT_PLUGIN(JuickPlugin);
+Q_EXPORT_PLUGIN(JuickPlugin)
 
-JuickPlugin::JuickPlugin():enabled(false)
-		, juick("juick@juick.com")
-		, jubo("jubo@nologin.ru")
-		, idStyle("")
-		, userStyle("")
-		, tagStyle("")
-		, quoteStyle("")
-		, linkStyle("")
-		, tagRx		  ("^\\s*(?!\\*\\S+\\*)(\\*\\S+)")
-		, pmRx		  ("^\\nPrivate message from (@.+):(.*)$")
-		, postRx		  ("\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n\\n(#\\d+)\\s(http://\\S*)\\n$")
-		, replyRx		  ("\\nReply by @(.*):\\n>(.{,50})\\n\\n(.*)\\n\\n(#\\d+/\\d+)\\s(http://\\S*)\\n$")
-		, regx		  ("(\\s+)(#\\d+(?:\\S+)|#\\d+/\\d+(?:\\S+)|@\\S+|_[^\\n]+_|\\*[^\\n]+\\*|/[^\\n]+/|http://\\S+|ftp://\\S+|https://\\S+){1}(\\s+)")
-		, rpostRx		  ("\\nReply posted.\\n(#.*)\\s(http://\\S*)\\n$")
-		, threadRx	  ("^\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(http://juick.com/\\S+)\\n(.*)")
-		, userRx		  ("^\\nBlog: http://.*")
-		, singleMsgRx	  ("^\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+) (\\((?:.*; )\\d+ repl(?:ies|y)\\) ){0,1}(http://juick.com/\\S+)\\n$")
-		, lastMsgRx	  ("^\\n(Last (?:popular ){0,1}messages:)(.*)")
-		, juboRx		  ("^\\n([^\\n]*)\\n@(\\S*):( [^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(http://juick.com/\\S+)\\n$")
-		, msgPostRx	  ("\\nNew message posted.\\n(#.*)\\s(http://\\S*)\\n$")
-		, delMsgRx	  ("^\\nMessage #\\d+ deleted.\\n$")
-		, delReplyRx	  ("^\\nReply #\\d+/\\d+ deleted.\\n$")
-		, idRx		  ("(#\\d+)(/\\d+){0,1}(\\S+){0,1}")
-		, nickRx		  ("(@[\\w\\-\\.@\\|]*)(\\b.*)")
-		, recomendRx	  ("^\\nRecommended by @(\\S*):\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n\\n(#\\d+) (\\(\\d+ repl(?:ies|y)\\) ){0,1}(http://\\S*)\\n$")
+JuickPlugin::JuickPlugin()
+	: enabled(false)
+	, psiOptions(0), activeTab(0), applicationInfo(0)
+	, userColor(0, 85, 255), tagColor(131, 145, 145), msgColor(87, 165, 87), quoteColor(187, 187, 187), lineColor(0, 0, 255)
+	, userBold(true), tagBold(false), msgBold(false), quoteBold(false), lineBold(false)
+	, userItalic(false), tagItalic(true), msgItalic(false), quoteItalic(false), lineItalic(false)
+	, userUnderline(false), tagUnderline(false), msgUnderline(true), quoteUnderline(false), lineUnderline(true)
+	, juick("juick@juick.com"), jubo("jubo@nologin.ru")
+	, idStyle(""), userStyle(""), tagStyle(""), quoteStyle(""), linkStyle("")
+	, tagRx		("^\\s*(?!\\*\\S+\\*)(\\*\\S+)")
+	, pmRx		("^\\nPrivate message from (@.+):(.*)$")
+	, postRx	("\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n\\n(#\\d+)\\s(http://\\S*)\\n$")
+	, replyRx	("\\nReply by @(.*):\\n>(.{,50})\\n\\n(.*)\\n\\n(#\\d+/\\d+)\\s(http://\\S*)\\n$")
+	, regx		("(\\s+)(#\\d+(?:\\S+)|#\\d+/\\d+(?:\\S+)|@\\S+|_[^\\n]+_|\\*[^\\n]+\\*|/[^\\n]+/|http://\\S+|ftp://\\S+|https://\\S+){1}(\\s+)")
+	, rpostRx	("\\nReply posted.\\n(#.*)\\s(http://\\S*)\\n$")
+	, threadRx	("^\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(http://juick.com/\\S+)\\n(.*)")
+	, userRx	("^\\nBlog: http://.*")
+	, singleMsgRx	("^\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+) (\\((?:.*; )\\d+ repl(?:ies|y)\\) ){0,1}(http://juick.com/\\S+)\\n$")
+	, lastMsgRx	("^\\n(Last (?:popular ){0,1}messages:)(.*)")
+	, juboRx	("^\\n([^\\n]*)\\n@(\\S*):( [^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(http://juick.com/\\S+)\\n$")
+	, msgPostRx	("\\nNew message posted.\\n(#.*)\\s(http://\\S*)\\n$")
+	, delMsgRx	("^\\nMessage #\\d+ deleted.\\n$")
+	, delReplyRx	("^\\nReply #\\d+/\\d+ deleted.\\n$")
+	, idRx		("(#\\d+)(/\\d+){0,1}(\\S+){0,1}")
+	, nickRx	("(@[\\w\\-\\.@\\|]*)(\\b.*)")
+	, recomendRx	("^\\nRecommended by @(\\S*):\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n\\n(#\\d+) (\\(\\d+ repl(?:ies|y)\\) ){0,1}(http://\\S*)\\n$")
+	, idAsResource(false), showPhoto(false), showAvatars(false), workInGroupChat(false)
+	, showAllmsgString(tr("Show all messages"))
+	, replyMsgString(tr("Reply"))
+	, userInfoString(tr("Show %1's info and last 10 messages"))
+	, subscribeString(tr("Subscribe"))
+	, showLastTenString(tr("Show last 10 messages with tag %1"))
+	, unsubscribeString(tr("Unsubscribe"))
 {
-	userColor = QColor(0, 85, 255);
-	tagColor = QColor(131, 145, 145);
-	msgColor = QColor(87, 165, 87);
-	quoteColor = QColor(187, 187, 187);
-	lineColor = QColor(0, 0, 255);
-	userBold = true;
-	tagBold = false;
-	msgBold = false;
-	quoteBold = false;
-	lineBold = false;
-	userItalic = false;
-	tagItalic = true;
-	msgItalic = false;
-	quoteItalic = false;
-	lineItalic = false;
-	userUnderline = false;
-	tagUnderline = false;
-	msgUnderline = true;
-	quoteUnderline = false;
-	lineUnderline = true;
-	idAsResource = false;
-	showPhoto = false;
-	showAvatars = false;
-	workInGroupChat = false;
 	pmRx.setMinimal(true);
 	replyRx.setMinimal(true);
 	regx.setMinimal(true);
 	postRx.setMinimal(true);
 	singleMsgRx.setMinimal(true);
 	juboRx.setMinimal(true);
-	showAllmsgString = tr("Show all messages");
-	replyMsgString = tr("Reply");
-	userInfoString = tr("Show %1's info and last 10 messages");
-	subscribeString = tr("Subscribe");
-	showLastTenString = tr("Show last 10 messages with tag %1");
-	unsubscribeString = tr("Unsubscribe");
 	jidList_ = QStringList() << "juick@juick.com" << "jubo@nologin.ru";
-
 }
 
 QString JuickPlugin::name() const
@@ -423,158 +346,74 @@ QWidget* JuickPlugin::options()
 
 bool JuickPlugin::enable()
 {
-	srand(time(NULL));
 	enabled = true;
-	QVariant vuserColor(userColor);
-	vuserColor = psiOptions->getPluginOption(constuserColor);
-	if (!vuserColor.isNull()) {
-		userColor = vuserColor.toString();
 
-	}
-	QVariant vtagColor(tagColor);
-	vtagColor = psiOptions->getPluginOption(consttagColor);
-	if (!vtagColor.isNull()) {
-		tagColor = vtagColor.toString();
-	}
-	QVariant vmsgColor(msgColor);
-	vmsgColor = psiOptions->getPluginOption(constmsgColor);
-	if (!vmsgColor.isNull()) {
-		msgColor = vmsgColor.toString();
-	}
-	QVariant vQcolor(quoteColor);
-	vQcolor = psiOptions->getPluginOption(constQcolor);
-	if (!vQcolor.isNull()) {
-		quoteColor = vQcolor.toString();
-	}
-	QVariant vLcolor(lineColor);
-	vLcolor = psiOptions->getPluginOption(constLcolor);
-	if (!vLcolor.isNull()) {
-		lineColor = vLcolor.toString();
-	}
+	userColor = psiOptions->getPluginOption(constuserColor, userColor).toString();
+	tagColor = psiOptions->getPluginOption(consttagColor, tagColor).toString();
+	msgColor  = psiOptions->getPluginOption(constmsgColor, msgColor).toString();
+	quoteColor = psiOptions->getPluginOption(constQcolor, quoteColor).toString();
+	lineColor = psiOptions->getPluginOption(constLcolor, lineColor).toString();
+
 	//bold
-	QVariant vUbold(userBold);
-	vUbold = psiOptions->getPluginOption(constUbold);
-	if (!vUbold.isNull()) {
-		userBold = vUbold.toBool();
+	userBold = psiOptions->getPluginOption(constUbold, userBold).toBool();
+	tagBold = psiOptions->getPluginOption(constTbold, tagBold).toBool();
+	msgBold = psiOptions->getPluginOption(constMbold, msgBold).toBool();
+	quoteBold = psiOptions->getPluginOption(constQbold, quoteBold).toBool();
+	lineBold = psiOptions->getPluginOption(constLbold, lineBold).toBool();
 
-	}
-	QVariant vTbold(tagBold);
-	vTbold = psiOptions->getPluginOption(constTbold);
-	if (!vTbold.isNull()) {
-		tagBold = vTbold.toBool();
-	}
-	QVariant vMbold(msgBold);
-	vMbold = psiOptions->getPluginOption(constMbold);
-	if (!vMbold.isNull()) {
-		msgBold = vMbold.toBool();
-	}
-	QVariant vQbold(quoteBold);
-	vQbold = psiOptions->getPluginOption(constQbold);
-	if (!vQbold.isNull()) {
-		quoteBold = vQbold.toBool();
-	}
-	QVariant vLbold(lineBold);
-	vLbold = psiOptions->getPluginOption(constLbold);
-	if (!vLbold.isNull()) {
-		lineBold = vLbold.toBool();
-	}
 	//italic
-	QVariant vUitalic(userItalic);
-	vUitalic = psiOptions->getPluginOption(constUitalic);
-	if (!vUitalic.isNull()) {
-		userItalic = vUitalic.toBool();
+	userItalic = psiOptions->getPluginOption(constUitalic, userItalic).toBool();
+	tagItalic = psiOptions->getPluginOption(constTitalic, tagItalic).toBool();
+	msgItalic = psiOptions->getPluginOption(constMitalic, msgItalic).toBool();
+	quoteItalic = psiOptions->getPluginOption(constQitalic, quoteItalic).toBool();
+	lineItalic = psiOptions->getPluginOption(constLitalic, lineItalic).toBool();
 
-	}
-	QVariant vTitalic(tagItalic);
-	vTitalic = psiOptions->getPluginOption(constTitalic);
-	if (!vTitalic.isNull()) {
-		tagItalic = vTitalic.toBool();
-	}
-	QVariant vMitalic(msgItalic);
-	vMitalic = psiOptions->getPluginOption(constMitalic);
-	if (!vMitalic.isNull()) {
-		msgItalic = vMitalic.toBool();
-	}
-	QVariant vQitalic(quoteItalic);
-	vQitalic = psiOptions->getPluginOption(constQitalic);
-	if (!vQitalic.isNull()) {
-		quoteItalic = vQitalic.toBool();
-	}
-	QVariant vLitalic(lineItalic);
-	vLitalic = psiOptions->getPluginOption(constLitalic);
-	if (!vLitalic.isNull()) {
-		lineItalic = vLitalic.toBool();
-	}
 	//underline
-	QVariant vUunderline(userUnderline);
-	vUunderline = psiOptions->getPluginOption(constUunderline);
-	if (!vUunderline.isNull()) {
-		userUnderline = vUunderline.toBool();
+	userUnderline = psiOptions->getPluginOption(constUunderline, userUnderline).toBool();
+	tagUnderline = psiOptions->getPluginOption(constTunderline, tagUnderline).toBool();
+	msgUnderline = psiOptions->getPluginOption(constMunderline, msgUnderline).toBool();
+	quoteUnderline = psiOptions->getPluginOption(constQunderline, quoteUnderline).toBool();
+	lineUnderline = psiOptions->getPluginOption(constLunderline, lineUnderline).toBool();
 
-	}
-	QVariant vTunderline(tagUnderline);
-	vTunderline = psiOptions->getPluginOption(constTunderline);
-	if (!vTunderline.isNull()) {
-		tagUnderline = vTunderline.toBool();
-	}
-	QVariant vMunderline(msgUnderline);
-	vMunderline = psiOptions->getPluginOption(constMunderline);
-	if (!vMunderline.isNull()) {
-		msgUnderline = vMunderline.toBool();
-	}
-	QVariant vQunderline(quoteUnderline);
-	vQunderline = psiOptions->getPluginOption(constQunderline);
-	if (!vQunderline.isNull()) {
-		quoteUnderline = vQunderline.toBool();
-	}
-	QVariant vLunderline(lineUnderline);
-	vLunderline = psiOptions->getPluginOption(constLunderline);
-	if (!vLunderline.isNull()) {
-		lineUnderline = vLunderline.toBool();
-	}
-	QVariant vIdAsResource(idAsResource);
-	vIdAsResource = psiOptions->getPluginOption(constIdAsResource);
-	if (!vIdAsResource.isNull()) {
-		idAsResource = vIdAsResource.toBool();
-	}
+	idAsResource = psiOptions->getPluginOption(constIdAsResource, idAsResource).toBool();
 	commonLinkColor =  psiOptions->getGlobalOption("options.ui.look.colors.chat.link-color").toString();
-	QVariant vShowPhoto(showPhoto);
-	vShowPhoto = psiOptions->getPluginOption(constShowPhoto);
-	if (!vShowPhoto.isNull()) {
-		showPhoto = vShowPhoto.toBool();
-	}
-	QVariant vShowAvatars(showAvatars);
-	vShowAvatars = psiOptions->getPluginOption(constShowAvatars);
-	if (!vShowAvatars.isNull()) {
-		showAvatars = vShowAvatars.toBool();
-	}
-	QVariant vWorkInGroupchat(workInGroupChat);
-	vWorkInGroupchat = psiOptions->getPluginOption(constWorkInGroupchat);
-	if (!vWorkInGroupchat.isNull()) {
-		workInGroupChat = vWorkInGroupchat.toBool();
-	}
-
+	showPhoto = psiOptions->getPluginOption(constShowPhoto, showPhoto).toBool();
+	showAvatars = psiOptions->getPluginOption(constShowAvatars, showAvatars).toBool();
+	workInGroupChat = psiOptions->getPluginOption(constWorkInGroupchat, workInGroupChat).toBool();
 	jidList_ = psiOptions->getPluginOption("constJidList",QVariant(jidList_)).toStringList();
-
 	applicationInfo->getProxyFor(constPluginName); // init proxy settings for Juick plugin
 
 	if (showAvatars) {
-		QString avDir = applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars";
-		QDir dir(avDir);
-		QDir perDir(avDir+"juick/per");
-		if(!perDir.exists())
-			dir.mkpath("juick/per");
+		createAvatarsDir();
 	}
+
 	return true;
 }
 
 bool JuickPlugin::disable()
 {
 	enabled = false;
+	logs_.clear();
+	QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/photos");
+	foreach(const QString& file, dir.entryList(QDir::Files)) {
+		QFile::remove(dir.absolutePath()+"/"+file);
+	}
 	return true;
 }
 
-void JuickPlugin::applyOptions(){
+void JuickPlugin::createAvatarsDir()
+{
+	QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars");
+	dir.mkpath("juick/photos");
+	if (!dir.exists("juick"))
+	{
+		QMessageBox::warning(0, tr("Warning"),tr("can't create folder %1 \ncaching avatars will be not available")
+				     .arg(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick"));
+	}
+}
+
+void JuickPlugin::applyOptions()
+{
 	if (!optionsWid)
 		return;
 
@@ -583,220 +422,99 @@ void JuickPlugin::applyOptions(){
 	msgColor = mcButton->property("psi_color").value<QColor>();
 	quoteColor = qcButton->property("psi_color").value<QColor>();
 	lineColor = lcButton->property("psi_color").value<QColor>();
-	QVariant vuserColor(userColor);
-	psiOptions->setPluginOption(constuserColor, vuserColor);
-	QVariant vtagColor(tagColor);
-	psiOptions->setPluginOption(consttagColor, vtagColor);
-	QVariant vmsgColor(msgColor);
-	psiOptions->setPluginOption(constmsgColor, vmsgColor);
-	QVariant vQcolor(quoteColor);
-	psiOptions->setPluginOption(constQcolor, vQcolor);
-	QVariant vLcolor(lineColor);
-	psiOptions->setPluginOption(constLcolor, vLcolor);
+	psiOptions->setPluginOption(constuserColor, userColor);
+	psiOptions->setPluginOption(consttagColor, tagColor);
+	psiOptions->setPluginOption(constmsgColor, msgColor);
+	psiOptions->setPluginOption(constQcolor, quoteColor);
+	psiOptions->setPluginOption(constLcolor, lineColor);
+
 	//bold
 	userBold = ubButton->isChecked();
 	tagBold = tbButton->isChecked();
 	msgBold = mbButton->isChecked();
 	quoteBold = qbButton->isChecked();
 	lineBold = lbButton->isChecked();
-	QVariant vUbold(userBold);
-	psiOptions->setPluginOption(constUbold, vUbold);
-	QVariant vTbold(tagBold);
-	psiOptions->setPluginOption(constTbold, vTbold);
-	QVariant vMbold(msgBold);
-	psiOptions->setPluginOption(constMbold, vMbold);
-	QVariant vQbold(quoteBold);
-	psiOptions->setPluginOption(constQbold, vQbold);
-	QVariant vLbold(lineBold);
-	psiOptions->setPluginOption(constLbold, vLbold);
+	psiOptions->setPluginOption(constUbold, userBold);
+	psiOptions->setPluginOption(constTbold, tagBold);
+	psiOptions->setPluginOption(constMbold, msgBold);
+	psiOptions->setPluginOption(constQbold, quoteBold);
+	psiOptions->setPluginOption(constLbold, lineBold);
+
 	//italic
 	userItalic = uiButton->isChecked();
 	tagItalic = tiButton->isChecked();
 	msgItalic = miButton->isChecked();
 	quoteItalic = qiButton->isChecked();
 	lineItalic = liButton->isChecked();
-	QVariant vUitalic(userItalic);
-	psiOptions->setPluginOption(constUitalic, vUitalic);
-	QVariant vTitalic(tagItalic);
-	psiOptions->setPluginOption(constTitalic, vTitalic);
-	QVariant vMitalic(msgItalic);
-	psiOptions->setPluginOption(constMitalic, vMitalic);
-	QVariant vQitalic(quoteItalic);
-	psiOptions->setPluginOption(constQitalic, vQitalic);
-	QVariant vLitalic(lineItalic);
-	psiOptions->setPluginOption(constLitalic, vLitalic);
+	psiOptions->setPluginOption(constUitalic, userItalic);
+	psiOptions->setPluginOption(constTitalic, tagItalic);
+	psiOptions->setPluginOption(constMitalic, msgItalic);
+	psiOptions->setPluginOption(constQitalic, quoteItalic);
+	psiOptions->setPluginOption(constLitalic, lineItalic);
+
 	//underline
 	userUnderline = uuButton->isChecked();
 	tagUnderline = tuButton->isChecked();
 	msgUnderline = muButton->isChecked();
 	quoteUnderline = quButton->isChecked();
 	lineUnderline = luButton->isChecked();
-	QVariant vUunderline(userUnderline);
-	psiOptions->setPluginOption(constUunderline, vUunderline);
-	QVariant vTunderline(tagUnderline);
-	psiOptions->setPluginOption(constTunderline, vTunderline);
-	QVariant vMunderline(msgUnderline);
-	psiOptions->setPluginOption(constMunderline, vMunderline);
-	QVariant vQunderline(quoteUnderline);
-	psiOptions->setPluginOption(constQunderline, vQunderline);
-	QVariant vLunderline(lineUnderline);
-	psiOptions->setPluginOption(constLunderline, vLunderline);
+	psiOptions->setPluginOption(constUunderline, userUnderline);
+	psiOptions->setPluginOption(constTunderline, tagUnderline);
+	psiOptions->setPluginOption(constMunderline, msgUnderline);
+	psiOptions->setPluginOption(constQunderline, quoteUnderline);
+	psiOptions->setPluginOption(constLunderline, lineUnderline);
+
 	//asResource
 	idAsResource = asResourceButton->isChecked();
-	QVariant vIdAsResource(idAsResource);
-	psiOptions->setPluginOption(constIdAsResource, vIdAsResource);
+	psiOptions->setPluginOption(constIdAsResource, idAsResource);
 	showPhoto = showPhotoButton->isChecked();
-	QVariant vShowPhoto(showPhoto);
-	psiOptions->setPluginOption(constShowPhoto, vShowPhoto);
+	psiOptions->setPluginOption(constShowPhoto, showPhoto);
 	showAvatars = showAvatarsButton->isChecked();
-	if (showAvatars == true){
-		bool cache = false;
-		QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars");
-		dir.mkpath("juick/per");
-		if (dir.exists("juick")){
-			cache = true;
-		} else {
-			QMessageBox::warning(0, tr("Warning"),tr("can't create folder %1 \ncaching avatars will be not available").arg(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick"));
-		}
-	}
-	QVariant vShowAvatars(showAvatars);
-	psiOptions->setPluginOption(constShowAvatars, vShowAvatars);
+	if (showAvatars)
+		createAvatarsDir();
+	psiOptions->setPluginOption(constShowAvatars, showAvatars);
 	workInGroupChat = groupChatButton->isChecked();
-	QVariant vWorkInGroupchat(workInGroupChat);
-	psiOptions->setPluginOption(constWorkInGroupchat, vWorkInGroupchat);
-
+	psiOptions->setPluginOption(constWorkInGroupchat, workInGroupChat);
 	psiOptions->setPluginOption("constJidList",QVariant(jidList_));
 
 }
 
-void JuickPlugin::restoreOptions(){
+void JuickPlugin::restoreOptions()
+{
 	if (!optionsWid)
 		return;
 
+	ucButton->setStyleSheet(QString("background-color: %1;").arg(userColor.name()));
+	tcButton->setStyleSheet(QString("background-color: %1;").arg(tagColor.name()));
+	mcButton->setStyleSheet(QString("background-color: %1;").arg(msgColor.name()));
+	qcButton->setStyleSheet(QString("background-color: %1;").arg(quoteColor.name()));
+	lcButton->setStyleSheet(QString("background-color: %1;").arg(lineColor.name()));
 
-	QVariant vuserColor(userColor);
-	vuserColor = psiOptions->getPluginOption(constuserColor);
-	if (!vuserColor.isNull()) {
-		ucButton->setStyleSheet(QString("background-color: %1;").arg(vuserColor.toString()));
-	}
-	QVariant vtagColor(tagColor);
-	vtagColor = psiOptions->getPluginOption(consttagColor);
-	if (!vtagColor.isNull()) {
-		tcButton->setStyleSheet(QString("background-color: %1;").arg(vtagColor.toString()));
-	}
-	QVariant vmsgColor(msgColor);
-	vmsgColor = psiOptions->getPluginOption(constmsgColor);
-	if (!vmsgColor.isNull()) {
-		mcButton->setStyleSheet(QString("background-color: %1;").arg(vmsgColor.toString()));
-	}
-	QVariant vQcolor(quoteColor);
-	vQcolor = psiOptions->getPluginOption(constQcolor);
-	if (!vQcolor.isNull()) {
-		qcButton->setStyleSheet(QString("background-color: %1;").arg(vQcolor.toString()));
-	}
-	QVariant vLcolor(lineColor);
-	vLcolor = psiOptions->getPluginOption(constLcolor);
-	if (!vLcolor.isNull()) {
-		lcButton->setStyleSheet(QString("background-color: %1;").arg(vLcolor.toString()));
-	}
 	//bold
-	QVariant vUbold(userBold);
-	vUbold = psiOptions->getPluginOption(constUbold);
-	if (!vUbold.isNull()) {
-		ubButton->setChecked(vUbold.toBool());
-	}
-	QVariant vTbold(tagBold);
-	vTbold = psiOptions->getPluginOption(constTbold);
-	if (!vTbold.isNull()) {
-		tbButton->setChecked(vTbold.toBool());
-	}
-	QVariant vMbold(msgBold);
-	vMbold = psiOptions->getPluginOption(constMbold);
-	if (!vMbold.isNull()) {
-		mbButton->setChecked(vMbold.toBool());
-	}
-	QVariant vQbold(quoteBold);
-	vQbold = psiOptions->getPluginOption(constQbold);
-	if (!vQbold.isNull()) {
-		qbButton->setChecked(vQbold.toBool());
-	}
-	QVariant vLbold(lineBold);
-	vLbold = psiOptions->getPluginOption(constLbold);
-	if (!vLbold.isNull()) {
-		lbButton->setChecked(vLbold.toBool());
-	}
+	ubButton->setChecked(userBold);
+	tbButton->setChecked(tagBold);
+	mbButton->setChecked(msgBold);
+	qbButton->setChecked(quoteBold);
+	lbButton->setChecked(lineBold);
+
 	//italic
-	QVariant vUitalic(userItalic);
-	vUitalic = psiOptions->getPluginOption(constUitalic);
-	if (!vUitalic.isNull()) {
-		uiButton->setChecked(vUitalic.toBool());
-	}
-	QVariant vTitalic(tagItalic);
-	vTitalic = psiOptions->getPluginOption(constTitalic);
-	if (!vTitalic.isNull()) {
-		tiButton->setChecked(vTitalic.toBool());
-	}
-	QVariant vMitalic(msgItalic);
-	vMitalic = psiOptions->getPluginOption(constMitalic);
-	if (!vMitalic.isNull()) {
-		miButton->setChecked(vMitalic.toBool());
-	}
-	QVariant vQitalic(quoteItalic);
-	vQitalic = psiOptions->getPluginOption(constQitalic);
-	if (!vQitalic.isNull()) {
-		qiButton->setChecked(vQitalic.toBool());
-	}
-	QVariant vLitalic(lineItalic);
-	vLitalic = psiOptions->getPluginOption(constLitalic);
-	if (!vLitalic.isNull()) {
-		liButton->setChecked(vLitalic.toBool());
-	}
+	uiButton->setChecked(userItalic);
+	tiButton->setChecked(tagItalic);
+	miButton->setChecked(msgItalic);
+	qiButton->setChecked(quoteItalic);
+	liButton->setChecked(lineItalic);
+
 	//underline
-	QVariant vUunderline(userUnderline);
-	vUunderline = psiOptions->getPluginOption(constUunderline);
-	if (!vUunderline.isNull()) {
-		uuButton->setChecked(vUunderline.toBool());
-	}
-	QVariant vTunderline(tagUnderline);
-	vTunderline = psiOptions->getPluginOption(constTunderline);
-	if (!vTunderline.isNull()) {
-		tuButton->setChecked(vTunderline.toBool());
-	}
-	QVariant vMunderline(msgUnderline);
-	vMunderline = psiOptions->getPluginOption(constMunderline);
-	if (!vMunderline.isNull()) {
-		muButton->setChecked(vMunderline.toBool());
-	}
-	QVariant vQunderline(quoteUnderline);
-	vQunderline = psiOptions->getPluginOption(constQunderline);
-	if (!vQunderline.isNull()) {
-		quButton->setChecked(vQunderline.toBool());
-	}
-	QVariant vLunderline(lineUnderline);
-	vLunderline = psiOptions->getPluginOption(constLunderline);
-	if (!vLunderline.isNull()) {
-		luButton->setChecked(vLunderline.toBool());
-	}
-	QVariant vIdAsResource(idAsResource);
-	vIdAsResource = psiOptions->getPluginOption(constIdAsResource);
-	if (!vIdAsResource.isNull()) {
-		asResourceButton->setChecked(vIdAsResource.toBool());
-	}
-	QVariant vShowPhoto(showPhoto);
-	vShowPhoto = psiOptions->getPluginOption(constShowPhoto);
-	if (!vShowPhoto.isNull()) {
-		showPhotoButton->setChecked(vShowPhoto.toBool());
-	}
-	QVariant vShowAvatars(showAvatars);
-	vShowAvatars = psiOptions->getPluginOption(constShowAvatars);
-	if (!vShowAvatars.isNull()) {
-		showAvatarsButton->setChecked(vShowAvatars.toBool());
-	}
-	QVariant vWorkInGroupchat(workInGroupChat);
-	vWorkInGroupchat = psiOptions->getPluginOption(constWorkInGroupchat);
-	if (!vWorkInGroupchat.isNull()) {
-		groupChatButton->setChecked(vWorkInGroupchat.toBool());
-	}
+	uuButton->setChecked(userUnderline);
+	tuButton->setChecked(tagUnderline);
+	muButton->setChecked(msgUnderline);
+	quButton->setChecked(quoteUnderline);
+	luButton->setChecked(lineUnderline);
+
+	asResourceButton->setChecked(idAsResource);
+	showPhotoButton->setChecked(showPhoto);
+	showAvatarsButton->setChecked(showAvatars);
+	groupChatButton->setChecked(workInGroupChat);
 }
 
 void JuickPlugin::requestJidList()
@@ -806,7 +524,8 @@ void JuickPlugin::requestJidList()
 	jjl->show();
 }
 
-void JuickPlugin::updateJidList(QStringList jids) {
+void JuickPlugin::updateJidList(const QStringList& jids)
+{
 	jidList_ = jids;
 	//HACK
 	if(optionsWid) {
@@ -815,18 +534,14 @@ void JuickPlugin::updateJidList(QStringList jids) {
 	}
 }
 
-bool JuickPlugin::processMessage(int account, const QString& fromJid, const QString& body, const QString& subject){
-	Q_UNUSED(account);
-	Q_UNUSED(fromJid);
-	Q_UNUSED(body);
-	Q_UNUSED(subject);
-	return false;
-}
-bool JuickPlugin::processEvent(int account, QDomElement& e){
+bool JuickPlugin::processEvent(int account, QDomElement& e)
+{
 	Q_UNUSED(account);
 	if (!enabled){
 		return false;
 	}
+
+	QDomDocument doc = e.ownerDocument();
 	QString jidToSend(juick);
 	QString jid = e.childNodes().at(3).firstChild().nodeValue();
 	QString usernameJ = jid.split("@").first();
@@ -854,9 +569,9 @@ bool JuickPlugin::processEvent(int account, QDomElement& e){
 		//juick bug
 		msg.replace("&gt;",">");
 		msg.replace("&lt;","<");
-		QDomElement element =  e.ownerDocument().createElement("html");
+		QDomElement element =  doc.createElement("html");
 		element.setAttribute("xmlns","http://jabber.org/protocol/xhtml-im");
-		QDomElement body = e.ownerDocument().createElement("body");
+		QDomElement body = doc.createElement("body");
 		body.setAttribute("xmlns","http://www.w3.org/1999/xhtml");
 		//Задаём стили
 		idStyle = "color: " + msgColor.name() + ";";
@@ -913,8 +628,8 @@ bool JuickPlugin::processEvent(int account, QDomElement& e){
 		QString res("");
 		//HELP
 		if (msg.indexOf("\nNICK mynickname - Set a nickname\n\n") != -1){
-			nl2br(body,e.ownerDocument(),msg);
-			if (idAsResource == true) {
+			nl2br(&body, &doc,msg);
+			if (idAsResource) {
 				QStringList tmp = activeTab->getJid().split('/');
 				if (tmp.count() > 1 && jid == tmp.first()){
 					resource = tmp.last();
@@ -924,180 +639,173 @@ bool JuickPlugin::processEvent(int account, QDomElement& e){
 		}
 		if (! e.lastChild().firstChild().nextSibling().isNull() && e.lastChild().firstChild().nextSibling().nodeName() == "x"){
 			//photo post
-			if (showPhoto && postRx.indexIn(msg) != -1){
+			if (showPhoto && postRx.indexIn(msg) != -1) {
 				QString resLink("");
-				if (idAsResource == true) {
+				if (idAsResource) {
 					resource = postRx.cap(4);
 					resLink = "/" + resource;
 					resLink.replace("#","%23");
 				}
 				QDomNode domUrl = e.lastChild().firstChild().nextSibling().firstChild().firstChild();
 				QString url = domUrl.nodeValue();
-				if(url.split('.').last() == "jpg"){
+				if(url.split('.').last() == "jpg") {
 					QUrl photoUrl(url);
-					Http *http = new Http(this);
-					http->setHost(photoUrl.host());
-
-					//-----by Dealer_WeARE-----------
-					Proxy prx = applicationInfo->getProxyFor(constPluginName);
-					http->setProxyHostPort(prx.host, prx.port, prx.user, prx.pass, prx.type);
-
-					QByteArray preview = http->get(QString(photoUrl.path()).replace("/photos-1024/","/ps/"));
-					http->deleteLater();
-					body.appendChild(e.ownerDocument().createElement("br"));
-					addUserLink(body, e.ownerDocument(), "@" + postRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+",jidToSend);
-					body.appendChild(e.ownerDocument().createTextNode(": "));
-					if (postRx.cap(2) != ""){
+					getPhoto(photoUrl);
+					body.appendChild(doc.createElement("br"));
+					addUserLink(&body, &doc, "@" + postRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+",jidToSend);
+					body.appendChild(doc.createTextNode(": "));
+					if (!postRx.cap(2).isEmpty()){
 						//добавляем теги
-						foreach (QString tag,postRx.cap(2).trimmed().split(" ")){
-							addTagLink(body, e.ownerDocument(), tag, jidToSend);
+						foreach (const QString& tag, postRx.cap(2).trimmed().split(" ")) {
+							addTagLink(&body, &doc, tag, jidToSend);
 						}
 					}
-					QDomElement table = e.ownerDocument().createElement("table");
-					QDomElement tableRow = e.ownerDocument().createElement("tr");
-					QDomElement td1 = e.ownerDocument().createElement("td");
+					QDomElement table = doc.createElement("table");
+					QDomElement tableRow = doc.createElement("tr");
+					QDomElement td1 = doc.createElement("td");
 					td1.setAttribute("valign","top");
-					QDomElement td2 = e.ownerDocument().createElement("td");
-					QDomElement link = e.ownerDocument().createElement("a");
+					QDomElement td2 = doc.createElement("td");
+					QDomElement link = doc.createElement("a");
 					link.setAttribute("href",url);
-					QDomElement img = e.ownerDocument().createElement("img");
-					QString imgdata = "data:image/jpg;base64,"+QString(QUrl::toPercentEncoding(preview.toBase64()));
-					img.setAttribute("src",imgdata);
+					QDomElement img = doc.createElement("img");
+					QString imgdata = photoUrl.path().replace("/", "%");//"data:image/jpg;base64,"+QString(QUrl::toPercentEncoding(preview.toBase64()));
+					QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/photos");
+					img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/%2").arg(dir.absolutePath()).arg(imgdata)).toEncoded()));
 					link.appendChild(img);
 					td1.appendChild(link);
 					QString newMsg = " " + postRx.cap(3) + " ";
-					elementFromString(td2,e.ownerDocument(),newMsg, jidToSend);
+					elementFromString(&td2, &doc,newMsg, jidToSend);
 					tableRow.appendChild(td1);
 					tableRow.appendChild(td2);
 					table.appendChild(tableRow);
 					body.appendChild(table);
-					addMessageId(body, e.ownerDocument(),postRx.cap(4), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend, resLink);
+					addMessageId(&body, &doc,postRx.cap(4), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend, resLink);
 					//ссылка на сообщение
-					body.appendChild(e.ownerDocument().createTextNode(" "));
-					addPlus(body, e.ownerDocument(), postRx.cap(4),jidToSend, resLink);
-					body.appendChild(e.ownerDocument().createTextNode(" "));
-					addSubscribe(body, e.ownerDocument(), postRx.cap(4),jidToSend, resLink);
-					body.appendChild(e.ownerDocument().createTextNode(" "));
-					addFavorite(body, e.ownerDocument(), postRx.cap(4),jidToSend, resLink);
-					body.appendChild(e.ownerDocument().createTextNode(" "));
-					addHttpLink(body, e.ownerDocument(), postRx.cap(5));
+					body.appendChild(doc.createTextNode(" "));
+					addPlus(&body, &doc, postRx.cap(4),jidToSend, resLink);
+					body.appendChild(doc.createTextNode(" "));
+					addSubscribe(&body, &doc, postRx.cap(4),jidToSend, resLink);
+					body.appendChild(doc.createTextNode(" "));
+					addFavorite(&body, &doc, postRx.cap(4),jidToSend, resLink);
+					body.appendChild(doc.createTextNode(" "));
+					addHttpLink(&body, &doc, postRx.cap(5));
 					msg = "";
 				}
 			}
 			//удаление вложения, пока шлётся ссылка в сообщении
 			e.lastChild().removeChild(e.lastChild().firstChild().nextSibling());
 		}
-		if ((jid == jubo || usernameJ == "jubo%nologin.ru") && juboRx.indexIn(msg) != -1){
+		if ((jid == jubo || usernameJ == "jubo%nologin.ru") && juboRx.indexIn(msg) != -1) {
 			//Jubo bot
-			body.appendChild(e.ownerDocument().createTextNode(juboRx.cap(1)));
-			body.appendChild(e.ownerDocument().createElement("br"));
-			addUserLink(body, e.ownerDocument(), "@" + juboRx.cap(2), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
-			body.appendChild(e.ownerDocument().createTextNode(": "));
-			if (juboRx.cap(3) != ""){
+			body.appendChild(doc.createTextNode(juboRx.cap(1)));
+			body.appendChild(doc.createElement("br"));
+			addUserLink(&body, &doc, "@" + juboRx.cap(2), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
+			body.appendChild(doc.createTextNode(": "));
+			if (!juboRx.cap(3).isEmpty()){
 				//добавляем теги
-				foreach (QString tag,juboRx.cap(3).trimmed().split(" ")){
-					addTagLink(body, e.ownerDocument(), tag, jidToSend);
+				foreach (const QString& tag,juboRx.cap(3).trimmed().split(" ")){
+					addTagLink(&body, &doc, tag, jidToSend);
 				}
 			}
 			//обрабатываем текст сообщения
 			QString newMsg = " " + juboRx.cap(4) + " ";
-			if (showAvatars){
-				QDomElement table = e.ownerDocument().createElement("table");
-				QDomElement tableRow = e.ownerDocument().createElement("tr");
-				QDomElement td1 = e.ownerDocument().createElement("td");
+			if (showAvatars) {
+				QDomElement table = doc.createElement("table");
+				QDomElement tableRow = doc.createElement("tr");
+				QDomElement td1 = doc.createElement("td");
 				td1.setAttribute("valign","top");
-				QDomElement td2 = e.ownerDocument().createElement("td");
-				QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/per");
-				if (dir.exists()){
-					QDomElement img = e.ownerDocument().createElement("img");
-					img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/@%2").arg(dir.absolutePath()).arg(juboRx.cap(2))).toEncoded()));
+				QDomElement td2 = doc.createElement("td");
+				QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
+				if (dir.exists()) {
+					QDomElement img = doc.createElement("img");
+					img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/@%2;").arg(dir.absolutePath()).arg(juboRx.cap(2))).toEncoded()));
 					///*/
 					td1.appendChild(img);
 				}
-				elementFromString(td2,e.ownerDocument(),newMsg,jidToSend);
+				elementFromString(&td2, &doc,newMsg,jidToSend);
 				tableRow.appendChild(td1);
 				tableRow.appendChild(td2);
 				table.appendChild(tableRow);
 				body.appendChild(table);
 			} else {
-				body.appendChild(e.ownerDocument().createElement("br"));
+				body.appendChild(doc.createElement("br"));
 				//обрабатываем текст сообщения
-				elementFromString(body,e.ownerDocument(), newMsg, jidToSend);
+				elementFromString(&body, &doc, newMsg, jidToSend);
 			}
 			//xmpp ссылка на сообщение
-			addMessageId(body, e.ownerDocument(),juboRx.cap(5), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2", jidToSend);
+			addMessageId(&body, &doc,juboRx.cap(5), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2", jidToSend);
 			//ссылка на сообщение
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addPlus(body, e.ownerDocument(), juboRx.cap(5), jidToSend);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addSubscribe(body, e.ownerDocument(), juboRx.cap(5),jidToSend);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addFavorite(body, e.ownerDocument(), juboRx.cap(5),jidToSend);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addHttpLink(body, e.ownerDocument(), juboRx.cap(6));
+			body.appendChild(doc.createTextNode(" "));
+			addPlus(&body, &doc, juboRx.cap(5), jidToSend);
+			body.appendChild(doc.createTextNode(" "));
+			addSubscribe(&body, &doc, juboRx.cap(5),jidToSend);
+			body.appendChild(doc.createTextNode(" "));
+			addFavorite(&body, &doc, juboRx.cap(5),jidToSend);
+			body.appendChild(doc.createTextNode(" "));
+			addHttpLink(&body, &doc, juboRx.cap(6));
 			msg = "";
-		} else if (lastMsgRx.indexIn(msg) != -1){
+		} else if (lastMsgRx.indexIn(msg) != -1) {
 			//last 10 messages
-			body.appendChild(e.ownerDocument().createTextNode(lastMsgRx.cap(1)));
+			body.appendChild(doc.createTextNode(lastMsgRx.cap(1)));
 			msg = lastMsgRx.cap(2);
 			while (singleMsgRx.indexIn(msg) != -1){
-				body.appendChild(e.ownerDocument().createElement("br"));
-				addUserLink(body, e.ownerDocument(), "@" + singleMsgRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
-				body.appendChild(e.ownerDocument().createTextNode(": "));
-				if (singleMsgRx.cap(2) != ""){
+				body.appendChild(doc.createElement("br"));
+				addUserLink(&body, &doc, "@" + singleMsgRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
+				body.appendChild(doc.createTextNode(": "));
+				if (!singleMsgRx.cap(2).isEmpty()){
 					//добавляем теги
-					foreach (QString tag,singleMsgRx.cap(2).trimmed().split(" ")){
-						addTagLink(body, e.ownerDocument(), tag, jidToSend);
+					foreach (const QString& tag, singleMsgRx.cap(2).trimmed().split(" ")){
+						addTagLink(&body, &doc, tag, jidToSend);
 					}
 				}
-				body.appendChild(e.ownerDocument().createElement("br"));
+				body.appendChild(doc.createElement("br"));
 				//обрабатываем текст сообщения
 				QString newMsg = " " + singleMsgRx.cap(3) + " ";
-				elementFromString(body,e.ownerDocument(), newMsg, jidToSend);
+				elementFromString(&body, &doc, newMsg, jidToSend);
 				//xmpp ссылка на сообщение
-				addMessageId(body, e.ownerDocument(),singleMsgRx.cap(4), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2", jidToSend);
-				body.appendChild(e.ownerDocument().createTextNode(" "));
-				addPlus(body, e.ownerDocument(), singleMsgRx.cap(4),jidToSend);
+				addMessageId(&body, &doc,singleMsgRx.cap(4), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2", jidToSend);
+				body.appendChild(doc.createTextNode(" "));
+				addPlus(&body, &doc, singleMsgRx.cap(4),jidToSend);
 				//ссылка на сообщение
-				body.appendChild(e.ownerDocument().createTextNode(" "));
-				addSubscribe(body, e.ownerDocument(), singleMsgRx.cap(4),jidToSend);
-				body.appendChild(e.ownerDocument().createTextNode(" "));
-				addFavorite(body, e.ownerDocument(), singleMsgRx.cap(4),jidToSend);
-				body.appendChild(e.ownerDocument().createTextNode(" "+singleMsgRx.cap(5)));
-				addHttpLink(body, e.ownerDocument(), singleMsgRx.cap(6));
-				body.appendChild(e.ownerDocument().createElement("br"));
+				body.appendChild(doc.createTextNode(" "));
+				addSubscribe(&body, &doc, singleMsgRx.cap(4),jidToSend);
+				body.appendChild(doc.createTextNode(" "));
+				addFavorite(&body, &doc, singleMsgRx.cap(4),jidToSend);
+				body.appendChild(doc.createTextNode(" "+singleMsgRx.cap(5)));
+				addHttpLink(&body, &doc, singleMsgRx.cap(6));
+				body.appendChild(doc.createElement("br"));
 				msg = msg.right(msg.size() - singleMsgRx.matchedLength());
 			}
 			body.removeChild(body.lastChild());
 		} else if (msg.indexOf(topTag) != -1){
 			//Если это топ тегов
-			body.appendChild(e.ownerDocument().createTextNode(topTag));
-			body.appendChild(e.ownerDocument().createElement("br"));
+			body.appendChild(doc.createTextNode(topTag));
+			body.appendChild(doc.createElement("br"));
 			msg = msg.right(msg.size() - topTag.size() - 1);
 			while (tagRx.indexIn(msg, 0) != -1){
-				addTagLink(body, e.ownerDocument(), tagRx.cap(1), jidToSend);
-				body.appendChild(e.ownerDocument().createElement("br"));
+				addTagLink(&body, &doc, tagRx.cap(1), jidToSend);
+				body.appendChild(doc.createElement("br"));
 				msg = msg.right(msg.size() - tagRx.matchedLength());
 			}
 		} else if (recomendRx.indexIn(msg) != -1){
 			//разбор рекомендации
 			QString resLink("");
-			if (idAsResource == true) {
+			if (idAsResource) {
 				resource = recomendRx.cap(5);
 				resLink = "/" + resource;
 				resLink.replace("#","%23");
 			}
-			body.appendChild(e.ownerDocument().createElement("br"));
-			body.appendChild(e.ownerDocument().createTextNode(tr("Recommended by ")));
-			addUserLink(body, e.ownerDocument(), "@" + recomendRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
-			body.appendChild(e.ownerDocument().createTextNode(":"));
-			body.appendChild(e.ownerDocument().createElement("br"));
-			addUserLink(body, e.ownerDocument(), "@" + recomendRx.cap(2), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
-			body.appendChild(e.ownerDocument().createTextNode(": "));
-			if (recomendRx.cap(3) != ""){
+			body.appendChild(doc.createElement("br"));
+			body.appendChild(doc.createTextNode(tr("Recommended by ")));
+			addUserLink(&body, &doc, "@" + recomendRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
+			body.appendChild(doc.createTextNode(":"));
+			body.appendChild(doc.createElement("br"));
+			addUserLink(&body, &doc, "@" + recomendRx.cap(2), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
+			body.appendChild(doc.createTextNode(": "));
+			if (!recomendRx.cap(3).isEmpty()) {
 				//добавляем теги
-				foreach (QString tag,recomendRx.cap(3).trimmed().split(" ")){
-					addTagLink(body, e.ownerDocument(), tag, jidToSend);
+				foreach (const QString& tag,recomendRx.cap(3).trimmed().split(" ")){
+					addTagLink(&body, &doc, tag, jidToSend);
 				}
 			}
 			//mood
@@ -1107,26 +815,26 @@ bool JuickPlugin::processEvent(int account, QDomElement& e){
 			//tune
 			QRegExp tuneRx("\\*tune:\\s(.*)\\n(.*)");
 			if (moodRx.indexIn(recomendRx.cap(4)) != -1){
-				body.appendChild(e.ownerDocument().createElement("br"));
-				QDomElement bold = e.ownerDocument().createElement("b");
-				bold.appendChild(e.ownerDocument().createTextNode("mood: "));
+				body.appendChild(doc.createElement("br"));
+				QDomElement bold = doc.createElement("b");
+				bold.appendChild(doc.createTextNode("mood: "));
 				body.appendChild(bold);
-				QDomElement img = e.ownerDocument().createElement("icon");
+				QDomElement img = doc.createElement("icon");
 				img.setAttribute("name","mood/"+moodRx.cap(1).left(moodRx.cap(1).size()-1).toLower());
 				img.setAttribute("text",moodRx.cap(1));
 				body.appendChild(img);
-				body.appendChild(e.ownerDocument().createTextNode(" "+moodRx.cap(2)));
+				body.appendChild(doc.createTextNode(" "+moodRx.cap(2)));
 				msg = " " + moodRx.cap(3) + " ";
 			} else if(geoRx.indexIn(recomendRx.cap(4)) != -1) {
-				body.appendChild(e.ownerDocument().createElement("br"));
-				QDomElement bold = e.ownerDocument().createElement("b");
-				bold.appendChild(e.ownerDocument().createTextNode("geo: "+ geoRx.cap(1) ));
+				body.appendChild(doc.createElement("br"));
+				QDomElement bold = doc.createElement("b");
+				bold.appendChild(doc.createTextNode("geo: "+ geoRx.cap(1) ));
 				body.appendChild(bold);
 				msg = " " + geoRx.cap(2) + " ";
 			} else if(tuneRx.indexIn(recomendRx.cap(4)) != -1) {
-				body.appendChild(e.ownerDocument().createElement("br"));
-				QDomElement bold = e.ownerDocument().createElement("b");
-				bold.appendChild(e.ownerDocument().createTextNode("tune: "+ tuneRx.cap(1) ));
+				body.appendChild(doc.createElement("br"));
+				QDomElement bold = doc.createElement("b");
+				bold.appendChild(doc.createTextNode("tune: "+ tuneRx.cap(1) ));
 				body.appendChild(bold);
 				msg = " " + tuneRx.cap(2) + " ";
 			}
@@ -1134,56 +842,56 @@ bool JuickPlugin::processEvent(int account, QDomElement& e){
 				msg = " " + recomendRx.cap(4) + " ";
 			}
 			if (showAvatars){
-				QDomElement table = e.ownerDocument().createElement("table");
-				QDomElement tableRow = e.ownerDocument().createElement("tr");
-				QDomElement td1 = e.ownerDocument().createElement("td");
+				QDomElement table = doc.createElement("table");
+				QDomElement tableRow = doc.createElement("tr");
+				QDomElement td1 = doc.createElement("td");
 				td1.setAttribute("valign","top");
-				QDomElement td2 = e.ownerDocument().createElement("td");
-				QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/per");
+				QDomElement td2 = doc.createElement("td");
+				QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
 				if (dir.exists()){
-					QDomElement img = e.ownerDocument().createElement("img");
-					img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/@%2").arg(dir.absolutePath()).arg(recomendRx.cap(2))).toEncoded()));
+					QDomElement img = doc.createElement("img");
+					img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/@%2;").arg(dir.absolutePath()).arg(recomendRx.cap(2))).toEncoded()));
 					td1.appendChild(img);
-				}///
-				elementFromString(td2,e.ownerDocument(),msg, jidToSend);
+				}
+				elementFromString(&td2, &doc,msg, jidToSend);
 				tableRow.appendChild(td1);
 				tableRow.appendChild(td2);
 				table.appendChild(tableRow);
 				body.appendChild(table);
 			} else {
-				body.appendChild(e.ownerDocument().createElement("br"));
+				body.appendChild(doc.createElement("br"));
 				//обрабатываем текст сообщения
-				elementFromString(body,e.ownerDocument(),msg,  jidToSend);
+				elementFromString(&body, &doc,msg,  jidToSend);
 			}
 			//xmpp ссылка на сообщение
-			addMessageId(body, e.ownerDocument(),recomendRx.cap(5), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend,resLink);
+			addMessageId(&body, &doc,recomendRx.cap(5), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend,resLink);
 			//ссылка на сообщение
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addPlus(body, e.ownerDocument(), recomendRx.cap(5),jidToSend, resLink);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addSubscribe(body, e.ownerDocument(), recomendRx.cap(5),jidToSend,resLink);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addFavorite(body, e.ownerDocument(), recomendRx.cap(5),jidToSend,resLink);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			body.appendChild(e.ownerDocument().createTextNode(recomendRx.cap(6)));
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addHttpLink(body, e.ownerDocument(), recomendRx.cap(7));
+			body.appendChild(doc.createTextNode(" "));
+			addPlus(&body, &doc, recomendRx.cap(5),jidToSend, resLink);
+			body.appendChild(doc.createTextNode(" "));
+			addSubscribe(&body, &doc, recomendRx.cap(5),jidToSend,resLink);
+			body.appendChild(doc.createTextNode(" "));
+			addFavorite(&body, &doc, recomendRx.cap(5),jidToSend,resLink);
+			body.appendChild(doc.createTextNode(" "));
+			body.appendChild(doc.createTextNode(recomendRx.cap(6)));
+			body.appendChild(doc.createTextNode(" "));
+			addHttpLink(&body, &doc, recomendRx.cap(7));
 			msg = "";
 		} else if (postRx.indexIn(msg) != -1){
 			//разбор сообщения
 			QString resLink("");
-			if (idAsResource == true) {
+			if (idAsResource) {
 				resource = postRx.cap(4);
 				resLink = "/" + resource;
 				resLink.replace("#","%23");
 			}
-			body.appendChild(e.ownerDocument().createElement("br"));
-			addUserLink(body, e.ownerDocument(), "@" + postRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
-			body.appendChild(e.ownerDocument().createTextNode(": "));
-			if (postRx.cap(2) != ""){
+			body.appendChild(doc.createElement("br"));
+			addUserLink(&body, &doc, "@" + postRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
+			body.appendChild(doc.createTextNode(": "));
+			if (!postRx.cap(2).isEmpty()) {
 				//добавляем теги
-				foreach (QString tag,postRx.cap(2).trimmed().split(" ")){
-					addTagLink(body, e.ownerDocument(), tag, jidToSend);
+				foreach (const QString& tag,postRx.cap(2).trimmed().split(" ")){
+					addTagLink(&body, &doc, tag, jidToSend);
 				}
 			}
 			//mood
@@ -1193,26 +901,26 @@ bool JuickPlugin::processEvent(int account, QDomElement& e){
 			//tune
 			QRegExp tuneRx("\\*tune:\\s(.*)\\n(.*)");
 			if (moodRx.indexIn(postRx.cap(3)) != -1){
-				body.appendChild(e.ownerDocument().createElement("br"));
-				QDomElement bold = e.ownerDocument().createElement("b");
-				bold.appendChild(e.ownerDocument().createTextNode("mood: "));
+				body.appendChild(doc.createElement("br"));
+				QDomElement bold = doc.createElement("b");
+				bold.appendChild(doc.createTextNode("mood: "));
 				body.appendChild(bold);
-				QDomElement img = e.ownerDocument().createElement("icon");
+				QDomElement img = doc.createElement("icon");
 				img.setAttribute("name","mood/"+moodRx.cap(1).left(moodRx.cap(1).size()-1).toLower());
 				img.setAttribute("text",moodRx.cap(1));
 				body.appendChild(img);
-				body.appendChild(e.ownerDocument().createTextNode(" "+moodRx.cap(2)));
+				body.appendChild(doc.createTextNode(" "+moodRx.cap(2)));
 				msg = " " + moodRx.cap(3) + " ";
 			} else if(geoRx.indexIn(postRx.cap(3)) != -1) {
-				body.appendChild(e.ownerDocument().createElement("br"));
-				QDomElement bold = e.ownerDocument().createElement("b");
-				bold.appendChild(e.ownerDocument().createTextNode("geo: "+ geoRx.cap(1) ));
+				body.appendChild(doc.createElement("br"));
+				QDomElement bold = doc.createElement("b");
+				bold.appendChild(doc.createTextNode("geo: "+ geoRx.cap(1) ));
 				body.appendChild(bold);
 				msg = " " + geoRx.cap(2) + " ";
 			} else if(tuneRx.indexIn(postRx.cap(3)) != -1) {
-				body.appendChild(e.ownerDocument().createElement("br"));
-				QDomElement bold = e.ownerDocument().createElement("b");
-				bold.appendChild(e.ownerDocument().createTextNode("tune: "+ tuneRx.cap(1) ));
+				body.appendChild(doc.createElement("br"));
+				QDomElement bold = doc.createElement("b");
+				bold.appendChild(doc.createTextNode("tune: "+ tuneRx.cap(1) ));
 				body.appendChild(bold);
 				msg = " " + tuneRx.cap(2) + " ";
 			}
@@ -1220,116 +928,116 @@ bool JuickPlugin::processEvent(int account, QDomElement& e){
 				msg = " " + postRx.cap(3) + " ";
 			}
 			if (showAvatars){
-				QDomElement table = e.ownerDocument().createElement("table");
-				QDomElement tableRow = e.ownerDocument().createElement("tr");
-				QDomElement td1 = e.ownerDocument().createElement("td");
+				QDomElement table = doc.createElement("table");
+				QDomElement tableRow = doc.createElement("tr");
+				QDomElement td1 = doc.createElement("td");
 				td1.setAttribute("valign","top");
-				QDomElement td2 = e.ownerDocument().createElement("td");
-				QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/per");
+				QDomElement td2 = doc.createElement("td");
+				QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
 				if (dir.exists()){
-					QDomElement img = e.ownerDocument().createElement("img");
-					img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/@%2").arg(dir.absolutePath()).arg(postRx.cap(1))).toEncoded()));
+					QDomElement img = doc.createElement("img");
+					img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/@%2;").arg(dir.absolutePath()).arg(postRx.cap(1))).toEncoded()));
 					td1.appendChild(img);
 				}
-				elementFromString(td2,e.ownerDocument(),msg, jidToSend);
+				elementFromString(&td2, &doc,msg, jidToSend);
 				tableRow.appendChild(td1);
 				tableRow.appendChild(td2);
 				table.appendChild(tableRow);
 				body.appendChild(table);
 			} else {
-				body.appendChild(e.ownerDocument().createElement("br"));
+				body.appendChild(doc.createElement("br"));
 				//обрабатываем текст сообщения
-				elementFromString(body,e.ownerDocument(),msg,  jidToSend);
+				elementFromString(&body, &doc,msg,  jidToSend);
 			}
 			//xmpp ссылка на сообщение
-			addMessageId(body, e.ownerDocument(),postRx.cap(4), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend,resLink);
+			addMessageId(&body, &doc,postRx.cap(4), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend,resLink);
 			//ссылка на сообщение
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addPlus(body, e.ownerDocument(), postRx.cap(4),jidToSend, resLink);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addSubscribe(body, e.ownerDocument(), postRx.cap(4),jidToSend,resLink);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addFavorite(body, e.ownerDocument(), postRx.cap(4),jidToSend,resLink);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addHttpLink(body, e.ownerDocument(), postRx.cap(5));
+			body.appendChild(doc.createTextNode(" "));
+			addPlus(&body, &doc, postRx.cap(4),jidToSend, resLink);
+			body.appendChild(doc.createTextNode(" "));
+			addSubscribe(&body, &doc, postRx.cap(4),jidToSend,resLink);
+			body.appendChild(doc.createTextNode(" "));
+			addFavorite(&body, &doc, postRx.cap(4),jidToSend,resLink);
+			body.appendChild(doc.createTextNode(" "));
+			addHttpLink(&body, &doc, postRx.cap(5));
 			msg = "";
 		} else if (replyRx.indexIn(msg) != -1){
 			//обработка реплеев
 			QString resLink("");
 			QString replyId(replyRx.cap(4));
-			if (idAsResource == true) {
+			if (idAsResource) {
 				resource = replyId.left(replyId.indexOf("/"));
 				resLink = "/" + resource;
 				resLink.replace("#","%23");
 			}
-			body.appendChild(e.ownerDocument().createElement("br"));
-			addUserLink(body, e.ownerDocument(), "@" + replyRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
-			body.appendChild(e.ownerDocument().createTextNode(tr(" replied:")));
+			body.appendChild(doc.createElement("br"));
+			addUserLink(&body, &doc, "@" + replyRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
+			body.appendChild(doc.createTextNode(tr(" replied:")));
 			//цитата
-			QDomElement blockquote = e.ownerDocument().createElement("blockquote");
+			QDomElement blockquote = doc.createElement("blockquote");
 			blockquote.setAttribute("style",quoteStyle);
-			blockquote.appendChild(e.ownerDocument().createTextNode(replyRx.cap(2)));
+			blockquote.appendChild(doc.createTextNode(replyRx.cap(2)));
 			//обрабатываем текст сообщения
 			msg = " " + replyRx.cap(3) + " ";
 			if (showAvatars){
-				QDomElement table = e.ownerDocument().createElement("table");
-				QDomElement tableRow = e.ownerDocument().createElement("tr");
-				QDomElement td1 = e.ownerDocument().createElement("td");
+				QDomElement table = doc.createElement("table");
+				QDomElement tableRow = doc.createElement("tr");
+				QDomElement td1 = doc.createElement("td");
 				td1.setAttribute("valign","top");
-				QDomElement td2 = e.ownerDocument().createElement("td");
-				QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/per");
+				QDomElement td2 = doc.createElement("td");
+				QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
 				if (dir.exists()){
-					QDomElement img = e.ownerDocument().createElement("img");
-					img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/@%2").arg(dir.absolutePath()).arg(replyRx.cap(1))).toEncoded()));
+					QDomElement img = doc.createElement("img");
+					img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/@%2;").arg(dir.absolutePath()).arg(replyRx.cap(1))).toEncoded()));
 					td1.appendChild(img);
 				}
 				td2.appendChild(blockquote);
-				elementFromString(td2,e.ownerDocument(),msg,jidToSend);
+				elementFromString(&td2, &doc,msg,jidToSend);
 				tableRow.appendChild(td1);
 				tableRow.appendChild(td2);
 				table.appendChild(tableRow);
 				body.appendChild(table);
 			} else {
 				body.appendChild(blockquote);
-				elementFromString(body,e.ownerDocument(),msg,jidToSend);
+				elementFromString(&body, &doc,msg,jidToSend);
 			}
 			//xmpp ссылка на сообщение
-			addMessageId(body, e.ownerDocument(),replyId, replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend,resLink);
+			addMessageId(&body, &doc,replyId, replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend,resLink);
 			//ссылка на сообщение
-			body.appendChild(e.ownerDocument().createTextNode(" "));
+			body.appendChild(doc.createTextNode(" "));
 			QString msgId = replyId.split("/").first();
-			addUnsubscribe(body, e.ownerDocument(), replyId,jidToSend, resLink);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addPlus(body, e.ownerDocument(), msgId, jidToSend, resLink);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addHttpLink(body, e.ownerDocument(), replyRx.cap(5));
+			addUnsubscribe(&body, &doc, replyId,jidToSend, resLink);
+			body.appendChild(doc.createTextNode(" "));
+			addPlus(&body, &doc, msgId, jidToSend, resLink);
+			body.appendChild(doc.createTextNode(" "));
+			addHttpLink(&body, &doc, replyRx.cap(5));
 			msg = "";
 		} else if (rpostRx.indexIn(msg) != -1) {
 			//Reply posted
 			QString resLink("");
-			if (idAsResource == true) {
+			if (idAsResource) {
 				QString tmp(rpostRx.cap(1));
 				resource = tmp.left(tmp.indexOf("/"));
 				resLink = "/" + resource;
 				resLink.replace("#","%23");
 			}
-			body.appendChild(e.ownerDocument().createElement("br"));
-			body.appendChild(e.ownerDocument().createTextNode(tr("Reply posted.")));
-			body.appendChild(e.ownerDocument().createElement("br"));
+			body.appendChild(doc.createElement("br"));
+			body.appendChild(doc.createTextNode(tr("Reply posted.")));
+			body.appendChild(doc.createElement("br"));
 			//xmpp ссылка на сообщение
-			addMessageId(body, e.ownerDocument(),rpostRx.cap(1), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend,resLink);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addDelete(body, e.ownerDocument(),rpostRx.cap(1),jidToSend,resLink);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
+			addMessageId(&body, &doc,rpostRx.cap(1), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend,resLink);
+			body.appendChild(doc.createTextNode(" "));
+			addDelete(&body, &doc,rpostRx.cap(1),jidToSend,resLink);
+			body.appendChild(doc.createTextNode(" "));
 			//ссылка на сообщение
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addHttpLink(body, e.ownerDocument(), rpostRx.cap(2));
+			body.appendChild(doc.createTextNode(" "));
+			addHttpLink(&body, &doc, rpostRx.cap(2));
 			msg = "";
 
-		} else if (msgPostRx.indexIn(msg) != -1){
+		} else if (msgPostRx.indexIn(msg) != -1) {
 			//New message posted
 			QString resLink("");
-			if (idAsResource == true) {
+			if (idAsResource) {
 				QStringList tmp = activeTab->getJid().split('/');
 				if (tmp.count() > 1 && jid == tmp.first()){
 					resource = tmp.last();
@@ -1341,80 +1049,80 @@ bool JuickPlugin::processEvent(int account, QDomElement& e){
 				resLink.replace("#","%23");
 
 			}
-			body.appendChild(e.ownerDocument().createElement("br"));
-			body.appendChild(e.ownerDocument().createTextNode(tr("New message posted.")));
-			body.appendChild(e.ownerDocument().createElement("br"));
+			body.appendChild(doc.createElement("br"));
+			body.appendChild(doc.createTextNode(tr("New message posted.")));
+			body.appendChild(doc.createElement("br"));
 			//xmpp ссылка на сообщение
-			addMessageId(body, e.ownerDocument(),msgPostRx.cap(1), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addDelete(body, e.ownerDocument(),msgPostRx.cap(1),jidToSend);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
+			addMessageId(&body, &doc,msgPostRx.cap(1), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend);
+			body.appendChild(doc.createTextNode(" "));
+			addDelete(&body, &doc,msgPostRx.cap(1),jidToSend);
+			body.appendChild(doc.createTextNode(" "));
 			//ссылка на сообщение
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addHttpLink(body, e.ownerDocument(), msgPostRx.cap(2));
+			body.appendChild(doc.createTextNode(" "));
+			addHttpLink(&body, &doc, msgPostRx.cap(2));
 			msg = "";
-		}else if (threadRx.indexIn(msg) != -1){
+		} else if (threadRx.indexIn(msg) != -1) {
 			//Show All Messages
 			QString resLink("");
-			if (idAsResource == true) {
+			if (idAsResource) {
 				resource = threadRx.cap(4);
 				resLink = "/" + resource;
 				resLink.replace("#","%23");
 				res = resLink;
 			}
-			body.appendChild(e.ownerDocument().createElement("br"));
-			addUserLink(body, e.ownerDocument(), "@" + threadRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+",jidToSend);
-			body.appendChild(e.ownerDocument().createTextNode(": "));
-			if (threadRx.cap(2) != ""){
+			body.appendChild(doc.createElement("br"));
+			addUserLink(&body, &doc, "@" + threadRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+",jidToSend);
+			body.appendChild(doc.createTextNode(": "));
+			if (!threadRx.cap(2).isEmpty()) {
 				//добавляем теги
-				foreach (QString tag,threadRx.cap(2).trimmed().split(" ")){
-					addTagLink(body, e.ownerDocument(), tag,jidToSend);
+				foreach (const QString& tag,threadRx.cap(2).trimmed().split(" ")){
+					addTagLink(&body, &doc, tag,jidToSend);
 				}
 			}
-			body.appendChild(e.ownerDocument().createElement("br"));
+			body.appendChild(doc.createElement("br"));
 			//обрабатываем текст сообщения
 			QString newMsg(" " + threadRx.cap(3) + " ");
-			elementFromString(body,e.ownerDocument(),newMsg,jidToSend);
+			elementFromString(&body, &doc,newMsg,jidToSend);
 			//xmpp ссылка на сообщение
-			addMessageId(body, e.ownerDocument(),threadRx.cap(4), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend,resLink);
+			addMessageId(&body, &doc,threadRx.cap(4), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend,resLink);
 			//ссылка на сообщение
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addSubscribe(body, e.ownerDocument(), threadRx.cap(4),jidToSend, resLink);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addFavorite(body, e.ownerDocument(), threadRx.cap(4),jidToSend, resLink);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addHttpLink(body, e.ownerDocument(), threadRx.cap(5));
+			body.appendChild(doc.createTextNode(" "));
+			addSubscribe(&body, &doc, threadRx.cap(4),jidToSend, resLink);
+			body.appendChild(doc.createTextNode(" "));
+			addFavorite(&body, &doc, threadRx.cap(4),jidToSend, resLink);
+			body.appendChild(doc.createTextNode(" "));
+			addHttpLink(&body, &doc, threadRx.cap(5));
 			msg = msg.right(msg.size() - threadRx.matchedLength() + threadRx.cap(6).length());
 		} else if (singleMsgRx.indexIn(msg) != -1) {
 			//просмотр отдельного поста
-			body.appendChild(e.ownerDocument().createElement("br"));
-			addUserLink(body, e.ownerDocument(), "@" + singleMsgRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+",jidToSend);
-			body.appendChild(e.ownerDocument().createTextNode(": "));
-			if (singleMsgRx.cap(2) != ""){
+			body.appendChild(doc.createElement("br"));
+			addUserLink(&body, &doc, "@" + singleMsgRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+",jidToSend);
+			body.appendChild(doc.createTextNode(": "));
+			if (!singleMsgRx.cap(2).isEmpty()) {
 				//добавляем теги
-				foreach (QString tag,singleMsgRx.cap(2).trimmed().split(" ")){
-					addTagLink(body, e.ownerDocument(), tag,jidToSend);
+				foreach (const QString& tag,singleMsgRx.cap(2).trimmed().split(" ")){
+					addTagLink(&body, &doc, tag,jidToSend);
 				}
 			}
-			body.appendChild(e.ownerDocument().createElement("br"));
+			body.appendChild(doc.createElement("br"));
 			//обрабатываем текст сообщения
 			QString newMsg = " " + singleMsgRx.cap(3) + " ";
-			elementFromString(body,e.ownerDocument(), newMsg,jidToSend);
+			elementFromString(&body, &doc, newMsg,jidToSend);
 			//xmpp ссылка на сообщение
-			if (singleMsgRx.cap(5) == ""){
+			if (singleMsgRx.cap(5).isEmpty()) {
 				messageLinkPattern = "xmpp:%1%3?message;type=chat;body=%2";
 				altTextMsg = replyMsgString;
 			}
-			addMessageId(body, e.ownerDocument(), singleMsgRx.cap(4), altTextMsg, messageLinkPattern,jidToSend);
+			addMessageId(&body, &doc, singleMsgRx.cap(4), altTextMsg, messageLinkPattern,jidToSend);
 			//ссылка на сообщение
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addSubscribe(body, e.ownerDocument(), singleMsgRx.cap(4),jidToSend);
-			body.appendChild(e.ownerDocument().createTextNode(" "));
-			addFavorite(body, e.ownerDocument(), singleMsgRx.cap(4),jidToSend);
-			body.appendChild(e.ownerDocument().createTextNode(" "+singleMsgRx.cap(5)));
-			addHttpLink(body, e.ownerDocument(), singleMsgRx.cap(6));
+			body.appendChild(doc.createTextNode(" "));
+			addSubscribe(&body, &doc, singleMsgRx.cap(4),jidToSend);
+			body.appendChild(doc.createTextNode(" "));
+			addFavorite(&body, &doc, singleMsgRx.cap(4),jidToSend);
+			body.appendChild(doc.createTextNode(" "+singleMsgRx.cap(5)));
+			addHttpLink(&body, &doc, singleMsgRx.cap(6));
 			msg = "";
-		} else if (msg.indexOf("Recommended blogs:") != -1){
+		} else if (msg.indexOf("Recommended blogs:") != -1) {
 			//если команда @
 			userLinkPattern = "xmpp:%1?message;type=chat;body=S %2";
 			altTextUser =tr("Subscribe to %1's blog");
@@ -1436,20 +1144,20 @@ bool JuickPlugin::processEvent(int account, QDomElement& e){
 				   || msg == "\nThis nickname is already taken by someone\n"
 				   || msg == "\nUser not found.\n"
 				   || delMsgRx.indexIn(msg) != -1
-				   || delReplyRx.indexIn(msg) != -1 ){
+				   || delReplyRx.indexIn(msg) != -1 ) {
 			msg = msg.left(msg.size() - 1);
 		}
-		if (idAsResource == true && resource == "" && (jid != jubo || usernameJ != "jubo%nologin.ru")) {
+		if (idAsResource && resource.isEmpty() && (jid != jubo || usernameJ != "jubo%nologin.ru")) {
 			QStringList tmp = activeTab->getJid().split('/');
 			if (tmp.count() > 1 && jid == tmp.first()){
 				resource = tmp.last();
 			}
 		}
 		//обработка по умолчанию
-		elementFromString(body,e.ownerDocument(),msg,jidToSend,res);
+		elementFromString(&body, &doc,msg,jidToSend,res);
 		element.appendChild(body);
 		e.lastChild().appendChild(element);
-		if (resource != ""){
+		if (!resource.isEmpty()) {
 			QDomElement domMsg = e.lastChildElement();
 			QString from = domMsg.attribute("from");
 			from.replace(QRegExp("(.*)/.*"),"\\1/"+resource);
@@ -1458,6 +1166,7 @@ bool JuickPlugin::processEvent(int account, QDomElement& e){
 	}
 	return false;
 }
+
 void JuickPlugin::chooseColor(QAbstractButton* button)
 {
 	QColor c;
@@ -1472,178 +1181,203 @@ void JuickPlugin::chooseColor(QAbstractButton* button)
 
 	}
 }
-void JuickPlugin::clearCache(){
+
+void JuickPlugin::clearCache()
+{
 	QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
-	QStringList fileNames = dir.entryList(QStringList(QString("*")));
-	foreach(QString file,fileNames){
+	foreach(const QString& file, dir.entryList(QDir::Files)) {
 		QFile::remove(dir.absolutePath()+"/"+file);
 	}
 }
+
 void JuickPlugin::setOptionAccessingHost(OptionAccessingHost* host)
 {
 	psiOptions = host;
 }
 
-void JuickPlugin::setActiveTabAccessingHost(ActiveTabAccessingHost* host){
+void JuickPlugin::setActiveTabAccessingHost(ActiveTabAccessingHost* host)
+{
 	activeTab = host;
 }
-void JuickPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host){
+
+void JuickPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host)
+{
 	applicationInfo = host;
 }
+
 /*
   void JuickPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost *host) {
   accInfo = host;
   }
 */
-void JuickPlugin::optionChanged(const QString& option)
+
+bool JuickPlugin::incomingStanza(int account, const QDomElement& stanza)
 {
-	Q_UNUSED(option);
-}
-bool JuickPlugin::incomingStanza(int account, const QDomElement& stanza){
+	if(!enabled)
+		return false;
+
 	Q_UNUSED(account);
 	QString jid("");
 	QString usernameJ("");
-	if (enabled && stanza.tagName() == "message" ){
+	if (stanza.tagName() == "message" ) {
 		jid = stanza.attribute("from").split('/').first();
-		if (workInGroupChat == true && jid == "juick@conference.jabber.ru") {
+		usernameJ = jid.split("@").first();
+		if (workInGroupChat && jid == "juick@conference.jabber.ru") {
 			QString msg = stanza.firstChild().nextSibling().firstChild().nodeValue();
 			msg.replace(QRegExp("#(\\d+)"),"http://juick.com/\\1");
 			stanza.firstChild().nextSibling().firstChild().setNodeValue(msg);
 		}
-	}
-	if (enabled && showAvatars && stanza.tagName() == "message"
-		&& (jid = stanza.attribute("from").split('/').first(), usernameJ = jid.split("@").first(), /*jid == juick||jid == jubo*/ jidList_.contains(jid)
-			||usernameJ=="juick%juick.com"||usernameJ=="jubo%nologin.ru")){
-		QDomNodeList childs = stanza.childNodes();
-		int size = childs.size();
-		for(int i = 0; i< size; ++i){
-			QDomElement element = childs.item(i).toElement();
-			if (!element.isNull() && element.tagName() == "juick"){
-				QDomElement userElement = element.firstChildElement("user");
-				QString uid = userElement.attribute("uid");
-				QString unick = "@" + userElement.attribute("uname");
-				QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
-				if (dir.exists()){
-					QStringList fileName = dir.entryList(QStringList(QString(unick + ";*")));
-					if (!fileName.empty()){
-						QString fname = fileName.last();
-						bool ok;
-						QString day = fname.split(';').last();
-						if (QDate::currentDate().dayOfYear() - day.toInt(&ok,10) > (rand() %10 + 11)){
-							Http *http = new Http(this);
-							http->setHost("i.juick.com");
 
-							//-----by Dealer_WeARE-----------				
-							Proxy prx = applicationInfo->getProxyFor(constPluginName);
-							http->setProxyHostPort(prx.host, prx.port, prx.user, prx.pass, prx.type);
+		if (showAvatars && (jidList_.contains(jid) || usernameJ == "juick%juick.com" || usernameJ == "jubo%nologin.ru")) {
+			QDomNodeList childs = stanza.childNodes();
+			int size = childs.size();
+			for(int i = 0; i< size; ++i) {
+				QDomElement element = childs.item(i).toElement();
+				if (!element.isNull() && element.tagName() == "juick") {
+					QDomElement userElement = element.firstChildElement("user");
+					const QString uid = userElement.attribute("uid");
+					QString unick = "@" + userElement.attribute("uname");
+					QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
+					if(!dir.exists())
+						return false;
 
-							QByteArray img = http->get("/as/"+uid+".png");
-							if(img.isEmpty())
-								img = http->get("/a/"+uid+".png");
-							http->deleteLater();
-							QFile::remove(dir.absolutePath()+"/"+fname);
-							fname = QString("%1;%2").arg(unick).arg(QDate::currentDate().dayOfYear());
-							QFile file(QString("%1/%2").arg(dir.absolutePath()).arg(fname));
-							if(!file.open(QIODevice::WriteOnly)){
-								QMessageBox::warning(0, tr("Warning"),tr("Cannot write to file %1:\n%2.")
-													 .arg(file.fileName())
-													 .arg(file.errorString()));
-							} else {
-								file.write(img);
-								file.close();
-							}
-							QDir dirPer(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/per");
-							if (!dirPer.exists()){
-								dirPer.mkdir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/per");
-							}
-							QFile filePer(QString("%1/per/%2").arg(dir.absolutePath()).arg(unick));
-							if(!filePer.open(QIODevice::WriteOnly)){
-								QMessageBox::warning(0, tr("Warning"),tr("Cannot write to file %1:\n%2.")
-													 .arg(filePer.fileName())
-													 .arg(filePer.errorString()));
-							} else {
-								filePer.write(img);
-								filePer.close();
-							}
+					QStringList fileNames = dir.entryList(QStringList(QString(unick + ";*")));
+					if (!fileNames.empty()) {
+						QFile file(QString("%1/%2").arg(dir.absolutePath()).arg(fileNames.first()));
+						if (QFileInfo(file).lastModified().daysTo(QDateTime::currentDateTime()) > avatarsUpdateInterval
+								|| file.size() == 0) {
+							file.remove();
 						}
-					} else {
-						Http *http = new Http(this);
-						http->setHost("i.juick.com");
-
-						//-----by Dealer_WeARE-----------
-						Proxy prx = applicationInfo->getProxyFor(constPluginName);
-						http->setProxyHostPort(prx.host, prx.port, prx.user, prx.pass, prx.type);
-
-						QByteArray img = http->get("/as/"+uid+".png");
-						if(img.isEmpty())
-							img = http->get("/a/"+uid+".png");
-						http->deleteLater();
-						QFile file(QString("%1/%2;%3").arg(dir.absolutePath()).arg(unick).arg(QDate::currentDate().dayOfYear()));
-						QFile filePer(QString("%1/per/%2").arg(dir.absolutePath()).arg(unick));
-						if(!file.open(QIODevice::WriteOnly)){
-							QMessageBox::warning(0, tr("Warning"),tr("Cannot write to file %1:\n%2.")
-												 .arg(file.fileName())
-												 .arg(file.errorString()));
-						} else {
-							file.write(img);
-							file.close();
-						}
-						QDir dirPer(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/per");
-						if (!dirPer.exists()){
-							dirPer.mkdir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/per");
-						}
-						if(!filePer.open(QIODevice::WriteOnly)){
-							QMessageBox::warning(0, tr("Warning"),tr("Cannot write to file %1:\n%2.")
-												 .arg(filePer.fileName())
-												 .arg(filePer.errorString()));
-						} else {
-							filePer.write(img);
-							filePer.close();
+						else {
+							return false;
 						}
 					}
+
+					QMetaObject::invokeMethod(this, "getAvatar",
+								Qt::QueuedConnection,
+								Q_ARG(const QString&, uid),
+								Q_ARG(const QString&, unick));
+
+					break;
 				}
-				break;
 			}
 		}
 	}
 	return false;
 }
 
-bool JuickPlugin::outgoingStanza(int /*account*/, QDomElement& /*stanza*/)
+
+// Эта функция обновляет чатлоги, чтобы они перезагрузили
+// картинки с диска
+static void updateWidgets(QList<QWidget*> widgets)
 {
-	return false;
+	foreach(QWidget *w, widgets) {
+		if(w->inherits("QTextEdit"))
+			w->update();
+		else {
+			QWebView *wv = w->findChild<QWebView*>();
+			if(wv) {
+				wv->update();
+			}
+		}
+	}
 }
 
-void JuickPlugin::elementFromString(QDomElement& body,QDomDocument e, QString& msg,QString jid, QString resource){
+void JuickPlugin::getAvatar(const QString &uid, const QString& unick)
+{
+	QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
+	Http *http = new Http(this);
+	http->setHost("i.juick.com");
+
+	Proxy prx = applicationInfo->getProxyFor(constPluginName);
+	http->setProxyHostPort(prx.host, prx.port, prx.user, prx.pass, prx.type);
+
+	QByteArray img = http->get("/as/"+uid+".png");
+	if(img.isEmpty())
+		img = http->get("/a/"+uid+".png");
+	http->deleteLater();
+	QFile file(QString("%1/%2;").arg(dir.absolutePath()).arg(unick));
+
+	if(!file.open(QIODevice::WriteOnly)){
+		QMessageBox::warning(0, tr("Warning"),tr("Cannot write to file %1:\n%2.")
+				     .arg(file.fileName())
+				     .arg(file.errorString()));
+	}
+	else {
+		file.write(img);
+		file.close();
+	}
+
+	updateWidgets(logs_);
+}
+
+void JuickPlugin::getPhoto(const QUrl &url)
+{
+	Http *http = new Http(this);
+	http->setHost(url.host());
+
+	Proxy prx = applicationInfo->getProxyFor(constPluginName);
+	http->setProxyHostPort(prx.host, prx.port, prx.user, prx.pass, prx.type);
+	http->setProperty("path", url.path().replace("/", "%"));
+	connect(http, SIGNAL(dataReady(QByteArray)), SLOT(photoReady(QByteArray)));
+	http->get(QString(url.path()).replace("/photos-1024/","/ps/"), false);
+}
+
+void JuickPlugin::photoReady(const QByteArray &ba)
+{
+	Http* http = static_cast<Http*>(sender());
+	http->deleteLater();
+	QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/photos");
+	if(!dir.exists())
+		return;
+
+	QString path = http->property("path").toString();
+	QFile file(QString("%1/%2").arg(dir.absolutePath()).arg(path));
+
+	if(!file.open(QIODevice::WriteOnly)){
+		QMessageBox::warning(0, tr("Warning"),tr("Cannot write to file %1:\n%2.")
+				     .arg(file.fileName())
+				     .arg(file.errorString()));
+	}
+	else {
+		file.write(ba);
+		file.close();
+	}
+
+	updateWidgets(logs_);
+}
+
+void JuickPlugin::elementFromString(QDomElement* body,QDomDocument* e, const QString& msg, const QString& jid, const QString& resource)
+{
 	int new_pos = 0;
 	int pos = 0;
-	while ((new_pos = regx.indexIn(msg, pos)) != -1){
+	while ((new_pos = regx.indexIn(msg, pos)) != -1) {
 		QString before = msg.mid(pos,new_pos-pos+regx.cap(1).length());
 		int quoteSize = 0;
-		nl2br(body,e,before.right(before.size() - quoteSize));
+		nl2br(body, e, before.right(before.size() - quoteSize));
 		QString seg = regx.cap(2);
-		switch (seg.at(0).toAscii()){
+		switch (seg.at(0).toAscii()) {
 		case '#':{
 			idRx.indexIn(seg);
-			if (idRx.cap(2) != "" ){
+			if (!idRx.cap(2).isEmpty()) {
 				//для #1234/12 - +ненужен
 				messageLinkPattern = "xmpp:%1%3?message;type=chat;body=%2";
 				altTextMsg = replyMsgString;
 			}
-			addMessageId(body, e.ownerDocument(),idRx.cap(1)+idRx.cap(2), altTextMsg, messageLinkPattern,jid, resource);
-			body.appendChild(e.ownerDocument().createTextNode(idRx.cap(3)));
+			addMessageId(body, e,idRx.cap(1)+idRx.cap(2), altTextMsg, messageLinkPattern,jid, resource);
+			body->appendChild(e->createTextNode(idRx.cap(3)));
 			break;}
 		case '@':{
 			nickRx.indexIn(seg);
-			addUserLink(body, e.ownerDocument(), nickRx.cap(1), altTextUser ,userLinkPattern,jid);
-			body.appendChild(e.ownerDocument().createTextNode(nickRx.cap(2)));
+			addUserLink(body, e, nickRx.cap(1), altTextUser ,userLinkPattern,jid);
+			body->appendChild(e->createTextNode(nickRx.cap(2)));
 			//tag
 			if (nickRx.cap(2) == ":" && (regx.cap(1) == "\n" || regx.cap(1) == "\n\n")){
-				body.appendChild(e.ownerDocument().createTextNode(" "));
+				body->appendChild(e->ownerDocument().createTextNode(" "));
 				QString tagMsg = msg.right(msg.size()-(new_pos+regx.matchedLength()-regx.cap(3).size()));
 				for (int i=0; i < 6; ++i){
 					if (tagRx.indexIn(tagMsg, 0) != -1){
-						addTagLink(body, e.ownerDocument(), tagRx.cap(1),jid);
+						addTagLink(body, e, tagRx.cap(1),jid);
 						tagMsg = tagMsg.right(tagMsg.size() - tagRx.matchedLength());
 						new_pos += tagRx.matchedLength();
 					} else {
@@ -1654,27 +1388,27 @@ void JuickPlugin::elementFromString(QDomElement& body,QDomDocument e, QString& m
 			}
 			break;}
 		case '*':{
-			QDomElement bold = e.ownerDocument().createElement("b");
-			bold.appendChild(e.ownerDocument().createTextNode(seg.mid(1,seg.size()-2)));
-			body.appendChild(bold);
+			QDomElement bold = e->createElement("b");
+			bold.appendChild(e->createTextNode(seg.mid(1,seg.size()-2)));
+			body->appendChild(bold);
 			break;}
 		case '_':{
-			QDomElement under = e.ownerDocument().createElement("u");
-			under.appendChild(e.ownerDocument().createTextNode(seg.mid(1,seg.size()-2)));
-			body.appendChild(under);
+			QDomElement under = e->createElement("u");
+			under.appendChild(e->createTextNode(seg.mid(1,seg.size()-2)));
+			body->appendChild(under);
 			break;}
 		case '/':{
-			QDomElement italic = e.ownerDocument().createElement("i");
-			italic.appendChild(e.ownerDocument().createTextNode(seg.mid(1,seg.size()-2)));
-			body.appendChild(italic);
+			QDomElement italic = e->createElement("i");
+			italic.appendChild(e->createTextNode(seg.mid(1,seg.size()-2)));
+			body->appendChild(italic);
 			break;}
 		case 'h':
 		case 'f':{
-			QDomElement ahref = e.ownerDocument().createElement("a");
+			QDomElement ahref = e->createElement("a");
 			ahref.setAttribute("style","color:" + commonLinkColor + ";");
 			ahref.setAttribute("href",seg);
-			ahref.appendChild(e.ownerDocument().createTextNode(seg));
-			body.appendChild(ahref);
+			ahref.appendChild(e->createTextNode(seg));
+			body->appendChild(ahref);
 			break;}
 		default:{}
 		}
@@ -1682,87 +1416,134 @@ void JuickPlugin::elementFromString(QDomElement& body,QDomDocument e, QString& m
 		new_pos = pos;
 	}
 	nl2br(body, e , msg.right(msg.size()-pos));
-	body.appendChild(e.ownerDocument().createElement("br"));
-}
-void JuickPlugin::nl2br(QDomElement& body,QDomDocument e, QString msg){
-	foreach (QString str, msg.split("\n")) {
-		body.appendChild(e.createTextNode(str));
-		body.appendChild(e.createElement("br"));
-	}
-	body.removeChild(body.lastChild());
+	body->appendChild(e->createElement("br"));
 }
 
-void JuickPlugin::addPlus(QDomElement& body,QDomDocument e, QString msg, QString jid, QString resource){
-	QDomElement plus = e.createElement("a");
+void JuickPlugin::nl2br(QDomElement *body,QDomDocument* e, const QString& msg)
+{
+	foreach (const QString& str, msg.split("\n")) {
+		body->appendChild(e->createTextNode(str));
+		body->appendChild(e->createElement("br"));
+	}
+	body->removeChild(body->lastChild());
+}
+
+void JuickPlugin::addPlus(QDomElement *body,QDomDocument* e, const QString& msg_, const QString& jid, const QString& resource)
+{
+	QString msg(msg_);
+	QDomElement plus = e->createElement("a");
 	plus.setAttribute("style",idStyle);
 	plus.setAttribute("title",showAllmsgString);
 	plus.setAttribute("href",QString("xmpp:%1%3?message;type=chat;body=%2+").arg(jid).arg(msg.replace("#","%23")).arg(resource));
-	plus.appendChild(e.ownerDocument().createTextNode("+"));
-	body.appendChild(plus);
+	plus.appendChild(e->createTextNode("+"));
+	body->appendChild(plus);
 }
-void JuickPlugin::addSubscribe(QDomElement& body,QDomDocument e, QString msg, QString jid, QString resource){
-	QDomElement subscribe = e.createElement("a");
+
+void JuickPlugin::addSubscribe(QDomElement* body,QDomDocument* e, const QString& msg_, const QString& jid, const QString& resource)
+{
+	QString msg(msg_);
+	QDomElement subscribe = e->createElement("a");
 	subscribe.setAttribute("style",idStyle);
 	subscribe.setAttribute("title",subscribeString);
 	subscribe.setAttribute("href",QString("xmpp:%1%3?message;type=chat;body=S %2").arg(jid).arg(msg.replace("#","%23")).arg(resource));
-	subscribe.appendChild(e.ownerDocument().createTextNode("S"));
-	body.appendChild(subscribe);
+	subscribe.appendChild(e->createTextNode("S"));
+	body->appendChild(subscribe);
 }
-void JuickPlugin::addHttpLink(QDomElement& body,QDomDocument e, QString msg){
-	QDomElement ahref = e.createElement("a");
+
+void JuickPlugin::addHttpLink(QDomElement* body,QDomDocument* e, const QString& msg)
+{
+	QDomElement ahref = e->createElement("a");
 	ahref.setAttribute("href",msg);
 	ahref.setAttribute("style",linkStyle);
-	ahref.appendChild(e.ownerDocument().createTextNode(msg));
-	body.appendChild(ahref);
+	ahref.appendChild(e->createTextNode(msg));
+	body->appendChild(ahref);
 }
-void JuickPlugin::addTagLink(QDomElement& body,QDomDocument e, QString tag, QString jid){
-	QDomElement taglink = e.createElement("a");
+
+void JuickPlugin::addTagLink(QDomElement* body,QDomDocument* e, const QString& tag, const QString& jid)
+{
+	QDomElement taglink = e->createElement("a");
 	taglink.setAttribute("style",tagStyle);
 	taglink.setAttribute("title",showLastTenString.arg(tag));
 	taglink.setAttribute("href",QString("xmpp:%1?message;type=chat;body=%2").arg(jid).arg(tag));
-	taglink.appendChild(e.ownerDocument().createTextNode( tag));
-	body.appendChild(taglink);
-	body.appendChild(e.ownerDocument().createTextNode(" "));
+	taglink.appendChild(e->createTextNode( tag));
+	body->appendChild(taglink);
+	body->appendChild(e->createTextNode(" "));
 }
-void JuickPlugin::addUserLink(QDomElement& body,QDomDocument e, QString nick, QString altText, QString pattern, QString jid){
-	QDomElement ahref = e.createElement("a");
+
+void JuickPlugin::addUserLink(QDomElement* body,QDomDocument* e, const QString& nick, const QString& altText, const QString& pattern, const QString& jid)
+{
+	QDomElement ahref = e->createElement("a");
 	ahref.setAttribute("style", userStyle);
 	ahref.setAttribute("title", altText.arg(nick));
 	ahref.setAttribute("href", pattern.arg(jid).arg(nick));
-	ahref.appendChild(e.ownerDocument().createTextNode(nick));
-	body.appendChild(ahref);
+	ahref.appendChild(e->createTextNode(nick));
+	body->appendChild(ahref);
 }
-void JuickPlugin::addMessageId(QDomElement& body,QDomDocument e, QString mId, QString altText,QString pattern, QString jid, QString resource){
-	QDomElement ahref = e.createElement("a");
+
+void JuickPlugin::addMessageId(QDomElement* body,QDomDocument* e, const QString& mId_,
+			       const QString& altText, const QString& pattern, const QString& jid, const QString& resource)
+{
+	QString mId(mId_);
+	QDomElement ahref = e->createElement("a");
 	ahref.setAttribute("style",idStyle);
 	ahref.setAttribute("title",altText);
 	ahref.setAttribute("href",QString(pattern).arg(jid).arg(mId.replace("#","%23")).arg(resource));
-	ahref.appendChild(e.ownerDocument().createTextNode(mId.replace("%23","#")));
-	body.appendChild(ahref);
+	ahref.appendChild(e->createTextNode(mId.replace("%23","#")));
+	body->appendChild(ahref);
 }
-void JuickPlugin::addUnsubscribe(QDomElement& body,QDomDocument e, QString msg, QString jid, QString resource){
-	QDomElement unsubscribe = e.createElement("a");
+
+void JuickPlugin::addUnsubscribe(QDomElement* body,QDomDocument* e, const QString& msg_, const QString& jid, const QString& resource)
+{
+	QString msg(msg_);
+	QDomElement unsubscribe = e->createElement("a");
 	unsubscribe.setAttribute("style",idStyle);
 	unsubscribe.setAttribute("title",unsubscribeString);
 	unsubscribe.setAttribute("href",QString("xmpp:%1%3?message;type=chat;body=U %2").arg(jid).arg(msg.left(msg.indexOf("/")).replace("#","%23")).arg(resource));
-	unsubscribe.appendChild(e.ownerDocument().createTextNode("U"));
-	body.appendChild(unsubscribe);
+	unsubscribe.appendChild(e->createTextNode("U"));
+	body->appendChild(unsubscribe);
 }
-void JuickPlugin::addDelete(QDomElement& body,QDomDocument e, QString msg, QString jid, QString resource){
-	QDomElement unsubscribe = e.createElement("a");
+
+void JuickPlugin::addDelete(QDomElement* body, QDomDocument* e, const QString& msg_, const QString& jid, const QString& resource)
+{
+	QString msg(msg_);
+	QDomElement unsubscribe = e->createElement("a");
 	unsubscribe.setAttribute("style",idStyle);
 	unsubscribe.setAttribute("title",tr("Delete"));
 	unsubscribe.setAttribute("href",QString("xmpp:%1%3?message;type=chat;body=D %2").arg(jid).arg(msg.replace("#","%23")).arg(resource));
-	unsubscribe.appendChild(e.ownerDocument().createTextNode("D"));
-	body.appendChild(unsubscribe);
+	unsubscribe.appendChild(e->createTextNode("D"));
+	body->appendChild(unsubscribe);
 }
-void JuickPlugin::addFavorite(QDomElement& body,QDomDocument e, QString msg, QString jid, QString resource){
-	QDomElement unsubscribe = e.createElement("a");
+
+void JuickPlugin::addFavorite(QDomElement* body,QDomDocument* e, const QString& msg_, const QString& jid, const QString& resource)
+{
+	QString msg(msg_);
+	QDomElement unsubscribe = e->createElement("a");
 	unsubscribe.setAttribute("style",idStyle);
 	unsubscribe.setAttribute("title",tr("Add to favorites"));
 	unsubscribe.setAttribute("href",QString("xmpp:%1%3?message;type=chat;body=! %2").arg(jid).arg(msg.replace("#","%23")).arg(resource));
-	unsubscribe.appendChild(e.ownerDocument().createTextNode("!"));
-	body.appendChild(unsubscribe);
+	unsubscribe.appendChild(e->createTextNode("!"));
+	body->appendChild(unsubscribe);
+}
+
+// На самом деле мы никаких акшенов не добавляем.
+// Здесь мы просто ищем и сохраняем список уже открытых
+// чатов с juick
+QAction* JuickPlugin::getAction(QObject *parent, int /*account*/, const QString &contact)
+{
+	if(jidList_.contains(contact.split("/").first())) {
+		QWidget* log = parent->findChild<QWidget*>("log");
+		if(log) {
+			logs_.append(log);
+			connect(log, SIGNAL(destroyed()), SLOT(removeWidget()));
+		}
+	}
+	return 0;
+}
+
+void JuickPlugin::removeWidget()
+{
+	QWidget* w = static_cast<QWidget*>(sender());
+	logs_.removeAll(w);
 }
 
 QString JuickPlugin::pluginInfo() {

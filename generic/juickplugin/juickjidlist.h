@@ -27,11 +27,11 @@ class JuickJidList : public QDialog
 {
 	Q_OBJECT
 public:
-	JuickJidList(QStringList jids, QWidget *p = 0);
-	virtual ~JuickJidList() {};
+	JuickJidList(const QStringList& jids, QWidget *p = 0);
+	virtual ~JuickJidList() {}
 
 signals:
-	void listUpdated(QStringList);
+	void listUpdated(const QStringList&);
 
 private slots:
 	void addPressed();

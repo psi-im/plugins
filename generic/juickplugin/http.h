@@ -33,14 +33,17 @@ class Http: public QObject
 
 public:
 	Http(QObject *p = 0);
-	virtual ~Http() {};
-	QByteArray get(const QString& path);
+	virtual ~Http() {}
+	QByteArray get(const QString& path, bool sync = true);
 	void setProxyHostPort(const QString& host, int port, const QString& username = "", const QString& pass = "", const QString& type = "http");
 	void setHost(const QString& host);
 
 private slots:
 	void requestFinished(QNetworkReply *reply);
 	void timeout();
+
+signals:
+	void dataReady(const QByteArray&);
 
 private:
 	QNetworkAccessManager *manager_;

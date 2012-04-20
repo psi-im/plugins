@@ -21,7 +21,7 @@
 #include "juickjidlist.h"
 #include <QInputDialog>
 
-JuickJidList::JuickJidList(QStringList jids, QWidget *p)
+JuickJidList::JuickJidList(const QStringList &jids, QWidget *p)
 	: QDialog(p)
 	, jidList_(jids)
 {
