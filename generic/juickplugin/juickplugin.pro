@@ -8,7 +8,7 @@ SOURCES +=  http.cpp\
 HEADERS += http.h \
     juickjidlist.h
 
-QT += network
+QT += network webkit
 
 FORMS += \
     juickjidlist.ui
