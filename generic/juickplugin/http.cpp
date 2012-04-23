@@ -21,11 +21,7 @@
 #include "http.h"
 
 #include <QNetworkProxy>
-#include <QNetworkRequest>
-#include <QNetworkAccessManager>
-#include <QTimer>
 #include <QNetworkReply>
-#include <QEventLoop>
 #include <QDebug>
 
 
