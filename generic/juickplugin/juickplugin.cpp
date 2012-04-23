@@ -105,6 +105,21 @@ public:
 
 	virtual bool incomingStanza(int account, const QDomElement& stanza);
 	virtual bool outgoingStanza(int , QDomElement& ) { return false; }
+
+private slots:
+	void chooseColor(QWidget *);
+	void clearCache();
+	void updateJidList(const QStringList& jids);
+	void requestJidList();
+	void photoReady(const QByteArray& ba);
+	void removeWidget();
+
+private:
+	void createAvatarsDir();
+	void getAvatar(const QString& uid, const QString &unick);
+	void getPhoto(const QUrl &url);
+	Http* newHttp(const QString &path);
+
 	void elementFromString(QDomElement* body, QDomDocument* e, const QString &msg, const QString &jid, const QString &resource = "");
 	void nl2br(QDomElement* body, QDomDocument* e,const QString& msg);
 	void addPlus(QDomElement* body, QDomDocument* e, const QString &msg, const QString &jid, const QString &resource = "");
@@ -116,21 +131,7 @@ public:
 	void addUnsubscribe(QDomElement* body, QDomDocument* e, const QString &msg, const QString &jid, const QString &resource = "");
 	void addDelete(QDomElement* body ,QDomDocument* e, const QString& msg, const QString& jid, const QString& resource = "");
 	void addFavorite(QDomElement* body, QDomDocument* e, const QString &msg, const QString &jid, const QString &resource = "");
-
-private slots:
-	void chooseColor(QWidget *);
-	void clearCache();
-	void updateJidList(const QStringList& jids);
-	void requestJidList();
-	void photoReady(const QByteArray& ba);
-	void avatarReady(const QByteArray& ba);
-	void removeWidget();
-
-private:
-	void createAvatarsDir();
-	void getAvatar(const QString& uid, const QString &unick);
-	void getPhoto(const QUrl &url);
-	Http* newHttp(const QString &path);
+	void addAvatar(QDomElement *body, QDomDocument *doc, const QString &msg, const QString &jidToSend, const QString &ujid);
 
 private:
 	bool enabled;
@@ -535,7 +536,7 @@ bool JuickPlugin::processEvent(int /*account*/, QDomElement& e)
 			}
 			msg =  "";
 		}
-		if (! e.lastChild().firstChild().nextSibling().isNull() && e.lastChild().firstChild().nextSibling().nodeName() == "x"){
+		if (!e.lastChild().firstChild().nextSibling().isNull() && e.lastChild().firstChild().nextSibling().nodeName() == "x") {
 			//photo post
 			if (showPhoto && postRx.indexIn(msg) != -1) {
 				QString resLink("");
@@ -608,23 +609,7 @@ bool JuickPlugin::processEvent(int /*account*/, QDomElement& e)
 			//обрабатываем текст сообщения
 			QString newMsg = " " + juboRx.cap(4) + " ";
 			if (showAvatars) {
-				QDomElement table = doc.createElement("table");
-				QDomElement tableRow = doc.createElement("tr");
-				QDomElement td1 = doc.createElement("td");
-				td1.setAttribute("valign","top");
-				QDomElement td2 = doc.createElement("td");
-				QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
-				if (dir.exists()) {
-					QDomElement img = doc.createElement("img");
-					img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/@%2;").arg(dir.absolutePath()).arg(juboRx.cap(2))).toEncoded()));
-					///*/
-					td1.appendChild(img);
-				}
-				elementFromString(&td2, &doc,newMsg,jidToSend);
-				tableRow.appendChild(td1);
-				tableRow.appendChild(td2);
-				table.appendChild(tableRow);
-				body.appendChild(table);
+				addAvatar(&body, &doc, msg, jidToSend, juboRx.cap(2));
 			} else {
 				body.appendChild(doc.createElement("br"));
 				//обрабатываем текст сообщения
@@ -646,7 +631,7 @@ bool JuickPlugin::processEvent(int /*account*/, QDomElement& e)
 			//last 10 messages
 			body.appendChild(doc.createTextNode(lastMsgRx.cap(1)));
 			msg = lastMsgRx.cap(2);
-			while (singleMsgRx.indexIn(msg) != -1){
+			while (singleMsgRx.indexIn(msg) != -1) {
 				body.appendChild(doc.createElement("br"));
 				addUserLink(&body, &doc, "@" + singleMsgRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
 				body.appendChild(doc.createTextNode(": "));
@@ -675,7 +660,7 @@ bool JuickPlugin::processEvent(int /*account*/, QDomElement& e)
 				msg = msg.right(msg.size() - singleMsgRx.matchedLength());
 			}
 			body.removeChild(body.lastChild());
-		} else if (msg.indexOf(topTag) != -1){
+		} else if (msg.indexOf(topTag) != -1) {
 			//Если это топ тегов
 			body.appendChild(doc.createTextNode(topTag));
 			body.appendChild(doc.createElement("br"));
@@ -685,7 +670,7 @@ bool JuickPlugin::processEvent(int /*account*/, QDomElement& e)
 				body.appendChild(doc.createElement("br"));
 				msg = msg.right(msg.size() - tagRx.matchedLength());
 			}
-		} else if (recomendRx.indexIn(msg) != -1){
+		} else if (recomendRx.indexIn(msg) != -1) {
 			//разбор рекомендации
 			QString resLink("");
 			if (idAsResource) {
@@ -736,26 +721,11 @@ bool JuickPlugin::processEvent(int /*account*/, QDomElement& e)
 				body.appendChild(bold);
 				msg = " " + tuneRx.cap(2) + " ";
 			}
-			else{
+			else {
 				msg = " " + recomendRx.cap(4) + " ";
 			}
-			if (showAvatars){
-				QDomElement table = doc.createElement("table");
-				QDomElement tableRow = doc.createElement("tr");
-				QDomElement td1 = doc.createElement("td");
-				td1.setAttribute("valign","top");
-				QDomElement td2 = doc.createElement("td");
-				QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
-				if (dir.exists()){
-					QDomElement img = doc.createElement("img");
-					img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/@%2;").arg(dir.absolutePath()).arg(recomendRx.cap(2))).toEncoded()));
-					td1.appendChild(img);
-				}
-				elementFromString(&td2, &doc,msg, jidToSend);
-				tableRow.appendChild(td1);
-				tableRow.appendChild(td2);
-				table.appendChild(tableRow);
-				body.appendChild(table);
+			if (showAvatars) {
+				addAvatar(&body, &doc, msg, jidToSend, recomendRx.cap(2));
 			} else {
 				body.appendChild(doc.createElement("br"));
 				//обрабатываем текст сообщения
@@ -775,7 +745,7 @@ bool JuickPlugin::processEvent(int /*account*/, QDomElement& e)
 			body.appendChild(doc.createTextNode(" "));
 			addHttpLink(&body, &doc, recomendRx.cap(7));
 			msg = "";
-		} else if (postRx.indexIn(msg) != -1){
+		} else if (postRx.indexIn(msg) != -1) {
 			//разбор сообщения
 			QString resLink("");
 			if (idAsResource) {
@@ -798,7 +768,7 @@ bool JuickPlugin::processEvent(int /*account*/, QDomElement& e)
 			QRegExp geoRx("\\*geo:\\s(.*)\\n(.*)");
 			//tune
 			QRegExp tuneRx("\\*tune:\\s(.*)\\n(.*)");
-			if (moodRx.indexIn(postRx.cap(3)) != -1){
+			if (moodRx.indexIn(postRx.cap(3)) != -1) {
 				body.appendChild(doc.createElement("br"));
 				QDomElement bold = doc.createElement("b");
 				bold.appendChild(doc.createTextNode("mood: "));
@@ -822,26 +792,11 @@ bool JuickPlugin::processEvent(int /*account*/, QDomElement& e)
 				body.appendChild(bold);
 				msg = " " + tuneRx.cap(2) + " ";
 			}
-			else{
+			else {
 				msg = " " + postRx.cap(3) + " ";
 			}
-			if (showAvatars){
-				QDomElement table = doc.createElement("table");
-				QDomElement tableRow = doc.createElement("tr");
-				QDomElement td1 = doc.createElement("td");
-				td1.setAttribute("valign","top");
-				QDomElement td2 = doc.createElement("td");
-				QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
-				if (dir.exists()){
-					QDomElement img = doc.createElement("img");
-					img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/@%2;").arg(dir.absolutePath()).arg(postRx.cap(1))).toEncoded()));
-					td1.appendChild(img);
-				}
-				elementFromString(&td2, &doc,msg, jidToSend);
-				tableRow.appendChild(td1);
-				tableRow.appendChild(td2);
-				table.appendChild(tableRow);
-				body.appendChild(table);
+			if (showAvatars) {
+				addAvatar(&body, &doc, msg, jidToSend, postRx.cap(1));
 			} else {
 				body.appendChild(doc.createElement("br"));
 				//обрабатываем текст сообщения
@@ -859,7 +814,7 @@ bool JuickPlugin::processEvent(int /*account*/, QDomElement& e)
 			body.appendChild(doc.createTextNode(" "));
 			addHttpLink(&body, &doc, postRx.cap(5));
 			msg = "";
-		} else if (replyRx.indexIn(msg) != -1){
+		} else if (replyRx.indexIn(msg) != -1) {
 			//обработка реплеев
 			QString resLink("");
 			QString replyId(replyRx.cap(4));
@@ -877,26 +832,12 @@ bool JuickPlugin::processEvent(int /*account*/, QDomElement& e)
 			blockquote.appendChild(doc.createTextNode(replyRx.cap(2)));
 			//обрабатываем текст сообщения
 			msg = " " + replyRx.cap(3) + " ";
-			if (showAvatars){
-				QDomElement table = doc.createElement("table");
-				QDomElement tableRow = doc.createElement("tr");
-				QDomElement td1 = doc.createElement("td");
-				td1.setAttribute("valign","top");
-				QDomElement td2 = doc.createElement("td");
-				QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
-				if (dir.exists()){
-					QDomElement img = doc.createElement("img");
-					img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/@%2;").arg(dir.absolutePath()).arg(replyRx.cap(1))).toEncoded()));
-					td1.appendChild(img);
-				}
-				td2.appendChild(blockquote);
-				elementFromString(&td2, &doc,msg,jidToSend);
-				tableRow.appendChild(td1);
-				tableRow.appendChild(td2);
-				table.appendChild(tableRow);
-				body.appendChild(table);
+			body.appendChild(blockquote);
+			if (showAvatars) {
+				addAvatar(&body, &doc, msg, jidToSend, replyRx.cap(1));
+				//td2.appendChild(blockquote);
 			} else {
-				body.appendChild(blockquote);
+				//body.appendChild(blockquote);
 				elementFromString(&body, &doc,msg,jidToSend);
 			}
 			//xmpp ссылка на сообщение
@@ -1315,6 +1256,27 @@ void JuickPlugin::nl2br(QDomElement *body,QDomDocument* e, const QString& msg)
 		body->appendChild(e->createElement("br"));
 	}
 	body->removeChild(body->lastChild());
+}
+
+void JuickPlugin::addAvatar(QDomElement* body, QDomDocument* doc, const QString& msg, const QString& jidToSend, const QString& ujid)
+{
+	QDomElement table = doc->createElement("table");
+	QDomElement tableRow = doc->createElement("tr");
+	QDomElement td1 = doc->createElement("td");
+	td1.setAttribute("valign","top");
+	QDomElement td2 = doc->createElement("td");
+	QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
+	if (dir.exists()) {
+		QDomElement img = doc->createElement("img");
+		img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/@%2;").arg(dir.absolutePath()).arg(ujid)).toEncoded()));
+		td1.appendChild(img);
+	}
+//	td2.appendChild(blockquote);
+	elementFromString(&td2, doc, msg, jidToSend);
+	tableRow.appendChild(td1);
+	tableRow.appendChild(td2);
+	table.appendChild(tableRow);
+	body->appendChild(table);
 }
 
 void JuickPlugin::addPlus(QDomElement *body,QDomDocument* e, const QString& msg_, const QString& jid, const QString& resource)
