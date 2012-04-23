@@ -21,14 +21,18 @@
 #ifndef JUICKJIDLIST_H
 #define JUICKJIDLIST_H
 
-#include "ui_juickjidlist.h"
+#include <QDialog>
+
+namespace Ui {
+	class JuickJidDialog;
+}
 
 class JuickJidList : public QDialog
 {
 	Q_OBJECT
 public:
 	JuickJidList(const QStringList& jids, QWidget *p = 0);
-	virtual ~JuickJidList() {}
+	~JuickJidList();
 
 signals:
 	void listUpdated(const QStringList&);
@@ -40,7 +44,7 @@ private slots:
 	void enableButtons();
 
 private:
-	Ui::JuickJidDialog ui_;
+	Ui::JuickJidDialog *ui_;
 	QStringList jidList_;
 };
 

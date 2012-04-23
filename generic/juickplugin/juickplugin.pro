@@ -11,4 +11,5 @@ HEADERS += http.h \
 QT += network webkit
 
 FORMS += \
-    juickjidlist.ui
+    juickjidlist.ui \
+    settings.ui

@@ -18,11 +18,10 @@
  *
  */
 
-#include <QtCore>
-#include <QtGui>
 #include <QDomElement>
+#include <QMessageBox>
+#include <QColorDialog>
 #include <QtWebKit/QWebView>
-#include <QtWebKit/QWebFrame>
 
 #include "psiplugin.h"
 #include "eventfilter.h"
@@ -38,6 +37,7 @@
 
 #include "http.h"
 #include "juickjidlist.h"
+#include "ui_settings.h"
 
 #define constuserColor "usercolor"
 #define consttagColor "tagcolor"
@@ -118,29 +118,26 @@ public:
 	void addFavorite(QDomElement* body, QDomDocument* e, const QString &msg, const QString &jid, const QString &resource = "");
 
 private slots:
-	void chooseColor(QAbstractButton*);
+	void chooseColor(QWidget *);
 	void clearCache();
 	void updateJidList(const QStringList& jids);
 	void requestJidList();
-	void getAvatar(const QString& uid, const QString &unick);
 	void photoReady(const QByteArray& ba);
+	void avatarReady(const QByteArray& ba);
 	void removeWidget();
 
 private:
 	void createAvatarsDir();
+	void getAvatar(const QString& uid, const QString &unick);
 	void getPhoto(const QUrl &url);
+	Http* newHttp(const QString &path);
 
 private:
 	bool enabled;
 	OptionAccessingHost* psiOptions;
 	ActiveTabAccessingHost* activeTab;
 	ApplicationInfoAccessingHost* applicationInfo;
-	QCheckBox *ubButton, *uiButton, *uuButton, *tbButton, *tiButton, *tuButton;
-	QCheckBox *mbButton, *miButton, *muButton, *qbButton, *qiButton, *quButton;
-	QCheckBox *lbButton, *liButton, *luButton;
-	QToolButton *ucButton, *tcButton, *mcButton, *qcButton, *lcButton;
 	QColor userColor, tagColor, msgColor, quoteColor, lineColor;
-	QCheckBox *asResourceButton, *showPhotoButton, *showAvatarsButton, *groupChatButton;
 	bool userBold,tagBold,msgBold,quoteBold,lineBold;
 	bool userItalic,tagItalic,msgItalic,quoteItalic,lineItalic;
 	bool userUnderline,tagUnderline,msgUnderline,quoteUnderline,lineUnderline;
@@ -154,6 +151,7 @@ private:
 	QStringList jidList_;
 	QPointer<QWidget> optionsWid;
 	QList<QWidget*> logs_;
+	Ui::settings ui_;
 };
 
 Q_EXPORT_PLUGIN(JuickPlugin)
@@ -222,124 +220,21 @@ QWidget* JuickPlugin::options()
 		return 0;
 	}
 	optionsWid = new QWidget();
-	QVBoxLayout *vbox= new QVBoxLayout(optionsWid);
-	QVBoxLayout *leftvbox= new QVBoxLayout;
-	QVBoxLayout *rightvbox= new QVBoxLayout;
-	QHBoxLayout *hbox= new QHBoxLayout;
+	ui_.setupUi(optionsWid);
 
-	QHBoxLayout *ejl = new QHBoxLayout;
-	QPushButton *requestJids = new QPushButton(tr("Edit JIDs"));
-	ejl->addStretch();
-	ejl->addWidget(requestJids);
-	ejl->addStretch();
-	connect(requestJids, SIGNAL(released()), SLOT(requestJidList()));
-	vbox->addLayout(ejl);
+	QSignalMapper *sm = new QSignalMapper(optionsWid);
+	QList<QToolButton*> list = QList<QToolButton*>() << ui_.tb_link
+				<< ui_.tb_message << ui_.tb_name << ui_.tb_quote << ui_.tb_tag;
+	foreach(QToolButton* b, list) {
+		sm->setMapping(b, b);
+		connect(b, SIGNAL(clicked()), sm, SLOT(map()));
+	}
 
-	QGridLayout *layout= new QGridLayout;
-	layout->addWidget(new QLabel(tr("@username"),optionsWid),1,0);
-	layout->addWidget(new QLabel(tr("*tag"),optionsWid),2,0);
-	layout->addWidget(new QLabel(tr("#message id"),optionsWid),3,0);
-	layout->addWidget(new QLabel(tr(">quote"),optionsWid),4,0);
-	layout->addWidget(new QLabel(tr("http://link"),optionsWid),5,0);
-	layout->addWidget(new QLabel(tr("bold"),optionsWid),0,1);
-	layout->addWidget(new QLabel(tr("italic"),optionsWid),0,2);
-	layout->addWidget(new QLabel(tr("underline"),optionsWid),0,3);
-	layout->addWidget(new QLabel(tr("color"),optionsWid),0,4);
-	ubButton = new QCheckBox(optionsWid);
-	uiButton = new QCheckBox(optionsWid);
-	uuButton = new QCheckBox(optionsWid);
-	tbButton = new QCheckBox(optionsWid);
-	tiButton = new QCheckBox(optionsWid);
-	tuButton = new QCheckBox(optionsWid);
-	mbButton = new QCheckBox(optionsWid);
-	miButton = new QCheckBox(optionsWid);
-	muButton = new QCheckBox(optionsWid);
-	qbButton = new QCheckBox(optionsWid);
-	qiButton = new QCheckBox(optionsWid);
-	quButton = new QCheckBox(optionsWid);
-	lbButton = new QCheckBox(optionsWid);
-	liButton = new QCheckBox(optionsWid);
-	luButton = new QCheckBox(optionsWid);
-	ucButton = new QToolButton(optionsWid);
-	tcButton = new QToolButton(optionsWid);
-	mcButton = new QToolButton(optionsWid);
-	qcButton = new QToolButton(optionsWid);
-	lcButton = new QToolButton(optionsWid);
-	layout->addWidget(ubButton,1,1);
-	layout->addWidget(uiButton,1,2);
-	layout->addWidget(uuButton,1,3);
-	layout->addWidget(ucButton,1,4);
-	layout->addWidget(tbButton,2,1);
-	layout->addWidget(tiButton,2,2);
-	layout->addWidget(tuButton,2,3);
-	layout->addWidget(tcButton,2,4);
-	layout->addWidget(mbButton,3,1);
-	layout->addWidget(miButton,3,2);
-	layout->addWidget(muButton,3,3);
-	layout->addWidget(mcButton,3,4);
-	layout->addWidget(qbButton,4,1);
-	layout->addWidget(qiButton,4,2);
-	layout->addWidget(quButton,4,3);
-	layout->addWidget(qcButton,4,4);
-	layout->addWidget(lbButton,5,1);
-	layout->addWidget(liButton,5,2);
-	layout->addWidget(luButton,5,3);
-	layout->addWidget(lcButton,5,4);
-	QButtonGroup *b_color = new QButtonGroup;
-	b_color->addButton(ucButton);
-	b_color->addButton(tcButton);
-	b_color->addButton(mcButton);
-	b_color->addButton(qcButton);
-	b_color->addButton(lcButton);
-	ucButton->setStyleSheet(QString("background-color: %1;").arg(userColor.name()));
-	tcButton->setStyleSheet(QString("background-color: %1;").arg(tagColor.name()));
-	mcButton->setStyleSheet(QString("background-color: %1;").arg(msgColor.name()));
-	qcButton->setStyleSheet(QString("background-color: %1;").arg(quoteColor.name()));
-	lcButton->setStyleSheet(QString("background-color: %1;").arg(lineColor.name()));
-	ucButton->setProperty("psi_color",userColor);
-	tcButton->setProperty("psi_color",tagColor);
-	mcButton->setProperty("psi_color",msgColor);
-	qcButton->setProperty("psi_color",quoteColor);
-	lcButton->setProperty("psi_color",lineColor);
-	ubButton->setChecked(userBold);
-	tbButton->setChecked(tagBold);
-	mbButton->setChecked(msgBold);
-	qbButton->setChecked(quoteBold);
-	lbButton->setChecked(lineBold);
-	uiButton->setChecked(userItalic);
-	tiButton->setChecked(tagItalic);
-	miButton->setChecked(msgItalic);
-	qiButton->setChecked(quoteItalic);
-	liButton->setChecked(lineItalic);
-	uuButton->setChecked(userUnderline);
-	tuButton->setChecked(tagUnderline);
-	muButton->setChecked(msgUnderline);
-	quButton->setChecked(quoteUnderline);
-	luButton->setChecked(lineUnderline);
-	connect(b_color, SIGNAL(buttonClicked(QAbstractButton*)), SLOT(chooseColor(QAbstractButton*)));
-	vbox->addLayout(layout);
-	asResourceButton = new QCheckBox(tr("Use message Id as resource"),optionsWid);
-	asResourceButton->setChecked(idAsResource);
-	leftvbox->addWidget(asResourceButton);
-	showPhotoButton = new QCheckBox(tr("Show Photo"),optionsWid);
-	showPhotoButton->setChecked(showPhoto);
-	leftvbox->addWidget(showPhotoButton);
-	showAvatarsButton = new QCheckBox(tr("Show Avatars"),optionsWid);
-	showAvatarsButton->setChecked(showAvatars);
-	leftvbox->addWidget(showAvatarsButton);
-	groupChatButton = new QCheckBox(tr("Replaces message id with a link\nto this message in juick@conference.jabber.ru"),optionsWid);
-	groupChatButton->setChecked(workInGroupChat);
-	leftvbox->addWidget(groupChatButton);
-	QLabel *wikiLink = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/plugins#juick_plugin\">Wiki (Online)</a>"),optionsWid);
-	wikiLink->setOpenExternalLinks(true);
+	restoreOptions();
 
-	QPushButton *clearCacheButton = new QPushButton(tr("Clear avatar cache"), optionsWid);
-	connect(clearCacheButton,SIGNAL(released()),SLOT(clearCache()));
-	rightvbox->addWidget(clearCacheButton);
-	hbox->addLayout(leftvbox);
-	hbox->addLayout(rightvbox);
-	vbox->addLayout(hbox);
-	vbox->addWidget(wikiLink);
+	connect(sm, SIGNAL(mapped(QWidget*)), SLOT(chooseColor(QWidget*)));
+	connect(ui_.pb_clearCache, SIGNAL(released()), SLOT(clearCache()));
+	connect(ui_.pb_editJids, SIGNAL(released()), SLOT(requestJidList()));
 
 	return optionsWid;
 }
@@ -417,11 +312,11 @@ void JuickPlugin::applyOptions()
 	if (!optionsWid)
 		return;
 
-	userColor = ucButton->property("psi_color").value<QColor>();
-	tagColor = tcButton->property("psi_color").value<QColor>();
-	msgColor = mcButton->property("psi_color").value<QColor>();
-	quoteColor = qcButton->property("psi_color").value<QColor>();
-	lineColor = lcButton->property("psi_color").value<QColor>();
+	userColor = ui_.tb_name->property("psi_color").value<QColor>();
+	tagColor = ui_.tb_tag->property("psi_color").value<QColor>();
+	msgColor = ui_.tb_message->property("psi_color").value<QColor>();
+	quoteColor = ui_.tb_quote->property("psi_color").value<QColor>();
+	lineColor = ui_.tb_link->property("psi_color").value<QColor>();
 	psiOptions->setPluginOption(constuserColor, userColor);
 	psiOptions->setPluginOption(consttagColor, tagColor);
 	psiOptions->setPluginOption(constmsgColor, msgColor);
@@ -429,11 +324,11 @@ void JuickPlugin::applyOptions()
 	psiOptions->setPluginOption(constLcolor, lineColor);
 
 	//bold
-	userBold = ubButton->isChecked();
-	tagBold = tbButton->isChecked();
-	msgBold = mbButton->isChecked();
-	quoteBold = qbButton->isChecked();
-	lineBold = lbButton->isChecked();
+	userBold = ui_.cb_nameBold->isChecked();
+	tagBold = ui_.cb_tagBold->isChecked();
+	msgBold = ui_.cb_messageBold->isChecked();
+	quoteBold = ui_.cb_quoteBold->isChecked();
+	lineBold = ui_.cb_linkBold->isChecked();
 	psiOptions->setPluginOption(constUbold, userBold);
 	psiOptions->setPluginOption(constTbold, tagBold);
 	psiOptions->setPluginOption(constMbold, msgBold);
@@ -441,11 +336,11 @@ void JuickPlugin::applyOptions()
 	psiOptions->setPluginOption(constLbold, lineBold);
 
 	//italic
-	userItalic = uiButton->isChecked();
-	tagItalic = tiButton->isChecked();
-	msgItalic = miButton->isChecked();
-	quoteItalic = qiButton->isChecked();
-	lineItalic = liButton->isChecked();
+	userItalic = ui_.cb_nameItalic->isChecked();
+	tagItalic = ui_.cb_tagItalic->isChecked();
+	msgItalic = ui_.cb_messageItalic->isChecked();
+	quoteItalic = ui_.cb_quoteItalic->isChecked();
+	lineItalic = ui_.cb_linkItalic->isChecked();
 	psiOptions->setPluginOption(constUitalic, userItalic);
 	psiOptions->setPluginOption(constTitalic, tagItalic);
 	psiOptions->setPluginOption(constMitalic, msgItalic);
@@ -453,11 +348,11 @@ void JuickPlugin::applyOptions()
 	psiOptions->setPluginOption(constLitalic, lineItalic);
 
 	//underline
-	userUnderline = uuButton->isChecked();
-	tagUnderline = tuButton->isChecked();
-	msgUnderline = muButton->isChecked();
-	quoteUnderline = quButton->isChecked();
-	lineUnderline = luButton->isChecked();
+	userUnderline = ui_.cb_nameUnderline->isChecked();
+	tagUnderline = ui_.cb_tagUnderline->isChecked();
+	msgUnderline = ui_.cb_messageUnderline->isChecked();
+	quoteUnderline = ui_.cb_quoteUnderline->isChecked();
+	lineUnderline = ui_.cb_linkUnderline->isChecked();
 	psiOptions->setPluginOption(constUunderline, userUnderline);
 	psiOptions->setPluginOption(constTunderline, tagUnderline);
 	psiOptions->setPluginOption(constMunderline, msgUnderline);
@@ -465,15 +360,15 @@ void JuickPlugin::applyOptions()
 	psiOptions->setPluginOption(constLunderline, lineUnderline);
 
 	//asResource
-	idAsResource = asResourceButton->isChecked();
+	idAsResource = ui_.cb_idAsResource->isChecked();
 	psiOptions->setPluginOption(constIdAsResource, idAsResource);
-	showPhoto = showPhotoButton->isChecked();
+	showPhoto = ui_.cb_showPhoto->isChecked();
 	psiOptions->setPluginOption(constShowPhoto, showPhoto);
-	showAvatars = showAvatarsButton->isChecked();
+	showAvatars = ui_.cb_showAvatar->isChecked();
 	if (showAvatars)
 		createAvatarsDir();
 	psiOptions->setPluginOption(constShowAvatars, showAvatars);
-	workInGroupChat = groupChatButton->isChecked();
+	workInGroupChat = ui_.cb_conference->isChecked();
 	psiOptions->setPluginOption(constWorkInGroupchat, workInGroupChat);
 	psiOptions->setPluginOption("constJidList",QVariant(jidList_));
 
@@ -484,37 +379,42 @@ void JuickPlugin::restoreOptions()
 	if (!optionsWid)
 		return;
 
-	ucButton->setStyleSheet(QString("background-color: %1;").arg(userColor.name()));
-	tcButton->setStyleSheet(QString("background-color: %1;").arg(tagColor.name()));
-	mcButton->setStyleSheet(QString("background-color: %1;").arg(msgColor.name()));
-	qcButton->setStyleSheet(QString("background-color: %1;").arg(quoteColor.name()));
-	lcButton->setStyleSheet(QString("background-color: %1;").arg(lineColor.name()));
+	ui_.tb_name->setStyleSheet(QString("background-color: %1;").arg(userColor.name()));
+	ui_.tb_tag->setStyleSheet(QString("background-color: %1;").arg(tagColor.name()));
+	ui_.tb_message->setStyleSheet(QString("background-color: %1;").arg(msgColor.name()));
+	ui_.tb_quote->setStyleSheet(QString("background-color: %1;").arg(quoteColor.name()));
+	ui_.tb_link->setStyleSheet(QString("background-color: %1;").arg(lineColor.name()));
+	ui_.tb_name->setProperty("psi_color",userColor);
+	ui_.tb_tag->setProperty("psi_color",tagColor);
+	ui_.tb_message->setProperty("psi_color",msgColor);
+	ui_.tb_quote->setProperty("psi_color",quoteColor);
+	ui_.tb_link->setProperty("psi_color",lineColor);
 
 	//bold
-	ubButton->setChecked(userBold);
-	tbButton->setChecked(tagBold);
-	mbButton->setChecked(msgBold);
-	qbButton->setChecked(quoteBold);
-	lbButton->setChecked(lineBold);
+	ui_.cb_nameBold->setChecked(userBold);
+	ui_.cb_tagBold->setChecked(tagBold);
+	ui_.cb_messageBold->setChecked(msgBold);
+	ui_.cb_quoteBold->setChecked(quoteBold);
+	ui_.cb_linkBold->setChecked(lineBold);
 
 	//italic
-	uiButton->setChecked(userItalic);
-	tiButton->setChecked(tagItalic);
-	miButton->setChecked(msgItalic);
-	qiButton->setChecked(quoteItalic);
-	liButton->setChecked(lineItalic);
+	ui_.cb_nameItalic->setChecked(userItalic);
+	ui_.cb_tagItalic->setChecked(tagItalic);
+	ui_.cb_messageItalic->setChecked(msgItalic);
+	ui_.cb_quoteItalic->setChecked(quoteItalic);
+	ui_.cb_linkItalic->setChecked(lineItalic);
 
 	//underline
-	uuButton->setChecked(userUnderline);
-	tuButton->setChecked(tagUnderline);
-	muButton->setChecked(msgUnderline);
-	quButton->setChecked(quoteUnderline);
-	luButton->setChecked(lineUnderline);
+	ui_.cb_nameUnderline->setChecked(userUnderline);
+	ui_.cb_tagUnderline->setChecked(tagUnderline);
+	ui_.cb_messageUnderline->setChecked(msgUnderline);
+	ui_.cb_quoteUnderline->setChecked(quoteUnderline);
+	ui_.cb_linkUnderline->setChecked(lineUnderline);
 
-	asResourceButton->setChecked(idAsResource);
-	showPhotoButton->setChecked(showPhoto);
-	showAvatarsButton->setChecked(showAvatars);
-	groupChatButton->setChecked(workInGroupChat);
+	ui_.cb_idAsResource->setChecked(idAsResource);
+	ui_.cb_showPhoto->setChecked(showPhoto);
+	ui_.cb_showAvatar->setChecked(showAvatars);
+	ui_.cb_conference->setChecked(workInGroupChat);
 }
 
 void JuickPlugin::requestJidList()
@@ -529,17 +429,15 @@ void JuickPlugin::updateJidList(const QStringList& jids)
 	jidList_ = jids;
 	//HACK
 	if(optionsWid) {
-		ubButton->toggle();
-		ubButton->toggle();
+		ui_.cb_idAsResource->toggle();
+		ui_.cb_idAsResource->toggle();
 	}
 }
 
-bool JuickPlugin::processEvent(int account, QDomElement& e)
+bool JuickPlugin::processEvent(int /*account*/, QDomElement& e)
 {
-	Q_UNUSED(account);
-	if (!enabled){
+	if (!enabled)
 		return false;
-	}
 
 	QDomDocument doc = e.ownerDocument();
 	QString jidToSend(juick);
@@ -1167,17 +1065,17 @@ bool JuickPlugin::processEvent(int account, QDomElement& e)
 	return false;
 }
 
-void JuickPlugin::chooseColor(QAbstractButton* button)
+void JuickPlugin::chooseColor(QWidget* w)
 {
-	QColor c;
-	c = button->property("psi_color").value<QColor>();
+	QToolButton *button = static_cast<QToolButton*>(w);
+	QColor c(button->property("psi_color").value<QColor>());
 	c = QColorDialog::getColor(c);
 	if(c.isValid()) {
 		button->setProperty("psi_color", c);
 		button->setStyleSheet(QString("background-color: %1").arg(c.name()));
 		//HACK
-		ubButton->toggle();
-		ubButton->toggle();
+		ui_.cb_idAsResource->toggle();
+		ui_.cb_idAsResource->toggle();
 
 	}
 }
@@ -1211,17 +1109,14 @@ void JuickPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* 
   }
 */
 
-bool JuickPlugin::incomingStanza(int account, const QDomElement& stanza)
+bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 {
 	if(!enabled)
 		return false;
 
-	Q_UNUSED(account);
-	QString jid("");
-	QString usernameJ("");
 	if (stanza.tagName() == "message" ) {
-		jid = stanza.attribute("from").split('/').first();
-		usernameJ = jid.split("@").first();
+		const QString jid(stanza.attribute("from").split('/').first());
+		const QString usernameJ(jid.split("@").first());
 		if (workInGroupChat && jid == "juick@conference.jabber.ru") {
 			QString msg = stanza.firstChild().nextSibling().firstChild().nodeValue();
 			msg.replace(QRegExp("#(\\d+)"),"http://juick.com/\\1");
@@ -1235,8 +1130,8 @@ bool JuickPlugin::incomingStanza(int account, const QDomElement& stanza)
 				QDomElement element = childs.item(i).toElement();
 				if (!element.isNull() && element.tagName() == "juick") {
 					QDomElement userElement = element.firstChildElement("user");
-					const QString uid = userElement.attribute("uid");
-					QString unick = "@" + userElement.attribute("uname");
+					const QString uid(userElement.attribute("uid"));
+					const QString unick("@" + userElement.attribute("uname"));
 					QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
 					if(!dir.exists())
 						return false;
@@ -1253,11 +1148,7 @@ bool JuickPlugin::incomingStanza(int account, const QDomElement& stanza)
 						}
 					}
 
-					QMetaObject::invokeMethod(this, "getAvatar",
-								Qt::QueuedConnection,
-								Q_ARG(const QString&, uid),
-								Q_ARG(const QString&, unick));
-
+					getAvatar(uid, unick);
 					break;
 				}
 			}
@@ -1283,66 +1174,64 @@ static void updateWidgets(QList<QWidget*> widgets)
 	}
 }
 
+Http* JuickPlugin::newHttp(const QString& path)
+{
+	Http *http = new Http(this);
+	Proxy prx = applicationInfo->getProxyFor(constPluginName);
+	http->setProxyHostPort(prx.host, prx.port, prx.user, prx.pass, prx.type);
+	http->setProperty("path", path);
+	connect(http, SIGNAL(dataReady(QByteArray)), SLOT(photoReady(QByteArray)));
+	return http;
+}
+
 void JuickPlugin::getAvatar(const QString &uid, const QString& unick)
 {
 	QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
-	Http *http = new Http(this);
+	const QString path(QString("%1/%2;")
+		     .arg(dir.absolutePath())
+		     .arg(unick));
+
+	Http *http = newHttp(path);
 	http->setHost("i.juick.com");
-
-	Proxy prx = applicationInfo->getProxyFor(constPluginName);
-	http->setProxyHostPort(prx.host, prx.port, prx.user, prx.pass, prx.type);
-
-	QByteArray img = http->get("/as/"+uid+".png");
-	if(img.isEmpty())
-		img = http->get("/a/"+uid+".png");
-	http->deleteLater();
-	QFile file(QString("%1/%2;").arg(dir.absolutePath()).arg(unick));
-
-	if(!file.open(QIODevice::WriteOnly)){
-		QMessageBox::warning(0, tr("Warning"),tr("Cannot write to file %1:\n%2.")
-				     .arg(file.fileName())
-				     .arg(file.errorString()));
-	}
-	else {
-		file.write(img);
-		file.close();
-	}
-
-	updateWidgets(logs_);
+	http->get("/as/"+uid+".png");
+//	if(img.isEmpty())
+//		img = http->get("/a/"+uid+".png");
 }
 
 void JuickPlugin::getPhoto(const QUrl &url)
 {
-	Http *http = new Http(this);
-	http->setHost(url.host());
+	QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/photos");
+	const QString path(QString("%1/%2")
+		     .arg(dir.absolutePath())
+		     .arg(url.path().replace("/", "%")));
 
-	Proxy prx = applicationInfo->getProxyFor(constPluginName);
-	http->setProxyHostPort(prx.host, prx.port, prx.user, prx.pass, prx.type);
-	http->setProperty("path", url.path().replace("/", "%"));
-	connect(http, SIGNAL(dataReady(QByteArray)), SLOT(photoReady(QByteArray)));
-	http->get(QString(url.path()).replace("/photos-1024/","/ps/"), false);
+	Http *http = newHttp(path);
+	http->setHost(url.host());	
+	http->get(QString(url.path()).replace("/photos-1024/","/ps/"));
+}
+
+static void save(const QString &path, const QByteArray &img)
+{
+	QFile file(path);
+
+	if(file.open(QIODevice::WriteOnly)){
+		file.write(img);
+	}
+	else
+		QMessageBox::warning(0, QObject::tr("Warning"), QObject::tr("Cannot write to file %1:\n%2.")
+				     .arg(file.fileName())
+				     .arg(file.errorString()));
 }
 
 void JuickPlugin::photoReady(const QByteArray &ba)
 {
 	Http* http = static_cast<Http*>(sender());
 	http->deleteLater();
-	QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/photos");
-	if(!dir.exists())
+
+	if(ba.isEmpty())
 		return;
 
-	QString path = http->property("path").toString();
-	QFile file(QString("%1/%2").arg(dir.absolutePath()).arg(path));
-
-	if(!file.open(QIODevice::WriteOnly)){
-		QMessageBox::warning(0, tr("Warning"),tr("Cannot write to file %1:\n%2.")
-				     .arg(file.fileName())
-				     .arg(file.errorString()));
-	}
-	else {
-		file.write(ba);
-		file.close();
-	}
+	save(http->property("path").toString(), ba);
 
 	updateWidgets(logs_);
 }
@@ -1530,7 +1419,9 @@ void JuickPlugin::addFavorite(QDomElement* body,QDomDocument* e, const QString& 
 // чатов с juick
 QAction* JuickPlugin::getAction(QObject *parent, int /*account*/, const QString &contact)
 {
-	if(jidList_.contains(contact.split("/").first())) {
+	const QString jid = contact.split("/").first();
+	const QString usernameJ = jid.split("@").first();
+	if(jidList_.contains(jid) || usernameJ == "juick%juick.com"|| usernameJ == "jubo%nologin.ru") {
 		QWidget* log = parent->findChild<QWidget*>("log");
 		if(log) {
 			logs_.append(log);
@@ -1546,8 +1437,9 @@ void JuickPlugin::removeWidget()
 	logs_.removeAll(w);
 }
 
-QString JuickPlugin::pluginInfo() {
-	return tr("Author: ") +	 "VampiRUS\n\n"
+QString JuickPlugin::pluginInfo()
+{
+	return tr("Authors: ") + "VampiRUS, Dealer_WeARE\n\n"
 	+ trUtf8("This plugin is designed to work efficiently and comfortably with the Juick microblogging service.\n"
 			 "Currently, the plugin is able to: \n"
 			 "* Coloring @nick, *tag and #message_id in messages from the juick@juick.com bot\n"
@@ -1555,4 +1447,5 @@ QString JuickPlugin::pluginInfo() {
 			 "* Enable clickable @nick, *tag, #message_id and other control elements to insert them into the typing area\n\n"
 			 "Note: To work correctly, the option options.html.chat.render	must be set to true. ");
 }
+
 #include "juickplugin.moc"

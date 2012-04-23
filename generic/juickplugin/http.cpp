@@ -18,25 +18,24 @@
  *
  */
 
+#include "http.h"
+
 #include <QNetworkProxy>
 #include <QNetworkRequest>
-#include "qdebug.h"
+#include <QNetworkAccessManager>
+#include <QTimer>
+#include <QNetworkReply>
+#include <QEventLoop>
+#include <QDebug>
 
-#include "http.h"
 
 const int DOWNLOAD_TIMEOUT = 60000;
 
 Http::Http(QObject *p)
-	:QObject(p)
+	: QObject(p)
 {	
 	manager_ = new QNetworkAccessManager(this);
-	eloop_ = new QEventLoop(this);
-	url_ = QUrl();
-	ba_.clear();
-	timer_ = new QTimer(this);
-
 	connect(manager_, SIGNAL(finished(QNetworkReply*)), SLOT(requestFinished(QNetworkReply*)));
-	connect(timer_, SIGNAL(timeout()), SLOT(timeout()));
 }
 
 void Http::setHost(const QString &host)
@@ -45,27 +44,15 @@ void Http::setHost(const QString &host)
 	url_.setScheme("http");
 }
 
-QByteArray Http::get(const QString &path, bool sync)
+void Http::get(const QString &path)
 {
 	url_.setPath(path);
 	QNetworkRequest request;
 	request.setUrl(url_);
-	request.setRawHeader("User-Agent", "Juick Plugin (PSI+)");
+	request.setRawHeader("User-Agent", "Juick Plugin (Psi+)");
 	manager_->get(request);
-
-	if(sync) {
-		timer_->start(DOWNLOAD_TIMEOUT);
-		eloop_->exec();
-	}
-
-	return ba_;
 }
 
-void Http::timeout()
-{
-	timer_->stop();
-	eloop_->quit();
-}
 
 void Http::setProxyHostPort(const QString& host, int port, const QString& username, const QString& pass, const QString& type)
 {
@@ -93,10 +80,9 @@ void Http::requestFinished(QNetworkReply *reply)
 	}
 	else {
 		qDebug() << reply->errorString();
+		disconnect();
 		deleteLater();
 	}
 
-	timer_->stop();
 	reply->deleteLater();
-	eloop_->quit();
 }
