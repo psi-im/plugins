@@ -1,6 +1,6 @@
 /*
- * http.h - plugin
- * Copyright (C) 2009-2010 Kravtsov Nikolai, Khryukin Evgeny
+ * JuickParser - plugin
+ * Copyright (C) 2012 Kravtsov Nikolai, Khryukin Evgeny
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,35 +18,35 @@
  *
  */
 
-#ifndef HTTP_H
-#define HTTP_H
 
-#include <QUrl>
+#ifndef JUICKPARSER_H
+#define JUICKPARSER_H
 
-class QNetworkAccessManager;
-class QNetworkReply;
+#include <QDomElement>
+#include <QStringList>
 
-class Http: public QObject
+class JuickParser
 {
-	Q_OBJECT
-
 public:
-	Http(QObject *p = 0);
-	virtual ~Http() {}
-	void get(const QString& path);
-	void setProxyHostPort(const QString& host, int port, const QString& username = "",
-			      const QString& pass = "", const QString& type = "http");
-	void setHost(const QString& host);
+	JuickParser();
+	JuickParser(QDomElement* elem);
 
-private slots:
-	void requestFinished(QNetworkReply *reply);
-
-signals:
-	void dataReady(const QByteArray&);
+	bool hasJuckNamespace() const;
+	QString avatarLink() const;
+	QString photoLink() const;
+	QStringList tags() const;
+	QString messageId() const;
+	QString body() const;
+	QString nick() const;
+	QString link() const;
+	QDomElement findElement(const QString& tagName, const QString& xmlns) const;
 
 private:
-	QNetworkAccessManager *manager_;
-	QUrl url_;
-}; 
 
-#endif
+
+private:
+	QDomElement* elem_;
+	QDomElement juickElement_;
+};
+
+#endif // JUICKPARSER_H

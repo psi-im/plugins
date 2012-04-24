@@ -71,8 +71,8 @@ void Http::setProxyHostPort(const QString& host, int port, const QString& userna
 void Http::requestFinished(QNetworkReply *reply)
 {
 	if (reply->error() == QNetworkReply::NoError ) {
-		ba_ = reply->readAll();
-		emit dataReady(ba_);
+		QByteArray ba = reply->readAll();
+		emit dataReady(ba);
 	}
 	else {
 		qDebug() << reply->errorString();

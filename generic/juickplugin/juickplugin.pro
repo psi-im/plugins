@@ -3,10 +3,12 @@ include(../../psiplugin.pri)
 
 SOURCES +=  http.cpp\
             juickplugin.cpp \
-    juickjidlist.cpp
+    juickjidlist.cpp \
+    juickparser.cpp
 
 HEADERS += http.h \
-    juickjidlist.h
+    juickjidlist.h \
+    juickparser.h
 
 QT += network webkit
 
