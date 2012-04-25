@@ -21,7 +21,10 @@
 #include <QDomElement>
 #include <QMessageBox>
 #include <QColorDialog>
+#include <QTextEdit>
 #include <QtWebKit/QWebView>
+#include <QAbstractNetworkCache>
+//#include <QtWebKit/QWebFrame>
 
 #include "psiplugin.h"
 //#include "eventfilter.h"
@@ -90,22 +93,6 @@ static const int avatarsUpdateInterval = 10;
 //	e.save(str, 3);
 //	qDebug() << out;
 //}
-
-// Эта функция обновляет чатлоги, чтобы они перезагрузили
-// картинки с диска
-static void updateWidgets(QList<QWidget*> widgets)
-{
-	foreach(QWidget *w, widgets) {
-		if(w->inherits("QTextEdit"))
-			w->update();
-		else {
-			QWebView *wv = w->findChild<QWebView*>();
-			if(wv) {
-				wv->update();
-			}
-		}
-	}
-}
 
 static void save(const QString &path, const QByteArray &img)
 {
@@ -181,6 +168,7 @@ private slots:
 	void requestJidList();
 	void photoReady(const QByteArray& ba);
 	void removeWidget();
+	void updateWidgets();
 
 private:
 	void createAvatarsDir();
@@ -218,7 +206,9 @@ private:
 	QStringList jidList_;
 	QPointer<QWidget> optionsWid;
 	QList<QWidget*> logs_;
+	QList<QByteArray> urls_;
 	Ui::settings ui_;
+	QTimer updateTimer_;
 };
 
 Q_EXPORT_PLUGIN(JuickPlugin)
@@ -257,6 +247,9 @@ JuickPlugin::JuickPlugin()
 	singleMsgRx.setMinimal(true);
 	juboRx.setMinimal(true);
 	jidList_ = QStringList() << juick << jubo;
+	updateTimer_.setSingleShot(true);
+	updateTimer_.setInterval(1000);
+	connect(&updateTimer_, SIGNAL(timeout()), SLOT(updateWidgets()));
 }
 
 QString JuickPlugin::name() const
@@ -792,39 +785,39 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 				foreach (const QString& tag, tags_) {
 					addTagLink(&body, &doc, tag, jidToSend);
 				}
-				//mood
-				QRegExp moodRx("\\*mood:\\s(\\S*)\\s(.*)\\n(.*)");
-				//geo
-				QRegExp geoRx("\\*geo:\\s(.*)\\n(.*)");
-				//tune
-				QRegExp tuneRx("\\*tune:\\s(.*)\\n(.*)");
-				if (moodRx.indexIn(recomendRx.cap(4)) != -1){
-					body.appendChild(doc.createElement("br"));
-					QDomElement bold = doc.createElement("b");
-					bold.appendChild(doc.createTextNode("mood: "));
-					body.appendChild(bold);
-					QDomElement img = doc.createElement("icon");
-					img.setAttribute("name","mood/"+moodRx.cap(1).left(moodRx.cap(1).size()-1).toLower());
-					img.setAttribute("text",moodRx.cap(1));
-					body.appendChild(img);
-					body.appendChild(doc.createTextNode(" "+moodRx.cap(2)));
-					msg = " " + moodRx.cap(3) + " ";
-				} else if(geoRx.indexIn(recomendRx.cap(4)) != -1) {
-					body.appendChild(doc.createElement("br"));
-					QDomElement bold = doc.createElement("b");
-					bold.appendChild(doc.createTextNode("geo: "+ geoRx.cap(1) ));
-					body.appendChild(bold);
-					msg = " " + geoRx.cap(2) + " ";
-				} else if(tuneRx.indexIn(recomendRx.cap(4)) != -1) {
-					body.appendChild(doc.createElement("br"));
-					QDomElement bold = doc.createElement("b");
-					bold.appendChild(doc.createTextNode("tune: "+ tuneRx.cap(1) ));
-					body.appendChild(bold);
-					msg = " " + tuneRx.cap(2) + " ";
-				}
-				else {
+//				//mood
+//				QRegExp moodRx("\\*mood:\\s(\\S*)\\s(.*)\\n(.*)");
+//				//geo
+//				QRegExp geoRx("\\*geo:\\s(.*)\\n(.*)");
+//				//tune
+//				QRegExp tuneRx("\\*tune:\\s(.*)\\n(.*)");
+//				if (moodRx.indexIn(recomendRx.cap(4)) != -1){
+//					body.appendChild(doc.createElement("br"));
+//					QDomElement bold = doc.createElement("b");
+//					bold.appendChild(doc.createTextNode("mood: "));
+//					body.appendChild(bold);
+//					QDomElement img = doc.createElement("icon");
+//					img.setAttribute("name","mood/"+moodRx.cap(1).left(moodRx.cap(1).size()-1).toLower());
+//					img.setAttribute("text",moodRx.cap(1));
+//					body.appendChild(img);
+//					body.appendChild(doc.createTextNode(" "+moodRx.cap(2)));
+//					msg = " " + moodRx.cap(3) + " ";
+//				} else if(geoRx.indexIn(recomendRx.cap(4)) != -1) {
+//					body.appendChild(doc.createElement("br"));
+//					QDomElement bold = doc.createElement("b");
+//					bold.appendChild(doc.createTextNode("geo: "+ geoRx.cap(1) ));
+//					body.appendChild(bold);
+//					msg = " " + geoRx.cap(2) + " ";
+//				} else if(tuneRx.indexIn(recomendRx.cap(4)) != -1) {
+//					body.appendChild(doc.createElement("br"));
+//					QDomElement bold = doc.createElement("b");
+//					bold.appendChild(doc.createTextNode("tune: "+ tuneRx.cap(1) ));
+//					body.appendChild(bold);
+//					msg = " " + tuneRx.cap(2) + " ";
+//				}
+//				else {
 					msg = " " + recomendRx.cap(4) + " ";
-				}
+//				}
 				if (showAvatars) {
 					addAvatar(&body, &doc, msg, jidToSend, jp.nick());
 				} else {
@@ -862,39 +855,39 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 				foreach (const QString& tag, tags_){
 					addTagLink(&body, &doc, tag, jidToSend);
 				}
-				//mood
-				QRegExp moodRx("\\*mood:\\s(\\S*)\\s(.*)\\n(.*)");
-				//geo
-				QRegExp geoRx("\\*geo:\\s(.*)\\n(.*)");
-				//tune
-				QRegExp tuneRx("\\*tune:\\s(.*)\\n(.*)");
-				if (moodRx.indexIn(postRx.cap(3)) != -1) {
-					body.appendChild(doc.createElement("br"));
-					QDomElement bold = doc.createElement("b");
-					bold.appendChild(doc.createTextNode("mood: "));
-					body.appendChild(bold);
-					QDomElement img = doc.createElement("icon");
-					img.setAttribute("name","mood/"+moodRx.cap(1).left(moodRx.cap(1).size()-1).toLower());
-					img.setAttribute("text",moodRx.cap(1));
-					body.appendChild(img);
-					body.appendChild(doc.createTextNode(" "+moodRx.cap(2)));
-					msg = " " + moodRx.cap(3) + " ";
-				} else if(geoRx.indexIn(postRx.cap(3)) != -1) {
-					body.appendChild(doc.createElement("br"));
-					QDomElement bold = doc.createElement("b");
-					bold.appendChild(doc.createTextNode("geo: "+ geoRx.cap(1) ));
-					body.appendChild(bold);
-					msg = " " + geoRx.cap(2) + " ";
-				} else if(tuneRx.indexIn(postRx.cap(3)) != -1) {
-					body.appendChild(doc.createElement("br"));
-					QDomElement bold = doc.createElement("b");
-					bold.appendChild(doc.createTextNode("tune: "+ tuneRx.cap(1) ));
-					body.appendChild(bold);
-					msg = " " + tuneRx.cap(2) + " ";
-				}
-				else {
+//				//mood
+//				QRegExp moodRx("\\*mood:\\s(\\S*)\\s(.*)\\n(.*)");
+//				//geo
+//				QRegExp geoRx("\\*geo:\\s(.*)\\n(.*)");
+//				//tune
+//				QRegExp tuneRx("\\*tune:\\s(.*)\\n(.*)");
+//				if (moodRx.indexIn(postRx.cap(3)) != -1) {
+//					body.appendChild(doc.createElement("br"));
+//					QDomElement bold = doc.createElement("b");
+//					bold.appendChild(doc.createTextNode("mood: "));
+//					body.appendChild(bold);
+//					QDomElement img = doc.createElement("icon");
+//					img.setAttribute("name","mood/"+moodRx.cap(1).left(moodRx.cap(1).size()-1).toLower());
+//					img.setAttribute("text",moodRx.cap(1));
+//					body.appendChild(img);
+//					body.appendChild(doc.createTextNode(" "+moodRx.cap(2)));
+//					msg = " " + moodRx.cap(3) + " ";
+//				} else if(geoRx.indexIn(postRx.cap(3)) != -1) {
+//					body.appendChild(doc.createElement("br"));
+//					QDomElement bold = doc.createElement("b");
+//					bold.appendChild(doc.createTextNode("geo: "+ geoRx.cap(1) ));
+//					body.appendChild(bold);
+//					msg = " " + geoRx.cap(2) + " ";
+//				} else if(tuneRx.indexIn(postRx.cap(3)) != -1) {
+//					body.appendChild(doc.createElement("br"));
+//					QDomElement bold = doc.createElement("b");
+//					bold.appendChild(doc.createTextNode("tune: "+ tuneRx.cap(1) ));
+//					body.appendChild(bold);
+//					msg = " " + tuneRx.cap(2) + " ";
+//				}
+//				else {
 					msg = " " + postRx.cap(3) + " ";
-				}
+//				}
 				if (showAvatars) {
 					addAvatar(&body, &doc, msg, jidToSend, jp.nick());
 				} else {
@@ -1179,9 +1172,11 @@ void JuickPlugin::photoReady(const QByteArray &ba)
 	if(ba.isEmpty())
 		return;
 
-	save(http->property("path").toString(), ba);
+	const QString path = http->property("path").toString();
+	save(path, ba);
 
-	updateWidgets(logs_);
+	urls_.append(QUrl::fromLocalFile(path).toEncoded());
+	updateTimer_.start();
 }
 
 void JuickPlugin::elementFromString(QDomElement* body,QDomDocument* e, const QString& msg, const QString& jid, const QString& resource)
@@ -1395,6 +1390,37 @@ void JuickPlugin::removeWidget()
 {
 	QWidget* w = static_cast<QWidget*>(sender());
 	logs_.removeAll(w);
+}
+
+
+// Этот слот обновляет чатлоги, чтобы они перезагрузили
+// картинки с диска. Пока не работает
+void JuickPlugin::updateWidgets()
+{
+//	foreach(QWidget *w, logs_) {
+//		QTextEdit* te = qobject_cast<QTextEdit*>(w);
+//		if(te) {
+//			foreach(const QByteArray& url, urls_) {
+//				QUrl u;
+//				u.setEncodedUrl(url);
+//				te->document()->addResource(QTextDocument::ImageResource, u, QVariant(QImage(u.toLocalFile())));
+//			}
+//		}
+//		else {
+//			QWebView *wv = w->findChild<QWebView*>();
+//			if(wv) {
+//				QAbstractNetworkCache* c = wv->page()->networkAccessManager()->cache();
+//				foreach(const QByteArray& url, urls_) {
+//					QUrl u;
+//					u.setEncodedUrl(url);
+//					QFile f(u.toLocalFile());
+//					if(f.open(QFile::ReadOnly))
+//						c->insert(&f);
+//				}
+//			}
+//		}
+//	}
+	urls_.clear();
 }
 
 QString JuickPlugin::pluginInfo()
