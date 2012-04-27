@@ -18,20 +18,181 @@
  *
  */
 
+#include <QApplication>
+//#include <QDebug>
 #include "juickparser.h"
 
 static const QString juickLink("http://juick.com/%1");
 
-
-JuickParser::JuickParser()
-	: elem_(0)
+class JuickParser::Private
 {
-}
+public:
+	Private()
+	      : tagRx		("^\\s*(?!\\*\\S+\\*)(\\*\\S+)")
+//	      , pmRx		("^\\nPrivate message from (@.+):(.*)$")
+	      , postRx		("\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n\\n(#\\d+)\\s(http://\\S*)\\n$")
+	      , replyRx		("\\nReply by @(.*):\\n>(.{,50})\\n\\n(.*)\\n\\n(#\\d+/\\d+)\\s(http://\\S*)\\n$")
+//	      , regx		("(\\s+)(#\\d+(?:\\S+)|#\\d+/\\d+(?:\\S+)|@\\S+|_[^\\n]+_|\\*[^\\n]+\\*|/[^\\n]+/|http://\\S+|ftp://\\S+|https://\\S+){1}(\\s+)")
+	      , rpostRx		("\\nReply posted.\\n(#.*)\\s(http://\\S*)\\n$")
+	      , threadRx	("^\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(http://juick.com/\\S+)\\n(.*)")
+//	      , userRx		("^\\nBlog: http://.*")
+	      , singleMsgRx	("^\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+) (\\((?:.*; )\\d+ repl(?:ies|y)\\) ){0,1}(http://juick.com/\\S+)\\n$")
+	      , lastMsgRx	("^\\n(Last (?:popular ){0,1}messages:)(.*)")
+	      , juboRx		("^\\n([^\\n]*)\\n@(\\S*):( [^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(http://juick.com/\\S+)\\n$")
+	      , msgPostRx	("\\nNew message posted.\\n(#.*)\\s(http://\\S*)\\n$")
+//	      , delMsgRx	("^\\nMessage #\\d+ deleted.\\n$")
+//	      , delReplyRx	("^\\nReply #\\d+/\\d+ deleted.\\n$")
+//	      , idRx		("(#\\d+)(/\\d+){0,1}(\\S+){0,1}")
+//	      , nickRx		("(@[\\w\\-\\.@\\|]*)(\\b.*)")
+	      , recomendRx	("^\\nRecommended by @(\\S*):\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n\\n(#\\d+) (\\(\\d+ repl(?:ies|y)\\) ){0,1}(http://\\S*)\\n$")
+	      , topTag		("Top 20 tags:")
+	{
+//		pmRx.setMinimal(true);
+		replyRx.setMinimal(true);
+//		regx.setMinimal(true);
+		postRx.setMinimal(true);
+		singleMsgRx.setMinimal(true);
+		juboRx.setMinimal(true);
+	}
+
+	QRegExp tagRx,/*pmRx,*/postRx,replyRx,/*regx,*/rpostRx,threadRx/*,userRx*/;
+	QRegExp singleMsgRx,lastMsgRx,juboRx,msgPostRx,/*delMsgRx,delReplyRx,idRx,nickRx,*/recomendRx;
+	const QString topTag;
+};
+
+
+
 
 JuickParser::JuickParser(QDomElement *elem)
 	: elem_(elem)
 {
+	if(!d)
+		d = new Private();
+
 	juickElement_ = findElement("juick", "http://juick.com/message");
+
+	QString msg = "\n" + originMessage() + "\n";
+	msg.replace("&gt;",">");
+	msg.replace("&lt;","<");
+	if (d->juboRx.indexIn(msg) != -1) {
+		type_ = JM_Jubo;
+		JuickMessage m(d->juboRx.cap(2), d->juboRx.cap(5), d->juboRx.cap(3).trimmed().split(" "),
+			       d->juboRx.cap(4), d->juboRx.cap(6), QString());
+		messages_.append(m);
+		infoText_ = d->juboRx.cap(1);
+	}
+	else if(d->lastMsgRx.indexIn(msg) != -1) {
+		type_ = JM_10_Messages;
+		infoText_ =  d->lastMsgRx.cap(1);
+		QString mes = d->lastMsgRx.cap(2);
+		while(d->singleMsgRx.indexIn(mes) != -1) {
+			JuickMessage m(d->singleMsgRx.cap(1), d->singleMsgRx.cap(4), d->singleMsgRx.cap(2).trimmed().split(" "),
+				       d->singleMsgRx.cap(3), d->singleMsgRx.cap(6), d->singleMsgRx.cap(5));
+			messages_.append(m);
+			mes = mes.right(mes.size() - d->singleMsgRx.matchedLength());
+		}
+	}
+	else if (msg.indexOf(d->topTag) != -1) {
+		type_ = JM_Tags_Top;
+		infoText_ = d->topTag;
+		QStringList tags;
+		msg = msg.right(msg.size() - d->topTag.size() - 1);
+		while (d->tagRx.indexIn(msg, 0) != -1) {
+			tags.append(d->tagRx.cap(1));
+			msg = msg.right(msg.size() - d->tagRx.matchedLength());
+		}
+		JuickMessage m(QString(), QString(), tags, QString(), QString(), QString());
+		messages_.append(m);
+	}
+	else if (d->recomendRx.indexIn(msg) != -1) {
+		type_ = JM_Recomendation;
+		infoText_ = QObject::tr("Recommended by @%1").arg(d->recomendRx.cap(1));
+		JuickMessage m(d->recomendRx.cap(2), d->recomendRx.cap(5), d->recomendRx.cap(3).trimmed().split(" "),
+			       d->recomendRx.cap(4), d->recomendRx.cap(7), d->recomendRx.cap(6));
+		messages_.append(m);
+	}
+	else if (d->postRx.indexIn(msg) != -1) {
+		type_ = JM_Message;
+		infoText_ = QString();
+		JuickMessage m(d->postRx.cap(1), d->postRx.cap(4), d->postRx.cap(2).trimmed().split(" "),
+			       d->postRx.cap(3), d->postRx.cap(5), QString());
+		messages_.append(m);
+	}
+	else if (d->replyRx.indexIn(msg) != -1) {
+		type_ = JM_Reply;
+		infoText_ = d->replyRx.cap(2);
+		JuickMessage m(d->replyRx.cap(1), d->replyRx.cap(4), QStringList(),
+			       d->replyRx.cap(3), d->replyRx.cap(5), QString());
+		messages_.append(m);
+	}
+	else if (d->rpostRx.indexIn(msg) != -1) {
+		type_ = JM_Reply_Posted;
+		infoText_ = QObject::tr("Reply posted.");
+		JuickMessage m(QString(), d->rpostRx.cap(1), QStringList(),
+			       QString(), d->rpostRx.cap(2), QString());
+		messages_.append(m);
+	}
+	else if (d->msgPostRx.indexIn(msg) != -1) {
+		type_ = JM_Message_Posted;
+		infoText_ = QObject::tr("New message posted.");
+		JuickMessage m(QString(), d->msgPostRx.cap(1), QStringList(),
+			       QString(), d->msgPostRx.cap(2), QString());
+		messages_.append(m);
+	}
+	else if (d->threadRx.indexIn(msg) != -1) {
+		type_ = JM_All_Messages;
+		infoText_ = QString();
+		JuickMessage m(d->threadRx.cap(1), d->threadRx.cap(4), d->threadRx.cap(2).trimmed().split(" "),
+			       d->threadRx.cap(3), d->threadRx.cap(5), msg.right(msg.size() - d->threadRx.matchedLength() + d->threadRx.cap(6).length()));
+		messages_.append(m);
+	}
+	else if (d->singleMsgRx.indexIn(msg) != -1) {
+		type_ = JM_Post_View;
+		infoText_ = QString();
+		JuickMessage m(d->singleMsgRx.cap(1), d->singleMsgRx.cap(4), d->singleMsgRx.cap(2).trimmed().split(" "),
+			       d->singleMsgRx.cap(3), d->singleMsgRx.cap(6), d->singleMsgRx.cap(5));
+		messages_.append(m);
+	}
+	else {
+		type_ = JM_Other;
+	}
+
+//				//mood
+//				QRegExp moodRx("\\*mood:\\s(\\S*)\\s(.*)\\n(.*)");
+//				//geo
+//				QRegExp geoRx("\\*geo:\\s(.*)\\n(.*)");
+//				//tune
+//				QRegExp tuneRx("\\*tune:\\s(.*)\\n(.*)");
+//				if (moodRx.indexIn(recomendRx.cap(4)) != -1){
+//					body.appendChild(doc.createElement("br"));
+//					QDomElement bold = doc.createElement("b");
+//					bold.appendChild(doc.createTextNode("mood: "));
+//					body.appendChild(bold);
+//					QDomElement img = doc.createElement("icon");
+//					img.setAttribute("name","mood/"+moodRx.cap(1).left(moodRx.cap(1).size()-1).toLower());
+//					img.setAttribute("text",moodRx.cap(1));
+//					body.appendChild(img);
+//					body.appendChild(doc.createTextNode(" "+moodRx.cap(2)));
+//					msg = " " + moodRx.cap(3) + " ";
+//				} else if(geoRx.indexIn(recomendRx.cap(4)) != -1) {
+//					body.appendChild(doc.createElement("br"));
+//					QDomElement bold = doc.createElement("b");
+//					bold.appendChild(doc.createTextNode("geo: "+ geoRx.cap(1) ));
+//					body.appendChild(bold);
+//					msg = " " + geoRx.cap(2) + " ";
+//				} else if(tuneRx.indexIn(recomendRx.cap(4)) != -1) {
+//					body.appendChild(doc.createElement("br"));
+//					QDomElement bold = doc.createElement("b");
+//					bold.appendChild(doc.createTextNode("tune: "+ tuneRx.cap(1) ));
+//					body.appendChild(bold);
+//					msg = " " + tuneRx.cap(2) + " ";
+//				}
+}
+
+void JuickParser::reset()
+{
+	delete d;
+	d = 0;
 }
 
 bool JuickParser::hasJuckNamespace() const
@@ -64,39 +225,6 @@ QString JuickParser::photoLink() const
 	return photo;
 }
 
-QStringList JuickParser::tags() const
-{
-	QStringList tags;
-	if(hasJuckNamespace()) {
-		QDomElement tag = juickElement_.firstChildElement("tag");
-		while(!tag.isNull()) {
-			tags.append(tag.text());
-			tag = tag.nextSiblingElement("tag");
-		}
-	}
-	return tags;
-}
-
-QString JuickParser::messageId() const
-{
-	QString id;
-	if(hasJuckNamespace()) {
-		id = juickElement_.attribute("mid");
-	}
-	return id;
-}
-
-QString JuickParser::body() const
-{
-	QString body;
-	if(hasJuckNamespace()) {
-		QDomElement b = juickElement_.firstChildElement("body");
-		if(!b.isNull())
-			body = b.text();
-	}
-	return body;
-}
-
 QString JuickParser::nick() const
 {
 	QString nick;
@@ -106,13 +234,9 @@ QString JuickParser::nick() const
 	return nick;
 }
 
-QString JuickParser::link() const
+QString JuickParser::originMessage() const
 {
-	QString link;
-	if(hasJuckNamespace()) {
-		link = juickLink.arg(messageId());
-	}
-	return link;
+	return elem_->firstChildElement("body").text();
 }
 
 QDomElement JuickParser::findElement(const QString &tagName, const QString &xmlns) const
@@ -131,3 +255,5 @@ QDomElement JuickParser::findElement(const QString &tagName, const QString &xmln
 	}
 	return QDomElement();
 }
+
+JuickParser::Private* JuickParser::d = 0;

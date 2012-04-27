@@ -78,9 +78,11 @@ static const QString userInfoString(QObject::tr("Show %1's info and last 10 mess
 static const QString subscribeString(QObject::tr("Subscribe"));
 static const QString showLastTenString(QObject::tr("Show last 10 messages with tag %1"));
 static const QString unsubscribeString(QObject::tr("Unsubscribe"));
-static const QString topTag("Top 20 tags:");
 static const QString juick("juick@juick.com");
 static const QString jubo("jubo@nologin.ru");
+
+static const QString chatPlusAction = "xmpp:%1?message;type=chat;body=%2+";
+static const QString chatAction = "xmpp:%1%3?message;type=chat;body=%2";
 
 static const int avatarsUpdateInterval = 10;
 
@@ -199,8 +201,7 @@ private:
 	bool userItalic,tagItalic,msgItalic,quoteItalic,lineItalic;
 	bool userUnderline,tagUnderline,msgUnderline,quoteUnderline,lineUnderline;
 	QString idStyle,userStyle,tagStyle,quoteStyle,linkStyle;
-	QRegExp tagRx,pmRx,postRx,replyRx,regx,rpostRx,threadRx,userRx;
-	QRegExp singleMsgRx,lastMsgRx,juboRx,msgPostRx,delMsgRx,delReplyRx,idRx,nickRx,recomendRx;
+	QRegExp tagRx, pmRx, regx, userRx, delMsgRx, delReplyRx, idRx, nickRx;
 	QString userLinkPattern,messageLinkPattern,altTextUser,altTextMsg,commonLinkColor;
 	bool idAsResource,showPhoto,showAvatars,workInGroupChat;
 	QStringList jidList_;
@@ -222,30 +223,17 @@ JuickPlugin::JuickPlugin()
 	, userUnderline(false), tagUnderline(false), msgUnderline(true), quoteUnderline(false), lineUnderline(true)
 	, tagRx		("^\\s*(?!\\*\\S+\\*)(\\*\\S+)")
 	, pmRx		("^\\nPrivate message from (@.+):(.*)$")
-	, postRx	("\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n\\n(#\\d+)\\s(http://\\S*)\\n$")
-	, replyRx	("\\nReply by @(.*):\\n>(.{,50})\\n\\n(.*)\\n\\n(#\\d+/\\d+)\\s(http://\\S*)\\n$")
 	, regx		("(\\s+)(#\\d+(?:\\S+)|#\\d+/\\d+(?:\\S+)|@\\S+|_[^\\n]+_|\\*[^\\n]+\\*|/[^\\n]+/|http://\\S+|ftp://\\S+|https://\\S+){1}(\\s+)")
-	, rpostRx	("\\nReply posted.\\n(#.*)\\s(http://\\S*)\\n$")
-	, threadRx	("^\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(http://juick.com/\\S+)\\n(.*)")
 	, userRx	("^\\nBlog: http://.*")
-	, singleMsgRx	("^\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+) (\\((?:.*; )\\d+ repl(?:ies|y)\\) ){0,1}(http://juick.com/\\S+)\\n$")
-	, lastMsgRx	("^\\n(Last (?:popular ){0,1}messages:)(.*)")
-	, juboRx	("^\\n([^\\n]*)\\n@(\\S*):( [^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(http://juick.com/\\S+)\\n$")
-	, msgPostRx	("\\nNew message posted.\\n(#.*)\\s(http://\\S*)\\n$")
 	, delMsgRx	("^\\nMessage #\\d+ deleted.\\n$")
 	, delReplyRx	("^\\nReply #\\d+/\\d+ deleted.\\n$")
 	, idRx		("(#\\d+)(/\\d+){0,1}(\\S+){0,1}")
 	, nickRx	("(@[\\w\\-\\.@\\|]*)(\\b.*)")
-	, recomendRx	("^\\nRecommended by @(\\S*):\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n\\n(#\\d+) (\\(\\d+ repl(?:ies|y)\\) ){0,1}(http://\\S*)\\n$")
 	, idAsResource(false), showPhoto(false), showAvatars(true), workInGroupChat(false)
 
 {
 	pmRx.setMinimal(true);
-	replyRx.setMinimal(true);
 	regx.setMinimal(true);
-	postRx.setMinimal(true);
-	singleMsgRx.setMinimal(true);
-	juboRx.setMinimal(true);
 	jidList_ = QStringList() << juick << jubo;
 	updateTimer_.setSingleShot(true);
 	updateTimer_.setInterval(1000);
@@ -347,6 +335,7 @@ bool JuickPlugin::disable()
 	foreach(const QString& file, dir.entryList(QDir::Files)) {
 		QFile::remove(dir.absolutePath()+"/"+file);
 	}
+	JuickParser::reset();
 	return true;
 }
 
@@ -624,10 +613,10 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 				jidToSend = "juick%juick.com@"+jid.split("@").last();
 			}
 
-			userLinkPattern = "xmpp:%1?message;type=chat;body=%2+";
+			userLinkPattern = chatPlusAction;
 			altTextUser = userInfoString;
 			if ( jid == jubo ) {
-				messageLinkPattern = "xmpp:%1%3?message;type=chat;body=%2";
+				messageLinkPattern = chatAction;
 				altTextMsg = replyMsgString;
 			} else {
 				messageLinkPattern = "xmpp:%1%3?message;type=chat;body=%2+";
@@ -664,7 +653,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 			}
 
 			//добавляем перевод строки для обработки ссылок и номеров сообщений в конце сообщения
-			QString msg = "\n" + stanza.firstChildElement("body").text() + "\n";
+			QString msg = "\n" + jp.originMessage() + "\n";
 			msg.replace("&gt;",">");
 			msg.replace("&lt;","<");
 
@@ -686,402 +675,292 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 				msg =  "";
 			}
 
-			const QStringList tags_ = jp.tags();
 			const QString photo = jp.photoLink();
-
-			if ((jid == jubo || usernameJ == "jubo%nologin.ru") && juboRx.indexIn(msg) != -1) {
-				//Jubo bot
-				body.appendChild(doc.createTextNode(juboRx.cap(1)));
-				body.appendChild(doc.createElement("br"));
-				addUserLink(&body, &doc, "@" + juboRx.cap(2), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
-				body.appendChild(doc.createTextNode(": "));
-				if (!juboRx.cap(3).isEmpty()){
-					//добавляем теги
-					foreach (const QString& tag,juboRx.cap(3).trimmed().split(" ")){
-						addTagLink(&body, &doc, tag, jidToSend);
-					}
-				}
-				//обрабатываем текст сообщения
-				QString newMsg = " " + juboRx.cap(4) + " ";
-				if (showAvatars) {
-					addAvatar(&body, &doc, msg, jidToSend, juboRx.cap(2));
-				} else {
+			JuickMessages jm = jp.getMessages();
+			const JuickParser::JMType type = jp.type();
+			switch (type) {
+			case JuickParser::JM_Jubo:
+			{
+				if (jid == jubo || usernameJ == "jubo%nologin.ru") {
+					JuickMessage m = jm.first();
+					body.appendChild(doc.createTextNode(jp.infoText()));
 					body.appendChild(doc.createElement("br"));
-					//обрабатываем текст сообщения
-					elementFromString(&body, &doc, newMsg, jidToSend);
-				}
-				//xmpp ссылка на сообщение
-				addMessageId(&body, &doc,juboRx.cap(5), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2", jidToSend);
-				//ссылка на сообщение
-				body.appendChild(doc.createTextNode(" "));
-				addPlus(&body, &doc, juboRx.cap(5), jidToSend);
-				body.appendChild(doc.createTextNode(" "));
-				addSubscribe(&body, &doc, juboRx.cap(5),jidToSend);
-				body.appendChild(doc.createTextNode(" "));
-				addFavorite(&body, &doc, juboRx.cap(5),jidToSend);
-				body.appendChild(doc.createTextNode(" "));
-				addHttpLink(&body, &doc, juboRx.cap(6));
-				msg = "";
-			}
-			else if (lastMsgRx.indexIn(msg) != -1) {
-				//last 10 messages
-				body.appendChild(doc.createTextNode(lastMsgRx.cap(1)));
-				msg = lastMsgRx.cap(2);
-				while (singleMsgRx.indexIn(msg) != -1) {
-					body.appendChild(doc.createElement("br"));
-					addUserLink(&body, &doc, "@" + singleMsgRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
+					addUserLink(&body, &doc, "@"+m.unick, altTextUser ,chatPlusAction, jidToSend);
 					body.appendChild(doc.createTextNode(": "));
-					//добавляем теги
-					foreach (const QString& tag, tags_){
+					foreach (const QString& tag,m.tags) {
 						addTagLink(&body, &doc, tag, jidToSend);
 					}
-					body.appendChild(doc.createElement("br"));
+
 					//обрабатываем текст сообщения
-					QString newMsg = " " + singleMsgRx.cap(3) + " ";
-					elementFromString(&body, &doc, newMsg, jidToSend);
+					QString newMsg = " " + m.body + " ";
+					if (showAvatars) {
+						addAvatar(&body, &doc, newMsg, jidToSend, m.unick);
+					} else {
+						body.appendChild(doc.createElement("br"));
+						//обрабатываем текст сообщения
+						elementFromString(&body, &doc, newMsg, jidToSend);
+					}
 					//xmpp ссылка на сообщение
-					addMessageId(&body, &doc,singleMsgRx.cap(4), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2", jidToSend);
-					body.appendChild(doc.createTextNode(" "));
-					addPlus(&body, &doc, singleMsgRx.cap(4),jidToSend);
+					addMessageId(&body, &doc, m.messageId, replyMsgString, chatAction, jidToSend);
 					//ссылка на сообщение
 					body.appendChild(doc.createTextNode(" "));
-					addSubscribe(&body, &doc, singleMsgRx.cap(4),jidToSend);
+					addPlus(&body, &doc, m.messageId, jidToSend);
 					body.appendChild(doc.createTextNode(" "));
-					addFavorite(&body, &doc, singleMsgRx.cap(4),jidToSend);
-					body.appendChild(doc.createTextNode(" "+singleMsgRx.cap(5)));
-					addHttpLink(&body, &doc, singleMsgRx.cap(6));
+					addSubscribe(&body, &doc, m.messageId,jidToSend);
+					body.appendChild(doc.createTextNode(" "));
+					addFavorite(&body, &doc, m.messageId,jidToSend);
+					body.appendChild(doc.createTextNode(" "));
+					addHttpLink(&body, &doc, m.link);
+					msg = "";
+				}
+				break;
+			}
+			case JuickParser::JM_10_Messages:
+			{
+				body.appendChild(doc.createTextNode(jp.infoText()));
+				foreach(const JuickMessage& m, jm) {
 					body.appendChild(doc.createElement("br"));
-					msg = msg.right(msg.size() - singleMsgRx.matchedLength());
+					addUserLink(&body, &doc, "@" + m.unick, altTextUser ,chatPlusAction, jidToSend);
+					body.appendChild(doc.createTextNode(": "));
+					//добавляем теги
+					foreach (const QString& tag, m.tags){
+						addTagLink(&body, &doc, tag, jidToSend);
+					}
+					body.appendChild(doc.createElement("br"));
+					//обрабатываем текст сообщения
+					QString newMsg = " " + m.body + " ";
+					elementFromString(&body, &doc, newMsg, jidToSend);
+					//xmpp ссылка на сообщение
+					addMessageId(&body, &doc, m.messageId, replyMsgString, chatAction, jidToSend);
+					body.appendChild(doc.createTextNode(" "));
+					addPlus(&body, &doc, m.messageId,jidToSend);
+					//ссылка на сообщение
+					body.appendChild(doc.createTextNode(" "));
+					addSubscribe(&body, &doc, m.messageId,jidToSend);
+					body.appendChild(doc.createTextNode(" "));
+					addFavorite(&body, &doc, m.messageId,jidToSend);
+					body.appendChild(doc.createTextNode(" "+m.infoText));
+					addHttpLink(&body, &doc, m.link);
+					body.appendChild(doc.createElement("br"));
 				}
 				body.removeChild(body.lastChild());
+				msg = "";
+				break;
 			}
-			else if (msg.indexOf(topTag) != -1) {
-				//Если это топ тегов
-				body.appendChild(doc.createTextNode(topTag));
+			case JuickParser::JM_Tags_Top:
+			{
+				body.appendChild(doc.createTextNode(jp.infoText()));
 				body.appendChild(doc.createElement("br"));
-				msg = msg.right(msg.size() - topTag.size() - 1);
-				while (tagRx.indexIn(msg, 0) != -1) {
-					addTagLink(&body, &doc, tagRx.cap(1), jidToSend);
+				JuickMessage m = jm.first();
+				foreach(const QString& tag, m.tags) {
+					addTagLink(&body, &doc, tag, jidToSend);
 					body.appendChild(doc.createElement("br"));
-					msg = msg.right(msg.size() - tagRx.matchedLength());
 				}
+				break;
 			}
-			else if (recomendRx.indexIn(msg) != -1) {
-				//разбор рекомендации
+			case JuickParser::JM_Recomendation:
+			case JuickParser::JM_Message:
+			case JuickParser::JM_All_Messages:
+			{
+				JuickMessage m = jm.first();
 				QString resLink("");
 				if (idAsResource) {
-					resource = recomendRx.cap(5);
+					resource = m.messageId;
 					resLink = "/" + resource;
 					resLink.replace("#","%23");
 				}
 				body.appendChild(doc.createElement("br"));
-				body.appendChild(doc.createTextNode(tr("Recommended by ")));
-				addUserLink(&body, &doc, "@" + recomendRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
-				body.appendChild(doc.createTextNode(":"));
-				body.appendChild(doc.createElement("br"));
-				addUserLink(&body, &doc, "@" + recomendRx.cap(2), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
+
+				if(type == JuickParser::JM_Recomendation) {
+					QStringList tmp = jp.infoText().split("@");
+					body.appendChild(doc.createTextNode(tmp.first()));
+					addUserLink(&body, &doc, "@" + tmp.last(), altTextUser ,chatPlusAction, jidToSend);
+					body.appendChild(doc.createTextNode(":"));
+					body.appendChild(doc.createElement("br"));
+				}
+
+				addUserLink(&body, &doc, "@" + m.unick, altTextUser ,chatPlusAction, jidToSend);
 				body.appendChild(doc.createTextNode(": "));
 				//добавляем теги
-				foreach (const QString& tag, tags_) {
+				foreach (const QString& tag, m.tags) {
 					addTagLink(&body, &doc, tag, jidToSend);
 				}
-//				//mood
-//				QRegExp moodRx("\\*mood:\\s(\\S*)\\s(.*)\\n(.*)");
-//				//geo
-//				QRegExp geoRx("\\*geo:\\s(.*)\\n(.*)");
-//				//tune
-//				QRegExp tuneRx("\\*tune:\\s(.*)\\n(.*)");
-//				if (moodRx.indexIn(recomendRx.cap(4)) != -1){
-//					body.appendChild(doc.createElement("br"));
-//					QDomElement bold = doc.createElement("b");
-//					bold.appendChild(doc.createTextNode("mood: "));
-//					body.appendChild(bold);
-//					QDomElement img = doc.createElement("icon");
-//					img.setAttribute("name","mood/"+moodRx.cap(1).left(moodRx.cap(1).size()-1).toLower());
-//					img.setAttribute("text",moodRx.cap(1));
-//					body.appendChild(img);
-//					body.appendChild(doc.createTextNode(" "+moodRx.cap(2)));
-//					msg = " " + moodRx.cap(3) + " ";
-//				} else if(geoRx.indexIn(recomendRx.cap(4)) != -1) {
-//					body.appendChild(doc.createElement("br"));
-//					QDomElement bold = doc.createElement("b");
-//					bold.appendChild(doc.createTextNode("geo: "+ geoRx.cap(1) ));
-//					body.appendChild(bold);
-//					msg = " " + geoRx.cap(2) + " ";
-//				} else if(tuneRx.indexIn(recomendRx.cap(4)) != -1) {
-//					body.appendChild(doc.createElement("br"));
-//					QDomElement bold = doc.createElement("b");
-//					bold.appendChild(doc.createTextNode("tune: "+ tuneRx.cap(1) ));
-//					body.appendChild(bold);
-//					msg = " " + tuneRx.cap(2) + " ";
-//				}
-//				else {
-					msg = " " + recomendRx.cap(4) + " ";
-//				}
+				msg = " " + m.body + " ";
+
 				if (showAvatars) {
-					addAvatar(&body, &doc, msg, jidToSend, jp.nick());
+					addAvatar(&body, &doc, msg, jidToSend, m.unick);
 				} else {
 					body.appendChild(doc.createElement("br"));
 					//обрабатываем текст сообщения
 					elementFromString(&body, &doc, msg, jidToSend);
 				}
 				//xmpp ссылка на сообщение
-				addMessageId(&body, &doc,recomendRx.cap(5), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2", jidToSend, resLink);
+				addMessageId(&body, &doc, m.messageId, replyMsgString, chatAction, jidToSend, resLink);
 				//ссылка на сообщение
 				body.appendChild(doc.createTextNode(" "));
-				addPlus(&body, &doc, recomendRx.cap(5),jidToSend, resLink);
+				if(type != JuickParser::JM_All_Messages) {
+					addPlus(&body, &doc, m.messageId,jidToSend, resLink);
+					body.appendChild(doc.createTextNode(" "));
+				}
+				addSubscribe(&body, &doc, m.messageId,jidToSend,resLink);
 				body.appendChild(doc.createTextNode(" "));
-				addSubscribe(&body, &doc, recomendRx.cap(5),jidToSend,resLink);
+				addFavorite(&body, &doc, m.messageId,jidToSend,resLink);
 				body.appendChild(doc.createTextNode(" "));
-				addFavorite(&body, &doc, recomendRx.cap(5),jidToSend,resLink);
-				body.appendChild(doc.createTextNode(" "));
-				body.appendChild(doc.createTextNode(recomendRx.cap(6)));
-				body.appendChild(doc.createTextNode(" "));
-				addHttpLink(&body, &doc, recomendRx.cap(7));
-				msg = "";
+				if(!m.infoText.isEmpty() && type != JuickParser::JM_All_Messages) {
+					body.appendChild(doc.createTextNode(m.infoText));
+					body.appendChild(doc.createTextNode(" "));
+				}
+				addHttpLink(&body, &doc, m.link);
+				if(type == JuickParser::JM_All_Messages)
+					msg = m.infoText;
+				else
+					msg = "";
+				break;
 			}
-			else if (postRx.indexIn(msg) != -1) {
-				//разбор сообщения
+			case JuickParser::JM_Reply:
+			{
+				JuickMessage m = jm.first();
 				QString resLink("");
-				if (idAsResource) {
-					resource = postRx.cap(4);
-					resLink = "/" + resource;
-					resLink.replace("#","%23");
-				}
-				body.appendChild(doc.createElement("br"));
-				addUserLink(&body, &doc, "@" + postRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
-				body.appendChild(doc.createTextNode(": "));
-				//добавляем теги
-				foreach (const QString& tag, tags_){
-					addTagLink(&body, &doc, tag, jidToSend);
-				}
-//				//mood
-//				QRegExp moodRx("\\*mood:\\s(\\S*)\\s(.*)\\n(.*)");
-//				//geo
-//				QRegExp geoRx("\\*geo:\\s(.*)\\n(.*)");
-//				//tune
-//				QRegExp tuneRx("\\*tune:\\s(.*)\\n(.*)");
-//				if (moodRx.indexIn(postRx.cap(3)) != -1) {
-//					body.appendChild(doc.createElement("br"));
-//					QDomElement bold = doc.createElement("b");
-//					bold.appendChild(doc.createTextNode("mood: "));
-//					body.appendChild(bold);
-//					QDomElement img = doc.createElement("icon");
-//					img.setAttribute("name","mood/"+moodRx.cap(1).left(moodRx.cap(1).size()-1).toLower());
-//					img.setAttribute("text",moodRx.cap(1));
-//					body.appendChild(img);
-//					body.appendChild(doc.createTextNode(" "+moodRx.cap(2)));
-//					msg = " " + moodRx.cap(3) + " ";
-//				} else if(geoRx.indexIn(postRx.cap(3)) != -1) {
-//					body.appendChild(doc.createElement("br"));
-//					QDomElement bold = doc.createElement("b");
-//					bold.appendChild(doc.createTextNode("geo: "+ geoRx.cap(1) ));
-//					body.appendChild(bold);
-//					msg = " " + geoRx.cap(2) + " ";
-//				} else if(tuneRx.indexIn(postRx.cap(3)) != -1) {
-//					body.appendChild(doc.createElement("br"));
-//					QDomElement bold = doc.createElement("b");
-//					bold.appendChild(doc.createTextNode("tune: "+ tuneRx.cap(1) ));
-//					body.appendChild(bold);
-//					msg = " " + tuneRx.cap(2) + " ";
-//				}
-//				else {
-					msg = " " + postRx.cap(3) + " ";
-//				}
-				if (showAvatars) {
-					addAvatar(&body, &doc, msg, jidToSend, jp.nick());
-				} else {
-					body.appendChild(doc.createElement("br"));
-					//обрабатываем текст сообщения
-					elementFromString(&body, &doc, msg, jidToSend);
-				}
-				//xmpp ссылка на сообщение
-				addMessageId(&body, &doc,postRx.cap(4), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend,resLink);
-				//ссылка на сообщение
-				body.appendChild(doc.createTextNode(" "));
-				addPlus(&body, &doc, postRx.cap(4),jidToSend, resLink);
-				body.appendChild(doc.createTextNode(" "));
-				addSubscribe(&body, &doc, postRx.cap(4),jidToSend,resLink);
-				body.appendChild(doc.createTextNode(" "));
-				addFavorite(&body, &doc, postRx.cap(4),jidToSend,resLink);
-				body.appendChild(doc.createTextNode(" "));
-				addHttpLink(&body, &doc, postRx.cap(5));
-				msg = "";
-			}
-			else if (replyRx.indexIn(msg) != -1) {
-				//обработка реплеев
-				QString resLink("");
-				QString replyId(replyRx.cap(4));
+				QString replyId(m.messageId);
 				if (idAsResource) {
 					resource = replyId.left(replyId.indexOf("/"));
 					resLink = "/" + resource;
 					resLink.replace("#","%23");
 				}
 				body.appendChild(doc.createElement("br"));
-				addUserLink(&body, &doc, "@" + replyRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+", jidToSend);
+				addUserLink(&body, &doc, "@" + m.unick, altTextUser ,chatPlusAction, jidToSend);
 				body.appendChild(doc.createTextNode(tr(" replied:")));
 				//цитата
 				QDomElement blockquote = doc.createElement("blockquote");
 				blockquote.setAttribute("style",quoteStyle);
-				blockquote.appendChild(doc.createTextNode(replyRx.cap(2)));
+				blockquote.appendChild(doc.createTextNode(jp.infoText()));
 				//обрабатываем текст сообщения
-				msg = " " + replyRx.cap(3) + " ";
+				msg = " " + m.body + " ";
 				body.appendChild(blockquote);
 				if (showAvatars) {
-					addAvatar(&body, &doc, msg, jidToSend, jp.nick());
+					addAvatar(&body, &doc, msg, jidToSend, m.unick);
 					//td2.appendChild(blockquote);
 				} else {
 					//body.appendChild(blockquote);
 					elementFromString(&body, &doc,msg,jidToSend);
 				}
 				//xmpp ссылка на сообщение
-				addMessageId(&body, &doc,replyId, replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend,resLink);
+				addMessageId(&body, &doc,m.messageId, replyMsgString, chatAction,jidToSend,resLink);
 				//ссылка на сообщение
 				body.appendChild(doc.createTextNode(" "));
-				QString msgId = replyId.split("/").first();
-				addUnsubscribe(&body, &doc, replyId,jidToSend, resLink);
+				QString msgId = m.messageId.split("/").first();
+				addUnsubscribe(&body, &doc, m.messageId,jidToSend, resLink);
 				body.appendChild(doc.createTextNode(" "));
 				addPlus(&body, &doc, msgId, jidToSend, resLink);
 				body.appendChild(doc.createTextNode(" "));
-				addHttpLink(&body, &doc, replyRx.cap(5));
+				addHttpLink(&body, &doc, m.link);
 				msg = "";
+				break;
 			}
-			else if (rpostRx.indexIn(msg) != -1) {
-				//Reply posted
+			case JuickParser::JM_Reply_Posted:
+			case JuickParser::JM_Message_Posted:
+			{
+				JuickMessage m = jm.first();
 				QString resLink("");
 				if (idAsResource) {
-					QString tmp(rpostRx.cap(1));
-					resource = tmp.left(tmp.indexOf("/"));
-					resLink = "/" + resource;
-					resLink.replace("#","%23");
-				}
-				body.appendChild(doc.createElement("br"));
-				body.appendChild(doc.createTextNode(tr("Reply posted.")));
-				body.appendChild(doc.createElement("br"));
-				//xmpp ссылка на сообщение
-				addMessageId(&body, &doc,rpostRx.cap(1), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend,resLink);
-				body.appendChild(doc.createTextNode(" "));
-				addDelete(&body, &doc,rpostRx.cap(1),jidToSend,resLink);
-				body.appendChild(doc.createTextNode(" "));
-				//ссылка на сообщение
-				body.appendChild(doc.createTextNode(" "));
-				addHttpLink(&body, &doc, rpostRx.cap(2));
-				msg = "";
-			}
-			else if (msgPostRx.indexIn(msg) != -1) {
-				//New message posted
-				QString resLink("");
-				if (idAsResource) {
-					QStringList tmp = activeTab->getJid().split('/');
-					if (tmp.count() > 1 && jid == tmp.first()){
-						resource = tmp.last();
+					if(type == JuickParser::JM_Reply_Posted) {
+						resource = m.messageId.split("/").first();
 						resLink = "/" + resource;
-					} else {
-						QString tmp(msgPostRx.cap(1));
-						resLink = "/" + tmp.left(tmp.indexOf("/"));
+					}
+					else {
+						QStringList tmp = activeTab->getJid().split('/');
+						if (tmp.count() > 1 && jid == tmp.first()) {
+							resource = tmp.last();
+							resLink = "/" + resource;
+						}
+						else {
+							resLink = "/" + m.messageId.split("/").first();
+						}
 					}
 					resLink.replace("#","%23");
-
 				}
 				body.appendChild(doc.createElement("br"));
-				body.appendChild(doc.createTextNode(tr("New message posted.")));
+				body.appendChild(doc.createTextNode(jp.infoText()));
 				body.appendChild(doc.createElement("br"));
 				//xmpp ссылка на сообщение
-				addMessageId(&body, &doc,msgPostRx.cap(1), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend);
+				addMessageId(&body, &doc, m.messageId, replyMsgString, chatAction,jidToSend,resLink);
 				body.appendChild(doc.createTextNode(" "));
-				addDelete(&body, &doc,msgPostRx.cap(1),jidToSend);
+				addDelete(&body, &doc, m.messageId, jidToSend, resLink);
 				body.appendChild(doc.createTextNode(" "));
 				//ссылка на сообщение
 				body.appendChild(doc.createTextNode(" "));
-				addHttpLink(&body, &doc, msgPostRx.cap(2));
+				addHttpLink(&body, &doc, m.link);
 				msg = "";
+				break;
 			}
-			else if (threadRx.indexIn(msg) != -1) {
-				//Show All Messages
-				QString resLink("");
-				if (idAsResource) {
-					resource = threadRx.cap(4);
-					resLink = "/" + resource;
-					resLink.replace("#","%23");
-					res = resLink;
-				}
+			case JuickParser::JM_Post_View:
+			{
+				JuickMessage m = jm.first();
 				body.appendChild(doc.createElement("br"));
-				addUserLink(&body, &doc, "@" + threadRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+",jidToSend);
+				addUserLink(&body, &doc, "@" + m.unick, altTextUser ,chatPlusAction,jidToSend);
 				body.appendChild(doc.createTextNode(": "));
 				//добавляем теги
-				foreach (const QString& tag, tags_) {
+				foreach (const QString& tag, m.tags) {
 					addTagLink(&body, &doc, tag,jidToSend);
 				}
 				body.appendChild(doc.createElement("br"));
 				//обрабатываем текст сообщения
-				QString newMsg(" " + threadRx.cap(3) + " ");
-				elementFromString(&body, &doc,newMsg,jidToSend);
-				//xmpp ссылка на сообщение
-				addMessageId(&body, &doc,threadRx.cap(4), replyMsgString, "xmpp:%1%3?message;type=chat;body=%2",jidToSend,resLink);
-				//ссылка на сообщение
-				body.appendChild(doc.createTextNode(" "));
-				addSubscribe(&body, &doc, threadRx.cap(4),jidToSend, resLink);
-				body.appendChild(doc.createTextNode(" "));
-				addFavorite(&body, &doc, threadRx.cap(4),jidToSend, resLink);
-				body.appendChild(doc.createTextNode(" "));
-				addHttpLink(&body, &doc, threadRx.cap(5));
-				msg = msg.right(msg.size() - threadRx.matchedLength() + threadRx.cap(6).length());
-			}
-			else if (singleMsgRx.indexIn(msg) != -1) {
-				//просмотр отдельного поста
-				body.appendChild(doc.createElement("br"));
-				addUserLink(&body, &doc, "@" + singleMsgRx.cap(1), altTextUser ,"xmpp:%1?message;type=chat;body=%2+",jidToSend);
-				body.appendChild(doc.createTextNode(": "));
-				//добавляем теги
-				foreach (const QString& tag, tags_) {
-					addTagLink(&body, &doc, tag,jidToSend);
+				QString newMsg = " " + m.body + " ";
+				if (showAvatars) {
+					addAvatar(&body, &doc, newMsg, jidToSend, m.unick);
+				} else {
+					body.appendChild(doc.createElement("br"));
+					//обрабатываем текст сообщения
+					elementFromString(&body, &doc, newMsg, jidToSend);
 				}
-				body.appendChild(doc.createElement("br"));
-				//обрабатываем текст сообщения
-				QString newMsg = " " + singleMsgRx.cap(3) + " ";
-				elementFromString(&body, &doc, newMsg,jidToSend);
 				//xmpp ссылка на сообщение
-				if (singleMsgRx.cap(5).isEmpty()) {
-					messageLinkPattern = "xmpp:%1%3?message;type=chat;body=%2";
+				if (m.infoText.isEmpty()) {
+					messageLinkPattern = chatAction;
 					altTextMsg = replyMsgString;
 				}
-				addMessageId(&body, &doc, singleMsgRx.cap(4), altTextMsg, messageLinkPattern,jidToSend);
+				addMessageId(&body, &doc, m.messageId, altTextMsg, messageLinkPattern, jidToSend);
 				//ссылка на сообщение
 				body.appendChild(doc.createTextNode(" "));
-				addSubscribe(&body, &doc, singleMsgRx.cap(4),jidToSend);
+				addSubscribe(&body, &doc, m.messageId,jidToSend);
 				body.appendChild(doc.createTextNode(" "));
-				addFavorite(&body, &doc, singleMsgRx.cap(4),jidToSend);
-				body.appendChild(doc.createTextNode(" "+singleMsgRx.cap(5)));
-				addHttpLink(&body, &doc, singleMsgRx.cap(6));
+				addFavorite(&body, &doc, m.messageId,jidToSend);
+				body.appendChild(doc.createTextNode(" "+m.infoText));
+				addHttpLink(&body, &doc, m.link);
 				msg = "";
+				break;
 			}
-			else if (msg.indexOf("Recommended blogs:") != -1) {
-				//если команда @
-				userLinkPattern = "xmpp:%1?message;type=chat;body=S %2";
-				altTextUser = tr("Subscribe to %1's blog");
+			default:
+			{
+				if (msg.indexOf("Recommended blogs:") != -1) {
+					//если команда @
+					userLinkPattern = "xmpp:%1?message;type=chat;body=S %2";
+					altTextUser = tr("Subscribe to %1's blog");
+				}
+				else if (pmRx.indexIn(msg) != -1) {
+					//Если PM
+					userLinkPattern = "xmpp:%1?message;type=chat;body=PM %2";
+					altTextUser = tr("Send personal message to %1");
+				}
+				else if (userRx.indexIn(msg) != -1) {
+					//Если информация о пользователе
+					userLinkPattern = "xmpp:%1?message;type=chat;body=S %2";
+					altTextUser = tr("Subscribe to %1's blog");
+				}
+				else if (msg == "\nPONG\n"
+					 || msg == "\nSubscribed!\n"
+					 || msg == "\nUnsubscribed!\n"
+					 || msg == "\nPrivate message sent.\n"
+					 || msg == "\nInvalid request.\n"
+					 || msg == "\nMessage added to your favorites.\n"
+					 || msg == "\nMessage, you are replying to, not found.\n"
+					 || msg == "\nThis nickname is already taken by someone\n"
+					 || msg == "\nUser not found.\n"
+					 || delMsgRx.indexIn(msg) != -1
+					 || delReplyRx.indexIn(msg) != -1 ) {
+					msg = msg.left(msg.size() - 1);
+				}
+				break;
 			}
-			else if (pmRx.indexIn(msg) != -1) {
-				//Если PM
-				userLinkPattern = "xmpp:%1?message;type=chat;body=PM %2";
-				altTextUser = tr("Send personal message to %1");
-			}
-			else if (userRx.indexIn(msg) != -1) {
-				//Если информация о пользователе
-				userLinkPattern = "xmpp:%1?message;type=chat;body=S %2";
-				altTextUser = tr("Subscribe to %1's blog");
-			}
-			else if (msg == "\nPONG\n"
-				   || msg == "\nSubscribed!\n"
-				   || msg == "\nUnsubscribed!\n"
-				   || msg == "\nPrivate message sent.\n"
-				   || msg == "\nInvalid request.\n"
-				   || msg == "\nMessage added to your favorites.\n"
-				   || msg == "\nMessage, you are replying to, not found.\n"
-				   || msg == "\nThis nickname is already taken by someone\n"
-				   || msg == "\nUser not found.\n"
-				   || delMsgRx.indexIn(msg) != -1
-				   || delReplyRx.indexIn(msg) != -1 ) {
-				msg = msg.left(msg.size() - 1);
 			}
 
 			if (idAsResource && resource.isEmpty() && (jid != jubo || usernameJ != "jubo%nologin.ru")) {
@@ -1193,7 +1072,7 @@ void JuickPlugin::elementFromString(QDomElement* body,QDomDocument* e, const QSt
 			idRx.indexIn(seg);
 			if (!idRx.cap(2).isEmpty()) {
 				//для #1234/12 - +ненужен
-				messageLinkPattern = "xmpp:%1%3?message;type=chat;body=%2";
+				messageLinkPattern = chatAction;
 				altTextMsg = replyMsgString;
 			}
 			addMessageId(body, e,idRx.cap(1)+idRx.cap(2), altTextMsg, messageLinkPattern,jid, resource);

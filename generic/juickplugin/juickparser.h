@@ -25,28 +25,66 @@
 #include <QDomElement>
 #include <QStringList>
 
+struct JuickMessage {
+	JuickMessage(const QString& _unick, const QString& _mes, const QStringList& _tags,
+		     const QString& _body, const QString& _link, const QString& info)
+		: unick(_unick), messageId(_mes), tags(_tags), body(_body), link(_link), infoText(info)
+	{
+	}
+	QString unick;
+	QString messageId;
+	QStringList tags;
+	QString body;
+	QString link;
+	QString infoText;
+};
+
+typedef QList<JuickMessage> JuickMessages;
+
 class JuickParser
 {
-public:
-	JuickParser();
+public:	
 	JuickParser(QDomElement* elem);
+	virtual ~JuickParser() {}
+
+	static void reset();
+
+	enum JMType {
+		JM_Other = 0,
+		JM_10_Messages,
+		JM_Tags_Top,
+		JM_Recomendation,
+		JM_Message,
+		JM_Message_Posted,
+		JM_Reply,
+		JM_Reply_Posted,
+		JM_All_Messages,
+		JM_Post_View,
+		JM_Jubo
+	};
 
 	bool hasJuckNamespace() const;
 	QString avatarLink() const;
 	QString photoLink() const;
-	QStringList tags() const;
-	QString messageId() const;
-	QString body() const;
 	QString nick() const;
-	QString link() const;
-	QDomElement findElement(const QString& tagName, const QString& xmlns) const;
+	QString infoText() const { return infoText_; }
+	JMType type() const { return type_; }
+	JuickMessages getMessages() const { return messages_; }
+	QString originMessage() const;
+	QDomElement findElement(const QString& tagName, const QString& xmlns) const;	
 
 private:
-
+	JuickParser() {}
+	Q_DISABLE_COPY(JuickParser)
 
 private:
 	QDomElement* elem_;
 	QDomElement juickElement_;
+	JMType type_;
+	QString infoText_;
+	JuickMessages messages_;
+	class Private;
+	static Private* d;
 };
 
 #endif // JUICKPARSER_H
