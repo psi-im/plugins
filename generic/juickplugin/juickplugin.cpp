@@ -23,8 +23,8 @@
 #include <QColorDialog>
 #include <QTextEdit>
 #include <QtWebKit/QWebView>
-#include <QAbstractNetworkCache>
-//#include <QtWebKit/QWebFrame>
+#include <QtWebKit/QWebFrame>
+#include <QtWebKit/QWebElement>
 
 #include "psiplugin.h"
 //#include "eventfilter.h"
@@ -100,7 +100,7 @@ static void save(const QString &path, const QByteArray &img)
 {
 	QFile file(path);
 
-	if(file.open(QIODevice::WriteOnly)){
+	if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 		file.write(img);
 	}
 	else
@@ -1271,34 +1271,35 @@ void JuickPlugin::removeWidget()
 	logs_.removeAll(w);
 }
 
-
 // Этот слот обновляет чатлоги, чтобы они перезагрузили
-// картинки с диска. Пока не работает
+// картинки с диска.
 void JuickPlugin::updateWidgets()
 {
-//	foreach(QWidget *w, logs_) {
-//		QTextEdit* te = qobject_cast<QTextEdit*>(w);
-//		if(te) {
-//			foreach(const QByteArray& url, urls_) {
-//				QUrl u;
-//				u.setEncodedUrl(url);
-//				te->document()->addResource(QTextDocument::ImageResource, u, QVariant(QImage(u.toLocalFile())));
-//			}
-//		}
-//		else {
-//			QWebView *wv = w->findChild<QWebView*>();
-//			if(wv) {
-//				QAbstractNetworkCache* c = wv->page()->networkAccessManager()->cache();
-//				foreach(const QByteArray& url, urls_) {
-//					QUrl u;
-//					u.setEncodedUrl(url);
-//					QFile f(u.toLocalFile());
-//					if(f.open(QFile::ReadOnly))
-//						c->insert(&f);
-//				}
-//			}
-//		}
-//	}
+	foreach(QWidget *w, logs_) {
+		QTextEdit* te = qobject_cast<QTextEdit*>(w);
+		if(te) {
+			QTextDocument* td = te->document();
+			foreach(const QByteArray& url, urls_) {
+				QUrl u(url);
+				td->addResource(QTextDocument::ImageResource, u, QPixmap(u.toLocalFile()));
+			}
+			td->adjustSize();
+		}
+		else {
+			QWebView *wv = w->findChild<QWebView*>();
+			if(wv) {
+				int t = QTime::currentTime().msec();
+				QWebFrame* wf = wv->page()->mainFrame();
+				foreach(const QByteArray& url, urls_) {
+					QUrl u(url);
+					QWebElement elem = wf->findFirstElement(QString("img[src=\"%1\"]").arg(u.toString()));
+					if(!elem.isNull()) {
+						elem.setAttribute("src", u.toString() + "?" + QString::number(qrand()%t));
+					}
+				}
+			}
+		}
+	}
 	urls_.clear();
 }
 

@@ -18,7 +18,6 @@
  *
  */
 
-#include <QApplication>
 //#include <QDebug>
 #include "juickparser.h"
 
