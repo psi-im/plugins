@@ -19,6 +19,7 @@
  */
 
 //#include <QDebug>
+#include <QDateTime>
 #include "juickparser.h"
 
 static const QString juickLink("http://juick.com/%1");
@@ -236,6 +237,27 @@ QString JuickParser::nick() const
 QString JuickParser::originMessage() const
 {
 	return elem_->firstChildElement("body").text();
+}
+
+QString JuickParser::timeStamp() const
+{
+	QString ts;
+	if(hasJuckNamespace()) {
+		ts = juickElement_.attribute("ts");
+		if(!ts.isEmpty()) {
+			QDateTime dt = QDateTime::fromString(ts, "yyyy-MM-dd hh:mm:ss");
+			static qlonglong offset = -1;
+			if(offset == -1) {
+				QDateTime cur = QDateTime::currentDateTime();
+				QDateTime utc = cur.toUTC();
+				utc.setTimeSpec(Qt::LocalTime);
+				offset = utc.secsTo(cur);
+			}
+			dt.addSecs(offset);
+			ts = dt.toString("yyyy-MM-dd hh:mm:ss");
+		}
+	}
+	return ts;
 }
 
 QDomElement JuickParser::findElement(const QString &tagName, const QString &xmlns) const

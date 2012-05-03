@@ -739,6 +739,10 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 					body.appendChild(doc.createTextNode(jp.infoText()));
 				}
 				body.appendChild(doc.createElement("br"));
+				if(!jp.timeStamp().isEmpty()) {
+					body.appendChild(doc.createTextNode(tr("Time stamp: %1").arg(jp.timeStamp())));
+					body.appendChild(doc.createElement("br"));
+				}
 
 				if(type == JuickParser::JM_Recomendation) {
 					QStringList tmp = jp.infoText().split("@");

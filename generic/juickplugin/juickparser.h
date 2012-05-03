@@ -71,6 +71,7 @@ public:
 	JMType type() const { return type_; }
 	JuickMessages getMessages() const { return messages_; }
 	QString originMessage() const;
+	QString timeStamp() const;
 	QDomElement findElement(const QString& tagName, const QString& xmlns) const;	
 
 private:
