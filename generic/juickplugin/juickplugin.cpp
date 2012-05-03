@@ -679,48 +679,12 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 			JuickMessages jm = jp.getMessages();
 			const JuickParser::JMType type = jp.type();
 			switch (type) {
-			case JuickParser::JM_Jubo:
-			{
-				if (jid == jubo || usernameJ == "jubo%nologin.ru") {
-					JuickMessage m = jm.first();
-					body.appendChild(doc.createTextNode(jp.infoText()));
-					body.appendChild(doc.createElement("br"));
-					addUserLink(&body, &doc, "@"+m.unick, altTextUser ,chatPlusAction, jidToSend);
-					body.appendChild(doc.createTextNode(": "));
-					foreach (const QString& tag,m.tags) {
-						addTagLink(&body, &doc, tag, jidToSend);
-					}
-
-					//обрабатываем текст сообщения
-					QString newMsg = " " + m.body + " ";
-					if (showAvatars) {
-						addAvatar(&body, &doc, newMsg, jidToSend, m.unick);
-					} else {
-						body.appendChild(doc.createElement("br"));
-						//обрабатываем текст сообщения
-						elementFromString(&body, &doc, newMsg, jidToSend);
-					}
-					//xmpp ссылка на сообщение
-					addMessageId(&body, &doc, m.messageId, replyMsgString, chatAction, jidToSend);
-					//ссылка на сообщение
-					body.appendChild(doc.createTextNode(" "));
-					addPlus(&body, &doc, m.messageId, jidToSend);
-					body.appendChild(doc.createTextNode(" "));
-					addSubscribe(&body, &doc, m.messageId,jidToSend);
-					body.appendChild(doc.createTextNode(" "));
-					addFavorite(&body, &doc, m.messageId,jidToSend);
-					body.appendChild(doc.createTextNode(" "));
-					addHttpLink(&body, &doc, m.link);
-					msg = "";
-				}
-				break;
-			}
 			case JuickParser::JM_10_Messages:
 			{
 				body.appendChild(doc.createTextNode(jp.infoText()));
 				foreach(const JuickMessage& m, jm) {
 					body.appendChild(doc.createElement("br"));
-					addUserLink(&body, &doc, "@" + m.unick, altTextUser ,chatPlusAction, jidToSend);
+					addUserLink(&body, &doc, "@" + m.unick, altTextUser, chatPlusAction, jidToSend);
 					body.appendChild(doc.createTextNode(": "));
 					//добавляем теги
 					foreach (const QString& tag, m.tags){
@@ -736,15 +700,15 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 					addPlus(&body, &doc, m.messageId,jidToSend);
 					//ссылка на сообщение
 					body.appendChild(doc.createTextNode(" "));
-					addSubscribe(&body, &doc, m.messageId,jidToSend);
+					addSubscribe(&body, &doc, m.messageId, jidToSend);
 					body.appendChild(doc.createTextNode(" "));
-					addFavorite(&body, &doc, m.messageId,jidToSend);
+					addFavorite(&body, &doc, m.messageId, jidToSend);
 					body.appendChild(doc.createTextNode(" "+m.infoText));
 					addHttpLink(&body, &doc, m.link);
 					body.appendChild(doc.createElement("br"));
 				}
 				body.removeChild(body.lastChild());
-				msg = "";
+				msg.clear();
 				break;
 			}
 			case JuickParser::JM_Tags_Top:
@@ -761,25 +725,30 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 			case JuickParser::JM_Recomendation:
 			case JuickParser::JM_Message:
 			case JuickParser::JM_All_Messages:
+			case JuickParser::JM_Post_View:
+			case JuickParser::JM_Jubo:
 			{
 				JuickMessage m = jm.first();
 				QString resLink("");
-				if (idAsResource) {
+				if (idAsResource && type != JuickParser::JM_Post_View  && type != JuickParser::JM_Jubo) {
 					resource = m.messageId;
 					resLink = "/" + resource;
 					resLink.replace("#","%23");
+				}
+				if(type == JuickParser::JM_Jubo) {
+					body.appendChild(doc.createTextNode(jp.infoText()));
 				}
 				body.appendChild(doc.createElement("br"));
 
 				if(type == JuickParser::JM_Recomendation) {
 					QStringList tmp = jp.infoText().split("@");
 					body.appendChild(doc.createTextNode(tmp.first()));
-					addUserLink(&body, &doc, "@" + tmp.last(), altTextUser ,chatPlusAction, jidToSend);
+					addUserLink(&body, &doc, "@" + tmp.last(), altTextUser, chatPlusAction, jidToSend);
 					body.appendChild(doc.createTextNode(":"));
 					body.appendChild(doc.createElement("br"));
 				}
 
-				addUserLink(&body, &doc, "@" + m.unick, altTextUser ,chatPlusAction, jidToSend);
+				addUserLink(&body, &doc, "@" + m.unick, altTextUser, chatPlusAction, jidToSend);
 				body.appendChild(doc.createTextNode(": "));
 				//добавляем теги
 				foreach (const QString& tag, m.tags) {
@@ -794,17 +763,22 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 					//обрабатываем текст сообщения
 					elementFromString(&body, &doc, msg, jidToSend);
 				}
+
+				if (type == JuickParser::JM_Post_View && m.infoText.isEmpty()) {
+					messageLinkPattern = chatAction;
+					altTextMsg = replyMsgString;
+				}
 				//xmpp ссылка на сообщение
 				addMessageId(&body, &doc, m.messageId, replyMsgString, chatAction, jidToSend, resLink);
 				//ссылка на сообщение
 				body.appendChild(doc.createTextNode(" "));
-				if(type != JuickParser::JM_All_Messages) {
-					addPlus(&body, &doc, m.messageId,jidToSend, resLink);
+				if(type != JuickParser::JM_All_Messages && type != JuickParser::JM_Post_View) {
+					addPlus(&body, &doc, m.messageId, jidToSend, resLink);
 					body.appendChild(doc.createTextNode(" "));
 				}
-				addSubscribe(&body, &doc, m.messageId,jidToSend,resLink);
+				addSubscribe(&body, &doc, m.messageId, jidToSend, resLink);
 				body.appendChild(doc.createTextNode(" "));
-				addFavorite(&body, &doc, m.messageId,jidToSend,resLink);
+				addFavorite(&body, &doc, m.messageId, jidToSend, resLink);
 				body.appendChild(doc.createTextNode(" "));
 				if(!m.infoText.isEmpty() && type != JuickParser::JM_All_Messages) {
 					body.appendChild(doc.createTextNode(m.infoText));
@@ -814,7 +788,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 				if(type == JuickParser::JM_All_Messages)
 					msg = m.infoText;
 				else
-					msg = "";
+					msg.clear();
 				break;
 			}
 			case JuickParser::JM_Reply:
@@ -854,7 +828,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 				addPlus(&body, &doc, msgId, jidToSend, resLink);
 				body.appendChild(doc.createTextNode(" "));
 				addHttpLink(&body, &doc, m.link);
-				msg = "";
+				msg.clear();
 				break;
 			}
 			case JuickParser::JM_Reply_Posted:
@@ -885,48 +859,16 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 				//xmpp ссылка на сообщение
 				addMessageId(&body, &doc, m.messageId, replyMsgString, chatAction,jidToSend,resLink);
 				body.appendChild(doc.createTextNode(" "));
+				if(type == JuickParser::JM_Message_Posted) {
+					addPlus(&body, &doc, m.messageId, jidToSend, resLink);
+					body.appendChild(doc.createTextNode(" "));
+				}
 				addDelete(&body, &doc, m.messageId, jidToSend, resLink);
 				body.appendChild(doc.createTextNode(" "));
 				//ссылка на сообщение
 				body.appendChild(doc.createTextNode(" "));
 				addHttpLink(&body, &doc, m.link);
-				msg = "";
-				break;
-			}
-			case JuickParser::JM_Post_View:
-			{
-				JuickMessage m = jm.first();
-				body.appendChild(doc.createElement("br"));
-				addUserLink(&body, &doc, "@" + m.unick, altTextUser ,chatPlusAction,jidToSend);
-				body.appendChild(doc.createTextNode(": "));
-				//добавляем теги
-				foreach (const QString& tag, m.tags) {
-					addTagLink(&body, &doc, tag,jidToSend);
-				}
-				body.appendChild(doc.createElement("br"));
-				//обрабатываем текст сообщения
-				QString newMsg = " " + m.body + " ";
-				if (showAvatars) {
-					addAvatar(&body, &doc, newMsg, jidToSend, m.unick);
-				} else {
-					body.appendChild(doc.createElement("br"));
-					//обрабатываем текст сообщения
-					elementFromString(&body, &doc, newMsg, jidToSend);
-				}
-				//xmpp ссылка на сообщение
-				if (m.infoText.isEmpty()) {
-					messageLinkPattern = chatAction;
-					altTextMsg = replyMsgString;
-				}
-				addMessageId(&body, &doc, m.messageId, altTextMsg, messageLinkPattern, jidToSend);
-				//ссылка на сообщение
-				body.appendChild(doc.createTextNode(" "));
-				addSubscribe(&body, &doc, m.messageId,jidToSend);
-				body.appendChild(doc.createTextNode(" "));
-				addFavorite(&body, &doc, m.messageId,jidToSend);
-				body.appendChild(doc.createTextNode(" "+m.infoText));
-				addHttpLink(&body, &doc, m.link);
-				msg = "";
+				msg.clear();
 				break;
 			}
 			default:
