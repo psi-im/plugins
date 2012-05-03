@@ -253,7 +253,7 @@ QString JuickParser::timeStamp() const
 				utc.setTimeSpec(Qt::LocalTime);
 				offset = utc.secsTo(cur);
 			}
-			dt.addSecs(offset);
+			dt = dt.addSecs(offset);
 			ts = dt.toString("yyyy-MM-dd hh:mm:ss");
 		}
 	}
