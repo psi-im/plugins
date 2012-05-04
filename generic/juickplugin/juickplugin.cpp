@@ -223,7 +223,7 @@ JuickPlugin::JuickPlugin()
 	, userUnderline(false), tagUnderline(false), msgUnderline(true), quoteUnderline(false), lineUnderline(true)
 	, tagRx		("^\\s*(?!\\*\\S+\\*)(\\*\\S+)")
 	, pmRx		("^\\nPrivate message from (@.+):(.*)$")
-	, regx		("(\\s+)(#\\d+(?:\\S+)|#\\d+/\\d+(?:\\S+)|@\\S+|_[^\\n]+_|\\*[^\\n]+\\*|/[^\\n]+/|http://\\S+|ftp://\\S+|https://\\S+){1}(\\s+)")
+	, regx		("(\\s+)(#\\d+/{0,1}\\d*(?:\\S+)|@\\S+|_[^\\n]+_|\\*[^\\n]+\\*|/[^\\n]+/|http://\\S+|ftp://\\S+|https://\\S+){1}(\\s+)")
 	, userRx	("^\\nBlog: http://.*")
 	, delMsgRx	("^\\nMessage #\\d+ deleted.\\n$")
 	, delReplyRx	("^\\nReply #\\d+/\\d+ deleted.\\n$")
@@ -985,7 +985,7 @@ void JuickPlugin::getPhoto(const QUrl &url)
 		     .arg(url.path().replace("/", "%")));
 
 	Http *http = newHttp(path);
-	http->setHost(url.host());	
+	http->setHost(url.host());
 	http->get(QString(url.path()).replace("/photos-1024/","/ps/"));
 }
 
