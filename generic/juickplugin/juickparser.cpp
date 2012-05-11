@@ -35,6 +35,7 @@ public:
 	      , rpostRx		("\\nReply posted.\\n(#.*)\\s(http://\\S*)\\n$")
 	      , threadRx	("^\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(http://juick.com/\\S+)\\n(.*)")
 	      , userRx		("^\\nBlog: http://.*")
+	      , yourMesRecRx	("\\n@(\\S*)( recommended your post )(#\\d+)\\.\\s+(http://juick.com/\\S+).*")
 	      , singleMsgRx	("^\\n@(\\S+):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+) (\\(.*[;]{0,1}\\s*(?:\\d+ repl(?:ies|y)){0,1}\\) )(http://juick.com/\\S+)\\n$")
 	      , lastMsgRx	("^\\n(Last (?:popular ){0,1}messages:)(.*)")
 	      , juboRx		("^\\n([^\\n]*)\\n@(\\S*):( [^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(http://juick.com/\\S+)\\n$")
@@ -54,11 +55,10 @@ public:
 		juboRx.setMinimal(true);
 	}
 
-	QRegExp tagRx, pmRx, postRx,replyRx,/*regx,*/rpostRx,threadRx, userRx;
+	QRegExp tagRx, pmRx, postRx,replyRx,/*regx,*/rpostRx,threadRx, userRx, yourMesRecRx;
 	QRegExp singleMsgRx,lastMsgRx,juboRx,msgPostRx,/*delMsgRx,delReplyRx,idRx,nickRx,*/recomendRx;
 	const QString topTag;
 };
-
 
 
 
@@ -73,7 +73,9 @@ JuickParser::JuickParser(QDomElement *elem)
 	QString msg = "\n" + originMessage() + "\n";
 	msg.replace("&gt;",">");
 	msg.replace("&lt;","<");
-	if (d->recomendRx.indexIn(msg) != -1) { //must go before JM_Jubo check
+
+	//Порядок обработки имеет значение
+	if (d->recomendRx.indexIn(msg) != -1) {
 			type_ = JM_Recomendation;
 			infoText_ = QObject::tr("Recommended by @%1").arg(d->recomendRx.cap(1));
 			JuickMessage m(d->recomendRx.cap(2), d->recomendRx.cap(5), d->recomendRx.cap(3).trimmed().split(" "),
@@ -84,7 +86,7 @@ JuickParser::JuickParser(QDomElement *elem)
 		type_ = JM_Private;
 	}
 	else if (d->userRx.indexIn(msg) != -1) {
-		type_ = JM_USER_INFO;
+		type_ = JM_User_Info;
 	}
 	else if(d->lastMsgRx.indexIn(msg) != -1) {
 		type_ = JM_10_Messages;
@@ -108,13 +110,6 @@ JuickParser::JuickParser(QDomElement *elem)
 		}
 		JuickMessage m(QString(), QString(), tags, QString(), QString(), QString());
 		messages_.append(m);
-	}
-	else if (d->juboRx.indexIn(msg) != -1) { //must go after JM_Recomendation check
-		type_ = JM_Jubo;
-		JuickMessage m(d->juboRx.cap(2), d->juboRx.cap(5), d->juboRx.cap(3).trimmed().split(" "),
-			       d->juboRx.cap(4), d->juboRx.cap(6), QString());
-		messages_.append(m);
-		infoText_ = d->juboRx.cap(1);
 	}
 	else if (d->postRx.indexIn(msg) != -1) {
 		type_ = JM_Message;
@@ -156,6 +151,19 @@ JuickParser::JuickParser(QDomElement *elem)
 		infoText_ = QString();
 		JuickMessage m(d->singleMsgRx.cap(1), d->singleMsgRx.cap(4), d->singleMsgRx.cap(2).trimmed().split(" "),
 			       d->singleMsgRx.cap(3), d->singleMsgRx.cap(6), d->singleMsgRx.cap(5));
+		messages_.append(m);
+	}
+	else if (d->juboRx.indexIn(msg) != -1) {
+		type_ = JM_Jubo;
+		JuickMessage m(d->juboRx.cap(2), d->juboRx.cap(5), d->juboRx.cap(3).trimmed().split(" "),
+			       d->juboRx.cap(4), d->juboRx.cap(6), QString());
+		messages_.append(m);
+		infoText_ = d->juboRx.cap(1);
+	}
+	else if(d->yourMesRecRx.indexIn(msg) != -1) {
+		type_ = JM_Your_Post_Recommended;
+		JuickMessage m(d->yourMesRecRx.cap(1), d->yourMesRecRx.cap(3), QStringList(),
+			       d->yourMesRecRx.cap(2), d->yourMesRecRx.cap(4), QObject::tr(" recommended your post "));
 		messages_.append(m);
 	}
 	else {

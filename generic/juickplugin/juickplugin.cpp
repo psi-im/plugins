@@ -46,8 +46,8 @@ static const QString showLastTenString(QObject::tr("Show last 10 messages with t
 static const QString unsubscribeString(QObject::tr("Unsubscribe"));
 static const QString juick("juick@juick.com");
 static const QString jubo("jubo@nologin.ru");
-static const QRegExp delMsgRx("^\\nMessage #\\d+ deleted.\\n$");
-static const QRegExp delReplyRx("^\\nReply #\\d+/\\d+ deleted.\\n$");
+//static const QRegExp delMsgRx("^\\nMessage #\\d+ deleted.\\n$");
+//static const QRegExp delReplyRx("^\\nReply #\\d+/\\d+ deleted.\\n$");
 
 static const QString chatPlusAction = "xmpp:%1?message;type=chat;body=%2+";
 static const QString chatAction = "xmpp:%1%3?message;type=chat;body=%2";
@@ -565,14 +565,14 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 					elementFromString(&body, &doc, newMsg, jidToSend);
 					//xmpp ссылка на сообщение
 					addMessageId(&body, &doc, m.messageId, replyMsgString, chatAction, jidToSend);
-					body.appendChild(doc.createTextNode(" "));
+					body.appendChild(doc.createTextNode("  "));
 					addPlus(&body, &doc, m.messageId,jidToSend);
 					//ссылка на сообщение
-					body.appendChild(doc.createTextNode(" "));
+					body.appendChild(doc.createTextNode("  "));
 					addSubscribe(&body, &doc, m.messageId, jidToSend);
-					body.appendChild(doc.createTextNode(" "));
+					body.appendChild(doc.createTextNode("  "));
 					addFavorite(&body, &doc, m.messageId, jidToSend);
-					body.appendChild(doc.createTextNode(" "+m.infoText));
+					body.appendChild(doc.createTextNode("  "+m.infoText));
 					addHttpLink(&body, &doc, m.link);
 					body.appendChild(doc.createElement("br"));
 				}
@@ -599,7 +599,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 			{
 				JuickMessage m = jm.first();
 				QString resLink("");
-				if (idAsResource && type != JuickParser::JM_Post_View  && type != JuickParser::JM_Jubo) {
+				if (idAsResource && type != JuickParser::JM_Post_View/*  && type != JuickParser::JM_Jubo*/) {
 					resource = m.messageId;
 					resLink = "/" + resource;
 					resLink.replace("#","%23");
@@ -644,18 +644,18 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 				//xmpp ссылка на сообщение
 				addMessageId(&body, &doc, m.messageId, replyMsgString, chatAction, jidToSend, resLink);
 				//ссылка на сообщение
-				body.appendChild(doc.createTextNode(" "));
+				body.appendChild(doc.createTextNode("  "));
 				if(type != JuickParser::JM_All_Messages && type != JuickParser::JM_Post_View) {
 					addPlus(&body, &doc, m.messageId, jidToSend, resLink);
-					body.appendChild(doc.createTextNode(" "));
+					body.appendChild(doc.createTextNode("  "));
 				}
 				addSubscribe(&body, &doc, m.messageId, jidToSend, resLink);
-				body.appendChild(doc.createTextNode(" "));
+				body.appendChild(doc.createTextNode("  "));
 				addFavorite(&body, &doc, m.messageId, jidToSend, resLink);
-				body.appendChild(doc.createTextNode(" "));
+				body.appendChild(doc.createTextNode("  "));
 				if(!m.infoText.isEmpty() && type != JuickParser::JM_All_Messages) {
 					body.appendChild(doc.createTextNode(m.infoText));
-					body.appendChild(doc.createTextNode(" "));
+					body.appendChild(doc.createTextNode("  "));
 				}
 				addHttpLink(&body, &doc, m.link);
 				if(type == JuickParser::JM_All_Messages)
@@ -689,17 +689,17 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 					//td2.appendChild(blockquote);
 				} else {
 					//body.appendChild(blockquote);
-					elementFromString(&body, &doc,msg,jidToSend);
+					elementFromString(&body, &doc, msg, jidToSend);
 				}
 				//xmpp ссылка на сообщение
-				addMessageId(&body, &doc,m.messageId, replyMsgString, chatAction,jidToSend,resLink);
+				addMessageId(&body, &doc,m.messageId, replyMsgString, chatAction, jidToSend, resLink);
 				//ссылка на сообщение
-				body.appendChild(doc.createTextNode(" "));
+				body.appendChild(doc.createTextNode("  "));
 				QString msgId = m.messageId.split("/").first();
-				addUnsubscribe(&body, &doc, m.messageId,jidToSend, resLink);
-				body.appendChild(doc.createTextNode(" "));
+				addUnsubscribe(&body, &doc, m.messageId, jidToSend, resLink);
+				body.appendChild(doc.createTextNode("  "));
 				addPlus(&body, &doc, msgId, jidToSend, resLink);
-				body.appendChild(doc.createTextNode(" "));
+				body.appendChild(doc.createTextNode("  "));
 				addHttpLink(&body, &doc, m.link);
 				msg.clear();
 				break;
@@ -731,15 +731,35 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 				body.appendChild(doc.createElement("br"));
 				//xmpp ссылка на сообщение
 				addMessageId(&body, &doc, m.messageId, replyMsgString, chatAction,jidToSend,resLink);
-				body.appendChild(doc.createTextNode(" "));
+				body.appendChild(doc.createTextNode("  "));
 				if(type == JuickParser::JM_Message_Posted) {
 					addPlus(&body, &doc, m.messageId, jidToSend, resLink);
-					body.appendChild(doc.createTextNode(" "));
+					body.appendChild(doc.createTextNode("  "));
 				}
 				addDelete(&body, &doc, m.messageId, jidToSend, resLink);
-				body.appendChild(doc.createTextNode(" "));
+				body.appendChild(doc.createTextNode("  "));
 				//ссылка на сообщение
-				body.appendChild(doc.createTextNode(" "));
+				body.appendChild(doc.createTextNode("  "));
+				addHttpLink(&body, &doc, m.link);
+				msg.clear();
+				break;
+			}
+			case JuickParser::JM_Your_Post_Recommended:
+			{
+				JuickMessage m = jm.first();
+				QString resLink("");
+				if (idAsResource) {
+					resource = m.messageId;
+					resLink = "/" + resource;
+					resLink.replace("#","%23");
+				}
+				body.appendChild(doc.createElement("br"));
+				addUserLink(&body, &doc, "@" + m.unick, altTextUser ,chatPlusAction, jidToSend);
+				body.appendChild(doc.createTextNode(m.infoText));
+				addMessageId(&body, &doc, m.messageId, replyMsgString, chatAction, jidToSend, resLink);
+				body.appendChild(doc.createElement("br"));
+				addPlus(&body, &doc, m.messageId, jidToSend, resLink);
+				body.appendChild(doc.createTextNode("  "));
 				addHttpLink(&body, &doc, m.link);
 				msg.clear();
 				break;
@@ -748,11 +768,13 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 			{
 				userLinkPattern = "xmpp:%1?message;type=chat;body=PM %2";
 				altTextUser = tr("Send personal message to %1");
+				break;
 			}
-			case JuickParser::JM_USER_INFO:
+			case JuickParser::JM_User_Info:
 			{
 				userLinkPattern = "xmpp:%1?message;type=chat;body=S %2";
 				altTextUser = tr("Subscribe to %1's blog");
+				break;
 			}
 			default:
 			{
@@ -761,26 +783,26 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 					userLinkPattern = "xmpp:%1?message;type=chat;body=S %2";
 					altTextUser = tr("Subscribe to %1's blog");
 				}
-				else if (msg == "\nPONG\n"
-					 || msg == "\nSubscribed!\n"
-					 || msg == "\nUnsubscribed!\n"
-					 || msg == "\nPrivate message sent.\n"
-					 || msg == "\nInvalid request.\n"
-					 || msg == "\nMessage added to your favorites.\n"
-					 || msg == "\nMessage, you are replying to, not found.\n"
-					 || msg == "\nThis nickname is already taken by someone\n"
-					 || msg == "\nUser not found.\n"
-					 || delMsgRx.indexIn(msg) != -1
-					 || delReplyRx.indexIn(msg) != -1 ) {
-					msg = msg.left(msg.size() - 1);
-				}
+//				else if (msg == "\nPONG\n"
+//					 || msg == "\nSubscribed!\n"
+//					 || msg == "\nUnsubscribed!\n"
+//					 || msg == "\nPrivate message sent.\n"
+//					 || msg == "\nInvalid request.\n"
+//					 || msg == "\nMessage added to your favorites.\n"
+//					 || msg == "\nMessage, you are replying to, not found.\n"
+//					 || msg == "\nThis nickname is already taken by someone\n"
+//					 || msg == "\nUser not found.\n"
+//					 || delMsgRx.indexIn(msg) != -1
+//					 || delReplyRx.indexIn(msg) != -1 ) {
+//					msg = msg.left(msg.size() - 1);
+//				}
 				break;
 			}
 			}
 
-			if (idAsResource && resource.isEmpty() && (jid != jubo || usernameJ != "jubo%nologin.ru")) {
+			if (idAsResource && resource.isEmpty() && jid != jubo && usernameJ != "jubo%nologin.ru") {
 				QStringList tmp = activeTab->getJid().split('/');
-				if (tmp.count() > 1 && jid == tmp.first()){
+				if (tmp.count() > 1 && jid == tmp.first()) {
 					resource = tmp.last();
 				}
 			}
@@ -812,8 +834,8 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 			nonConstStanza.appendChild(element);
 			if (!resource.isEmpty()) {
 				QString from = stanza.attribute("from");
-				from.replace(QRegExp("(.*)/.*"),"\\1/"+resource);
-				nonConstStanza.setAttribute("from",from);
+				from.replace(QRegExp("(.*)/.*"), "\\1/"+resource);
+				nonConstStanza.setAttribute("from", from);
 			}
 
 //			qDebug() << "AFTER";
@@ -924,7 +946,7 @@ void JuickPlugin::addPlus(QDomElement *body,QDomDocument* e, const QString& msg_
 	plus.setAttribute("style",idStyle);
 	plus.setAttribute("title",showAllmsgString);
 	plus.setAttribute("href",QString("xmpp:%1%3?message;type=chat;body=%2+").arg(jid).arg(msg.replace("#","%23")).arg(resource));
-	plus.appendChild(e->createTextNode(" +"));
+	plus.appendChild(e->createTextNode("+"));
 	body->appendChild(plus);
 }
 
@@ -935,7 +957,7 @@ void JuickPlugin::addSubscribe(QDomElement* body,QDomDocument* e, const QString&
 	subscribe.setAttribute("style",idStyle);
 	subscribe.setAttribute("title",subscribeString);
 	subscribe.setAttribute("href",QString("xmpp:%1%3?message;type=chat;body=S %2").arg(jid).arg(msg.replace("#","%23")).arg(resource));
-	subscribe.appendChild(e->createTextNode(" S"));
+	subscribe.appendChild(e->createTextNode("S"));
 	body->appendChild(subscribe);
 }
 
@@ -988,7 +1010,7 @@ void JuickPlugin::addUnsubscribe(QDomElement* body,QDomDocument* e, const QStrin
 	unsubscribe.setAttribute("style",idStyle);
 	unsubscribe.setAttribute("title",unsubscribeString);
 	unsubscribe.setAttribute("href",QString("xmpp:%1%3?message;type=chat;body=U %2").arg(jid).arg(msg.left(msg.indexOf("/")).replace("#","%23")).arg(resource));
-	unsubscribe.appendChild(e->createTextNode(" U"));
+	unsubscribe.appendChild(e->createTextNode("U"));
 	body->appendChild(unsubscribe);
 }
 
@@ -999,7 +1021,7 @@ void JuickPlugin::addDelete(QDomElement* body, QDomDocument* e, const QString& m
 	unsubscribe.setAttribute("style",idStyle);
 	unsubscribe.setAttribute("title",tr("Delete"));
 	unsubscribe.setAttribute("href",QString("xmpp:%1%3?message;type=chat;body=D %2").arg(jid).arg(msg.replace("#","%23")).arg(resource));
-	unsubscribe.appendChild(e->createTextNode(" D"));
+	unsubscribe.appendChild(e->createTextNode("D"));
 	body->appendChild(unsubscribe);
 }
 
@@ -1010,7 +1032,7 @@ void JuickPlugin::addFavorite(QDomElement* body,QDomDocument* e, const QString& 
 	unsubscribe.setAttribute("style",idStyle);
 	unsubscribe.setAttribute("title",tr("Add to favorites"));
 	unsubscribe.setAttribute("href",QString("xmpp:%1%3?message;type=chat;body=! %2").arg(jid).arg(msg.replace("#","%23")).arg(resource));
-	unsubscribe.appendChild(e->createTextNode(" !"));
+	unsubscribe.appendChild(e->createTextNode("!"));
 	body->appendChild(unsubscribe);
 }
 

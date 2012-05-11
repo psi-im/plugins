@@ -62,7 +62,8 @@ public:
 		JM_Post_View,
 		JM_Jubo,
 		JM_Private,
-		JM_USER_INFO
+		JM_User_Info,
+		JM_Your_Post_Recommended
 	};
 
 	bool hasJuckNamespace() const;
