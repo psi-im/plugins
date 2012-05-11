@@ -36,7 +36,7 @@ public:
 	      , threadRx	("^\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(http://juick.com/\\S+)\\n(.*)")
 	      , userRx		("^\\nBlog: http://.*")
 	      , yourMesRecRx	("\\n@(\\S*)( recommended your post )(#\\d+)\\.\\s+(http://juick.com/\\S+).*")
-	      , singleMsgRx	("^\\n@(\\S+):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+) (\\(.*[;]{0,1}\\s*(?:\\d+ repl(?:ies|y)){0,1}\\) )(http://juick.com/\\S+)\\n$")
+	      , singleMsgRx	("^\\n@(\\S+):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+) (\\(.*;{0,1}\\s*(?:\\d+ repl(?:ies|y)){0,1}\\) ){0,1}(http://juick.com/\\S+)\\n$")
 	      , lastMsgRx	("^\\n(Last (?:popular ){0,1}messages:)(.*)")
 	      , juboRx		("^\\n([^\\n]*)\\n@(\\S*):( [^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(http://juick.com/\\S+)\\n$")
 	      , msgPostRx	("\\nNew message posted.\\n(#.*)\\s(http://\\S*)\\n$")
