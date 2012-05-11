@@ -26,51 +26,17 @@
 #include <QtWebKit/QWebFrame>
 #include <QtWebKit/QWebElement>
 
-#include "psiplugin.h"
-//#include "eventfilter.h"
-#include "stanzafilter.h"
-#include "optionaccessor.h"
 #include "optionaccessinghost.h"
-#include "activetabaccessor.h"
 #include "activetabaccessinghost.h"
-#include "applicationinfoaccessor.h"
 #include "applicationinfoaccessinghost.h"
-#include "plugininfoprovider.h"
-#include "toolbariconaccessor.h"
 
-#include "http.h"
+#include "juickplugin.h"
+#include "juickdownloader.h"
 #include "juickjidlist.h"
-#include "ui_settings.h"
 #include "juickparser.h"
-
-#define constuserColor "usercolor"
-#define consttagColor "tagcolor"
-#define constmsgColor "idcolor"
-#define constQcolor "quotecolor"
-#define constLcolor "linkcolor"
-#define constUbold "userbold"
-#define constTbold "tagbold"
-#define constMbold "idbold"
-#define constQbold "quotebold"
-#define constLbold "linkbold"
-#define constUitalic "useritalic"
-#define constTitalic "tagitalic"
-#define constMitalic "iditalic"
-#define constQitalic "quoteitalic"
-#define constLitalic "linkitalic"
-#define constUunderline "userunderline"
-#define constTunderline "tagunderline"
-#define constMunderline "idunderline"
-#define constQunderline "quoteunderline"
-#define constLunderline "linkunderline"
-#define constIdAsResource "idAsResource"
-#define constShowPhoto "showphoto"
-#define constShowAvatars "showavatars"
-#define constWorkInGroupchat "workingroupchat"
+#include "defines.h"
 
 
-#define constVersion "0.11.0"
-#define constPluginName "Juick Plugin"
 
 static const QString showAllmsgString(QObject::tr("Show all messages"));
 static const QString replyMsgString(QObject::tr("Reply"));
@@ -80,6 +46,8 @@ static const QString showLastTenString(QObject::tr("Show last 10 messages with t
 static const QString unsubscribeString(QObject::tr("Unsubscribe"));
 static const QString juick("juick@juick.com");
 static const QString jubo("jubo@nologin.ru");
+static const QRegExp delMsgRx("^\\nMessage #\\d+ deleted.\\n$");
+static const QRegExp delReplyRx("^\\nReply #\\d+/\\d+ deleted.\\n$");
 
 static const QString chatPlusAction = "xmpp:%1?message;type=chat;body=%2+";
 static const QString chatAction = "xmpp:%1%3?message;type=chat;body=%2";
@@ -96,18 +64,7 @@ static const int avatarsUpdateInterval = 10;
 //	qDebug() << out;
 //}
 
-static void save(const QString &path, const QByteArray &img)
-{
-	QFile file(path);
 
-	if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-		file.write(img);
-	}
-	else
-		QMessageBox::warning(0, QObject::tr("Warning"), QObject::tr("Cannot write to file %1:\n%2.")
-				     .arg(file.fileName())
-				     .arg(file.errorString()));
-}
 
 static void nl2br(QDomElement *body,QDomDocument* e, const QString& msg)
 {
@@ -124,94 +81,6 @@ static void nl2br(QDomElement *body,QDomDocument* e, const QString& msg)
 //-----------------------------
 //------JuickPlugin------------
 //-----------------------------
-class JuickPlugin : public QObject, public PsiPlugin, /*public EventFilter,*/ public OptionAccessor, public ActiveTabAccessor,
-			public StanzaFilter, public ApplicationInfoAccessor, public PluginInfoProvider, public ToolbarIconAccessor
-{
-	Q_OBJECT
-	Q_INTERFACES(PsiPlugin /*EventFilter*/ OptionAccessor ActiveTabAccessor StanzaFilter
-			ApplicationInfoAccessor PluginInfoProvider ToolbarIconAccessor)
-
-public:
-	JuickPlugin();
-	virtual QString name() const;
-	virtual QString shortName() const;
-	virtual QString version() const;
-	virtual QWidget* options();
-	virtual bool enable();
-	virtual bool disable();
-	virtual void applyOptions();
-	virtual void restoreOptions();
-
-//	//event filter
-//	virtual bool processEvent(int /*account*/, QDomElement& /*e*/) { return false; }
-//	virtual bool processMessage(int , const QString& , const QString& , const QString& ) { return false; }
-//	virtual bool processOutgoingMessage(int , const QString& , QString& , const QString& , QString& ) { return false; }
-//	virtual void logout(int ) {}
-
-	// OptionAccessor
-	virtual void setOptionAccessingHost(OptionAccessingHost* host);
-	virtual void optionChanged(const QString& ) {}
-	//ActiveTabAccessor
-	virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
-	//ApplicationInfoAccessor
-	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
-	virtual QString pluginInfo();
-	//virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
-	virtual QList < QVariantHash > getButtonParam() { return QList < QVariantHash >(); }
-	virtual QAction* getAction(QObject* parent, int account, const QString& contact);
-
-	virtual bool incomingStanza(int account, const QDomElement& stanza);
-	virtual bool outgoingStanza(int , QDomElement& ) { return false; }
-
-private slots:
-	void chooseColor(QWidget *);
-	void clearCache();
-	void updateJidList(const QStringList& jids);
-	void requestJidList();
-	void photoReady(const QByteArray& ba);
-	void removeWidget();
-	void updateWidgets();
-
-private:
-	void createAvatarsDir();
-	void getAvatar(const QString& link, const QString &unick);
-	void getPhoto(const QUrl &url);
-	Http* newHttp(const QString &path);
-	void setStyles();
-
-	void elementFromString(QDomElement* body, QDomDocument* e, const QString &msg, const QString &jid, const QString &resource = "");
-	void addPlus(QDomElement* body, QDomDocument* e, const QString &msg, const QString &jid, const QString &resource = "");
-	void addSubscribe(QDomElement* body, QDomDocument* e, const QString &msg, const QString &jid, const QString &resource = "");
-	void addHttpLink(QDomElement* body, QDomDocument* e, const QString &msg);
-	void addTagLink(QDomElement* body, QDomDocument* e, const QString &tag, const QString &jid);
-	void addUserLink(QDomElement* body, QDomDocument* e, const QString& nick, const QString& altText, const QString& pattern, const QString& jid);
-	void addMessageId(QDomElement* body, QDomDocument* e, const QString& mId, const QString& altText, const QString& pattern, const QString& jid, const QString& resource = "");
-	void addUnsubscribe(QDomElement* body, QDomDocument* e, const QString &msg, const QString &jid, const QString &resource = "");
-	void addDelete(QDomElement* body ,QDomDocument* e, const QString& msg, const QString& jid, const QString& resource = "");
-	void addFavorite(QDomElement* body, QDomDocument* e, const QString &msg, const QString &jid, const QString &resource = "");
-	void addAvatar(QDomElement *body, QDomDocument *doc, const QString &msg, const QString &jidToSend, const QString &ujid);
-
-private:
-	bool enabled;
-	OptionAccessingHost* psiOptions;
-	ActiveTabAccessingHost* activeTab;
-	ApplicationInfoAccessingHost* applicationInfo;
-	QColor userColor, tagColor, msgColor, quoteColor, lineColor;
-	bool userBold,tagBold,msgBold,quoteBold,lineBold;
-	bool userItalic,tagItalic,msgItalic,quoteItalic,lineItalic;
-	bool userUnderline,tagUnderline,msgUnderline,quoteUnderline,lineUnderline;
-	QString idStyle,userStyle,tagStyle,quoteStyle,linkStyle;
-	QRegExp tagRx, pmRx, regx, userRx, delMsgRx, delReplyRx, idRx, nickRx;
-	QString userLinkPattern,messageLinkPattern,altTextUser,altTextMsg,commonLinkColor;
-	bool idAsResource,showPhoto,showAvatars,workInGroupChat;
-	QStringList jidList_;
-	QPointer<QWidget> optionsWid;
-	QList<QWidget*> logs_;
-	QList<QByteArray> urls_;
-	Ui::settings ui_;
-	QTimer updateTimer_;
-};
-
 Q_EXPORT_PLUGIN(JuickPlugin)
 
 JuickPlugin::JuickPlugin()
@@ -221,23 +90,16 @@ JuickPlugin::JuickPlugin()
 	, userBold(true), tagBold(false), msgBold(false), quoteBold(false), lineBold(false)
 	, userItalic(false), tagItalic(true), msgItalic(false), quoteItalic(false), lineItalic(false)
 	, userUnderline(false), tagUnderline(false), msgUnderline(true), quoteUnderline(false), lineUnderline(true)
-	, tagRx		("^\\s*(?!\\*\\S+\\*)(\\*\\S+)")
-	, pmRx		("^\\nPrivate message from (@.+):(.*)$")
-	, regx		("(\\s+)(#\\d+/{0,1}\\d*(?:\\S+)|@\\S+|_[^\\n]+_|\\*[^\\n]+\\*|/[^\\n]+/|http://\\S+|ftp://\\S+|https://\\S+){1}(\\s+)")
-	, userRx	("^\\nBlog: http://.*")
-	, delMsgRx	("^\\nMessage #\\d+ deleted.\\n$")
-	, delReplyRx	("^\\nReply #\\d+/\\d+ deleted.\\n$")
-	, idRx		("(#\\d+)(/\\d+){0,1}(\\S+){0,1}")
-	, nickRx	("(@[\\w\\-\\.@\\|]*)(\\b.*)")
+	, tagRx	("^\\s*(?!\\*\\S+\\*)(\\*\\S+)")
+	, regx	("(\\s+)(#\\d+/{0,1}\\d*(?:\\S+)|@\\S+|_[^\\n]+_|\\*[^\\n]+\\*|/[^\\n]+/|http://\\S+|ftp://\\S+|https://\\S+){1}(\\s+)")
+	, idRx	("(#\\d+)(/\\d+){0,1}(\\S+){0,1}")
+	, nickRx("(@[\\w\\-\\.@\\|]*)(\\b.*)")
 	, idAsResource(false), showPhoto(false), showAvatars(true), workInGroupChat(false)
+	, downloader_(0)
 
 {
-	pmRx.setMinimal(true);
 	regx.setMinimal(true);
 	jidList_ = QStringList() << juick << jubo;
-	updateTimer_.setSingleShot(true);
-	updateTimer_.setInterval(1000);
-	connect(&updateTimer_, SIGNAL(timeout()), SLOT(updateWidgets()));
 }
 
 QString JuickPlugin::name() const
@@ -319,9 +181,12 @@ bool JuickPlugin::enable()
 	jidList_ = psiOptions->getPluginOption("constJidList",QVariant(jidList_)).toStringList();
 	applicationInfo->getProxyFor(constPluginName); // init proxy settings for Juick plugin
 
-	if (showAvatars) {
+	if (showAvatars || showPhoto) {
 		createAvatarsDir();
 	}
+	downloader_ = new JuickDownloader(applicationInfo, this);
+	connect(downloader_, SIGNAL(finished(QList<QByteArray>)), SLOT(updateWidgets(QList<QByteArray>)));
+
 	setStyles();
 
 	return true;
@@ -336,6 +201,11 @@ bool JuickPlugin::disable()
 		QFile::remove(dir.absolutePath()+"/"+file);
 	}
 	JuickParser::reset();
+
+	downloader_->disconnect();
+	downloader_->deleteLater();
+	downloader_ = 0;
+
 	return true;
 }
 
@@ -343,7 +213,7 @@ void JuickPlugin::createAvatarsDir()
 {
 	QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars");
 	dir.mkpath("juick/photos");
-	if (!dir.exists("juick"))
+	if (!dir.exists("juick/photos"))
 	{
 		QMessageBox::warning(0, tr("Warning"),tr("can't create folder %1 \ncaching avatars will be not available")
 				     .arg(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick"));
@@ -408,7 +278,7 @@ void JuickPlugin::applyOptions()
 	showPhoto = ui_.cb_showPhoto->isChecked();
 	psiOptions->setPluginOption(constShowPhoto, showPhoto);
 	showAvatars = ui_.cb_showAvatar->isChecked();
-	if (showAvatars)
+	if (showAvatars || showPhoto)
 		createAvatarsDir();
 	psiOptions->setPluginOption(constShowAvatars, showAvatars);
 	workInGroupChat = ui_.cb_conference->isChecked();
@@ -572,12 +442,6 @@ void JuickPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* 
 	applicationInfo = host;
 }
 
-/*
-  void JuickPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost *host) {
-  accInfo = host;
-  }
-*/
-
 bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 {
 	if(!enabled)
@@ -647,8 +511,13 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 						}
 					}
 
-					if(getAv)
-						getAvatar(ava, unick);
+					if(getAv) {
+						QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
+						const QString path(QString("%1/%2;").arg(dir.absolutePath()).arg(unick));
+						const QString url = QString("http://i.juick.com%1").arg(ava);
+						JuickDownloadItem it(path, url);
+						downloader_->get(it);
+					}
 				}
 			}
 
@@ -672,7 +541,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 						resource = tmp.last();
 					}
 				}
-				msg =  "";
+				msg.clear();
 			}
 
 			const QString photo = jp.photoLink();
@@ -875,20 +744,20 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 				msg.clear();
 				break;
 			}
+			case JuickParser::JM_Private:
+			{
+				userLinkPattern = "xmpp:%1?message;type=chat;body=PM %2";
+				altTextUser = tr("Send personal message to %1");
+			}
+			case JuickParser::JM_USER_INFO:
+			{
+				userLinkPattern = "xmpp:%1?message;type=chat;body=S %2";
+				altTextUser = tr("Subscribe to %1's blog");
+			}
 			default:
 			{
 				if (msg.indexOf("Recommended blogs:") != -1) {
 					//если команда @
-					userLinkPattern = "xmpp:%1?message;type=chat;body=S %2";
-					altTextUser = tr("Subscribe to %1's blog");
-				}
-				else if (pmRx.indexIn(msg) != -1) {
-					//Если PM
-					userLinkPattern = "xmpp:%1?message;type=chat;body=PM %2";
-					altTextUser = tr("Send personal message to %1");
-				}
-				else if (userRx.indexIn(msg) != -1) {
-					//Если информация о пользователе
 					userLinkPattern = "xmpp:%1?message;type=chat;body=S %2";
 					altTextUser = tr("Subscribe to %1's blog");
 				}
@@ -919,13 +788,15 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 			if (!photo.isEmpty()) {
 				if(showPhoto) {
 					//photo post
-					QUrl photoUrl(photo);
-					getPhoto(photoUrl);
+					const QUrl photoUrl(photo);
+					const QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/photos");
+					const QString path(QString("%1/%2").arg(dir.absolutePath()).arg(photoUrl.path().replace("/", "%")));
+					JuickDownloadItem it(path, photoUrl.toString().replace("/photos-1024/","/ps/"));
+					downloader_->get(it);
 					QDomElement link = doc.createElement("a");
 					link.setAttribute("href", photo);
 					QDomElement img = doc.createElement("img");
 					QString imgdata = photoUrl.path().replace("/", "%");
-					QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/photos");
 					img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/%2").arg(dir.absolutePath()).arg(imgdata)).toEncoded()));
 					link.appendChild(img);
 					link.appendChild(doc.createElement("br"));
@@ -951,57 +822,6 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 	}
 
 	return false;
-}
-
-Http* JuickPlugin::newHttp(const QString& path)
-{
-	Http *http = new Http(this);
-	Proxy prx = applicationInfo->getProxyFor(constPluginName);
-	http->setProxyHostPort(prx.host, prx.port, prx.user, prx.pass, prx.type);
-	http->setProperty("path", path);
-	connect(http, SIGNAL(dataReady(QByteArray)), SLOT(photoReady(QByteArray)));
-	return http;
-}
-
-void JuickPlugin::getAvatar(const QString &link, const QString& unick)
-{
-	QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
-	const QString path(QString("%1/%2;")
-		     .arg(dir.absolutePath())
-		     .arg(unick));
-
-	Http *http = newHttp(path);
-	http->setHost("i.juick.com");
-	http->get(link);
-//	if(img.isEmpty())
-//		img = http->get("/a/"+uid+".png");
-}
-
-void JuickPlugin::getPhoto(const QUrl &url)
-{
-	QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/photos");
-	const QString path(QString("%1/%2")
-		     .arg(dir.absolutePath())
-		     .arg(url.path().replace("/", "%")));
-
-	Http *http = newHttp(path);
-	http->setHost(url.host());
-	http->get(QString(url.path()).replace("/photos-1024/","/ps/"));
-}
-
-void JuickPlugin::photoReady(const QByteArray &ba)
-{
-	Http* http = static_cast<Http*>(sender());
-	http->deleteLater();
-
-	if(ba.isEmpty())
-		return;
-
-	const QString path = http->property("path").toString();
-	save(path, ba);
-
-	urls_.append(QUrl::fromLocalFile(path).toEncoded());
-	updateTimer_.start();
 }
 
 void JuickPlugin::elementFromString(QDomElement* body,QDomDocument* e, const QString& msg, const QString& jid, const QString& resource)
@@ -1104,7 +924,7 @@ void JuickPlugin::addPlus(QDomElement *body,QDomDocument* e, const QString& msg_
 	plus.setAttribute("style",idStyle);
 	plus.setAttribute("title",showAllmsgString);
 	plus.setAttribute("href",QString("xmpp:%1%3?message;type=chat;body=%2+").arg(jid).arg(msg.replace("#","%23")).arg(resource));
-	plus.appendChild(e->createTextNode("+"));
+	plus.appendChild(e->createTextNode(" +"));
 	body->appendChild(plus);
 }
 
@@ -1115,7 +935,7 @@ void JuickPlugin::addSubscribe(QDomElement* body,QDomDocument* e, const QString&
 	subscribe.setAttribute("style",idStyle);
 	subscribe.setAttribute("title",subscribeString);
 	subscribe.setAttribute("href",QString("xmpp:%1%3?message;type=chat;body=S %2").arg(jid).arg(msg.replace("#","%23")).arg(resource));
-	subscribe.appendChild(e->createTextNode("S"));
+	subscribe.appendChild(e->createTextNode(" S"));
 	body->appendChild(subscribe);
 }
 
@@ -1168,7 +988,7 @@ void JuickPlugin::addUnsubscribe(QDomElement* body,QDomDocument* e, const QStrin
 	unsubscribe.setAttribute("style",idStyle);
 	unsubscribe.setAttribute("title",unsubscribeString);
 	unsubscribe.setAttribute("href",QString("xmpp:%1%3?message;type=chat;body=U %2").arg(jid).arg(msg.left(msg.indexOf("/")).replace("#","%23")).arg(resource));
-	unsubscribe.appendChild(e->createTextNode("U"));
+	unsubscribe.appendChild(e->createTextNode(" U"));
 	body->appendChild(unsubscribe);
 }
 
@@ -1179,7 +999,7 @@ void JuickPlugin::addDelete(QDomElement* body, QDomDocument* e, const QString& m
 	unsubscribe.setAttribute("style",idStyle);
 	unsubscribe.setAttribute("title",tr("Delete"));
 	unsubscribe.setAttribute("href",QString("xmpp:%1%3?message;type=chat;body=D %2").arg(jid).arg(msg.replace("#","%23")).arg(resource));
-	unsubscribe.appendChild(e->createTextNode("D"));
+	unsubscribe.appendChild(e->createTextNode(" D"));
 	body->appendChild(unsubscribe);
 }
 
@@ -1190,7 +1010,7 @@ void JuickPlugin::addFavorite(QDomElement* body,QDomDocument* e, const QString& 
 	unsubscribe.setAttribute("style",idStyle);
 	unsubscribe.setAttribute("title",tr("Add to favorites"));
 	unsubscribe.setAttribute("href",QString("xmpp:%1%3?message;type=chat;body=! %2").arg(jid).arg(msg.replace("#","%23")).arg(resource));
-	unsubscribe.appendChild(e->createTextNode("!"));
+	unsubscribe.appendChild(e->createTextNode(" !"));
 	body->appendChild(unsubscribe);
 }
 
@@ -1219,13 +1039,13 @@ void JuickPlugin::removeWidget()
 
 // Этот слот обновляет чатлоги, чтобы они перезагрузили
 // картинки с диска.
-void JuickPlugin::updateWidgets()
+void JuickPlugin::updateWidgets(const QList<QByteArray>& urls)
 {
 	foreach(QWidget *w, logs_) {
 		QTextEdit* te = qobject_cast<QTextEdit*>(w);
 		if(te) {
 			QTextDocument* td = te->document();
-			foreach(const QByteArray& url, urls_) {
+			foreach(const QByteArray& url, urls) {
 				QUrl u(url);
 				td->addResource(QTextDocument::ImageResource, u, QPixmap(u.toLocalFile()));
 			}
@@ -1234,19 +1054,18 @@ void JuickPlugin::updateWidgets()
 		else {
 			QWebView *wv = w->findChild<QWebView*>();
 			if(wv) {
-				int t = QTime::currentTime().msec();
+				int t = qrand()%QTime::currentTime().msec();
 				QWebFrame* wf = wv->page()->mainFrame();
-				foreach(const QByteArray& url, urls_) {
+				foreach(const QByteArray& url, urls) {
 					QUrl u(url);
 					QWebElement elem = wf->findFirstElement(QString("img[src=\"%1\"]").arg(u.toString()));
 					if(!elem.isNull()) {
-						elem.setAttribute("src", u.toString() + "?" + QString::number(qrand()%t));
+						elem.setAttribute("src", u.toString() + "?" + QString::number(++t));
 					}
 				}
 			}
 		}
 	}
-	urls_.clear();
 }
 
 QString JuickPlugin::pluginInfo()
@@ -1259,5 +1078,3 @@ QString JuickPlugin::pluginInfo()
 			 "* Enable clickable @nick, *tag, #message_id and other control elements to insert them into the typing area\n\n"
 			 "Note: To work correctly, the option options.html.chat.render	must be set to true. ");
 }
-
-#include "juickplugin.moc"

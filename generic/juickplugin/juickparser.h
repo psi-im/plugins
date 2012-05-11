@@ -60,7 +60,9 @@ public:
 		JM_Reply_Posted,
 		JM_All_Messages,
 		JM_Post_View,
-		JM_Jubo
+		JM_Jubo,
+		JM_Private,
+		JM_USER_INFO
 	};
 
 	bool hasJuckNamespace() const;
