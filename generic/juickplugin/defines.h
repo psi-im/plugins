@@ -45,6 +45,7 @@
 #define constShowPhoto "showphoto"
 #define constShowAvatars "showavatars"
 #define constWorkInGroupchat "workingroupchat"
+#define constVersionOpt "version"
 
 
 #define constVersion "0.11.0"

@@ -146,6 +146,21 @@ bool JuickPlugin::enable()
 {
 	enabled = true;
 
+	QVariant v = psiOptions->getPluginOption(constVersionOpt, QVariant::Invalid);
+
+	//Проверяем, обновился ли плагин
+	if(!v.isValid() || v.toString() != constVersion) {
+		QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars");
+		foreach(const QString& f, QDir(dir.path()+"/juick/per").entryList(QDir::Files)) {
+			QFile::remove(dir.path()+"/juick/per/"+f);
+		}
+		foreach(const QString& f, QDir(dir.path()+"/juick").entryList(QDir::Files)) {
+			QFile::remove(dir.path()+"/juick/"+f);
+		}
+		dir.rmdir("juick/per");
+		psiOptions->setPluginOption(constVersionOpt, constVersion);
+	}
+
 	userColor = psiOptions->getPluginOption(constuserColor, userColor).toString();
 	tagColor = psiOptions->getPluginOption(consttagColor, tagColor).toString();
 	msgColor  = psiOptions->getPluginOption(constmsgColor, msgColor).toString();
@@ -497,10 +512,8 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 						getAv = false;
 					}
 					else {
-						QStringList fileNames = dir.entryList(QStringList(QString(unick + ";*")));
-
-						if (!fileNames.empty()) {
-							QFile file(QString("%1/%2").arg(dir.absolutePath()).arg(fileNames.first()));
+						QFile file(QString("%1/%2").arg(dir.absolutePath()).arg(unick));
+						if (file.exists()) {
 							if (QFileInfo(file).lastModified().daysTo(QDateTime::currentDateTime()) > avatarsUpdateInterval
 									|| file.size() == 0) {
 								file.remove();
@@ -513,7 +526,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 
 					if(getAv) {
 						QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
-						const QString path(QString("%1/%2;").arg(dir.absolutePath()).arg(unick));
+						const QString path(QString("%1/%2").arg(dir.absolutePath()).arg(unick));
 						const QString url = QString("http://i.juick.com%1").arg(ava);
 						JuickDownloadItem it(path, url);
 						downloader_->get(it);
@@ -928,7 +941,7 @@ void JuickPlugin::addAvatar(QDomElement* body, QDomDocument* doc, const QString&
 	QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
 	if (dir.exists()) {
 		QDomElement img = doc->createElement("img");
-		img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/@%2;").arg(dir.absolutePath()).arg(ujid)).toEncoded()));
+		img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/@%2").arg(dir.absolutePath()).arg(ujid)).toEncoded()));
 		td1.appendChild(img);
 	}
 //	td2.appendChild(blockquote);
