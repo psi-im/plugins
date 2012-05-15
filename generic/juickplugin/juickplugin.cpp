@@ -1085,6 +1085,7 @@ void JuickPlugin::updateWidgets(const QList<QByteArray>& urls)
 				td->addResource(QTextDocument::ImageResource, u, QPixmap(u.toLocalFile()));
 			}
 			td->adjustSize();
+			te->setLineWrapColumnOrWidth(te->lineWrapColumnOrWidth());
 		}
 		else {
 			QWebView *wv = w->findChild<QWebView*>();
