@@ -621,7 +621,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 					body.appendChild(doc.createTextNode(jp.infoText()));
 				}
 				body.appendChild(doc.createElement("br"));
-				if(!jp.timeStamp().isEmpty()) {
+				if(type == JuickParser::JM_Recomendation && !jp.timeStamp().isEmpty()) {
 					body.appendChild(doc.createTextNode(tr("Time stamp: %1").arg(jp.timeStamp())));
 					body.appendChild(doc.createElement("br"));
 				}
@@ -1085,7 +1085,7 @@ void JuickPlugin::updateWidgets(const QList<QByteArray>& urls)
 				td->addResource(QTextDocument::ImageResource, u, QPixmap(u.toLocalFile()));
 			}
 			td->adjustSize();
-			te->setLineWrapColumnOrWidth(te->lineWrapColumnOrWidth());
+			te->update();
 		}
 		else {
 			QWebView *wv = w->findChild<QWebView*>();
