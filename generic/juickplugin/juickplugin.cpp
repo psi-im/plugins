@@ -612,7 +612,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 			{
 				JuickMessage m = jm.first();
 				QString resLink("");
-				if (idAsResource && type != JuickParser::JM_Post_View/*  && type != JuickParser::JM_Jubo*/) {
+				if (idAsResource && type != JuickParser::JM_Post_View && type != JuickParser::JM_Jubo) {
 					resource = m.messageId;
 					resLink = "/" + resource;
 					resLink.replace("#","%23");
@@ -1084,8 +1084,9 @@ void JuickPlugin::updateWidgets(const QList<QByteArray>& urls)
 				QUrl u(url);
 				td->addResource(QTextDocument::ImageResource, u, QPixmap(u.toLocalFile()));
 			}
-			td->adjustSize();
-			te->update();
+//			td->adjustSize();
+//			te->update();
+			te->setLineWrapColumnOrWidth(te->lineWrapColumnOrWidth());
 		}
 		else {
 			QWebView *wv = w->findChild<QWebView*>();
