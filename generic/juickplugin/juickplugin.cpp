@@ -1091,7 +1091,7 @@ void JuickPlugin::updateWidgets(const QList<QByteArray>& urls)
 		else {
 			QWebView *wv = w->findChild<QWebView*>();
 			if(wv) {
-				int t = qrand()%QTime::currentTime().msec();
+				int t = qrand()%(QTime::currentTime().msec() + 1);
 				QWebFrame* wf = wv->page()->mainFrame();
 				foreach(const QByteArray& url, urls) {
 					QUrl u(url);
