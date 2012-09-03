@@ -32,6 +32,9 @@ class AccountSettings
 {
 
 public:
+	enum {RespAllow = 0, RespNotImpl = 1, RespIgnore = 2}; // как номер индекса в combobox
+	enum {LogNever = 0, LogIfReplace = 1, LogAlways = 2};
+
 	AccountSettings();
 	AccountSettings(const QString&);
 	~AccountSettings();
@@ -43,7 +46,7 @@ public:
 	QString account_id;
 	bool enable_contacts;
 	bool enable_conferences;
-	bool lock_requ;
+	int  response_mode;
 	bool lock_time_requ;
 	int  show_requ_mode;
 	QString os_name;

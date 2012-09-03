@@ -30,9 +30,9 @@
 #include "clientswitcherplugin.h"
 #include "viewer.h"
 
-Q_EXPORT_PLUGIN(ClientSwitcherPlugin);
+Q_EXPORT_PLUGIN(ClientSwitcherPlugin)
 
-#define cVer                    "0.0.13"
+#define cVer                    "0.0.14"
 #define constPluginShortName    "clientswitcher"
 #define constPluginName         "Client Switcher Plugin"
 #define constForAllAcc          "for_all_acc"
@@ -101,6 +101,8 @@ bool ClientSwitcherPlugin::enable()
 	os_presets << (OsStruct){"Arch Linux"} << (OsStruct){"Debian GNU/Linux 6.0.1 (squeeze)"};
 	os_presets << (OsStruct){"Ubuntu 10.04.2 LTS"} << (OsStruct){"RFRemix release 14.1 (Laughlin)"};
 	os_presets << (OsStruct){"openSUSE 11.4"} << (OsStruct){"Gentoo Base System release 2.0.3"};
+	os_presets << (OsStruct){"Mac OS X"} << (OsStruct){"Mac OS X 10.6"};
+	os_presets << (OsStruct){"Android OS 2.3.6 (build XXLB1)"};
 	os_presets << (OsStruct){"Plan9"} << (OsStruct){"Solaris"};
 	os_presets << (OsStruct){"FreeBSD"} << (OsStruct){"NetBSD"} << (OsStruct){"OpenBSD"};
 	os_presets << (OsStruct){"Nokia5130c-2/07.91"} << (OsStruct){"SonyEricssonW580i/R8BE001"};
@@ -185,7 +187,7 @@ QWidget* ClientSwitcherPlugin::options()
 	// Элементы для просмотра логов
 	QDir dir(logsDir);
 	int pos = -1;
-	foreach(QString file, dir.entryList(QDir::Files)) {
+	foreach(const QString &file, dir.entryList(QDir::Files)) {
 		ui_options.cb_logslist->addItem(file);
 		++pos;
 		if (file == lastLogItem)
@@ -196,7 +198,7 @@ QWidget* ClientSwitcherPlugin::options()
 	//--
 	connect(ui_options.cb_allaccounts, SIGNAL(stateChanged(int)), this, SLOT(enableAccountsList(int)));
 	connect(ui_options.cb_accounts, SIGNAL(currentIndexChanged(int)), this, SLOT(restoreOptionsAcc(int)));
-	connect(ui_options.cb_lockrequ, SIGNAL(clicked(bool)), this, SLOT(enableMainParams(bool)));
+	connect(ui_options.cmb_lockrequ, SIGNAL(currentIndexChanged(int)), this, SLOT(enableMainParams(int)));
 	connect(ui_options.cb_ospreset, SIGNAL(currentIndexChanged(int)), this, SLOT(enableOsParams(int)));
 	connect(ui_options.cb_clientpreset, SIGNAL(currentIndexChanged(int)), this, SLOT(enableClientParams(int)));
 	connect(ui_options.bt_viewlog, SIGNAL(released()), this, SLOT(viewFromOpt()));
@@ -238,10 +240,11 @@ void ClientSwitcherPlugin::applyOptions() {
 		caps_updated = true;
 	}
 	// Блокировка запроса версии
-	tmp_flag = ui_options.cb_lockrequ->isChecked();
-	if (as->lock_requ != tmp_flag) {
-		as->lock_requ = tmp_flag;
-		caps_updated = true;
+	int respMode = ui_options.cmb_lockrequ->currentIndex();
+	if (as->response_mode != respMode) {
+		if (as->response_mode == AccountSettings::RespAllow || respMode == AccountSettings::RespAllow)
+			caps_updated = true;
+		as->response_mode = respMode;
 	}
 	// Блокировка запроса времени
 	tmp_flag = ui_options.cb_locktimerequ->isChecked();
@@ -375,28 +378,43 @@ bool ClientSwitcherPlugin::incomingStanza(int account, const QDomElement& stanza
 		return false;
 	if (!as->enable_contacts && !as->enable_conferences)
 		return false;
-	if (as->lock_requ || as->lock_time_requ || !as->caps_node.isEmpty() || !as->caps_version.isEmpty()) {
+	int respMode = as->response_mode;
+	if (respMode != AccountSettings::RespAllow || as->lock_time_requ || !as->caps_node.isEmpty() || !as->caps_version.isEmpty()) {
 		if (stanza.tagName() == "iq" && stanza.attribute("type") == "get") {
-			if (isSkipStanza(as, account, stanza.attribute("from")))
+			const QString s_to = stanza.attribute("from");
+			if (isSkipStanza(as, account, s_to))
 				return false;
 			QDomNode s_child = stanza.firstChild();
 			while (!s_child.isNull()) {
-				if (s_child.toElement().tagName() == "query" && s_child.toElement().attribute("xmlns") == "http://jabber.org/protocol/disco#info") {
-					QString node = s_child.toElement().attribute("node");
-					if (!node.isEmpty()) {
-						QString new_node = def_caps_node;
-						QStringList split_node = node.split("#");
-						if (split_node.size() > 1) {
-							split_node.removeFirst();
-							QString node_ver = split_node.join("#");
-							if (node_ver == ((!as->lock_requ) ? as->caps_version : "n/a")) {
-								node_ver = def_caps_version;
+				const QString xmlns = s_child.toElement().attribute("xmlns");
+				if (s_child.toElement().tagName() == "query") {
+					if (xmlns == "http://jabber.org/protocol/disco#info") {
+						QString node = s_child.toElement().attribute("node");
+						if (!node.isEmpty()) {
+							QString new_node = def_caps_node;
+							QStringList split_node = node.split("#");
+							if (split_node.size() > 1) {
+								split_node.removeFirst();
+								QString node_ver = split_node.join("#");
+								if (node_ver == ((respMode == AccountSettings::RespAllow) ? as->caps_version : "n/a")) {
+									node_ver = def_caps_version;
+								}
+								new_node.append("#" + node_ver);
 							}
-							new_node.append("#" + node_ver);
+							s_child.toElement().setAttribute("node", sender_->escape(new_node));
 						}
-						s_child.toElement().setAttribute("node", sender_->escape(new_node));
 					}
-					// break
+					else if (xmlns == "jabber:iq:version") {
+						if (respMode == AccountSettings::RespIgnore) {
+							// Showing popup if it is necessary
+							if (as->show_requ_mode == AccountSettings::LogAlways)
+								showPopup(jidToNick(account, s_to));
+							// Write log if it is necessary
+							if (as->log_mode == AccountSettings::LogAlways)
+								saveToLog(account, s_to, "ignored");
+							return true;
+						}
+					}
 				}
 				s_child = s_child.nextSibling();
 			}
@@ -414,7 +432,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 	AccountSettings *as = getAccountSetting(acc_id);
 	if (!as)
 		return false;
-	if (as->lock_requ || !as->caps_node.isEmpty() || !as->caps_version.isEmpty()) {
+	if (as->response_mode != AccountSettings::RespAllow || !as->caps_node.isEmpty() || !as->caps_version.isEmpty()) {
 		// --------------- presence ---------------
 		if (stanza.tagName() == "presence") {
 			if (!as->enable_contacts && !as->enable_conferences)
@@ -447,18 +465,26 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 			}
 			if ((found_flag == 1 && as->enable_contacts) || (found_flag == 3 && as->enable_conferences)) {
 				// Подменяем капс
-				caps_node.toElement().setAttribute("node", (!as->lock_requ) ? sender_->escape(as->caps_node) : "unknow");
-				caps_node.toElement().setAttribute("ver", (!as->lock_requ) ? sender_->escape(as->caps_version) : "n/a");
+				if (as->response_mode != AccountSettings::RespNotImpl)
+				{
+					caps_node.toElement().setAttribute("node", sender_->escape(as->caps_node));
+					caps_node.toElement().setAttribute("ver", sender_->escape(as->caps_version));
+				}
+				else {
+					caps_node.toElement().setAttribute("node", "unknow");
+					caps_node.toElement().setAttribute("ver", "n/a");
+				}
 			}
 			return false;
 		}
 	}
-	bool is_version_query = false;
-	bool is_version_replaced = false;
 	if (stanza.tagName() == "iq" && stanza.attribute("type") == "result") {
+		bool is_version_query = false;
+		bool is_version_replaced = false;
 		QString s_to = stanza.attribute("to");
 		QStringList send_ver_list;
 		QDomNode s_child = stanza.firstChild();
+		int respMode = as->response_mode;
 		while (!s_child.isNull()) {
 			if (s_child.toElement().tagName() == "query") {
 				QString xmlns_str = s_child.namespaceURI();
@@ -466,25 +492,25 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 					// --- Ответ disco
 					if (isSkipStanza(as, account, s_to))
 						return false;
-					if (!as->lock_requ && !as->lock_time_requ && as->caps_node.isEmpty() && as->caps_version.isEmpty())
+					if (respMode == AccountSettings::RespAllow && !as->lock_time_requ && as->caps_node.isEmpty() && as->caps_version.isEmpty())
 						return false;
 					// Подменяем ноду, если она есть
 					QString node = s_child.toElement().attribute("node");
 					if (!node.isEmpty()) {
-						QString new_node = (!as->lock_requ) ? sender_->escape(as->caps_node) : "unknow";
+						QString new_node = (respMode == AccountSettings::RespAllow) ? sender_->escape(as->caps_node) : "unknow";
 						QStringList split_node = node.split("#");
 						if (split_node.size() > 1) {
 							split_node.removeFirst();
 							QString new_ver = split_node.join("#");
 							if (new_ver == def_caps_version)
-								new_ver = (!as->lock_requ) ? sender_->escape(as->caps_version) : "n/a";
+								new_ver = (respMode == AccountSettings::RespAllow) ? sender_->escape(as->caps_version) : "n/a";
 							new_node.append("#" + new_ver);
 						}
 						s_child.toElement().setAttribute("node", new_node);
 					}
 					// Подменяем identity и удаляем feature для версии, если есть блокировка
 					int update = 0;
-					if (!as->lock_requ)
+					if (respMode == AccountSettings::RespAllow)
 						++update;
 					if (!as->lock_time_requ)
 						++update;
@@ -494,7 +520,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 					while (!q_child.isNull()) {
 						QString tag_name = q_child.toElement().tagName();
 						if (tag_name == "feature") {
-							if (as->lock_requ && q_child.toElement().attribute("var") == "jabber:iq:version") {
+							if (respMode != AccountSettings::RespAllow && q_child.toElement().attribute("var") == "jabber:iq:version") {
 								ver_domnode = q_child;
 								if (++update >= 3)
 									break;
@@ -505,7 +531,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 							}
 						} else if (tag_name == "identity") {
 							if (!q_child.toElement().attribute("name").isEmpty())
-								q_child.toElement().setAttribute("name", (!as->lock_requ) ? sender_->escape(as->client_name) : "unknow");
+								q_child.toElement().setAttribute("name", (respMode == AccountSettings::RespAllow) ? sender_->escape(as->client_name) : "unknow");
 							if (++update >= 3)
 								break;
 						}
@@ -521,10 +547,10 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 					// Ответ version
 					is_version_query = true;
 					bool skip_stanza = isSkipStanza(as, account, s_to);
-					if (skip_stanza && as->log_mode != 2)
+					if (skip_stanza && as->log_mode != AccountSettings::LogAlways)
 						break;
-					QDomDocument xmldoc;
-					if (!as->lock_requ) {
+					QDomDocument xmldoc = stanza.ownerDocument();
+					if (respMode == AccountSettings::RespAllow) {
 						// Подменяем ответ
 						bool f_os_name = false;
 						bool f_client_name = false;
@@ -590,7 +616,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 							os_name.appendChild(doc.createTextNode(sender_->escape(as->os_name)));
 							s_child.appendChild(os_name);
 						}
-					} else {
+					} else if (respMode == AccountSettings::RespNotImpl) {
 						// Отклонение запроса, как будто не реализовано
 						stanza.setAttribute("type", "error");
 						QDomNode q_child = s_child.firstChild();
@@ -636,23 +662,16 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 			}
 			s_child = s_child.nextSibling();
 		}
+
 		// Showing popup if it is necessary
-		if (is_version_query && as->show_requ_mode != 0 && (as->show_requ_mode == 2 || is_version_replaced)) {
-			int msecs = psiPopup->popupDuration(constPluginName);
-			if (msecs > 0) {
-				// Вызываем popup
-				QString s_nick = "";
-				if (psiContactInfo)
-					s_nick = psiContactInfo->name(account, s_to/*.split("/").first().toLower()*/);
-				if (s_nick.isEmpty())
-				s_nick = s_to;
-				psiPopup->initPopup(tr("%1 has requested your version").arg(s_nick), constPluginName, "psi/headline", popupId);
-			}
-		}
+		if (is_version_query && as->show_requ_mode != AccountSettings::LogNever
+				&& (as->show_requ_mode == AccountSettings::LogAlways || is_version_replaced))
+			showPopup(jidToNick(account, s_to));
+
 		// Write log if it is necessary
-		if (is_version_query && as->log_mode != 0 && (as->log_mode == 2 || is_version_replaced)) {
+		if (is_version_query && as->log_mode != AccountSettings::LogNever
+				&& (as->log_mode == AccountSettings::LogAlways || is_version_replaced))
 			saveToLog(account, s_to, send_ver_list.join(", "));
-		}
 	}
 	return false;
 }
@@ -851,7 +870,7 @@ void ClientSwitcherPlugin::restoreOptionsAcc(int acc_index)
 			// Подмена/блокировка для конференций
 			ui_options.cb_conferencesenable->setChecked(as->enable_conferences);
 			// Блокировка запроса версии
-			ui_options.cb_lockrequ->setChecked(as->lock_requ);
+			ui_options.cmb_lockrequ->setCurrentIndex(as->response_mode);
 			// Блокировка запроса времени
 			ui_options.cb_locktimerequ->setChecked(as->lock_time_requ);
 			// Уведомления при запросах версии
@@ -881,8 +900,8 @@ void ClientSwitcherPlugin::restoreOptionsAcc(int acc_index)
 			ui_options.le_capsversion->setText(cp_ver);
 			// Блокировка/снятие блокировки виджетов
 			ui_options.gb_enablefor->setEnabled(true);
-			ui_options.cb_lockrequ->setEnabled(true);
-			enableMainParams(as->lock_requ);
+			ui_options.cmb_lockrequ->setEnabled(true);
+			enableMainParams(as->response_mode);
 			enableOsParams(os_templ);
 			enableClientParams(cl_templ);
 			return;
@@ -892,8 +911,8 @@ void ClientSwitcherPlugin::restoreOptionsAcc(int acc_index)
 	ui_options.cb_contactsenable->setChecked(false);
 	ui_options.cb_conferencesenable->setChecked(false);
 	ui_options.gb_enablefor->setEnabled(false);
-	ui_options.cb_lockrequ->setChecked(false);
-	ui_options.cb_lockrequ->setEnabled(false);
+	ui_options.cmb_lockrequ->setCurrentIndex(AccountSettings::RespAllow);
+	ui_options.cmb_lockrequ->setEnabled(false);
 	ui_options.cb_ospreset->setCurrentIndex(0);
 	ui_options.gb_os->setEnabled(false);
 	ui_options.cb_clientpreset->setCurrentIndex(0);
@@ -902,10 +921,11 @@ void ClientSwitcherPlugin::restoreOptionsAcc(int acc_index)
 	enableClientParams(0);
 }
 
-void ClientSwitcherPlugin::enableMainParams(bool lock_mode)
+void ClientSwitcherPlugin::enableMainParams(int lock_mode)
 {
-	ui_options.gb_os->setEnabled(!lock_mode);
-	ui_options.gb_client->setEnabled(!lock_mode);
+	bool enableFlag = (lock_mode == AccountSettings::RespAllow);
+	ui_options.gb_os->setEnabled(enableFlag);
+	ui_options.gb_client->setEnabled(enableFlag);
 }
 
 void ClientSwitcherPlugin::enableOsParams(int mode)
@@ -962,6 +982,23 @@ void ClientSwitcherPlugin::viewFromOpt() {
 	showLog(lastLogItem);
 }
 
+QString ClientSwitcherPlugin::jidToNick(int account, const QString &jid)
+{
+	QString nick;
+	if (psiContactInfo)
+		nick = psiContactInfo->name(account, jid);
+	if (nick.isEmpty())
+		nick = jid;
+	return nick;
+}
+
+void ClientSwitcherPlugin::showPopup(const QString &nick)
+{
+	int msecs = psiPopup->popupDuration(constPluginName);
+	if (msecs > 0)
+		psiPopup->initPopup(tr("%1 has requested your version").arg(nick), constPluginName, "psi/headline", popupId);
+}
+
 void ClientSwitcherPlugin::showLog(QString filename)
 {
 	QString fullname = logsDir + filename;
@@ -991,8 +1028,14 @@ void ClientSwitcherPlugin::saveToLog(int account, QString to_jid, QString ver_st
 }
 
 void ClientSwitcherPlugin::onCloseView(int w, int h) {
-	widthLogsView = w;
-	heightLogsView = h;
-	psiOptions->setPluginOption(constShowLogWidth, QVariant(w));
-	psiOptions->setPluginOption(constShowLogHeight, QVariant(h));
+	if (widthLogsView != w)
+	{
+		widthLogsView = w;
+		psiOptions->setPluginOption(constShowLogWidth, QVariant(w));
+	}
+	if (heightLogsView != h)
+	{
+		heightLogsView = h;
+		psiOptions->setPluginOption(constShowLogHeight, QVariant(h));
+	}
 }

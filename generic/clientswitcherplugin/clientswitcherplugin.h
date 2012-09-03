@@ -138,13 +138,15 @@ private:
 	int getAccountById(QString&);
 	AccountSettings* getAccountSetting(const QString&);
 	bool isSkipStanza(AccountSettings*, int, QString);
+	QString jidToNick(int account, const QString &jid);
+	void showPopup(const QString &nick);
 	void showLog(QString filename);
 	void saveToLog(int, QString, QString);
 
 private slots:
 	void enableAccountsList(int);
 	void restoreOptionsAcc(int);
-	void enableMainParams(bool);
+	void enableMainParams(int);
 	void enableOsParams(int);
 	void enableClientParams(int);
 	void setNewCaps(int);

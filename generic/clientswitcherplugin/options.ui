@@ -22,9 +22,6 @@
        <verstretch>1</verstretch>
       </sizepolicy>
      </property>
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
      <widget class="QWidget" name="tab1">
       <attribute name="title">
        <string>General</string>
@@ -81,18 +78,37 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>464</width>
-            <height>410</height>
+            <width>434</width>
+            <height>437</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_4">
              <item>
-              <widget class="QCheckBox" name="cb_lockrequ">
+              <widget class="QLabel" name="label_4">
                <property name="text">
-                <string>Deny iq version</string>
+                <string>Response mode</string>
                </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="cmb_lockrequ">
+               <item>
+                <property name="text">
+                 <string>allow</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>not implemented</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>ignore</string>
+                </property>
+               </item>
               </widget>
              </item>
              <item>
@@ -418,7 +434,8 @@
   <tabstop>tabWidget</tabstop>
   <tabstop>cb_accounts</tabstop>
   <tabstop>cb_allaccounts</tabstop>
-  <tabstop>cb_lockrequ</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>cmb_lockrequ</tabstop>
   <tabstop>cb_locktimerequ</tabstop>
   <tabstop>cb_ospreset</tabstop>
   <tabstop>le_osname</tabstop>

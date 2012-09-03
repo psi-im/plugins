@@ -48,7 +48,7 @@ bool AccountSettings::isValid()
 
 bool AccountSettings::isEmpty()
 {
-	if (!enable_contacts && !enable_conferences && !lock_requ && !lock_time_requ && show_requ_mode == 0 && log_mode == 0) {
+	if (!enable_contacts && !enable_conferences && response_mode == RespAllow && !lock_time_requ && show_requ_mode == LogNever && log_mode == LogNever) {
 		if (os_name.isEmpty() && client_name.isEmpty() && caps_node.isEmpty() && caps_version.isEmpty()) {
 			return true;
 		}
@@ -92,15 +92,20 @@ void AccountSettings::fromString(const QString& set_str)
 			} else if (param_name == "en_cnf") {
 				enable_conferences = (param_value == "true") ? true : false;
 			} else if (param_name == "l_req") {
-				lock_requ = (param_value == "true") ? true : false;
+				if (param_value == "true")
+					response_mode = RespNotImpl;
+				else if (param_value == "ignore")
+					response_mode = RespIgnore;
+				else
+					response_mode = RespAllow;
 			} else if (param_name == "l_treq") {
 				lock_time_requ = (param_value == "true") ? true : false;
 			} else if (param_name == "s_req") {
-				show_requ_mode = 0;
+				show_requ_mode = LogNever;
 				if (param_value == "true" || param_value == "if-repl") {
-					show_requ_mode = 1;
+					show_requ_mode = LogIfReplace;
 				} else if (param_value == "always") {
-					show_requ_mode = 2;
+					show_requ_mode = LogAlways;
 				}
 			} else if (param_name == "os_nm") {
 				os_name = stripSlashes(param_value);
@@ -113,11 +118,11 @@ void AccountSettings::fromString(const QString& set_str)
 			} else if (param_name == "cp_ver") {
 				caps_version = stripSlashes(param_value);
 			} else if (param_name == "log") {
-				log_mode = 0;
+				log_mode = LogNever;
 				if (param_value == "true" || param_value == "if-repl") {
-					log_mode = 1;
+					log_mode = LogIfReplace;
 				} else if (param_value == "always") {
-					log_mode = 2;
+					log_mode = LogAlways;
 				}
 			}
 		}
@@ -130,12 +135,18 @@ QString AccountSettings::toString()
 	QString s_res = "acc_id=" + addSlashes(account_id);
 	s_res.append(";en_cnt=").append((enable_contacts) ? "true" : "false");
 	s_res.append(";en_cnf=").append((enable_conferences) ? "true" : "false");
-	s_res.append(";l_req=").append((lock_requ) ? "true" : "false");
-	s_res.append(";l_treq=").append((lock_time_requ) ? "true" : "false");
 	QString str1;
-	if (show_requ_mode == 1) {
+	if (response_mode == RespNotImpl)
+		str1 = "true";
+	else if (response_mode == RespIgnore)
+		str1 = "ignore";
+	else
+		str1 = "false";
+	s_res.append(";l_req=").append(str1);
+	s_res.append(";l_treq=").append((lock_time_requ) ? "true" : "false");
+	if (show_requ_mode == LogIfReplace) {
 		str1 = "if-repl";
-	} else if (show_requ_mode == 2) {
+	} else if (show_requ_mode == LogAlways) {
 		str1 = "always";
 	} else {
 		str1 = "never";
@@ -146,9 +157,9 @@ QString AccountSettings::toString()
 	s_res.append(";cl_ver=").append(addSlashes(client_version));
 	s_res.append(";cp_nd=").append(addSlashes(caps_node));
 	s_res.append(";cp_ver=").append(addSlashes(caps_version));
-	if (log_mode == 1) {
+	if (log_mode == LogIfReplace) {
 		str1 = "if-repl";
-	} else if (log_mode == 2) {
+	} else if (log_mode == LogAlways) {
 		str1 = "always";
 	} else {
 		str1 = "never";
@@ -162,15 +173,15 @@ void AccountSettings::init()
 	account_id = "";
 	enable_contacts = false;
 	enable_conferences = false;
-	lock_requ = false;
+	response_mode = RespAllow;
 	lock_time_requ = false;
-	show_requ_mode = 0;
+	show_requ_mode = LogNever;
 	os_name = "";
 	client_name = "";
 	client_version = "";
 	caps_node = "";
 	caps_version = "";
-	log_mode = 0;
+	log_mode = LogNever;
 }
 
 QString AccountSettings::addSlashes(QString& str)
