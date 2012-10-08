@@ -90,7 +90,7 @@ public:
 	QList < QVariantHash > getAccountMenuParam();
 	QList < QVariantHash > getContactMenuParam();
 	virtual QAction* getContactAction(QObject* , int , const QString& );
-	virtual QAction* getAccountAction(QObject* , int ) { return 0; };
+	virtual QAction* getAccountAction(QObject* , int ) { return 0; }
         virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
 	virtual QString pluginInfo();
 	virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
@@ -117,7 +117,7 @@ private:
 	bool isSndEnable;
 	bool disableSnd;
 	bool disablePopupDnd;
-	bool popupId;
+	int popupId;
 
 	bool checkWatchedItem(const QString& from, const QString& body, WatchedItem *wi);
 
@@ -140,7 +140,7 @@ private slots:
 	void timeOut();
 };
 
-Q_EXPORT_PLUGIN(Watcher);
+Q_EXPORT_PLUGIN(Watcher)
 
 Watcher::Watcher()
 	: psiOptions(0)
