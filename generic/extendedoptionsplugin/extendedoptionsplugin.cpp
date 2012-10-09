@@ -343,7 +343,7 @@ QWidget* ExtendedOptions::options()
 	showRole = new QCheckBox(tr("Show roles and affiliations changes"));
         showStatus = new QCheckBox(tr("Show status changes"));
         skipAutojoin = new QCheckBox(tr("Enable autojoin for bookmarked conferences"));
-	hideAutoJoin = new QCheckBox(tr("Hide auto-join conferences"));
+	hideAutoJoin = new QCheckBox(tr("Hide conference on auto-join"));
 	mucHtml = new QCheckBox(tr("Enable HTML rendering in MUC chat window"));
 
 	muc_leave_status_message = new QLineEdit;
