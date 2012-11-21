@@ -32,7 +32,7 @@
 
 Q_EXPORT_PLUGIN(ClientSwitcherPlugin)
 
-#define cVer                    "0.0.14"
+#define cVer                    "0.0.15"
 #define constPluginShortName    "clientswitcher"
 #define constPluginName         "Client Switcher Plugin"
 #define constForAllAcc          "for_all_acc"
@@ -401,7 +401,7 @@ bool ClientSwitcherPlugin::incomingStanza(int account, const QDomElement& stanza
 								}
 								new_node.append("#" + node_ver);
 							}
-							s_child.toElement().setAttribute("node", sender_->escape(new_node));
+							s_child.toElement().setAttribute("node", new_node);
 						}
 					}
 					else if (xmlns == "jabber:iq:version") {
@@ -467,8 +467,8 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 				// Подменяем капс
 				if (as->response_mode != AccountSettings::RespNotImpl)
 				{
-					caps_node.toElement().setAttribute("node", sender_->escape(as->caps_node));
-					caps_node.toElement().setAttribute("ver", sender_->escape(as->caps_version));
+					caps_node.toElement().setAttribute("node", as->caps_node);
+					caps_node.toElement().setAttribute("ver", as->caps_version);
 				}
 				else {
 					caps_node.toElement().setAttribute("node", "unknow");
@@ -497,13 +497,13 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 					// Подменяем ноду, если она есть
 					QString node = s_child.toElement().attribute("node");
 					if (!node.isEmpty()) {
-						QString new_node = (respMode == AccountSettings::RespAllow) ? sender_->escape(as->caps_node) : "unknow";
+						QString new_node = (respMode == AccountSettings::RespAllow) ? as->caps_node : "unknow";
 						QStringList split_node = node.split("#");
 						if (split_node.size() > 1) {
 							split_node.removeFirst();
 							QString new_ver = split_node.join("#");
 							if (new_ver == def_caps_version)
-								new_ver = (respMode == AccountSettings::RespAllow) ? sender_->escape(as->caps_version) : "n/a";
+								new_ver = (respMode == AccountSettings::RespAllow) ? as->caps_version : "n/a";
 							new_node.append("#" + new_ver);
 						}
 						s_child.toElement().setAttribute("node", new_node);
@@ -531,7 +531,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 							}
 						} else if (tag_name == "identity") {
 							if (!q_child.toElement().attribute("name").isEmpty())
-								q_child.toElement().setAttribute("name", (respMode == AccountSettings::RespAllow) ? sender_->escape(as->client_name) : "unknow");
+								q_child.toElement().setAttribute("name", (respMode == AccountSettings::RespAllow) ? as->client_name : "unknow");
 							if (++update >= 3)
 								break;
 						}
@@ -562,7 +562,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 								QString str1;
 								if (!skip_stanza && !as->os_name.isEmpty()) {
 									str1 = as->os_name;
-									q_child.toElement().replaceChild(xmldoc.createTextNode(sender_->escape(str1)), q_child.firstChild());
+									q_child.toElement().replaceChild(xmldoc.createTextNode(str1), q_child.firstChild());
 									is_version_replaced = true;
 								} else {
 									str1 = q_child.toElement().text();
@@ -573,7 +573,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 								QString str1;
 								if (!skip_stanza && !as->client_name.isEmpty()) {
 									str1 = as->client_name;
-									q_child.toElement().replaceChild(xmldoc.createTextNode(sender_->escape(str1)), q_child.firstChild());
+									q_child.toElement().replaceChild(xmldoc.createTextNode(str1), q_child.firstChild());
 									is_version_replaced = true;
 								} else {
 									str1 = q_child.toElement().text();
@@ -584,7 +584,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 								QString str1;
 								if (!skip_stanza && !as->caps_version.isEmpty()) {
 									str1 = as->client_version;
-									q_child.toElement().replaceChild(xmldoc.createTextNode(sender_->escape(str1)), q_child.firstChild());
+									q_child.toElement().replaceChild(xmldoc.createTextNode(str1), q_child.firstChild());
 									is_version_replaced = true;
 								} else {
 									str1 = q_child.toElement().text();
@@ -599,21 +599,21 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 						if (!f_client_name && !as->client_name.isEmpty()) {
 							doc = s_child.ownerDocument();
 							QDomElement cl_name = doc.createElement("name");
-							cl_name.appendChild(doc.createTextNode(sender_->escape(as->client_name)));
+							cl_name.appendChild(doc.createTextNode(as->client_name));
 							s_child.appendChild(cl_name);
 						}
 						if (!f_client_ver && !as->client_version.isEmpty()) {
 							if (doc.isNull())
 								doc = s_child.ownerDocument();
 							QDomElement cl_ver = doc.createElement("version");
-							cl_ver.appendChild(doc.createTextNode(sender_->escape(as->client_version)));
+							cl_ver.appendChild(doc.createTextNode(as->client_version));
 							s_child.appendChild(cl_ver);
 						}
 						if (!f_os_name && !as->os_name.isEmpty()) {
 							if (doc.isNull())
 								doc = s_child.ownerDocument();
 							QDomElement os_name = doc.createElement("os");
-							os_name.appendChild(doc.createTextNode(sender_->escape(as->os_name)));
+							os_name.appendChild(doc.createTextNode(as->os_name));
 							s_child.appendChild(os_name);
 						}
 					} else if (respMode == AccountSettings::RespNotImpl) {
