@@ -89,7 +89,9 @@ QString QxtWindowSystem::windowTitle(WId window)
     // most of CoreGraphics private definitions ask for CGSValue as key but since
     // converting strings to/from CGSValue was dropped in 10.5, I use CFString, which
     // apparently also works.
-    err = CGSGetWindowProperty(connection, window, (CGSValue)CFSTR("kCGSWindowTitle"), &windowTitle);
+
+    // FIXME: Not public API function. Can't compile with OS X 10.8
+    // err = CGSGetWindowProperty(connection, window, (CGSValue)CFSTR("kCGSWindowTitle"), &windowTitle);
     if (err != noErr) return QString();
 
     // this is UTF8 encoded
