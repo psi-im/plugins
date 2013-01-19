@@ -36,6 +36,7 @@
 #include "optionaccessor.h"
 #include "optionaccessinghost.h"
 #include "stanzasender.h"
+#include "stanzasendinghost.h"
 #include "stanzafilter.h"
 #include "plugininfoprovider.h"
 #include "applicationinfoaccessor.h"

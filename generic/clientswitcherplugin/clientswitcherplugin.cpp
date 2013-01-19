@@ -32,7 +32,7 @@
 
 Q_EXPORT_PLUGIN(ClientSwitcherPlugin)
 
-#define cVer                    "0.0.15"
+#define cVer                    "0.0.16"
 #define constPluginShortName    "clientswitcher"
 #define constPluginName         "Client Switcher Plugin"
 #define constForAllAcc          "for_all_acc"
@@ -996,7 +996,7 @@ void ClientSwitcherPlugin::showPopup(const QString &nick)
 {
 	int msecs = psiPopup->popupDuration(constPluginName);
 	if (msecs > 0)
-		psiPopup->initPopup(tr("%1 has requested your version").arg(nick), constPluginName, "psi/headline", popupId);
+		psiPopup->initPopup(tr("%1 has requested your version").arg(sender_->escape(nick)), constPluginName, "psi/headline", popupId);
 }
 
 void ClientSwitcherPlugin::showLog(QString filename)
