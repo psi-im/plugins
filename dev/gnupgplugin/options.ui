@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Options</class>
+ <widget class="QWidget" name="Options">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>490</width>
+    <height>451</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <widget class="QTreeView" name="keys">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::ExtendedSelection</enum>
+     </property>
+     <property name="animated">
+      <bool>true</bool>
+     </property>
+     <property name="expandsOnDoubleClick">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QPushButton" name="btnAdd">
+       <property name="text">
+        <string>Add</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnRemove">
+       <property name="text">
+        <string>Remove</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Import</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string>Export</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnInfo">
+       <property name="text">
+        <string>Info</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btnAdd</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>addKey()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>448</x>
+     <y>23</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>487</x>
+     <y>17</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnRemove</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>removeKey()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>449</x>
+     <y>56</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>487</x>
+     <y>55</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>importKey()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>454</x>
+     <y>92</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>488</x>
+     <y>104</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>exportKey()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>440</x>
+     <y>127</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>487</x>
+     <y>158</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnInfo</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>showInfo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>428</x>
+     <y>422</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>490</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>addKey()</slot>
+  <slot>removeKey()</slot>
+  <slot>importKey()</slot>
+  <slot>exportKey()</slot>
+  <slot>showInfo()</slot>
+ </slots>
+</ui>
