@@ -238,6 +238,7 @@ void Options::exportKey()
 	foreach (QModelIndex key, pkeys) {
 		QString filename = key.sibling(key.row(), 1).data().toString() + " " + key.sibling(key.row(), 2).data().toString() + ".asc";
 		QFileDialog dlg(this);
+		dlg.setAcceptMode(QFileDialog::AcceptSave);
 		dlg.setFileMode(QFileDialog::AnyFile);
 		QStringList nameFilters;
 		nameFilters << trUtf8("ASCII (*.asc)");
