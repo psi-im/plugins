@@ -32,6 +32,7 @@
 #include <QApplication>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QLabel>
 
 Options::Options(QWidget *parent)
 	: QWidget(parent)
@@ -103,14 +104,15 @@ void Options::addKey()
 
 	key += "%commit\n";
 
-	QString progressText = trUtf8(
+	QProgressDialog waitingDlg("", trUtf8("Cancel"), 0, 0, this);
+	QLabel progressTextLable(trUtf8(
 "<b>Please wait.</b><br/>"
-"We need to generate a lot of random bytes. It is a good idea to perform<br/>"
-"some other action (type on the keyboard, move the mouse, utilize the<br/>"
-"disks) during the prime generation; this gives the random number<br/>"
-"generator a better chance to gain enough entropy.");
-
-	QProgressDialog waitingDlg(progressText, trUtf8("Cancel"), 0, 0, this);
+"We need to generate a lot of random bytes. It is a good idea to perform "
+"some other action (type on the keyboard, move the mouse, utilize the "
+"disks) during the prime generation; this gives the random number "
+"generator a better chance to gain enough entropy."), &waitingDlg);
+	progressTextLable.setWordWrap(true);
+	waitingDlg.setLabel(&progressTextLable);
 	waitingDlg.setWindowModality(Qt::WindowModal);
 	waitingDlg.setWindowTitle(trUtf8("Key pair generating"));
 	waitingDlg.show();
