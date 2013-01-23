@@ -43,7 +43,7 @@ public:
 	// from PsiPlugin
 	QString name() const { return "GnuPG"; }
 	QString shortName() const { return "gnupg"; }
-	QString version() const { return "0.1.0"; }
+	QString version() const { return "0.1.1"; }
 
 	QWidget *options();
 	bool enable();

@@ -34,7 +34,7 @@ GpgProcess::GpgProcess(QObject *parent)
 
 QString GpgProcess::findBin() const
 {
-	QString bin = "gpg";
+	QString bin;
 
 #ifdef Q_OS_WIN
 	HKEY root;
@@ -90,6 +90,9 @@ QString GpgProcess::findBin() const
 		fi.setFile(QCoreApplication::applicationDirPath() + "/gpg2" + suffix);
 		if (fi.exists()) {
 			bin = fi.filePath();
+		}
+		else {
+			bin = "gpg" + suffix;
 		}
 	}
 
