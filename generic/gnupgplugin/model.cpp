@@ -134,7 +134,7 @@ void Model::listKeys()
 	GpgProcess process;
 	process.start(arguments);
 	process.waitForFinished();
-	QString keysRaw = process.readAll();
+	QString keysRaw = QString::fromUtf8(process.readAll());
 
 	arguments.clear();
 	arguments << "--with-fingerprint"
@@ -144,7 +144,7 @@ void Model::listKeys()
 
 	process.start(arguments);
 	process.waitForFinished();
-	keysRaw += process.readAll();
+	keysRaw += QString::fromUtf8(process.readAll());
 
 
 	showKeys(keysRaw);
