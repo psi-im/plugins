@@ -20,14 +20,14 @@
    <item row="1" column="0">
     <widget class="QLabel" name="label_4">
      <property name="text">
-      <string>E-mail address </string>
+      <string>E-mail address: </string>
      </property>
     </widget>
    </item>
    <item row="4" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Length </string>
+      <string>Length: </string>
      </property>
     </widget>
    </item>
@@ -50,7 +50,7 @@
    <item row="2" column="0">
     <widget class="QLabel" name="label_5">
      <property name="text">
-      <string>Comment </string>
+      <string>Comment: </string>
      </property>
     </widget>
    </item>
@@ -73,7 +73,7 @@
    <item row="0" column="0">
     <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>Full name </string>
+      <string>Full name: </string>
      </property>
     </widget>
    </item>
@@ -93,7 +93,7 @@
       <bool>false</bool>
      </property>
      <property name="text">
-      <string>Expiration date </string>
+      <string>Expiration date: </string>
      </property>
     </widget>
    </item>
@@ -124,7 +124,7 @@
    <item row="3" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Key type </string>
+      <string>Key type: </string>
      </property>
     </widget>
    </item>
@@ -168,14 +168,14 @@
    <item row="7" column="0">
     <widget class="QLabel" name="label_7">
      <property name="text">
-      <string>Passphrase </string>
+      <string>Passphrase: </string>
      </property>
     </widget>
    </item>
    <item row="8" column="0">
     <widget class="QLabel" name="label_8">
      <property name="text">
-      <string>Repeat </string>
+      <string>Repeat: </string>
      </property>
     </widget>
    </item>
