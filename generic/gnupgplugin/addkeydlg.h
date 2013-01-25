@@ -46,6 +46,7 @@ public:
 private slots:
 	void setEnabledExpiration(bool b);
 	void checkPass();
+	void fillLenght(const QString &type);
 
 private:
 	Ui::AddKeyDlg *ui;

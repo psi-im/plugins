@@ -29,6 +29,7 @@ AddKeyDlg::AddKeyDlg(QWidget *parent)
 	ui->setupUi(this);
 	adjustSize();
 	ui->dateExpiration->setDate(QDate::currentDate());
+	fillLenght(ui->cmbType->currentText());
 }
 
 AddKeyDlg::~AddKeyDlg()
@@ -85,4 +86,16 @@ void AddKeyDlg::setEnabledExpiration(bool b)
 void AddKeyDlg::checkPass()
 {
 	ui->btnBox->button(QDialogButtonBox::Ok)->setEnabled(ui->linePass->text() == ui->linePass2->text());
+}
+
+void AddKeyDlg::fillLenght(const QString &type)
+{
+	QStringList lenghts;
+	lenghts << "1024" << "2048" << "3072";
+	if (!type.contains("DSA")) {
+		lenghts << "4096";
+	}
+	ui->cmbLength->clear();
+	ui->cmbLength->addItems(lenghts);
+	ui->cmbLength->setCurrentIndex(1);
 }

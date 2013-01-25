@@ -141,28 +141,8 @@
       <bool>true</bool>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>-1</number>
      </property>
-     <item>
-      <property name="text">
-       <string>1024</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>2048</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>3072</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>4096</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item row="7" column="0">
@@ -216,8 +196,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>257</x>
-     <y>472</y>
+     <x>266</x>
+     <y>331</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -232,8 +212,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>325</x>
-     <y>472</y>
+     <x>334</x>
+     <y>331</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -289,9 +269,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cmbType</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>AddKeyDlg</receiver>
+   <slot>fillLenght(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>289</x>
+     <y>112</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>386</x>
+     <y>79</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>setEnabledExpiration(bool)</slot>
   <slot>checkPass()</slot>
+  <slot>fillLenght(QString)</slot>
  </slots>
 </ui>
