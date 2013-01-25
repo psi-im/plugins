@@ -40,10 +40,16 @@ public:
 public slots:
 	void addKey();
 	void removeKey();
-	void importKey();
-	void exportKey();
+
+	void importKeyFromFile();
+	void importKeyFromClipboard();
+
+	void exportKeyToFile();
+	void exportKeyToClipboard();
 
 	void showInfo();
+
+	void updateKeys();
 
 private:
 	Ui::Options *ui;

@@ -105,7 +105,6 @@ QList<QStandardItem*> parseLine(const QString &line)
 Model::Model(QObject *parent)
 	: QStandardItemModel(parent)
 {
-	listKeys();
 }
 
 void Model::listKeys()

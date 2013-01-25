@@ -34,6 +34,10 @@
 #include <QMessageBox>
 #include <QLabel>
 #include <QProgressBar>
+#include <QAction>
+#include <QMenu>
+#include <QClipboard>
+#include <QApplication>
 
 Options::Options(QWidget *parent)
 	: QWidget(parent)
@@ -43,7 +47,32 @@ Options::Options(QWidget *parent)
 
 	Model *model = new Model(this);
 	ui->keys->setModel(model);
+	updateKeys();
 
+
+	// Import key
+	QAction *action;
+	QMenu *menu = new QMenu(this);
+
+	action = menu->addAction(trUtf8("from file"));
+	connect(action, SIGNAL(triggered()), SLOT(importKeyFromFile()));
+
+	action = menu->addAction(trUtf8("from clipboard"));
+	connect(action, SIGNAL(triggered()), SLOT(importKeyFromClipboard()));
+
+	ui->btnImport->setMenu(menu);
+
+	// Export key
+
+	menu = new QMenu(this);
+	action = menu->addAction(trUtf8("to file"));
+	connect(action, SIGNAL(triggered()), SLOT(exportKeyToFile()));
+	ui->btnExport->addAction(action);
+
+	action = menu->addAction(trUtf8("to clipboard"));
+	connect(action, SIGNAL(triggered()), SLOT(exportKeyToClipboard()));
+
+	ui->btnExport->setMenu(menu);
 }
 
 Options::~Options()
@@ -147,12 +176,11 @@ void Options::addKey()
 		qApp->processEvents();
 	}
 
-	qobject_cast<Model*>(ui->keys->model())->listKeys();
+	updateKeys();
 }
 
 void Options::removeKey()
 {
-	Model *model = qobject_cast<Model*>(ui->keys->model());
 	QItemSelectionModel *selModel = ui->keys->selectionModel();
 
 	if (!selModel->hasSelection()) {
@@ -191,10 +219,10 @@ void Options::removeKey()
 		gpg.waitForFinished();
 	}
 
-	model->listKeys();
+	updateKeys();
 }
 
-void Options::importKey()
+void Options::importKeyFromFile()
 {
 	QFileDialog dlg(this);
 	dlg.setFileMode(QFileDialog::ExistingFiles);
@@ -217,12 +245,11 @@ void Options::importKey()
 		gpg.waitForFinished();
 	}
 
-	qobject_cast<Model*>(ui->keys->model())->listKeys();
+	updateKeys();
 }
 
-void Options::exportKey()
+void Options::exportKeyToFile()
 {
-	Model *model = qobject_cast<Model*>(ui->keys->model());
 	QItemSelectionModel *selModel = ui->keys->selectionModel();
 
 	if (!selModel->hasSelection()) {
@@ -279,8 +306,76 @@ void Options::exportKey()
 		gpg.start(arguments);
 		gpg.waitForFinished();
 	}
+}
 
-	model->listKeys();
+void Options::importKeyFromClipboard()
+{
+	QClipboard *clipboard = QApplication::clipboard();
+	QString key = clipboard->text().trimmed();
+
+	if (!key.startsWith("-----BEGIN PGP PUBLIC KEY BLOCK-----") ||
+		!key.endsWith("-----END PGP PUBLIC KEY BLOCK-----")) {
+		return;
+	}
+
+	GpgProcess gpg;
+	QStringList arguments;
+	arguments << "--batch"
+			  << "--import";
+	gpg.start(arguments);
+	gpg.waitForStarted();
+	gpg.write(key.toUtf8());
+	gpg.closeWriteChannel();
+	gpg.waitForFinished();
+
+	updateKeys();
+}
+
+void Options::exportKeyToClipboard()
+{
+	QItemSelectionModel *selModel = ui->keys->selectionModel();
+
+	if (!selModel->hasSelection()) {
+		return;
+	}
+
+	QModelIndexList indexes = selModel->selectedIndexes();
+	QModelIndexList pkeys; // Key IDs
+	foreach (QModelIndex index, indexes) {
+		// Every selection contains all columns. Need to work only with first
+		if (index.column() > 0) {
+			continue;
+		}
+
+		// Choose only primary keys
+		QModelIndex pIndex = index;
+		if (index.parent().isValid()) {
+			pIndex = index.parent();
+		}
+
+		if (pkeys.indexOf(pIndex) < 0) {
+			pkeys << pIndex;
+		}
+	}
+
+	// Remove primary keys
+	QString strKey = "";
+	foreach (QModelIndex key, pkeys) {
+		GpgProcess gpg;
+		QStringList arguments;
+		QString fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
+		arguments << "--armor"
+				  << "--export"
+				  << fingerprint;
+
+		gpg.start(arguments);
+		gpg.waitForFinished();
+
+		strKey += QString::fromUtf8(gpg.readAllStandardOutput());
+	}
+
+	QClipboard *clipboard = QApplication::clipboard();
+	clipboard->setText(strKey.toUtf8().trimmed());
 }
 
 void Options::showInfo()
@@ -288,4 +383,14 @@ void Options::showInfo()
 	GpgProcess gpg;
 	QMessageBox box(QMessageBox::Information, trUtf8("GnuPG info"), gpg.info(), QMessageBox::Ok, this);
 	box.exec();
+}
+
+void Options::updateKeys()
+{
+	qobject_cast<Model*>(ui->keys->model())->listKeys();
+
+	int columns = ui->keys->model()->columnCount();
+	for (int i = 0; i < columns; i++) {
+		ui->keys->resizeColumnToContents(i);
+	}
 }

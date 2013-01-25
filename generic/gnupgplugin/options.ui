@@ -47,14 +47,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="btnImport">
        <property name="text">
         <string>Import</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="btnExport">
        <property name="text">
         <string>Export</string>
        </property>
@@ -119,38 +119,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>Options</receiver>
-   <slot>importKey()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>454</x>
-     <y>92</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>488</x>
-     <y>104</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_2</sender>
-   <signal>clicked()</signal>
-   <receiver>Options</receiver>
-   <slot>exportKey()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>440</x>
-     <y>127</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>487</x>
-     <y>158</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>btnInfo</sender>
    <signal>clicked()</signal>
    <receiver>Options</receiver>
@@ -170,8 +138,6 @@
  <slots>
   <slot>addKey()</slot>
   <slot>removeKey()</slot>
-  <slot>importKey()</slot>
-  <slot>exportKey()</slot>
   <slot>showInfo()</slot>
  </slots>
 </ui>
