@@ -106,5 +106,5 @@ QString GpgProcess::info()
 			  << "--no-tty";
 	start(arguments);
 	waitForFinished();
-	return QString("%1 %2\n%3").arg(_bin).arg(arguments.join(" ")).arg(QString::fromUtf8(readAll()));
+	return QString("%1 %2\n%3").arg(_bin).arg(arguments.join(" ")).arg(QString::fromLocal8Bit(readAll()));
 }
