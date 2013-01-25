@@ -39,12 +39,10 @@ public:
 	QString comment() const;
 	int type() const;
 	int length() const;
-	bool isExpired() const;
 	QDate expiration() const;
 	QString pass() const;
 
 private slots:
-	void setEnabledExpiration(bool b);
 	void checkPass();
 	void fillLenght(const QString &type);
 

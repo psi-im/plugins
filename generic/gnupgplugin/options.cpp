@@ -75,7 +75,7 @@ void Options::addKey()
 	name = dlg.name();
 	comment = dlg.comment();
 	email = dlg.email();
-	expiration = dlg.isExpired() ? dlg.expiration().toString(Qt::ISODate) : "0";
+	expiration = dlg.expiration().isValid() ? dlg.expiration().toString(Qt::ISODate) : "0";
 	pass = dlg.pass();
 
 	key += QString("Key-Type: %1\n").arg(type);

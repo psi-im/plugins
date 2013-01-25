@@ -21,6 +21,7 @@
 #include <QPushButton>
 #include "addkeydlg.h"
 #include "ui_addkeydlg.h"
+#include "datewidget.h"
 
 AddKeyDlg::AddKeyDlg(QWidget *parent)
 	: QDialog(parent)
@@ -62,11 +63,6 @@ int AddKeyDlg::length() const
 	return ui->cmbLength->currentText().toInt();
 }
 
-bool AddKeyDlg::isExpired() const
-{
-	return ui->chkExpires->isChecked();
-}
-
 QDate AddKeyDlg::expiration() const
 {
 	return ui->dateExpiration->date();
@@ -75,12 +71,6 @@ QDate AddKeyDlg::expiration() const
 QString AddKeyDlg::pass() const
 {
 	return ui->linePass->text();
-}
-
-void AddKeyDlg::setEnabledExpiration(bool b)
-{
-	ui->lblExpiration->setEnabled(b);
-	ui->dateExpiration->setEnabled(b);
 }
 
 void AddKeyDlg::checkPass()
