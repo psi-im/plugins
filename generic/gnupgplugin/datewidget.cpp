@@ -57,7 +57,7 @@ DateWidget::DateWidget(QWidget *parent)
 inline QString dateFormat()
 {
 	QString format = QLocale().dateFormat(QLocale::LongFormat);
-#ifndef Q_OS_MAC
+#ifdef Q_OS_MAC
 	// The LongFormat has changed between OS X 10.6 and 10.7.
 	// https://qt.gitorious.org/qt/qtbase/commit/8e722eb/diffs
 	// https://bugreports.qt-project.org/browse/QTBUG-27790
