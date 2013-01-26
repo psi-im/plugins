@@ -56,7 +56,7 @@ public:
 	void optionChanged(const QString &option) { Q_UNUSED(option) }
 
 	// from ApplicationInfoAccessor
-	void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) {}
+	void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) { Q_UNUSED(host) }
 
 
 	// from PluginInfoProvider
