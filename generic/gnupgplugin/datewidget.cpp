@@ -56,7 +56,16 @@ DateWidget::DateWidget(QWidget *parent)
 // Always use format of current locale
 inline QString dateFormat()
 {
-	return QLocale().dateFormat(QLocale::LongFormat);
+	QString format = QLocale().dateFormat(QLocale::LongFormat);
+#ifndef Q_OS_MAC
+	// The LongFormat has changed between OS X 10.6 and 10.7.
+	// https://qt.gitorious.org/qt/qtbase/commit/8e722eb/diffs
+	// https://bugreports.qt-project.org/browse/QTBUG-27790
+	if (format.count('y') == 1) {
+		format.replace('y', "yyyy");
+	}
+#endif
+	return format;
 }
 
 void DateWidget::setDate(const QDate &date)
