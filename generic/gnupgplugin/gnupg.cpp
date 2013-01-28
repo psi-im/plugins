@@ -27,10 +27,8 @@
 Q_EXPORT_PLUGIN(GnuPG);
 
 GnuPG::GnuPG()
-	: _optionsHost(0)
-	, _enabled(false)
+	: _enabled(false)
 	, _optionsForm(0)
-	, _isAlerted(false)
 {
 }
 
@@ -41,7 +39,7 @@ GnuPG::~GnuPG()
 
 QWidget *GnuPG::options()
 {
-	if (!_enabled || !_optionsHost) {
+	if (!_enabled) {
 		return 0;
 	}
 
@@ -51,10 +49,7 @@ QWidget *GnuPG::options()
 
 bool GnuPG::enable()
 {
-	if (_optionsHost) {
-		_enabled = true;
-	}
-
+    _enabled = true;
 	return _enabled;
 }
 

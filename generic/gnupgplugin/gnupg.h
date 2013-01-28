@@ -24,16 +24,14 @@
 #include <QtCore>
 #include "psiplugin.h"
 #include "applicationinfoaccessinghost.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
 #include "plugininfoprovider.h"
 
 class Options;
 
-class GnuPG : public QObject, public PsiPlugin, public OptionAccessor, public PluginInfoProvider
+class GnuPG : public QObject, public PsiPlugin, public PluginInfoProvider
 {
 	Q_OBJECT
-	Q_INTERFACES(PsiPlugin OptionAccessor PluginInfoProvider)
+	Q_INTERFACES(PsiPlugin PluginInfoProvider)
 
 public:
 	GnuPG();
@@ -50,18 +48,12 @@ public:
 	void applyOptions();
 	void restoreOptions();
 
-	// from OptionAccessor
-	void setOptionAccessingHost(OptionAccessingHost *host) { _optionsHost = host; }
-	void optionChanged(const QString &option) { Q_UNUSED(option) }
-
 	// from PluginInfoProvider
 	QString pluginInfo() { return ""; }
 
 private:
-	OptionAccessingHost *_optionsHost;
 	bool _enabled;
 	Options *_optionsForm;
-	bool _isAlerted;
 };
 
 #endif // ALERTWEIRDJID_H
