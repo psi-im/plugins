@@ -1,7 +1,7 @@
 include(../../psiplugin.pri)
 
 CONFIG += release
-LIBS += -lotr -ltidy
+LIBS += -lotr -ltidy -lgcrypt -lgpg-error
 RESOURCES = otrplugin.qrc
 unix {
 	INCLUDEPATH += /usr/include/tidy
