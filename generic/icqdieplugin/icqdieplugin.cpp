@@ -113,15 +113,15 @@ IcqDie::IcqDie()
 	MessageCount = 0;
 
 	enabled = false;
-	MessageRecv = trUtf8("Я Вам как Linux скажу, только Вы не обижайтесь. "
-			  "Этот человек, конечно, получит Ваше сообщение, но лучше бы Вам общаться с ним через Jabber. "
-			  "А то не ровен час - аська сдохнет, старушка своё отжила. Его JID: %1.\n\n"
-			  "Искренне Ваш, Debian Sid.");
-	MessageNoRecv = trUtf8("Я Вам как Linux скажу, только Вы не обижайтесь. "
-			  "Этот человек имел в виду всех пользователей аськи, поэтому если Вы до сих пор сидите в этой сети, "
-			  "то он не получит Ваше сообщение, поэтому Вам придётся общаться с ним через Jabber. Его JID: %1.\n\n"
-			  "Если Вы не знаете что такое Jabber, то есть Google - он всё знает и поможет любому, кто к нему обратится.\n"
-			  "Искренне Ваш, Debian Sid.");
+	MessageRecv = trUtf8("I can tell you as a Linux, but do not be mad at me. "
+            "Certainly this human will receive this message. But it's much better to chat to him by Jabber. "
+            "You are risking, one never knows when ICQ can die, granny already outlived its. His JID: %1.\n\n"
+            "Sincerely yours, Debian Sid.");
+	MessageNoRecv = trUtf8("I can tell you as a Linux, but do not be mad at me. "
+            "This human do not use ICQ anymore, so if you are still use that network he will not receive your message and you have to chat to him by Jabber. His JID: %1.\n\n"
+            "If you don't know what Jabber is - use Google. It knows everything and ready to help everyone who ask it.\n"
+            "Sincerely yours, Debian Sid.");
+
 
 	ActiveTabHost = 0;
 	AccInfoHost = 0;
