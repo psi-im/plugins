@@ -32,23 +32,26 @@ GpgProcess::GpgProcess(QObject *parent)
 	_bin = findBin();
 }
 
-QString GpgProcess::findBin() const
+inline bool checkBin(const QString &bin)
 {
-	QString bin;
+	QFileInfo fi(bin);
+	return fi.exists();
+}
 
 #ifdef Q_OS_WIN
+static bool checkReg(QString &bin)
+{
 	HKEY root;
 	root = HKEY_CURRENT_USER;
 
 	HKEY hkey = 0;
 	const char *path = "Software\\GNU\\GnuPG";
-	if(RegOpenKeyExA(HKEY_CURRENT_USER, path, 0, KEY_QUERY_VALUE, &hkey) != ERROR_SUCCESS)
-	{
-		if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, path, 0, KEY_QUERY_VALUE, &hkey) != ERROR_SUCCESS)
-		{
-			hkey = 0;
-		}
-	}
+	const char *path2 = "Software\\Wow6432Node\\GNU\\GnuPG";
+	if(RegOpenKeyExA(HKEY_CURRENT_USER, path, 0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {}
+	else if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, path, 0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {}
+	else if(RegOpenKeyExA(HKEY_CURRENT_USER, path2, 0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {}
+	else if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, path2, 0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {}
+	else hkey = 0;
 
 	if (hkey)
 	{
@@ -63,38 +66,34 @@ QString GpgProcess::findBin() const
 		}
 
 		RegCloseKey(hkey);
+		if (!bin.isEmpty() && checkBin(bin)) {
+			return true;
+		}
 	}
-
+	return false;
+}
 #endif
 
-	QFileInfo fi;
-#ifdef Q_OS_MAC
-	// mac-gpg
-	fi.setFile("/usr/local/bin/gpg");
-	if(fi.exists())
-		bin = fi.filePath();
-#endif
-
-	// prefer bundled gpg
+QString GpgProcess::findBin() const
+{
 #ifdef Q_OS_WIN
 	QString suffix=".exe";
 #else
 	QString suffix="";
 #endif
 
-	fi.setFile(QCoreApplication::applicationDirPath() + "/gpg" + suffix);
-	if (fi.exists()) {
-		bin = fi.filePath();
-	}
-	else {
-		fi.setFile(QCoreApplication::applicationDirPath() + "/gpg2" + suffix);
-		if (fi.exists()) {
-			bin = fi.filePath();
-		}
-		else {
-			bin = "gpg" + suffix;
-		}
-	}
+	QString bin;
+	// prefer bundled gpg
+	if (checkBin(bin = QCoreApplication::applicationDirPath() + "/gpg" + suffix)) {}
+	else if (checkBin(bin = QCoreApplication::applicationDirPath() + "/gpg2" + suffix)) {}
+#ifdef Q_OS_WIN
+	else if (checkReg(bin)) {}
+#endif
+#ifdef Q_OS_MAC
+	// mac-gpg
+	else if (checkBin(bin = "/usr/local/bin/gpg"));
+#endif
+	else bin = "gpg";
 
 	return bin;
 }
@@ -106,5 +105,14 @@ QString GpgProcess::info()
 			  << "--no-tty";
 	start(arguments);
 	waitForFinished();
-	return QString("%1 %2\n%3").arg(_bin).arg(arguments.join(" ")).arg(QString::fromLocal8Bit(readAll()));
+
+	QString message;
+	if (error() == FailedToStart) {
+		message = trUtf8("Can't start ") + _bin;
+	}
+	else {
+		message = QString("%1 %2\n%3").arg(_bin).arg(arguments.join(" ")).arg(QString::fromLocal8Bit(readAll()));
+	}
+
+	return message;
 }

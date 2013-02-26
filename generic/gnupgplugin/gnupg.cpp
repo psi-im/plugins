@@ -66,3 +66,11 @@ void GnuPG::applyOptions()
 void GnuPG::restoreOptions()
 {
 }
+
+QString GnuPG::pluginInfo()
+{
+	return tr("Author: ") +	 "Ivan Romanov\n"
+		   + tr("e-mail: ") + "drizt@land.ru\n\n"
+		   + tr("GnuPG Key Manager can create, remove, export and import GnuPG keys. "
+				"It can do only the base operations but I hope it will be ebough for your needs.");
+}

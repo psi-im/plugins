@@ -38,9 +38,9 @@ public:
 	~GnuPG();
 
 	// from PsiPlugin
-	QString name() const { return "GnuPG"; }
+	QString name() const { return "GnuPG Key Manager"; }
 	QString shortName() const { return "gnupg"; }
-	QString version() const { return "0.2.0"; }
+	QString version() const { return "0.2.1"; }
 
 	QWidget *options();
 	bool enable();
@@ -49,7 +49,7 @@ public:
 	void restoreOptions();
 
 	// from PluginInfoProvider
-	QString pluginInfo() { return ""; }
+	QString pluginInfo();
 
 private:
 	bool _enabled;
