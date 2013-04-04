@@ -23,12 +23,6 @@
 #include <QStandardItem>
 #include <QItemSelectionModel>
 #include <QProgressDialog>
-#include "options.h"
-#include "ui_options.h"
-#include "model.h"
-#include "gpgprocess.h"
-#include "addkeydlg.h"
-#include <QDebug>
 #include <QApplication>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -38,6 +32,12 @@
 #include <QMenu>
 #include <QClipboard>
 #include <QApplication>
+#include "options.h"
+#include "ui_options.h"
+#include "model.h"
+#include "gpgprocess.h"
+#include "addkeydlg.h"
+#include "optionaccessinghost.h"
 
 Options::Options(QWidget *parent)
 	: QWidget(parent)
@@ -82,6 +82,20 @@ Options::~Options()
 
 void Options::update()
 {
+}
+
+void Options::loadSettings()
+{
+	ui->chkAutoImport->setChecked(_optionHost->getPluginOption("auto-import", false).toBool());
+	ui->chkHideKeyMessage->setChecked(_optionHost->getPluginOption("hide-key-message", false).toBool());
+	ui->chkSendChatButton->setChecked(_optionHost->getPluginOption("send-chat-button", false).toBool());
+}
+
+void Options::saveSettings()
+{
+	_optionHost->setPluginOption("auto-import", ui->chkAutoImport->isChecked());
+	_optionHost->setPluginOption("hide-key-message", ui->chkHideKeyMessage->isChecked());
+	_optionHost->setPluginOption("send-chat-button", ui->chkSendChatButton->isChecked());
 }
 
 void Options::addKey()

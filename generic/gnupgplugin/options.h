@@ -24,6 +24,7 @@
 #include <QWidget>
 
 class GPGProc;
+class OptionAccessingHost;
 
 namespace Ui { class Options; }
 
@@ -36,6 +37,10 @@ public:
 	~Options();
 
 	void update();
+	void setOptionAccessingHost(OptionAccessingHost* host) { _optionHost = host; }
+
+	void loadSettings();
+	void saveSettings();
 
 public slots:
 	void addKey();
@@ -54,6 +59,7 @@ public slots:
 private:
 	Ui::Options *ui;
 	GPGProc *_gpgProc;
+	OptionAccessingHost* _optionHost;
 };
 
 #endif // OPTIONS_H
