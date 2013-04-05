@@ -108,6 +108,10 @@ QString GnuPG::pluginInfo()
 
 bool GnuPG::incomingStanza(int account, const QDomElement& stanza)
 {
+	if (!_enabled) {
+		return false;
+	}
+
 	if (!_optionHost->getPluginOption("auto-import", false).toBool()) {
 		return false;
 	}
