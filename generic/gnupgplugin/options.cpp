@@ -220,6 +220,12 @@ void Options::removeKey()
 		}
 	}
 
+	if (!pkeys.isEmpty()) {
+		if (QMessageBox::question(this, tr("Delete"), tr("Do you want to delete the selected keys?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
+			return;
+		}
+	}
+
 	// Remove primary keys
 	foreach (QModelIndex key, pkeys) {
 		GpgProcess gpg;
