@@ -9,6 +9,7 @@
 #include <QDesktopWidget>
 #include <QLocale>
 #include <QDebug>
+#include <QKeyEvent>
 
 #include "datewidget.h"
 
@@ -94,4 +95,17 @@ void DateWidget::calendarSetDate()
 void DateWidget::disableExpiration()
 {
 	setText(trUtf8("never"));
+}
+
+void DateWidget::keyPressEvent(QKeyEvent *event)
+{
+	if (event->key() == Qt::Key_Backspace || event->key() == Qt::Key_Delete) {
+		disableExpiration();
+	}
+	else if (event->key() == Qt::Key_Space) {
+		showPopup();
+	}
+	else {
+		LineEditWidget::keyPressEvent(event);
+	}
 }

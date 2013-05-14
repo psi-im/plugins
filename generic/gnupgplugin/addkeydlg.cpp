@@ -32,6 +32,7 @@ AddKeyDlg::AddKeyDlg(QWidget *parent)
 	// By default key expires in a year
 	ui->dateExpiration->setDate(QDate::currentDate().addYears(1));
 	fillLenght(ui->cmbType->currentText());
+	ui->lineName->setFocus();
 }
 
 AddKeyDlg::~AddKeyDlg()

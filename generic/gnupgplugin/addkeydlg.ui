@@ -154,8 +154,7 @@
     </widget>
    </item>
    <item row="6" column="1">
-    <widget class="DateWidget" name="dateExpiration">
-    </widget>
+    <widget class="DateWidget" name="dateExpiration"/>
    </item>
   </layout>
  </widget>
@@ -172,6 +171,7 @@
   <tabstop>lineComment</tabstop>
   <tabstop>cmbType</tabstop>
   <tabstop>cmbLength</tabstop>
+  <tabstop>dateExpiration</tabstop>
   <tabstop>linePass</tabstop>
   <tabstop>linePass2</tabstop>
   <tabstop>btnBox</tabstop>

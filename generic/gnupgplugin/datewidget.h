@@ -26,6 +26,7 @@ protected slots:
 	void closeCalendar(const QDate &text);
 	void calendarSetDate();
 	void disableExpiration();
+	void keyPressEvent(QKeyEvent *event);
 
 private:
 	// Inner widgets
