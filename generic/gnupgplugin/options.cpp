@@ -401,7 +401,15 @@ void Options::exportKeyToClipboard()
 void Options::showInfo()
 {
 	GpgProcess gpg;
-	QMessageBox box(QMessageBox::Information, trUtf8("GnuPG info"), gpg.info(), QMessageBox::Ok, this);
+	QString info;
+	QMessageBox::Icon icon;
+	if (gpg.info(info)) {
+		icon = QMessageBox::Information;
+	}
+	else {
+		icon = QMessageBox::Critical;
+	}
+	QMessageBox box(icon, trUtf8("GnuPG info"), info, QMessageBox::Ok, this);
 	box.exec();
 }
 
