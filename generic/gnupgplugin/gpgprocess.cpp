@@ -33,7 +33,7 @@ GpgProcess::GpgProcess(QObject *parent)
 	_bin = findBin();
 }
 
-static bool checkBin(const QString &bin)
+inline bool checkBin(const QString &bin)
 {
 	QFileInfo fi(bin);
 	return fi.exists();
@@ -71,13 +71,13 @@ static QString findRegGpgProgram()
 	const char *path2 = "Software\\Wow6432Node\\GNU\\GnuPG";
 
 	QString dir;
-	if (getRegKey(HKEY_CURRENT_USER, path, dir)) {}
-	else if (getRegKey(HKEY_CURRENT_USER, path2, dir)) {}
-	else if (getRegKey(HKEY_LOCAL_MACHINE, path, dir)) {}
-	else if (getRegKey(HKEY_LOCAL_MACHINE, path2, dir)) {}
+	getRegKey(HKEY_CURRENT_USER, path, dir)  ||
+	getRegKey(HKEY_CURRENT_USER, path2, dir) ||
+	getRegKey(HKEY_LOCAL_MACHINE, path, dir) ||
+	getRegKey(HKEY_LOCAL_MACHINE, path2, dir);
 
 	if (!dir.isEmpty())	{
-		foreach (QString bin, bins) {
+		foreach (const QString &bin, bins) {
 			if (checkBin(dir + "\\" + bin)) {
 				return dir + "\\" + bin;
 			}
@@ -99,7 +99,7 @@ QString GpgProcess::findBin() const
 #endif
 
 	// Prefer bundled gpg
-	foreach (QString bin, bins)	{
+	foreach (const QString &bin, bins)	{
 		if (checkBin(QCoreApplication::applicationDirPath() + "/" + bin)) {
 			return QCoreApplication::applicationDirPath() + "/" + bin;
 		}
@@ -131,8 +131,8 @@ QString GpgProcess::findBin() const
 #endif
 	paths.removeDuplicates();
 
-	foreach (QString path, paths) {
-		foreach (QString bin, bins) {
+	foreach (const QString &path, paths) {
+		foreach (const QString &bin, bins) {
 			if (checkBin(path + "/" + bin)) {
 				return path + "/" + bin;
 			}
@@ -163,7 +163,7 @@ bool GpgProcess::info(QString &message)
 		}
 	}
 	else {
-		message = trUtf8("GnuPG pgogram not found");
+		message = trUtf8("GnuPG program not found");
 	}
 
 	return res;
