@@ -29,6 +29,9 @@ KNOWN ISSUES
 
 CHANGES
 
+  0.9.5
+    -Add support of libotr >= 4.0.0.
+
   0.9.5pre
     -Ignore internal messages, report state changes and notifications
      via system messages
@@ -133,7 +136,7 @@ all people who sent patches. Especially to specThor <specthor@web.de>
 for UTF8 patches, Hannes Mehnert <hannes@mehnert.org> for chatdialog.
 Rolf Wuerdemann <rowue@digitalis.org> for configure patch and several
 bugfixes. Thanks to wadealer from Psi+ for adapting and including the
-patches into Psi+.
+patches into Psi+. Thanks to Boris Pek for porting to libotr >= 4.0.0.
 
 
 

@@ -4,6 +4,7 @@
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
  *                    2011  Florian Fieber
+ *                    2013  Boris Pek (tehnick-8@mail.ru)
  *
  * This program was originally written as part of a diplom thesis
  * advised by Prof. Dr. Ruediger Weis (PST Labor)
@@ -37,6 +38,9 @@ extern "C"
 #include <libotr/proto.h>
 #include <libotr/message.h>
 #include <libotr/privkey.h>
+#if (OTRL_VERSION_MAJOR >= 4)
+#include <libotr/instag.h>
+#endif
 #include "otrlextensions.h"
 }
 
@@ -118,14 +122,7 @@ public:
                      const char* recipient);
     void inject_message(const char* accountname, const char* protocol,
                         const char* recipient, const char* message);
-    void notify(OtrlNotifyLevel level, const char* accountname,
-                const char* protocol, const char* username, const char* title,
-                const char* primary, const char* secondary);
-    int display_otr_message(const char* accountname, const char* protocol,
-                            const char* username, const char* msg);
     void update_context_list();
-    const char* protocol_name(const char* protocol);
-    void protocol_name_free(const char* protocol_name);
     void new_fingerprint(OtrlUserState us, const char* accountname,
                          const char* protocol, const char* username,
                          unsigned char fingerprint[20]);
@@ -133,7 +130,21 @@ public:
     void gone_secure(ConnContext* context);
     void gone_insecure(ConnContext* context);
     void still_secure(ConnContext* context, int is_reply);
+#if (OTRL_VERSION_MAJOR >= 4)
+    void handle_msg_event(OtrlMessageEvent msg_event, ConnContext* context,
+                          const char* message, gcry_error_t err);
+    void handle_smp_event(OtrlSMPEvent smp_event, ConnContext* context,
+                          unsigned short progress_percent, char* question);
+#else
     void log_message(const char* message);
+    void notify(OtrlNotifyLevel level, const char* accountname,
+                const char* protocol, const char* username, const char* title,
+                const char* primary, const char* secondary);
+    int display_otr_message(const char* accountname, const char* protocol,
+                            const char* username, const char* msg);
+    const char* protocol_name(const char* protocol);
+    void protocol_name_free(const char* protocol_name);
+#endif
 
     const char* account_name(const char* account,
                              const char* protocol);
@@ -149,16 +160,7 @@ public:
     static void cb_inject_message(void* opdata, const char* accountname,
                                   const char* protocol, const char* recipient,
                                   const char* message);
-    static void cb_notify(void* opdata, OtrlNotifyLevel level,
-                          const char* accountname, const char* protocol,
-                          const char* username, const char* title,
-                          const char* primary, const char* secondary);
-    static int cb_display_otr_message(void* opdata, const char* accountname,
-                                      const char* protocol, const char* username,
-                                      const char* msg);
     static void cb_update_context_list(void* opdata);
-    static const char* cb_protocol_name(void* opdata, const char* protocol);
-    static void cb_protocol_name_free(void* opdata, const char* protocol_name);
     static void cb_new_fingerprint(void* opdata, OtrlUserState us,
                                    const char* accountname, const char* protocol,
                                    const char* username, unsigned char fingerprint[20]);
@@ -166,7 +168,25 @@ public:
     static void cb_gone_secure(void* opdata, ConnContext* context);
     static void cb_gone_insecure(void* opdata, ConnContext* context);
     static void cb_still_secure(void* opdata, ConnContext* context, int is_reply);
+#if (OTRL_VERSION_MAJOR >= 4)
+    static void cb_handle_msg_event(void* opdata, OtrlMessageEvent msg_event,
+                                    ConnContext* context, const char* message,
+                                    gcry_error_t err);
+    static void cb_handle_smp_event(void* opdata, OtrlSMPEvent smp_event,
+                                    ConnContext* context, unsigned short progress_percent,
+                                    char* question);
+#else
     static void cb_log_message(void* opdata, const char* message);
+    static void cb_notify(void* opdata, OtrlNotifyLevel level,
+                          const char* accountname, const char* protocol,
+                          const char* username, const char* title,
+                          const char* primary, const char* secondary);
+    static int cb_display_otr_message(void* opdata, const char* accountname,
+                                      const char* protocol, const char* username,
+                                      const char* msg);
+    static const char* cb_protocol_name(void* opdata, const char* protocol);
+    static void cb_protocol_name_free(void* opdata, const char* protocol_name);
+#endif
 
     static const char* cb_account_name(void* opdata, const char* account, const char* protocol);
     static void cb_account_name_free(void* opdata, const char* account_name);
