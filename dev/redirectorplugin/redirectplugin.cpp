@@ -21,82 +21,16 @@
 #include <QDomElement>
 #include <QDateTime>
 
-#include "psiplugin.h"
-#include "optionaccessor.h"
+#include "redirectplugin.h"
+
 #include "optionaccessinghost.h"
-#include "stanzafilter.h"
-#include "stanzasender.h"
 #include "stanzasendinghost.h"
-#include "accountinfoaccessor.h"
 #include "accountinfoaccessinghost.h"
-#include "applicationinfoaccessor.h"
 #include "applicationinfoaccessinghost.h"
-#include "popupaccessor.h"
-#include "popupaccessinghost.h"
-#include "iconfactoryaccessor.h"
-#include "iconfactoryaccessinghost.h"
-#include "plugininfoprovider.h"
 #include "contactinfoaccessinghost.h"
-#include "contactinfoaccessor.h"
 
-#include "ui_options.h"
 
-#define cVer "0.0.1"
-
-class Redirector: public QObject, public PsiPlugin, public OptionAccessor, public StanzaSender,  public StanzaFilter,
-public AccountInfoAccessor, public ApplicationInfoAccessor,
-public PluginInfoProvider, public ContactInfoAccessor
-{
-	Q_OBJECT
-	Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter AccountInfoAccessor ApplicationInfoAccessor
-				 PluginInfoProvider ContactInfoAccessor)
-
-public:
-	inline Redirector() : enabled(false)
-	  , psiOptions(0)
-	  , stanzaHost(0)
-	  , accInfoHost(0)
-	  , appInfoHost(0)
-	  , contactInfo(0) {}
-	QString name() const { return "Redirect Plugin"; }
-	QString shortName() const { return "redirect"; }
-	QString version() const { return cVer; }
-	//PsiPlugin::Priority priority() {return PriorityNormal;}
-	QWidget* options();
-	bool enable();
-	bool disable();
-	void applyOptions();
-	void restoreOptions();
-	void setOptionAccessingHost(OptionAccessingHost* host) { psiOptions = host; }
-	void optionChanged(const QString& ) {}
-	void setStanzaSendingHost(StanzaSendingHost *host) { stanzaHost = host; }
-	bool incomingStanza(int account, const QDomElement& xml);
-	bool outgoingStanza(int account, QDomElement& xml);
-	void setAccountInfoAccessingHost(AccountInfoAccessingHost* host) { accInfoHost = host; }
-	void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host) { appInfoHost = host; }
-	void setContactInfoAccessingHost(ContactInfoAccessingHost* host) { contactInfo = host; }
-	QString pluginInfo();
-
-private slots:
-
-private:
-	QString targetJid;
-	QHash<QString, int> contactIdMap;
-	int nextContactId;
-	int targetAccount;
-	QWidget *options_;
-
-	bool enabled;
-	OptionAccessingHost* psiOptions;
-	StanzaSendingHost* stanzaHost;
-	AccountInfoAccessingHost *accInfoHost;
-	ApplicationInfoAccessingHost *appInfoHost;
-	ContactInfoAccessingHost* contactInfo;
-
-	Ui::Options ui_;
-};
-
-Q_EXPORT_PLUGIN(Redirector);
+Q_EXPORT_PLUGIN2(redirectplugin, Redirector)
 
 
 bool Redirector::enable() {
@@ -116,7 +50,6 @@ void Redirector::applyOptions() {
 		return;
 
 	targetJid = ui_.le_jid->text();
-	targetAccount = contactInfo->findOnlineAccountFor(targetJid);
 	psiOptions->setPluginOption("jid", targetJid);
 }
 
@@ -141,7 +74,13 @@ QWidget* Redirector::options() {
 }
 
 bool Redirector::incomingStanza(int account, const QDomElement& stanza) {
+	Q_UNUSED(account)
+
 	if (!enabled || stanza.tagName() != "message") {
+		return false;
+	}
+	int targetAccount = accInfoHost->findOnlineAccountForContact(targetJid);
+	if (targetAccount == -1) {
 		return false;
 	}
 
@@ -182,5 +121,3 @@ QString Redirector::pluginInfo() {
 			+ tr("Email: ") + "rion4ik@gmail.com\n\n"
 			+ trUtf8("Redirects all incoming messages to some jid and allows to redirect messages back.");
 }
-
-#include "redirectplugin.moc"

@@ -7,5 +7,5 @@ exists($$sdkdir) {
     include(../../psiplugin.pri)
 }
 SOURCES += redirectplugin.cpp
-HEADERS +=
+HEADERS += redirectplugin.h
 FORMS += options.ui
