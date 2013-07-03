@@ -20,6 +20,7 @@
 
 #include <QDomElement>
 #include <QDateTime>
+#include <QTextDocument>
 
 #include "redirectplugin.h"
 
@@ -36,6 +37,7 @@ Q_EXPORT_PLUGIN2(redirectplugin, Redirector)
 bool Redirector::enable() {
 	if (psiOptions) {
 		enabled = true;
+		targetJid = psiOptions->getPluginOption("jid").toString();
 	}
 	return enabled;
 }
@@ -80,11 +82,10 @@ bool Redirector::incomingStanza(int account, const QDomElement& stanza) {
 		return false;
 	}
 	int targetAccount = accInfoHost->findOnlineAccountForContact(targetJid);
-	if (targetAccount == -1) {
+	QDomNodeList bodies = stanza.elementsByTagName("body");
+	if (targetAccount == -1 || bodies.count() == 0) {
 		return false;
 	}
-
-	// redirect only messages atm
 
 	int contactId;
 	QString from = stanza.attribute("from");
@@ -99,8 +100,9 @@ bool Redirector::incomingStanza(int account, const QDomElement& stanza) {
 		contactIdMap.insert(from, nextContactId);
 		contactId = nextContactId++;
 	}
-	e.appendChild(doc.createElement("body").appendChild(
-					  doc.createTextNode(QString("#%1").arg(contactId))));
+	QDomElement body = doc.createElement("body");
+	e.appendChild(body);
+	body.appendChild(doc.createTextNode(QString("#%1 %2").arg(contactId).arg(Qt::escape(bodies.at(0).toElement().text()))));
 	QDomElement forward = e.appendChild(doc.createElementNS("urn:xmpp:forward:0", "forwarded")).toElement();
 	forward.appendChild(doc.createElementNS("urn:xmpp:delay", "delay")).toElement()
 			.setAttribute("stamp", QDateTime::currentDateTimeUtc().toString("yyyy-MM-ddThh:mm:ssZ"));
