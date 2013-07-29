@@ -934,9 +934,11 @@ void JuickPlugin::elementFromString(QDomElement* body,QDomDocument* e, const QSt
 void JuickPlugin::addAvatar(QDomElement* body, QDomDocument* doc, const QString& msg, const QString& jidToSend, const QString& ujid)
 {
 	QDomElement table = doc->createElement("table");
+	table.setAttribute("style", "word-wrap:break-word; table-layout: fixed; width:100%");
 	QDomElement tableRow = doc->createElement("tr");
 	QDomElement td1 = doc->createElement("td");
 	td1.setAttribute("valign","top");
+	td1.setAttribute("style", "width:50px");
 	QDomElement td2 = doc->createElement("td");
 	QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
 	if (dir.exists()) {
