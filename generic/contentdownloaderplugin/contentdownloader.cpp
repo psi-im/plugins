@@ -1,17 +1,17 @@
 /*
  * contentdownloader.cpp - plugin interface
  * Copyright (C) 2010  Ivan Romanov <drizt@land.ru>
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -50,7 +50,7 @@ QString ContentDownloader::shortName() const
 
 QString ContentDownloader::version() const
 {
-	return "0.2.2";
+	return "0.2.3";
 }
 
 QWidget *ContentDownloader::options()
@@ -70,9 +70,9 @@ QWidget *ContentDownloader::options()
 	} else {
 		type = QNetworkProxy::HttpProxy;
 	}
-	
+
 	QNetworkProxy proxy(type, psiProxy.host, psiProxy.port, psiProxy.user, psiProxy.pass);
-	
+
 	form_ = new Form();
 	form_->setDataDir(appInfoHost->appHomeDir(ApplicationInfoAccessingHost::DataLocation));
 	form_->setCacheDir(appInfoHost->appHomeDir(ApplicationInfoAccessingHost::CacheLocation));
@@ -106,7 +106,7 @@ void ContentDownloader::restoreOptions()
 {
 }
 
-void ContentDownloader::setOptionAccessingHost(OptionAccessingHost *host) 
+void ContentDownloader::setOptionAccessingHost(OptionAccessingHost *host)
 {
 	psiOptions = host;
 }
