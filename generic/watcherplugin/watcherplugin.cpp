@@ -49,7 +49,7 @@
 #include "soundaccessor.h"
 
 
-#define constVersion "0.4.1"
+#define constVersion "0.4.2"
 
 #define constSoundFile "sndfl"
 #define constInterval "intrvl"
@@ -594,7 +594,7 @@ void Watcher::editItemAct() {
 		EditItemDlg *eid = new EditItemDlg(icoHost, psiOptions, optionsWid);
 		eid->init(wi->settingsString());
 		connect(eid, SIGNAL(testSound(QString)), this, SLOT(playSound(QString)));
-		connect(eid, SIGNAL(dlgAccepted(QString)), this, SLOT(editCurrentItem(QString)));		
+		connect(eid, SIGNAL(dlgAccepted(QString)), this, SLOT(editCurrentItem(QString)));
 		eid->show();
 	}
 }
@@ -626,4 +626,3 @@ QString Watcher::pluginInfo() {
 }
 
 #include "watcherplugin.moc"
-

@@ -52,7 +52,7 @@ void Viewer::keyPressEvent(QKeyEvent * e)
         if (e->key() == Qt::Key_Space) {
                 foreach(const QModelIndex &check, selectionModel()->selectedRows(0)) {
                         model()->setData(check, 3); //invert
-                }                
+                }
         } else {
                 QTableView::keyPressEvent(e);
         }
@@ -91,7 +91,7 @@ void Viewer::contextMenuEvent( QContextMenuEvent * e )
 void Viewer::itemClicked(const QModelIndex& index)
 {
 	if(index.column() == 0) {
-		model()->setData(currentIndex(), 3); //invert
+		model()->setData(index, 3); //invert
 	} else if(index.column() == 4) {
 		emit checkSound(index);
 	} else if(index.column() == 3) {
