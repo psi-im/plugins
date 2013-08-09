@@ -64,8 +64,8 @@ void EditItemDlg::init(const QString &settings)
 void EditItemDlg::getFileName()
 {
 	QString fileName = QFileDialog::getOpenFileName(0,tr("Choose a sound file"),
-							psiOptions->getPluginOption(constLastFile, QVariant("")).toString(),
-							tr("Sound (*.wav)"));
+													psiOptions->getPluginOption(constLastFile, QVariant("")).toString(),
+													tr("Sound (*.wav)"));
 	if(fileName.isEmpty())
 		return;
 	QFileInfo fi(fileName);

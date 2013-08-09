@@ -27,25 +27,25 @@
 
 class Model : public QAbstractTableModel
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
 	Model(const QStringList& watchedJids_, const QStringList& Sounds_, QObject *parent = 0);
-        ~Model() {};
-        virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
-        virtual QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
-        virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
-        virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
-        virtual int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
-        virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
-        QString jid(const QModelIndex & index) const;
-        QString soundFile(const QModelIndex & index) const;
-        QString tmpSoundFile(const QModelIndex & index) const;
-        void apply();
-        void deleteSelected();
-        void reset();
-        void selectAll();
-        void unselectAll();
+	~Model() {};
+	virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
+	virtual QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
+	virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
+	virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
+	virtual int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
+	virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
+	QString jid(const QModelIndex & index) const;
+	QString soundFile(const QModelIndex & index) const;
+	QString tmpSoundFile(const QModelIndex & index) const;
+	void apply();
+	void deleteSelected();
+	void reset();
+	void selectAll();
+	void unselectAll();
 	void addRow(const QString& jid = "");
 	void deleteRow(const QString& jid);
 	void setStatusForJid(const QString& jid, const QString& status);
@@ -56,9 +56,9 @@ public:
 	QStringList getSounds() const;
 
 private:
-        QStringList headers, watchedJids, tmpWatchedJids_, sounds, tmpSounds_;
-        QMap<QString, QString> statuses;
-        QList<bool> selected;        
+	QStringList headers, watchedJids, tmpWatchedJids_, sounds, tmpSounds_;
+	QMap<QString, QString> statuses;
+	QList<bool> selected;
 };
 
 

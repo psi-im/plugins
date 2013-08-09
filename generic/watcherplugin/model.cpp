@@ -21,9 +21,9 @@
 #include "model.h"
 
 Model::Model(const QStringList& watchedJids_, const QStringList& Sounds_, QObject* parent)
-        : QAbstractTableModel(parent)
-        , watchedJids(watchedJids_)
-        , sounds(Sounds_)
+	: QAbstractTableModel(parent)
+	, watchedJids(watchedJids_)
+	, sounds(Sounds_)
 {
 	headers << tr("")
 			<< tr("Watch for JIDs")
@@ -40,12 +40,12 @@ Model::Model(const QStringList& watchedJids_, const QStringList& Sounds_, QObjec
 QVariant Model::headerData ( int section, Qt::Orientation orientation, int role) const
 {
 	if (role == Qt::DisplayRole) {
-                if (orientation == Qt::Horizontal) {
-                        return headers.at(section);
-                } else {
-                        return section+1;
-                }
-        } else
+		if (orientation == Qt::Horizontal) {
+			return headers.at(section);
+		} else {
+			return section+1;
+		}
+	} else
 		return QVariant();
 }
 
@@ -81,33 +81,33 @@ QVariant Model::data(const QModelIndex & index, int role) const
 	int i = index.column();
 	switch(i) {
 	case(0):
-                if (role == Qt::CheckStateRole) {
-                        return selected.at(index.row()) ? 2:0;
-                } else if (role == Qt::TextAlignmentRole) {
-                        return (int)(Qt::AlignRight | Qt::AlignVCenter);
-                } else if (role == Qt::DisplayRole)
-                        return QVariant("");
-             case(1):
-                if (role == Qt::TextAlignmentRole) {
-                        return (int)(Qt::AlignRight | Qt::AlignVCenter);
-                } else if (role == Qt::DisplayRole)
+		if (role == Qt::CheckStateRole) {
+			return selected.at(index.row()) ? 2:0;
+		} else if (role == Qt::TextAlignmentRole) {
+			return (int)(Qt::AlignRight | Qt::AlignVCenter);
+		} else if (role == Qt::DisplayRole)
+			return QVariant("");
+	case(1):
+		if (role == Qt::TextAlignmentRole) {
+			return (int)(Qt::AlignRight | Qt::AlignVCenter);
+		} else if (role == Qt::DisplayRole)
 			return QVariant(tmpWatchedJids_.at(index.row()));
-             case(2):
-                if (role == Qt::TextAlignmentRole) {
-                        return (int)(Qt::AlignRight | Qt::AlignVCenter);
-                } else if (role == Qt::DisplayRole)
-                        return QVariant(tmpSounds_.at(index.row()));
-             case(3):
+	case(2):
 		if (role == Qt::TextAlignmentRole) {
-                        return (int)(Qt::AlignRight | Qt::AlignVCenter);
-                } else if (role == Qt::DisplayRole)
-			return QVariant();
-             case(4):
+			return (int)(Qt::AlignRight | Qt::AlignVCenter);
+		} else if (role == Qt::DisplayRole)
+			return QVariant(tmpSounds_.at(index.row()));
+	case(3):
 		if (role == Qt::TextAlignmentRole) {
-                        return (int)(Qt::AlignRight | Qt::AlignVCenter);
-                } else if (role == Qt::DisplayRole)
+			return (int)(Qt::AlignRight | Qt::AlignVCenter);
+		} else if (role == Qt::DisplayRole)
 			return QVariant();
-        }
+	case(4):
+		if (role == Qt::TextAlignmentRole) {
+			return (int)(Qt::AlignRight | Qt::AlignVCenter);
+		} else if (role == Qt::DisplayRole)
+			return QVariant();
+	}
 	return QVariant();
 }
 
@@ -226,7 +226,7 @@ void Model::addRow(const QString& jid)
 	tmpWatchedJids_ << jid;
 	tmpSounds_ << "";
 
-	if(!jid.isEmpty()) {      //вызов происходит из меню контакта
+	if(!jid.isEmpty()) {	  //вызов происходит из меню контакта
 		watchedJids.append(jid);
 		sounds.append("");
 	}

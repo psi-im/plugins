@@ -25,7 +25,7 @@
 
 QSize IconDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const QModelIndex& index) const
 {
-	if(index.isValid())  {
+	if(index.isValid())	 {
 		return QSize (18,18);
 	}
 
@@ -40,19 +40,19 @@ void IconDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & opti
 
 	QPalette palette = option.palette;
 	QColor c = (option.state & QStyle::State_Selected) ?
-		   palette.color(QPalette::Highlight) : palette.color(QPalette::Base);
+	palette.color(QPalette::Highlight) : palette.color(QPalette::Base);
 
 	painter->fillRect(rect, c);
 
 	QPalette::ColorGroup cg = option.state & QStyle::State_Enabled
-                                  ? QPalette::Normal : QPalette::Disabled;
+	? QPalette::Normal : QPalette::Disabled;
 
 
 	if (option.state & QStyle::State_Selected) {
-                painter->setPen(palette.color(cg, QPalette::HighlightedText));
+		painter->setPen(palette.color(cg, QPalette::HighlightedText));
 	}
 	else {
-                painter->setPen(palette.color(cg, QPalette::Text));
+		painter->setPen(palette.color(cg, QPalette::Text));
 	}
 
 	QPixmap pix;
