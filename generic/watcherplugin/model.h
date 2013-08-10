@@ -30,7 +30,7 @@ class Model : public QAbstractTableModel
 	Q_OBJECT
 
 public:
-	Model(const QStringList& watchedJids_, const QStringList& Sounds_, QObject *parent = 0);
+	Model(const QStringList& watchedJids_, const QStringList& Sounds_, const QStringList& enabledJids_, QObject *parent = 0);
 	~Model() {};
 	virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
 	virtual QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
@@ -42,10 +42,9 @@ public:
 	QString soundFile(const QModelIndex & index) const;
 	QString tmpSoundFile(const QModelIndex & index) const;
 	void apply();
-	void deleteSelected();
+	void deleteRows(const QModelIndexList &indexList);
+	bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
 	void reset();
-	void selectAll();
-	void unselectAll();
 	void addRow(const QString& jid = "");
 	void deleteRow(const QString& jid);
 	void setStatusForJid(const QString& jid, const QString& status);
@@ -54,11 +53,14 @@ public:
 	int indexByJid(const QString& jid) const;
 	QStringList getWatchedJids() const;
 	QStringList getSounds() const;
+	QStringList getEnabledJids() const;
+	void setJidEnabled(const QString& jid, bool enabled);
+	bool jidEnabled(const QString& jid);
 
 private:
-	QStringList headers, watchedJids, tmpWatchedJids_, sounds, tmpSounds_;
+	QStringList headers, watchedJids, tmpWatchedJids_, sounds, tmpSounds_, enabledJids;
 	QMap<QString, QString> statuses;
-	QList<bool> selected;
+	QList<bool> tmpEnabledJids_;
 };
 
 

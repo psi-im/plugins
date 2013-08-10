@@ -13,3 +13,4 @@ HEADERS += view.h \
     edititemdlg.h
 FORMS += options.ui \
     edititemdlg.ui
+RESOURCES += resources.qrc

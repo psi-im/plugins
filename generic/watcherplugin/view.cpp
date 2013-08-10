@@ -19,6 +19,7 @@
  */
 
 #include "view.h"
+#include "model.h"
 
 #include <QHeaderView>
 #include <QMenu>
@@ -101,4 +102,10 @@ void Viewer::itemClicked(const QModelIndex& index)
 	} else if(index.column() == 3) {
 		emit getSound(index);
 	}
+}
+
+void Viewer::deleteSelected()
+{
+	QItemSelectionModel *selection = selectionModel();
+	qobject_cast<Model*>(model())->deleteRows(selection->selectedRows());
 }

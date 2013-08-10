@@ -20,10 +20,11 @@
 
 #include "model.h"
 
-Model::Model(const QStringList& watchedJids_, const QStringList& Sounds_, QObject* parent)
+Model::Model(const QStringList& watchedJids_, const QStringList& Sounds_, const QStringList& enabledJids_, QObject* parent)
 	: QAbstractTableModel(parent)
 	, watchedJids(watchedJids_)
 	, sounds(Sounds_)
+	, enabledJids(enabledJids_)
 {
 	headers << tr("")
 			<< tr("Watch for JIDs")
@@ -31,10 +32,12 @@ Model::Model(const QStringList& watchedJids_, const QStringList& Sounds_, QObjec
 			<< tr("")
 			<< tr("");
 
-	unselectAll();
-
 	tmpWatchedJids_ = watchedJids;
 	tmpSounds_ = sounds;
+
+	foreach (QString enabledJid, enabledJids_) {
+		tmpEnabledJids_ << (enabledJid == "true" ? true : false);
+	}
 }
 
 QVariant Model::headerData ( int section, Qt::Orientation orientation, int role) const
@@ -80,29 +83,29 @@ QVariant Model::data(const QModelIndex & index, int role) const
 
 	int i = index.column();
 	switch(i) {
-	case(0):
+	case 0:
 		if (role == Qt::CheckStateRole) {
-			return selected.at(index.row()) ? 2:0;
+			return tmpEnabledJids_.at(index.row()) ? 2:0;
 		} else if (role == Qt::TextAlignmentRole) {
 			return (int)(Qt::AlignRight | Qt::AlignVCenter);
 		} else if (role == Qt::DisplayRole)
 			return QVariant("");
-	case(1):
+	case 1:
 		if (role == Qt::TextAlignmentRole) {
 			return (int)(Qt::AlignRight | Qt::AlignVCenter);
 		} else if (role == Qt::DisplayRole)
 			return QVariant(tmpWatchedJids_.at(index.row()));
-	case(2):
+	case 2:
 		if (role == Qt::TextAlignmentRole) {
 			return (int)(Qt::AlignRight | Qt::AlignVCenter);
 		} else if (role == Qt::DisplayRole)
 			return QVariant(tmpSounds_.at(index.row()));
-	case(3):
+	case 3:
 		if (role == Qt::TextAlignmentRole) {
 			return (int)(Qt::AlignRight | Qt::AlignVCenter);
 		} else if (role == Qt::DisplayRole)
 			return QVariant();
-	case(4):
+	case 4:
 		if (role == Qt::TextAlignmentRole) {
 			return (int)(Qt::AlignRight | Qt::AlignVCenter);
 		} else if (role == Qt::DisplayRole)
@@ -142,16 +145,16 @@ bool Model::setData(const QModelIndex & index, const QVariant & value, int role)
 
 	int column = index.column();
 	if(column == 0) {
-		bool b = selected.at( index.row() );
+		bool b = tmpEnabledJids_.at( index.row() );
 		switch(value.toInt()) {
-		case(0):
-			selected.replace( index.row(), false);
+		case 0:
+			tmpEnabledJids_.replace( index.row(), false);
 			break;
-		case(2):
-			selected.replace( index.row(), true);
+		case 2:
+			tmpEnabledJids_.replace( index.row(), true);
 			break;
-		case(3):
-			selected.replace( index.row(), !b);
+		case 3:
+			tmpEnabledJids_.replace( index.row(), !b);
 			break;
 		}
 	}
@@ -171,53 +174,47 @@ void Model::setStatusForJid(const QString& jid, const QString& status)
 	statuses.insert(jid, status);
 }
 
-void Model::deleteSelected()
+void Model::deleteRows(const QModelIndexList &indexList)
 {
-	emit layoutAboutToBeChanged ();
-	QStringList tmpJids, tmpSounds;
-	for(int i=0; i<watchedJids.size(); i++) {
-		if(!selected.at(i)) {
-			tmpJids.append(watchedJids.at(i));
-			tmpSounds.append(sounds.at(i));
-		}
+	QList<bool> selected;
+	for (int i = 0; i < tmpWatchedJids_.size(); i++) {
+		selected << false;
 	}
 
-	tmpWatchedJids_.clear();
-	tmpSounds_.clear();
-	tmpWatchedJids_ = tmpJids;
-	tmpSounds_ = tmpSounds;
+	foreach (QModelIndex index, indexList) {
+		selected[index.row()] = true;
+	}
 
-	unselectAll();
+	QStringList tmpJids, tmpSounds;
+	QList<bool> tmpEnabledJids;
+	for (int i = tmpWatchedJids_.size() - 1; i >= 0; i--) {
+		if(selected.at(i)) {
+			removeRow(i);
+		}
+	}
+}
+
+bool Model::removeRows(int row, int count, const QModelIndex &parent)
+{
+	beginRemoveRows(parent, row, row + count - 1);
+	for (int i = 0; i < count; i++) {
+		tmpWatchedJids_.removeAt(row);
+		tmpSounds_.removeAt(row);
+		tmpEnabledJids_.removeAt(row);
+	}
+	endRemoveRows();
+	return true;
 }
 
 void Model::reset()
 {
 	tmpWatchedJids_ = watchedJids;
 	tmpSounds_ = sounds;
-	unselectAll();
-}
 
-void Model::selectAll()
-{
-	selected.clear();
-
-	foreach(QString jid, tmpWatchedJids_) {
-		Q_UNUSED(jid);
-		selected.append(true);
+	tmpEnabledJids_.clear();
+	foreach (QString enabledJid, enabledJids) {
+		tmpEnabledJids_ << (enabledJid == "true" ? true : false);
 	}
-
-	emit layoutChanged();
-}
-
-void Model::unselectAll()
-{
-	selected.clear();
-
-	foreach(QString jid, watchedJids) {
-		selected.append(false);
-	}
-
-	emit layoutChanged();
 }
 
 void Model::addRow(const QString& jid)
@@ -229,9 +226,10 @@ void Model::addRow(const QString& jid)
 	if(!jid.isEmpty()) {	  //вызов происходит из меню контакта
 		watchedJids.append(jid);
 		sounds.append("");
+		enabledJids.append("true");
 	}
 
-	selected.append(false);
+	tmpEnabledJids_.append(true);
 	endInsertRows();
 }
 
@@ -244,7 +242,7 @@ void Model::deleteRow(const QString& jid)
 	sounds.removeAt(index);
 	tmpWatchedJids_.removeAt(index);
 	tmpSounds_.removeAt(index);
-	selected.removeAt(index);
+	tmpEnabledJids_.removeAt(index);
 
 	emit layoutChanged();
 }
@@ -253,6 +251,10 @@ void Model::apply()
 {
 	watchedJids =  tmpWatchedJids_;
 	sounds = tmpSounds_;
+	enabledJids.clear();
+	foreach (bool enabledJid, tmpEnabledJids_) {
+		enabledJids << (enabledJid ? "true" : "false");
+	}
 }
 
 QString Model::statusByJid(const QString& jid) const
@@ -283,4 +285,36 @@ QStringList Model::getWatchedJids() const
 QStringList Model::getSounds() const
 {
 	return sounds;
+}
+
+QStringList Model::getEnabledJids() const
+{
+	return enabledJids;
+}
+
+void Model::setJidEnabled(const QString& jid, bool enabled)
+{
+	// Do nothing if need to disable jid which is not in watcher list
+	if (!getWatchedJids().contains(jid, Qt::CaseInsensitive) && !enabled) {
+		return;
+	}
+
+	// Before add Jid to watcher list
+	if (!getWatchedJids().contains(jid, Qt::CaseInsensitive)) {
+		addRow(jid);
+	}
+
+	QModelIndex ind = index(indexByJid(jid), 0);
+	setData(ind, enabled ? 2 : 0);
+}
+
+bool Model::jidEnabled(const QString& jid)
+{
+	// watcher doesn't applied for this jid
+	if (!getWatchedJids().contains(jid, Qt::CaseInsensitive	)) {
+		return false;
+	}
+
+	QModelIndex ind = index(indexByJid(jid), 0);
+	return (data(ind, Qt::CheckStateRole) == 2) ? true : false;
 }

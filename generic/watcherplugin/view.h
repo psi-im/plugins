@@ -33,6 +33,7 @@ class Viewer : public QTableView
 public:
 	Viewer(QWidget *parent = 0) : QTableView(parent) {};
 	void init(IconFactoryAccessingHost *iconHost);
+	void deleteSelected();
 
 private:
 	IconFactoryAccessingHost *iconHost_;

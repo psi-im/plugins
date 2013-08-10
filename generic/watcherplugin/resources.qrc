@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>watcher_on.png</file>
+        <file>watcher.png</file>
+    </qresource>
+</RCC>
