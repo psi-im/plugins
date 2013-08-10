@@ -256,6 +256,7 @@ bool Watcher::disable() {
 	qDeleteAll(items_);
 	qDeleteAll(actions_);
 	items_.clear();
+	actions_.clear();
 
 	popup->unregisterOption(POPUP_OPTION_NAME);
 	enabled = false;
