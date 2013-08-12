@@ -578,7 +578,7 @@ void Watcher::actionActivated()
 
 void Watcher::removeFromActions(QObject *object)
 {
-	actions_.remove(actions_.key(qobject_cast<QAction*>(object)));
+	actions_.remove(object->property("jid").toString());
 }
 
 void Watcher::playSound(const QString& f) {
