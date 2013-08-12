@@ -255,6 +255,7 @@ bool Watcher::disable() {
 
 	qDeleteAll(items_);
 	foreach (QAction* action, actions_) {
+		action->disconnect();
 		action->deleteLater();
 	}
 	items_.clear();
