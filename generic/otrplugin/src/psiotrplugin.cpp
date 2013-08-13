@@ -141,7 +141,7 @@ QString PsiOtrPlugin::shortName() const
 
 QString PsiOtrPlugin::version() const
 {
-    return "0.9.5";
+    return "0.9.6";
 }
 
 // ---------------------------------------------------------------------------
@@ -219,6 +219,11 @@ void PsiOtrPlugin::applyOptions()
 
 void PsiOtrPlugin::restoreOptions()
 {
+}
+
+QIcon PsiOtrPlugin::icon() const
+{
+	return QIcon(":/otrplugin/otr_yes.png");
 }
 
 //-----------------------------------------------------------------------------

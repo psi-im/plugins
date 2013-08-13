@@ -43,7 +43,7 @@
 
 #include "ui_options.h"
 
-#define cVer "0.1.1"
+#define cVer "0.1.2"
 
 #define constInterval "intrvl"
 #define constAction "action"
@@ -92,6 +92,7 @@ public:
 	virtual bool incomingStanza(int account, const QDomElement& xml);
 	virtual bool outgoingStanza(int , QDomElement &) { return false; }
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 private slots:
 	void menuActivated();
@@ -375,7 +376,7 @@ bool ExtendedMenuPlugin::incomingStanza(int account, const QDomElement &xml)
 										}
 										else {
 											text = tr("%1 uptime is %2").arg(jid, secondsToString(secs));
-										}										
+										}
 									}
 									else {
 										text = tr("%1 is online!").arg(jid);
@@ -612,6 +613,11 @@ QString ExtendedMenuPlugin::pluginInfo()
 	return tr("Author: ") +  "Dealer_WeARE\n"
 			+ tr("Email: ") + "wadealer@gmail.com\n\n"
 			+ tr("This plugin adds several additional commands into contacts context menu.");
+}
+
+QIcon ExtendedMenuPlugin::icon() const
+{
+	return QIcon(":/icons/extendedmenu.png");
 }
 
 #include "extendedmenuplugin.moc"

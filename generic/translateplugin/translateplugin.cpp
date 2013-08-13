@@ -37,7 +37,7 @@
 #define constNew "newsymbol"
 #define constShortCut "shortcut"
 #define constNotTranslate "nottranslate"
-#define constVersion "0.4.3"
+#define constVersion "0.4.4"
 
 static const QString mucData = "groupchat";
 static const QString chatData = "chat";
@@ -63,7 +63,7 @@ public:
         // OptionAccessor
         virtual void setOptionAccessingHost(OptionAccessingHost* host);
         virtual void optionChanged(const QString& option);
-	
+
 	// ShortcutsAccessor
 	virtual void setShortcutAccessingHost(ShortcutAccessingHost* host);
 	virtual void setShortcuts();
@@ -77,6 +77,7 @@ public:
 	virtual QAction* getGCAction(QObject* parent, int account, const QString& contact);
 
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 private slots:
         void trans();
@@ -577,6 +578,11 @@ QString TranslatePlugin::pluginInfo()
 {
 	return tr("Author: ") +  "VampiRUS\n\n"
 			+ trUtf8("This plugin allows you to convert selected text into another language.\n");
+}
+
+QIcon TranslatePlugin::icon() const
+{
+	return QIcon(":/icons/translate.png");
 }
 
 #include "translateplugin.moc"

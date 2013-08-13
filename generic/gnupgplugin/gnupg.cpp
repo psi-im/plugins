@@ -98,6 +98,11 @@ void GnuPG::restoreOptions()
 {
 }
 
+QIcon GnuPG::icon() const
+{
+	return QIcon(":/icons/gnupg.png");
+}
+
 QString GnuPG::pluginInfo()
 {
 	return tr("Author: ") +	 "Ivan Romanov\n"

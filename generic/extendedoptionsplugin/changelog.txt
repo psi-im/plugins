@@ -1,3 +1,7 @@
+2013-08-13
+v0.3.8 - taurus
+  + Иконка плагина
+
 2012-04-03
 v0.3.7
   + добавлены опции "options.service-discovery.last-activity", "options.ui.notifications.sounds.notify-every-muc-message",

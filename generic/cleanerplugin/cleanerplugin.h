@@ -54,6 +54,7 @@ public:
         virtual void setOptionAccessingHost(OptionAccessingHost* host);
         virtual void optionChanged(const QString& ) {};
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 private:
 	bool enabled;

@@ -32,7 +32,7 @@
 
 Q_EXPORT_PLUGIN(ClientSwitcherPlugin)
 
-#define cVer                    "0.0.16"
+#define cVer                    "0.0.17"
 #define constPluginShortName    "clientswitcher"
 #define constPluginName         "Client Switcher Plugin"
 #define constForAllAcc          "for_all_acc"
@@ -346,6 +346,11 @@ void ClientSwitcherPlugin::restoreOptions() {
 	ui_options.cb_accounts->setCurrentIndex(acc_idx);
 	//--
 	restoreOptionsAcc(acc_idx);
+}
+
+QIcon ClientSwitcherPlugin::icon() const
+{
+	return QIcon(":/icons/clientswitcher.png");
 }
 
 //-- OptionAccessor -------------------------------------------------

@@ -3,5 +3,6 @@
         <file>calendar.png</file>
         <file>clean.png</file>
         <file>key.png</file>
+        <file>gnupg.png</file>
     </qresource>
 </RCC>

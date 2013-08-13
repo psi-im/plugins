@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/conferenceloggerplugin" >
-        <file>openlog.gif</file>
+        <file>conferencelogger.png</file>
     </qresource>
 </RCC>

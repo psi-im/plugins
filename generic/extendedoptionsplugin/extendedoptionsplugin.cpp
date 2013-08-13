@@ -28,7 +28,7 @@
 #include "plugininfoprovider.h"
 
 
-#define constVersion "0.3.7"
+#define constVersion "0.3.8"
 
 class ExtToolButton : public QToolButton
 {
@@ -59,6 +59,7 @@ public:
         virtual void setOptionAccessingHost(OptionAccessingHost* host);
         virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 private slots:
         void chooseColor(QAbstractButton*);
@@ -78,7 +79,7 @@ private:
         QCheckBox *centralToolbar;
         QCheckBox *confirmClearing;
         QCheckBox *messageIcons;
-        //QCheckBox *altnSwitch;        
+        //QCheckBox *altnSwitch;
         QCheckBox *showAvatar;
         QSpinBox *avatarSize;
         QCheckBox *disablePastSend;
@@ -280,7 +281,7 @@ QWidget* ExtendedOptions::options()
         showAvatar = new QCheckBox(tr("Show Avatar"));
         disablePastSend = new QCheckBox(tr("Disable \"Paste and Send\" button"));
         sayMode = new QCheckBox(tr("Enable \"Says style\""));
-	disableSend = new QCheckBox(tr("Hide \"Send\" button"));	
+	disableSend = new QCheckBox(tr("Hide \"Send\" button"));
 
 	avatarSize = new QSpinBox;
 	QGridLayout *chatGridLayout = new QGridLayout;
@@ -594,7 +595,7 @@ QWidget* ExtendedOptions::options()
 	box3Layout->addWidget(groupTip);
 	box3Layout->addLayout(pbLayout);
         box3Layout->addLayout(lcLayout);
-        box3Layout->addLayout(mcLayout);	
+        box3Layout->addLayout(mcLayout);
 	box3Layout->addLayout(composingLayout);
 	box3Layout->addLayout(unreadLayout);
         box3Layout->addStretch();
@@ -1055,5 +1056,9 @@ QString ExtendedOptions::pluginInfo()
 				 "understanding of the results when changing the option.");
 }
 
-#include "extendedoptionsplugin.moc"
+QIcon ExtendedOptions::icon() const
+{
+	return QIcon(":/icons/extendedoptions.png");
+}
 
+#include "extendedoptionsplugin.moc"

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>gnome3support.png</file>
+    </qresource>
+</RCC>

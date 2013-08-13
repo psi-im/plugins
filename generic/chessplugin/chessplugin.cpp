@@ -54,7 +54,7 @@
 #include "invitedialog.h"
 #include "request.h"
 
-#define cVer "0.2.6"
+#define cVer "0.2.7"
 
 #define soundStartConst "soundstart"
 #define soundFinishConst "soundfinish"
@@ -102,6 +102,7 @@ public:
 	virtual QString pluginInfo();
 	virtual void setPopupAccessingHost(PopupAccessingHost* host);
 	virtual void setSoundAccessingHost(SoundAccessingHost* host);
+	virtual QIcon icon() const;
 
 public slots:
 	void closeBoardEvent();
@@ -848,5 +849,9 @@ QString ChessPlugin::pluginInfo() {
 				 "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat window.");
 }
 
+QIcon ChessPlugin::icon() const
+{
+	return QIcon(":/chessplugin/chess.png");
+}
 
 #include "chessplugin.moc"

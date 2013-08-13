@@ -7,4 +7,5 @@ FORMS += captchadialog.ui \
     options.ui
 HEADERS += captchadialog.h \
     loader.h
+RESOURCES += resources.qrc
 QT += network

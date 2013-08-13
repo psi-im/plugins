@@ -17,7 +17,7 @@
 #include "preferenceswidget.h"
 
 
-#define VERSION "0.0.2"
+#define VERSION "0.0.3"
 #define PLUGIN_NAME "Psto Plugin"
 #define PLUGIN_NAME_SHORT "psto"
 
@@ -82,6 +82,7 @@ public:
         Q_UNUSED(account); Q_UNUSED(stanza); return false; }
 
     virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 private:
     const QStringList psto_jids;

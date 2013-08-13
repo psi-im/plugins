@@ -43,7 +43,7 @@
 
 #include "ui_options.h"
 
-#define cVer "0.4.0"
+#define cVer "0.4.1"
 #define constLastCheck "lstchck"
 #define constDays "days"
 #define constInterval "intrvl"
@@ -89,7 +89,7 @@ public:
 	virtual void setSoundAccessingHost(SoundAccessingHost* host);
 	virtual void setContactInfoAccessingHost(ContactInfoAccessingHost *host);
 	virtual QString pluginInfo();
-
+	virtual QIcon icon() const;
 
 private:
 	QString checkBirthdays();
@@ -534,6 +534,11 @@ QString Reminder::pluginInfo() {
 				 "The first time you install this plugin, you need to log on to all of your accounts, go to the plugin settings and click \"Update Birthdays\"."
 				 "The plugin will then collect the information about the birthdays of all the users in your roster, but when the 'Use vCards cache' option is"
 				 "selected, the users' vCards that are cached on your hard disk will be used. ");
+}
+
+QIcon Reminder::icon() const
+{
+	return QIcon(":/reminder/birthday.png");
 }
 
 #include "birthdayreminderplugin.moc"

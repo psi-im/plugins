@@ -40,7 +40,7 @@ class QDomElement;
 class NotesController;
 class Notes;
 
-#define constVersion "0.1.8"
+#define constVersion "0.1.9"
 #define NOTES_ID "strnotes_1"
 
 class StorageNotesPlugin : public QObject, public PsiPlugin, public StanzaSender, public IconFactoryAccessor, public PluginInfoProvider,
@@ -70,6 +70,7 @@ public:
 	virtual QAction* getContactAction(QObject* , int , const QString& ) { return 0; }
 	virtual QAction* getAccountAction(QObject* , int ) { return 0; }
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 private slots:
 	void start();
@@ -86,5 +87,3 @@ private:
 };
 
 #endif // STORAGENOTESPLUGIN_H
-
-

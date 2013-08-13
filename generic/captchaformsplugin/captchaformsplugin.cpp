@@ -39,7 +39,7 @@
 #include "applicationinfoaccessor.h"
 
 
-#define constVersion "0.1.0"
+#define constVersion "0.1.1"
 #define constProxyHost "host"
 #define constProxyPort "port"
 #define constProxyUser "user"
@@ -73,6 +73,7 @@ public:
 	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
 	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 private:
         OptionAccessingHost *psiOptions;
@@ -386,7 +387,7 @@ bool CaptchaFormsPlugin::isValidChallenge(const QDomElement& stanza, QHash<QStri
 	dataFields["to"] = stanza.attribute("to");
 
 	find = false;
-	QString id = stanza.attribute("id");	
+	QString id = stanza.attribute("id");
 
 	QDomNode field = formElem.firstChild();
 	while(!field.isNull()) {
@@ -451,5 +452,9 @@ QString CaptchaFormsPlugin::pluginInfo()
 			+ trUtf8("This plugin is designed to pass of captcha directly from the Psi+.");
 }
 
-#include "captchaformsplugin.moc"
+QIcon CaptchaFormsPlugin::icon() const
+{
+	return QIcon(":/icons/captcha.png");
+}
 
+#include "captchaformsplugin.moc"

@@ -89,7 +89,7 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 }
 #endif
 
-#define constVersion "0.2.3"
+#define constVersion "0.2.4"
 
 #define constStatus "status"
 #define constStatusMessage "statusmessage"
@@ -120,6 +120,7 @@ public:
 	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
 	virtual void setPsiAccountControllingHost(PsiAccountControllingHost* host);
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 private:
 	bool enabled;
@@ -404,6 +405,11 @@ QString VideoStatusChanger::pluginInfo()
 				 "To work with VLC player you need to enable the option \"Control Interface D-Bus\" in the Advanced Settings tab on \"Interface\\Control Interface\" section of the player settings; \n\n"
 				 "To work with Kaffeine player you must have player version (>= 1.0), additional configuration is not needed; \n\n"
 				 "To work with GNOME MPlayer additional configuration is not needed.");
+}
+
+QIcon VideoStatusChanger::icon() const
+{
+	return QIcon(":/icons/videostatus.png");
 }
 
 #ifdef Q_WS_X11

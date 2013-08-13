@@ -45,7 +45,7 @@
 
 #include "ui_options.h"
 
-#define cVer "0.1.9"
+#define cVer "0.2.0"
 #define constSoundFile "sndfl"
 #define constInterval "intrvl"
 #define constInfPopup "infPopup"
@@ -92,13 +92,13 @@ public:
         virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
 	virtual void setSoundAccessingHost(SoundAccessingHost* host);
 	virtual QString pluginInfo();
-
+	virtual QIcon icon() const;
 
 private:
         bool enabled;
         OptionAccessingHost* psiOptions;
 	AccountInfoAccessingHost *accInfoHost;
-        ActiveTabAccessingHost* activeTab;       
+        ActiveTabAccessingHost* activeTab;
 	IconFactoryAccessingHost *icoHost;
         PopupAccessingHost* popup;
         StanzaSendingHost *stanzaSender;
@@ -502,7 +502,7 @@ void AttentionPlugin::nudge() {
 	if(!nudgeWindow_ || !nudgeTimer_ || nudgeTimer_->isActive())
 		return;
 
-	oldPoint_ = nudgeWindow_->pos();	
+	oldPoint_ = nudgeWindow_->pos();
 	nudgeTimer_->start();
 }
 
@@ -532,6 +532,11 @@ QString AttentionPlugin::pluginInfo() {
 			+ tr("Email: ") + "wadealer@gmail.com\n\n"
 			+ trUtf8("This plugin is designed to send and receive special messages such as Attentions.\n"
 				 "To work correctly, the plugin requires that the client of the other part supports XEP-0224 (for example: Pidgin, Miranda IM with Nudge plugin).");
+}
+
+QIcon AttentionPlugin::icon() const
+{
+	return QIcon(":/attentionplugin/attention.png");
 }
 
 #include "attentionplugin.moc"

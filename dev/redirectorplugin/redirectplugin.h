@@ -21,6 +21,7 @@
 #ifndef REDIRECTPLUGIN_H
 #define REDIRECTPLUGIN_H
 
+#include <QIcon>
 #include "psiplugin.h"
 #include "optionaccessor.h"
 #include "stanzafilter.h"
@@ -57,13 +58,14 @@ public:
 	  , contactInfo(0) {}
 	QString name() const { return "Redirect Plugin"; }
 	QString shortName() const { return "redirect"; }
-	QString version() const { return "0.0.1"; }
+	QString version() const { return "0.0.2"; }
 	//PsiPlugin::Priority priority() {return PriorityNormal;}
 	QWidget* options();
 	bool enable();
 	bool disable();
 	void applyOptions();
 	void restoreOptions();
+	QIcon icon() const { return QIcon(); }
 	void setOptionAccessingHost(OptionAccessingHost* host) { psiOptions = host; }
 	void optionChanged(const QString& ) {}
 	void setStanzaSendingHost(StanzaSendingHost *host) { stanzaHost = host; }

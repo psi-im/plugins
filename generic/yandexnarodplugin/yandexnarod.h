@@ -67,6 +67,7 @@ public:
 	virtual QAction* getContactAction(QObject* /*parent*/, int /*account*/, const QString& /*contact*/) { return 0; };
 	virtual QAction* getAccountAction(QObject* /*parent*/, int /*account*/) { return 0; };
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 private slots:
 	void manage_clicked();

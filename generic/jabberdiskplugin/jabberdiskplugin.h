@@ -41,7 +41,7 @@ class QDomElement;
 
 #include "ui_options.h"
 
-#define constVersion "0.0.3"
+#define constVersion "0.0.4"
 
 class JabberDiskPlugin : public QObject, public PsiPlugin, public StanzaSender, public IconFactoryAccessor,
 	public PluginInfoProvider, public StanzaFilter, public MenuAccessor, public AccountInfoAccessor, public OptionAccessor
@@ -76,6 +76,7 @@ public:
 	virtual QAction* getContactAction(QObject* , int , const QString& );
 	virtual QAction* getAccountAction(QObject* , int ) { return 0; };
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 
 //signals:
@@ -100,5 +101,3 @@ private:
 };
 
 #endif
-
-

@@ -41,7 +41,7 @@
 
 #include "ui_options.h"
 
-#define cVer "0.0.9"
+#define cVer "0.1.0"
 #define constSoundFile "sndfl"
 #define constInterval "intrvl"
 #define constTune "tune"
@@ -85,6 +85,7 @@ public:
 	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
 	virtual void setSoundAccessingHost(SoundAccessingHost* host);
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 
 private:
@@ -563,6 +564,11 @@ QString PepPlugin::pluginInfo()
 	return tr("Author: ") +  "Dealer_WeARE\n"
 			+ tr("Email: ") + "wadealer@gmail.com\n\n"
 			+ tr("This plugin shows popup notifications when users from your roster changes their mood, tune or activity.");
+}
+
+QIcon PepPlugin::icon() const
+{
+	return QIcon(":/icons/pepchangenotify.png");
 }
 
 #include "pepchangenotifyplugin.moc"

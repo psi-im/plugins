@@ -34,7 +34,7 @@
 #include "accountinfoaccessinghost.h"
 #include "plugininfoprovider.h"
 
-#define cVer "0.3.1"
+#define cVer "0.3.2"
 #define constMessage "mssg"
 #define constDisableFor "dsblfr"
 #define constEnableFor "enblfr"
@@ -75,13 +75,14 @@ public:
         virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
         virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 private:
 	bool enabled;
         AccountInfoAccessingHost* AccInfoHost;
         ActiveTabAccessingHost* ActiveTabHost;
-	OptionAccessingHost* psiOptions;        
-        StanzaSendingHost* StanzaHost;        
+	OptionAccessingHost* psiOptions;
+        StanzaSendingHost* StanzaHost;
         QTextEdit *messageWidget;
         QTextEdit *disableforWidget;
         QString Message;
@@ -130,7 +131,7 @@ AutoReply::AutoReply() {
         NotInRosterWidget = 0;
         NotInRoster = true;
         EnableDisable = 1;
-        Counter.clear();        
+        Counter.clear();
         Times = 2;
         ResetTime = 5;
         spinWidget = 0;
@@ -139,13 +140,13 @@ AutoReply::AutoReply() {
         DisableForAccWidget = 0;
         resetWidget = 0;
         DisableFor = "juick@juick.com\npsi-dev@conference.jabber.ru\njubo@nologin.ru\njabrss@cmeerw.net\nrss2jabber.com\nbot.talk.google.com\nbot.rambler.ru\nnotify@planary.ru\nwebtoim@gmail.com\nwebtoim1@gmail.com\narx-bot-11@onblabla.ru\nen2ru@jtalk.ru\nru2en@jtalk.ru\ngluxi@inhex.net\nisida@xmpp.ru\ntwitter.tweet.im\nrss@isida-bot.com\nhuti.ua@gmail.com";
-        enabled = false;        
+        enabled = false;
         Message = "I'll write you later...";
         messageWidget = 0;
         ActiveTabHost = 0;
         AccInfoHost = 0;
         disableforWidget = 0;
-        psiOptions = 0;        
+        psiOptions = 0;
         StanzaHost = 0;
         sonlineWidget = 0;
         sawayWidget = 0;
@@ -261,7 +262,7 @@ bool AutoReply::enable() {
 }
 
 bool AutoReply::disable() {
-	enabled = false;        
+	enabled = false;
 	return true;
 }
 
@@ -458,7 +459,7 @@ QWidget* AutoReply::options() {
         messageWidget->setMaximumHeight(60);
         messageWidget->setText(Message);
         disableforWidget = new QTextEdit();
-        disableforWidget->setText(DisableFor);       
+        disableforWidget->setText(DisableFor);
         enabledisableWidget = new QComboBox();
         enabledisableWidget->addItem(tr("Enable"));
         enabledisableWidget->addItem(tr("Disable"));
@@ -501,8 +502,8 @@ QWidget* AutoReply::options() {
 		statusLayout->addWidget(sxaWidget); }
         if(psiOptions->getGlobalOption("options.ui.menu.status.invisible").toBool()) {
 		statusLayout->addWidget(sinvisWidget); }
-        statusLayout->addStretch();        
-        groupBox->setLayout(statusLayout);        
+        statusLayout->addStretch();
+        groupBox->setLayout(statusLayout);
 
         QVBoxLayout *Layout = new QVBoxLayout;
         Layout->addWidget(new QLabel(tr("Auto Reply Message:")));
@@ -530,7 +531,7 @@ QWidget* AutoReply::options() {
         timesLayout->addWidget(new QLabel(tr("Send maximum")));
         timesLayout->addWidget(spinWidget);
         timesLayout->addWidget(new QLabel(tr("times (-1=infinite)")));
-        timesLayout->addStretch();       
+        timesLayout->addStretch();
         QVBoxLayout *flags = new QVBoxLayout;
         flags->addLayout(AccLayout);
         flags->addStretch();
@@ -541,7 +542,7 @@ QWidget* AutoReply::options() {
         QHBoxLayout *hLayout = new QHBoxLayout;
         hLayout->addLayout(disableLayout);
         QFrame *frame = new QFrame();
-        frame->setMinimumWidth(8);        
+        frame->setMinimumWidth(8);
         hLayout->addWidget(frame);
         hLayout->addLayout(flags);
         QLabel *wikiLink = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/plugins#autoreply_plugin\">Wiki (Online)</a>"));
@@ -752,6 +753,11 @@ QString AutoReply::pluginInfo() {
 				 "The list of exceptions for jids has two operating modes:\n"
 				 "* auto-responder is switched off for the list of exceptions, for the others is switched on (Disable mode)\n"
 				 "* auto-responder is switched on for the list of exceptions, for the others is switched off (Enable mode) ");
+}
+
+QIcon AutoReply::icon() const
+{
+	return QIcon(":/icons/autoreply.png");
 }
 
 #include "autoreplyplugin.moc"

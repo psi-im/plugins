@@ -50,7 +50,7 @@
 #include "soundaccessor.h"
 #include "toolbariconaccessor.h"
 
-#define constVersion "0.4.3"
+#define constVersion "0.4.4"
 
 #define constSoundFile "sndfl"
 #define constInterval "intrvl"
@@ -90,6 +90,8 @@ public:
 	virtual void optionChanged(const QString& option);
 	virtual void applyOptions();
 	virtual void restoreOptions();
+	virtual QIcon icon() const;
+
 	virtual void setPopupAccessingHost(PopupAccessingHost* host);
 	virtual void setOptionAccessingHost(OptionAccessingHost* host);
 	virtual bool incomingStanza(int account, const QDomElement& xml);
@@ -365,6 +367,11 @@ void Watcher::restoreOptions() {
 	foreach(WatchedItem* wi, items_) {
 		ui_.listWidget->addItem(wi->copy());
 	}
+}
+
+QIcon Watcher::icon() const
+{
+	return QIcon(":/icons/watcher.png");
 }
 
 bool Watcher::incomingStanza(int acc, const QDomElement &stanza) {

@@ -71,6 +71,7 @@ public:
 	virtual QWidget* options();
 	virtual void applyOptions();
 	virtual void restoreOptions();
+	virtual QIcon icon() const;
 	// OptionAccessor
 	virtual void setOptionAccessingHost(OptionAccessingHost*);
 	virtual void optionChanged(const QString&);

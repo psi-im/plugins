@@ -11,3 +11,5 @@ FORMS += \
 HEADERS += \
     preferenceswidget.h \
     pstoplugin.h
+
+RESOURCES += resources.qrc

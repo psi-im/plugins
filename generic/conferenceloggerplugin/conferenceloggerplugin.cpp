@@ -43,7 +43,7 @@
 
 #include "viewer.h"
 
-#define cVer "0.2.0"
+#define cVer "0.2.1"
 #define constHeight "Height"
 #define constWidth "Width"
 #define constlastItem "lastItem"
@@ -77,6 +77,7 @@ public:
 	virtual QList < QVariantHash > getGCButtonParam();
 	virtual QAction* getGCAction(QObject* , int , const QString& ) { return 0; };
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 
 private:
@@ -131,7 +132,7 @@ QString ConferenceLogger::version() const {
 }
 
 bool ConferenceLogger::enable() {
-	QFile file(":/conferenceloggerplugin/openlog.gif");
+	QFile file(":/conferenceloggerplugin/conferencelogger.png");
 	if ( file.open(QIODevice::ReadOnly) ) {
 		QByteArray image = file.readAll();
 		IcoHost->addIcon("loggerplugin/openlog",image);
@@ -339,5 +340,9 @@ QString ConferenceLogger::pluginInfo() {
 				 "Note: To work correctly, the option options.ui.chat.central-toolbar  must be set to true.");
 }
 
+QIcon ConferenceLogger::icon() const
+{
+	return QIcon(":/conferenceloggerplugin/conferencelogger.png");
+}
 
 #include "conferenceloggerplugin.moc"

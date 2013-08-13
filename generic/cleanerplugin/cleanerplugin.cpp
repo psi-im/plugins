@@ -21,7 +21,7 @@
 #include "cleanerplugin.h"
 #include "cleaner.h"
 
-#define constVersion "0.3.1"
+#define constVersion "0.3.2"
 
 #define constHeight "height"
 #define constWidth "width"
@@ -142,4 +142,9 @@ QString CleanerPlugin::pluginInfo()
 			+ tr("Email: ") + "wadealer@gmail.com\n\n"
 			+ trUtf8("This plugin is designed to clear the avatar cache, saved local copies of vCards and history logs.\n"
 				 "You can preview items before deleting them from your hard drive.");
+}
+
+QIcon CleanerPlugin::icon() const
+{
+	return QIcon(":/cleanerplugin/cleaner.png");
 }

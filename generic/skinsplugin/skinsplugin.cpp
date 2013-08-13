@@ -33,7 +33,7 @@
 #include "optionsparser.h"
 
 
-#define cVer "0.3.2"
+#define cVer "0.3.3"
 
 
 class SkinsPlugin: public QObject, public PsiPlugin, public ApplicationInfoAccessor, public OptionAccessor, public PluginInfoProvider
@@ -55,10 +55,11 @@ public:
         virtual void setOptionAccessingHost(OptionAccessingHost* host);
         virtual void optionChanged(const QString& /*option*/) {};
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 private:
         bool enabled;
-        OptionAccessingHost* psiOptions; 
+        OptionAccessingHost* psiOptions;
         ApplicationInfoAccessingHost *appInfo;
 	Ui::SkinsPlugin ui_;
         QStringList skins_;
@@ -87,7 +88,7 @@ private slots:
 Q_EXPORT_PLUGIN(SkinsPlugin);
 
 SkinsPlugin::SkinsPlugin() {
-        enabled = false;        
+        enabled = false;
         appInfo = 0;
         psiOptions = 0;
     }
@@ -195,7 +196,7 @@ void SkinsPlugin::findSkins(QString path) {
 
     foreach (QString subDir, dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
         findSkins(path + QDir::separator() + subDir);
-    }    
+    }
 }
 
 void SkinsPlugin::updateButtonPressed() {
@@ -480,6 +481,11 @@ QString SkinsPlugin::pluginInfo() {
 			   "2. Restart the application\n"
 			   "3. Apply the same skin again\n"
 			 "This allows all settings (icons, toolbar layout) to be picked up correctly. ");
+}
+
+QIcon SkinsPlugin::icon() const
+{
+	return QIcon(":/skinsplugin/skins.png");
 }
 
 #include "skinsplugin.moc"

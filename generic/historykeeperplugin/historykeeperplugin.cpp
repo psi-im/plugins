@@ -34,7 +34,7 @@
 #include "iconfactoryaccessinghost.h"
 #include "iconfactoryaccessor.h"
 
-#define cVer "0.0.6"
+#define cVer "0.0.7"
 #define constClearHistoryFor "clear-history-for"
 
 
@@ -64,6 +64,7 @@ public:
 	virtual QAction* getContactAction(QObject* p, int acc, const QString& jid);
 	virtual QAction* getAccountAction(QObject* , int ) { return 0; };
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 
 private:
@@ -286,6 +287,11 @@ QString HistoryKeeperPlugin::pluginInfo()
 			+ tr("Email: ") + "wadealer@gmail.com\n\n"
 			+ trUtf8("This plugin is designed to remove the history of selected contacts when the Psi+ is closed.\n"
 				 "You can select or deselect a contact for history removal from the context menu of a contact or via the plugin options.");
+}
+
+QIcon HistoryKeeperPlugin::icon() const
+{
+	return QIcon(":/icons/historykeeper.png");
 }
 
 #include "historykeeperplugin.moc"

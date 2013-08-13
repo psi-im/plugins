@@ -24,7 +24,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QDomElement>
-
+#include <QIcon>
 
 StorageNotesPlugin::StorageNotesPlugin()
 	: stanzaSender(0)
@@ -175,6 +175,11 @@ QString StorageNotesPlugin::pluginInfo() {
 			+ trUtf8("This plugin is an implementation of XEP-0049: Private XML Storage.\n"
 				 "The plugin is fully compatible with notes saved using Miranda IM.\n"
 				 "The plugin is designed to keep notes on the jabber server with the ability to access them from anywhere using Psi+ or Miranda IM.");
+}
+
+QIcon StorageNotesPlugin::icon() const
+{
+	return QIcon(":/storagenotes/storagenotes.png");
 }
 
 Q_EXPORT_PLUGIN(StorageNotesPlugin)

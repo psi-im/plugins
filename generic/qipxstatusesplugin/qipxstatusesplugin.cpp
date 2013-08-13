@@ -23,6 +23,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QDomElement>
+#include <QIcon>
 
 #include "psiplugin.h"
 #include "stanzafilter.h"
@@ -30,7 +31,7 @@
 #include "contactstateaccessinghost.h"
 #include "plugininfoprovider.h"
 
-#define cVer "0.0.7"
+#define cVer "0.0.8"
 
 class QipXStatuses: public QObject, public PsiPlugin, public StanzaFilter, public ContactStateAccessor, public PluginInfoProvider
 {
@@ -51,11 +52,12 @@ public:
 	virtual bool outgoingStanza(int account, QDomElement& xml);
         virtual void setContactStateAccessingHost(ContactStateAccessingHost* host);
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 
 private:
         bool enabled;
-        ContactStateAccessingHost *contactState;        
+        ContactStateAccessingHost *contactState;
 
         QDomElement activityToXml(QString type, QString specificType, QString text);
         QDomElement MoodToXml(QString type, QString text);
@@ -342,6 +344,11 @@ QString QipXStatuses::pluginInfo() {
 	return tr("Author: ") +  "Dealer_WeARE\n"
 			+ tr("Email: ") + "wadealer@gmail.com\n\n"
 			+ trUtf8("This plugin is designed to display x-statuses of contacts using the QIP Infium jabber client.");
+}
+
+QIcon QipXStatuses::icon() const
+{
+	return QIcon(":/icons/qipxstatuses.png");
 }
 
 #include "qipxstatusesplugin.moc"

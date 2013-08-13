@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>extendedoptions.png</file>
+    </qresource>
+</RCC>

@@ -3,6 +3,7 @@
         <file alias="black-stone">img/black-stone.png</file>
         <file alias="white-stone">img/white-stone.png</file>
         <file alias="gomoku">img/gomoku.png</file>
+        <file>img/gomoku_16.png</file>
         <file alias="goban1">img/goban1.png</file>
     </qresource>
 </RCC>

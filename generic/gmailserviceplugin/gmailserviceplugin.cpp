@@ -264,7 +264,7 @@ void GmailNotifyPlugin::updateOptions(int index)
 	ui_.rb_all_messages->setChecked(as->notifyAllUnread);
 
 	ui_.cb_archiving->setChecked(as->isArchivingEnabled);
-	ui_.cb_suggestions->setChecked(as->isSuggestionsEnabled);	
+	ui_.cb_suggestions->setChecked(as->isSuggestionsEnabled);
 
 	ui_.cb_shared_statuses->setChecked(as->isSharedStatusEnabled);
 	ui_.cb_shared_statuses->setVisible(as->isSharedStatusSupported);
@@ -344,7 +344,7 @@ bool GmailNotifyPlugin::outgoingStanza(int account, QDomElement& stanza)
 bool GmailNotifyPlugin::checkFeatures(int account, const QDomElement &stanza, const QDomElement& query)
 {
 	bool myReqyest = false;
-	if (stanza.attribute("type") == "result"		
+	if (stanza.attribute("type") == "result"
 	     && query.tagName() == "query"
 	     && query.attribute("xmlns") == "http://jabber.org/protocol/disco#info")
 	{
@@ -995,4 +995,9 @@ QString GmailNotifyPlugin::pluginInfo()
 			+ trUtf8("Shows notifications of new messages in your Gmailbox.\n"
 			 "Note: The plugin only checks the root of your Inbox folder in your"
 			 " Gmailbox for new messages. When using server side mail filtering, you may not be notified about all new messages.");
+}
+
+QIcon GmailNotifyPlugin::icon() const
+{
+	return QIcon(":/icons/gmailnotify.png");
 }

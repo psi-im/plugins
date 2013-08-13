@@ -50,7 +50,7 @@ QString ContentDownloader::shortName() const
 
 QString ContentDownloader::version() const
 {
-	return "0.2.3";
+	return "0.2.4";
 }
 
 QWidget *ContentDownloader::options()
@@ -104,6 +104,11 @@ void ContentDownloader::applyOptions()
 
 void ContentDownloader::restoreOptions()
 {
+}
+
+QIcon ContentDownloader::icon() const
+{
+	return QIcon(":/icons/download.png");
 }
 
 void ContentDownloader::setOptionAccessingHost(OptionAccessingHost *host)

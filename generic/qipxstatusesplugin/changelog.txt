@@ -1,3 +1,7 @@
+2013-08-13
+v0.0.8 - taurus
+  + Иконка плагина
+
 2010-09-11
 v0.0.7
   * обновлена ссылка на wiki ( http://psi-plus.com/wiki/plugins#qip_x-statuses_plugin )

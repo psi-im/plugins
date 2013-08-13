@@ -346,6 +346,11 @@ void JuickPlugin::restoreOptions()
 	ui_.cb_conference->setChecked(workInGroupChat);
 }
 
+QIcon JuickPlugin::icon() const
+{
+	return QIcon(":/icons/juick.png");
+}
+
 void JuickPlugin::requestJidList()
 {
 	JuickJidList *jjl = new JuickJidList(jidList_, optionsWid);

@@ -9,11 +9,11 @@
  *
  * Alternatively, this file may be used under the terms of the GNU
  * General Public License version 2 or (at your option) any later version
- * or GNU Lesser General Public License version 2 or (at your option) any 
- * later version as published by the Free Software Foundation and 
+ * or GNU Lesser General Public License version 2 or (at your option) any
+ * later version as published by the Free Software Foundation and
  * appearing in the file copying.txt included in the packaging of this file.
- * Please review the following information to ensure the GNU General 
- * Public License version 2.0 requirements will be met: 
+ * Please review the following information to ensure the GNU General
+ * Public License version 2.0 requirements will be met:
  * <http://www.gnu.org/licenses/>.
  */
 
@@ -35,7 +35,7 @@
 #include "plugininfoprovider.h"
 #include "ui_icqdieoptions.h"
 
-#define cVer "0.1.5"
+#define cVer "0.1.6"
 #define constMessageRecv "msgr"
 #define constMessageNoRecv "msgnr"
 #define constCustom "custom"
@@ -69,6 +69,7 @@ public:
 	virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
 	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 private:
 	bool enabled;
@@ -413,6 +414,11 @@ QString IcqDie::pluginInfo() {
 			 "* set the max count of messages by contact\n"
 			 "* disable the message for the active window/tab\n"
 			 "* disable messages for contacts that are not in your roster");
+}
+
+QIcon IcqDie::icon() const
+{
+	return QIcon(":/icons/icqdie.png");
 }
 
 #include "icqdieplugin.moc"

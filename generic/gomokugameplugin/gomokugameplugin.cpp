@@ -28,7 +28,7 @@
 #include "common.h"
 #include "options.h"
 
-#define constVersion            "0.1.0"
+#define constVersion            "0.1.1"
 #define constShortPluginName    "gomokugameplugin"
 
 Q_EXPORT_PLUGIN(GomokuGamePlugin);
@@ -145,6 +145,11 @@ void GomokuGamePlugin::restoreOptions()
 	ui_.cb_disable_conf->setChecked(options->getOption(constConfDisable).toBool());
 	ui_.cb_save_pos->setChecked(options->getOption(constSaveWndPosition).toBool());
 	ui_.cb_save_w_h->setChecked(options->getOption(constSaveWndWidthHeight).toBool());
+}
+
+QIcon GomokuGamePlugin::icon() const
+{
+	return QIcon(":/gomokugameplugin/img/gomoku_16.png");
 }
 
 /**

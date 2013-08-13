@@ -104,6 +104,7 @@ public:
     virtual bool disable();
     virtual void applyOptions();
     virtual void restoreOptions();
+	virtual QIcon icon() const;
 
     // PluginInfoProvider
     virtual QString pluginInfo();

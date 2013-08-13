@@ -69,6 +69,7 @@ public:
 	virtual void restoreOptions();
 
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 
 private slots:
@@ -235,6 +236,11 @@ QString ScreenshotPlugin::pluginInfo()
 			 "* File Name -- format of the filename (default: pic-yyyyMMdd-hhmmss, where yyyyMMdd=YYYYMMDD, and hhmmss are current date in the format yearmonthday-hourminutesecond)\n"
 		     "The address of FTP server is specified as ftp://ftp.domain.tld/path1/path2")
 		     + tr("\n\nSettings for authorization on some hostings can be found here: http://code.google.com/p/qscreenshot/wiki/Authorization");
+}
+
+QIcon ScreenshotPlugin::icon() const
+{
+	return QIcon(":/screenshotplugin/screenshot.png");
 }
 
 #include "screenshotplugin.moc"

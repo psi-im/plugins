@@ -45,7 +45,7 @@
 #include "ui_options.h"
 #include "deferredstanzasender.h"
 
-#define cVer "0.5.5"
+#define cVer "0.5.6"
 #define constQuestion "qstn"
 #define constAnswer "answr"
 #define constUnblocked "UnblockedList"
@@ -97,6 +97,7 @@ public:
         virtual bool disable();
         virtual void applyOptions();
         virtual void restoreOptions();
+	virtual QIcon icon() const;
         virtual void setOptionAccessingHost(OptionAccessingHost* host);
 	virtual void optionChanged(const QString& ) {}
         virtual void setStanzaSendingHost(StanzaSendingHost *host);
@@ -134,7 +135,7 @@ private:
 
 
 	bool enabled;
-	OptionAccessingHost* psiOptions;        
+	OptionAccessingHost* psiOptions;
 	DefferedStanzaSender* stanzaHost;
 	AccountInfoAccessingHost *accInfoHost;
 	ApplicationInfoAccessingHost *appInfoHost;
@@ -297,7 +298,7 @@ bool StopSpam::disable() {
 	stanzaHost = 0;
 
 	popup->unregisterOption(POPUP_OPTION);
-	enabled = false;        
+	enabled = false;
 	return true;
 }
 
@@ -391,6 +392,11 @@ void StopSpam::restoreOptions() {
 	ui_.le_number->setText(QString::number(Counter));
 
         model_->reset();
+}
+
+QIcon StopSpam::icon() const
+{
+	return QIcon(":/icons/stopspam.png");
 }
 
 QWidget* StopSpam::options() {

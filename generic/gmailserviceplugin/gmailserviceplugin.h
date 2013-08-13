@@ -58,7 +58,7 @@ class QDomElement;
 
 #define POPUP_OPTION "Gmail Service Plugin"
 
-#define PLUGIN_VERSION "0.7.4"
+#define PLUGIN_VERSION "0.7.5"
 
 
 class GmailNotifyPlugin : public QObject, public PsiPlugin, public AccountInfoAccessor,
@@ -100,6 +100,7 @@ public:
 	virtual QAction* getAccountAction(QObject* /*parent*/, int /*account*/) { return 0; }
 
 	virtual QString pluginInfo();
+	virtual QIcon icon() const;
 
 private slots:
 	void updateSharedStatus(AccountSettings* as);

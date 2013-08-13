@@ -35,7 +35,7 @@
 
 static const QStringList statuses = QStringList() << "online" << "invisible" << "dnd" << "away";
 
-#define constVersion "0.0.2"
+#define constVersion "0.0.3"
 
 class Gnome3StatusWatcher : public QObject, public PsiPlugin, public PluginInfoProvider, public OptionAccessor,
 		public PsiAccountController, public AccountInfoAccessor
@@ -52,6 +52,7 @@ public:
 	virtual bool disable();
 	virtual void applyOptions() {};
 	virtual void restoreOptions() {};
+	virtual QIcon icon() const;
 	virtual void optionChanged(const QString&) {};
 	virtual void setOptionAccessingHost(OptionAccessingHost* host);
 	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
@@ -124,6 +125,11 @@ bool Gnome3StatusWatcher::disable(){
 		disconnectFromBus(gnome3Service);
 	}
 	return true;
+}
+
+QIcon Gnome3StatusWatcher::icon() const
+{
+	return QIcon(":/icons/gnome3support.png");
 }
 
 QWidget* Gnome3StatusWatcher::options()
