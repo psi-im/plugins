@@ -26,6 +26,7 @@
 #include "psiaccountcontroller.h"
 #include "psiaccountcontrollinghost.h"
 
+#include <QIcon>
 #include <QDBusConnection>
 #include <QDBusConnectionInterface>
 
