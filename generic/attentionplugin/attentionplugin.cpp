@@ -92,7 +92,7 @@ public:
         virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
 	virtual void setSoundAccessingHost(SoundAccessingHost* host);
 	virtual QString pluginInfo();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 private:
         bool enabled;
@@ -534,9 +534,9 @@ QString AttentionPlugin::pluginInfo() {
 				 "To work correctly, the plugin requires that the client of the other part supports XEP-0224 (for example: Pidgin, Miranda IM with Nudge plugin).");
 }
 
-QIcon AttentionPlugin::icon() const
+QPixmap AttentionPlugin::icon() const
 {
-	return QIcon(":/attentionplugin/attention.png");
+	return QPixmap(":/attentionplugin/attention.png");
 }
 
 #include "attentionplugin.moc"

@@ -85,7 +85,7 @@ public:
 	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
 	virtual void setSoundAccessingHost(SoundAccessingHost* host);
 	virtual QString pluginInfo();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 
 private:
@@ -566,9 +566,9 @@ QString PepPlugin::pluginInfo()
 			+ tr("This plugin shows popup notifications when users from your roster changes their mood, tune or activity.");
 }
 
-QIcon PepPlugin::icon() const
+QPixmap PepPlugin::icon() const
 {
-	return QIcon(":/icons/pepchangenotify.png");
+	return QPixmap(":/icons/pepchangenotify.png");
 }
 
 #include "pepchangenotifyplugin.moc"

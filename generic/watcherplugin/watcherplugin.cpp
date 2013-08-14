@@ -90,7 +90,7 @@ public:
 	virtual void optionChanged(const QString& option);
 	virtual void applyOptions();
 	virtual void restoreOptions();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 	virtual void setPopupAccessingHost(PopupAccessingHost* host);
 	virtual void setOptionAccessingHost(OptionAccessingHost* host);
@@ -369,9 +369,9 @@ void Watcher::restoreOptions() {
 	}
 }
 
-QIcon Watcher::icon() const
+QPixmap Watcher::icon() const
 {
-	return QIcon(":/icons/watcher.png");
+	return QPixmap(":/icons/watcher.png");
 }
 
 bool Watcher::incomingStanza(int acc, const QDomElement &stanza) {

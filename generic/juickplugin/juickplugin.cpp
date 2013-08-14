@@ -346,9 +346,9 @@ void JuickPlugin::restoreOptions()
 	ui_.cb_conference->setChecked(workInGroupChat);
 }
 
-QIcon JuickPlugin::icon() const
+QPixmap JuickPlugin::icon() const
 {
-	return QIcon(":/icons/juick.png");
+	return QPixmap(":/icons/juick.png");
 }
 
 void JuickPlugin::requestJidList()

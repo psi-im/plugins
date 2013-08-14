@@ -69,7 +69,7 @@ public:
 	virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
 	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
 	virtual QString pluginInfo();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 private:
 	bool enabled;
@@ -416,9 +416,9 @@ QString IcqDie::pluginInfo() {
 			 "* disable messages for contacts that are not in your roster");
 }
 
-QIcon IcqDie::icon() const
+QPixmap IcqDie::icon() const
 {
-	return QIcon(":/icons/icqdie.png");
+	return QPixmap(":/icons/icqdie.png");
 }
 
 #include "icqdieplugin.moc"

@@ -64,7 +64,7 @@ public:
 	virtual QAction* getContactAction(QObject* p, int acc, const QString& jid);
 	virtual QAction* getAccountAction(QObject* , int ) { return 0; };
 	virtual QString pluginInfo();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 
 private:
@@ -289,9 +289,9 @@ QString HistoryKeeperPlugin::pluginInfo()
 				 "You can select or deselect a contact for history removal from the context menu of a contact or via the plugin options.");
 }
 
-QIcon HistoryKeeperPlugin::icon() const
+QPixmap HistoryKeeperPlugin::icon() const
 {
-	return QIcon(":/icons/historykeeper.png");
+	return QPixmap(":/icons/historykeeper.png");
 }
 
 #include "historykeeperplugin.moc"

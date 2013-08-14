@@ -53,7 +53,7 @@ public:
 	virtual bool disable();
 	virtual void applyOptions() {};
 	virtual void restoreOptions() {};
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 	virtual void optionChanged(const QString&) {};
 	virtual void setOptionAccessingHost(OptionAccessingHost* host);
 	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
@@ -128,9 +128,9 @@ bool Gnome3StatusWatcher::disable(){
 	return true;
 }
 
-QIcon Gnome3StatusWatcher::icon() const
+QPixmap Gnome3StatusWatcher::icon() const
 {
-	return QIcon(":/icons/gnome3support.png");
+	return QPixmap(":/icons/gnome3support.png");
 }
 
 QWidget* Gnome3StatusWatcher::options()

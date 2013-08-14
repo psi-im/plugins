@@ -120,7 +120,7 @@ public:
 	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
 	virtual void setPsiAccountControllingHost(PsiAccountControllingHost* host);
 	virtual QString pluginInfo();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 private:
 	bool enabled;
@@ -407,9 +407,9 @@ QString VideoStatusChanger::pluginInfo()
 				 "To work with GNOME MPlayer additional configuration is not needed.");
 }
 
-QIcon VideoStatusChanger::icon() const
+QPixmap VideoStatusChanger::icon() const
 {
-	return QIcon(":/icons/videostatus.png");
+	return QPixmap(":/icons/videostatus.png");
 }
 
 #ifdef Q_WS_X11

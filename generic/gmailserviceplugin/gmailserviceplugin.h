@@ -100,7 +100,7 @@ public:
 	virtual QAction* getAccountAction(QObject* /*parent*/, int /*account*/) { return 0; }
 
 	virtual QString pluginInfo();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 private slots:
 	void updateSharedStatus(AccountSettings* as);

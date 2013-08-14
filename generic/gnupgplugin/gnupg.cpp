@@ -98,9 +98,9 @@ void GnuPG::restoreOptions()
 {
 }
 
-QIcon GnuPG::icon() const
+QPixmap GnuPG::icon() const
 {
-	return QIcon(":/icons/gnupg.png");
+	return QPixmap(":/icons/gnupg.png");
 }
 
 QString GnuPG::pluginInfo()

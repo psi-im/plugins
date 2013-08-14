@@ -69,7 +69,7 @@ public:
 	virtual void restoreOptions();
 
 	virtual QString pluginInfo();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 
 private slots:
@@ -238,9 +238,9 @@ QString ScreenshotPlugin::pluginInfo()
 		     + tr("\n\nSettings for authorization on some hostings can be found here: http://code.google.com/p/qscreenshot/wiki/Authorization");
 }
 
-QIcon ScreenshotPlugin::icon() const
+QPixmap ScreenshotPlugin::icon() const
 {
-	return QIcon(":/screenshotplugin/screenshot.png");
+	return QPixmap(":/screenshotplugin/screenshot.png");
 }
 
 #include "screenshotplugin.moc"

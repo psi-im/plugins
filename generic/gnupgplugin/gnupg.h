@@ -77,7 +77,7 @@ public:
 	bool disable();
 	void applyOptions();
 	void restoreOptions();
-	QIcon icon() const;
+	QPixmap icon() const;
 
 	// from PluginInfoProvider
 	QString pluginInfo();

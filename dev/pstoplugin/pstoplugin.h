@@ -82,7 +82,7 @@ public:
         Q_UNUSED(account); Q_UNUSED(stanza); return false; }
 
     virtual QString pluginInfo();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 private:
     const QStringList psto_jids;

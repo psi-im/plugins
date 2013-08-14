@@ -82,7 +82,7 @@ public:
 	virtual void setOptionAccessingHost(OptionAccessingHost *host);
 	virtual void optionChanged(const QString &) {}
 	virtual QString pluginInfo();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 private slots:
 	void actionActivated();
@@ -307,9 +307,9 @@ QString ImagePlugin::pluginInfo()
 				 "Note: To work correctly, the option options.ui.chat.central-toolbar  must be set to true.");
 }
 
-QIcon ImagePlugin::icon() const
+QPixmap ImagePlugin::icon() const
 {
-	return QIcon(":/imageplugin/imageplugin.gif");
+	return QPixmap(":/imageplugin/imageplugin.gif");
 }
 
 #include "imageplugin.moc"

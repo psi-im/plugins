@@ -77,7 +77,7 @@ public:
 	virtual QAction* getGCAction(QObject* parent, int account, const QString& contact);
 
 	virtual QString pluginInfo();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 private slots:
         void trans();
@@ -580,9 +580,9 @@ QString TranslatePlugin::pluginInfo()
 			+ trUtf8("This plugin allows you to convert selected text into another language.\n");
 }
 
-QIcon TranslatePlugin::icon() const
+QPixmap TranslatePlugin::icon() const
 {
-	return QIcon(":/icons/translate.png");
+	return QPixmap(":/icons/translate.png");
 }
 
 #include "translateplugin.moc"

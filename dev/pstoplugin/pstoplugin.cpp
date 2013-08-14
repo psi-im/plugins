@@ -100,6 +100,11 @@ QString PstoPlugin::pluginInfo() {
     return "plugin info";
 }
 
+QPixmap PstoPlugin::icon() const
+{
+	return QPixmap(":/icons/psto.png");
+}
+
 bool PstoPlugin::enable() {
     if (psiOptions) {
         enabled = true;

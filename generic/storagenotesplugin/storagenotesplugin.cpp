@@ -177,9 +177,9 @@ QString StorageNotesPlugin::pluginInfo() {
 				 "The plugin is designed to keep notes on the jabber server with the ability to access them from anywhere using Psi+ or Miranda IM.");
 }
 
-QIcon StorageNotesPlugin::icon() const
+QPixmap StorageNotesPlugin::icon() const
 {
-	return QIcon(":/storagenotes/storagenotes.png");
+	return QPixmap(":/storagenotes/storagenotes.png");
 }
 
 Q_EXPORT_PLUGIN(StorageNotesPlugin)

@@ -89,7 +89,7 @@ public:
 	virtual void setSoundAccessingHost(SoundAccessingHost* host);
 	virtual void setContactInfoAccessingHost(ContactInfoAccessingHost *host);
 	virtual QString pluginInfo();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 private:
 	QString checkBirthdays();
@@ -536,9 +536,9 @@ QString Reminder::pluginInfo() {
 				 "selected, the users' vCards that are cached on your hard disk will be used. ");
 }
 
-QIcon Reminder::icon() const
+QPixmap Reminder::icon() const
 {
-	return QIcon(":/reminder/birthday.png");
+	return QPixmap(":/reminder/birthday.png");
 }
 
 #include "birthdayreminderplugin.moc"

@@ -221,9 +221,9 @@ void PsiOtrPlugin::restoreOptions()
 {
 }
 
-QIcon PsiOtrPlugin::icon() const
+QPixmap PsiOtrPlugin::icon() const
 {
-	return QIcon(":/otrplugin/otr_yes.png");
+	return QPixmap(":/otrplugin/otr_yes.png");
 }
 
 //-----------------------------------------------------------------------------

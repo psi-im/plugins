@@ -77,7 +77,7 @@ public:
 	virtual QList < QVariantHash > getGCButtonParam();
 	virtual QAction* getGCAction(QObject* , int , const QString& ) { return 0; };
 	virtual QString pluginInfo();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 
 private:
@@ -340,9 +340,9 @@ QString ConferenceLogger::pluginInfo() {
 				 "Note: To work correctly, the option options.ui.chat.central-toolbar  must be set to true.");
 }
 
-QIcon ConferenceLogger::icon() const
+QPixmap ConferenceLogger::icon() const
 {
-	return QIcon(":/conferenceloggerplugin/conferencelogger.png");
+	return QPixmap(":/conferenceloggerplugin/conferencelogger.png");
 }
 
 #include "conferenceloggerplugin.moc"

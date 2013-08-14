@@ -21,7 +21,7 @@
 #ifndef REDIRECTPLUGIN_H
 #define REDIRECTPLUGIN_H
 
-#include <QIcon>
+#include <QPixmap>
 #include "psiplugin.h"
 #include "optionaccessor.h"
 #include "stanzafilter.h"
@@ -65,7 +65,7 @@ public:
 	bool disable();
 	void applyOptions();
 	void restoreOptions();
-	QIcon icon() const { return QIcon(); }
+	QPixmap icon() const { return QPixmap(); }
 	void setOptionAccessingHost(OptionAccessingHost* host) { psiOptions = host; }
 	void optionChanged(const QString& ) {}
 	void setStanzaSendingHost(StanzaSendingHost *host) { stanzaHost = host; }

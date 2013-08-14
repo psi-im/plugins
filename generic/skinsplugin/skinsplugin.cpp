@@ -55,7 +55,7 @@ public:
         virtual void setOptionAccessingHost(OptionAccessingHost* host);
         virtual void optionChanged(const QString& /*option*/) {};
 	virtual QString pluginInfo();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 private:
         bool enabled;
@@ -483,9 +483,9 @@ QString SkinsPlugin::pluginInfo() {
 			 "This allows all settings (icons, toolbar layout) to be picked up correctly. ");
 }
 
-QIcon SkinsPlugin::icon() const
+QPixmap SkinsPlugin::icon() const
 {
-	return QIcon(":/skinsplugin/skins.png");
+	return QPixmap(":/skinsplugin/skins.png");
 }
 
 #include "skinsplugin.moc"

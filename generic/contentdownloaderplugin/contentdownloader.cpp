@@ -106,9 +106,9 @@ void ContentDownloader::restoreOptions()
 {
 }
 
-QIcon ContentDownloader::icon() const
+QPixmap ContentDownloader::icon() const
 {
-	return QIcon(":/icons/download.png");
+	return QPixmap(":/icons/download.png");
 }
 
 void ContentDownloader::setOptionAccessingHost(OptionAccessingHost *host)

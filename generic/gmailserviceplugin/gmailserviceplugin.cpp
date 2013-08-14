@@ -997,7 +997,7 @@ QString GmailNotifyPlugin::pluginInfo()
 			 " Gmailbox for new messages. When using server side mail filtering, you may not be notified about all new messages.");
 }
 
-QIcon GmailNotifyPlugin::icon() const
+QPixmap GmailNotifyPlugin::icon() const
 {
-	return QIcon(":/icons/gmailnotify.png");
+	return QPixmap(":/icons/gmailnotify.png");
 }

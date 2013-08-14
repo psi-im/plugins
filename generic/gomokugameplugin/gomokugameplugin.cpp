@@ -147,9 +147,9 @@ void GomokuGamePlugin::restoreOptions()
 	ui_.cb_save_w_h->setChecked(options->getOption(constSaveWndWidthHeight).toBool());
 }
 
-QIcon GomokuGamePlugin::icon() const
+QPixmap GomokuGamePlugin::icon() const
 {
-	return QIcon(":/gomokugameplugin/img/gomoku_16.png");
+	return QPixmap(":/gomokugameplugin/img/gomoku_16.png");
 }
 
 /**

@@ -215,9 +215,9 @@ QString JabberDiskPlugin::pluginInfo()
 			+ tr("Email: ") + "wadealer@gmail.com\n\n";
 }
 
-QIcon JabberDiskPlugin::icon() const
+QPixmap JabberDiskPlugin::icon() const
 {
-	return QIcon(":/icons/jabberdisk.png");
+	return QPixmap(":/icons/jabberdisk.png");
 }
 
 Q_EXPORT_PLUGIN(JabberDiskPlugin);

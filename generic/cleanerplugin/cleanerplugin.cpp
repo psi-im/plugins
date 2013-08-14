@@ -144,7 +144,7 @@ QString CleanerPlugin::pluginInfo()
 				 "You can preview items before deleting them from your hard drive.");
 }
 
-QIcon CleanerPlugin::icon() const
+QPixmap CleanerPlugin::icon() const
 {
-	return QIcon(":/cleanerplugin/cleaner.png");
+	return QPixmap(":/cleanerplugin/cleaner.png");
 }

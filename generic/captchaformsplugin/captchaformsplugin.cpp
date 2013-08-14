@@ -73,7 +73,7 @@ public:
 	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
 	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
 	virtual QString pluginInfo();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 private:
         OptionAccessingHost *psiOptions;
@@ -452,9 +452,9 @@ QString CaptchaFormsPlugin::pluginInfo()
 			+ trUtf8("This plugin is designed to pass of captcha directly from the Psi+.");
 }
 
-QIcon CaptchaFormsPlugin::icon() const
+QPixmap CaptchaFormsPlugin::icon() const
 {
-	return QIcon(":/icons/captcha.png");
+	return QPixmap(":/icons/captcha.png");
 }
 
 #include "captchaformsplugin.moc"

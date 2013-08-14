@@ -75,7 +75,7 @@ public:
         virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
         virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
 	virtual QString pluginInfo();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 private:
 	bool enabled;
@@ -755,9 +755,9 @@ QString AutoReply::pluginInfo() {
 				 "* auto-responder is switched on for the list of exceptions, for the others is switched off (Enable mode) ");
 }
 
-QIcon AutoReply::icon() const
+QPixmap AutoReply::icon() const
 {
-	return QIcon(":/icons/autoreply.png");
+	return QPixmap(":/icons/autoreply.png");
 }
 
 #include "autoreplyplugin.moc"

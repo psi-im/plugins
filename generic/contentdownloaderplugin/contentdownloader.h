@@ -50,7 +50,7 @@ public:
 	bool disable();
 	void applyOptions();
 	void restoreOptions();
-	QIcon icon() const;
+	QPixmap icon() const;
 
 	// from OptionAccessor
 	void setOptionAccessingHost(OptionAccessingHost* host);

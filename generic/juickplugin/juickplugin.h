@@ -53,7 +53,7 @@ public:
 	virtual bool disable();
 	virtual void applyOptions();
 	virtual void restoreOptions();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 	virtual void setOptionAccessingHost(OptionAccessingHost* host);
 	virtual void optionChanged(const QString& ) {}
 	virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);

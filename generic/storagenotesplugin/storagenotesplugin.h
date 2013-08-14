@@ -70,7 +70,7 @@ public:
 	virtual QAction* getContactAction(QObject* , int , const QString& ) { return 0; }
 	virtual QAction* getAccountAction(QObject* , int ) { return 0; }
 	virtual QString pluginInfo();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 private slots:
 	void start();

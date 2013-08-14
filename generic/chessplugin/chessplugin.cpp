@@ -102,7 +102,7 @@ public:
 	virtual QString pluginInfo();
 	virtual void setPopupAccessingHost(PopupAccessingHost* host);
 	virtual void setSoundAccessingHost(SoundAccessingHost* host);
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
 
 public slots:
 	void closeBoardEvent();
@@ -849,9 +849,9 @@ QString ChessPlugin::pluginInfo() {
 				 "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat window.");
 }
 
-QIcon ChessPlugin::icon() const
+QPixmap ChessPlugin::icon() const
 {
-	return QIcon(":/chessplugin/chess.png");
+	return QPixmap(":/chessplugin/chess.png");
 }
 
 #include "chessplugin.moc"

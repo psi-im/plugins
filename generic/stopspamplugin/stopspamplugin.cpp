@@ -97,7 +97,7 @@ public:
         virtual bool disable();
         virtual void applyOptions();
         virtual void restoreOptions();
-	virtual QIcon icon() const;
+	virtual QPixmap icon() const;
         virtual void setOptionAccessingHost(OptionAccessingHost* host);
 	virtual void optionChanged(const QString& ) {}
         virtual void setStanzaSendingHost(StanzaSendingHost *host);
@@ -394,9 +394,9 @@ void StopSpam::restoreOptions() {
         model_->reset();
 }
 
-QIcon StopSpam::icon() const
+QPixmap StopSpam::icon() const
 {
-	return QIcon(":/icons/stopspam.png");
+	return QPixmap(":/icons/stopspam.png");
 }
 
 QWidget* StopSpam::options() {

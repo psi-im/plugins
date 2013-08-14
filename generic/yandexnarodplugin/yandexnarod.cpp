@@ -242,9 +242,9 @@ QString yandexnarodPlugin::pluginInfo()
 	return trUtf8("Ported from QutIM Yandex.Narod plugin\nhttp://qutim.org/forum/viewtopic.php?f=62&t=711\n\n");
 }
 
-QIcon yandexnarodPlugin::icon() const
+QPixmap yandexnarodPlugin::icon() const
 {
-	return QIcon(":/icons/yandexnarodplugin.png");
+	return QPixmap(":/icons/yandexnarodplugin.png");
 }
 
 Q_EXPORT_PLUGIN(yandexnarodPlugin);
