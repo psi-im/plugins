@@ -117,7 +117,7 @@ private:
 			EventMood,
 			EventActivity
 			//,EventGeolocation
-		}; 
+		};
 		QString jid;
 		QMap<Event, QTime> events;
 		bool operator==(const ContactState& s)
@@ -150,7 +150,7 @@ PepPlugin::PepPlugin()
 	, psiOptions(0)
 	, accInfoHost(0)
 	, popup(0)
-	, appInfo(0)	
+	, appInfo(0)
 	, contactInfo(0)
 	, iconHost(0)
 	, sound_(0)
@@ -173,7 +173,7 @@ QString PepPlugin::name() const
 
 QString PepPlugin::shortName() const
 {
-	return "pepplugin";
+	return "pep";
 }
 
 QString PepPlugin::version() const
