@@ -200,7 +200,7 @@ QString ChessPlugin::name() const {
 }
 
 QString ChessPlugin::shortName() const {
-        return "chess";
+        return "chessplugin";
 }
 
 QString ChessPlugin::version() const {

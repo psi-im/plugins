@@ -29,7 +29,7 @@
 #include "options.h"
 
 #define constVersion            "0.1.1"
-#define constShortPluginName    "gomokugame"
+#define constShortPluginName    "gomokugameplugin"
 
 Q_EXPORT_PLUGIN(GomokuGamePlugin);
 
