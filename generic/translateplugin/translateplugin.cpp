@@ -559,7 +559,7 @@ void TranslatePlugin::setupGCTab(QWidget* tab, int /*account*/, const QString& /
 {
 	QAction* act = new QAction(tab);
 	tab->addAction(act);
-	act->setData(chatData);
+	act->setData(mucData);
 	act->setShortcut(QKeySequence(shortCut));
 	act->setShortcutContext(Qt::WindowShortcut);
 	connect(act, SIGNAL(triggered()), SLOT(trans()));
