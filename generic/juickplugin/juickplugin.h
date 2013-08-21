@@ -1,6 +1,6 @@
 /*
  * juickplugin.h - plugin
- * Copyright (C) 2009-2012 Kravtsov Nikolai, Khryukin Evgeny
+ * Copyright (C) 2009-2012  Kravtsov Nikolai, Khryukin Evgeny
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,7 +26,7 @@
 #include "optionaccessor.h"
 #include "activetabaccessor.h"
 #include "plugininfoprovider.h"
-#include "toolbariconaccessor.h"
+#include "chattabaccessor.h"
 #include "applicationinfoaccessor.h"
 #include "ui_settings.h"
 
@@ -37,11 +37,11 @@ class JuickDownloader;
 class QDomDocument;
 
 class JuickPlugin : public QObject, public PsiPlugin, public OptionAccessor, public ActiveTabAccessor,
-			public StanzaFilter, public ApplicationInfoAccessor, public PluginInfoProvider, public ToolbarIconAccessor
+			public StanzaFilter, public ApplicationInfoAccessor, public PluginInfoProvider, public ChatTabAccessor
 {
 	Q_OBJECT
 	Q_INTERFACES(PsiPlugin OptionAccessor ActiveTabAccessor StanzaFilter
-			ApplicationInfoAccessor PluginInfoProvider ToolbarIconAccessor)
+			ApplicationInfoAccessor PluginInfoProvider ChatTabAccessor)
 
 public:
 	JuickPlugin();
@@ -59,8 +59,10 @@ public:
 	virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
 	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
 	virtual QString pluginInfo();
-	virtual QList < QVariantHash > getButtonParam() { return QList < QVariantHash >(); }
-	virtual QAction* getAction(QObject* parent, int account, const QString& contact);
+
+	// ChatTabAccessor
+	void setupChatTab(QWidget* tab, int account, const QString& contact);
+	void setupGCTab(QWidget* tab, int account, const QString& contact) { /* do nothing*/ }
 
 	virtual bool incomingStanza(int account, const QDomElement& stanza);
 	virtual bool outgoingStanza(int , QDomElement& ) { return false; }

@@ -1056,21 +1056,19 @@ void JuickPlugin::addFavorite(QDomElement* body,QDomDocument* e, const QString& 
 	body->appendChild(unsubscribe);
 }
 
-// На самом деле мы никаких акшенов не добавляем.
 // Здесь мы просто ищем и сохраняем список уже открытых
 // чатов с juick
-QAction* JuickPlugin::getAction(QObject *parent, int /*account*/, const QString &contact)
+void JuickPlugin::setupChatTab(QWidget* tab, int /*account*/, const QString &contact)
 {
 	const QString jid = contact.split("/").first();
 	const QString usernameJ = jid.split("@").first();
 	if(jidList_.contains(jid) || usernameJ == "juick%juick.com"|| usernameJ == "jubo%nologin.ru") {
-		QWidget* log = parent->findChild<QWidget*>("log");
+		QWidget* log = tab->findChild<QWidget*>("log");
 		if(log) {
 			logs_.append(log);
 			connect(log, SIGNAL(destroyed()), SLOT(removeWidget()));
 		}
 	}
-	return 0;
 }
 
 void JuickPlugin::removeWidget()

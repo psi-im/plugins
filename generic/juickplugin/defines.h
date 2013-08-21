@@ -48,7 +48,7 @@
 #define constVersionOpt "version"
 
 
-#define constVersion "0.11.3"
+#define constVersion "0.11.4"
 #define constPluginName "Juick Plugin"
 
 #endif // DEFINES_H
