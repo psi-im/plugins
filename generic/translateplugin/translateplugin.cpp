@@ -1,6 +1,6 @@
 /*
  * translateplugin.cpp - plugin
- * Copyright (C) 2009-2010	Kravtsov Nikolai
+ * Copyright (C) 2009-2010  Kravtsov Nikolai
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,16 @@
  *
  */
 
-#include <QtGui>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QTableWidgetItem>
+#include <QTableWidget>
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QHeaderView>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QLabel>
 #include <QApplication>
 #include <QMap>
 #include <QAction>
@@ -50,9 +59,12 @@ class TranslatePlugin : public QObject
 					  , public ChatTabAccessor
 {
 	Q_OBJECT
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "com.psi-plus.TranslatePlugin")
+#endif
 	Q_INTERFACES(PsiPlugin OptionAccessor ShortcutAccessor ActiveTabAccessor PluginInfoProvider ChatTabAccessor)
 
-	public:
+public:
 	TranslatePlugin();
 	virtual QString name() const;
 	virtual QString shortName() const;
@@ -91,7 +103,9 @@ private slots:
 	void restoreMap();
 	void hack();
 	void actionDestroyed(QObject* obj);
+
 private:
+	void setupTab(QWidget* tab, const QString& data);
 	bool enabled_;
 	bool notTranslate;
 	QMap<QString,QString> map;
@@ -108,7 +122,9 @@ private:
 	QList<QAction *> actions_;
 };
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(TranslatePlugin);
+#endif
 
 TranslatePlugin::TranslatePlugin()
 	: enabled_(false)
@@ -543,11 +559,11 @@ void TranslatePlugin::hack()
 	check_button->toggle();
 }
 
-void TranslatePlugin::setupChatTab(QWidget* tab, int /*account*/, const QString& /*contact*/)
+void TranslatePlugin::setupTab(QWidget* tab, const QString& data)
 {
 	QAction* act = new QAction(tab);
 	tab->addAction(act);
-	act->setData(chatData);
+	act->setData(data);
 	act->setShortcut(QKeySequence(shortCut));
 	act->setShortcutContext(Qt::WindowShortcut);
 	connect(act, SIGNAL(triggered()), SLOT(trans()));
@@ -555,16 +571,14 @@ void TranslatePlugin::setupChatTab(QWidget* tab, int /*account*/, const QString&
 	actions_.append(act);
 }
 
+void TranslatePlugin::setupChatTab(QWidget* tab, int /*account*/, const QString& /*contact*/)
+{
+	setupTab(tab, chatData);
+}
+
 void TranslatePlugin::setupGCTab(QWidget* tab, int /*account*/, const QString& /*contact*/)
 {
-	QAction* act = new QAction(tab);
-	tab->addAction(act);
-	act->setData(mucData);
-	act->setShortcut(QKeySequence(shortCut));
-	act->setShortcutContext(Qt::WindowShortcut);
-	connect(act, SIGNAL(triggered()), SLOT(trans()));
-	connect(act, SIGNAL(destroyed(QObject*)), SLOT(actionDestroyed(QObject*)));
-	actions_.append(act);
+	setupTab(tab, mucData);
 }
 
 void TranslatePlugin::actionDestroyed(QObject *obj)
