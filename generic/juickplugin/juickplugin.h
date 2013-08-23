@@ -40,6 +40,9 @@ class JuickPlugin : public QObject, public PsiPlugin, public OptionAccessor, pub
 			public StanzaFilter, public ApplicationInfoAccessor, public PluginInfoProvider, public ChatTabAccessor
 {
 	Q_OBJECT
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "com.psi-plus.JuickPlugin")
+#endif
 	Q_INTERFACES(PsiPlugin OptionAccessor ActiveTabAccessor StanzaFilter
 			ApplicationInfoAccessor PluginInfoProvider ChatTabAccessor)
 

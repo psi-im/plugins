@@ -22,9 +22,9 @@
 #include <QMessageBox>
 #include <QColorDialog>
 #include <QTextEdit>
-#include <QtWebKit/QWebView>
-#include <QtWebKit/QWebFrame>
-#include <QtWebKit/QWebElement>
+#include <QWebView>
+#include <QWebFrame>
+#include <QWebElement>
 
 #include "optionaccessinghost.h"
 #include "activetabaccessinghost.h"
@@ -81,7 +81,9 @@ static void nl2br(QDomElement *body,QDomDocument* e, const QString& msg)
 //-----------------------------
 //------JuickPlugin------------
 //-----------------------------
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(JuickPlugin)
+#endif
 
 JuickPlugin::JuickPlugin()
 	: enabled(false)
@@ -873,7 +875,7 @@ void JuickPlugin::elementFromString(QDomElement* body,QDomDocument* e, const QSt
 		int quoteSize = 0;
 		nl2br(body, e, before.right(before.size() - quoteSize));
 		QString seg = regx.cap(2);
-		switch (seg.at(0).toAscii()) {
+		switch (seg.at(0).toLatin1()) {
 		case '#':{
 			idRx.indexIn(seg);
 			if (!idRx.cap(2).isEmpty()) {
