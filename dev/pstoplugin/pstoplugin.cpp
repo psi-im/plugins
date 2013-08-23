@@ -100,11 +100,6 @@ QString PstoPlugin::pluginInfo() {
     return "plugin info";
 }
 
-QPixmap PstoPlugin::icon() const
-{
-	return QPixmap(":/icons/psto.png");
-}
-
 bool PstoPlugin::enable() {
     if (psiOptions) {
         enabled = true;
@@ -232,7 +227,7 @@ void PstoPlugin::setOptionAccessingHost(OptionAccessingHost * host) {
 
 
 QString PstoPlugin::generateXMPPUrl(const QString & jid, const QString & message) {
-    QString message_percent(message.toAscii().toPercentEncoding());
+    QString message_percent(message.toLatin1().toPercentEncoding());
     return QString("xmpp:%1?message;type=chat;body=%2").arg(jid, message_percent);
 }
 
@@ -465,4 +460,11 @@ void PstoPlugin::processMessageString(const int /*pos_number*/,
     html_body.appendChild(doc.createElement("br"));
 }
 
+QPixmap PstoPlugin::icon() const
+{
+	return QPixmap(":/icons/psto.png");
+}
+
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(PstoPlugin);
+#endif
