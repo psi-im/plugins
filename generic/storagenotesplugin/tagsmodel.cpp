@@ -116,8 +116,9 @@ void TagModel::removeTag(const QString& tag_)
 
 void TagModel::clear()
 {
+	beginResetModel();
 	stringList.clear();
-	reset();
+	endResetModel();
 }
 
 QModelIndex TagModel::indexByTag(const QString& tag) const
@@ -144,7 +145,7 @@ QString TagModel::allTagsName()
 
 ////--------NoteModel---------------------
 NoteModel::NoteModel(QObject *parent) : QAbstractListModel(parent)
-{  
+{
 }
 
 int NoteModel::rowCount(const QModelIndex &/*parent*/) const
@@ -193,8 +194,9 @@ QVariant NoteModel::data(const QModelIndex &index, int role) const
 
 void NoteModel::clear()
 {
+	beginResetModel();
 	notesList.clear();
-	reset();
+	endResetModel();
 }
 
 void NoteModel::editNote(const QDomElement& note, const QModelIndex &index)
@@ -262,4 +264,3 @@ bool ProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &parent) cons
 	QStringList tags = index.data(NoteModel::TagRole).toString().split(" ");
 	return  tags.contains(filter, Qt::CaseInsensitive);
 }
-

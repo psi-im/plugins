@@ -182,4 +182,6 @@ QPixmap StorageNotesPlugin::icon() const
 	return QPixmap(":/storagenotes/storagenotes.png");
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(StorageNotesPlugin)
+#endif

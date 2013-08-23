@@ -47,6 +47,9 @@ class StorageNotesPlugin : public QObject, public PsiPlugin, public StanzaSender
 		public AccountInfoAccessor, public StanzaFilter, public PopupAccessor, public MenuAccessor
 {
         Q_OBJECT
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "com.psi-plus.StorageNotesPlugin")
+#endif
 	Q_INTERFACES(PsiPlugin StanzaSender IconFactoryAccessor AccountInfoAccessor StanzaFilter PopupAccessor MenuAccessor PluginInfoProvider)
 public:
 	StorageNotesPlugin();
