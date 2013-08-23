@@ -46,25 +46,25 @@ Q_EXPORT_PLUGIN(ClientSwitcherPlugin)
 
 
 ClientSwitcherPlugin::ClientSwitcherPlugin() :
-		sender_(0),
-		psiOptions(0),
-		psiPopup(0),
-		psiInfo(0),
-		psiAccount(0),
-		psiAccountCtl(0),
-		psiContactInfo(0),
-		psiIcon(0),
-		enabled(false),
-		for_all_acc(false),
-		def_os_name(""),
-		def_client_name(""),
-		def_client_version(""),
-		def_caps_node(""),
-		def_caps_version(""),
-		heightLogsView(500),
-		widthLogsView(600),
-		lastLogItem(""),
-		popupId(0)
+	sender_(0),
+	psiOptions(0),
+	psiPopup(0),
+	psiInfo(0),
+	psiAccount(0),
+	psiAccountCtl(0),
+	psiContactInfo(0),
+	psiIcon(0),
+	enabled(false),
+	for_all_acc(false),
+	def_os_name(""),
+	def_client_name(""),
+	def_client_version(""),
+	def_caps_node(""),
+	def_caps_version(""),
+	heightLogsView(500),
+	widthLogsView(600),
+	lastLogItem(""),
+	popupId(0)
 
 {
 	settingsList.clear();
@@ -170,8 +170,8 @@ QWidget* ClientSwitcherPlugin::options()
 	if (!enabled) {
 		return 0;
 	}
-        QWidget* optionsWid = new QWidget();
-        ui_options.setupUi(optionsWid);
+	QWidget* optionsWid = new QWidget();
+	ui_options.setupUi(optionsWid);
 	// Заполняем виджет пресетов ОС
 	ui_options.cb_ospreset->addItem("default", "default");
 	ui_options.cb_ospreset->addItem("user defined", "user");
@@ -672,21 +672,21 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 
 		// Showing popup if it is necessary
 		if (is_version_query && as->show_requ_mode != AccountSettings::LogNever
-				&& (as->show_requ_mode == AccountSettings::LogAlways || is_version_replaced))
+			&& (as->show_requ_mode == AccountSettings::LogAlways || is_version_replaced))
 			showPopup(jidToNick(account, s_to));
 
 		// Write log if it is necessary
 		if (is_version_query && as->log_mode != AccountSettings::LogNever
-				&& (as->log_mode == AccountSettings::LogAlways || is_version_replaced))
+			&& (as->log_mode == AccountSettings::LogAlways || is_version_replaced))
 			saveToLog(account, s_to, send_ver_list.join(", "));
 	}
 	return false;
 }
 
 QString ClientSwitcherPlugin::pluginInfo() {
-        return tr("Authors: ") +  "Liuch\n\n"
-			+ trUtf8("The plugin is intended for substitution of the client version, his name and operating system type.\n"
-				"You can specify the version of the client and OS or to select them from the preset list.\n");
+	return tr("Authors: ") +  "Liuch\n\n"
+		 + trUtf8("The plugin is intended for substitution of the client version, his name and operating system type.\n"
+				  "You can specify the version of the client and OS or to select them from the preset list.\n");
 }
 
 void ClientSwitcherPlugin::setPopupAccessingHost(PopupAccessingHost* host)
@@ -790,9 +790,9 @@ AccountSettings* ClientSwitcherPlugin::getAccountSetting(const QString &acc_id)
 }
 
 /**
-  * Отсылка пресентса с новыми капсами от имени указанного аккаунта
-  * Если account == -1, то капсы посылаются всем активным аккаунтам
-  */
+ * Отсылка пресентса с новыми капсами от имени указанного аккаунта
+ * Если account == -1, то капсы посылаются всем активным аккаунтам
+ */
 void ClientSwitcherPlugin::setNewCaps(int account)
 {
 	if (!enabled || !psiAccount || !psiAccountCtl)
@@ -832,7 +832,7 @@ bool ClientSwitcherPlugin::isSkipStanza(AccountSettings* as, int account, QStrin
 			}
 		}
 		if (psiContactInfo->isConference(account, to_jid) || psiContactInfo->isPrivate(account, to)) {
-		//if (to.contains("conference.")) {
+			//if (to.contains("conference.")) {
 			if (!as->enable_conferences)
 				return true;
 		} else {

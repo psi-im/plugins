@@ -84,7 +84,7 @@ public:
 	virtual bool incomingStanza(int, const QDomElement&);
 	virtual bool outgoingStanza(int, QDomElement&);
 	// EventFilter
-        virtual QString pluginInfo();
+	virtual QString pluginInfo();
 	// PopupAccessor
 	virtual void setPopupAccessingHost(PopupAccessingHost*);
 	// ApplicationInfoAccessor
@@ -106,10 +106,10 @@ private:
 	struct ClientStruct {
 		QString name;
 		QString version;
-                QString caps_node;
-                QString caps_version;
+		QString caps_node;
+		QString caps_version;
 	};
-        Ui::OptionsWidget ui_options;
+	Ui::OptionsWidget ui_options;
 	StanzaSendingHost* sender_;
 	OptionAccessingHost* psiOptions;
 	PopupAccessingHost* psiPopup;
