@@ -50,33 +50,33 @@
 #define constShortCut "shortcut"
 
 class ConferenceLogger: public QObject, public PsiPlugin, public StanzaFilter, public AccountInfoAccessor, public ApplicationInfoAccessor, public OptionAccessor,
-public ActiveTabAccessor, public GCToolbarIconAccessor, public IconFactoryAccessor, public PluginInfoProvider
+						public ActiveTabAccessor, public GCToolbarIconAccessor, public IconFactoryAccessor, public PluginInfoProvider
 {
 	Q_OBJECT
 #ifdef HAVE_QT5
-    Q_PLUGIN_METADATA(IID "com.psi-plus.ConferenceLogger")
+	Q_PLUGIN_METADATA(IID "com.psi-plus.ConferenceLogger")
 #endif
 	Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor ApplicationInfoAccessor OptionAccessor
-		     ActiveTabAccessor GCToolbarIconAccessor IconFactoryAccessor PluginInfoProvider)
+				 ActiveTabAccessor GCToolbarIconAccessor IconFactoryAccessor PluginInfoProvider)
 
-public:
+	public:
 	ConferenceLogger();
 	virtual QString name() const;
 	virtual QString shortName() const;
 	virtual QString version() const;
-        virtual QWidget* options();
+	virtual QWidget* options();
 	virtual bool enable();
-        virtual bool disable();
-        virtual void applyOptions();
-        virtual void restoreOptions(){};
-        virtual bool incomingStanza(int account, const QDomElement& xml);
+	virtual bool disable();
+	virtual void applyOptions();
+	virtual void restoreOptions(){};
+	virtual bool incomingStanza(int account, const QDomElement& xml);
 	virtual bool outgoingStanza(int account, QDomElement& xml);
-        virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
-        virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
-        virtual void setOptionAccessingHost(OptionAccessingHost* host);
-        virtual void optionChanged(const QString& /*option*/){};
-        virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
-        virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
+	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
+	virtual void setOptionAccessingHost(OptionAccessingHost* host);
+	virtual void optionChanged(const QString& /*option*/){};
+	virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
+	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
 	virtual QList < QVariantHash > getGCButtonParam();
 	virtual QAction* getGCAction(QObject* , int , const QString& ) { return 0; };
 	virtual QString pluginInfo();
@@ -84,25 +84,25 @@ public:
 
 
 private:
-        bool enabled;
-        AccountInfoAccessingHost *AccInfoHost;
-        ApplicationInfoAccessingHost *AppInfoHost;
-        OptionAccessingHost *psiOptions;
-        ActiveTabAccessingHost* activeTab;
-        IconFactoryAccessingHost *IcoHost;
-        QString HistoryDir;
-        void Logger(QString room, QString from, QString MyJid, QString Text, QString Stamp);
-        QComboBox *FilesBox;
-        QPushButton *viewButton;
-        int Height;
-        int Width;
-        QString lastItem;
-        void showLog(QString filename);
+	bool enabled;
+	AccountInfoAccessingHost *AccInfoHost;
+	ApplicationInfoAccessingHost *AppInfoHost;
+	OptionAccessingHost *psiOptions;
+	ActiveTabAccessingHost* activeTab;
+	IconFactoryAccessingHost *IcoHost;
+	QString HistoryDir;
+	void Logger(QString room, QString from, QString MyJid, QString Text, QString Stamp);
+	QComboBox *FilesBox;
+	QPushButton *viewButton;
+	int Height;
+	int Width;
+	QString lastItem;
+	void showLog(QString filename);
 
 private slots:
-        void view();
-        void viewFromOpt();
-        void onClose(int, int);
+	void view();
+	void viewFromOpt();
+	void onClose(int, int);
 };
 
 #ifndef HAVE_QT5
@@ -110,30 +110,30 @@ Q_EXPORT_PLUGIN(ConferenceLogger);
 #endif
 
 ConferenceLogger::ConferenceLogger() {
-        enabled = false;
-        AppInfoHost = 0;
-        AccInfoHost = 0;
-        psiOptions = 0;
-        IcoHost = 0;
-        activeTab = 0;
-        HistoryDir = "";
-        FilesBox = 0;
-        viewButton = 0;
-        Height = 500;
-        Width = 600;
-        lastItem = "";
+	enabled = false;
+	AppInfoHost = 0;
+	AccInfoHost = 0;
+	psiOptions = 0;
+	IcoHost = 0;
+	activeTab = 0;
+	HistoryDir = "";
+	FilesBox = 0;
+	viewButton = 0;
+	Height = 500;
+	Width = 600;
+	lastItem = "";
 }
 
 QString ConferenceLogger::name() const {
-        return "Conference Logger Plugin";
+	return "Conference Logger Plugin";
 }
 
 QString ConferenceLogger::shortName() const {
-        return "logger";
+	return "logger";
 }
 
 QString ConferenceLogger::version() const {
-        return cVer;
+	return cVer;
 }
 
 bool ConferenceLogger::enable() {
@@ -157,7 +157,7 @@ bool ConferenceLogger::enable() {
 }
 
 bool ConferenceLogger::disable() {
-        enabled = false;
+	enabled = false;
 	return true;
 }
 
@@ -261,7 +261,7 @@ void ConferenceLogger::Logger(QString room, QString from, QString MyJid, QString
 }
 
 void ConferenceLogger::applyOptions() {
-	if (FilesBox == 0)  return;
+	if (FilesBox == 0)	return;
 
 	QVariant vlastItem(FilesBox->currentText());
 	lastItem = vlastItem.toString();
@@ -338,11 +338,11 @@ QList < QVariantHash > ConferenceLogger::getGCButtonParam() {
 }
 
 QString ConferenceLogger::pluginInfo() {
-	return tr("Author: ") +  "Dealer_WeARE\n"
-			+ tr("Email: ") + "wadealer@gmail.com\n\n"
-			+ trUtf8("This plugin is designed to save conference logs in which the Psi+ user sits.\n"
-				 "Conferences logs can be viewed from the plugin settings or by clicking on the appropriate button on the toolbar in the active window/tab with conference.\n\n"
-				 "Note: To work correctly, the option options.ui.chat.central-toolbar  must be set to true.");
+	return tr("Author: ") +	 "Dealer_WeARE\n"
+		 + tr("Email: ") + "wadealer@gmail.com\n\n"
+		 + trUtf8("This plugin is designed to save conference logs in which the Psi+ user sits.\n"
+				  "Conferences logs can be viewed from the plugin settings or by clicking on the appropriate button on the toolbar in the active window/tab with conference.\n\n"
+				  "Note: To work correctly, the option options.ui.chat.central-toolbar	must be set to true.");
 }
 
 QPixmap ConferenceLogger::icon() const
