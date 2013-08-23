@@ -43,17 +43,17 @@ CleanerPlugin::CleanerPlugin()
 
 QString CleanerPlugin::name() const
 {
-        return "Cleaner Plugin";
+	return "Cleaner Plugin";
 }
 
 QString CleanerPlugin::shortName() const
 {
-        return "cleaner";
+	return "cleaner";
 }
 
 QString CleanerPlugin::version() const
 {
-        return constVersion;
+	return constVersion;
 }
 
 bool CleanerPlugin::enable()
@@ -79,23 +79,23 @@ bool CleanerPlugin::disable()
 
 QWidget* CleanerPlugin::options()
 {
-        if (!enabled) {
+	if (!enabled) {
 		return 0;
 	}
-        QWidget *options = new QWidget();
-        QVBoxLayout *hbox= new QVBoxLayout(options);
-        QPushButton *goButton = new QPushButton(tr("Launch Cleaner"));
+	QWidget *options = new QWidget();
+	QVBoxLayout *hbox= new QVBoxLayout(options);
+	QPushButton *goButton = new QPushButton(tr("Launch Cleaner"));
 	QHBoxLayout *h = new QHBoxLayout;
 	h->addWidget(goButton);
 	h->addStretch();
 	hbox->addLayout(h);
-        QLabel *wikiLink = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/plugins#cleaner_plugin\">Wiki (Online)</a>"));
+	QLabel *wikiLink = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/plugins#cleaner_plugin\">Wiki (Online)</a>"));
 	wikiLink->setOpenExternalLinks(true);
-        hbox->addStretch();
-        hbox->addWidget(wikiLink);
-        connect(goButton, SIGNAL(released()), SLOT(start()));
+	hbox->addStretch();
+	hbox->addWidget(wikiLink);
+	connect(goButton, SIGNAL(released()), SLOT(start()));
 
-        return options;
+	return options;
 }
 
 void CleanerPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost * host)
@@ -140,10 +140,10 @@ void CleanerPlugin::deleteCln()
 
 QString CleanerPlugin::pluginInfo()
 {
-	return tr("Author: ") +  "Dealer_WeARE\n"
-			+ tr("Email: ") + "wadealer@gmail.com\n\n"
-			+ trUtf8("This plugin is designed to clear the avatar cache, saved local copies of vCards and history logs.\n"
-				 "You can preview items before deleting them from your hard drive.");
+	return tr("Author: ") +	 "Dealer_WeARE\n"
+		 + tr("Email: ") + "wadealer@gmail.com\n\n"
+		 + trUtf8("This plugin is designed to clear the avatar cache, saved local copies of vCards and history logs.\n"
+				  "You can preview items before deleting them from your hard drive.");
 }
 
 QPixmap CleanerPlugin::icon() const

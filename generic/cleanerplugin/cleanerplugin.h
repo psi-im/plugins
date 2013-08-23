@@ -34,43 +34,44 @@
 class CleanerMainWindow;
 
 class CleanerPlugin : public QObject, public PsiPlugin, public ApplicationInfoAccessor,
-public IconFactoryAccessor, public OptionAccessor, public PluginInfoProvider
+					  public IconFactoryAccessor, public OptionAccessor, public PluginInfoProvider
 {
-        Q_OBJECT
+	Q_OBJECT
 #ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.CleanerPlugin")
 #endif
 	Q_INTERFACES(PsiPlugin ApplicationInfoAccessor IconFactoryAccessor OptionAccessor PluginInfoProvider)
+
 public:
 	CleanerPlugin();
-        virtual QString name() const;
-        virtual QString shortName() const;
-        virtual QString version() const;
-        virtual QWidget* options();
-        virtual bool enable();
-        virtual bool disable();
+	virtual QString name() const;
+	virtual QString shortName() const;
+	virtual QString version() const;
+	virtual QWidget* options();
+	virtual bool enable();
+	virtual bool disable();
 
-        virtual void applyOptions() {};
-        virtual void restoreOptions() {};
-        virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
-        virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
-        virtual void setOptionAccessingHost(OptionAccessingHost* host);
-        virtual void optionChanged(const QString& ) {};
+	virtual void applyOptions() {};
+	virtual void restoreOptions() {};
+	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
+	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
+	virtual void setOptionAccessingHost(OptionAccessingHost* host);
+	virtual void optionChanged(const QString& ) {};
 	virtual QString pluginInfo();
 	virtual QPixmap icon() const;
 
 private:
 	bool enabled;
-        ApplicationInfoAccessingHost *appInfo;
-        IconFactoryAccessingHost* iconHost;
-        OptionAccessingHost* psiOptions;
+	ApplicationInfoAccessingHost *appInfo;
+	IconFactoryAccessingHost* iconHost;
+	OptionAccessingHost* psiOptions;
 	QPointer<CleanerMainWindow> cln;
-        friend class CleanerMainWindow;
-        int height, width;
+	friend class CleanerMainWindow;
+	int height, width;
 
 private slots:
-        void start();
-        void deleteCln();
+	void start();
+	void deleteCln();
 
 };
 
