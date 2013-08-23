@@ -65,40 +65,40 @@
 
 
 class ChessPlugin: public QObject, public PsiPlugin, public OptionAccessor, public ActiveTabAccessor, public MenuAccessor, public ApplicationInfoAccessor,
-public ToolbarIconAccessor, public IconFactoryAccessor, public StanzaSender, public AccountInfoAccessor, public StanzaFilter,
-public PluginInfoProvider, public EventCreator, public ContactInfoAccessor, public PopupAccessor, public SoundAccessor
+				   public ToolbarIconAccessor, public IconFactoryAccessor, public StanzaSender, public AccountInfoAccessor, public StanzaFilter,
+				   public PluginInfoProvider, public EventCreator, public ContactInfoAccessor, public PopupAccessor, public SoundAccessor
 {
 	Q_OBJECT
 #ifdef HAVE_QT5
-    Q_PLUGIN_METADATA(IID "com.psi-plus.ChessPlugin")
+	Q_PLUGIN_METADATA(IID "com.psi-plus.ChessPlugin")
 #endif
 	Q_INTERFACES(PsiPlugin AccountInfoAccessor OptionAccessor ActiveTabAccessor MenuAccessor StanzaFilter ContactInfoAccessor SoundAccessor
-		     ToolbarIconAccessor IconFactoryAccessor StanzaSender ApplicationInfoAccessor PluginInfoProvider EventCreator PopupAccessor)
+				 ToolbarIconAccessor IconFactoryAccessor StanzaSender ApplicationInfoAccessor PluginInfoProvider EventCreator PopupAccessor)
 
 public:
 	ChessPlugin();
 	virtual QString name() const;
 	virtual QString shortName() const;
 	virtual QString version() const;
-        virtual QWidget* options();
+	virtual QWidget* options();
 	virtual bool enable();
-        virtual bool disable();
-        virtual void applyOptions();
-        virtual void restoreOptions();
-        virtual void optionChanged(const QString& /*option*/){};
-        virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
-        virtual void setOptionAccessingHost(OptionAccessingHost* host);
-        virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
-        virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
-        virtual void setStanzaSendingHost(StanzaSendingHost *host);
+	virtual bool disable();
+	virtual void applyOptions();
+	virtual void restoreOptions();
+	virtual void optionChanged(const QString& /*option*/){};
+	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+	virtual void setOptionAccessingHost(OptionAccessingHost* host);
+	virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
+	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
+	virtual void setStanzaSendingHost(StanzaSendingHost *host);
 	virtual QList < QVariantHash > getButtonParam();
 	virtual QAction* getAction(QObject* , int , const QString& ) { return 0; };
 	virtual QList < QVariantHash > getAccountMenuParam();
 	virtual QList < QVariantHash > getContactMenuParam();
 	virtual QAction* getContactAction(QObject* , int , const QString& ) { return 0; };
 	virtual QAction* getAccountAction(QObject* , int ) { return 0; };
-        virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
-        virtual bool incomingStanza(int account, const QDomElement& xml);
+	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
+	virtual bool incomingStanza(int account, const QDomElement& xml);
 	virtual bool outgoingStanza(int account, QDomElement& xml);
 	virtual void setEventCreatingHost(EventCreatingHost *host);
 	virtual void setContactInfoAccessingHost(ContactInfoAccessingHost* host);
@@ -142,27 +142,27 @@ private:
 
 private:
 	bool enabled;
-        OptionAccessingHost* psiOptions;
+	OptionAccessingHost* psiOptions;
 	AccountInfoAccessingHost *accInfoHost;
-        ActiveTabAccessingHost* activeTab;
+	ActiveTabAccessingHost* activeTab;
 	IconFactoryAccessingHost *icoHost;
-        ApplicationInfoAccessingHost* appInfo;
-        StanzaSendingHost *stanzaSender;
+	ApplicationInfoAccessingHost* appInfo;
+	StanzaSendingHost *stanzaSender;
 	EventCreatingHost *psiEvent;
 	ContactInfoAccessingHost* contactInfo;
 	PopupAccessingHost* popup;
 	SoundAccessingHost* sound_;
 
-        ChessWindow *board;
-        bool game_, theEnd_;
-        bool waitFor;
-        int id;
+	ChessWindow *board;
+	bool game_, theEnd_;
+	bool waitFor;
+	int id;
 	QString tmpId;
 
-        QString soundStart, soundFinish, soundMove, soundError;
-        bool DndDisable, DefSoundSettings, enableSound;
+	QString soundStart, soundFinish, soundMove, soundError;
+	bool DndDisable, DefSoundSettings, enableSound;
 
-        Ui::options ui_;
+	Ui::options ui_;
 
 	QList<Request> requests;
 	QList<Request> invites;
@@ -201,15 +201,15 @@ ChessPlugin::ChessPlugin()
 }
 
 QString ChessPlugin::name() const {
-        return "Chess Plugin";
+	return "Chess Plugin";
 }
 
 QString ChessPlugin::shortName() const {
-        return "chessplugin";
+	return "chessplugin";
 }
 
 QString ChessPlugin::version() const {
-        return cVer;
+	return cVer;
 }
 
 bool ChessPlugin::enable() {
@@ -224,20 +224,20 @@ bool ChessPlugin::enable() {
 	requests.clear();
 	invites.clear();
 
-        enabled = true;
+	enabled = true;
 	QFile file(":/chessplugin/figures/Black queen 2d.png");
 	if(file.open(QIODevice::ReadOnly)) {
 		QByteArray ico = file.readAll();
 		icoHost->addIcon("chessplugin/chess", ico);
 		file.close();
-        }
-        soundStart = psiOptions->getPluginOption(soundStartConst, QVariant(soundStart)).toString();
-        soundFinish = psiOptions->getPluginOption(soundFinishConst, QVariant(soundFinish)).toString();
-        soundMove = psiOptions->getPluginOption(soundMoveConst, QVariant(soundMove)).toString();
-        soundError = psiOptions->getPluginOption(soundErrorConst, QVariant(soundError)).toString();
-        DndDisable = psiOptions->getPluginOption(constDndDisable, QVariant(DndDisable)).toBool();
-        DefSoundSettings = psiOptions->getPluginOption(constDefSoundSettings, QVariant(DefSoundSettings)).toBool();
-        return enabled;
+	}
+	soundStart = psiOptions->getPluginOption(soundStartConst, QVariant(soundStart)).toString();
+	soundFinish = psiOptions->getPluginOption(soundFinishConst, QVariant(soundFinish)).toString();
+	soundMove = psiOptions->getPluginOption(soundMoveConst, QVariant(soundMove)).toString();
+	soundError = psiOptions->getPluginOption(soundErrorConst, QVariant(soundError)).toString();
+	DndDisable = psiOptions->getPluginOption(constDndDisable, QVariant(DndDisable)).toBool();
+	DefSoundSettings = psiOptions->getPluginOption(constDefSoundSettings, QVariant(DefSoundSettings)).toBool();
+	return enabled;
 }
 
 bool ChessPlugin::disable() {
@@ -456,11 +456,12 @@ void ChessPlugin::sendInvite(const Request& req, const QString& resource, const 
 	r.chessId = "ch_111";
 	r.jid += "/" + stanzaSender->escape(resource);
 	r.requestId = newId();
-	stanzaSender->sendStanza(r.account, QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><create xmlns=\"games:board\" id=\"%4\" type=\"chess\" color=\"%3\"></create></iq>")
-				 .arg(r.jid)
-				 .arg(r.requestId)
-				 .arg(color)
-				 .arg(r.chessId));
+	stanzaSender->sendStanza(r.account,
+							 QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><create xmlns=\"games:board\" id=\"%4\" type=\"chess\" color=\"%3\"></create></iq>")
+							 .arg(r.jid)
+							 .arg(r.requestId)
+							 .arg(color)
+							 .arg(r.chessId));
 	if(color == "white")
 		r.type = Figure::WhitePlayer;
 	else
@@ -472,27 +473,30 @@ void ChessPlugin::sendInvite(const Request& req, const QString& resource, const 
 
 //Этот метод вызывается, когда вы принимаете приглашение
 void ChessPlugin::accept() {
-	stanzaSender->sendStanza(currentGame_.account, QString("<iq type=\"result\" to=\"%1\" id=\"%2\"><create xmlns=\"games:board\" type=\"chess\" id=\"%3\"/></iq>")
-				 .arg(currentGame_.jid)
-				 .arg(currentGame_.requestId)
-				 .arg(currentGame_.chessId));
+	stanzaSender->sendStanza(currentGame_.account,
+							 QString("<iq type=\"result\" to=\"%1\" id=\"%2\"><create xmlns=\"games:board\" type=\"chess\" id=\"%3\"/></iq>")
+							 .arg(currentGame_.jid)
+							 .arg(currentGame_.requestId)
+							 .arg(currentGame_.chessId));
 	acceptGame();
 }
 
 //Этот метод вызывается, когда вы отказываетесь от игры
 void ChessPlugin::reject() {
-	stanzaSender->sendStanza(currentGame_.account, QString("<iq type=\"error\" to=\"%1\" id=\"%2\"></iq>")
-				.arg(currentGame_.jid)
-				.arg(currentGame_.requestId));
+	stanzaSender->sendStanza(currentGame_.account,
+							 QString("<iq type=\"error\" to=\"%1\" id=\"%2\"></iq>")
+							 .arg(currentGame_.jid)
+							 .arg(currentGame_.requestId));
 	rejectGame();
 }
 
 // Этот метод вызывается, когда вы закрыли доску.
 void ChessPlugin::closeBoardEvent() {
-	stanzaSender->sendStanza(currentGame_.account, QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><close xmlns=\"games:board\" id=\"%3\" type=\"chess\"></close></iq>")
-				 .arg(currentGame_.jid)
-				 .arg(newId())
-				 .arg(currentGame_.chessId));
+	stanzaSender->sendStanza(currentGame_.account,
+							 QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><close xmlns=\"games:board\" id=\"%3\" type=\"chess\"></close></iq>")
+							 .arg(currentGame_.jid)
+							 .arg(newId())
+							 .arg(currentGame_.chessId));
 
 	if((DefSoundSettings || psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool()) && enableSound)
 		playSound(soundFinish);
@@ -503,7 +507,7 @@ void ChessPlugin::closeBoardEvent() {
 void ChessPlugin::boardClosed() {
 	if(theEnd_) return;
 	QMessageBox::warning(board, tr("Chess Plugin"),
-			     tr("Your opponent has closed the board!\n You can still save the game."), QMessageBox::Ok);
+						 tr("Your opponent has closed the board!\n You can still save the game."), QMessageBox::Ok);
 }
 
 // Окончание игры
@@ -546,23 +550,24 @@ void ChessPlugin::rejectGame() {
 
 // Вы отправляете вашему сопернику сохраненную партию
 void ChessPlugin::load(const QString& settings) {
-	stanzaSender->sendStanza(currentGame_.account, QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><load xmlns=\"games:board\" id=\"%3\" type=\"chess\">%4</load></iq>")
-				 .arg(currentGame_.jid)
-				 .arg(newId())
-				 .arg(currentGame_.chessId)
-				 .arg(settings));
+	stanzaSender->sendStanza(currentGame_.account,
+							 QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><load xmlns=\"games:board\" id=\"%3\" type=\"chess\">%4</load></iq>")
+							 .arg(currentGame_.jid)
+							 .arg(newId())
+							 .arg(currentGame_.chessId)
+							 .arg(settings));
 }
 
 // Вы походили
 void ChessPlugin::move(int oldX, int oldY, int newX, int newY, const QString& figure) {
 	QString stanza = QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><turn xmlns=\"games:board\" type=\"chess\" id=\"%7\"><move pos=\"%3,%4;%5,%6\">")
-			 .arg(currentGame_.jid)
-			 .arg(newId())
-			 .arg(QString::number(oldX))
-			 .arg(QString::number(oldY))
-			 .arg(QString::number(newX))
-			 .arg(QString::number(newY))
-			 .arg(currentGame_.chessId);
+							 .arg(currentGame_.jid)
+							 .arg(newId())
+							 .arg(QString::number(oldX))
+							 .arg(QString::number(oldY))
+							 .arg(QString::number(newX))
+							 .arg(QString::number(newY))
+							 .arg(currentGame_.chessId);
 	if(!figure.isEmpty())
 		stanza += QString("<promotion>%1</promotion>").arg(figure);
 	stanza += "</move></turn></iq>";
@@ -573,22 +578,24 @@ void ChessPlugin::move(int oldX, int oldY, int newX, int newY, const QString& fi
 
 // Вы согласились с ходом
 void ChessPlugin::moveAccepted() {
-	stanzaSender->sendStanza(currentGame_.account, QString("<iq type=\"result\" to=\"%1\" id=\"%2\"><turn type=\"chess\" id=\"%3\" xmlns=\"games:board\"/></iq>")
-				 .arg(currentGame_.jid)
-				 .arg(tmpId)
-				 .arg(currentGame_.chessId));
+	stanzaSender->sendStanza(currentGame_.account,
+							 QString("<iq type=\"result\" to=\"%1\" id=\"%2\"><turn type=\"chess\" id=\"%3\" xmlns=\"games:board\"/></iq>")
+							 .arg(currentGame_.jid)
+							 .arg(tmpId)
+							 .arg(currentGame_.chessId));
 }
 
 void ChessPlugin::youLose() {
 	if(theEnd_) return;
-	stanzaSender->sendStanza(currentGame_.account, QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><turn xmlns=\"games:board\" type=\"chess\" id=\"%3\"><resign/></turn></iq>")
-				 .arg(currentGame_.jid)
-				 .arg(newId())
-				 .arg(currentGame_.chessId));
+	stanzaSender->sendStanza(currentGame_.account,
+							 QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><turn xmlns=\"games:board\" type=\"chess\" id=\"%3\"><resign/></turn></iq>")
+							 .arg(currentGame_.jid)
+							 .arg(newId())
+							 .arg(currentGame_.chessId));
 	board->youLose();
 	theEnd_ = true;
 	QMessageBox::information(board, tr("Chess Plugin"),
-				 tr("You Lose."), QMessageBox::Ok);
+							 tr("You Lose."), QMessageBox::Ok);
 }
 
 void ChessPlugin::youWin() {
@@ -598,21 +605,22 @@ void ChessPlugin::youWin() {
 	board->youWin();
 	theEnd_ = true;
 	QMessageBox::information(board, tr("Chess Plugin"),
-				 tr("You Win!"), QMessageBox::Ok);
+							 tr("You Win!"), QMessageBox::Ok);
 }
 
 void ChessPlugin::draw() {
 	if(!theEnd_) {
-		stanzaSender->sendStanza(currentGame_.account, QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><turn xmlns=\"games:board\" type=\"chess\" id=\"%3\"><draw/></turn></iq>")
-					 .arg(currentGame_.jid)
-					 .arg(newId())
-					 .arg(currentGame_.chessId));
+		stanzaSender->sendStanza(currentGame_.account,
+								 QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><turn xmlns=\"games:board\" type=\"chess\" id=\"%3\"><draw/></turn></iq>")
+								 .arg(currentGame_.jid)
+								 .arg(newId())
+								 .arg(currentGame_.chessId));
 		if((DefSoundSettings || psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool()) && enableSound)
 			playSound(soundStart);
 		board->youDraw();
 		theEnd_ = true;
 		QMessageBox::information(board, tr("Chess Plugin"),
-					 tr("Draw!"), QMessageBox::Ok);
+								 tr("Draw!"), QMessageBox::Ok);
 	}
 }
 
@@ -620,7 +628,7 @@ void ChessPlugin::error() {
 	if((DefSoundSettings || psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool()) && enableSound)
 		playSound(soundError);
 	QMessageBox::warning(board, tr("Chess Plugin"),
-			     tr("Unknown error!"), QMessageBox::Ok);
+						 tr("Unknown error!"), QMessageBox::Ok);
 	board->close();
 }
 
@@ -639,9 +647,10 @@ bool ChessPlugin::incomingStanza(int account, const QDomElement& xml)
 				const QString xmlId = stanzaSender->escape(xml.attribute("id"));
 				const QString xmlFrom = stanzaSender->escape(xml.attribute("from"));
 				if((DndDisable && accInfoHost->getStatus(account) == "dnd") || game_) {
-					stanzaSender->sendStanza(account, QString("<iq type=\"error\" to=\"%1\" id=\"%2\"></iq>")
-								 .arg(xmlFrom)
-								 .arg(xmlId));
+					stanzaSender->sendStanza(account,
+											 QString("<iq type=\"error\" to=\"%1\" id=\"%2\"></iq>")
+											 .arg(xmlFrom)
+											 .arg(xmlId));
 					return true;
 				}
 				const QString color = stanzaSender->escape(createElem.attribute("color"));
@@ -759,9 +768,10 @@ void ChessPlugin::doInviteDialog(const QString& jid) {
 
 	if(game_) {
 		QMessageBox::information(0, tr("Chess Plugin"), tr("You are allready playing!"));
-		stanzaSender->sendStanza(rec.account, QString("<iq type=\"error\" to=\"%1\" id=\"%2\"></iq>")
-					 .arg(rec.jid)
-					 .arg(rec.requestId));
+		stanzaSender->sendStanza(rec.account,
+								 QString("<iq type=\"error\" to=\"%1\" id=\"%2\"></iq>")
+								 .arg(rec.jid)
+								 .arg(rec.requestId));
 		return;
 	}
 
@@ -846,12 +856,12 @@ void ChessPlugin::toggleEnableSound(bool enable) {
 }
 
 QString ChessPlugin::pluginInfo() {
-	return tr("Author: ") +  "Dealer_WeARE\n"
-			+ tr("Email: ") + "wadealer@gmail.com\n\n"
-			+ trUtf8("This plugin allows you to play chess with your friends.\n"
-				 "The plugin is compatible with a similar plugin for Tkabber.\n"
-				 "For sending commands, normal messages are used, so this plugin will always work wherever you are able to log in."
-				 "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat window.");
+	return tr("Author: ") +	 "Dealer_WeARE\n"
+		 + tr("Email: ") + "wadealer@gmail.com\n\n"
+		 + trUtf8("This plugin allows you to play chess with your friends.\n"
+				  "The plugin is compatible with a similar plugin for Tkabber.\n"
+				  "For sending commands, normal messages are used, so this plugin will always work wherever you are able to log in."
+				  "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat window.");
 }
 
 QPixmap ChessPlugin::icon() const
