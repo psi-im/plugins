@@ -50,24 +50,24 @@
 static const QStringList methods = QStringList() << "qa" << "ocr" << "picture_q" << "picture_recog";
 
 class CaptchaFormsPlugin : public QObject, public PsiPlugin, public OptionAccessor, public PluginInfoProvider, public EventCreator,
-			   public StanzaFilter, public StanzaSender, public AccountInfoAccessor, public ApplicationInfoAccessor
+						   public StanzaFilter, public StanzaSender, public AccountInfoAccessor, public ApplicationInfoAccessor
 {
-        Q_OBJECT
+	Q_OBJECT
 #ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.CaptchaFormsPlugin")
 #endif
 	Q_INTERFACES(PsiPlugin OptionAccessor PluginInfoProvider EventCreator StanzaFilter StanzaSender AccountInfoAccessor ApplicationInfoAccessor)
-public:
+	public:
 	CaptchaFormsPlugin();
-        virtual QString name() const;
-        virtual QString shortName() const;
-        virtual QString version() const;
-        virtual QWidget* options();
-        virtual bool enable();
-        virtual bool disable();
+	virtual QString name() const;
+	virtual QString shortName() const;
+	virtual QString version() const;
+	virtual QWidget* options();
+	virtual bool enable();
+	virtual bool disable();
 	virtual void optionChanged(const QString&){};
-        virtual void applyOptions();
-        virtual void restoreOptions();
+	virtual void applyOptions();
+	virtual void restoreOptions();
 	virtual void setOptionAccessingHost(OptionAccessingHost* host);
 	virtual void setEventCreatingHost(EventCreatingHost* host);
 	virtual bool incomingStanza(int account, const QDomElement& xml);
@@ -79,7 +79,7 @@ public:
 	virtual QPixmap icon() const;
 
 private:
-        OptionAccessingHost *psiOptions;
+	OptionAccessingHost *psiOptions;
 	EventCreatingHost *psiEvent;
 	StanzaSendingHost *stanzaSender;
 	AccountInfoAccessingHost* accInfo;
@@ -130,35 +130,35 @@ QString CaptchaFormsPlugin::shortName() const {
 }
 
 QString CaptchaFormsPlugin::version() const {
-        return constVersion;
+	return constVersion;
 }
 
 bool CaptchaFormsPlugin::enable()
 {
-    if(psiOptions) {
-	enabled = true;
-	id = 111;
-	useProxy = psiOptions->getPluginOption(constUseProxy, QVariant(useProxy)).toBool();
-	autopopup = psiOptions->getPluginOption(constAutopopup, QVariant(autopopup)).toBool();
+	if(psiOptions) {
+		enabled = true;
+		id = 111;
+		useProxy = psiOptions->getPluginOption(constUseProxy, QVariant(useProxy)).toBool();
+		autopopup = psiOptions->getPluginOption(constAutopopup, QVariant(autopopup)).toBool();
 
-	if(!useProxy)
-		appInfo->getProxyFor(name()); //register proxy
-    }
-    return enabled;
+		if(!useProxy)
+			appInfo->getProxyFor(name()); //register proxy
+	}
+	return enabled;
 }
 
 bool CaptchaFormsPlugin::disable()
 {
 	enabled = false;
-        return true;
+	return true;
 }
 
 QWidget* CaptchaFormsPlugin::options()
 {
-        if (!enabled) {
+	if (!enabled) {
 		return 0;
 	}
-        QWidget *options = new QWidget();
+	QWidget *options = new QWidget();
 	ui_.setupUi(options);
 
 	restoreOptions();
@@ -184,7 +184,7 @@ void CaptchaFormsPlugin::restoreOptions()
 
 void CaptchaFormsPlugin::setOptionAccessingHost(OptionAccessingHost *host)
 {
-    psiOptions = host;
+	psiOptions = host;
 }
 
 void CaptchaFormsPlugin::setEventCreatingHost(EventCreatingHost *host)
@@ -221,7 +221,7 @@ bool CaptchaFormsPlugin::incomingStanza(int account, const QDomElement &xml)
 				eventActivated(dataFields.value("sender"));
 			else
 				psiEvent->createNewEvent(account, dataFields.value("sender"), tr("Captcha Plugin: CAPTCHA from %1")
-						 .arg(dataFields.value("sender")), this, SLOT(eventActivated(QString)));
+										 .arg(dataFields.value("sender")), this, SLOT(eventActivated(QString)));
 
 			return true;
 		}
@@ -330,15 +330,15 @@ void CaptchaFormsPlugin::submitChallenge(const QString& id, const QString& text)
 
 	QHash<QString, QString> dataFields = challenges_.at(index);
 	QString mes = QString("<iq type=\"set\" from=\"%1\" to=\"%2\" xml:lang=\"en\" id=\"%3\">"
-				"<captcha xmlns=\"urn:xmpp:captcha\"><x xmlns=\"jabber:x:data\" type=\"submit\">"
-				"<field var=\"FORM_TYPE\"><value>urn:xmpp:captcha</value></field>"
-				"<field var=\"from\"><value>%4</value></field>"
-				"<field var=\"challenge\"><value>%5</value></field>"
-				"<field var=\"%6\"><value>%7</value></field>"
-				"</x></captcha></iq>")
-			.arg(stanzaSender->escape(dataFields.value("to")), stanzaSender->escape(dataFields.value("sender")), stanzaSender->escape(dataFields.value("id")))
-			.arg(stanzaSender->escape(dataFields.value("from")), stanzaSender->escape(dataFields.value("challenge")))
-			.arg(stanzaSender->escape(dataFields.value("method")), text);
+						  "<captcha xmlns=\"urn:xmpp:captcha\"><x xmlns=\"jabber:x:data\" type=\"submit\">"
+						  "<field var=\"FORM_TYPE\"><value>urn:xmpp:captcha</value></field>"
+						  "<field var=\"from\"><value>%4</value></field>"
+						  "<field var=\"challenge\"><value>%5</value></field>"
+						  "<field var=\"%6\"><value>%7</value></field>"
+						  "</x></captcha></iq>")
+						  .arg(stanzaSender->escape(dataFields.value("to")), stanzaSender->escape(dataFields.value("sender")), stanzaSender->escape(dataFields.value("id")))
+						  .arg(stanzaSender->escape(dataFields.value("from")), stanzaSender->escape(dataFields.value("challenge")))
+						  .arg(stanzaSender->escape(dataFields.value("method")), text);
 
 	stanzaSender->sendStanza(dataFields.value("account").toInt(), mes);
 
@@ -354,12 +354,12 @@ void CaptchaFormsPlugin::cancelChallenge(const QString& id)
 	QHash<QString, QString> dataFields = challenges_.at(index);
 
 	QString mes = QString("<message type=\"error\" to=\"%1\" xml:lang=\"en\" id=\"%2\">"
-			"<error xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\" type=\"modify\">"
-			"<not-acceptable xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/></error></message>")
-			//.arg(dataFields.value("to"))
-			.arg(stanzaSender->escape(dataFields.value("sender")))
-			.arg(stanzaSender->escape(dataFields.value("challenge")));
-	stanzaSender->sendStanza(dataFields.value("account").toInt(), mes);
+						  "<error xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\" type=\"modify\">"
+						  "<not-acceptable xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/></error></message>")
+						  //.arg(dataFields.value("to"))
+						  .arg(stanzaSender->escape(dataFields.value("sender")))
+						  .arg(stanzaSender->escape(dataFields.value("challenge")));
+						  stanzaSender->sendStanza(dataFields.value("account").toInt(), mes);
 
 	challenges_.removeAt(index);
 }
@@ -451,9 +451,9 @@ bool CaptchaFormsPlugin::isValidChallenge(const QDomElement& stanza, QHash<QStri
 
 QString CaptchaFormsPlugin::pluginInfo()
 {
-	return tr("Author: ") +  "Dealer_WeARE\n"
-			+ tr("Email: ") + "wadealer@gmail.com\n\n"
-			+ trUtf8("This plugin is designed to pass of captcha directly from the Psi+.");
+	return tr("Author: ") +	 "Dealer_WeARE\n"
+	     + tr("Email: ") + "wadealer@gmail.com\n\n"
+	     + trUtf8("This plugin is designed to pass of captcha directly from the Psi+.");
 }
 
 QPixmap CaptchaFormsPlugin::icon() const
