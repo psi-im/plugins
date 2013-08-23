@@ -56,6 +56,9 @@ class ImagePlugin : public QObject, public PsiPlugin, public ToolbarIconAccessor
 		, public PsiAccountController, public OptionAccessor
 {
 	Q_OBJECT
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "com.psi-plus.ImagePlugin")
+#endif
 	Q_INTERFACES(PsiPlugin ToolbarIconAccessor GCToolbarIconAccessor
 		     StanzaSender ActiveTabAccessor PsiAccountController OptionAccessor
 		     IconFactoryAccessor AccountInfoAccessor PluginInfoProvider)
@@ -98,7 +101,9 @@ private:
 	QHash<QString,int> accounts_;
 };
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(ImagePlugin)
+#endif
 
 ImagePlugin::ImagePlugin()
 	: iconHost(0)
