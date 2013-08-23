@@ -69,6 +69,9 @@ public ToolbarIconAccessor, public IconFactoryAccessor, public StanzaSender, pub
 public PluginInfoProvider, public EventCreator, public ContactInfoAccessor, public PopupAccessor, public SoundAccessor
 {
 	Q_OBJECT
+#ifdef HAVE_QT5
+    Q_PLUGIN_METADATA(IID "com.psi-plus.ChessPlugin")
+#endif
 	Q_INTERFACES(PsiPlugin AccountInfoAccessor OptionAccessor ActiveTabAccessor MenuAccessor StanzaFilter ContactInfoAccessor SoundAccessor
 		     ToolbarIconAccessor IconFactoryAccessor StanzaSender ApplicationInfoAccessor PluginInfoProvider EventCreator PopupAccessor)
 
@@ -166,7 +169,9 @@ private:
 	Request currentGame_;
 };
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(ChessPlugin);
+#endif
 
 ChessPlugin::ChessPlugin()
 	: enabled(false)

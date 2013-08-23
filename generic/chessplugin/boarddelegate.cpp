@@ -31,6 +31,6 @@ void BoardDelegate::paint(QPainter * painter, const QStyleOptionViewItem & optio
 		       QColor("#b5e3ff") : index.data(Qt::BackgroundColorRole).value<QColor>();
 	painter->fillRect(r, color);
 
-	QPixmap pix = qVariantValue<QPixmap>(index.data(Qt::DisplayRole));
+	QPixmap pix = index.data(Qt::DisplayRole).value<QPixmap>();
 	painter->drawPixmap(r, pix);
 }

@@ -183,7 +183,8 @@ void BoardModel::reset()
 	blackFigures_.append(blackCastle);
 	blackFigures_.append(blackCastle2);
 
-	QAbstractTableModel::reset();
+	beginResetModel();
+	endResetModel();
 }
 
 bool BoardModel::moveRequested(QModelIndex oldIndex, QModelIndex newIndex)
