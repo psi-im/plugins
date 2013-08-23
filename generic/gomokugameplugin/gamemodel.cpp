@@ -164,7 +164,7 @@ GameModel::GameModel(const QString load_str, bool local, QObject *parent) :
 	loadedTurnsCount = turnsCount_;
 	const int pos = load_str.indexOf("sha1sum:", 0, Qt::CaseInsensitive);
 	if (pos != -1) {
-		const QString sum_str = QCryptographicHash::hash(load_str.left(pos).toAscii().data(), QCryptographicHash::Sha1).toHex().constData();
+		const QString sum_str = QCryptographicHash::hash(load_str.left(pos).toLatin1().data(), QCryptographicHash::Sha1).toHex().constData();
 		if (sum_str == load_str.mid(pos + 8, 40))
 			chksum = ChksumCorrect;
 		else
@@ -525,7 +525,7 @@ QString GameModel::toString() const
 	res_str.append(QString("Color:%1;\n").arg((my_el == GameElement::TypeBlack) ? "black" : "white"));
 	res_str.append(QString("Status:%1;\n").arg(statusString()));
 	QString tmp_str = res_str;
-	QString crcStr = QCryptographicHash::hash(tmp_str.replace("\n", "").toAscii().data(), QCryptographicHash::Sha1).toHex().constData();
+	QString crcStr = QCryptographicHash::hash(tmp_str.replace("\n", "").toLatin1().data(), QCryptographicHash::Sha1).toHex().constData();
 	res_str.append(QString("Sha1Sum:%1;\n").arg(crcStr));
 
 	return res_str;

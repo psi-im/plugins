@@ -26,8 +26,6 @@
 #ifndef GOMOKUGAMEPLUGIN_H
 #define GOMOKUGAMEPLUGIN_H
 
-#include <QtGui>
-#include <QtCore>
 #include <QObject>
 #include <QDomElement>
 
@@ -65,6 +63,9 @@ public ContactInfoAccessor, public StanzaSender, public StanzaFilter, public Eve
 public MenuAccessor, public PopupAccessor
 {
 	Q_OBJECT
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "com.psi-plus.GomokuGamePlugin")
+#endif
 	Q_INTERFACES(PsiPlugin PluginInfoProvider OptionAccessor IconFactoryAccessor ToolbarIconAccessor
 		     ActiveTabAccessor AccountInfoAccessor ContactInfoAccessor StanzaSender StanzaFilter
 		     EventCreator SoundAccessor MenuAccessor PopupAccessor)

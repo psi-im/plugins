@@ -823,7 +823,11 @@ void GameSessions::sendErrorIq(int account, QString jid, QString id, const QStri
 
 QString XML::escapeString(const QString &str)
 {
+#ifdef HAVE_QT5
+	return str.toHtmlEscaped().replace("\"", "&quot;");
+#else
 	return Qt::escape(str).replace("\"", "&quot;");
+#endif
 }
 
 QString XML::iqErrorString(const QString &jid, const QString &id)

@@ -27,12 +27,12 @@
 #include "common.h"
 
 BoardModel::BoardModel(QObject *parent) :
-    QAbstractTableModel(parent),
-    selectX(-1),
-    selectY(-1),
-    columnCount_(0),
-    rowCount_(0),
-    gameModel(NULL)
+	QAbstractTableModel(parent),
+	selectX(-1),
+	selectY(-1),
+	columnCount_(0),
+	rowCount_(0),
+	gameModel(NULL)
 {
 }
 
@@ -50,7 +50,8 @@ void BoardModel::init(GameModel *gm)
 	selectX = -1;
 	selectY = -1;
 	setHeaders();
-	QAbstractTableModel::reset();
+	beginResetModel();
+	endResetModel();
 	connect(gameModel, SIGNAL(statusUpdated(GameModel::GameStatus)), this, SIGNAL(changeGameStatus(GameModel::GameStatus)));
 	emit changeGameStatus(gm->gameStatus());
 }
