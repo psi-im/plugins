@@ -30,9 +30,9 @@
 #include "applicationinfoaccessinghost.h"
 #include "contactinfoaccessinghost.h"
 
-
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(redirectplugin, Redirector)
-
+#endif
 
 bool Redirector::enable() {
 	if (psiOptions) {
@@ -102,7 +102,11 @@ bool Redirector::incomingStanza(int account, const QDomElement& stanza) {
 	}
 	QDomElement body = doc.createElement("body");
 	e.appendChild(body);
+#ifdef HAVE_QT5
+	body.appendChild(doc.createTextNode(QString("#%1 %2").arg(contactId).arg(bodies.at(0).toElement().text().toHtmlEscaped())));
+#else
 	body.appendChild(doc.createTextNode(QString("#%1 %2").arg(contactId).arg(Qt::escape(bodies.at(0).toElement().text()))));
+#endif
 	QDomElement forward = e.appendChild(doc.createElementNS("urn:xmpp:forward:0", "forwarded")).toElement();
 	forward.appendChild(doc.createElementNS("urn:xmpp:delay", "delay")).toElement()
 			.setAttribute("stamp", QDateTime::currentDateTimeUtc().toString("yyyy-MM-ddThh:mm:ssZ"));
