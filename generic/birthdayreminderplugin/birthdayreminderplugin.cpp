@@ -64,6 +64,9 @@ class Reminder : public QObject, public PsiPlugin, public StanzaFilter, public A
 		public PluginInfoProvider, public SoundAccessor, public ContactInfoAccessor
 {
 	Q_OBJECT
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "com.psi-plus.Reminder")
+#endif
 	Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor ApplicationInfoAccessor StanzaSender OptionAccessor
 		     PopupAccessor IconFactoryAccessor PluginInfoProvider SoundAccessor ContactInfoAccessor)
 
@@ -130,7 +133,9 @@ private:
 	Ui::Options ui_;
 };
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(Reminder)
+#endif
 
 Reminder::Reminder()
 	: enabled(false)
