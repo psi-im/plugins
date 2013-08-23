@@ -53,6 +53,9 @@ class CaptchaFormsPlugin : public QObject, public PsiPlugin, public OptionAccess
 			   public StanzaFilter, public StanzaSender, public AccountInfoAccessor, public ApplicationInfoAccessor
 {
         Q_OBJECT
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "com.psi-plus.CaptchaFormsPlugin")
+#endif
 	Q_INTERFACES(PsiPlugin OptionAccessor PluginInfoProvider EventCreator StanzaFilter StanzaSender AccountInfoAccessor ApplicationInfoAccessor)
 public:
 	CaptchaFormsPlugin();
@@ -100,8 +103,9 @@ private slots:
 	void loaderError(const QString& id);
 };
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(CaptchaFormsPlugin);
-
+#endif
 
 CaptchaFormsPlugin::CaptchaFormsPlugin()
 	: psiOptions(0)
