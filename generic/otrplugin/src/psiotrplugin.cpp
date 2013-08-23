@@ -287,7 +287,11 @@ bool PsiOtrPlugin::processEvent(int accountIndex, QDomElement& e)
         }
         else if (!plainBody.isNull())
         {
+#ifdef HAVE_QT5
+            cyphertext = plainBody.firstChild().toText().nodeValue().toHtmlEscaped();
+#else
             cyphertext = Qt::escape(plainBody.firstChild().toText().nodeValue());
+#endif
         }
         else
         {
@@ -320,7 +324,6 @@ bool PsiOtrPlugin::processEvent(int accountIndex, QDomElement& e)
                     HtmlTidy htmlTidy("<body xmlns=\"http://www.w3.org/1999/xhtml\">" +
                                       decrypted + "</body>");
                     decrypted = htmlTidy.output();
-
                     bodyText = htmlToPlain(decrypted);
 
                     // replace html body
@@ -386,7 +389,11 @@ bool PsiOtrPlugin::processOutgoingMessage(int accountIndex, const QString& conta
     QString encrypted = m_otrConnection->encryptMessage(
         account,
         getCorrectJid(accountIndex, contact),
+#ifdef HAVE_QT5
+        body.toHtmlEscaped());
+#else
         Qt::escape(body));
+#endif
 
     //if there has been an error, drop the message
     if (encrypted.isEmpty())
@@ -845,7 +852,7 @@ QString PsiOtrPlugin::getCorrectJid(int accountIndex, const QString& fullJid)
 } // namespace psiotr
 
 //-----------------------------------------------------------------------------
-
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(psiOtrPlugin, psiotr::PsiOtrPlugin)
-
+#endif
 //-----------------------------------------------------------------------------

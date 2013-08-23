@@ -77,19 +77,22 @@ class PsiOtrPlugin : public QObject,
                      public IconFactoryAccessor,
                      public OtrCallback
 {
-Q_OBJECT
-Q_INTERFACES(PsiPlugin
-             PluginInfoProvider
-             EventFilter
-             OptionAccessor
-             StanzaSender
-             ApplicationInfoAccessor
-             PsiAccountController
-             StanzaFilter
-             ToolbarIconAccessor
-             AccountInfoAccessor
-             ContactInfoAccessor
-             IconFactoryAccessor)
+    Q_OBJECT
+#ifdef HAVE_QT5
+    Q_PLUGIN_METADATA(IID "com.psi-plus.PsiOtrPlugin")
+#endif
+    Q_INTERFACES(PsiPlugin
+                 PluginInfoProvider
+                 EventFilter
+                 OptionAccessor
+                 StanzaSender
+                 ApplicationInfoAccessor
+                 PsiAccountController
+                 StanzaFilter
+                 ToolbarIconAccessor
+                 AccountInfoAccessor
+                 ContactInfoAccessor
+                 IconFactoryAccessor)
 
 public:
     PsiOtrPlugin();
