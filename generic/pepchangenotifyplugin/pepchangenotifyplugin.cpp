@@ -18,9 +18,11 @@
  *
  */
 
-#include <QtGui>
+#include <QFileDialog>
 #include <QDomElement>
-
+#ifndef HAVE_QT5
+#include <QTextDocument>
+#endif
 #include "psiplugin.h"
 #include "stanzafilter.h"
 #include "accountinfoaccessor.h"
@@ -61,6 +63,9 @@ class PepPlugin: public QObject, public PsiPlugin, public StanzaFilter, public A
 			public ApplicationInfoAccessor, public ContactInfoAccessor, public IconFactoryAccessor
 {
 	Q_OBJECT
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "com.psi-plus.PepPlugin")
+#endif
 	Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor OptionAccessor PopupAccessor SoundAccessor
 		     PluginInfoProvider ApplicationInfoAccessor ContactInfoAccessor IconFactoryAccessor)
 
@@ -117,7 +122,7 @@ private:
 			EventMood,
 			EventActivity
 			//,EventGeolocation
-		}; 
+		};
 		QString jid;
 		QMap<Event, QTime> events;
 		bool operator==(const ContactState& s)
@@ -143,14 +148,16 @@ private slots:
 	void doNotification(const QString& title, const QString& text, const QString& icon);
     };
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(PepPlugin);
+#endif
 
 PepPlugin::PepPlugin()
 	: enabled(false)
 	, psiOptions(0)
 	, accInfoHost(0)
 	, popup(0)
-	, appInfo(0)	
+	, appInfo(0)
 	, contactInfo(0)
 	, iconHost(0)
 	, sound_(0)
@@ -480,7 +487,11 @@ void PepPlugin::showPopup(const QString &title, const QString &text, const QStri
 
 	int interval = popup->popupDuration(POPUP_OPTION_NAME);
 	if(interval) {
+#ifdef HAVE_QT5
+		popup->initPopup(text.toHtmlEscaped(), title.toHtmlEscaped(), icon, popupId);
+#else
 		popup->initPopup(Qt::escape(text), Qt::escape(title), icon, popupId);
+#endif
 	}
 	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd", suppressDnd);
 }
