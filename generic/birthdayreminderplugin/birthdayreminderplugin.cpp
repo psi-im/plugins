@@ -60,35 +60,35 @@ static const QString id = "bdreminder_1";
 static const QString dirName = "Birthdays";
 
 class Reminder : public QObject, public PsiPlugin, public StanzaFilter, public AccountInfoAccessor, public ApplicationInfoAccessor,
-		public StanzaSender, public OptionAccessor, public PopupAccessor, public IconFactoryAccessor,
-		public PluginInfoProvider, public SoundAccessor, public ContactInfoAccessor
+				 public StanzaSender, public OptionAccessor, public PopupAccessor, public IconFactoryAccessor,
+				 public PluginInfoProvider, public SoundAccessor, public ContactInfoAccessor
 {
 	Q_OBJECT
 #ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.Reminder")
 #endif
 	Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor ApplicationInfoAccessor StanzaSender OptionAccessor
-		     PopupAccessor IconFactoryAccessor PluginInfoProvider SoundAccessor ContactInfoAccessor)
+				 PopupAccessor IconFactoryAccessor PluginInfoProvider SoundAccessor ContactInfoAccessor)
 
-public:
+	public:
 	Reminder();
 	virtual QString name() const;
 	virtual QString shortName() const;
 	virtual QString version() const;
-        virtual QWidget* options();
+	virtual QWidget* options();
 	virtual bool enable();
-        virtual bool disable();
-        virtual void applyOptions();
-        virtual void restoreOptions();
-        virtual bool incomingStanza(int account, const QDomElement& xml);
+	virtual bool disable();
+	virtual void applyOptions();
+	virtual void restoreOptions();
+	virtual bool incomingStanza(int account, const QDomElement& xml);
 	virtual bool outgoingStanza(int account, QDomElement& xml);
-        virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
-        virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
-        virtual void setStanzaSendingHost(StanzaSendingHost *host);
-        virtual void setOptionAccessingHost(OptionAccessingHost* host);
+	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
+	virtual void setStanzaSendingHost(StanzaSendingHost *host);
+	virtual void setOptionAccessingHost(OptionAccessingHost* host);
 	virtual void optionChanged(const QString& ){}
-        virtual void setPopupAccessingHost(PopupAccessingHost* host);
-        virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
+	virtual void setPopupAccessingHost(PopupAccessingHost* host);
+	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
 	virtual void setSoundAccessingHost(SoundAccessingHost* host);
 	virtual void setContactInfoAccessingHost(ContactInfoAccessingHost *host);
 	virtual QString pluginInfo();
@@ -138,37 +138,37 @@ Q_EXPORT_PLUGIN(Reminder)
 #endif
 
 Reminder::Reminder()
-	: enabled(false)
-	, psiOptions(0)
-	, accInfoHost(0)
-	, appInfoHost(0)
-	, stanzaHost(0)
-	, popup(0)
-	, icoHost(0)
-	, lastCheck("1901010101")
-	, days_(5)
-	, interval(24)
-	//, timeout(15)
-	, startCheck(true)
-	, checkFromRoster(true)
-	, lastUpdate("19010101")
-	, updateInterval(30)
-	, soundFile("sound/reminder.wav")
-	, updateInProgress(false)
-	, popupId(0)
+: enabled(false)
+ , psiOptions(0)
+ , accInfoHost(0)
+ , appInfoHost(0)
+ , stanzaHost(0)
+ , popup(0)
+ , icoHost(0)
+ , lastCheck("1901010101")
+ , days_(5)
+ , interval(24)
+//, timeout(15)
+ , startCheck(true)
+ , checkFromRoster(true)
+ , lastUpdate("19010101")
+ , updateInterval(30)
+ , soundFile("sound/reminder.wav")
+ , updateInProgress(false)
+ , popupId(0)
 {
 }
 
 QString Reminder::name() const {
-        return "Birthday Reminder Plugin";
+	return "Birthday Reminder Plugin";
 }
 
 QString Reminder::shortName() const {
-        return "reminder";
+	return "reminder";
 }
 
 QString Reminder::version() const {
-        return cVer;
+	return cVer;
 }
 
 bool Reminder::enable() {
@@ -384,7 +384,7 @@ void Reminder::updateVCard() {
 				}
 				else if(accInfoHost->getStatus(accs) != "offline") {
 					QString text = "<iq type=\"get\" to=\"%1\" id=\"%2\">"
-							"<vCard xmlns=\"vcard-temp\" /></iq>";
+					"<vCard xmlns=\"vcard-temp\" /></iq>";
 					foreach(const QString& Jid, Jids) {
 						stanzaHost->sendStanza(accs, text.arg(Jid, id));
 					}
@@ -533,12 +533,12 @@ void Reminder::checkSound() {
 }
 
 QString Reminder::pluginInfo() {
-	return tr("Author: ") +  "Dealer_WeARE\n"
-			+ tr("Email: ") + "wadealer@gmail.com\n\n"
-			+ trUtf8("This plugin is designed to show reminders of upcoming birthdays.\n"
-				 "The first time you install this plugin, you need to log on to all of your accounts, go to the plugin settings and click \"Update Birthdays\"."
-				 "The plugin will then collect the information about the birthdays of all the users in your roster, but when the 'Use vCards cache' option is"
-				 "selected, the users' vCards that are cached on your hard disk will be used. ");
+	return tr("Author: ") +	 "Dealer_WeARE\n"
+		 + tr("Email: ") + "wadealer@gmail.com\n\n"
+		 + trUtf8("This plugin is designed to show reminders of upcoming birthdays.\n"
+				  "The first time you install this plugin, you need to log on to all of your accounts, go to the plugin settings and click \"Update Birthdays\"."
+				  "The plugin will then collect the information about the birthdays of all the users in your roster, but when the 'Use vCards cache' option is"
+				  "selected, the users' vCards that are cached on your hard disk will be used. ");
 }
 
 QPixmap Reminder::icon() const
