@@ -55,57 +55,57 @@
 #define POPUP_OPTION "Attention Plugin"
 
 class AttentionPlugin: public QObject, public PsiPlugin, public StanzaFilter, public AccountInfoAccessor,
-public OptionAccessor, public ActiveTabAccessor, public ToolbarIconAccessor, public ApplicationInfoAccessor,
-public IconFactoryAccessor, public PopupAccessor, public StanzaSender, public MenuAccessor, public PluginInfoProvider,
-public SoundAccessor
+					   public OptionAccessor, public ActiveTabAccessor, public ToolbarIconAccessor, public ApplicationInfoAccessor,
+					   public IconFactoryAccessor, public PopupAccessor, public StanzaSender, public MenuAccessor, public PluginInfoProvider,
+					   public SoundAccessor
 {
 	Q_OBJECT
 #ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.AttentionPlugin")
 #endif
-        Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor OptionAccessor ActiveTabAccessor ApplicationInfoAccessor
-		     ToolbarIconAccessor IconFactoryAccessor PopupAccessor StanzaSender MenuAccessor PluginInfoProvider
-		     SoundAccessor)
+	Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor OptionAccessor ActiveTabAccessor ApplicationInfoAccessor
+				 ToolbarIconAccessor IconFactoryAccessor PopupAccessor StanzaSender MenuAccessor PluginInfoProvider
+				 SoundAccessor)
 
 public:
 	AttentionPlugin();
 	virtual QString name() const;
 	virtual QString shortName() const;
 	virtual QString version() const;
-        virtual QWidget* options();
+	virtual QWidget* options();
 	virtual bool enable();
-        virtual bool disable();
-        virtual void applyOptions();
-        virtual void restoreOptions();
-        virtual bool incomingStanza(int account, const QDomElement& xml);
+	virtual bool disable();
+	virtual void applyOptions();
+	virtual void restoreOptions();
+	virtual bool incomingStanza(int account, const QDomElement& xml);
 	virtual bool outgoingStanza(int account, QDomElement& xml);
-        virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
-        virtual void setOptionAccessingHost(OptionAccessingHost* host);
-        virtual void optionChanged(const QString& option);
-        virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
-        virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
-        virtual void setPopupAccessingHost(PopupAccessingHost* host);
-        virtual void setStanzaSendingHost(StanzaSendingHost *host);
+	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+	virtual void setOptionAccessingHost(OptionAccessingHost* host);
+	virtual void optionChanged(const QString& option);
+	virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
+	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
+	virtual void setPopupAccessingHost(PopupAccessingHost* host);
+	virtual void setStanzaSendingHost(StanzaSendingHost *host);
 	virtual QList < QVariantHash > getButtonParam();
 	virtual QAction* getAction(QObject* , int , const QString& ) { return 0; };
 	virtual QList < QVariantHash > getAccountMenuParam();
 	virtual QList < QVariantHash > getContactMenuParam();
 	virtual QAction* getContactAction(QObject* , int , const QString& ) { return 0; };
 	virtual QAction* getAccountAction(QObject* , int ) { return 0; };
-        virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
+	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
 	virtual void setSoundAccessingHost(SoundAccessingHost* host);
 	virtual QString pluginInfo();
 	virtual QPixmap icon() const;
 
 private:
-        bool enabled;
-        OptionAccessingHost* psiOptions;
+	bool enabled;
+	OptionAccessingHost* psiOptions;
 	AccountInfoAccessingHost *accInfoHost;
-        ActiveTabAccessingHost* activeTab;
+	ActiveTabAccessingHost* activeTab;
 	IconFactoryAccessingHost *icoHost;
-        PopupAccessingHost* popup;
-        StanzaSendingHost *stanzaSender;
-        ApplicationInfoAccessingHost* appInfo;
+	PopupAccessingHost* popup;
+	StanzaSendingHost *stanzaSender;
+	ApplicationInfoAccessingHost* appInfo;
 	SoundAccessingHost* sound_;
 	QString soundFile;
 	int timeout_;
@@ -117,11 +117,11 @@ private:
 	int popupId;
 
 
-        struct Blocked {
+	struct Blocked {
 		int Acc;
 		QString Jid;
 		QDateTime LastMes;
-        };
+	};
 	QVector<Blocked> blockedJids_;
 
 	Ui::Options ui_;
@@ -136,10 +136,10 @@ private:
 	void showPopup(int account, const QString& jid, const QString& text);
 
 private slots:
-        void checkSound();
-        void getSound();
-        void sendAttentionFromTab();
-        void sendAttentionFromMenu();
+	void checkSound();
+	void getSound();
+	void sendAttentionFromTab();
+	void sendAttentionFromMenu();
 	void nudgeTimerTimeout();
 };
 
@@ -167,15 +167,15 @@ AttentionPlugin::AttentionPlugin()
 }
 
 QString AttentionPlugin::name() const {
-        return "Attention Plugin";
+	return "Attention Plugin";
 }
 
 QString AttentionPlugin::shortName() const {
-        return "attention";
+	return "attention";
 }
 
 QString AttentionPlugin::version() const {
-        return cVer;
+	return cVer;
 }
 
 bool AttentionPlugin::enable() {
@@ -196,7 +196,7 @@ bool AttentionPlugin::enable() {
 		infPopup = psiOptions->getPluginOption(constInfPopup, QVariant(infPopup)).toBool();
 		disableDnd = psiOptions->getPluginOption(constDisableDnd, QVariant(disableDnd)).toBool();
 		popupId = popup->registerOption(POPUP_OPTION,  psiOptions->getPluginOption(constInterval, QVariant(4000)).toInt()/1000,
-						"plugins.options."+shortName()+"."+constInterval);
+										"plugins.options."+shortName()+"."+constInterval);
 
 		QWidgetList wl = qApp->allWidgets();
 		foreach(QWidget *w, wl) {
@@ -213,7 +213,7 @@ bool AttentionPlugin::enable() {
 }
 
 bool AttentionPlugin::disable() {
-        enabled = false;
+	enabled = false;
 	nudgeTimer_->stop();
 	delete nudgeTimer_;
 	nudgeTimer_ = 0;
@@ -283,11 +283,11 @@ bool AttentionPlugin::incomingStanza(int account, const QDomElement& stanza) {
 				playSound(soundFile);
 
 			/*QTextEdit *te = activeTab->getEditBox();
-	     if(te)
-		     nudgeWindow_ = te->window();
+			  if(te)
+			  nudgeWindow_ = te->window();
 
-	     else
-		     nudgeWindow_ = qApp->activeWindow();*/
+			  else
+			  nudgeWindow_ = qApp->activeWindow();*/
 
 
 
@@ -302,9 +302,9 @@ bool AttentionPlugin::incomingStanza(int account, const QDomElement& stanza) {
 			{
 				if(query.attribute("node") == "http://psi-dev.googlecode.com/caps#at-pl") {
 					QString reply = QString("<iq type=\"result\" to=\"%1\" id=\"%2\">"
-							"<query xmlns=\"http://jabber.org/protocol/disco#info\" node=\"http://psi-dev.googlecode.com/caps#at-pl\">"
-							"<feature var=\"urn:xmpp:attention:0\"/></query></iq>")
-							.arg(stanzaSender->escape(stanza.attribute("from")), stanzaSender->escape(stanza.attribute("id")));
+											"<query xmlns=\"http://jabber.org/protocol/disco#info\" node=\"http://psi-dev.googlecode.com/caps#at-pl\">"
+											"<feature var=\"urn:xmpp:attention:0\"/></query></iq>")
+					                        .arg(stanzaSender->escape(stanza.attribute("from")), stanzaSender->escape(stanza.attribute("id")));
 					stanzaSender->sendStanza(account, reply);
 					return true;
 				}
@@ -480,7 +480,7 @@ void AttentionPlugin::sendAttentionFromMenu() {
 
 bool AttentionPlugin::findAcc(int account, const QString& Jid, int &i) {
 	for(; i > 0;) {
-		Blocked Block =  blockedJids_[--i];
+		Blocked Block =	 blockedJids_[--i];
 		if(Block.Acc == account && Block.Jid == Jid) {
 			return true;
 		}
@@ -493,14 +493,14 @@ QList < QVariantHash > AttentionPlugin::getAccountMenuParam() {
 }
 
 QList < QVariantHash > AttentionPlugin::getContactMenuParam() {
-        QVariantHash hash;
-        hash["icon"] = QVariant(QString("attentionplugin/attention"));
-        hash["name"] = QVariant(tr("Send Attention"));
-        hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
-        hash["slot"] = QVariant(SLOT(sendAttentionFromMenu()));
+	QVariantHash hash;
+	hash["icon"] = QVariant(QString("attentionplugin/attention"));
+	hash["name"] = QVariant(tr("Send Attention"));
+	hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+	hash["slot"] = QVariant(SLOT(sendAttentionFromMenu()));
 	QList< QVariantHash >  l;
 	l.push_back(hash);
-        return l;
+	return l;
 }
 
 void AttentionPlugin::nudge() {
@@ -533,10 +533,10 @@ void AttentionPlugin::nudgeTimerTimeout() {
 }
 
 QString AttentionPlugin::pluginInfo() {
-	return tr("Author: ") +  "Dealer_WeARE\n"
-			+ tr("Email: ") + "wadealer@gmail.com\n\n"
-			+ trUtf8("This plugin is designed to send and receive special messages such as Attentions.\n"
-				 "To work correctly, the plugin requires that the client of the other part supports XEP-0224 (for example: Pidgin, Miranda IM with Nudge plugin).");
+	return tr("Author: ") +	 "Dealer_WeARE\n"
+	     + tr("Email: ") + "wadealer@gmail.com\n\n"
+	     + trUtf8("This plugin is designed to send and receive special messages such as Attentions.\n"
+			      "To work correctly, the plugin requires that the client of the other part supports XEP-0224 (for example: Pidgin, Miranda IM with Nudge plugin).");
 }
 
 QPixmap AttentionPlugin::icon() const
