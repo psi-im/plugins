@@ -24,7 +24,9 @@
 #include "gmailserviceplugin.h"
 #include "common.h"
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(GmailNotifyPlugin);
+#endif
 
 GmailNotifyPlugin::GmailNotifyPlugin()
 	: enabled(false)

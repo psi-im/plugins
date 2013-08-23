@@ -67,6 +67,9 @@ class GmailNotifyPlugin : public QObject, public PsiPlugin, public AccountInfoAc
 	public ToolbarIconAccessor, public EventCreator, public SoundAccessor, public MenuAccessor
 {
 	Q_OBJECT
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "com.psi-plus.GmailNotifyPlugin")
+#endif
 	Q_INTERFACES(PsiPlugin StanzaFilter StanzaSender /*EventFilter*/ OptionAccessor PluginInfoProvider
 		     AccountInfoAccessor PopupAccessor PsiAccountController IconFactoryAccessor
 		     ToolbarIconAccessor EventCreator SoundAccessor MenuAccessor)
