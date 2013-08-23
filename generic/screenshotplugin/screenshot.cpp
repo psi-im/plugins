@@ -317,7 +317,7 @@ void Screenshot::updateStatusBar()
 	const QSize s = ui_.lb_pixmap->getPixmap().size();
 	QBuffer buffer;
 	buffer.open( QBuffer::ReadWrite );
-	ui_.lb_pixmap->getPixmap().save( &buffer , format.toAscii() );
+	ui_.lb_pixmap->getPixmap().save( &buffer , format.toLatin1() );
 	const qint64 size = buffer.size();
 	sbLbSize->setText(tr("Size: %1x%2px; %3 bytes").arg(s.width()).arg(s.height()).arg(size));
 //	sbLbSize->setMaximumWidth( QFontMetrics( sbLbSize->font() ).width( sbLbSize->text() ) + 10 );
@@ -569,7 +569,7 @@ void Screenshot::saveScreenshot()
 							   .arg(format.toUpper())
 							   .arg(format));
 	if (!fileName.isEmpty()) {
-		originalPixmap.save(fileName, format.toAscii());
+		originalPixmap.save(fileName, format.toLatin1());
 		QFileInfo fi(fileName);
 		lastFolder = fi.absoluteDir().path();
 		settingsChanged(constLastFolder, lastFolder);
@@ -631,7 +631,7 @@ void Screenshot::uploadFtp()
 	ba.clear();
 	QBuffer buffer( &ba );
 	buffer.open( QBuffer::ReadWrite );
-	originalPixmap.save( &buffer , format.toAscii() );
+	originalPixmap.save( &buffer , format.toLatin1() );
 
 	QString fileName = tr("%1.").arg(QDateTime::currentDateTime().toString(fileNameFormat)) + format;
 
@@ -711,7 +711,7 @@ void Screenshot::uploadHttp()
 	QByteArray a;
 	QBuffer buffer(&a);
 	buffer.open( QBuffer::ReadWrite );
-	originalPixmap.save( &buffer , format.toAscii() );
+	originalPixmap.save( &buffer , format.toLatin1() );
 	ba.append(a);
 
 	ba.append("\r\n--" + boundary + "--\r\n");
@@ -832,7 +832,7 @@ void Screenshot::newRequest(const QNetworkReply *const old, const QString &link)
 
 	QUrl netrequrl(link);
 	if (netrequrl.host().isEmpty())
-		netrequrl = QUrl("http://" + old->url().encodedHost() + link);
+		netrequrl = QUrl("http://" + QUrl::toAce(old->url().host()) + link);
 	QNetworkRequest netreq(netrequrl);
 
 	ui_.progressBar->setValue(0);

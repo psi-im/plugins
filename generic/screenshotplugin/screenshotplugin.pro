@@ -1,6 +1,9 @@
 include(../../psiplugin.pri)
 CONFIG += release
 QT += network
+greaterThan(QT_MAJOR_VERSION, 4) {
+  QT += printsupport
+}
 
 DEPENDPATH += . qxt/core qxt/gui
 INCLUDEPATH += . qxt/gui qxt/core
@@ -51,7 +54,9 @@ SOURCES  +=	qxt/core/qxtglobal.cpp \
 
 unix:!macx {
 	CONFIG += X11
-	SOURCES += qxt/gui/qxtwindowsystem_x11.cpp
+	SOURCES += qxt/gui/qxtwindowsystem_x11.cpp \
+			qxt/gui/x11info.cpp
+	HEADERS += qxt/gui/x11info.h
 }
 macx {
 	SOURCES += qxt/gui/qxtwindowsystem_mac.cpp

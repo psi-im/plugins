@@ -18,7 +18,21 @@
  *
  */
 
-#include <QtGui>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QStyle>
+#include <QDialogButtonBox>
+#include <QInputDialog>
+#include <QApplication>
+#include <QClipboard>
+#include <QPainter>
+#include <QMouseEvent>
+#include <QMenu>
+#include <QPrintDialog>
+#include <QColorDialog>
+#include <QFontDialog>
 
 #include "pixmapwidget.h"
 #include "options.h"
@@ -218,7 +232,7 @@ void PixmapWidget::newWidth(int w)
 void PixmapWidget::setPixmap(const QPixmap& pix)
 {
 	mainPixmap = QPixmap();
-	mainPixmap = pix;	
+	mainPixmap = pix;
 	setFixedSize(mainPixmap.size());
 	selectionRect->clear();
 	update();
@@ -311,7 +325,7 @@ void PixmapWidget::blur()
 	saveUndoPixmap();
 	bool ok = false;
 	int radius = Options::instance()->getOption(constRadius, 5).toInt();
-	radius = QInputDialog::getInteger(this, tr("Input radius"), tr("Radius"), radius, 1, 100, 1, &ok);
+	radius = QInputDialog::getInt(this, tr("Input radius"), tr("Radius"), radius, 1, 100, 1, &ok);
 	if(!ok)
 		return;
 

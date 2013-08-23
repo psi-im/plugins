@@ -43,6 +43,9 @@ class ScreenshotPlugin : public QObject, public PsiPlugin, public OptionAccessor
 		public IconFactoryAccessor, public MenuAccessor, public ApplicationInfoAccessor
 {
 	Q_OBJECT
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "com.psi-plus.ScreenshotPlugin")
+#endif
 	Q_INTERFACES(PsiPlugin OptionAccessor ShortcutAccessor PluginInfoProvider IconFactoryAccessor MenuAccessor ApplicationInfoAccessor)
 
 public:
@@ -89,7 +92,9 @@ private:
 	Controller* controller_;
 };
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(ScreenshotPlugin);
+#endif
 
 ScreenshotPlugin::ScreenshotPlugin()
 	: enabled_(false)
