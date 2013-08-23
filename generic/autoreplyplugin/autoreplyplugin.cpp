@@ -57,8 +57,8 @@
 #define constSXa "xa"
 #define constNotInRoster "ntnrstr"
 
-class AutoReply: public QObject, public PsiPlugin, public OptionAccessor, public StanzaSender,  public StanzaFilter,
-public ActiveTabAccessor, public AccountInfoAccessor, public PluginInfoProvider
+class AutoReply: public QObject, public PsiPlugin, public OptionAccessor, public StanzaSender,	public StanzaFilter,
+				 public ActiveTabAccessor, public AccountInfoAccessor, public PluginInfoProvider
 {
 	Q_OBJECT
 #ifdef HAVE_QT5
@@ -66,71 +66,71 @@ public ActiveTabAccessor, public AccountInfoAccessor, public PluginInfoProvider
 #endif
 	Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter ActiveTabAccessor AccountInfoAccessor PluginInfoProvider)
 
-public:
+	public:
 	AutoReply();
 	virtual QString name() const;
 	virtual QString shortName() const;
 	virtual QString version() const;
-        virtual QWidget* options();
+	virtual QWidget* options();
 	virtual bool enable();
-        virtual bool disable();
-        virtual void applyOptions();
-        virtual void restoreOptions();
-        virtual void setOptionAccessingHost(OptionAccessingHost* host);
+	virtual bool disable();
+	virtual void applyOptions();
+	virtual void restoreOptions();
+	virtual void setOptionAccessingHost(OptionAccessingHost* host);
 	virtual void optionChanged(const QString& option);
-        virtual void setStanzaSendingHost(StanzaSendingHost *host);
-        virtual bool incomingStanza(int account, const QDomElement& stanza);
+	virtual void setStanzaSendingHost(StanzaSendingHost *host);
+	virtual bool incomingStanza(int account, const QDomElement& stanza);
 	virtual bool outgoingStanza(int account, QDomElement& stanza);
-        virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
-        virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+	virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
+	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
 	virtual QString pluginInfo();
 	virtual QPixmap icon() const;
 
 private:
 	bool enabled;
-        AccountInfoAccessingHost* AccInfoHost;
-        ActiveTabAccessingHost* ActiveTabHost;
+	AccountInfoAccessingHost* AccInfoHost;
+	ActiveTabAccessingHost* ActiveTabHost;
 	OptionAccessingHost* psiOptions;
-        StanzaSendingHost* StanzaHost;
-        QTextEdit *messageWidget;
-        QTextEdit *disableforWidget;
-        QString Message;
-        QString DisableFor;
-        QSpinBox *spinWidget;
-        QSpinBox *resetWidget;
-        QCheckBox *activetabWidget;
-        QComboBox *enabledisableWidget;
-        QTextEdit *DisableForAccWidget;
-        QCheckBox *sonlineWidget;
-        QCheckBox *sawayWidget;
-        QCheckBox *sdndWidget;
-        QCheckBox *sxaWidget;
-        QCheckBox *schatWidget;
-        QCheckBox *sinvisWidget;
-        QCheckBox *NotInRosterWidget;
-        bool NotInRoster;
-        int EnableDisable;
-        struct Base {
+	StanzaSendingHost* StanzaHost;
+	QTextEdit *messageWidget;
+	QTextEdit *disableforWidget;
+	QString Message;
+	QString DisableFor;
+	QSpinBox *spinWidget;
+	QSpinBox *resetWidget;
+	QCheckBox *activetabWidget;
+	QComboBox *enabledisableWidget;
+	QTextEdit *DisableForAccWidget;
+	QCheckBox *sonlineWidget;
+	QCheckBox *sawayWidget;
+	QCheckBox *sdndWidget;
+	QCheckBox *sxaWidget;
+	QCheckBox *schatWidget;
+	QCheckBox *sinvisWidget;
+	QCheckBox *NotInRosterWidget;
+	bool NotInRoster;
+	int EnableDisable;
+	struct Base {
 		int Account;
 		QString Jid;
 		int count;
 		QDateTime LastMes;
-        };
-        QVector<Base> Counter;
-        int Times;
-        int ResetTime;
-        bool ActiveTabIsEnable;
-        bool SOnline;
-        bool SAway;
-        bool SDnd;
-        bool SXa;
-        bool SChat;
-        bool SInvis;
-        QString DisableForAcc;
-        bool FindAcc(int account, QString jid, int &i);
+	};
+	QVector<Base> Counter;
+	int Times;
+	int ResetTime;
+	bool ActiveTabIsEnable;
+	bool SOnline;
+	bool SAway;
+	bool SDnd;
+	bool SXa;
+	bool SChat;
+	bool SInvis;
+	QString DisableForAcc;
+	bool FindAcc(int account, QString jid, int &i);
 
 private slots:
-        void setEnableDisableText(int Arg);
+	void setEnableDisableText(int Arg);
 };
 
 #ifndef HAVE_QT5
@@ -138,51 +138,51 @@ Q_EXPORT_PLUGIN(AutoReply);
 #endif
 
 AutoReply::AutoReply() {
-        ActiveTabIsEnable = true;
-        NotInRosterWidget = 0;
-        NotInRoster = true;
-        EnableDisable = 1;
-        Counter.clear();
-        Times = 2;
-        ResetTime = 5;
-        spinWidget = 0;
-        activetabWidget = 0;
-        DisableForAcc = "";
-        DisableForAccWidget = 0;
-        resetWidget = 0;
-        DisableFor = "juick@juick.com\npsi-dev@conference.jabber.ru\njubo@nologin.ru\njabrss@cmeerw.net\nrss2jabber.com\nbot.talk.google.com\nbot.rambler.ru\nnotify@planary.ru\nwebtoim@gmail.com\nwebtoim1@gmail.com\narx-bot-11@onblabla.ru\nen2ru@jtalk.ru\nru2en@jtalk.ru\ngluxi@inhex.net\nisida@xmpp.ru\ntwitter.tweet.im\nrss@isida-bot.com\nhuti.ua@gmail.com";
-        enabled = false;
-        Message = "I'll write you later...";
-        messageWidget = 0;
-        ActiveTabHost = 0;
-        AccInfoHost = 0;
-        disableforWidget = 0;
-        psiOptions = 0;
-        StanzaHost = 0;
-        sonlineWidget = 0;
-        sawayWidget = 0;
-        sdndWidget = 0;
-        sxaWidget = 0;
-        schatWidget = 0;
-        sinvisWidget = 0;
-        SOnline = 0;
-        SAway = 1;
-        SDnd = 1;
-        SXa = 1;
-        SChat = 0;
-        SInvis = 0;
+	ActiveTabIsEnable = true;
+	NotInRosterWidget = 0;
+	NotInRoster = true;
+	EnableDisable = 1;
+	Counter.clear();
+	Times = 2;
+	ResetTime = 5;
+	spinWidget = 0;
+	activetabWidget = 0;
+	DisableForAcc = "";
+	DisableForAccWidget = 0;
+	resetWidget = 0;
+	DisableFor = "juick@juick.com\npsi-dev@conference.jabber.ru\njubo@nologin.ru\njabrss@cmeerw.net\nrss2jabber.com\nbot.talk.google.com\nbot.rambler.ru\nnotify@planary.ru\nwebtoim@gmail.com\nwebtoim1@gmail.com\narx-bot-11@onblabla.ru\nen2ru@jtalk.ru\nru2en@jtalk.ru\ngluxi@inhex.net\nisida@xmpp.ru\ntwitter.tweet.im\nrss@isida-bot.com\nhuti.ua@gmail.com";
+	enabled = false;
+	Message = "I'll write you later...";
+	messageWidget = 0;
+	ActiveTabHost = 0;
+	AccInfoHost = 0;
+	disableforWidget = 0;
+	psiOptions = 0;
+	StanzaHost = 0;
+	sonlineWidget = 0;
+	sawayWidget = 0;
+	sdndWidget = 0;
+	sxaWidget = 0;
+	schatWidget = 0;
+	sinvisWidget = 0;
+	SOnline = 0;
+	SAway = 1;
+	SDnd = 1;
+	SXa = 1;
+	SChat = 0;
+	SInvis = 0;
 }
 
 QString AutoReply::name() const {
-        return "Auto Reply Plugin";
+	return "Auto Reply Plugin";
 }
 
 QString AutoReply::shortName() const {
-        return "replyer";
+	return "replyer";
 }
 
 QString AutoReply::version() const {
-        return cVer;
+	return cVer;
 }
 
 bool AutoReply::enable() {
@@ -279,8 +279,8 @@ bool AutoReply::disable() {
 
 void AutoReply::applyOptions() {
 	if (messageWidget == 0 || disableforWidget == 0 || spinWidget == 0 || activetabWidget == 0 || resetWidget == 0 || enabledisableWidget ==0) {
-                return;
-        }
+		return;
+	}
 	QVariant vMessage(messageWidget->toPlainText());
 	psiOptions->setPluginOption(constMessage, vMessage);
 	Message = vMessage.toString();
@@ -462,112 +462,112 @@ void AutoReply::restoreOptions() {
 }
 
 QWidget* AutoReply::options() {
-        if (!enabled) {
-                return 0;
-        }
-        QWidget *optionsWid = new QWidget();
-        messageWidget = new QTextEdit();
-        messageWidget->setMaximumHeight(60);
-        messageWidget->setText(Message);
-        disableforWidget = new QTextEdit();
-        disableforWidget->setText(DisableFor);
-        enabledisableWidget = new QComboBox();
-        enabledisableWidget->addItem(tr("Enable"));
-        enabledisableWidget->addItem(tr("Disable"));
-        enabledisableWidget->setCurrentIndex(EnableDisable);
-        DisableForAccWidget = new QTextEdit();
-        DisableForAccWidget->setText(DisableForAcc);
-        spinWidget = new QSpinBox();
-        spinWidget->setMinimum(-1);
-        spinWidget->setValue(Times);
-        resetWidget = new QSpinBox();
-        resetWidget->setMaximum(2000);
-        resetWidget->setMinimum(1);
-        resetWidget->setValue(ResetTime);
-        activetabWidget = new QCheckBox(tr("Disable if chat window is active"));
-        activetabWidget->setChecked(ActiveTabIsEnable);
-        NotInRosterWidget = new QCheckBox(tr("Disable if contact isn't from your roster"));
-        NotInRosterWidget->setChecked(NotInRoster);
+	if (!enabled) {
+		return 0;
+	}
+	QWidget *optionsWid = new QWidget();
+	messageWidget = new QTextEdit();
+	messageWidget->setMaximumHeight(60);
+	messageWidget->setText(Message);
+	disableforWidget = new QTextEdit();
+	disableforWidget->setText(DisableFor);
+	enabledisableWidget = new QComboBox();
+	enabledisableWidget->addItem(tr("Enable"));
+	enabledisableWidget->addItem(tr("Disable"));
+	enabledisableWidget->setCurrentIndex(EnableDisable);
+	DisableForAccWidget = new QTextEdit();
+	DisableForAccWidget->setText(DisableForAcc);
+	spinWidget = new QSpinBox();
+	spinWidget->setMinimum(-1);
+	spinWidget->setValue(Times);
+	resetWidget = new QSpinBox();
+	resetWidget->setMaximum(2000);
+	resetWidget->setMinimum(1);
+	resetWidget->setValue(ResetTime);
+	activetabWidget = new QCheckBox(tr("Disable if chat window is active"));
+	activetabWidget->setChecked(ActiveTabIsEnable);
+	NotInRosterWidget = new QCheckBox(tr("Disable if contact isn't from your roster"));
+	NotInRosterWidget->setChecked(NotInRoster);
 
-        sonlineWidget = new QCheckBox(tr("Online"));
-        sonlineWidget->setChecked(SOnline);
-        sawayWidget = new QCheckBox(tr("Away"));
-        sawayWidget->setChecked(SAway);
-        sdndWidget = new QCheckBox(tr("Dnd"));
-        sdndWidget->setChecked(SDnd);
-        sxaWidget = new QCheckBox(tr("XA"));
-        sxaWidget->setChecked(SXa);
-        schatWidget = new QCheckBox(tr("Chat"));
-        schatWidget->setChecked(SChat);
-        sinvisWidget = new QCheckBox(tr("Invisible"));
-        sinvisWidget->setChecked(SInvis);
+	sonlineWidget = new QCheckBox(tr("Online"));
+	sonlineWidget->setChecked(SOnline);
+	sawayWidget = new QCheckBox(tr("Away"));
+	sawayWidget->setChecked(SAway);
+	sdndWidget = new QCheckBox(tr("Dnd"));
+	sdndWidget->setChecked(SDnd);
+	sxaWidget = new QCheckBox(tr("XA"));
+	sxaWidget->setChecked(SXa);
+	schatWidget = new QCheckBox(tr("Chat"));
+	schatWidget->setChecked(SChat);
+	sinvisWidget = new QCheckBox(tr("Invisible"));
+	sinvisWidget->setChecked(SInvis);
 
-        QGroupBox *groupBox = new QGroupBox(tr("Enable if status is:"));
-        QHBoxLayout *statusLayout = new QHBoxLayout;
-        statusLayout->addWidget(sonlineWidget);
-        if(psiOptions->getGlobalOption("options.ui.menu.status.chat").toBool()) {
+	QGroupBox *groupBox = new QGroupBox(tr("Enable if status is:"));
+	QHBoxLayout *statusLayout = new QHBoxLayout;
+	statusLayout->addWidget(sonlineWidget);
+	if(psiOptions->getGlobalOption("options.ui.menu.status.chat").toBool()) {
 		statusLayout->addWidget(schatWidget); }
-        statusLayout->addWidget(sawayWidget);
-        statusLayout->addWidget(sdndWidget);
-        if(psiOptions->getGlobalOption("options.ui.menu.status.xa").toBool()) {
+	statusLayout->addWidget(sawayWidget);
+	statusLayout->addWidget(sdndWidget);
+	if(psiOptions->getGlobalOption("options.ui.menu.status.xa").toBool()) {
 		statusLayout->addWidget(sxaWidget); }
-        if(psiOptions->getGlobalOption("options.ui.menu.status.invisible").toBool()) {
+	if(psiOptions->getGlobalOption("options.ui.menu.status.invisible").toBool()) {
 		statusLayout->addWidget(sinvisWidget); }
-        statusLayout->addStretch();
-        groupBox->setLayout(statusLayout);
+	statusLayout->addStretch();
+	groupBox->setLayout(statusLayout);
 
-        QVBoxLayout *Layout = new QVBoxLayout;
-        Layout->addWidget(new QLabel(tr("Auto Reply Message:")));
-        Layout->addWidget(messageWidget);
-        QVBoxLayout *disableLayout = new QVBoxLayout;
-        QHBoxLayout *EnDis = new QHBoxLayout;
-        EnDis->addWidget(enabledisableWidget);
-        EnDis->addWidget(new QLabel(tr("for JIDs and conferences:")));
-        QLabel *Label = new QLabel(tr("You can also specify a part of JID\n(without any additional symbols)"));
-        QFont font;
-        font.setPointSize(8);
-        Label->setFont(font);
-        disableLayout->addLayout(EnDis);
-        disableLayout->addWidget(disableforWidget);
-        disableLayout->addWidget(Label);
-        QVBoxLayout *AccLayout = new QVBoxLayout;
-        AccLayout->addWidget(new QLabel(tr("Disable for your accounts (specify your JIDs):")));
-        AccLayout->addWidget(DisableForAccWidget);
-        QHBoxLayout *resetLayout = new QHBoxLayout;
-        resetLayout->addWidget(new QLabel(tr("Timeout to reset counter:")));
-        resetLayout->addWidget(resetWidget);
-        resetLayout->addWidget(new QLabel(tr("min.")));
-        resetLayout->addStretch();
-        QHBoxLayout *timesLayout = new QHBoxLayout;
-        timesLayout->addWidget(new QLabel(tr("Send maximum")));
-        timesLayout->addWidget(spinWidget);
-        timesLayout->addWidget(new QLabel(tr("times (-1=infinite)")));
-        timesLayout->addStretch();
-        QVBoxLayout *flags = new QVBoxLayout;
-        flags->addLayout(AccLayout);
-        flags->addStretch();
-        flags->addLayout(timesLayout);
-        flags->addLayout(resetLayout);
-        flags->addWidget(activetabWidget);
-        flags->addWidget(NotInRosterWidget);
-        QHBoxLayout *hLayout = new QHBoxLayout;
-        hLayout->addLayout(disableLayout);
-        QFrame *frame = new QFrame();
-        frame->setMinimumWidth(8);
-        hLayout->addWidget(frame);
-        hLayout->addLayout(flags);
-        QLabel *wikiLink = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/plugins#autoreply_plugin\">Wiki (Online)</a>"));
-        wikiLink->setOpenExternalLinks(true);
-        QVBoxLayout *tab1Layout = new QVBoxLayout(optionsWid);
-        tab1Layout->addLayout(Layout);
-        tab1Layout->addStretch();
-        tab1Layout->addLayout(hLayout);
-        tab1Layout->addWidget(groupBox);
-        tab1Layout->addWidget(wikiLink);
+	QVBoxLayout *Layout = new QVBoxLayout;
+	Layout->addWidget(new QLabel(tr("Auto Reply Message:")));
+	Layout->addWidget(messageWidget);
+	QVBoxLayout *disableLayout = new QVBoxLayout;
+	QHBoxLayout *EnDis = new QHBoxLayout;
+	EnDis->addWidget(enabledisableWidget);
+	EnDis->addWidget(new QLabel(tr("for JIDs and conferences:")));
+	QLabel *Label = new QLabel(tr("You can also specify a part of JID\n(without any additional symbols)"));
+	QFont font;
+	font.setPointSize(8);
+	Label->setFont(font);
+	disableLayout->addLayout(EnDis);
+	disableLayout->addWidget(disableforWidget);
+	disableLayout->addWidget(Label);
+	QVBoxLayout *AccLayout = new QVBoxLayout;
+	AccLayout->addWidget(new QLabel(tr("Disable for your accounts (specify your JIDs):")));
+	AccLayout->addWidget(DisableForAccWidget);
+	QHBoxLayout *resetLayout = new QHBoxLayout;
+	resetLayout->addWidget(new QLabel(tr("Timeout to reset counter:")));
+	resetLayout->addWidget(resetWidget);
+	resetLayout->addWidget(new QLabel(tr("min.")));
+	resetLayout->addStretch();
+	QHBoxLayout *timesLayout = new QHBoxLayout;
+	timesLayout->addWidget(new QLabel(tr("Send maximum")));
+	timesLayout->addWidget(spinWidget);
+	timesLayout->addWidget(new QLabel(tr("times (-1=infinite)")));
+	timesLayout->addStretch();
+	QVBoxLayout *flags = new QVBoxLayout;
+	flags->addLayout(AccLayout);
+	flags->addStretch();
+	flags->addLayout(timesLayout);
+	flags->addLayout(resetLayout);
+	flags->addWidget(activetabWidget);
+	flags->addWidget(NotInRosterWidget);
+	QHBoxLayout *hLayout = new QHBoxLayout;
+	hLayout->addLayout(disableLayout);
+	QFrame *frame = new QFrame();
+	frame->setMinimumWidth(8);
+	hLayout->addWidget(frame);
+	hLayout->addLayout(flags);
+	QLabel *wikiLink = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/plugins#autoreply_plugin\">Wiki (Online)</a>"));
+	wikiLink->setOpenExternalLinks(true);
+	QVBoxLayout *tab1Layout = new QVBoxLayout(optionsWid);
+	tab1Layout->addLayout(Layout);
+	tab1Layout->addStretch();
+	tab1Layout->addLayout(hLayout);
+	tab1Layout->addWidget(groupBox);
+	tab1Layout->addWidget(wikiLink);
 
-        connect(enabledisableWidget, SIGNAL(currentIndexChanged(int)), SLOT(setEnableDisableText(int)));
+	connect(enabledisableWidget, SIGNAL(currentIndexChanged(int)), SLOT(setEnableDisableText(int)));
 
-        return optionsWid;
+	return optionsWid;
 }
 
 void AutoReply::setOptionAccessingHost(OptionAccessingHost* host) {
@@ -604,7 +604,7 @@ bool AutoReply::incomingStanza(int account, const QDomElement& stanza) {
 					}
 				}
 			}
-			if(!state)  return false;
+			if(!state)	return false;
 
 			QStringList Disable = DisableForAcc.split(QRegExp("\\s+"), QString::SkipEmptyParts);
 			QString AccJid = AccInfoHost->getJid(account);
@@ -614,12 +614,12 @@ bool AutoReply::incomingStanza(int account, const QDomElement& stanza) {
 
 			QString type = "";
 			type = stanza.attribute("type");
-			if(type == "groupchat" || type == "error" || type == "normal")  return false;
+			if(type == "groupchat" || type == "error" || type == "normal")	return false;
 
 			QDomElement Body = stanza.firstChildElement("body");
 			if(Body.isNull())  return false;
 
-			if(Body.text() == Message)  return false;
+			if(Body.text() == Message)	return false;
 
 			QDomElement rec =  stanza.firstChildElement("received");
 			if(!rec.isNull())  return false;
@@ -638,7 +638,7 @@ bool AutoReply::incomingStanza(int account, const QDomElement& stanza) {
 			Disable = DisableFor.split(QRegExp("\\s+"), QString::SkipEmptyParts);
 			if(EnableDisable) {
 				while(!Disable.isEmpty()) {
-					QString J =  Disable.takeFirst();
+					QString J =	 Disable.takeFirst();
 					if(J.toLower() == valF.toLower() || from.contains(J, Qt::CaseInsensitive)) {
 						return false;
 					}
@@ -647,7 +647,7 @@ bool AutoReply::incomingStanza(int account, const QDomElement& stanza) {
 			else {
 				bool b = false;
 				while(!Disable.isEmpty()) {
-					QString J =  Disable.takeFirst();
+					QString J =	 Disable.takeFirst();
 					if(J.toLower() == valF.toLower() || from.contains(J, Qt::CaseInsensitive)) {
 						b = true;
 					}
@@ -751,19 +751,19 @@ void AutoReply::setEnableDisableText(int Arg) {
 }
 
 QString AutoReply::pluginInfo() {
-	return tr("Author: ") +  "Dealer_WeARE\n"
-			+ tr("Email: ") + "wadealer@gmail.com\n\n"
-			+ trUtf8("This plugin acts as an auto-answering machine. It has a number of simple configuration options, which you can use to:\n"
-				 "* set a text message for auto-answer\n"
-				 "* exclude specified jids, including conferences, from the objects for auto-answer (if a jid conference is set, the exception will include all private messages)\n"
-				 "* disable the auto-responder for some of your accounts\n"
-				 "* set the number of sent auto messages\n"
-				 "* set the time interval after which the number of auto messages counter will be reset\n"
-				 "* disable the auto-responder for the active tab\n"
-				 "* disable the auto-responder for contacts that are not in your roster\n"
-				 "The list of exceptions for jids has two operating modes:\n"
-				 "* auto-responder is switched off for the list of exceptions, for the others is switched on (Disable mode)\n"
-				 "* auto-responder is switched on for the list of exceptions, for the others is switched off (Enable mode) ");
+	return tr("Author: ") +	 "Dealer_WeARE\n"
+	     + tr("Email: ") + "wadealer@gmail.com\n\n"
+	     + trUtf8("This plugin acts as an auto-answering machine. It has a number of simple configuration options, which you can use to:\n"
+				  "* set a text message for auto-answer\n"
+				  "* exclude specified jids, including conferences, from the objects for auto-answer (if a jid conference is set, the exception will include all private messages)\n"
+				  "* disable the auto-responder for some of your accounts\n"
+				  "* set the number of sent auto messages\n"
+				  "* set the time interval after which the number of auto messages counter will be reset\n"
+				  "* disable the auto-responder for the active tab\n"
+				  "* disable the auto-responder for contacts that are not in your roster\n"
+				  "The list of exceptions for jids has two operating modes:\n"
+				  "* auto-responder is switched off for the list of exceptions, for the others is switched on (Disable mode)\n"
+				  "* auto-responder is switched on for the list of exceptions, for the others is switched off (Enable mode) ");
 }
 
 QPixmap AutoReply::icon() const
