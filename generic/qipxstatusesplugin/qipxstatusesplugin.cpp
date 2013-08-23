@@ -36,6 +36,9 @@
 class QipXStatuses: public QObject, public PsiPlugin, public StanzaFilter, public ContactStateAccessor, public PluginInfoProvider
 {
 	Q_OBJECT
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "com.psi-plus.QipXStatuses")
+#endif
 	Q_INTERFACES(PsiPlugin StanzaFilter ContactStateAccessor PluginInfoProvider)
 
 public:
@@ -63,7 +66,9 @@ private:
         QDomElement MoodToXml(QString type, QString text);
     };
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(QipXStatuses);
+#endif
 
 QipXStatuses::QipXStatuses() {
     enabled = false;
