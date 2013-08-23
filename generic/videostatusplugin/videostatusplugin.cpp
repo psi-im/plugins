@@ -38,7 +38,7 @@
 #include <QDBusReply>
 #include <QDBusInterface>
 #include <QDBusConnectionInterface>
-#include <QX11Info>
+#include "x11info.h"
 #include <X11/Xlib.h>
 
 static const QString MPRIS_PREFIX = "org.mpris";
@@ -104,6 +104,9 @@ class VideoStatusChanger : public QObject, public PsiPlugin, public PluginInfoPr
 			, public PsiAccountController, public AccountInfoAccessor
 {
 	Q_OBJECT
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "com.psi-plus.VideoStatusChanger")
+#endif
 	Q_INTERFACES(PsiPlugin PluginInfoProvider OptionAccessor PsiAccountController AccountInfoAccessor)
 public:
 	VideoStatusChanger();
@@ -176,7 +179,9 @@ private slots:
 
 };
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(VideoStatusChanger);
+#endif
 
 VideoStatusChanger::VideoStatusChanger()
 {
@@ -566,8 +571,8 @@ static WindowList getWindows(Atom prop)
 	int format = 0;
 	uchar* data = 0;
 	ulong count, after;
-	Display* display = QX11Info::display();
-	Window window = QX11Info::appRootWindow();
+	Display* display = X11Info::display();
+	Window window = X11Info::appRootWindow();
 	if (XGetWindowProperty(display, window, prop, 0, 1024 * sizeof(Window) / 4, False, AnyPropertyType,
 			       &type, &format, &count, &after, &data) == Success)
 	{
@@ -584,7 +589,7 @@ static Window activeWindow()
 {
 	static Atom net_active = 0;
 	if (!net_active)
-		net_active = XInternAtom(QX11Info::display(), "_NET_ACTIVE_WINDOW", True);
+		net_active = XInternAtom(X11Info::display(), "_NET_ACTIVE_WINDOW", True);
 
 	return getWindows(net_active).value(0);
 }
@@ -619,7 +624,7 @@ void VideoStatusChanger::fullSTTimeout()
 {
 #ifdef Q_WS_X11
 	Window w = activeWindow();
-	Display  *display = QX11Info::display();
+	Display  *display = X11Info::display();
 	bool full = false;
 	static Atom state = XInternAtom(display, "_NET_WM_STATE", False);
 	static Atom  fullScreen = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);
