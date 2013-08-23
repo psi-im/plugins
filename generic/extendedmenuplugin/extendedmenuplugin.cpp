@@ -57,28 +57,28 @@ static const QString timeString = "<iq from='%1' to='%2' type='get' id='%3'><tim
 
 enum ActionType { NoAction = 0, CopyJid, CopyNick, CopyStatusMessage, RequestPing, RequestLastSeen, RequestTime };
 
-class ExtendedMenuPlugin: public QObject, public PsiPlugin, public OptionAccessor,  public AccountInfoAccessor,
-		public IconFactoryAccessor, public PopupAccessor, public MenuAccessor, public PluginInfoProvider,
-		public ContactInfoAccessor, public StanzaSender, public StanzaFilter, public ToolbarIconAccessor
+class ExtendedMenuPlugin: public QObject, public PsiPlugin, public OptionAccessor,	public AccountInfoAccessor,
+						  public IconFactoryAccessor, public PopupAccessor, public MenuAccessor, public PluginInfoProvider,
+						  public ContactInfoAccessor, public StanzaSender, public StanzaFilter, public ToolbarIconAccessor
 {
 	Q_OBJECT
 #ifdef HAVE_QT5
-    Q_PLUGIN_METADATA(IID "com.psi-plus.ExtendedMenuPlugin")
+	Q_PLUGIN_METADATA(IID "com.psi-plus.ExtendedMenuPlugin")
 #endif
-	Q_INTERFACES(PsiPlugin  AccountInfoAccessor OptionAccessor IconFactoryAccessor PopupAccessor  MenuAccessor
-		     ContactInfoAccessor PluginInfoProvider StanzaFilter StanzaSender ToolbarIconAccessor)
+	Q_INTERFACES(PsiPlugin	AccountInfoAccessor OptionAccessor IconFactoryAccessor PopupAccessor  MenuAccessor
+				 ContactInfoAccessor PluginInfoProvider StanzaFilter StanzaSender ToolbarIconAccessor)
 
-public:
+	public:
 	ExtendedMenuPlugin();
 	virtual QString name() const;
 	virtual QString shortName() const;
 	virtual QString version() const;
-        virtual QWidget* options();
+	virtual QWidget* options();
 	virtual Priority priority();
 	virtual bool enable();
-        virtual bool disable();
-        virtual void applyOptions();
-        virtual void restoreOptions();
+	virtual bool disable();
+	virtual void applyOptions();
+	virtual void restoreOptions();
 	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
 	virtual void setOptionAccessingHost(OptionAccessingHost* host);
 	virtual void optionChanged(const QString& ) {}
@@ -102,7 +102,7 @@ private slots:
 	void toolbarActionActivated();
 
 private:
-        bool enabled;
+	bool enabled;
 	OptionAccessingHost* psiOptions;
 	AccountInfoAccessingHost *accInfo;
 	IconFactoryAccessingHost *icoHost;
@@ -170,7 +170,7 @@ QString ExtendedMenuPlugin::shortName() const
 
 QString ExtendedMenuPlugin::version() const
 {
-        return cVer;
+	return cVer;
 }
 
 PsiPlugin::Priority ExtendedMenuPlugin::priority()
@@ -217,7 +217,7 @@ bool ExtendedMenuPlugin::enable()
 
 bool ExtendedMenuPlugin::disable()
 {
-        enabled = false;
+	enabled = false;
 	requestList_.clear();
 
 	popup->unregisterOption(POPUP_OPTION_NAME);
@@ -344,91 +344,91 @@ bool ExtendedMenuPlugin::incomingStanza(int account, const QDomElement &xml)
 							name = contactInfo->name(account, jid.split("/").first());
 						}
 						switch(r.type) {
-							case(RequestPing):
-							{
-								const QString title = tr("Ping %1").arg(name);
-								if(xml.attribute("type") == "result") {
-									double msecs = ((double)r.time.msecsTo(QTime::currentTime()))/1000;
-									showPopup(tr("Pong from %1 after %2 secs")
+						case(RequestPing):
+						{
+							const QString title = tr("Ping %1").arg(name);
+							if(xml.attribute("type") == "result") {
+								double msecs = ((double)r.time.msecsTo(QTime::currentTime()))/1000;
+								showPopup(tr("Pong from %1 after %2 secs")
 										  .arg(jid)
 										  .arg(QString::number(msecs, 'f', 3)),
 										  title);
-								}
-								else {
-									showPopup(tr("Feature not implemented"),
-										  title);
-								}
-								break;
 							}
-							case(RequestLastSeen):
+							else {
+								showPopup(tr("Feature not implemented"),
+										  title);
+							}
+							break;
+						}
+						case(RequestLastSeen):
+						{
+							const QString title = tr("%1 Last Activity").arg(name);
+							QDomElement query = xml.firstChildElement("query");
+							if(!query.isNull()
+							   && query.attribute("xmlns") == "jabber:iq:last"
+							   && query.hasAttribute("seconds"))
 							{
-								const QString title = tr("%1 Last Activity").arg(name);
-								QDomElement query = xml.firstChildElement("query");
-								if(!query.isNull()
-									&& query.attribute("xmlns") == "jabber:iq:last"
-									&& query.hasAttribute("seconds"))
-								{
-									ulong secs = query.attribute("seconds").toInt();
-									QString text;
-									if(secs) {
-										if(jid.contains("@")) {
-											if(jid.contains("/")) {
-												text = tr("%1 Last Activity was %2 ago").arg(jid, secondsToString(secs));
-											}
-											else {
-												text = tr("%1 went offline %2 ago").arg(jid, secondsToString(secs));
-											}
+								ulong secs = query.attribute("seconds").toInt();
+								QString text;
+								if(secs) {
+									if(jid.contains("@")) {
+										if(jid.contains("/")) {
+											text = tr("%1 Last Activity was %2 ago").arg(jid, secondsToString(secs));
 										}
 										else {
-											text = tr("%1 uptime is %2").arg(jid, secondsToString(secs));
+											text = tr("%1 went offline %2 ago").arg(jid, secondsToString(secs));
 										}
 									}
 									else {
-										text = tr("%1 is online!").arg(jid);
+										text = tr("%1 uptime is %2").arg(jid, secondsToString(secs));
+									}
+								}
+								else {
+									text = tr("%1 is online!").arg(jid);
+								}
+								showPopup(text, title);
+							}
+							else {
+								QDomElement error = xml.firstChildElement("error");
+								if(!error.isNull()) {
+									QString text = tr("Unknown error!");
+									QString tagName = getFirstChildElement(error).tagName();
+									if(!tagName.isEmpty()) {
+										if(tagName == "service-unavailable") {
+											text = tr("Service unavailable");
+										}
+										else if(tagName == "feature-not-implemented") {
+											text = tr("Feature not implemented");
+										}
+										else if(tagName == "not-allowed" || tagName == "forbidden") {
+											text = tr("You are not authorized to retrieve Last Activity information");
+										}
 									}
 									showPopup(text, title);
 								}
-								else {
-									QDomElement error = xml.firstChildElement("error");
-									if(!error.isNull()) {
-										QString text = tr("Unknown error!");
-										QString tagName = getFirstChildElement(error).tagName();
-										if(!tagName.isEmpty()) {
-											if(tagName == "service-unavailable") {
-												text = tr("Service unavailable");
-											}
-											else if(tagName == "feature-not-implemented") {
-												text = tr("Feature not implemented");
-											}
-											else if(tagName == "not-allowed" || tagName == "forbidden") {
-												text = tr("You are not authorized to retrieve Last Activity information");
-											}
-										}
-										showPopup(text, title);
-									}
-								}
-								break;
 							}
-							case(RequestTime):
-							{
-								QDomElement time = xml.firstChildElement("time");
-								if(!time.isNull()) {
-									const QString title = tr("%1 Time").arg(name);
-									QDomElement utc = time.firstChildElement("utc");
-									if(!utc.isNull()) {
-										QString zone = time.firstChildElement("tzo").text();
-										QDateTime dt = QDateTime::fromString(utc.text(), Qt::ISODate);
-										dt = dt.addSecs(stringToInt(zone)*3600);
-										showPopup(tr("%1 time is %2").arg(jid, dt.toString("yyyy-MM-dd hh:mm:ss")), title);
-									}
-									else if(!xml.firstChildElement("error").isNull()) {
-										showPopup(tr("Feature not implemented"), title);
-									}
+							break;
+						}
+						case(RequestTime):
+						{
+							QDomElement time = xml.firstChildElement("time");
+							if(!time.isNull()) {
+								const QString title = tr("%1 Time").arg(name);
+								QDomElement utc = time.firstChildElement("utc");
+								if(!utc.isNull()) {
+									QString zone = time.firstChildElement("tzo").text();
+									QDateTime dt = QDateTime::fromString(utc.text(), Qt::ISODate);
+									dt = dt.addSecs(stringToInt(zone)*3600);
+									showPopup(tr("%1 time is %2").arg(jid, dt.toString("yyyy-MM-dd hh:mm:ss")), title);
 								}
-								break;
+								else if(!xml.firstChildElement("error").isNull()) {
+									showPopup(tr("Feature not implemented"), title);
+								}
 							}
-							default:
-								break;
+							break;
+						}
+						default:
+							break;
 						}
 						rl.removeAll(r);
 						if(!rl.isEmpty()) {
@@ -615,9 +615,9 @@ void ExtendedMenuPlugin::addRequest(int account, const Request &r)
 
 QString ExtendedMenuPlugin::pluginInfo()
 {
-	return tr("Author: ") +  "Dealer_WeARE\n"
-			+ tr("Email: ") + "wadealer@gmail.com\n\n"
-			+ tr("This plugin adds several additional commands into contacts context menu.");
+	return tr("Author: ") +	 "Dealer_WeARE\n"
+		 + tr("Email: ") + "wadealer@gmail.com\n\n"
+		 + tr("This plugin adds several additional commands into contacts context menu.");
 }
 
 QPixmap ExtendedMenuPlugin::icon() const
