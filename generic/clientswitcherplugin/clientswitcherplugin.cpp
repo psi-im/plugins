@@ -30,7 +30,9 @@
 #include "clientswitcherplugin.h"
 #include "viewer.h"
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(ClientSwitcherPlugin)
+#endif
 
 #define cVer                    "0.0.17"
 #define constPluginShortName    "clientswitcher"
