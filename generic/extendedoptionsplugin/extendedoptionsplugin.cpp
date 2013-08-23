@@ -18,7 +18,19 @@
  *
  */
 
-#include <QtGui>
+#include <QSpinBox>
+#include <QCheckBox>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QTextList>
+#include <QToolButton>
+#include <QScrollArea>
+#include <QVBoxLayout>
+#include <QTextEdit>
+#include <QGroupBox>
+#include <QLabel>
+#include <QButtonGroup>
+#include <QColorDialog>
 
 #include "psiplugin.h"
 #include "optionaccessor.h"
@@ -44,6 +56,9 @@ public:
 class ExtendedOptions : public QObject, public PsiPlugin, public OptionAccessor, public ApplicationInfoAccessor, public PluginInfoProvider
 {
         Q_OBJECT
+#ifdef HAVE_QT5
+    Q_PLUGIN_METADATA(IID "com.psi-plus.ExtendedOptions")
+#endif
 	Q_INTERFACES(PsiPlugin OptionAccessor ApplicationInfoAccessor PluginInfoProvider)
 public:
 			ExtendedOptions();
@@ -193,7 +208,9 @@ private:
 	QCheckBox *popupsSuppressAway;
 };
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(ExtendedOptions)
+#endif
 
 ExtendedOptions::ExtendedOptions()
 	: psiOptions(0)
