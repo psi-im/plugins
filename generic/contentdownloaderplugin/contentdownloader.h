@@ -36,6 +36,9 @@ class Form;
 
 class ContentDownloader : public QObject, public PsiPlugin, public OptionAccessor, public ApplicationInfoAccessor , public PluginInfoProvider {
 	Q_OBJECT
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "com.psi-plus.ContentDownloader")
+#endif
 	Q_INTERFACES(PsiPlugin OptionAccessor ApplicationInfoAccessor PluginInfoProvider)
 public:
 	ContentDownloader();
