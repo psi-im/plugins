@@ -26,7 +26,11 @@ void Viewer::init()
 {
         setSelectionBehavior(QAbstractItemView::SelectRows);
         resizeColumnsToContents();
+#ifdef HAVE_QT5
+        horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+#else
         horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+#endif
         horizontalHeader()->setStretchLastSection(true);
         verticalHeader()->setDefaultAlignment( Qt::AlignHCenter );
 

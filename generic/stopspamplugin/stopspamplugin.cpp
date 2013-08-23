@@ -83,6 +83,9 @@ public AccountInfoAccessor, public ApplicationInfoAccessor, public PopupAccessor
 public PluginInfoProvider, public EventFilter, public ContactInfoAccessor
 {
 	Q_OBJECT
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "com.psi-plus.StopSpam")
+#endif
         Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter AccountInfoAccessor ApplicationInfoAccessor
 		     PopupAccessor IconFactoryAccessor PluginInfoProvider EventFilter ContactInfoAccessor)
 
@@ -183,7 +186,9 @@ private:
 	int popupId;
 };
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(StopSpam);
+#endif
 
 StopSpam::StopSpam()
 	: enabled(false)
