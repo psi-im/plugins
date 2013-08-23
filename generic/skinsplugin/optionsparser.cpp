@@ -241,7 +241,7 @@ QString Base64::encode(const QByteArray &s)
                 p[at++] = tbl[b];
                 p[at++] = tbl[c];
         }
-        return QString::fromAscii(p);
+        return QString::fromLatin1(p);
 }
 
 QByteArray Base64::decode(const QString& input)
