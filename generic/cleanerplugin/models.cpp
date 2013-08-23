@@ -32,7 +32,8 @@
 void BaseModel::reset()
 {
 	selected_.clear();
-	QAbstractTableModel::reset();
+    beginResetModel();
+    endResetModel();
 }
 
 int BaseModel::selectedCount(const QModelIndex &) const

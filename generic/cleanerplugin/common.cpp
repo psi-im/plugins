@@ -20,7 +20,13 @@
 
 #include "common.h"
 #include <QDir>
-#include <QtGui>
+#include <QTextList>
+#include <QTextEdit>
+#include <QLineEdit>
+#include <QLabel>
+#include <QPushButton>
+#include <QTextStream>
+#include <QFileDialog>
 #include <QDomElement>
 
 

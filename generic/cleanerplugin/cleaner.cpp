@@ -21,6 +21,8 @@
 #include "cleaner.h"
 #include "common.h"
 #include <QDomDocument>
+#include <QInputDialog>
+#include <QMessageBox>
 
 
 CleanerMainWindow::CleanerMainWindow(CleanerPlugin *cleaner)
@@ -322,7 +324,7 @@ void CleanerMainWindow::viewAvatar(const QModelIndex& index)
 	if(index.column() != 1)
 		return;
 
-	AvatarView *avaView = new AvatarView(qVariantValue<QPixmap>(index.data(Qt::DisplayRole)), this);
+	AvatarView *avaView = new AvatarView(index.data(Qt::DisplayRole).value<QPixmap>(), this);
 	avaView->setIcon(cleaner_->iconHost->getIcon("psi/save"));
 	avaView->show();
 }

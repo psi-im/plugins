@@ -21,7 +21,7 @@
 #ifndef CLEANER_H
 #define CLEANER_H
 
-#include <QtGui>
+#include <QMainWindow>
 #include "cleanerplugin.h"
 #include "ui_cleaner.h"
 #include "models.h"

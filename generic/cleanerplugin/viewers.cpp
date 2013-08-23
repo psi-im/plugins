@@ -36,7 +36,11 @@ void ClearingViewer::init(IconFactoryAccessingHost *iconHost)
 {
         iconHost_ = iconHost;
         resizeColumnsToContents();
+#ifdef HAVE_QT5
+        horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+#else
         horizontalHeader()->setResizeMode(0, QHeaderView::ResizeToContents);
+#endif
         horizontalHeader()->setStretchLastSection(true);
         horizontalHeader()->setSortIndicator(-1, Qt::AscendingOrder);
         verticalHeader()->setDefaultAlignment( Qt::AlignHCenter );
@@ -115,7 +119,7 @@ void AvatarDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
 	QColor c = (option.state & QStyle::State_Selected) ? palette.color(QPalette::Highlight) : palette.color(QPalette::Base);
 	painter->fillRect(r, c);
 
-	QPixmap pix = qVariantValue<QPixmap>(index.data(Qt::DisplayRole));
+	QPixmap pix = index.data(Qt::DisplayRole).value<QPixmap>();
 	painter->save();
 	painter->setClipRect(r);
 	if(!pix.isNull()) {
