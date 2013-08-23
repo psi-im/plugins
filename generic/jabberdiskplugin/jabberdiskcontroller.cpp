@@ -107,7 +107,11 @@ void JabberDiskController::sendStanza(int account, const QString &to, const QStr
 			.arg(accInfo->getJid(account))
 			.arg(to)
 			.arg(*id)
+#ifdef HAVE_QT5
+			.arg(message.toHtmlEscaped());
+#else
 			.arg(Qt::escape(message));
+#endif
 	stanzaSender->sendStanza(account, txt);
 }
 

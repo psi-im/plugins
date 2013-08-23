@@ -142,7 +142,11 @@ void JDMainWin::outgoingMessage(const QString &message)
 
 void JDMainWin::appendMessage(const QString& message, bool outgoing)
 {
+#ifdef HAVE_QT5
+	QString msg = message.toHtmlEscaped().replace("\n", "<br>");
+#else
 	QString msg = Qt::escape(message).replace("\n", "<br>");
+#endif
 	if (outgoing)
 		msg = "<span style='color:blue'>" + tr("<b>You:</b> ") + msg+ "</span>";
 	else

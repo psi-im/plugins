@@ -19,6 +19,8 @@
  */
 
 #include <QMimeData>
+#include <QIODevice>
+#include <QDataStream>
 #include "jd_item.h"
 //#include <QDebug>
 

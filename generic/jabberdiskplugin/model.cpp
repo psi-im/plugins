@@ -27,7 +27,11 @@
 JDModel::JDModel(const QString &diskName, QObject *parent)
 	: QAbstractItemModel(parent)
 	, diskName_(diskName)
+#ifdef HAVE_QT5
+	, rootIndex_(createIndex(0, 0, static_cast<quintptr>(0)))
+#else
 	, rootIndex_(createIndex(0, 0, 0))
+#endif
 {
 }
 
@@ -315,8 +319,9 @@ bool JDModel::addItem(JDItem *i)
 
 void JDModel::clear()
 {
+	beginResetModel();
 	removeAll();
-	reset();
+	endResetModel();
 }
 
 void JDModel::removeAll()
@@ -342,7 +347,7 @@ JDItem* JDModel::findDirItem(const QString &path) const
 }
 
 QStringList JDModel::dirs(const QString &path) const
-{		
+{
 	QStringList dirs_;
 	foreach(const ProxyItem& i, items_) {
 		if(i.item->type() != JDItem::Dir)

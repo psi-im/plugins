@@ -48,6 +48,9 @@ class JabberDiskPlugin : public QObject, public PsiPlugin, public StanzaSender, 
 	/*, public PopupAccessor,*/
 {
         Q_OBJECT
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "com.psi-plus.JabberDiskPlugin")
+#endif
 	Q_INTERFACES(PsiPlugin StanzaFilter StanzaSender IconFactoryAccessor AccountInfoAccessor//  PopupAccessor
 		     MenuAccessor PluginInfoProvider OptionAccessor)
 public:
