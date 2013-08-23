@@ -60,6 +60,9 @@ public IconFactoryAccessor, public PopupAccessor, public StanzaSender, public Me
 public SoundAccessor
 {
 	Q_OBJECT
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "com.psi-plus.AttentionPlugin")
+#endif
         Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor OptionAccessor ActiveTabAccessor ApplicationInfoAccessor
 		     ToolbarIconAccessor IconFactoryAccessor PopupAccessor StanzaSender MenuAccessor PluginInfoProvider
 		     SoundAccessor)
@@ -140,7 +143,9 @@ private slots:
 	void nudgeTimerTimeout();
 };
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(AttentionPlugin);
+#endif
 
 AttentionPlugin::AttentionPlugin()
 	: enabled(false)
