@@ -42,6 +42,9 @@ class Gnome3StatusWatcher : public QObject, public PsiPlugin, public PluginInfoP
 		public PsiAccountController, public AccountInfoAccessor
 {
 	Q_OBJECT
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "com.psi-plus.Gnome3StatusWatcher")
+#endif
 	Q_INTERFACES(PsiPlugin PluginInfoProvider OptionAccessor PsiAccountController AccountInfoAccessor)
 public:
 	Gnome3StatusWatcher();
@@ -75,7 +78,9 @@ private slots:
 	void onGnome3StatusChange(const uint &status);
 };
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(Gnome3StatusWatcher);
+#endif
 
 Gnome3StatusWatcher::Gnome3StatusWatcher() {
 	enabled = false;
