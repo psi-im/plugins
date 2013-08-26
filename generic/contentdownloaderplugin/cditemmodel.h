@@ -21,7 +21,6 @@
 #ifndef CDITEMMODEL_H
 #define CDITEMMODEL_H
 
-#include <QtNetwork>
 #include <QAbstractTableModel>
 #include "contentitem.h"
 

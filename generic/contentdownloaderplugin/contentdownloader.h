@@ -21,8 +21,6 @@
 #ifndef CONTENTDOWLOADER_H
 #define CONTENTDOWLOADER_H
 
-#include <QtCore>
-#include <QtGui>
 #include <QWidget>
 #include "psiplugin.h"
 #include "applicationinfoaccessor.h"
