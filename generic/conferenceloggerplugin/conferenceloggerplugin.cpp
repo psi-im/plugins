@@ -342,7 +342,7 @@ QString ConferenceLogger::pluginInfo() {
 		 + tr("Email: ") + "wadealer@gmail.com\n\n"
 		 + trUtf8("This plugin is designed to save conference logs in which the Psi+ user sits.\n"
 				  "Conferences logs can be viewed from the plugin settings or by clicking on the appropriate button on the toolbar in the active window/tab with conference.\n\n"
-				  "Note: To work correctly, the option options.ui.chat.central-toolbar	must be set to true.");
+				  "Note: To work correctly, the option options.ui.chat.central-toolbar must be set to true.");
 }
 
 QPixmap ConferenceLogger::icon() const
