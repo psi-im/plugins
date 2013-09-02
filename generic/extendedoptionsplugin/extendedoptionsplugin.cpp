@@ -92,13 +92,11 @@ private:
 
 	//Chats-----
 	// QCheckBox *htmlRender;
-	QCheckBox *centralToolbar;
 	QCheckBox *confirmClearing;
 	QCheckBox *messageIcons;
 	//QCheckBox *altnSwitch;
 	QCheckBox *showAvatar;
 	QSpinBox *avatarSize;
-	QCheckBox *disablePastSend;
 	QCheckBox *sayMode;
 	QCheckBox *disableSend;
 	QCheckBox *auto_capitalize;
@@ -289,7 +287,6 @@ QWidget* ExtendedOptions::options()
 
 	//Chats-----
 	//	htmlRender = new QCheckBox(tr("Enable HTML rendering in chat window"));
-	centralToolbar = new QCheckBox(tr("Enable central toolbar"));
 	confirmClearing = new QCheckBox(tr("Ask for confirmation before clearing chat window"));
 	messageIcons = new QCheckBox(tr("Enable icons in chat"));
 	scaledIcons = new QCheckBox(tr("Scaled message icons"));
@@ -297,7 +294,6 @@ QWidget* ExtendedOptions::options()
 	/* altnSwitch = new QCheckBox(tr("Switch tabs with \"ALT+(1-9)\""));
 	   altnSwitch->setChecked(psiOptions->getGlobalOption("options.ui.tabs.alt-n-switch").toBool());*/
 	showAvatar = new QCheckBox(tr("Show Avatar"));
-	disablePastSend = new QCheckBox(tr("Disable \"Paste and Send\" button"));
 	sayMode = new QCheckBox(tr("Enable \"Says style\""));
 	disableSend = new QCheckBox(tr("Hide \"Send\" button"));
 
@@ -325,12 +321,10 @@ QWidget* ExtendedOptions::options()
 	tab1Layout->addWidget(new QLabel(tr("Chat window caption:")));
 	tab1Layout->addWidget(chat_caption);
 	// tab1Layout->addWidget(htmlRender);
-	tab1Layout->addWidget(centralToolbar);
 	tab1Layout->addWidget(confirmClearing);
 	tab1Layout->addWidget(messageIcons);
 	tab1Layout->addWidget(scaledIcons);
 	//tab1Layout->addWidget(altnSwitch);
-	tab1Layout->addWidget(disablePastSend);
 	tab1Layout->addWidget(disableSend);
 	tab1Layout->addWidget(sayMode);
 	tab1Layout->addWidget(showAvatar);
@@ -725,13 +719,11 @@ void ExtendedOptions::applyOptions()
 
 	//Chats-----
 	//psiOptions->setGlobalOption("options.html.chat.render",QVariant(htmlRender->isChecked()));
-	psiOptions->setGlobalOption("options.ui.chat.central-toolbar",QVariant(centralToolbar->isChecked()));
 	psiOptions->setGlobalOption("options.ui.chat.warn-before-clear",QVariant(confirmClearing->isChecked()));
 	psiOptions->setGlobalOption("options.ui.chat.use-message-icons",QVariant(messageIcons->isChecked()));
 	psiOptions->setGlobalOption("options.ui.chat.scaled-message-icons",QVariant(scaledIcons->isChecked()));
 	//psiOptions->setGlobalOption("options.ui.tabs.alt-n-switch",QVariant(altnSwitch->isChecked()));
 	psiOptions->setGlobalOption("options.ui.chat.avatars.show",QVariant(showAvatar->isChecked()));
-	psiOptions->setGlobalOption("options.ui.chat.disable-paste-send",QVariant(disablePastSend->isChecked()));
 	psiOptions->setGlobalOption("options.ui.chat.use-chat-says-style",QVariant(sayMode->isChecked()));
 	psiOptions->setGlobalOption("options.ui.chat.avatars.size", QVariant(avatarSize->value()));
 	psiOptions->setGlobalOption("options.ui.disable-send-button",QVariant(disableSend->isChecked()));
@@ -855,14 +847,12 @@ void ExtendedOptions::restoreOptions()
 
 	//Chats-----
 	// htmlRender->setChecked(psiOptions->getGlobalOption("options.html.chat.render").toBool());
-	centralToolbar->setChecked(psiOptions->getGlobalOption("options.ui.chat.central-toolbar").toBool());
 	confirmClearing->setChecked(psiOptions->getGlobalOption("options.ui.chat.warn-before-clear").toBool());
 	messageIcons->setChecked(psiOptions->getGlobalOption("options.ui.chat.use-message-icons").toBool());
 	scaledIcons->setChecked(psiOptions->getGlobalOption("options.ui.chat.scaled-message-icons").toBool());
 	// altnSwitch->setChecked(psiOptions->getGlobalOption("options.ui.tabs.alt-n-switch").toBool());
 	showAvatar->setChecked(psiOptions->getGlobalOption("options.ui.chat.avatars.show").toBool());
 	avatarSize->setValue(psiOptions->getGlobalOption("options.ui.chat.avatars.size").toInt());
-	disablePastSend->setChecked(psiOptions->getGlobalOption("options.ui.chat.disable-paste-send").toBool());
 	sayMode->setChecked(psiOptions->getGlobalOption("options.ui.chat.use-chat-says-style").toBool());
 	disableSend->setChecked(psiOptions->getGlobalOption("options.ui.disable-send-button").toBool());
 
@@ -1053,8 +1043,8 @@ void ExtendedOptions::saveFile(const QString& text)
 void ExtendedOptions::hack()
 {
 	//Enable "Apply" button
-	centralToolbar->toggle();
-	centralToolbar->toggle();
+	confirmClearing->toggle();
+	confirmClearing->toggle();
 }
 
 QString ExtendedOptions::profileDir()
