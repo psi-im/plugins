@@ -43,7 +43,7 @@
 
 #include "viewer.h"
 
-#define cVer "0.2.1"
+#define cVer "0.2.2"
 #define constHeight "Height"
 #define constWidth "Width"
 #define constlastItem "lastItem"
@@ -329,7 +329,7 @@ void ConferenceLogger::setIconFactoryAccessingHost(IconFactoryAccessingHost *hos
 QList < QVariantHash > ConferenceLogger::getGCButtonParam() {
 	QList< QVariantHash > l;
 	QVariantHash hash;
-	hash["tooltip"] = QVariant(tr("Conference History"));
+	hash["tooltip"] = QVariant(tr("Groupchat History"));
 	hash["icon"] = QVariant(QString("loggerplugin/openlog"));
 	hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
 	hash["slot"] = QVariant(SLOT(view()));
@@ -340,9 +340,9 @@ QList < QVariantHash > ConferenceLogger::getGCButtonParam() {
 QString ConferenceLogger::pluginInfo() {
 	return tr("Author: ") +	 "Dealer_WeARE\n"
 		 + tr("Email: ") + "wadealer@gmail.com\n\n"
-		 + trUtf8("This plugin is designed to save conference logs in which the Psi+ user sits.\n"
-				  "Conferences logs can be viewed from the plugin settings or by clicking on the appropriate button on the toolbar in the active window/tab with conference.\n\n"
-				  "Note: To work correctly, the option options.ui.chat.central-toolbar must be set to true.");
+		 + trUtf8("This plugin is designed to save groupchat logs in which the Psi+ user sits.\n"
+				  "Groupchats logs can be viewed from the plugin settings or by clicking on the appropriate button on the toolbar in the active window/tab with groupchat.\n\n"
+				  "Note: To work correctly, the the Groupchat Toolbar must be enabled.");
 }
 
 QPixmap ConferenceLogger::icon() const

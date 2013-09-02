@@ -29,7 +29,7 @@
 #include "options.h"
 #include <QFileDialog>
 
-#define constVersion            "0.1.1"
+#define constVersion            "0.1.2"
 #define constShortPluginName    "gomokugameplugin"
 
 #ifndef HAVE_QT5

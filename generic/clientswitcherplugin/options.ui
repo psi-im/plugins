@@ -275,7 +275,7 @@
                 <item>
                  <widget class="QCheckBox" name="cb_conferencesenable">
                   <property name="text">
-                   <string>Conferences</string>
+                   <string>Groupchats</string>
                   </property>
                  </widget>
                 </item>

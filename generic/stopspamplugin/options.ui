@@ -90,13 +90,13 @@
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
-       <string>MUC</string>
+       <string>Groupchat</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <widget class="QCheckBox" name="cb_enable_muc">
          <property name="text">
-          <string>Enable Stop Spam for private messages in MUC</string>
+          <string>Enable Stop Spam for private messages in groupchat</string>
          </property>
         </widget>
        </item>

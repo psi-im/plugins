@@ -225,7 +225,7 @@
    <item>
     <widget class="QCheckBox" name="cb_disable_conf">
      <property name="text">
-      <string>Disable invitations from conference</string>
+      <string>Disable invitations from groupchat</string>
      </property>
     </widget>
    </item>

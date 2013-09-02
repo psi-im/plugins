@@ -40,7 +40,7 @@
 #include "plugininfoprovider.h"
 
 
-#define constVersion "0.3.8"
+#define constVersion "0.3.9"
 
 class ExtToolButton : public QToolButton
 {
@@ -276,7 +276,7 @@ QWidget* ExtendedOptions::options()
 	QVBoxLayout *tab7Layout = new QVBoxLayout(tab7);
 	QVBoxLayout *tab8Layout = new QVBoxLayout(tab8);
 	tabs->addTab(tab1, tr("Chat"));
-	tabs->addTab(tab2, tr("Conference"));
+	tabs->addTab(tab2, tr("Groupchat"));
 	tabs->addTab(tab5, tr("Tabs"));
 	tabs->addTab(tab3, tr("Roster"));
 	tabs->addTab(tab4, tr("Menu"));
@@ -361,9 +361,9 @@ QWidget* ExtendedOptions::options()
 	status_with_priority = new QCheckBox(tr("Show status with priority"));
 	showRole = new QCheckBox(tr("Show roles and affiliations changes"));
 	showStatus = new QCheckBox(tr("Show status changes"));
-	skipAutojoin = new QCheckBox(tr("Enable autojoin for bookmarked conferences"));
-	hideAutoJoin = new QCheckBox(tr("Hide conference on auto-join"));
-	mucHtml = new QCheckBox(tr("Enable HTML rendering in MUC chat window"));
+	skipAutojoin = new QCheckBox(tr("Enable autojoin for bookmarked groupchats"));
+	hideAutoJoin = new QCheckBox(tr("Hide groupchat on auto-join"));
+	mucHtml = new QCheckBox(tr("Enable HTML rendering in groupchat chat window"));
 
 	muc_leave_status_message = new QLineEdit;
 	accept_defaults = new QCheckBox(tr("Automatically accept the default room configuration"));
@@ -386,14 +386,14 @@ QWidget* ExtendedOptions::options()
 	mucGeneralLayout->addWidget(status_with_priority);
 	mucGeneralLayout->addWidget(skipAutojoin);
 	mucGeneralLayout->addWidget(hideAutoJoin);
-	mucGeneralLayout->addWidget(new QLabel(tr("Disable autojoin to folowing conferences:\n(specify JIDs)")));
+	mucGeneralLayout->addWidget(new QLabel(tr("Disable autojoin to folowing groupchats:\n(specify JIDs)")));
 	mucGeneralLayout->addWidget(bookmarksListSkip);
-	mucGeneralLayout->addWidget(new QLabel(tr("MUC leave status message:")));
+	mucGeneralLayout->addWidget(new QLabel(tr("Groupchat leave status message:")));
 	mucGeneralLayout->addWidget(muc_leave_status_message);
 	mucGeneralLayout->addStretch();
 
 
-	leftMucRoster = new QCheckBox(tr("Place MUC roster at left"));
+	leftMucRoster = new QCheckBox(tr("Place groupchat roster at left"));
 	showGroups = new QCheckBox(tr("Show groups"));
 	use_slim_group_headings = new QCheckBox(tr("Use slim group heading"));
 	show_status_icons = new QCheckBox(tr("Show status icons"));
@@ -553,7 +553,7 @@ QWidget* ExtendedOptions::options()
 	nrcLayout->addStretch();
 	nrcLayout->addWidget(noroleColor);
 
-	groupMucRoster = new QGroupBox(tr("MUC roster coloring:"));
+	groupMucRoster = new QGroupBox(tr("Groupchat roster coloring:"));
 	groupMucRoster->setCheckable(true);
 	QVBoxLayout *mucRosterLay = new QVBoxLayout(groupMucRoster);
 	mucRosterLay->addLayout(modcLayout);
@@ -689,7 +689,7 @@ QWidget* ExtendedOptions::options()
 	account_single = new QCheckBox(tr("Enable \"Single Account\" mode"));
 	xml_console_enable_at_login = new QCheckBox(tr("Enable XML-console on login"));
 	lastActivity = new QCheckBox(tr("Enable last activity server"));
-	sndMucNotify = new QCheckBox(tr("Enable sound notifications for every MUC message"));
+	sndMucNotify = new QCheckBox(tr("Enable sound notifications for every groupchat message"));
 	popupsSuppressDnd = new QCheckBox(tr("Disable popup notifications if status is DND"));
 	popupsSuppressAway = new QCheckBox(tr("Disable popup notifications if status is Away"));
 
