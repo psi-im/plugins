@@ -1,6 +1,6 @@
 2013-09-02
 v0.5.7 - taurus
-  * Использовать слово Groupchat вместе Conference и MUC
+  * Использовать слово Groupchat вместо Conference и MUC
 
 2013-08-13
 v0.5.6 - taurus

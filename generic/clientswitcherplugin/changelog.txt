@@ -1,6 +1,6 @@
 2013-09-02
 v0.0.18 - taurus
-  * Использовать слово Groupchat вместе Conference
+  * Использовать слово Groupchat вместо Conference
 
 2013-08-13
 v0.0.17 - taurus
