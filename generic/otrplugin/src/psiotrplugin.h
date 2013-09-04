@@ -107,7 +107,7 @@ public:
     virtual bool disable();
     virtual void applyOptions();
     virtual void restoreOptions();
-	virtual QPixmap icon() const;
+    virtual QPixmap icon() const;
 
     // PluginInfoProvider
     virtual QString pluginInfo();
