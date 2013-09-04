@@ -1,0 +1,171 @@
+Off-The-Record-Messaging plugin for Psi
+
+This is a Off-The-Record-Messaging plugin for the Psi+ instant
+messenger. Psi+ (aka Psi-dev) is a collection of patches for Psi. Psi+
+is available from http://code.google.com/p/psi-dev/.
+
+See the file INSTALL for instructions how to build the plugin.
+
+Please note that the plugin may be instable and security is not guaranteed.
+
+See http://www.cypherpunks.ca/otr/ for more information about OTR.
+
+
+
+TODOs
+* Configure OTR policy per contact
+* Documentation
+
+
+
+
+KNOWN ISSUES
+* Currently only works for top priority resources
+* System messages are only displayed for existing chat windows, might be
+  displayed in wrong order (needs to be fixed in Psi+)
+
+
+
+
+CHANGES
+
+  0.9.5
+    -Add support of libotr >= 4.0.0.
+
+  0.9.5pre
+    -Ignore internal messages, report state changes and notifications
+     via system messages
+    -The authentication dialog now differs between 'question and answer'
+     and 'shared secret', enabling mutual authentication for the latter.
+    -Add plugin info
+
+  0.9.4
+    -Add authentication via Socialist Millionaires' Protocol
+    -Fix escaping of plaintext OTR messages
+    -Ignore incoming messages of type "error"
+    -Fix OtrInternal::account_name()
+    -Use radio boxes for policy settings
+    -Add option to close a session when a contact goes offline
+    -Enable sorting for fingerprint and key table
+
+  0.9.3
+    -Fix fetching private keys
+    -Finish session when forgetting a fingerprint
+    -Enforce Unix line feeds
+    -Don't quote non-breaking spaces
+    -Use JID instead of account ID in libotr messages
+    -Remove HTML from outgoing libotr messages
+    -Add key generation and deletion to options
+    -Add context menu to fingerprint and private key widget
+    -Fix file path encoding for non-UTF-8 systems
+
+  0.9.2
+    -Encode strings as UTF-8 before passing them to libotr
+    -Fix fingerprint verification and deletion
+    -Only handle decrypted messages as HTML if they look like HTML
+    -Escape XML entities before encrypting
+    -Change options namespace and short name
+    -Identify accounts by ID, not by index
+    -Output accounts by name
+    -Auto-resize table columns in options
+    -Don't send empty messages
+    -Handle multiple selections in the fingerprint widget,
+     fix selections made without mouse
+
+  0.9.1
+    -OTR data is now stored in the data directory of the current profile
+    -Fix OTR for private messages
+    -Fix fingerprint verification
+    -Add indication for unverified sessions
+    -New Icons
+    -Improved HTML to plaintext conversion
+    -Make strings translatable
+
+  0.9
+    -update to Psi+ revision 3961.
+    -fix html tidying for incoming messages.
+    -rework message boxes and button in chatdialog.
+
+  0.8
+    -update to Psi+ revision 3763.
+    -Html is removed in outgoing encrypted messages.
+
+  0.7
+    -Use icons for otr button.
+    -Fixed update of message state on button.
+    -Default policy is now 'enabled'.
+    -Problem related to key generation fixed.
+    -Enabling and disabling of plugin fixed.
+    -Adapted to Psi+ interface changes.
+
+  0.6
+    -adapt to Psi+ plugin interface
+    -use HtmlTidy for invalid XHTML in encrypted messages
+    -changed handling of callbacks
+    -several bugfixes
+
+  0.5
+    -adapted to Psi 0.13
+    -ignore plugin for groupchat messages
+    -repaired window shown during key generation
+    -enable "End private Conversation" button in "finish" state.
+    -add --enable-plugins to Psi configure script
+    -several bugfixes and code cleanups
+
+  0.4
+    -menu in chatdialog to start OTR session, etc.
+    -incoming messages with invalid html markup were discarded in
+     previous versions.
+    -problem with 'status' information of known fingerprints resolved
+
+  0.3
+    -character encoding in tagged-plaintext-messages
+    -send otr-disconnect message when going offline
+    -resolved problems with configuration widget
+
+  0.2
+    -character encoding in encrypted messages
+
+
+
+
+THANKS
+
+Thanks to Prof. Dr. Ruediger Weis for supporting this work. Thanks to
+all people who sent patches. Especially to specThor <specthor@web.de>
+for UTF8 patches, Hannes Mehnert <hannes@mehnert.org> for chatdialog.
+Rolf Wuerdemann <rowue@digitalis.org> for configure patch and several
+bugfixes. Thanks to wadealer from Psi+ for adapting and including the
+patches into Psi+. Thanks to Boris Pek for porting to libotr >= 4.0.0.
+
+
+
+
+LICENSE
+
+The Off-the-Record Messaging plugin for Psi+ is covered by the following
+(GPL) license:
+
+    Off-the-Record Messaging plugin for Psi+
+    Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
+                  2011-2012  Florian Fieber
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of version 2 of the GNU General Public License as
+    published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+
+CONTACT
+
+http://public.beuth-hochschule.de/~s30935/
+timo-e@freenet.de
