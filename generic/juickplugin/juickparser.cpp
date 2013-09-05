@@ -230,7 +230,7 @@ QString JuickParser::photoLink() const
 		QDomElement url = x.firstChildElement("url");
 		if(!url.isNull()) {
 			photo = url.text().trimmed();
-			if(!photo.endsWith(".jpg", Qt::CaseInsensitive))
+			if(!photo.endsWith(".jpg", Qt::CaseInsensitive) && !photo.endsWith(".png", Qt::CaseInsensitive))
 				photo.clear();
 		}
 	}
