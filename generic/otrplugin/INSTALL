@@ -23,13 +23,18 @@ Perform the following steps:
 - Then run make to compile everything:
   $ make
 
-The resulting binary is libpsi-otr.so. This file should be copied to the
-plugins subdirectory of the Psi resources or Psi home directory. On Unix, 
-this is usually /usr/local/share/psi/plugins and ~/.psi/plugins.
+The resulting binary is libotrplugin.so or otrplugin.dll. This file should be
+copied to the plugins subdirectory of the Psi+ resources:
+* /usr/lib/psi-plus/plugins/ or /usr/local/lib/psi-plus/plugins/ or
+  ~/.local/share/psi+/plugins on Linux-based and FreeBSD systems
+* C:\Program Files\Psi+\plugins\ or %PSI_PLUS_DIRECTORY%\plugins\
+  on MS Windows systems
 
+Build and installation in Mac OS X is possible as well, but it requires some
+magic.
 
-If you have successfully build the plugin, do the following steps when you run
-Psi for the first time:
+If you have successfully installed OTR plugin, do the following steps when you
+run Psi+ for the first time:
 - Enable the plugin in the 'Options'-->'Plugins' dialog and click on 'Apply'.
 - Set the OTR policy in the 'Config' Tab of the plugin options.
   In most cases 'Automatically start private messaging' should be a good choice.
