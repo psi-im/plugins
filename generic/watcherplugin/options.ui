@@ -170,13 +170,6 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
-        <widget class="QCheckBox" name="cb_showOnToolbar">
-         <property name="text">
-          <string>Show Watch for JID button on chat toolbar</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QCheckBox" name="cb_showInContext">
          <property name="text">
           <string>Show Watch for JID button in contact context menu</string>

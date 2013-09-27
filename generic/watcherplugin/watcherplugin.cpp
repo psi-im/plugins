@@ -50,7 +50,7 @@
 #include "soundaccessor.h"
 #include "toolbariconaccessor.h"
 
-#define constVersion "0.4.4"
+#define constVersion "0.4.5"
 
 #define constSoundFile "sndfl"
 #define constInterval "intrvl"
@@ -61,7 +61,6 @@
 #define constWatchedItems "watcheditem"
 #define constDisableSnd "dsblsnd"
 #define constDisablePopupDnd "dsblpopupdnd"
-#define constShowOnToolbar "showontoolbar"
 #define constShowInContext "showincontext"
 
 #define POPUP_OPTION_NAME "Watcher Plugin"
@@ -134,7 +133,6 @@ private:
 	bool disablePopupDnd;
 	int popupId;
 	QHash<QString, QAction*> actions_;
-	bool showOnToolbar_;
 	bool showInContext_;
 
 	bool checkWatchedItem(const QString& from, const QString& body, WatchedItem *wi);
@@ -244,7 +242,6 @@ bool Watcher::enable() {
 			file.close();
 		}
 
-		showOnToolbar_ = psiOptions->getPluginOption(constShowOnToolbar, QVariant(true)).toBool();
 		showInContext_ = psiOptions->getPluginOption(constShowInContext, QVariant(true)).toBool();
 	}
 
@@ -291,7 +288,6 @@ QWidget* Watcher::options() {
 	ui_.tableView->setModel(model_);
 	ui_.tableView->init(icoHost);
 
-	ui_.cb_showOnToolbar->setChecked(showOnToolbar_);
 	ui_.cb_showInContext->setChecked(showInContext_);
 
 	connect(ui_.tableView, SIGNAL(checkSound(QModelIndex)), this, SLOT(checkSound(QModelIndex)));
@@ -351,10 +347,8 @@ void Watcher::applyOptions() {
 
 	psiOptions->setPluginOption(constWatchedItems, QVariant(l));
 
-	showOnToolbar_ = ui_.cb_showOnToolbar->isChecked();
 	showInContext_ = ui_.cb_showInContext->isChecked();
 
-	psiOptions->setPluginOption(constShowOnToolbar, QVariant(showOnToolbar_));
 	psiOptions->setPluginOption(constShowInContext, QVariant(showInContext_));
 }
 
@@ -551,7 +545,7 @@ QAction* Watcher::createAction(QObject *parent, const QString &contact)
 
 QAction* Watcher::getAction(QObject *parent, int /*account*/, const QString &contact)
 {
-	if (!enabled || !showOnToolbar_) {
+	if (!enabled) {
 		return 0;
 	}
 
