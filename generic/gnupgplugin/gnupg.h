@@ -70,7 +70,7 @@ public:
 	// from PsiPlugin
 	QString name() const { return "GnuPG Key Manager"; }
 	QString shortName() const { return "gnupg"; }
-	QString version() const { return "0.3.4"; }
+	QString version() const { return "0.3.5"; }
 
 	QWidget *options();
 	bool enable();

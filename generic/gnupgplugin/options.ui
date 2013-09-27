@@ -117,13 +117,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="chkSendChatButton">
-         <property name="text">
-          <string>Show Send Public Key button on chat toolbar</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>

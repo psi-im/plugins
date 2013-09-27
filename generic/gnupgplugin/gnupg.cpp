@@ -172,14 +172,12 @@ QList<QVariantHash> GnuPG::getButtonParam()
 {
 	QList<QVariantHash> l;
 
-	if (_optionHost->getPluginOption("send-chat-button", false).toBool()) {
-		QVariantHash hash;
-		hash["tooltip"] = QVariant(tr("Send GnuPG Public Key"));
-		hash["icon"] = QVariant(QString("gnupg/icon"));
-		hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
-		hash["slot"] = QVariant(SLOT(actionActivated()));
-		l << hash;
-	}
+	QVariantHash hash;
+	hash["tooltip"] = QVariant(tr("Send GnuPG Public Key"));
+	hash["icon"] = QVariant(QString("gnupg/icon"));
+	hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+	hash["slot"] = QVariant(SLOT(actionActivated()));
+	l << hash;
 	return l;
 }
 

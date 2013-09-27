@@ -88,14 +88,12 @@ void Options::loadSettings()
 {
 	ui->chkAutoImport->setChecked(_optionHost->getPluginOption("auto-import", false).toBool());
 	ui->chkHideKeyMessage->setChecked(_optionHost->getPluginOption("hide-key-message", false).toBool());
-	ui->chkSendChatButton->setChecked(_optionHost->getPluginOption("send-chat-button", false).toBool());
 }
 
 void Options::saveSettings()
 {
 	_optionHost->setPluginOption("auto-import", ui->chkAutoImport->isChecked());
 	_optionHost->setPluginOption("hide-key-message", ui->chkHideKeyMessage->isChecked());
-	_optionHost->setPluginOption("send-chat-button", ui->chkSendChatButton->isChecked());
 }
 
 void Options::addKey()
