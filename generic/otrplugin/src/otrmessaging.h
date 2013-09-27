@@ -25,8 +25,7 @@
 
 #include <QList>
 #include <QHash>
-
-class QString;
+#include <QString>
 
 class OtrInternal;
 
