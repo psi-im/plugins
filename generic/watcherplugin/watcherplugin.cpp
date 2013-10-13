@@ -379,14 +379,20 @@ bool Watcher::incomingStanza(int acc, const QDomElement &stanza) {
 				return false;
 
 			bool find = false;
-			if(model_->getWatchedJids().contains(from, Qt::CaseInsensitive) &&
-			   model_->getEnabledJids().at(model_->indexByJid(from)) == "true")
-				find = true;
+			int index = model_->indexByJid(from);
+			if(index >= 0) {
+				if (model_->getEnabledJids().at(index) == "true") {
+					find = true;
+				}
+			}
 			else {
 				from = from.split("/").takeFirst();
-				if(model_->getWatchedJids().contains(from, Qt::CaseInsensitive)&&
-				   model_->getEnabledJids().at(model_->indexByJid(from)) == "true")
-					find = true;
+				index = model_->indexByJid(from);
+				if(index >= 0) {
+					if (model_->getEnabledJids().at(index) == "true") {
+						find = true;
+					}
+				}
 			}
 			if(find) {
 				QString status = stanza.firstChildElement("show").text();
