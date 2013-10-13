@@ -50,7 +50,7 @@
 #include "soundaccessor.h"
 #include "toolbariconaccessor.h"
 
-#define constVersion "0.4.5"
+#define constVersion "0.4.6"
 
 #define constSoundFile "sndfl"
 #define constInterval "intrvl"
