@@ -1,10 +1,18 @@
+2013-10-14
+v0.9.7 tehnick
+  * Fix problem of initialization of private conversation when both sides use
+    libotr 4.0.x. Protocol OTRv2 is forced. This is temporary solution.
+  * Fix tiny memory leak when libotr 4.x is used.
+  * Tiny improvement in endSession() function when libotr 4.x is used.
+  * Better error handling when libotr 4.x is used.
+
 2013-08-13
-v0.9.6
+v0.9.6 taurus
   * Add function returning plugin's icon.
   * Fix build with Qt 5.x.
 
 2013-06-30
-v0.9.5
+v0.9.5 tehnick
   * Add support of libotr >= 4.0.0.
 
 2012-04-04

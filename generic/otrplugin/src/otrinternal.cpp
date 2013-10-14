@@ -311,9 +311,8 @@ psiotr::OtrMessageType OtrInternal::decryptMessage(const QString& account,
             }
         }
     }
-
-    otrl_tlv_free(tlvs);
 #endif
+    otrl_tlv_free(tlvs);
 
     if (ignoreMessage == 1)
     {
@@ -472,7 +471,14 @@ void OtrInternal::startSession(const QString& account, const QString& contact)
 
     //TODO: make allowed otr versions configureable
     char* msg = otrl_proto_default_query_msg(m_callback->humanAccountPublic(account).toUtf8().constData(),
+#if (OTRL_VERSION_MAJOR >= 4)
+                                             OTRL_POLICY_ALLOW_V2);
+    // Yes, this is a malicious hack. And in the bright future (OTRL_POLICY_ALLOW_V3 | OTRL_POLICY_ALLOW_V2)
+    // or OTRL_POLICY_DEFAULT should be used. But for now this is only possible solution for fixing the problem
+    // of initialization of private conversation when both sides use libotr 4.0.x.
+#else
                                              OTRL_POLICY_DEFAULT);
+#endif
 
     m_callback->sendMessage(account, contact, QString::fromUtf8(msg));
 
@@ -499,7 +505,7 @@ void OtrInternal::endSession(const QString& account, const QString& contact)
                             account.toUtf8().constData(), OTR_PROTOCOL_STRING,
                             contact.toUtf8().constData()
 #if (OTRL_VERSION_MAJOR >= 4)
-                            ,(otrl_instag_t)NULL
+                            ,OTRL_INSTAG_BEST
 #endif
                             );
 }
@@ -930,6 +936,12 @@ void OtrInternal::handle_msg_event(OtrlMessageEvent msg_event, ConnContext* cont
     else if (msg_event == OTRL_MSGEVENT_CONNECTION_ENDED) {
         QString errorString = QObject::tr("Your message was not sent. Either end your "
                                           "private conversation, or restart it.");
+        m_callback->displayOtrMessage(QString::fromUtf8(context->accountname),
+                                      QString::fromUtf8(context->username),
+                                      errorString);
+    }
+    else if (msg_event == OTRL_MSGEVENT_RCVDMSG_UNRECOGNIZED) {
+        QString errorString = QObject::tr("Unreadable encrypted message was received.");
         m_callback->displayOtrMessage(QString::fromUtf8(context->accountname),
                                       QString::fromUtf8(context->username),
                                       errorString);
