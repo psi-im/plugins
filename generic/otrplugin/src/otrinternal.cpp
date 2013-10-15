@@ -925,23 +925,36 @@ void OtrInternal::handle_msg_event(OtrlMessageEvent msg_event, ConnContext* cont
     Q_UNUSED(err);
     Q_UNUSED(message);
 
-    if (msg_event == OTRL_MSGEVENT_RCVDMSG_UNENCRYPTED) {
-        QString errorString = QObject::tr("<b>The following message received "
-                                          "from %1 was <i>not</i> encrypted:</b>")
-                                          .arg(QString::fromUtf8(context->username));
-        m_callback->displayOtrMessage(QString::fromUtf8(context->accountname),
-                                      QString::fromUtf8(context->username),
-                                      errorString);
+    QString errorString;
+    switch (msg_event)
+    {
+        case OTRL_MSGEVENT_RCVDMSG_UNENCRYPTED:
+            errorString = QObject::tr("<b>The following message received "
+                                      "from %1 was <i>not</i> encrypted:</b>")
+                                     .arg(QString::fromUtf8(context->username));
+            break;
+        case OTRL_MSGEVENT_CONNECTION_ENDED:
+            errorString = QObject::tr("Your message was not sent. Either end your "
+                                       "private conversation, or restart it.");
+            break;
+        case OTRL_MSGEVENT_RCVDMSG_UNRECOGNIZED:
+            errorString = QObject::tr("Unreadable encrypted message was received.");
+            break;
+        case OTRL_MSGEVENT_RCVDMSG_NOT_IN_PRIVATE:
+            errorString = QObject::tr("Received an encrypted message but it cannot "
+                                      "be read because no private connection is "
+                                      "established yet.");
+            break;
+        case OTRL_MSGEVENT_RCVDMSG_UNREADABLE:
+            errorString = QObject::tr("Received message is unreadable.");
+            break;
+        case OTRL_MSGEVENT_RCVDMSG_MALFORMED:
+            errorString = QObject::tr("Received message contains malformed data.");
+            break;
+        default: ;
     }
-    else if (msg_event == OTRL_MSGEVENT_CONNECTION_ENDED) {
-        QString errorString = QObject::tr("Your message was not sent. Either end your "
-                                          "private conversation, or restart it.");
-        m_callback->displayOtrMessage(QString::fromUtf8(context->accountname),
-                                      QString::fromUtf8(context->username),
-                                      errorString);
-    }
-    else if (msg_event == OTRL_MSGEVENT_RCVDMSG_UNRECOGNIZED) {
-        QString errorString = QObject::tr("Unreadable encrypted message was received.");
+
+    if (!errorString.isEmpty()) {
         m_callback->displayOtrMessage(QString::fromUtf8(context->accountname),
                                       QString::fromUtf8(context->username),
                                       errorString);
