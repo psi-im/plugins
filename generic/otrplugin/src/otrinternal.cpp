@@ -210,9 +210,9 @@ psiotr::OtrMessageType OtrInternal::decryptMessage(const QString& account,
 
 #if (OTRL_VERSION_MAJOR >= 4)
     // Magic hack to force it work similar to libotr < 4.0.0.
-    // If user received unencrypted message he should be notified.
-    // See also: https://developer.pidgin.im/ticket/14874
-    if (!cryptedMessage.startsWith("?OTR") && ignoreMessage) {
+    // If user received unencrypted message he (she) should be notified.
+    // See OTRL_MSGEVENT_RCVDMSG_UNENCRYPTED as well.
+    if (ignoreMessage && !newMessage && !cryptedMessage.startsWith("?OTR")) {
         ignoreMessage = 0;
     }
 #else
@@ -925,13 +925,16 @@ void OtrInternal::handle_msg_event(OtrlMessageEvent msg_event, ConnContext* cont
     Q_UNUSED(err);
     Q_UNUSED(message);
 
+    QString account = QString::fromUtf8(context->accountname);
+    QString contact = QString::fromUtf8(context->username);
+
     QString errorString;
     switch (msg_event)
     {
         case OTRL_MSGEVENT_RCVDMSG_UNENCRYPTED:
             errorString = QObject::tr("<b>The following message received "
                                       "from %1 was <i>not</i> encrypted:</b>")
-                                     .arg(QString::fromUtf8(context->username));
+                                     .arg(m_callback->humanContact(account, contact));
             break;
         case OTRL_MSGEVENT_CONNECTION_ENDED:
             errorString = QObject::tr("Your message was not sent. Either end your "
