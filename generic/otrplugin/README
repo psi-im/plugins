@@ -1,8 +1,8 @@
-Off-The-Record-Messaging plugin for Psi
+Off-The-Record-Messaging plugin for Psi+
 
 This is a Off-The-Record-Messaging plugin for the Psi+ instant messenger.
 Psi+ (aka Psi-dev) is a collection of patches for Psi. It is available from
-http://code.google.com/p/psi-dev/
+http://psi-dev.googlecode.com/
 
 See the file INSTALL for instructions how to build this plugin.
 
