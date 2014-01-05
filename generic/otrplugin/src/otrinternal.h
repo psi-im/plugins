@@ -135,6 +135,7 @@ public:
                           const char* message, gcry_error_t err);
     void handle_smp_event(OtrlSMPEvent smp_event, ConnContext* context,
                           unsigned short progress_percent, char* question);
+    void create_instag(const char* accountname, const char* protocol);
 #else
     void log_message(const char* message);
     void notify(OtrlNotifyLevel level, const char* accountname,
@@ -175,6 +176,7 @@ public:
     static void cb_handle_smp_event(void* opdata, OtrlSMPEvent smp_event,
                                     ConnContext* context, unsigned short progress_percent,
                                     char* question);
+    static void cb_create_instag(void* opdata, const char* accountname, const char* protocol);
 #else
     static void cb_log_message(void* opdata, const char* message);
     static void cb_notify(void* opdata, OtrlNotifyLevel level,
@@ -211,6 +213,11 @@ private:
      * Name of the file storing dsa-keys.
      */
     QString m_keysFile;
+
+    /**
+     * Name of the file storing instance tags.
+     */
+    QString m_instagsFile;
 
     /**
      * Name of the file storing known fingerprints.

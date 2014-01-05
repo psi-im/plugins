@@ -1,7 +1,13 @@
+2014-01-06
+v0.9.8 tehnick
+  * Fix OTRv3 support: added limited support of instance tags. Previous
+    temporary solution is not needed anymore. (Affects only build with
+    libotr 4.x.)
+
 2013-10-14
 v0.9.7 tehnick
   * Fix problem of initialization of private conversation when both sides use
-    libotr 4.0.x. Protocol OTRv2 is forced. This is temporary solution.
+    libotr 4.x. Protocol OTRv2 is forced. This is temporary solution.
   * Fix tiny memory leak when libotr 4.x is used.
   * Tiny improvement in endSession() function when libotr 4.x is used.
   * Better error handling when libotr 4.x is used.
