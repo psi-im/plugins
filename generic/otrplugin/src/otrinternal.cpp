@@ -4,7 +4,8 @@
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
  *               2011-2012  Florian Fieber
- *                    2013  Boris Pek (tehnick-8@mail.ru)
+ *                    2013  Georg Rudoy
+ *               2013-2014  Boris Pek (tehnick-8@mail.ru)
  *
  * This program was originally written as part of a diplom thesis
  * advised by Prof. Dr. Ruediger Weis (PST Labor)
@@ -32,7 +33,8 @@
 #include <QCoreApplication>
 #include <QMessageBox>
 #include <QAbstractButton>
-#include <QThread>
+#include <QtConcurrentRun>
+#include <QFutureWatcher>
 #include <QString>
 #include <QByteArray>
 #include <QRegExp>
@@ -48,33 +50,6 @@ static const QString OTR_FINGERPRINTS_FILE = "otr.fingerprints";
 static const QString OTR_KEYS_FILE = "otr.keys";
 static const QString OTR_INSTAGS_FILE = "otr.instags";
 
-//-----------------------------------------------------------------------------
-
-class KeyGeneratorThread : public QThread
-{
-public:
-    KeyGeneratorThread(const OtrlUserState& userstate, const QString& keysFile,
-                       const char* accountname, const char* protocol)
-    : m_userstate(userstate),
-      m_keysFile(keysFile),
-      m_accountname(accountname),
-      m_protocol(protocol)
-    {
-    }
-
-    void run()
-    {
-        otrl_privkey_generate(m_userstate, QFile::encodeName(m_keysFile).constData(),
-                              m_accountname, m_protocol);
-    }
-
-private:
-    const OtrlUserState& m_userstate;
-    const QString& m_keysFile;
-    const char* m_accountname;
-    const char* m_protocol;
-};
-
 // ============================================================================
 
 OtrInternal::OtrInternal(psiotr::OtrCallback* callback,
@@ -82,7 +57,8 @@ OtrInternal::OtrInternal(psiotr::OtrCallback* callback,
     : m_userstate(),
       m_uiOps(),
       m_callback(callback),
-      m_otrPolicy(policy)
+      m_otrPolicy(policy),
+      is_generating(false)
 {
     QDir profileDir(callback->dataDir());
 
@@ -833,37 +809,57 @@ OtrlPolicy OtrInternal::policy(ConnContext*)
 void OtrInternal::create_privkey(const char* accountname,
                                  const char* protocol)
 {
-    m_callback->stopMessages();
-
-    KeyGeneratorThread keyGenerator(m_userstate, m_keysFile,
-                                    accountname, protocol);
-    keyGenerator.start();
-
-    QMessageBox infoMb(QMessageBox::Information, QObject::tr("Psi OTR"),
-                       QObject::tr("Generating keys for account \"%1\"."
-                                   "\nThis may take a while.")
-                                   .arg(m_callback->humanAccount(
-                                            QString::fromUtf8(accountname))),
-                       QMessageBox::Ok, NULL,
-                       Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
-    infoMb.button(QMessageBox::Ok)->setEnabled(false);
-    infoMb.button(QMessageBox::Ok)->setText(QObject::tr("Please wait..."));
-    infoMb.setWindowModality(Qt::ApplicationModal);
-    infoMb.show();
-
-    while (!keyGenerator.isFinished())
+    if (is_generating)
     {
-        QCoreApplication::processEvents();
+        return;
     }
 
-    infoMb.button(QMessageBox::Ok)->setEnabled(true);
-    infoMb.button(QMessageBox::Ok)->setText(QObject::tr("Ok"));
+    QMessageBox qMB(QMessageBox::Question, QObject::tr("Psi OTR"),
+                    QObject::tr("Private keys for account \"%1\" need to be generated. "
+                                "This takes quite some time (from a few seconds to a "
+                                "couple of minutes), and while you can use Psi+ in the "
+                                "meantime, all the messages will be sent unencrypted "
+                                "until keys are generated. You will be notified when "
+                                "this process finishes.\n"
+                                "\n"
+                                "Do you want to generate keys now?")
+                                .arg(m_callback->humanAccount(
+                                            QString::fromUtf8(accountname))),
+                       QMessageBox::Yes | QMessageBox::No);
+
+    if (qMB.exec() != QMessageBox::Yes)
+    {
+        return;
+    }
+
+    is_generating = true;
+
+    QEventLoop loop;
+    QFutureWatcher<gcry_error_t> watcher;
+
+    QObject::connect(&watcher, SIGNAL(finished()), &loop, SLOT(quit()));
+
+    QFuture<unsigned int> future = QtConcurrent::run(otrl_privkey_generate,
+                                              m_userstate,
+                                              QFile::encodeName(m_keysFile).constData(),
+                                              accountname,
+                                              protocol);
+    watcher.setFuture(future);
+
+    loop.exec();
+
+    is_generating = false;
 
     char fingerprint[45];
     if (otrl_privkey_fingerprint(m_userstate, fingerprint, accountname,
                                  protocol))
     {
-        infoMb.setText(QObject::tr("Fingerprint for account \"%1\":\n%2")
+        QMessageBox infoMb(QMessageBox::Information, QObject::tr("Psi OTR"),
+                           QObject::tr("Keys have been generated. "
+                                       "Fingerprint for account \"%1\":\n"
+                                       "%2\n"
+                                       "\n"
+                                       "Thanks for your patience.")
                                    .arg(m_callback->humanAccount(
                                             QString::fromUtf8(accountname)))
                                    .arg(QString(fingerprint)));
@@ -876,12 +872,9 @@ void OtrInternal::create_privkey(const char* accountname,
                                        "\nThe OTR Plugin will not work.")
                                        .arg(m_callback->humanAccount(
                                                 QString::fromUtf8(accountname))),
-                           QMessageBox::Ok, NULL,
-                           Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+                           QMessageBox::Ok);
         failMb.exec();
     }
-
-    m_callback->startMessages();
 }
 
 // ---------------------------------------------------------------------------

@@ -2,6 +2,7 @@
 v0.9.9 tehnick
   * Minimize the number of modal dialogs: use other ways for notifying user
     (system messages in chat).
+  * Do not block program windows during generating of private key.
 
 2014-01-06
 v0.9.8 tehnick

@@ -4,7 +4,7 @@
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
  *                    2011  Florian Fieber
- *                    2013  Boris Pek (tehnick-8@mail.ru)
+ *               2013-2014  Boris Pek (tehnick-8@mail.ru)
  *
  * This program was originally written as part of a diplom thesis
  * advised by Prof. Dr. Ruediger Weis (PST Labor)
@@ -228,6 +228,11 @@ private:
      * Reference to the default OTR policy
      */
     psiotr::OtrPolicy& m_otrPolicy;
+
+    /**
+     * Variable used during generating of private key.
+     */
+    bool is_generating;
 };
 
 // ---------------------------------------------------------------------------
