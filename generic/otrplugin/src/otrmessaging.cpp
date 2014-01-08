@@ -4,6 +4,7 @@
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
  *                    2011  Florian Fieber
+ *                    2014  Boris Pek (tehnick-8@mail.ru)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -75,7 +76,8 @@ OtrMessaging::~OtrMessaging()
 
 //-----------------------------------------------------------------------------
 
-QString OtrMessaging::encryptMessage(const QString& account, const QString& contact,
+QString OtrMessaging::encryptMessage(const QString& account,
+                                     const QString& contact,
                                      const QString& message)
 {
     return m_impl->encryptMessage(account, contact, message);
@@ -236,6 +238,15 @@ OtrPolicy OtrMessaging::getPolicy()
 void OtrMessaging::generateKey(const QString& account)
 {
     m_impl->generateKey(account);
+}
+
+//-----------------------------------------------------------------------------
+
+bool OtrMessaging::displayOtrMessage(const QString& account,
+                                     const QString& contact,
+                                     const QString& message)
+{
+    return m_callback->displayOtrMessage(account, contact, message);
 }
 
 //-----------------------------------------------------------------------------

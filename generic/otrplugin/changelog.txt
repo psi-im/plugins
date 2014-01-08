@@ -1,3 +1,8 @@
+2014-01-09
+v0.9.9 tehnick
+  * Minimize the number of modal dialogs: use other ways for notifying user
+    (system messages in chat).
+
 2014-01-06
 v0.9.8 tehnick
   * Fix OTRv3 support: added limited support of instance tags. Previous

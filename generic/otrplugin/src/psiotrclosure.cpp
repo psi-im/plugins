@@ -4,6 +4,7 @@
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
  *               2011-2012  Florian Fieber
+ *                    2014  Boris Pek (tehnick-8@mail.ru)
  *
  * This program was originally written as part of a diplom thesis
  * advised by Prof. Dr. Ruediger Weis (PST Labor)
@@ -576,17 +577,13 @@ void PsiOtrClosure::sessionID(bool)
     }
     else
     {
-        msg = tr("Session ID between account \"%1\" and %2:<br/>%3")
+        msg = tr("Session ID between account \"%1\" and %2: %3")
                 .arg(m_otr->humanAccount(m_account))
                 .arg(m_contact)
                 .arg(sId);
     }
 
-    QMessageBox mb(QMessageBox::Information, tr("Psi OTR"), msg, NULL,
-                   static_cast<QWidget*>(m_parentWidget),
-                   Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
-    mb.setTextFormat(Qt::RichText);
-    mb.exec();
+    m_otr->displayOtrMessage(m_account, m_contact, msg);
 }
 
 //-----------------------------------------------------------------------------
@@ -607,14 +604,11 @@ void PsiOtrClosure::fingerprint(bool)
                                            tr("No private key for account \"%1\"")
                                              .arg(m_otr->humanAccount(m_account)));
 
-    QString msg(tr("Fingerprint for account \"%1\":\n%2"));
+    QString msg(tr("Fingerprint for account \"%1\": %2")
+                   .arg(m_otr->humanAccount(m_account))
+                   .arg(fingerprint));
 
-    QMessageBox mb(QMessageBox::Information, tr("Psi OTR"),
-                   msg.arg(m_otr->humanAccount(m_account))
-                      .arg(fingerprint),
-                   NULL, static_cast<QWidget*>(m_parentWidget),
-                   Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
-    mb.exec();
+    m_otr->displayOtrMessage(m_account, m_contact, msg);
 }
 
 //-----------------------------------------------------------------------------

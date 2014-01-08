@@ -4,6 +4,7 @@
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
  *                    2011  Florian Fieber
+ *                    2014  Boris Pek (tehnick-8@mail.ru)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -323,6 +324,12 @@ public:
      * This function blocks until keys are available.
      */
     void generateKey(const QString& account);
+
+    /**
+     * Display OTR message.
+     */
+    bool displayOtrMessage(const QString& account, const QString& contact,
+                           const QString& message);
 
     /**
      * Report a change of state.
