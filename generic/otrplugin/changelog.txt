@@ -1,3 +1,9 @@
+2014-03-07
+v1.0.0 tehnick
+  * Minimize the number of modal dialogs: use other ways for notifying user
+    (system messages in chat).
+  * Small code improvements. [Thanks to Michael Kurz]
+
 2014-01-09
 v0.9.9 tehnick
   * Minimize the number of modal dialogs: use other ways for notifying user
