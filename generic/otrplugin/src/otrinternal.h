@@ -38,6 +38,9 @@ extern "C"
 #include <libotr/proto.h>
 #include <libotr/message.h>
 #include <libotr/privkey.h>
+#ifndef OTRL_PRIVKEY_FPRINT_HUMAN_LEN
+#define OTRL_PRIVKEY_FPRINT_HUMAN_LEN 45
+#endif
 #if (OTRL_VERSION_MAJOR >= 4)
 #include <libotr/instag.h>
 #endif

@@ -411,7 +411,7 @@ QHash<QString, QString> OtrInternal::getPrivateKeys()
     for (privKey = m_userstate->privkey_root; privKey != NULL;
          privKey = privKey->next)
     {
-        char fingerprintBuf[45];
+        char fingerprintBuf[OTRL_PRIVKEY_FPRINT_HUMAN_LEN];
         char* success = otrl_privkey_fingerprint(m_userstate,
                                                  fingerprintBuf,
                                                  privKey->accountname,
@@ -774,7 +774,7 @@ void OtrInternal::generateKey(const QString& account)
 
 QString OtrInternal::humanFingerprint(const unsigned char* fingerprint)
 {
-    char fpHash[45];
+    char fpHash[OTRL_PRIVKEY_FPRINT_HUMAN_LEN];
     otrl_privkey_hash_to_human(fpHash, fingerprint);
     return QString(fpHash);
 }
@@ -850,7 +850,7 @@ void OtrInternal::create_privkey(const char* accountname,
 
     is_generating = false;
 
-    char fingerprint[45];
+    char fingerprint[OTRL_PRIVKEY_FPRINT_HUMAN_LEN];
     if (otrl_privkey_fingerprint(m_userstate, fingerprint, accountname,
                                  protocol))
     {
