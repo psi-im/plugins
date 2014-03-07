@@ -138,10 +138,13 @@ QString OtrInternal::encryptMessage(const QString& account, const QString& conta
                                NULL, NULL);
     if (err)
     {
-        m_callback->notifyUser(psiotr::OTR_NOTIFY_ERROR,
-                               QObject::tr("Encrypting message to %1 "
-                                           "failed.\nThe message was not sent.")
-                                           .arg(contact));
+        if (!m_callback->displayOtrMessage(account, contact, message))
+        {
+            m_callback->notifyUser(psiotr::OTR_NOTIFY_ERROR,
+                                   QObject::tr("Encrypting message to %1 "
+                                               "failed.\nThe message was not sent.")
+                                               .arg(contact));
+        }
         return QString();
     }
 
@@ -990,27 +993,32 @@ void OtrInternal::notify(OtrlNotifyLevel level, const char* accountname,
                          const char* protocol, const char* username,
                          const char* title, const char* primary, const char* secondary)
 {
-    Q_UNUSED(accountname);
     Q_UNUSED(protocol);
-    Q_UNUSED(username);
     Q_UNUSED(title);
 
-    psiotr::OtrNotifyType type;
+    QString account = QString::fromUtf8(accountname);
+    QString contact = QString::fromUtf8(username);
+    QString message = QString(primary) + "\n" + QString(secondary);
 
-    if (level == OTRL_NOTIFY_ERROR )
+    if (!m_callback->displayOtrMessage(account, contact, message))
     {
-        type = psiotr::OTR_NOTIFY_ERROR;
-    }
-    else if (level == OTRL_NOTIFY_WARNING)
-    {
-        type = psiotr::OTR_NOTIFY_WARNING;
-    }
-    else
-    {
-        type = psiotr::OTR_NOTIFY_ERROR;
-    }
+        psiotr::OtrNotifyType type;
 
-    m_callback->notifyUser(type, QString(primary) + "\n" + QString(secondary));
+        if (level == OTRL_NOTIFY_ERROR )
+        {
+            type = psiotr::OTR_NOTIFY_ERROR;
+        }
+        else if (level == OTRL_NOTIFY_WARNING)
+        {
+            type = psiotr::OTR_NOTIFY_WARNING;
+        }
+        else
+        {
+            type = psiotr::OTR_NOTIFY_ERROR;
+        }
+
+        m_callback->notifyUser(type, message);
+    }
 }
 
 int OtrInternal::display_otr_message(const char* accountname,
