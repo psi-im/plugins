@@ -837,7 +837,7 @@ void OtrInternal::create_privkey(const char* accountname,
 
     is_generating = true;
 
-    const char* keysfile = QFile::encodeName(m_keysFile).constData();
+    QByteArray keysfile = QFile::encodeName(m_keysFile);
 
     QEventLoop loop;
     QFutureWatcher<gcry_error_t> watcher;
@@ -846,7 +846,7 @@ void OtrInternal::create_privkey(const char* accountname,
 
     QFuture<gcry_error_t> future = QtConcurrent::run(otrl_privkey_generate,
                                               m_userstate,
-                                              keysfile,
+                                              keysfile.constData(),
                                               accountname,
                                               protocol);
     watcher.setFuture(future);
