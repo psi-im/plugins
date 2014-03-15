@@ -1,5 +1,10 @@
+2014-03-15
+v0.1.3 tehnick
+  * Show messages in chat instead of using popups. Popups will be used only if chat is not opened yet.
+  * Show message dialogs when popups are disabled.
+
 2013-08-13
-v0.1.2 - taurus
+v0.1.2 taurus
   + Иконка плагина
 
 2012-02-20

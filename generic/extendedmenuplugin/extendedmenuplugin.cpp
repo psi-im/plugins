@@ -46,7 +46,7 @@
 
 #include "ui_options.h"
 
-#define cVer "0.1.2"
+#define cVer "0.1.3"
 
 #define constInterval "intrvl"
 #define constAction "action"
