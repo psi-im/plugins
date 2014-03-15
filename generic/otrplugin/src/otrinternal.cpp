@@ -138,12 +138,12 @@ QString OtrInternal::encryptMessage(const QString& account, const QString& conta
                                NULL, NULL);
     if (err)
     {
-        if (!m_callback->displayOtrMessage(account, contact, message))
+        QString err_message = QObject::tr("Encrypting message to %1 "
+                                          "failed.\nThe message was not sent.")
+                                          .arg(contact);
+        if (!m_callback->displayOtrMessage(account, contact, err_message))
         {
-            m_callback->notifyUser(psiotr::OTR_NOTIFY_ERROR,
-                                   QObject::tr("Encrypting message to %1 "
-                                               "failed.\nThe message was not sent.")
-                                               .arg(contact));
+            m_callback->notifyUser(account, contact, err_message, psiotr::OTR_NOTIFY_ERROR);
         }
         return QString();
     }
@@ -1017,7 +1017,7 @@ void OtrInternal::notify(OtrlNotifyLevel level, const char* accountname,
             type = psiotr::OTR_NOTIFY_ERROR;
         }
 
-        m_callback->notifyUser(type, message);
+        m_callback->notifyUser(account, contact, message, type);
     }
 }
 
@@ -1084,7 +1084,7 @@ void OtrInternal::new_fingerprint(OtrlUserState us, const char* accountname,
 
     if (!m_callback->displayOtrMessage(account, contact, message))
     {
-        m_callback->notifyUser(psiotr::OTR_NOTIFY_INFO, message);
+        m_callback->notifyUser(account, contact, message, psiotr::OTR_NOTIFY_INFO);
     }
 }
 

@@ -106,8 +106,8 @@ public:
 
     virtual bool isLoggedIn(const QString& account, const QString& contact) = 0;
 
-    virtual void notifyUser(const OtrNotifyType& type,
-                            const QString& message) = 0;
+    virtual void notifyUser(const QString& account, const QString& contact,
+                            const QString& message, const OtrNotifyType& type) = 0;
 
     virtual bool displayOtrMessage(const QString& account, const QString& contact,
                                    const QString& message) = 0;

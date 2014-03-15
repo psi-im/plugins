@@ -113,7 +113,9 @@ PsiOtrPlugin::PsiOtrPlugin()
       m_accountHost(NULL),
       m_accountInfo(NULL),
       m_contactInfo(NULL),
-      m_iconHost(NULL)
+      m_iconHost(NULL),
+      m_psiEvent(NULL),
+      m_messageBox(NULL)
 {
 }
 
@@ -127,7 +129,7 @@ PsiOtrPlugin::~PsiOtrPlugin()
 
 QString PsiOtrPlugin::name() const
 {
-    return "Off-the-Record Messaging";
+    return "Off-the-Record Messaging Plugin";
 }
 
 // ---------------------------------------------------------------------------
@@ -485,6 +487,11 @@ void PsiOtrPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost* host)
 }
 
 //-----------------------------------------------------------------------------
+void PsiOtrPlugin::setEventCreatingHost(EventCreatingHost *host) {
+    m_psiEvent = host;
+}
+
+//-----------------------------------------------------------------------------
 
 bool PsiOtrPlugin::incomingStanza(int accountIndex, const QDomElement& xml)
 {
@@ -619,7 +626,8 @@ bool PsiOtrPlugin::isLoggedIn(const QString& account, const QString& contact)
 
 //-----------------------------------------------------------------------------
 
-void PsiOtrPlugin::notifyUser(const OtrNotifyType& type, const QString& message)
+void PsiOtrPlugin::notifyUser(const QString& account, const QString& contact,
+                              const QString& message, const OtrNotifyType& type)
 {
     QMessageBox::Icon messageBoxIcon;
     if (type == OTR_NOTIFY_ERROR)
@@ -635,9 +643,24 @@ void PsiOtrPlugin::notifyUser(const OtrNotifyType& type, const QString& message)
         messageBoxIcon = QMessageBox::Information;
     }
 
-    QMessageBox mb(messageBoxIcon, tr("Psi OTR"), message, QMessageBox::Ok, NULL,
-                   Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
-    mb.exec();
+    m_messageBox = new QMessageBox(messageBoxIcon, tr("Psi OTR"), message,
+                                   QMessageBox::Ok, NULL,
+                                   Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+
+    m_psiEvent->createNewEvent(getAccountIndexById(account), contact,
+                               tr("OTR Plugin: event from %1").arg(contact),
+                               this, SLOT(eventActivated()));
+}
+
+//-----------------------------------------------------------------------------
+
+void PsiOtrPlugin::eventActivated()
+{
+    if (m_messageBox) {
+        m_messageBox->exec();
+        delete m_messageBox;
+        m_messageBox = NULL;
+    }
 }
 
 //-----------------------------------------------------------------------------

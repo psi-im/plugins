@@ -28,6 +28,7 @@
 #define PSIOTRPLUGIN_H_
 
 #include <QObject>
+#include <QMessageBox>
 
 #include "otrmessaging.h"
 #include "psiplugin.h"
@@ -44,6 +45,8 @@
 #include "accountinfoaccessor.h"
 #include "contactinfoaccessor.h"
 #include "iconfactoryaccessor.h"
+#include "eventcreatinghost.h"
+#include "eventcreator.h"
 
 class ApplicationInfoAccessingHost;
 class PsiAccountControllingHost;
@@ -66,6 +69,7 @@ class PsiOtrPlugin : public QObject,
                      public PsiPlugin,
                      public PluginInfoProvider,
                      public EventFilter,
+                     public EventCreator,
                      public OptionAccessor,
                      public StanzaSender,
                      public ApplicationInfoAccessor,
@@ -84,6 +88,7 @@ class PsiOtrPlugin : public QObject,
     Q_INTERFACES(PsiPlugin
                  PluginInfoProvider
                  EventFilter
+                 EventCreator
                  OptionAccessor
                  StanzaSender
                  ApplicationInfoAccessor
@@ -121,6 +126,9 @@ public:
                                         QString& subject);
     virtual void logout(int accountIndex);
 
+    // EventCreator
+    virtual void setEventCreatingHost(EventCreatingHost *host);
+
     // OptionAccessor
     virtual void setOptionAccessingHost(OptionAccessingHost* host);
     virtual void optionChanged(const QString& option);
@@ -157,7 +165,8 @@ public:
     virtual void sendMessage(const QString& account, const QString& contact,
                              const QString& message);
     virtual bool isLoggedIn(const QString& account, const QString& contact);
-    virtual void notifyUser(const OtrNotifyType& type, const QString& message);
+    virtual void notifyUser(const QString& account, const QString& contact,
+                            const QString& message, const OtrNotifyType& type);
 
     virtual bool displayOtrMessage(const QString& account, const QString& contact,
                                    const QString& message);
@@ -199,6 +208,9 @@ public:
      */
     QString getAccountJidById(const QString& accountId);
 
+private slots:
+    void eventActivated();
+
 private:
     /**
      * Returns full Jid for private contacts,
@@ -216,6 +228,8 @@ private:
     AccountInfoAccessingHost*                       m_accountInfo;
     ContactInfoAccessingHost*                       m_contactInfo;
     IconFactoryAccessingHost*                       m_iconHost;
+    EventCreatingHost*                              m_psiEvent;
+    QMessageBox*                                    m_messageBox;
 };
 
 //-----------------------------------------------------------------------------
