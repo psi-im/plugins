@@ -40,6 +40,8 @@
 #include "stanzasender.h"
 #include "stanzasendinghost.h"
 #include "toolbariconaccessor.h"
+#include "psiaccountcontroller.h"
+#include "psiaccountcontrollinghost.h"
 
 #include "ui_options.h"
 
@@ -59,16 +61,18 @@ enum ActionType { NoAction = 0, CopyJid, CopyNick, CopyStatusMessage, RequestPin
 
 class ExtendedMenuPlugin: public QObject, public PsiPlugin, public OptionAccessor,	public AccountInfoAccessor,
 						  public IconFactoryAccessor, public PopupAccessor, public MenuAccessor, public PluginInfoProvider,
-						  public ContactInfoAccessor, public StanzaSender, public StanzaFilter, public ToolbarIconAccessor
+						  public ContactInfoAccessor, public StanzaSender, public StanzaFilter, public ToolbarIconAccessor,
+						  public PsiAccountController
 {
 	Q_OBJECT
 #ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.ExtendedMenuPlugin")
 #endif
 	Q_INTERFACES(PsiPlugin	AccountInfoAccessor OptionAccessor IconFactoryAccessor PopupAccessor  MenuAccessor
-				 ContactInfoAccessor PluginInfoProvider StanzaFilter StanzaSender ToolbarIconAccessor)
+				 ContactInfoAccessor PluginInfoProvider StanzaFilter StanzaSender ToolbarIconAccessor
+				 PsiAccountController)
 
-	public:
+public:
 	ExtendedMenuPlugin();
 	virtual QString name() const;
 	virtual QString shortName() const;
@@ -84,6 +88,7 @@ class ExtendedMenuPlugin: public QObject, public PsiPlugin, public OptionAccesso
 	virtual void optionChanged(const QString& ) {}
 	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
 	virtual void setPopupAccessingHost(PopupAccessingHost* host);
+	virtual void setPsiAccountControllingHost(PsiAccountControllingHost* host);
 	virtual QList < QVariantHash > getAccountMenuParam();
 	virtual QList < QVariantHash > getContactMenuParam();
 	virtual QAction* getContactAction(QObject* , int , const QString& );
@@ -106,6 +111,7 @@ private:
 	OptionAccessingHost* psiOptions;
 	AccountInfoAccessingHost *accInfo;
 	IconFactoryAccessingHost *icoHost;
+	PsiAccountControllingHost* accountHost;
 	PopupAccessingHost* popup;
 	ContactInfoAccessingHost* contactInfo;
 	StanzaSendingHost* stanzaSender;
@@ -134,6 +140,7 @@ private:
 	typedef QList<Request> Requests;
 	QHash<int, Requests> requestList_;
 
+	void showMessage(int account, const QString& contact, const QString& text, const QString& title);
 	void showPopup(const QString& text, const QString& title);
 	void fillMenu(QMenu* m, int account, const QString& jid);
 	void addRequest(int account, const Request& r);
@@ -149,6 +156,7 @@ ExtendedMenuPlugin::ExtendedMenuPlugin()
 	, psiOptions(0)
 	, accInfo(0)
 	, icoHost(0)
+	, accountHost(0)
 	, popup(0)
 	, contactInfo(0)
 	, stanzaSender(0)
@@ -271,6 +279,11 @@ void ExtendedMenuPlugin::setPopupAccessingHost(PopupAccessingHost* host)
 	popup = host;
 }
 
+void ExtendedMenuPlugin::setPsiAccountControllingHost(PsiAccountControllingHost* host)
+{
+	accountHost = host;
+}
+
 void ExtendedMenuPlugin::setContactInfoAccessingHost(ContactInfoAccessingHost *host)
 {
 	contactInfo = host;
@@ -349,13 +362,15 @@ bool ExtendedMenuPlugin::incomingStanza(int account, const QDomElement &xml)
 							const QString title = tr("Ping %1").arg(name);
 							if(xml.attribute("type") == "result") {
 								double msecs = ((double)r.time.msecsTo(QTime::currentTime()))/1000;
-								showPopup(tr("Pong from %1 after %2 secs")
+								showMessage(account, jid,
+										  tr("Pong from %1 after %2 secs")
 										  .arg(jid)
 										  .arg(QString::number(msecs, 'f', 3)),
 										  title);
 							}
 							else {
-								showPopup(tr("Feature not implemented"),
+								showMessage(account, jid,
+										  tr("Feature not implemented"),
 										  title);
 							}
 							break;
@@ -386,7 +401,7 @@ bool ExtendedMenuPlugin::incomingStanza(int account, const QDomElement &xml)
 								else {
 									text = tr("%1 is online!").arg(jid);
 								}
-								showPopup(text, title);
+								showMessage(account, jid, text, title);
 							}
 							else {
 								QDomElement error = xml.firstChildElement("error");
@@ -404,7 +419,7 @@ bool ExtendedMenuPlugin::incomingStanza(int account, const QDomElement &xml)
 											text = tr("You are not authorized to retrieve Last Activity information");
 										}
 									}
-									showPopup(text, title);
+									showMessage(account, jid, text, title);
 								}
 							}
 							break;
@@ -419,10 +434,14 @@ bool ExtendedMenuPlugin::incomingStanza(int account, const QDomElement &xml)
 									QString zone = time.firstChildElement("tzo").text();
 									QDateTime dt = QDateTime::fromString(utc.text(), Qt::ISODate);
 									dt = dt.addSecs(stringToInt(zone)*3600);
-									showPopup(tr("%1 time is %2").arg(jid, dt.toString("yyyy-MM-dd hh:mm:ss")), title);
+									showMessage(account, jid,
+												tr("%1 time is %2").arg(jid, dt.toString("yyyy-MM-dd hh:mm:ss")),
+												title);
 								}
 								else if(!xml.firstChildElement("error").isNull()) {
-									showPopup(tr("Feature not implemented"), title);
+									showMessage(account, jid,
+												tr("Feature not implemented"),
+												title);
 								}
 							}
 							break;
@@ -445,6 +464,13 @@ bool ExtendedMenuPlugin::incomingStanza(int account, const QDomElement &xml)
 	}
 
 	return false;
+}
+
+void ExtendedMenuPlugin::showMessage(int account, const QString& contact, const QString &text, const QString &title)
+{
+	if(!accountHost->appendSysMsg(account, contact, text)) {
+		showPopup(text, title);
+	}
 }
 
 void ExtendedMenuPlugin::showPopup(const QString &text, const QString &title)
