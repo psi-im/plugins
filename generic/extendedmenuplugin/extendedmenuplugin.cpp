@@ -22,6 +22,7 @@
 #include <QClipboard>
 #include <QApplication>
 #include <QDomElement>
+#include <QMessageBox>
 
 #include "psiplugin.h"
 #include "accountinfoaccessor.h"
@@ -142,6 +143,7 @@ private:
 
 	void showMessage(int account, const QString& contact, const QString& text, const QString& title);
 	void showPopup(const QString& text, const QString& title);
+	void showDialog(const QString& text, const QString& title);
 	void fillMenu(QMenu* m, int account, const QString& jid);
 	void addRequest(int account, const Request& r);
 	void doCommand(int account, const QString &jid, const QString& command, ActionType type_);
@@ -475,10 +477,24 @@ void ExtendedMenuPlugin::showMessage(int account, const QString& contact, const 
 
 void ExtendedMenuPlugin::showPopup(const QString &text, const QString &title)
 {
-	int interval = popup->popupDuration(POPUP_OPTION_NAME);
-	if(interval) {
-		popup->initPopup(text, title, "psi/headline", popupId);
+	QString popupOption = "options.ui.notifications.passive-popups.enabled";
+	bool popupsEnabled = psiOptions->getGlobalOption(popupOption).toBool();
+	if(popupsEnabled) {
+		int interval = popup->popupDuration(POPUP_OPTION_NAME);
+		if(interval) {
+			popup->initPopup(text, title, "psi/headline", popupId);
+		}
 	}
+	else {
+		showDialog(text, title);
+	}
+}
+
+void ExtendedMenuPlugin::showDialog(const QString &text, const QString &title)
+{
+	QMessageBox mb(QMessageBox::Information, title, text, QMessageBox::Ok, NULL,
+				   Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+	mb.exec();
 }
 
 QList < QVariantHash > ExtendedMenuPlugin::getButtonParam()
