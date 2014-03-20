@@ -55,7 +55,8 @@ typedef QPair<QString, QString> StringMap;
 static const QList<StringMap> players = QList<StringMap>() << StringMap("vlc", "VLC")
 							   << StringMap("Totem", "Totem (>=2.30.2)")
 							   << StringMap("kaffeine", "Kaffeine (>=1.0)")
-							   << StringMap("mplayer", "GNOME MPlayer");
+							   << StringMap("mplayer", "GNOME MPlayer")
+							   << StringMap("dragonplayer", "Dragon Player");
 struct PlayerStatus
 {
 	int playStatus;
@@ -89,7 +90,7 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 }
 #endif
 
-#define constVersion "0.2.4"
+#define constVersion "0.2.5"
 
 #define constStatus "status"
 #define constStatusMessage "statusmessage"
@@ -383,14 +384,14 @@ QWidget* VideoStatusChanger::options()
 	//добавляем чекбоксы плееров
 	int i = 0;
 	int columns = (players.length() < 5) ? 2 : 3;
-	int rows = (players.length() + columns - 1) / columns;
 	foreach (StringMap item, players) {
 		i = players.indexOf(item);
 		if (i != -1) {
 			QCheckBox *cb = new QCheckBox(item.second);
 			cb->setObjectName(item.first);
 			cb->setChecked(false);
-			ui_.gridLayout->addWidget(cb,i/rows,i%columns);
+			int row = (i - columns) < 0 ? 0 : i/columns;
+			ui_.gridLayout->addWidget(cb,row,i%columns);
 		}
 	}
 #endif
