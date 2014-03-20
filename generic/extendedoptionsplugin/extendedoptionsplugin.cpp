@@ -40,7 +40,7 @@
 #include "plugininfoprovider.h"
 
 
-#define constVersion "0.3.9"
+#define constVersion "0.4.0"
 
 class ExtToolButton : public QToolButton
 {
@@ -80,6 +80,9 @@ public:
 private slots:
 	void chooseColor(QAbstractButton*);
 	void hack();
+
+private:
+	void setWhatThis();
 
 private:
 	OptionAccessingHost *psiOptions;
@@ -134,6 +137,7 @@ private:
 	QLineEdit *muc_leave_status_message;
 	QCheckBox *accept_defaults;
 	QCheckBox *auto_configure;
+	QCheckBox *allowMucEvents;
 
 	//Roster
 	QCheckBox *resolveNicks;
@@ -358,6 +362,7 @@ QWidget* ExtendedOptions::options()
 	skipAutojoin = new QCheckBox(tr("Enable autojoin for bookmarked groupchats"));
 	hideAutoJoin = new QCheckBox(tr("Hide groupchat on auto-join"));
 	mucHtml = new QCheckBox(tr("Enable HTML rendering in groupchat chat window"));
+	allowMucEvents = new QCheckBox(tr("Allow groupchat highlight events"));
 
 	muc_leave_status_message = new QLineEdit;
 	accept_defaults = new QCheckBox(tr("Automatically accept the default room configuration"));
@@ -380,6 +385,7 @@ QWidget* ExtendedOptions::options()
 	mucGeneralLayout->addWidget(status_with_priority);
 	mucGeneralLayout->addWidget(skipAutojoin);
 	mucGeneralLayout->addWidget(hideAutoJoin);
+	mucGeneralLayout->addWidget(allowMucEvents);
 	mucGeneralLayout->addWidget(new QLabel(tr("Disable autojoin to folowing groupchats:\n(specify JIDs)")));
 	mucGeneralLayout->addWidget(bookmarksListSkip);
 	mucGeneralLayout->addWidget(new QLabel(tr("Groupchat leave status message:")));
@@ -651,8 +657,10 @@ QWidget* ExtendedOptions::options()
 
 	middleButton = new QComboBox;
 	QHBoxLayout *mbLayout = new QHBoxLayout;
+	middleButton->addItem("none");
 	middleButton->addItem("hide");
 	middleButton->addItem("close");
+	middleButton->addItem("detach");
 	mbLayout->addWidget(new QLabel(tr("Action for mouse middle click on tabs:")));
 	mbLayout->addStretch();
 	mbLayout->addWidget(middleButton);
@@ -707,6 +715,8 @@ QWidget* ExtendedOptions::options()
 	mainLayout->addWidget(area);
 	mainLayout->addWidget(wikiLink);
 
+	setWhatThis();
+
 	restoreOptions();
 
 	return options_;
@@ -741,6 +751,7 @@ void ExtendedOptions::applyOptions()
 
 
 	//MUC-----
+	psiOptions->setGlobalOption("options.ui.muc.allow-highlight-events", QVariant(allowMucEvents->isChecked()));
 	psiOptions->setGlobalOption("options.muc.show-joins",QVariant(showJoins->isChecked()));
 	psiOptions->setGlobalOption("options.muc.show-role-affiliation",QVariant(showRole->isChecked()));
 	psiOptions->setGlobalOption("options.muc.show-status-changes",QVariant(showStatus->isChecked()));
@@ -859,12 +870,13 @@ void ExtendedOptions::restoreOptions()
 	auto_capitalize->setChecked(psiOptions->getGlobalOption("options.ui.chat.auto-capitalize").toBool());
 	auto_scroll_to_bottom->setChecked(psiOptions->getGlobalOption("options.ui.chat.auto-scroll-to-bottom").toBool());
 	chat_caption->setText(psiOptions->getGlobalOption("options.ui.chat.caption").toString());
-	default_jid_mode->setCurrentIndex(default_jid_mode->findText(psiOptions->getGlobalOption("options.ui.chat.default-jid-mode").toString()));;
+	default_jid_mode->setCurrentIndex(default_jid_mode->findText(psiOptions->getGlobalOption("options.ui.chat.default-jid-mode").toString()));
 	default_jid_mode_ignorelist->setPlainText(psiOptions->getGlobalOption("options.ui.chat.default-jid-mode-ignorelist").toString().split(",").join("\n"));
 	show_status_changes->setChecked(psiOptions->getGlobalOption("options.ui.chat.show-status-changes").toBool());
 	chat_status_with_priority->setChecked(psiOptions->getGlobalOption("options.ui.chat.status-with-priority").toBool());
 
 	//MUC-----
+	allowMucEvents->setChecked(psiOptions->getGlobalOption("options.ui.muc.allow-highlight-events").toBool());
 	showJoins->setChecked(psiOptions->getGlobalOption("options.muc.show-joins").toBool());
 	showRole->setChecked(psiOptions->getGlobalOption("options.muc.show-role-affiliation").toBool());
 	showStatus->setChecked(psiOptions->getGlobalOption("options.muc.show-status-changes").toBool());
@@ -1045,6 +1057,120 @@ void ExtendedOptions::hack()
 	//Enable "Apply" button
 	confirmClearing->toggle();
 	confirmClearing->toggle();
+}
+
+void ExtendedOptions::setWhatThis()
+{
+	//Chats-----
+	confirmClearing->setWhatsThis("options.ui.chat.warn-before-clear");
+	messageIcons->setWhatsThis("options.ui.chat.use-message-icons");
+	scaledIcons->setWhatsThis("options.ui.chat.scaled-message-icons");
+	showAvatar->setWhatsThis("options.ui.chat.avatars.show");
+	avatarSize->setWhatsThis("options.ui.chat.avatars.size");
+	sayMode->setWhatsThis("options.ui.chat.use-chat-says-style");
+	disableSend->setWhatsThis("options.ui.disable-send-button");
+
+	auto_capitalize->setWhatsThis("options.ui.chat.auto-capitalize");
+	auto_scroll_to_bottom->setWhatsThis("options.ui.chat.auto-scroll-to-bottom");
+	chat_caption->setWhatsThis("options.ui.chat.caption");
+	default_jid_mode->setWhatsThis("options.ui.chat.default-jid-mode");
+	default_jid_mode_ignorelist->setWhatsThis("options.ui.chat.default-jid-mode-ignorelist");
+	show_status_changes->setWhatsThis("options.ui.chat.show-status-changes");
+	chat_status_with_priority->setWhatsThis("options.ui.chat.status-with-priority");
+
+	//MUC-----
+	allowMucEvents->setWhatsThis("options.ui.muc.allow-highlight-events");
+	showJoins->setWhatsThis("options.muc.show-joins");
+	showRole->setWhatsThis("options.muc.show-role-affiliation");
+	showStatus->setWhatsThis("options.muc.show-status-changes");
+	leftMucRoster->setWhatsThis("options.ui.muc.roster-at-left");
+	showGroups->setWhatsThis("options.ui.muc.userlist.show-groups");
+	showAffIcons->setWhatsThis("options.ui.muc.userlist.show-affiliation-icons");
+	skipAutojoin->setWhatsThis("options.muc.bookmarks.auto-join");
+	mucClientIcons->setWhatsThis("options.ui.muc.userlist.show-client-icons");
+	mucHtml->setWhatsThis("options.html.muc.render");
+	hideAutoJoin->setWhatsThis("options.ui.muc.hide-on-autojoin");
+
+	show_initial_joins->setWhatsThis("options.ui.muc.show-initial-joins");
+	status_with_priority->setWhatsThis("options.ui.muc.status-with-priority");
+	show_status_icons->setWhatsThis("options.ui.muc.userlist.show-status-icons");
+	use_slim_group_headings->setWhatsThis("options.ui.muc.userlist.use-slim-group-headings");
+	userlist_contact_sort_style->setWhatsThis("options.ui.muc.userlist.contact-sort-style");
+	avatars_at_left->setWhatsThis("options.ui.muc.userlist.avatars.avatars-at-left");
+	avatars_show->setWhatsThis("options.ui.muc.userlist.avatars.show");
+	userlist_avatars_size->setWhatsThis("options.ui.muc.userlist.avatars.size");
+	userlist_avatars_radius->setWhatsThis("options.ui.muc.userlist.avatars.radius");
+	muc_leave_status_message->setWhatsThis("options.muc.leave-status-message");
+	accept_defaults->setWhatsThis("options.muc.accept-defaults");
+	auto_configure->setWhatsThis("options.muc.auto-configure");
+
+	//Tabs----------------------
+	disableScroll->setWhatsThis("options.ui.tabs.disable-wheel-scroll");
+	bottomTabs->setWhatsThis("options.ui.tabs.put-tabs-at-bottom");
+	closeButton->setWhatsThis("options.ui.tabs.show-tab-close-buttons");
+	middleButton->setWhatsThis("options.ui.tabs.mouse-middle-button");
+	mouseDoubleclick->setWhatsThis("options.ui.tabs.mouse-doubleclick-action");
+	showTabIcons->setWhatsThis("options.ui.tabs.show-tab-icons");
+	hideWhenClose->setWhatsThis("options.ui.chat.hide-when-closing");
+	canCloseTab->setWhatsThis("options.ui.tabs.can-close-inactive-tab");
+
+	//Roster
+	resolveNicks->setWhatsThis("options.contactlist.resolve-nicks-on-contact-add");
+	lockRoster->setWhatsThis("options.ui.contactlist.lockdown-roster");
+	leftRoster->setWhatsThis("options.ui.contactlist.roster-at-left-when-all-in-one-window");
+	singleLineStatus->setWhatsThis("options.ui.contactlist.status-messages.single-line");
+	avatarTip->setWhatsThis("options.ui.contactlist.tooltip.avatar");
+	statusTip->setWhatsThis("options.ui.contactlist.tooltip.last-status");
+	geoTip->setWhatsThis("options.ui.contactlist.tooltip.geolocation");
+	pgpTip->setWhatsThis("options.ui.contactlist.tooltip.pgp");
+	clientTip->setWhatsThis("options.ui.contactlist.tooltip.client-version");
+	sortContacts->setWhatsThis("options.ui.contactlist.contact-sort-style");
+	leftAvatars->setWhatsThis("options.ui.contactlist.avatars.avatars-at-left");
+	defaultAvatar->setWhatsThis("options.ui.contactlist.avatars.use-default-avatar");
+	showStatusIcons->setWhatsThis("options.ui.contactlist.show-status-icons");
+	statusIconsOverAvatars->setWhatsThis("options.ui.contactlist.status-icon-over-avatar");
+	auto_delete_unlisted->setWhatsThis("options.ui.contactlist.auto-delete-unlisted");
+
+	//Menu------
+	admin->setWhatsThis("options.ui.menu.account.admin");
+	activeChats->setWhatsThis("options.ui.menu.contact.active-chats");
+	pgpKey->setWhatsThis("options.ui.menu.contact.custom-pgp-key");
+	picture->setWhatsThis("options.ui.menu.contact.custom-picture");
+	changeProfile->setWhatsThis("options.ui.menu.main.change-profile");
+	chat->setWhatsThis("options.ui.menu.status.chat");
+	invis->setWhatsThis("options.ui.menu.status.invisible");
+	xa->setWhatsThis("options.ui.menu.status.xa");
+	enableMessages->setWhatsThis("options.ui.message.enabled");
+
+	//Look----
+	popupBorder->setWhatsThis("options.ui.look.colors.passive-popup.border");
+	linkColor->setWhatsThis("options.ui.look.colors.chat.link-color");
+	mailtoColor->setWhatsThis("options.ui.look.colors.chat.mailto-color");
+	moderColor->setWhatsThis("options.ui.look.colors.muc.role-moderator");
+	parcColor->setWhatsThis("options.ui.look.colors.muc.role-participant");
+	visitorColor->setWhatsThis("options.ui.look.colors.muc.role-visitor");
+	noroleColor->setWhatsThis("options.ui.look.colors.muc.role-norole");
+	tipText->setWhatsThis("options.ui.look.colors.tooltip.text");
+	tipBase->setWhatsThis("options.ui.look.colors.tooltip.background");
+	unreadBut->setWhatsThis("options.ui.look.colors.chat.unread-message-color");
+	composingBut->setWhatsThis("options.ui.look.colors.chat.composing-color");
+	groupTip->setWhatsThis("options.ui.look.colors.tooltip.enable");
+	groupMucRoster->setWhatsThis("options.ui.muc.userlist.nick-coloring");
+
+	//CSS----------------
+	chatCss->setWhatsThis("options.ui.chat.css");
+	rosterCss->setWhatsThis("options.ui.contactlist.css");
+	popupCss->setWhatsThis("options.ui.notifications.passive-popups.css");
+	tooltipCss->setWhatsThis("options.ui.contactlist.tooltip.css");
+
+	//Misc--------------------
+	flash_windows->setWhatsThis("options.ui.flash-windows");
+	account_single->setWhatsThis("options.ui.account.single");
+	xml_console_enable_at_login->setWhatsThis("options.xml-console.enable-at-login");
+	lastActivity->setWhatsThis("options.service-discovery.last-activity");
+	sndMucNotify->setWhatsThis("options.ui.notifications.sounds.notify-every-muc-message");
+	popupsSuppressDnd->setWhatsThis("options.ui.notifications.passive-popups.suppress-while-dnd");
+	popupsSuppressAway->setWhatsThis("options.ui.notifications.passive-popups.suppress-while-away");
 }
 
 QString ExtendedOptions::profileDir()
