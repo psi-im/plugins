@@ -1,6 +1,8 @@
 CONFIG += release
 TARGET = stopspamplugin
 include(../../psiplugin.pri)
+INCLUDEPATH += $$PWD
+DEPENDPATH += $$PWD
 SOURCES += stopspamplugin.cpp \
     view.cpp \
     model.cpp \

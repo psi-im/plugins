@@ -1,6 +1,8 @@
 CONFIG += release
 RESOURCES = chessplugin.qrc
 include(../../psiplugin.pri)
+INCLUDEPATH += $$PWD
+DEPENDPATH += $$PWD
 SOURCES += chessplugin.cpp \
     figure.cpp \
     boardmodel.cpp \

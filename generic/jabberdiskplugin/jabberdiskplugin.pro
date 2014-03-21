@@ -1,5 +1,7 @@
 CONFIG += release
 include(../../psiplugin.pri)
+INCLUDEPATH += $$PWD
+DEPENDPATH += $$PWD
 SOURCES += jabberdiskplugin.cpp \
     model.cpp \
     jabberdiskcontroller.cpp \

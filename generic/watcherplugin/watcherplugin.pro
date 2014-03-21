@@ -1,5 +1,7 @@
 CONFIG += release
 include(../../psiplugin.pri)
+INCLUDEPATH += $$PWD
+DEPENDPATH += $$PWD
 SOURCES += watcherplugin.cpp \
     view.cpp \
     model.cpp \

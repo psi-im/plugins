@@ -2,6 +2,9 @@ include(../../psiplugin.pri)
 CONFIG += release
 QT += network
 
+INCLUDEPATH += $$PWD
+DEPENDPATH += $$PWD
+
 HEADERS += yandexnarod.h \
     requestauthdialog.h \
     uploaddialog.h \

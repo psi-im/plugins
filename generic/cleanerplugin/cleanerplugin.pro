@@ -1,5 +1,7 @@
 CONFIG += release
 include(../../psiplugin.pri)
+INCLUDEPATH += $$PWD
+DEPENDPATH += $$PWD
 RESOURCES = cleanerplugin.qrc
 SOURCES += cleanerplugin.cpp \
     cleaner.cpp \

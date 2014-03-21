@@ -1,5 +1,7 @@
 CONFIG += release
 include(../../psiplugin.pri)
+INCLUDEPATH += $$PWD
+DEPENDPATH += $$PWD
 HEADERS += gomokugameplugin.h \
     pluginwindow.h \
     boardview.h \

@@ -1,5 +1,7 @@
 CONFIG += release
 include(../../psiplugin.pri)
+INCLUDEPATH += $$PWD
+DEPENDPATH += $$PWD
 
 SOURCES += options.cpp \
            model.cpp \
