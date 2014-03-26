@@ -1,3 +1,7 @@
+2014-03-26
+v1.0.2 tehnick
+  * Fix a queue of events for modal dialogs. Also it fixes small memory leak.
+
 2014-03-15
 v1.0.1 tehnick
   * Use a queue of events for some modal dialogs. They will not be shown
