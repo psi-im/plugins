@@ -115,7 +115,7 @@ PsiOtrPlugin::PsiOtrPlugin()
       m_contactInfo(NULL),
       m_iconHost(NULL),
       m_psiEvent(NULL),
-      m_messageBox(NULL)
+      m_messageBoxList()
 {
 }
 
@@ -643,9 +643,10 @@ void PsiOtrPlugin::notifyUser(const QString& account, const QString& contact,
         messageBoxIcon = QMessageBox::Information;
     }
 
-    m_messageBox = new QMessageBox(messageBoxIcon, tr("Psi OTR"), message,
-                                   QMessageBox::Ok, NULL,
-                                   Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+    QMessageBox *messageBox = new QMessageBox(messageBoxIcon, tr("Psi OTR"), message,
+                                              QMessageBox::Ok, NULL,
+                                              Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+    m_messageBoxList.enqueue(messageBox);
 
     m_psiEvent->createNewEvent(getAccountIndexById(account), contact,
                                tr("OTR Plugin: event from %1").arg(contact),
@@ -656,10 +657,12 @@ void PsiOtrPlugin::notifyUser(const QString& account, const QString& contact,
 
 void PsiOtrPlugin::eventActivated()
 {
-    if (m_messageBox) {
-        m_messageBox->exec();
-        delete m_messageBox;
-        m_messageBox = NULL;
+    if (!m_messageBoxList.empty()) {
+        QMessageBox *messageBox = m_messageBoxList.dequeue();
+        if (messageBox) {
+            messageBox->exec();
+            delete messageBox;
+        }
     }
 }
 

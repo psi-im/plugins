@@ -29,6 +29,7 @@
 
 #include <QObject>
 #include <QMessageBox>
+#include <QQueue>
 
 #include "otrmessaging.h"
 #include "psiplugin.h"
@@ -229,7 +230,7 @@ private:
     ContactInfoAccessingHost*                       m_contactInfo;
     IconFactoryAccessingHost*                       m_iconHost;
     EventCreatingHost*                              m_psiEvent;
-    QMessageBox*                                    m_messageBox;
+    QQueue<QMessageBox*>                            m_messageBoxList;
 };
 
 //-----------------------------------------------------------------------------
