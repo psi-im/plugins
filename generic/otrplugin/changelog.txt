@@ -1,6 +1,7 @@
 2014-03-26
 v1.0.2 tehnick
-  * Fix a queue of events for modal dialogs. Also it fixes small memory leak.
+  * Fix a queue of events for modal dialogs.
+  * Fix possible memory leak after disabling of the plugin.
 
 2014-03-15
 v1.0.1 tehnick

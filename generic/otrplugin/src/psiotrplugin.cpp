@@ -206,6 +206,12 @@ bool PsiOtrPlugin::disable()
     }
     m_onlineUsers.clear();
 
+    QMessageBox *messageBox = NULL;
+    while (!m_messageBoxList.empty()) {
+        messageBox = m_messageBoxList.dequeue();
+        delete messageBox;
+    }
+
     delete m_otrConnection;
     m_enabled = false;
     return true;
