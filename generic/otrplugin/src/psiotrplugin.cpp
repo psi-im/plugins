@@ -206,10 +206,9 @@ bool PsiOtrPlugin::disable()
     }
     m_onlineUsers.clear();
 
-    QMessageBox *messageBox = NULL;
     while (!m_messageBoxList.empty()) {
-        messageBox = m_messageBoxList.dequeue();
-        delete messageBox;
+        qDeleteAll(m_messageBoxList.begin(), m_messageBoxList.end());
+        m_messageBoxList.clear();
     }
 
     delete m_otrConnection;
