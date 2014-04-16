@@ -43,13 +43,12 @@ inline bool checkBin(const QString &bin)
 static bool getRegKey(HKEY root, const char *path, QString &value)
 {
 	HKEY hkey = 0;
-
-	char szValue[256];
-	DWORD dwLen = 256;
-
 	bool res = false;
 
 	if(RegOpenKeyExA(root, path, 0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {
+		DWORD dwLen = 256;
+		char szValue[256];
+
 		if (RegQueryValueExA(hkey, "Install Directory", NULL, NULL, (LPBYTE)szValue, &dwLen) == ERROR_SUCCESS) {
 			value = QString::fromLocal8Bit(szValue);
 			res = true;
