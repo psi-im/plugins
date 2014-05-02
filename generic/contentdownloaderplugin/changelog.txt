@@ -1,3 +1,8 @@
+2014-05-02  zet
+v0.2.5
+  * https://raw.githubusercontent.com/psi-plus/contentdownloader/master/content.list
+
+
 2013-08-13 taurus
 v0.2.4
   + Иконка плагина

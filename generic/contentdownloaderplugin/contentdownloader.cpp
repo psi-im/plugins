@@ -52,7 +52,7 @@ QString ContentDownloader::shortName() const
 
 QString ContentDownloader::version() const
 {
-	return "0.2.4";
+	return "0.2.5";
 }
 
 QWidget *ContentDownloader::options()
