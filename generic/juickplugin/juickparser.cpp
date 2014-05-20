@@ -242,8 +242,8 @@ QString JuickParser::photoLink() const
 QString JuickParser::nick() const
 {
 	QString nick;
-	if(hasJuckNamespace()) {
-		nick = juickElement_.attribute("uname");
+	if(!userElement_.isNull()) {
+		nick = userElement_.attribute("uname");
 	}
 	return nick;
 }
