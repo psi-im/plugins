@@ -84,6 +84,7 @@ private:
 private:
 	QDomElement* elem_;
 	QDomElement juickElement_;
+	QDomElement userElement_;
 	JMType type_;
 	QString infoText_;
 	JuickMessages messages_;

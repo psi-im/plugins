@@ -69,6 +69,7 @@ JuickParser::JuickParser(QDomElement *elem)
 		d = new Private();
 
 	juickElement_ = findElement("juick", "http://juick.com/message");
+	userElement_  = findElement("user",  "http://juick.com/user");
 
 	QString msg = "\n" + originMessage() + "\n";
 	msg.replace("&gt;",">");
@@ -216,8 +217,8 @@ bool JuickParser::hasJuckNamespace() const
 QString JuickParser::avatarLink() const
 {
 	QString ava;
-	if(hasJuckNamespace()) {
-		ava = "/as/"+juickElement_.attribute("uid")+".png";
+	if(!userElement_.isNull()) {
+		ava = "/as/"+userElement_.attribute("uid")+".png";
 	}
 	return ava;
 }
