@@ -93,9 +93,10 @@ JuickPlugin::JuickPlugin()
 	, userItalic(false), tagItalic(true), msgItalic(false), quoteItalic(false), lineItalic(false)
 	, userUnderline(false), tagUnderline(false), msgUnderline(true), quoteUnderline(false), lineUnderline(true)
 	, tagRx	("^\\s*(?!\\*\\S+\\*)(\\*\\S+)")
-	, regx	("(\\s+)(#\\d+/{0,1}\\d*(?:\\S+)|@\\S+|_[^\\n]+_|\\*[^\\n]+\\*|/[^\\n]+/|http://\\S+|ftp://\\S+|https://\\S+){1}(\\s+)")
+	, regx	("(\\s+)(#\\d+/{0,1}\\d*(?:\\S+)|@\\S+|_[^\\n]+_|\\*[^\\n]+\\*|/[^\\n]+/|http://\\S+|ftp://\\S+|https://\\S+|\\[[^\\]]+\\]\\[[^\\]]+\\]){1}(\\s+)")
 	, idRx	("(#\\d+)(/\\d+){0,1}(\\S+){0,1}")
 	, nickRx("(@[\\w\\-\\.@\\|]*)(\\b.*)")
+	, linkRx("\\[([^\\]]+)\\]\\[([^\\]]+)\\]")
 	, idAsResource(false), showPhoto(false), showAvatars(true), workInGroupChat(false)
 	, downloader_(0)
 
@@ -927,6 +928,14 @@ void JuickPlugin::elementFromString(QDomElement* body,QDomDocument* e, const QSt
 			ahref.setAttribute("style","color:" + commonLinkColor + ";");
 			ahref.setAttribute("href",seg);
 			ahref.appendChild(e->createTextNode(seg));
+			body->appendChild(ahref);
+			break;}
+		case '[':{
+			QDomElement ahref = e->createElement("a");
+			linkRx.indexIn(seg);
+			ahref.setAttribute("style","color:" + commonLinkColor + ";");
+			ahref.setAttribute("href",linkRx.cap(2));
+			ahref.appendChild(e->createTextNode(linkRx.cap(1)));
 			body->appendChild(ahref);
 			break;}
 		default:{}

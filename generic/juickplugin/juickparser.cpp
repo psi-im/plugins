@@ -69,7 +69,7 @@ JuickParser::JuickParser(QDomElement *elem)
 		d = new Private();
 
 	juickElement_ = findElement("juick", "http://juick.com/message");
-	userElement_  = findElement("user",  "http://juick.com/user");
+	userElement_  = juickElement_.firstChildElement("user");
 
 	QString msg = "\n" + originMessage() + "\n";
 	msg.replace("&gt;",">");

@@ -104,7 +104,7 @@ private:
 	bool userItalic,tagItalic,msgItalic,quoteItalic,lineItalic;
 	bool userUnderline,tagUnderline,msgUnderline,quoteUnderline,lineUnderline;
 	QString idStyle,userStyle,tagStyle,quoteStyle,linkStyle;
-	QRegExp tagRx, regx, idRx, nickRx;
+	QRegExp tagRx, regx, idRx, nickRx, linkRx;
 	QString userLinkPattern,messageLinkPattern,altTextUser,altTextMsg,commonLinkColor;
 	bool idAsResource,showPhoto,showAvatars,workInGroupChat;
 	QStringList jidList_;
