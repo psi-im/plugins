@@ -273,7 +273,7 @@ void ImagePlugin::actionActivated()
 	}
 	QBuffer b(&image);
 	pix.save(&b, mimeType.toAscii().constData());
-	QString imageBase64(QUrl::toPercentEncoding(image.toBase64()));
+	QString imageBase64(image.toBase64());
 	int length = image.length();
 	if(length > 61440) {
 		QMessageBox::information(0, tr("The image size is too large."),
