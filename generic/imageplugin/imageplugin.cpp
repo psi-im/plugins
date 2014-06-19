@@ -272,7 +272,7 @@ void ImagePlugin::actionActivated()
 		pix = pix.scaled(MAX_SIZE, MAX_SIZE, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 	}
 	QBuffer b(&image);
-	pix.save(&b, mimeType.toAscii().constData());
+	pix.save(&b, mimeType.toLatin1().constData());
 	QString imageBase64(image.toBase64());
 	int length = image.length();
 	if(length > 61440) {
