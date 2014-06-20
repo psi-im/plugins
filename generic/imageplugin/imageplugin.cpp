@@ -267,12 +267,13 @@ void ImagePlugin::actionActivated()
 	}
 
 	QByteArray image;
+	QString mimeType("jpeg");
 	if(pix.height() > MAX_SIZE || pix.width() > MAX_SIZE) {
 		pix = pix.scaled(MAX_SIZE, MAX_SIZE, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 	}
 	QBuffer b(&image);
-	pix.save(&b, "jpg");
-	QString imageBase64(QUrl::toPercentEncoding(image.toBase64()));
+	pix.save(&b, mimeType.toLatin1().constData());
+	QString imageBase64(image.toBase64());
 	int length = image.length();
 	if(length > 61440) {
 		QMessageBox::information(0, tr("The image size is too large."),
@@ -290,13 +291,13 @@ void ImagePlugin::actionActivated()
 			.arg(jidToSend)
 			.arg(stanzaSender->uniqueId(account))
 			.arg(body)
-			.arg(fileName.right(fileName.length() - fileName.lastIndexOf(".") - 1))
+			.arg(mimeType)
 			.arg(imageBase64);
 
 	stanzaSender->sendStanza(account, msgHtml);
 	psiController->appendSysMsg(account, jidToSend, tr("Image %1 sent <br/><img src=\"data:image/%2;base64,%3\" alt=\"img\"/> ")
 				    .arg(imageName)
-				    .arg(fileName.right(fileName.length() - fileName.lastIndexOf(".") - 1))
+				    .arg(mimeType)
 				    .arg(imageBase64));
 
 
