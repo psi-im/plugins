@@ -6,6 +6,9 @@ RESOURCES = otrplugin.qrc
 unix {
 	INCLUDEPATH += /usr/include/tidy
 }
+greaterThan(QT_MAJOR_VERSION, 4) {
+	QT += concurrent
+}
 
 HEADERS += src/psiotrplugin.h
 HEADERS += src/otrmessaging.h
