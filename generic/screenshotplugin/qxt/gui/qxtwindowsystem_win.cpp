@@ -41,7 +41,7 @@ BOOL CALLBACK qxt_EnumWindowsProc(HWND hwnd, LPARAM lParam)
 {
     Q_UNUSED(lParam);
     if (::IsWindowVisible(hwnd))
-        qxt_Windows += hwnd;
+        qxt_Windows += (WId)hwnd;
     return true;
 }
 
@@ -56,16 +56,20 @@ WindowList QxtWindowSystem::windows()
 
 WId QxtWindowSystem::activeWindow()
 {
-    return ::GetForegroundWindow();
+    return (WId)::GetForegroundWindow();
 }
 
 WId QxtWindowSystem::findWindow(const QString& title)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
     QT_WA({
-        return ::FindWindow(NULL, (TCHAR*)title.utf16());
+        return (WId)::FindWindow(NULL, (TCHAR*)title.utf16());
     }, {
-        return ::FindWindowA(NULL, title.toLocal8Bit());
+        return (WId)::FindWindowA(NULL, title.toLocal8Bit());
     });
+#else
+    return (WId)::FindWindow(NULL, (TCHAR*)title.utf16());
+#endif
 }
 
 WId QxtWindowSystem::windowAt(const QPoint& pos)
@@ -73,22 +77,26 @@ WId QxtWindowSystem::windowAt(const QPoint& pos)
     POINT pt;
     pt.x = pos.x();
     pt.y = pos.y();
-    return ::WindowFromPoint(pt);
+    return (WId)::WindowFromPoint(pt);
 }
 
 QString QxtWindowSystem::windowTitle(WId window)
 {
     QString title;
-    int len = ::GetWindowTextLength(window);
+    int len = ::GetWindowTextLength((HWND)window);
     if (len >= 0)
     {
         TCHAR* buf = new TCHAR[len+1];
-        len = ::GetWindowText(window, buf, len+1);
+        len = ::GetWindowText((HWND)window, buf, len+1);
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
         QT_WA({
             title = QString::fromUtf16((const ushort*)buf, len);
         }, {
             title = QString::fromLocal8Bit((const char*)buf, len);
         });
+#else
+            title = QString::fromUtf16((const ushort*)buf, len);
+#endif
         delete[] buf;
     }
     return title;
@@ -98,7 +106,7 @@ QRect QxtWindowSystem::windowGeometry(WId window)
 {
     RECT rc;
     QRect rect;
-    if (::GetWindowRect(window, &rc))
+    if (::GetWindowRect((HWND)window, &rc))
     {
         rect.setTop(rc.top);
         rect.setBottom(rc.bottom);
@@ -117,4 +125,3 @@ uint QxtWindowSystem::idleTime()
         idle = ::GetTickCount() - info.dwTime;
     return idle;
 }
-
