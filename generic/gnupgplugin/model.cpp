@@ -21,11 +21,14 @@
 #include "model.h"
 #include "gpgprocess.h"
 #include <QDateTime>
-#include <QDebug>
 
 inline QString epochToHuman(const QString &seconds)
 {
-	return QDateTime::fromMSecsSinceEpoch(seconds.toLongLong() * 1000).date().toString();
+	qint64 ms = seconds.toLongLong() * 1000;
+	if (ms)
+		return QDateTime::fromMSecsSinceEpoch(ms).date().toString();
+	else
+		return QString();
 }
 
 inline QString uidToName(const QString &uid)
@@ -79,6 +82,9 @@ QList<QStandardItem*> parseLine(const QString &line)
 	// Creation key time in human readable format
 	rows << new QStandardItem(epochToHuman(line.section(':', 5, 5)));
 
+	// Expiration time
+	rows << new QStandardItem(epochToHuman(line.section(':', 6, 6)));
+
 	// Length of key
 	rows << new QStandardItem(line.section(':', 2, 2));
 
@@ -116,6 +122,7 @@ void Model::listKeys()
 				 << trUtf8("Name")
 				 << trUtf8("E-Mail")
 				 << trUtf8("Created")
+				 << trUtf8("Expiration")
 				 << trUtf8("Length")
 				 << trUtf8("Comment")
 				 << trUtf8("Algorithm")
@@ -164,7 +171,7 @@ void Model::showKeys(const QString &keysRaw)
 			if (type == "sec") {
 				secretKeys << row.at(7)->text();
 			}
-			else if (secretKeys.indexOf(row.at(7)->text()) >= 0) {
+			else if (secretKeys.indexOf(row.at(8)->text()) >= 0) {
 				lastRow.clear();
 				continue;
 			}
@@ -178,11 +185,11 @@ void Model::showKeys(const QString &keysRaw)
 			if (lastRow.first()->rowCount() == 1) {
 				lastRow.at(1)->setText(row.at(1)->text());
 				lastRow.at(2)->setText(row.at(2)->text());
-				lastRow.at(5)->setText(row.at(5)->text());
+				lastRow.at(6)->setText(row.at(6)->text());
 			}
 		}
 		else if (type == "fpr") {
-			row.at(8)->setText(line.section(':', 9, 9));
+			row.at(9)->setText(line.section(':', 9, 9));
 		}
 	}
 }
