@@ -117,7 +117,7 @@ bool GnuPG::incomingStanza(int account, const QDomElement& stanza)
 		return false;
 	}
 
-	if (!_optionHost->getPluginOption("auto-import", false).toBool()) {
+	if (!_optionHost->getPluginOption("auto-import", true).toBool()) {
 		return false;
 	}
 
@@ -160,7 +160,7 @@ bool GnuPG::incomingStanza(int account, const QDomElement& stanza)
 		return false;
 	}
 
-	if (!_optionHost->getPluginOption("hide-key-message", false).toBool()) {
+	if (!_optionHost->getPluginOption("hide-key-message", true).toBool()) {
 		return false;
 	}
 	else {

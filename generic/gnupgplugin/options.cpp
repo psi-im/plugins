@@ -86,8 +86,8 @@ void Options::update()
 
 void Options::loadSettings()
 {
-	ui->chkAutoImport->setChecked(_optionHost->getPluginOption("auto-import", false).toBool());
-	ui->chkHideKeyMessage->setChecked(_optionHost->getPluginOption("hide-key-message", false).toBool());
+	ui->chkAutoImport->setChecked(_optionHost->getPluginOption("auto-import", true).toBool());
+	ui->chkHideKeyMessage->setChecked(_optionHost->getPluginOption("hide-key-message", true).toBool());
 }
 
 void Options::saveSettings()
