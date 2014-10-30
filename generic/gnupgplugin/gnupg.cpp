@@ -204,14 +204,14 @@ void GnuPG::actionActivated()
 		}
 
 		// Comment
-		if (!model->item(i, 5)->text().isEmpty()) {
+		if (!model->item(i, 6)->text().isEmpty()) {
 			if (!str.isEmpty()) {
 				str += " ";
 			}
-			str += QString("(%1)").arg(model->item(i, 5)->text());
+			str += QString("(%1)").arg(model->item(i, 6)->text());
 		}
 
-		// Password
+		// Email
 		if (!model->item(i, 2)->text().isEmpty()) {
 			if (!str.isEmpty()) {
 				str += " ";
@@ -223,7 +223,7 @@ void GnuPG::actionActivated()
 		if (!str.isEmpty()) {
 			str += " ";
 		}
-		str += model->item(i, 7)->text();
+		str += model->item(i, 8)->text();
 
 		QAction *action = _menu->addAction(str);
 		action->setData(model->item(i, 8)->text());
