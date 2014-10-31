@@ -193,40 +193,40 @@ void GnuPG::actionActivated()
 	model->listKeys();
 
 	for (int i = 0; i < model->rowCount(); i++) {
-		if (model->item(i)->text() != "sec") {
+		if (model->item(i, Model::Type)->text() != "sec") {
 			continue;
 		}
 
 		QString str;
 		// User name
-		if (!model->item(i, 1)->text().isEmpty()) {
-			str += model->item(i, 1)->text();
+		if (!model->item(i, Model::Name)->text().isEmpty()) {
+			str += model->item(i, Model::Name)->text();
 		}
 
 		// Comment
-		if (!model->item(i, 6)->text().isEmpty()) {
+		if (!model->item(i, Model::Comment)->text().isEmpty()) {
 			if (!str.isEmpty()) {
 				str += " ";
 			}
-			str += QString("(%1)").arg(model->item(i, 6)->text());
+			str += QString("(%1)").arg(model->item(i, Model::Comment)->text());
 		}
 
 		// Email
-		if (!model->item(i, 2)->text().isEmpty()) {
+		if (!model->item(i, Model::Email)->text().isEmpty()) {
 			if (!str.isEmpty()) {
 				str += " ";
 			}
-			str += QString("<%1>").arg(model->item(i, 2)->text());
+			str += QString("<%1>").arg(model->item(i, Model::Email)->text());
 		}
 
 		// Short ID
 		if (!str.isEmpty()) {
 			str += " ";
 		}
-		str += model->item(i, 8)->text();
+		str += model->item(i, Model::ShortId)->text();
 
 		QAction *action = _menu->addAction(str);
-		action->setData(model->item(i, 8)->text());
+		action->setData(model->item(i, Model::Fingerprint)->text());
 		connect(action, SIGNAL(triggered()), SLOT(sendPublicKey()));
 	}
 

@@ -117,17 +117,24 @@ void Model::listKeys()
 {
 	clear();
 
-	QStringList headerLabels;
-	headerLabels << trUtf8("Type")
-				 << trUtf8("Name")
-				 << trUtf8("E-Mail")
-				 << trUtf8("Created")
-				 << trUtf8("Expiration")
-				 << trUtf8("Length")
-				 << trUtf8("Comment")
-				 << trUtf8("Algorithm")
-				 << trUtf8("Short ID")
-				 << trUtf8("Fingerprint");
+	static QStringList headerLabels;
+
+	if (headerLabels.isEmpty()) {
+		for (int i = 0; i < Model::Count; ++i) {
+			headerLabels << QString();
+		}
+
+		headerLabels[Type] = ("Type");
+		headerLabels[Name] = ("Name");
+		headerLabels[Email] = ("E-Mail");
+		headerLabels[Created] = ("Created");
+		headerLabels[Expiration] = ("Expiration");
+		headerLabels[Length] = ("Length");
+		headerLabels[Comment] = ("Comment");
+		headerLabels[Algorithm] = ("Algorithm");
+		headerLabels[ShortId] = ("Short ID");
+		headerLabels[Fingerprint] = ("Fingerprint");
+	}
 
 	setHorizontalHeaderLabels(headerLabels);
 
@@ -169,9 +176,9 @@ void Model::showKeys(const QString &keysRaw)
 
 			// Show only secret part for keys pair
 			if (type == "sec") {
-				secretKeys << row.at(7)->text();
+				secretKeys << row.at(Algorithm)->text();
 			}
-			else if (secretKeys.indexOf(row.at(8)->text()) >= 0) {
+			else if (secretKeys.indexOf(row.at(ShortId)->text()) >= 0) {
 				lastRow.clear();
 				continue;
 			}
@@ -183,13 +190,13 @@ void Model::showKeys(const QString &keysRaw)
 			row = parseLine(line);
 			lastRow.first()->appendRow(row);
 			if (lastRow.first()->rowCount() == 1) {
-				lastRow.at(1)->setText(row.at(1)->text());
-				lastRow.at(2)->setText(row.at(2)->text());
-				lastRow.at(6)->setText(row.at(6)->text());
+				lastRow.at(Name)->setText(row.at(Name)->text());
+				lastRow.at(Email)->setText(row.at(Email)->text());
+				lastRow.at(Comment)->setText(row.at(Comment)->text());
 			}
 		}
 		else if (type == "fpr") {
-			row.at(9)->setText(line.section(':', 9, 9));
+			row.at(Fingerprint)->setText(line.section(':', Fingerprint, Fingerprint));
 		}
 	}
 }
