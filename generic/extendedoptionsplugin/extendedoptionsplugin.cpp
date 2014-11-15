@@ -1,6 +1,6 @@
 /*
  * extendedoptionsplugin.cpp - plugin
- * Copyright (C) 2010  Khryukin Evgeny
+ * Copyright (C) 2010-2014  Khryukin Evgeny
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -40,7 +40,7 @@
 #include "plugininfoprovider.h"
 
 
-#define constVersion "0.4.0"
+#define constVersion "0.4.1"
 
 class ExtToolButton : public QToolButton
 {
@@ -199,7 +199,8 @@ private:
 	QCheckBox *showTabIcons;
 	QCheckBox *hideWhenClose;
 	QCheckBox *canCloseTab;
-	QComboBox* mouseDoubleclick;
+	QComboBox *mouseDoubleclick;
+	QCheckBox *multiRow;
 
 	//Misc
 	QCheckBox *flash_windows;
@@ -654,6 +655,7 @@ QWidget* ExtendedOptions::options()
 	showTabIcons = new QCheckBox(tr("Show status icons on tabs"));
 	hideWhenClose = new QCheckBox(tr("Hide tab when close chat window"));
 	canCloseTab = new QCheckBox(tr("Allow closing inactive tabs"));
+	multiRow = new QCheckBox(tr("Enable multirow tabs"));
 
 	middleButton = new QComboBox;
 	QHBoxLayout *mbLayout = new QHBoxLayout;
@@ -681,6 +683,7 @@ QWidget* ExtendedOptions::options()
 	tab5Layout->addWidget(canCloseTab);
 	tab5Layout->addWidget(closeButton);
 	tab5Layout->addWidget(showTabIcons);
+	tab5Layout->addWidget(multiRow);
 	tab5Layout->addLayout(mbLayout);
 	tab5Layout->addLayout(mdLayout);
 	tab5Layout->addStretch();
@@ -787,6 +790,7 @@ void ExtendedOptions::applyOptions()
 	psiOptions->setGlobalOption("options.ui.tabs.show-tab-icons",QVariant(showTabIcons->isChecked()));
 	psiOptions->setGlobalOption("options.ui.chat.hide-when-closing",QVariant(hideWhenClose->isChecked()));
 	psiOptions->setGlobalOption("options.ui.tabs.can-close-inactive-tab",QVariant(canCloseTab->isChecked()));
+	psiOptions->setGlobalOption("options.ui.tabs.multi-rows",QVariant(multiRow->isChecked()));
 
 	//Roster-----
 	psiOptions->setGlobalOption("options.contactlist.resolve-nicks-on-contact-add",QVariant(resolveNicks->isChecked()));
@@ -915,6 +919,7 @@ void ExtendedOptions::restoreOptions()
 	showTabIcons->setChecked(psiOptions->getGlobalOption("options.ui.tabs.show-tab-icons").toBool());
 	hideWhenClose->setChecked(psiOptions->getGlobalOption("options.ui.chat.hide-when-closing").toBool());
 	canCloseTab->setChecked(psiOptions->getGlobalOption("options.ui.tabs.can-close-inactive-tab").toBool());
+	multiRow->setChecked(psiOptions->getGlobalOption("options.ui.tabs.multi-rows").toBool());
 
 	//Roster
 	resolveNicks->setChecked(psiOptions->getGlobalOption("options.contactlist.resolve-nicks-on-contact-add").toBool());
@@ -1113,6 +1118,7 @@ void ExtendedOptions::setWhatThis()
 	showTabIcons->setWhatsThis("options.ui.tabs.show-tab-icons");
 	hideWhenClose->setWhatsThis("options.ui.chat.hide-when-closing");
 	canCloseTab->setWhatsThis("options.ui.tabs.can-close-inactive-tab");
+	multiRow->setWhatsThis("options.ui.tabs.multi-rows");
 
 	//Roster
 	resolveNicks->setWhatsThis("options.contactlist.resolve-nicks-on-contact-add");
