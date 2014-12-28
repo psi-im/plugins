@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg4429"
+   version="1.1"
+   inkscape:version="0.48.5 r10040"
+   sodipodi:docname="battleship.svg"
+   inkscape:export-filename="/home/aleksey/projects/inkscape/battleship.png"
+   inkscape:export-xdpi="0.59569383"
+   inkscape:export-ydpi="0.59569383">
+  <defs
+     id="defs4431">
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect4449"
+       is_visible="true" />
+    <filter
+       inkscape:collect="always"
+       id="filter4467">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="10.351467"
+         id="feGaussianBlur4469" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#ffffff"
+     borderopacity="0.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="0"
+     inkscape:zoom="0.175"
+     inkscape:cx="305.68212"
+     inkscape:cy="854.43693"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer2"
+     showgrid="false"
+     inkscape:snap-global="true"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="1276"
+     inkscape:window-height="1001"
+     inkscape:window-x="1280"
+     inkscape:window-y="19"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata4434">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline">
+    <g
+       id="g4456"
+       style="filter:url(#filter4467)"
+       inkscape:export-filename="/home/aleksey/projects/inkscape/battleship256.png"
+       inkscape:export-xdpi="10.27"
+       inkscape:export-ydpi="10.27">
+      <g
+         inkscape:export-ydpi="0.66000003"
+         inkscape:export-xdpi="0.66000003"
+         inkscape:export-filename="/home/aleksey/projects/inkscape/battleship16.png"
+         style="stroke-width:25;stroke-miterlimit:4;stroke-dasharray:none;"
+         id="g4366">
+        <path
+           style="fill:#e6e6e6;fill-opacity:1;stroke:#c8c8c8;stroke-width:25;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none;marker-end:none"
+           d="m 1053.2812,-1001.75 c -131.63816,0 -238.96903,57.06231 -244.31245,128.53125 -2.96825,-0.0811 -5.96379,-0.125 -8.96875,-0.125 -97.8333,0 -177.15625,43.47448 -177.15625,97.125 0,13.42585 4.98809,26.21256 13.96875,37.84375 -35.38613,5.77885 -61.1875,23.74848 -61.1875,45.03125 0,25.95052 38.36596,46.96875 85.6875,46.96875 41.36406,0 75.87059,-16.05876 83.90625,-37.4375 17.25147,3.07361 35.66097,4.75 54.78125,4.75 76.10488,0 140.99039,-26.33544 166.0625,-63.28125 27.09629,5.67616 56.4851,8.8125 87.2187,8.8125 135.0525,0 244.5313,-60.0327 244.5313,-134.09375 0,-74.06105 -109.4788,-134.125 -244.5313,-134.125 z"
+           id="path4268"
+           inkscape:connector-curvature="0" />
+        <g
+           style="stroke-width:25;stroke-miterlimit:4;stroke-dasharray:none"
+           id="g4299">
+          <g
+             style="stroke-width:25;stroke-miterlimit:4;stroke-dasharray:none"
+             id="g4294">
+            <path
+               style="fill:#c8c8c8;fill-opacity:1;stroke:#000000;stroke-width:25;stroke-linecap:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+               d="m 442.36636,-529.76313 418.12437,0 0,895.04002 -418.12437,0 z"
+               id="rect3856"
+               inkscape:connector-curvature="0" />
+            <rect
+               style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:25;stroke-linecap:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+               id="rect3871"
+               width="377.93134"
+               height="187.1185"
+               x="462.46289"
+               y="-515.39459" />
+            <rect
+               style="fill:#610000;fill-opacity:1;stroke:none;stroke-width:25;stroke-miterlimit:4;stroke-dasharray:none"
+               id="rect3873"
+               width="396.41351"
+               height="37.100803"
+               x="453.2218"
+               y="-271.12329" />
+          </g>
+          <path
+             inkscape:connector-curvature="0"
+             id="path4447"
+             d="m -403.27452,283.40625 c -4.19675,-0.0647 -8.4117,0.79956 -12.25,2.5 -5.11774,2.26725 -9.5488,6.05319 -12.59375,10.75 -2.94073,4.53606 -4.56755,9.90732 -4.65625,15.3125 -0.0886,5.40517 1.36584,10.80745 4.15625,15.4375 102.42165,136.72621 366.153133,443.1515 580.15625,576.375 l 475.6875,0 48.40625,0 475.68747,0 c 214.003,-133.2235 477.7345,-439.64879 580.1562,-576.375 2.7904,-4.63005 4.2449,-10.03233 4.1562,-15.4375 -0.089,-5.40518 -1.7154,-10.77644 -4.6562,-15.3125 -3.0449,-4.69681 -7.4759,-8.48275 -12.5938,-10.75 -5.1177,-2.26725 -10.9129,-3.02535 -16.4374,-2.125 l -1026.31247,0 -48.40625,0 -1026.3125,0 c -1.38115,-0.22509 -2.78858,-0.35344 -4.1875,-0.375 z"
+             style="fill:#c8c8c8;fill-opacity:1;stroke:#000000;stroke-width:25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+        </g>
+      </g>
+      <path
+         inkscape:export-ydpi="0.66000003"
+         inkscape:export-xdpi="0.66000003"
+         inkscape:export-filename="/home/aleksey/projects/inkscape/battleship16.png"
+         sodipodi:nodetypes="casac"
+         inkscape:connector-curvature="0"
+         id="path3852"
+         d="m -181.4286,970.07647 c 248.505741,0 268.593061,-152.88595 416.42856,-152.59761 146.61174,0.28596 254.95082,152.94424 412.38795,152.94424 157.43713,0 271.32858,-152.91198 420.46929,-152.94424 147.6841,-0.0319 186.1137,149.25026 416.4285,151.27057"
+         style="fill:none;stroke:#0000ff;stroke-width:200;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Layer2"
+     style="display:inline">
+    <g
+       id="g4288"
+       style="stroke-width:60;stroke-miterlimit:4;stroke-dasharray:none"
+       inkscape:export-xdpi="10.27"
+       inkscape:export-ydpi="10.27"
+       transform="translate(0,-85.71429)"
+       inkscape:export-filename="/home/aleksey/projects/inkscape/battleship256.png">
+      <path
+         transform="matrix(0.52793392,0,0,0.52793392,370.86937,511.99678)"
+         d="m 1874.2858,200.93361 c 0,741.63954 -601.2177,1342.85719 -1342.85721,1342.85719 -741.63954,0 -1342.85718,-601.21765 -1342.85718,-1342.85719 0,-741.63954 601.21764,-1342.85721 1342.85718,-1342.85721 741.63951,0 1342.85721,601.21767 1342.85721,1342.85721 z"
+         sodipodi:ry="1342.8572"
+         sodipodi:rx="1342.8572"
+         sodipodi:cy="200.93361"
+         sodipodi:cx="531.42859"
+         id="path4274"
+         style="fill:none;stroke:#000000;stroke-width:113.65058899;stroke-linecap:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         sodipodi:type="arc" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path4280"
+         d="m 650.53824,1300.0562 0,-583.06466"
+         style="fill:none;stroke:#000000;stroke-width:60;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:60;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         d="m -53.136351,620.01699 583.064701,-10e-5"
+         id="path4282"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path4286"
+         d="m 775.18874,620.01699 583.06466,-10e-5"
+         style="fill:none;stroke:#000000;stroke-width:60;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+  </g>
+</svg>
