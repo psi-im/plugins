@@ -30,7 +30,7 @@
 *****************************************************************************/
 
 #include <QLibrary>
-#include "x11info.h"
+#include <QX11Info>
 #include <X11/Xutil.h>
 
 static WindowList qxt_getWindows(Atom prop)
@@ -40,8 +40,8 @@ static WindowList qxt_getWindows(Atom prop)
     int format = 0;
     uchar* data = 0;
     ulong count, after;
-    Display* display = X11Info::display();
-    Window window = X11Info::appRootWindow();
+    Display* display = QX11Info::display();
+    Window window = QX11Info::appRootWindow();
     if (XGetWindowProperty(display, window, prop, 0, 1024 * sizeof(Window) / 4, False, AnyPropertyType,
                            &type, &format, &count, &after, &data) == Success)
     {
@@ -58,7 +58,7 @@ WindowList QxtWindowSystem::windows()
 {
     static Atom net_clients = 0;
     if (!net_clients)
-        net_clients = XInternAtom(X11Info::display(), "_NET_CLIENT_LIST_STACKING", True);
+        net_clients = XInternAtom(QX11Info::display(), "_NET_CLIENT_LIST_STACKING", True);
 
     return qxt_getWindows(net_clients);
 }
@@ -67,7 +67,7 @@ WId QxtWindowSystem::activeWindow()
 {
     static Atom net_active = 0;
     if (!net_active)
-        net_active = XInternAtom(X11Info::display(), "_NET_ACTIVE_WINDOW", True);
+        net_active = XInternAtom(QX11Info::display(), "_NET_ACTIVE_WINDOW", True);
 
     return qxt_getWindows(net_active).value(0);
 }
@@ -107,7 +107,7 @@ QString QxtWindowSystem::windowTitle(WId window)
 {
     QString name;
     char* str = 0;
-    if (XFetchName(X11Info::display(), window, &str))
+    if (XFetchName(QX11Info::display(), window, &str))
         name = QString::fromLatin1(str);
     if (str)
         XFree(str);
@@ -119,13 +119,13 @@ QRect QxtWindowSystem::windowGeometry(WId window)
     int x, y;
     uint width, height, border, depth;
     Window root, child;
-    Display* display = X11Info::display();
+    Display* display = QX11Info::display();
     XGetGeometry(display, window, &root, &x, &y, &width, &height, &border, &depth);
     XTranslateCoordinates(display, window, root, x, y, &x, &y, &child);
 
     static Atom net_frame = 0;
     if (!net_frame)
-        net_frame = XInternAtom(X11Info::display(), "_NET_FRAME_EXTENTS", True);
+        net_frame = XInternAtom(QX11Info::display(), "_NET_FRAME_EXTENTS", True);
 
     QRect rect(x, y, width, height);
     Atom type = 0;
@@ -157,7 +157,7 @@ typedef struct {
 } XScreenSaverInfo;
 
 typedef XScreenSaverInfo* (*XScreenSaverAllocInfo)();
-typedef Status (*XScreenSaverQueryInfo)(Display* display, Drawable* drawable, XScreenSaverInfo* info);
+typedef Status (*XScreenSaverQueryInfo)(Display* display, Drawable drawable, XScreenSaverInfo* info);
 
 static XScreenSaverAllocInfo _xScreenSaverAllocInfo = 0;
 static XScreenSaverQueryInfo _xScreenSaverQueryInfo = 0;
@@ -178,13 +178,12 @@ uint QxtWindowSystem::idleTime()
     if (xssResolved)
     {
         XScreenSaverInfo* info = _xScreenSaverAllocInfo();
-        const int screen = X11Info::appScreen();
-        Qt::HANDLE rootWindow = X11Info::appRootWindow(screen);
-        _xScreenSaverQueryInfo(X11Info::display(), (Drawable*) rootWindow, info);
+        const int screen = QX11Info::appScreen();
+        unsigned long rootWindow = (unsigned long)QX11Info::appRootWindow(screen);
+        _xScreenSaverQueryInfo(QX11Info::display(), (Drawable) rootWindow, info);
         idle = info->idle;
         if (info)
             XFree(info);
     }
     return idle;
 }
-

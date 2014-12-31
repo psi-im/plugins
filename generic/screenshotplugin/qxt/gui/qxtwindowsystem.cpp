@@ -33,7 +33,7 @@
 
 /*!
     \class QxtWindowSystem
-    \inmodule QxtGui
+    \inmodule QxtWidgets
     \brief The QxtWindowSystem class provides means for accessing native windows.
 
     \bold {Note:} The underlying window system might or might not allow one to alter
@@ -151,4 +151,3 @@ QStringList QxtWindowSystem::windowTitles()
     titles += QxtWindowSystem::windowTitle(window);
     return titles;
 }
-
