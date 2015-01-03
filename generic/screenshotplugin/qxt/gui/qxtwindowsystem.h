@@ -36,7 +36,7 @@
 
 typedef QList<WId> WindowList;
 
-class QXT_GUI_EXPORT QxtWindowSystem
+class /*QXT_GUI_EXPORT*/ QxtWindowSystem
 {
 public:
     static WindowList windows();

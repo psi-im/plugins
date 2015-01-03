@@ -1,4 +1,4 @@
-include(/usr/share/psi-plus/plugins/psiplugin.pri)
+include(../../psiplugin.pri)
 CONFIG += release
 QT += network
 greaterThan(QT_MAJOR_VERSION, 4) {
