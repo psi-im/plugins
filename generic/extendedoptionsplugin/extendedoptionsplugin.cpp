@@ -260,7 +260,6 @@ QWidget* ExtendedOptions::options()
 
 	options_ = new QWidget;
 	QVBoxLayout *mainLayout = new QVBoxLayout(options_);
-	QScrollArea* area = new QScrollArea;
 	QTabWidget *tabs = new QTabWidget;
 	QWidget *tab1 = new QWidget;
 	QWidget *tab2 = new QWidget;
@@ -287,8 +286,6 @@ QWidget* ExtendedOptions::options()
 	tabs->addTab(tab7, tr("CSS"));
 	tabs->addTab(tab8, tr("Misc"));
 
-	area->setWidget(tabs);
-	area->setWidgetResizable(true);
 
 	//Chats-----
 	//	htmlRender = new QCheckBox(tr("Enable HTML rendering in chat window"));
@@ -715,7 +712,7 @@ QWidget* ExtendedOptions::options()
 	QLabel *wikiLink = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/plugins#extended_options_plugin\">Wiki (Online)</a>"));
 	wikiLink->setOpenExternalLinks(true);
 
-	mainLayout->addWidget(area);
+	mainLayout->addWidget(tabs);
 	mainLayout->addWidget(wikiLink);
 
 	setWhatThis();
