@@ -23,6 +23,7 @@
 
 #include <QDomElement>
 #include <QMap>
+#include <QObject>
 #include <QStringList>
 
 class OptionsParser : public QObject

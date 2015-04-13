@@ -19,6 +19,7 @@
  */
 
 #include <QDateTime>
+#include <QObject>
 #include "juickparser.h"
 
 static const QString juickLink("http://juick.com/%1");
