@@ -28,9 +28,9 @@
 
 #include "ui_options.h"
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
 #include "windows.h"
-#elif defined (Q_WS_X11)
+#elif defined (HAVE_DBUS)
 #include <QCheckBox>
 #include <QDBusMessage>
 #include <QDBusConnection>
@@ -90,7 +90,7 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 }
 #endif
 
-#define constVersion "0.2.5"
+#define constVersion "0.2.6"
 
 #define constStatus "status"
 #define constStatusMessage "statusmessage"
@@ -133,7 +133,7 @@ private:
 	PsiAccountControllingHost* accControl;
 	QString status, statusMessage;
 	Ui::OptionsWidget ui_;
-#ifdef Q_WS_X11
+#ifdef HAVE_DBUS
 	bool playerGMPlayer_; //только для не MPRIS плеера GMPlayer
 	QHash<QString, bool> playerDictList;
 	QPointer<QTimer> checkTimer; //Таймер Gnome Mplayer
@@ -156,7 +156,7 @@ private:
 		QString message;
 	};
 	QHash<int, StatusString> statuses_;
-#ifdef Q_WS_WIN
+#ifdef HAVE_DBUS
 	void getDesktopSize();
 	bool isFullscreenWindow();
 
@@ -167,7 +167,7 @@ private:
 	void setStatusTimer(const int delay, const bool isStart);
 
 private slots:
-#ifdef Q_WS_X11
+#ifdef HAVE_DBUS
 	void checkMprisService(const QString &name, const QString &oldOwner, const QString &newOwner);
 	void onPlayerStatusChange(const PlayerStatus &ps);
 	void onPropertyChange(const QDBusMessage &msg);
@@ -187,7 +187,7 @@ Q_EXPORT_PLUGIN(VideoStatusChanger);
 VideoStatusChanger::VideoStatusChanger()
 {
 	enabled = false;
-#ifdef Q_WS_X11
+#ifdef HAVE_DBUS
 	playerGMPlayer_ = false;
 	foreach (StringMap item, players) {
 		playerDictList.insert(item.first, false);
@@ -239,7 +239,7 @@ bool VideoStatusChanger::enable()
 {
 	if(psiOptions) {
 		enabled = true;
-#ifdef Q_WS_X11
+#ifdef HAVE_DBUS
 		qDBusRegisterMetaType<PlayerStatus>();
 		services_ = QDBusConnection::sessionBus().interface()->registeredServiceNames().value();
 		//проверка на наличие уже запущенных плееров
@@ -263,7 +263,7 @@ bool VideoStatusChanger::enable()
 		restoreDelay = psiOptions->getPluginOption(constRestoreDelay, QVariant(restoreDelay)).toInt();
 		setDelay = psiOptions->getPluginOption(constSetDelay, QVariant(setDelay)).toInt();
 		fullScreen = psiOptions->getPluginOption(constFullScreen, fullScreen).toBool();
-#ifdef Q_WS_X11
+#ifdef HAVE_DBUS
 		//цепляем сигнал появления новых плееров
 		QDBusConnection::sessionBus().connect(QLatin1String("org.freedesktop.DBus"),
 						      QLatin1String("/org/freedesktop/DBus"),
@@ -284,7 +284,7 @@ bool VideoStatusChanger::disable()
 {
 	enabled = false;
 	fullST.stop();
-#ifdef Q_WS_X11
+#ifdef HAVE_DBUS
 	//отключаем прослушку активных плееров
 	foreach(const QString& player, services_) {
 		disconnectFromBus(player);
@@ -308,7 +308,7 @@ bool VideoStatusChanger::disable()
 
 void VideoStatusChanger::applyOptions()
 {
-#ifdef Q_WS_X11
+#ifdef HAVE_DBUS
 	//читаем состояние плееров
 	if (playerDictList.size() > 0) {
 		foreach (const QString& item, playerDictList.keys()) {
@@ -348,7 +348,7 @@ void VideoStatusChanger::applyOptions()
 
 void VideoStatusChanger::restoreOptions()
 {
-#ifdef Q_WS_X11
+#ifdef HAVE_DBUS
 	//читаем состояние плееров
 	if (playerDictList.size() > 0) {
 		foreach (const QString& item, playerDictList.keys()) {
@@ -359,7 +359,7 @@ void VideoStatusChanger::restoreOptions()
 			}
 		}
 	}
-#elif defined (Q_WS_WIN)
+#elif defined (Q_OS_WIN32)
 	ui_.groupBox->hide();
 #endif
 	QStringList list;
@@ -380,7 +380,7 @@ QWidget* VideoStatusChanger::options()
 	}
 	QWidget *optionsWid = new QWidget();
 	ui_.setupUi(optionsWid);
-#ifdef Q_WS_X11
+#ifdef HAVE_DBUS
 	//добавляем чекбоксы плееров
 	int i = 0;
 	int columns = (players.length() < 5) ? 2 : 3;
@@ -418,7 +418,7 @@ QPixmap VideoStatusChanger::icon() const
 	return QPixmap(":/icons/videostatus.png");
 }
 
-#ifdef Q_WS_X11
+#ifdef HAVE_DBUS
 bool VideoStatusChanger::isPlayerValid(const QString &service) //проверка является ли плеер разрешенным
 {
 	foreach (const QString& item, playerDictList.keys()) {
@@ -623,7 +623,7 @@ void VideoStatusChanger::asyncCallFinished(QDBusPendingCallWatcher *watcher)
 
 void VideoStatusChanger::fullSTTimeout()
 {
-#ifdef Q_WS_X11
+#ifdef HAVE_DBUS
 	Window w = activeWindow();
 	Display  *display = X11Info::display();
 	bool full = false;
@@ -649,7 +649,7 @@ void VideoStatusChanger::fullSTTimeout()
 	}
 	if(data)
 		XFree(data);
-#elif defined (Q_WS_WIN)
+#elif defined (Q_OS_WIN32)
 	bool full = isFullscreenWindow();
 #endif
 	if(full) {
@@ -662,7 +662,7 @@ void VideoStatusChanger::fullSTTimeout()
 	}
 }
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
 
 void VideoStatusChanger::getDesktopSize()
 {
