@@ -28,7 +28,7 @@
 
 #include "ui_options.h"
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
 #include "windows.h"
 #elif defined (HAVE_DBUS)
 #include <QCheckBox>
@@ -156,7 +156,7 @@ private:
 		QString message;
 	};
 	QHash<int, StatusString> statuses_;
-#ifdef HAVE_DBUS
+#ifdef Q_OS_WIN
 	void getDesktopSize();
 	bool isFullscreenWindow();
 
@@ -359,7 +359,7 @@ void VideoStatusChanger::restoreOptions()
 			}
 		}
 	}
-#elif defined (Q_OS_WIN32)
+#elif defined (Q_OS_WIN)
 	ui_.groupBox->hide();
 #endif
 	QStringList list;
@@ -649,7 +649,7 @@ void VideoStatusChanger::fullSTTimeout()
 	}
 	if(data)
 		XFree(data);
-#elif defined (Q_OS_WIN32)
+#elif defined (Q_OS_WIN)
 	bool full = isFullscreenWindow();
 #endif
 	if(full) {
@@ -662,7 +662,7 @@ void VideoStatusChanger::fullSTTimeout()
 	}
 }
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
 
 void VideoStatusChanger::getDesktopSize()
 {
