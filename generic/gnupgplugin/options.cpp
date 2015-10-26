@@ -231,7 +231,7 @@ void Options::removeKey()
 		arguments << "--yes"
 				  << "--batch"
 				  << "--delete-secret-and-public-key"
-				  << "0x" + key.sibling(key.row(), 8).data().toString();
+				  << "0x" + key.sibling(key.row(), Model::Fingerprint).data().toString();
 
 		gpg.start(arguments);
 		gpg.waitForFinished();
