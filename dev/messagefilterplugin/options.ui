@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Options</class>
+ <widget class="QWidget" name="Options">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>993</width>
+    <height>558</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_4">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Rules</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QWidget" name="widget" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QToolButton" name="btAddRule">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btRemoveRule">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btUpRule">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btDownRule">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Preferred</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>69</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QListWidget" name="lwRules">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="wRulePane" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QWidget" name="widget" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lneRuleName"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox">
+        <property name="title">
+         <string>Conditions</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QWidget" name="widget_3" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QToolButton" name="btAddCondition">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="btRemoveCondition">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="btUpCondition">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="btDownCondition">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>42</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QTableWidget" name="twConditions">
+           <property name="showGrid">
+            <bool>false</bool>
+           </property>
+           <property name="columnCount">
+            <number>3</number>
+           </property>
+           <attribute name="horizontalHeaderVisible">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="horizontalHeaderStretchLastSection">
+            <bool>true</bool>
+           </attribute>
+           <column/>
+           <column/>
+           <column/>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="chkShowMessage">
+        <property name="text">
+         <string>Show message if it satisfies the rule</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>lneRuleName</sender>
+   <signal>textEdited(QString)</signal>
+   <receiver>Options</receiver>
+   <slot>updateRuleName(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>388</x>
+     <y>31</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>994</x>
+     <y>22</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btAddRule</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>addRule()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>44</x>
+     <y>64</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>55</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btRemoveRule</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>removeRule()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>87</x>
+     <y>67</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>2</x>
+     <y>110</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btUpRule</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>upRule()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>121</x>
+     <y>64</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>157</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btDownRule</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>downRule()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>170</x>
+     <y>57</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>224</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btAddCondition</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>addCondition()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>329</x>
+     <y>112</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>995</x>
+     <y>89</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btRemoveCondition</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>removeCondition()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>360</x>
+     <y>121</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>991</x>
+     <y>159</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btUpCondition</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>upCondition()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>408</x>
+     <y>120</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>990</x>
+     <y>217</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btDownCondition</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>downCondition()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>460</x>
+     <y>108</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>991</x>
+     <y>275</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lwRules</sender>
+   <signal>currentRowChanged(int)</signal>
+   <receiver>Options</receiver>
+   <slot>setRulePane(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>192</x>
+     <y>276</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>992</x>
+     <y>535</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lwRules</sender>
+   <signal>currentRowChanged(int)</signal>
+   <receiver>Options</receiver>
+   <slot>updateRuleButtons()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>191</x>
+     <y>300</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>993</x>
+     <y>489</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>twConditions</sender>
+   <signal>currentCellChanged(int,int,int,int)</signal>
+   <receiver>Options</receiver>
+   <slot>updateConditionButtons()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>516</x>
+     <y>355</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>993</x>
+     <y>379</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btAddRule</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>hack()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>42</x>
+     <y>69</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>281</x>
+     <y>5</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btRemoveRule</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>hack()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>74</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>343</x>
+     <y>4</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btUpRule</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>hack()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>110</x>
+     <y>53</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>420</x>
+     <y>3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btDownRule</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>hack()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>160</x>
+     <y>53</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>495</x>
+     <y>1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btAddCondition</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>hack()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>118</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>639</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btRemoveCondition</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>hack()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>376</x>
+     <y>103</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>735</x>
+     <y>2</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btUpCondition</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>hack()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>394</x>
+     <y>112</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>804</x>
+     <y>-3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btDownCondition</sender>
+   <signal>clicked()</signal>
+   <receiver>Options</receiver>
+   <slot>hack()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>450</x>
+     <y>113</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>876</x>
+     <y>4</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>addRule()</slot>
+  <slot>removeRule()</slot>
+  <slot>upRule()</slot>
+  <slot>downRule()</slot>
+  <slot>addCondition()</slot>
+  <slot>removeCondition()</slot>
+  <slot>upCondition()</slot>
+  <slot>downCondition()</slot>
+  <slot>updateRuleName(QString)</slot>
+  <slot>setRulePane(int)</slot>
+  <slot>updateRuleButtons()</slot>
+  <slot>updateConditionButtons()</slot>
+  <slot>hack()</slot>
+ </slots>
+</ui>
