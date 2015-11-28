@@ -124,16 +124,16 @@ void Model::listKeys()
 			headerLabels << QString();
 		}
 
-		headerLabels[Type] = ("Type");
-		headerLabels[Name] = ("Name");
-		headerLabels[Email] = ("E-Mail");
-		headerLabels[Created] = ("Created");
-		headerLabels[Expiration] = ("Expiration");
-		headerLabels[Length] = ("Length");
-		headerLabels[Comment] = ("Comment");
-		headerLabels[Algorithm] = ("Algorithm");
-		headerLabels[ShortId] = ("Short ID");
-		headerLabels[Fingerprint] = ("Fingerprint");
+		headerLabels[Type] = tr("Type");
+		headerLabels[Name] = tr("Name");
+		headerLabels[Email] = tr("E-Mail");
+		headerLabels[Created] = tr("Created");
+		headerLabels[Expiration] = tr("Expiration");
+		headerLabels[Length] = tr("Length");
+		headerLabels[Comment] = tr("Comment");
+		headerLabels[Algorithm] = tr("Algorithm");
+		headerLabels[ShortId] = tr("Short ID");
+		headerLabels[Fingerprint] = tr("Fingerprint");
 	}
 
 	setHorizontalHeaderLabels(headerLabels);
