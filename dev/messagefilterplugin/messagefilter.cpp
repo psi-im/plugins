@@ -171,13 +171,13 @@ void MessageFilter::loadRules()
 	_rules.clear();
 	int rulesSize = _optionHost->getPluginOption("rules.size", 0).toInt();
 	for (int i = 0; i < rulesSize; ++i) {
-		QString optionName = QString("rules.%1.").arg(i);
+		QString optionName = QString("rules.l%1.").arg(i);
 		Rule rule;
 		rule.name = _optionHost->getPluginOption(optionName + "name").toString();
 		rule.showMessage = _optionHost->getPluginOption(optionName + "show-message").toBool();
 		int conditionsSize = _optionHost->getPluginOption(optionName + "conditions.size").toInt();
 		for (int j = 0; j < conditionsSize; ++j) {
-			QString optionName1 = QString("%1conditions.%2.").arg(optionName).arg(j);
+			QString optionName1 = QString("%1conditions.l%2.").arg(optionName).arg(j);
 			Condition condition;
 			condition.type = static_cast<ConditionType>(_optionHost->getPluginOption(optionName1 + "type").toInt());
 			condition.comparsion = static_cast<Comparsion>(_optionHost->getPluginOption(optionName1 + "comparsion").toInt());

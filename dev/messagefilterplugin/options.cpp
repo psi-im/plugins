@@ -77,14 +77,14 @@ void Options::saveSettings()
 
 	_optionHost->setPluginOption("rules.size", _rules.size());
 	for (int i = 0; i < _rules.size(); ++i) {
-		QString optionName = QString("rules.%1.").arg(i);
+		QString optionName = QString("rules.l%1.").arg(i);
 		Rule rule = _rules.at(i);
 		_optionHost->setPluginOption(optionName + "name", rule.name);
 		_optionHost->setPluginOption(optionName + "show-message", rule.showMessage);
 		_optionHost->setPluginOption(optionName + "conditions.size", rule.conditions.size());
 		for (int j = 0; j < rule.conditions.size(); ++j) {
 			Condition condition = rule.conditions.at(j);
-			QString optionName1 = QString("%1conditions.%2.").arg(optionName).arg(j);
+			QString optionName1 = QString("%1conditions.l%2.").arg(optionName).arg(j);
 			_optionHost->setPluginOption(optionName1 + "type", static_cast<int>(condition.type));
 			_optionHost->setPluginOption(optionName1 + "comparsion", static_cast<int>(condition.comparsion));
 			_optionHost->setPluginOption(optionName1 + "text", condition.text);
