@@ -253,7 +253,7 @@ QByteArray Base64::decode(const QString& input)
         // 64 specifies eof
         // everything else specifies data
 
-        char tbl[] = {
+        signed char tbl[] = {
                 -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
                 -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
                 -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,62,-1,-1,-1,63,
