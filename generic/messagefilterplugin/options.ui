@@ -87,7 +87,7 @@
     <widget class="QWidget" name="wRulePane" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QWidget" name="widget" native="true">
+       <widget class="QWidget" name="widget_2" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QLabel" name="label">
@@ -103,7 +103,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="groupBox">
+       <widget class="QGroupBox" name="groupBox_2">
         <property name="title">
          <string>Conditions</string>
         </property>
