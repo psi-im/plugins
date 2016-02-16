@@ -1,3 +1,7 @@
+16.02.16
+ver 0.0.02
+  * use new plugin interface
+
 15.02.16
 ver 0.0.01
     *initial version

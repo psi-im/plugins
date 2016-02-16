@@ -21,7 +21,7 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-#define constVersion "0.0.01"
+#define constVersion "0.0.02"
 #define constPluginName "Enum Messages Plugin"
 #define constEnumsFileName "/enum_messages_jids"
 

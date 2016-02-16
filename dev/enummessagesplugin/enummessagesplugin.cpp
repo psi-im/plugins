@@ -22,6 +22,7 @@
 #include <QVariant>
 #include <QFile>
 #include <QDataStream>
+//#include <QTextStream>
 
 #include "enummessagesplugin.h"
 
@@ -220,6 +221,61 @@ void EnumMessagesPlugin::setupChatTab(QWidget* tab, int account, const QString &
 	tab->setProperty(propAcc, account);
 	tab->setProperty(propJid, contact);
 	connect(tab, SIGNAL(destroyed()), SLOT(removeWidget()));
+}
+
+bool EnumMessagesPlugin::appendingChatMessage(int account, const QString &contact, QString &body, QDomElement &html, bool local)
+{
+	if(!enabled || !local)
+		return false;
+
+	if(body.isEmpty())
+		return false;
+
+	const QString jid(contact.split('/').first());
+
+	quint16 num = 0;
+
+	JidEnums jids;
+	if (_enumsOutgoing.contains(account)) {
+		jids = _enumsOutgoing.value(account);
+
+		if(jids.contains(jid)) {
+			num = jids.value(jid);
+		}
+	}
+
+	if (num == 0)
+		return false;
+
+	QDomNode bodyNode;
+	QDomDocument doc = html.ownerDocument();
+
+//	QString s;
+//	QTextStream str(&s, QIODevice::WriteOnly);
+//	html.save(str, 2);
+//	qDebug() << s;
+
+	if(html.isNull()) {
+		html = doc.createElement("body");
+		html.setAttribute("xmlns", htmlimNS);
+		doc.appendChild(html);
+	}
+	else {
+		bodyNode = html.firstChild();
+
+	}
+	if(bodyNode.isNull()) {
+		nl2br(&html, &doc, body);
+	}
+
+	QDomElement msgNum = doc.createElement("span");
+	msgNum.setAttribute("style", "color: " + QColor(Qt::green).name());
+	msgNum.appendChild(doc.createTextNode(QString("%1 ").arg(numToFormatedStr(num))));
+
+	QDomNode n = html.firstChild();
+	html.insertBefore(msgNum,n);
+
+	return false;
 }
 
 void EnumMessagesPlugin::removeWidget()
