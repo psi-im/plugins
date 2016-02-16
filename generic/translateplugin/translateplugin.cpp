@@ -45,7 +45,7 @@
 #define constNew "newsymbol"
 #define constShortCut "shortcut"
 #define constNotTranslate "nottranslate"
-#define constVersion "0.4.5"
+#define constVersion "0.4.6"
 
 static const QString mucData = "groupchat";
 static const QString chatData = "chat";
@@ -88,6 +88,8 @@ public:
 	//Tabs
 	virtual void setupChatTab(QWidget* tab, int account, const QString& contact);
 	virtual void setupGCTab(QWidget* tab, int account, const QString& contact);
+	virtual bool appendingChatMessage(int account, const QString& contact,
+					  QString& body, QDomElement& html, bool local);
 
 	virtual QString pluginInfo();
 	virtual QPixmap icon() const;
@@ -579,6 +581,12 @@ void TranslatePlugin::setupChatTab(QWidget* tab, int /*account*/, const QString&
 void TranslatePlugin::setupGCTab(QWidget* tab, int /*account*/, const QString& /*contact*/)
 {
 	setupTab(tab, mucData);
+}
+
+bool TranslatePlugin::appendingChatMessage(int/* account*/, const QString &/*contact*/,
+					   QString &/*body*/, QDomElement &/*html*/, bool /*local*/)
+{
+	return false;
 }
 
 void TranslatePlugin::actionDestroyed(QObject *obj)

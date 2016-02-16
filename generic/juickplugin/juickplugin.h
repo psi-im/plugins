@@ -66,6 +66,7 @@ public:
 	// ChatTabAccessor
 	void setupChatTab(QWidget* tab, int account, const QString& contact);
 	void setupGCTab(QWidget* /*tab*/, int /*account*/, const QString& /*contact*/) { /* do nothing*/ }
+	bool appendingChatMessage(int, const QString&, QString&, QDomElement&, bool) { return false; }
 
 	virtual bool incomingStanza(int account, const QDomElement& stanza);
 	virtual bool outgoingStanza(int , QDomElement& ) { return false; }
