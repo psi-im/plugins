@@ -21,8 +21,11 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-#define constVersion "0.0.02"
+#define constVersion "0.0.03"
 #define constPluginName "Enum Messages Plugin"
 #define constEnumsFileName "/enum_messages_jids"
+#define constInColor "in_color"
+#define constOutColor "out_color"
+#define constDefaultAction "default_action"
 
 #endif // DEFINES_H

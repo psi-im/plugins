@@ -22,6 +22,7 @@
 #include <QVariant>
 #include <QFile>
 #include <QDataStream>
+#include <QColorDialog>
 //#include <QTextStream>
 
 #include "enummessagesplugin.h"
@@ -48,6 +49,10 @@ EnumMessagesPlugin::EnumMessagesPlugin()
 	, _activeTab(0)
 	, _applicationInfo(0)
 	, _accContrller(0)
+	, _inColor(QColor(Qt::red))
+	, _outColor(QColor(Qt::green))
+	, _defaultAction(true)
+	, _options(0)
 
 {
 }
@@ -69,7 +74,20 @@ QString EnumMessagesPlugin::version() const
 
 QWidget* EnumMessagesPlugin::options()
 {
-	return 0;
+	if(!enabled) {
+		return 0;
+	}
+	_options = new QWidget();
+	_ui.setupUi(_options);
+
+	_ui.hack->hide();
+
+	connect(_ui.tb_inColor, SIGNAL(clicked()), SLOT(getColor()));
+	connect(_ui.tb_outColor, SIGNAL(clicked()), SLOT(getColor()));
+
+	restoreOptions();
+
+	return _options;
 }
 
 bool EnumMessagesPlugin::enable()
@@ -78,8 +96,12 @@ bool EnumMessagesPlugin::enable()
 	QFile f(_applicationInfo->appCurrentProfileDir(ApplicationInfoAccessingHost::DataLocation) + QString(constEnumsFileName));
 	if(f.exists() && f.open(QFile::ReadOnly)) {
 		QDataStream s(&f);
-		s >>_enumsIncomming;
+		s >>_enumsIncomming >> _jidActions;
 	}
+
+	_inColor = _psiOptions->getPluginOption(constInColor, _inColor).value<QColor>();
+	_outColor = _psiOptions->getPluginOption(constOutColor, _outColor).value<QColor>();
+	_defaultAction = _psiOptions->getPluginOption(constDefaultAction, _defaultAction).toBool();
 
 	return true;
 }
@@ -90,17 +112,36 @@ bool EnumMessagesPlugin::disable()
 	QFile f(_applicationInfo->appCurrentProfileDir(ApplicationInfoAccessingHost::DataLocation) + QString(constEnumsFileName));
 	if(f.open(QFile::WriteOnly | QFile::Truncate)) {
 		QDataStream s(&f);
-		s << _enumsIncomming;
+		s << _enumsIncomming << _jidActions;
 	}
 	return true;
 }
 
 void EnumMessagesPlugin::applyOptions()
 {
+	_defaultAction = _ui.rb_enabled->isChecked();
+	_inColor = _ui.tb_inColor->property("psi_color").value<QColor>();
+	_outColor = _ui.tb_outColor->property("psi_color").value<QColor>();
+
+	_psiOptions->setPluginOption(constInColor, _inColor);
+	_psiOptions->setPluginOption(constOutColor, _outColor);
+	_psiOptions->setPluginOption(constDefaultAction, _defaultAction);
 }
 
 void EnumMessagesPlugin::restoreOptions()
 {
+	if (_defaultAction) {
+		_ui.rb_enabled->setChecked(true);
+	}
+	else {
+		_ui.rb_disabled->setChecked(true);
+	}
+
+	_ui.tb_inColor->setStyleSheet(QString("background-color: %1;").arg(_inColor.name()));
+	_ui.tb_inColor->setProperty("psi_color", _inColor);
+
+	_ui.tb_outColor->setStyleSheet(QString("background-color: %1;").arg(_outColor.name()));
+	_ui.tb_outColor->setProperty("psi_color", _outColor);
 }
 
 QPixmap EnumMessagesPlugin::icon() const
@@ -147,6 +188,9 @@ bool EnumMessagesPlugin::incomingStanza(int account, const QDomElement& stanza)
 
 		const QString jid(stanza.attribute("from").split('/').first());
 
+		if(!isEnabledFor(account, jid))
+			return false;
+
 		quint16 num = stanza.attribute(emIdName,"1").toUShort();
 
 		quint16 myNum = 0;
@@ -174,7 +218,7 @@ bool EnumMessagesPlugin::incomingStanza(int account, const QDomElement& stanza)
 
 		QDomDocument doc = stanza.ownerDocument();
 		QDomElement& nonConst = const_cast<QDomElement&>(stanza);
-		addMessageNum(&doc, &nonConst, num, QColor(Qt::red));
+		addMessageNum(&doc, &nonConst, num, _inColor);
 	}
 
 	return false;
@@ -196,6 +240,9 @@ bool EnumMessagesPlugin::outgoingStanza(int account, QDomElement &stanza)
 
 		const QString jid(stanza.attribute("to").split('/').first());
 
+		if(!isEnabledFor(account, jid))
+			return false;
+
 		quint16 num = 1;
 
 		JidEnums jids;
@@ -216,6 +263,27 @@ bool EnumMessagesPlugin::outgoingStanza(int account, QDomElement &stanza)
 	return false;
 }
 
+QAction *EnumMessagesPlugin::getAction(QObject *parent, int account, const QString &contact)
+{
+	QAction* act = new QAction(icon(), tr("Enum Messages"), parent);
+	act->setCheckable(true);
+	const QString jid = contact.split("/").first();
+	act->setProperty("account", account);
+	act->setProperty("contact", jid);
+	connect(act, SIGNAL(triggered(bool)), SLOT(onActionActivated(bool)));
+
+	act->setChecked(_defaultAction);
+
+	if(_jidActions.contains(account)) {
+		JidActions a = _jidActions.value(account);
+		if(a.contains(jid)) {
+			act->setChecked(a.value(jid));
+		}
+	}
+
+	return act;
+}
+
 void EnumMessagesPlugin::setupChatTab(QWidget* tab, int account, const QString &contact)
 {
 	tab->setProperty(propAcc, account);
@@ -232,6 +300,9 @@ bool EnumMessagesPlugin::appendingChatMessage(int account, const QString &contac
 		return false;
 
 	const QString jid(contact.split('/').first());
+
+	if(!isEnabledFor(account, jid))
+		return false;
 
 	quint16 num = 0;
 
@@ -269,7 +340,7 @@ bool EnumMessagesPlugin::appendingChatMessage(int account, const QString &contac
 	}
 
 	QDomElement msgNum = doc.createElement("span");
-	msgNum.setAttribute("style", "color: " + QColor(Qt::green).name());
+	msgNum.setAttribute("style", "color: " + _outColor.name());
 	msgNum.appendChild(doc.createTextNode(QString("%1 ").arg(numToFormatedStr(num))));
 
 	QDomNode n = html.firstChild();
@@ -292,6 +363,35 @@ void EnumMessagesPlugin::removeWidget()
 		}
 	}
 
+}
+
+void EnumMessagesPlugin::getColor()
+{
+	QToolButton *button = static_cast<QToolButton*>(sender());
+	QColor c(button->property("psi_color").value<QColor>());
+	c = QColorDialog::getColor(c);
+	if(c.isValid()) {
+		button->setProperty("psi_color", c);
+		button->setStyleSheet(QString("background-color: %1").arg(c.name()));
+		//HACK
+		_ui.hack->toggle();
+	}
+}
+
+void EnumMessagesPlugin::onActionActivated(bool checked)
+{
+	QAction* act = static_cast<QAction*>(sender());
+	const int account = act->property("account").toInt();
+	const QString jid = act->property("contact").toString();
+
+	JidActions acts;
+
+	if(_jidActions.contains(account)) {
+		acts = _jidActions.value(account);
+	}
+
+	acts[jid] = checked;
+	_jidActions[account] = acts;
 }
 
 void EnumMessagesPlugin::addMessageNum(QDomDocument *doc, QDomElement *stanza, quint16 num, const QColor& color)
@@ -345,9 +445,26 @@ void EnumMessagesPlugin::nl2br(QDomElement *body, QDomDocument *doc, const QStri
 	body->removeChild(body->lastChild());
 }
 
+bool EnumMessagesPlugin::isEnabledFor(int account, const QString &jid) const
+{
+	bool res = _defaultAction;
+
+	if(_jidActions.contains(account)) {
+		JidActions acts = _jidActions.value(account);
+		if(acts.contains(jid)) {
+			res = acts.value(jid);
+		}
+	}
+
+	return res;
+}
+
 QString EnumMessagesPlugin::pluginInfo()
 {
-	return tr("Authors: ") + "Dealer_WeARE\n\n";
+	return tr("Authors: ") + "Dealer_WeARE\n\n" +
+		tr("The plugin is designed to enumerate messages, adding the messages numbers in chat logs "
+	"and notification of missed messages. \n"
+	"Supports per contact on / off message enumeration via the buttos on the chats toolbar.");
 }
 
 

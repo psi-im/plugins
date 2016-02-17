@@ -13,3 +13,6 @@ RESOURCES += resources.qrc
 
 OTHER_FILES += \
     changelog.txt
+
+FORMS += \
+    options.ui

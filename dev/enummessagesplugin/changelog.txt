@@ -1,3 +1,8 @@
+17.02.16
+ver 0.0.03
+  + add tollbar button
+  + add settings
+
 16.02.16
 ver 0.0.02
   * use new plugin interface

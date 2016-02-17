@@ -28,6 +28,11 @@
 #include "chattabaccessor.h"
 #include "applicationinfoaccessor.h"
 #include "psiaccountcontroller.h"
+#include "toolbariconaccessor.h"
+#include "ui_options.h"
+
+#include <QColor>
+#include <QPointer>
 
 class OptionAccessingHost;
 class ActiveTabAccessingHost;
@@ -36,7 +41,7 @@ class QDomDocument;
 
 class EnumMessagesPlugin : public QObject, public PsiPlugin, public OptionAccessor, public ActiveTabAccessor,
 			public StanzaFilter, public ApplicationInfoAccessor, public PluginInfoProvider,
-			public ChatTabAccessor, public PsiAccountController
+			public ChatTabAccessor, public PsiAccountController, public ToolbarIconAccessor
 {
 	Q_OBJECT
 #ifdef HAVE_QT5
@@ -44,7 +49,7 @@ class EnumMessagesPlugin : public QObject, public PsiPlugin, public OptionAccess
 #endif
 	Q_INTERFACES(PsiPlugin OptionAccessor ActiveTabAccessor StanzaFilter
 			ApplicationInfoAccessor PluginInfoProvider ChatTabAccessor
-			PsiAccountController)
+			PsiAccountController ToolbarIconAccessor)
 
 public:
 	EnumMessagesPlugin();
@@ -77,13 +82,20 @@ public:
 	virtual bool incomingStanza(int account, const QDomElement& stanza);
 	virtual bool outgoingStanza(int , QDomElement& );
 
+	//ToolbarIconAccessor
+	virtual QList < QVariantHash > getButtonParam() { return QList < QVariantHash >(); }
+	virtual QAction* getAction(QObject* parent, int account, const QString& contact);
+
 private slots:
 	void removeWidget();
+	void getColor();
+	void onActionActivated(bool);
 
 private:
 	void addMessageNum(QDomDocument* doc, QDomElement* stanza, quint16 num, const QColor& color);
 	static QString numToFormatedStr(int number);
 	static void nl2br(QDomElement *body,QDomDocument* doc, const QString& msg);
+	bool isEnabledFor(int account, const QString& jid) const;
 
 private:
 	bool enabled;
@@ -94,6 +106,12 @@ private:
 
 	typedef QMap <QString, quint16> JidEnums;
 	QMap <int, JidEnums> _enumsIncomming, _enumsOutgoing;
+	QColor _inColor, _outColor;
+	bool _defaultAction;
+	Ui::Options _ui;
+	QPointer<QWidget> _options;
+	typedef QMap <QString, bool> JidActions;
+	QMap <int, JidActions> _jidActions;
 };
 
 #endif // ENUMMESSAGESPLUGIN_H
