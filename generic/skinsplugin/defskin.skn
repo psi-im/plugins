@@ -111,7 +111,7 @@
 	<options.ui.contactlist.show-roster-avatar-frame />
 	<options.ui.tabs.show-tab-icons />
 	<options.ui.muc.show-client-icons />
-	<options.ui.contactlist.roster-at-left-when-all-in-one-window />
+	<options.ui.contactlist.aio-left-roster />
 	<options.ui.tabs.put-tabs-at-bottom />
 	<options.ui.look.colors.muc.nick-colors />
 	<options.ui.disable-send-button />

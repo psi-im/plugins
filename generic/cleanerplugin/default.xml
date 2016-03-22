@@ -251,7 +251,7 @@ QLineEdit#le_status_text {
 				<use-left-click type="bool">false</use-left-click>
 				<use-single-click type="bool">false</use-single-click>
 				<use-status-change-animation type="bool">true</use-status-change-animation>
-				<roster-at-left-when-all-in-one-window type="bool">false</roster-at-left-when-all-in-one-window>
+				<aio-left-roster type="bool">false</roster-at-left-when-all-in-one-window>
 				<use-transport-icons type="bool">true</use-transport-icons>
 				<saved-window-geometry type="QRect" >
 					<x>64</x>

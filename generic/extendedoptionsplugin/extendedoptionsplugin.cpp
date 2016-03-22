@@ -792,7 +792,7 @@ void ExtendedOptions::applyOptions()
 	//Roster-----
 	psiOptions->setGlobalOption("options.contactlist.resolve-nicks-on-contact-add",QVariant(resolveNicks->isChecked()));
 	psiOptions->setGlobalOption("options.ui.contactlist.lockdown-roster",QVariant(lockRoster->isChecked()));
-	psiOptions->setGlobalOption("options.ui.contactlist.roster-at-left-when-all-in-one-window",QVariant(leftRoster->isChecked()));
+	psiOptions->setGlobalOption("options.ui.contactlist.aio-left-roster",QVariant(leftRoster->isChecked()));
 	psiOptions->setGlobalOption("options.ui.contactlist.status-messages.single-line",QVariant(singleLineStatus->isChecked()));
 	psiOptions->setGlobalOption("options.ui.contactlist.tooltip.avatar",QVariant(avatarTip->isChecked()));
 	psiOptions->setGlobalOption("options.ui.contactlist.tooltip.last-status",QVariant(statusTip->isChecked()));
@@ -921,7 +921,7 @@ void ExtendedOptions::restoreOptions()
 	//Roster
 	resolveNicks->setChecked(psiOptions->getGlobalOption("options.contactlist.resolve-nicks-on-contact-add").toBool());
 	lockRoster->setChecked(psiOptions->getGlobalOption("options.ui.contactlist.lockdown-roster").toBool());
-	leftRoster->setChecked(psiOptions->getGlobalOption("options.ui.contactlist.roster-at-left-when-all-in-one-window").toBool());
+	leftRoster->setChecked(psiOptions->getGlobalOption("options.ui.contactlist.aio-left-roster").toBool());
 	singleLineStatus->setChecked(psiOptions->getGlobalOption("options.ui.contactlist.status-messages.single-line").toBool());
 	avatarTip->setChecked(psiOptions->getGlobalOption("options.ui.contactlist.tooltip.avatar").toBool());
 	statusTip->setChecked(psiOptions->getGlobalOption("options.ui.contactlist.tooltip.last-status").toBool());
@@ -1120,7 +1120,7 @@ void ExtendedOptions::setWhatThis()
 	//Roster
 	resolveNicks->setWhatsThis("options.contactlist.resolve-nicks-on-contact-add");
 	lockRoster->setWhatsThis("options.ui.contactlist.lockdown-roster");
-	leftRoster->setWhatsThis("options.ui.contactlist.roster-at-left-when-all-in-one-window");
+	leftRoster->setWhatsThis("options.ui.contactlist.aio-left-roster");
 	singleLineStatus->setWhatsThis("options.ui.contactlist.status-messages.single-line");
 	avatarTip->setWhatsThis("options.ui.contactlist.tooltip.avatar");
 	statusTip->setWhatsThis("options.ui.contactlist.tooltip.last-status");
