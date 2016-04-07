@@ -81,7 +81,7 @@ Controller::Controller(ApplicationInfoAccessingHost* appInfo)
 //		foreach(const QString& host, staticHostsList) {
 //			updateServer(&servers, host);
 //		}
-		updateServer(&servers, ompldr);
+		//updateServer(&servers, ompldr);
 
 		doUpdate();
 		o->setOption(constVersionOption, cVersion);
