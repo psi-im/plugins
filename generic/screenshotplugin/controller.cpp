@@ -27,14 +27,8 @@
 #include "defines.h"
 #include "applicationinfoaccessinghost.h"
 
-static const QString imageShack = "ImageShack.us&split&http://post.imageshack.us/&split&&split&&split&uploadtype=on&split&fileupload&split&readonly=\"readonly\" class=\"readonly\" value=\"(http://[^\"]+)\" /><span &split&true";
-static const QString radikal = "Radikal.ru&split&http://www.radikal.ru/action.aspx&split&&split&&split&upload=yes&split&F&split&<input\\s+id=\"input_link_1\"\\s+value=\"([^\"]+)\"&split&true";
 static const QString pixacadem = "Pix.Academ.info&split&http://pix.academ.info/&split&&split&&split&action=upload_image&split&image&split&<div id='link'><a id=\"original\" href=\"(http[^\"]+)\"&split&true";
-static const QString kachalka = "Kachalka.com&split&http://www.kachalka.com/upload.php&split&&split&&split&&split&userfile[]&split&name=\"option\" value=\"(http://www.kachalka.com/[^\"]+)\" /></td>&split&true";
-static const QString flashtux = "Img.Flashtux.org&split&http://img.flashtux.org/index.php&split&&split&&split&postimg=1&split&filename&split&<br />Link: <a href=\"(http://img.flashtux.org/[^\"]+)\">&split&true";
 static const QString smages = "Smages.com&split&http://smages.com/&split&&split&&split&&split&fileup&split&<div class=\"codex\"><a href=\"(http://smages.com/[^\"]+)\" target=\"_blank\">URL:</a></div>&split&true";
-static const QString ompldr = "Omploader.org&split&http://ompldr.org/upload&split&&split&&split&&split&file1&split&<div class=\"left\">File:</div><div class=\"right\"><a href=\"[^\"]+\">(http://ompldr.org/[^\"]+)</a></div>&split&true";
-static const QString ipicture = "Ipicture.ru&split&http://ipicture.ru/Upload/&split&&split&&split&method=file&split&userfile&split&value=\"(http://[^\"]+)\">&split&true";
 
 static const QStringList staticHostsList = QStringList() /*<< imageShack*/ << pixacadem << radikal
 					 << kachalka << flashtux << smages << ompldr << ipicture;
