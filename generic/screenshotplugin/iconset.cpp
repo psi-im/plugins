@@ -45,8 +45,7 @@ Iconset::~Iconset()
 
 void Iconset::reset()
 {
-	if(instance_ != 0)
-		delete instance_;
+	delete instance_;
 	instance_ = 0;
 }
 
