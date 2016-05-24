@@ -1,4 +1,8 @@
-include(../../psiplugin.pri)
+isEmpty(PSISDK) {
+    include(../../psiplugin.pri)
+} else {
+    include($$PSISDK/plugins/psiplugin.pri)
+}
 CONFIG += release
 QT += network
 greaterThan(QT_MAJOR_VERSION, 4) {
@@ -67,4 +71,5 @@ macx {
 }
 win32 {
 	SOURCES += qxt/gui/qxtwindowsystem_win.cpp
+	LIBS += -lUser32
 }

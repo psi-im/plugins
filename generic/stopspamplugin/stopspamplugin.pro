@@ -1,6 +1,10 @@
 CONFIG += release
 TARGET = stopspamplugin
-include(../../psiplugin.pri)
+isEmpty(PSISDK) {
+    include(../../psiplugin.pri)
+} else {
+    include($$PSISDK/plugins/psiplugin.pri)
+}
 INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 SOURCES += stopspamplugin.cpp \

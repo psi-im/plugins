@@ -1,6 +1,10 @@
 CONFIG += release
 RESOURCES = conferenceloggerplugin.qrc
-include(../../psiplugin.pri)
+isEmpty(PSISDK) {
+    include(../../psiplugin.pri)
+} else {
+    include($$PSISDK/plugins/psiplugin.pri)
+}
 SOURCES += conferenceloggerplugin.cpp \
     typeaheadfind.cpp \
     viewer.cpp
