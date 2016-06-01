@@ -18,6 +18,7 @@ SUBDIRS += attentionplugin \
     imageplugin \
     jabberdiskplugin \
     messagefilterplugin \
+    otrplugin \
     pepchangenotifyplugin \
     qipxstatusesplugin \
     screenshotplugin \
@@ -29,4 +30,4 @@ SUBDIRS += attentionplugin \
     watcherplugin
 
 # Broken plugins
-#    juickplugin otrplugin clientswitcherplugin gnupgplugin
+#    juickplugin clientswitcherplugin gnupgplugin

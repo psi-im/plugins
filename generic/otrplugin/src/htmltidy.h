@@ -27,12 +27,18 @@
 #include <QByteArray>
 
 #include <string>
-#ifndef Q_WS_WIN
-#include <tidy.h>
-#include <buffio.h>
+
+#ifdef LEGACY_TIDY
+# ifdef Q_OS_WIN
+#  include <tidy/tidy.h>
+#  include <tidy/buffio.h>
+# else
+#  include <tidy.h>
+#  include <buffio.h>
+# endif
 #else
-#include <tidy/tidy.h>
-#include <tidy/buffio.h>
+# include <tidy.h>
+# include <tidybuffio.h>
 #endif
 
 class QDomDocument;

@@ -1,7 +1,21 @@
-include(../../psiplugin.pri)
-
 CONFIG += release
-LIBS += -lotr -ltidy -lgcrypt -lgpg-error
+isEmpty(PSISDK) {
+    include(../../psiplugin.pri)
+} else {
+    include($$PSISDK/plugins/psiplugin.pri)
+}
+
+win32-msvc* {
+	# consider compiling https://github.com/Ri0n/libotr/tree/master/vs2015
+	LIBS += -lotr -ltidy
+} else {
+	LIBS += -lotr -ltidy -lgcrypt -lgpg-error
+}
+
+!win32:!exists(/usr/include/tidybuffio.h) {
+	DEFINES += LEGACY_TIDY
+}
+
 RESOURCES = otrplugin.qrc
 unix {
 	INCLUDEPATH += /usr/include/tidy
