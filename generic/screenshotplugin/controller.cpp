@@ -23,7 +23,7 @@
 #include "screenshot.h"
 #include "server.h"
 #include "options.h"
-#include "iconset.h"
+#include "screenshoticonset.h"
 #include "defines.h"
 #include "applicationinfoaccessinghost.h"
 
@@ -97,7 +97,7 @@ Controller::~Controller()
 	}
 
 	Options::reset();
-	Iconset::reset();
+	ScreenshotIconset::reset();
 }
 
 

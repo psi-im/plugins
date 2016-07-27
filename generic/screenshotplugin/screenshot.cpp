@@ -38,7 +38,7 @@
 #include "server.h"
 #include "screenshotoptions.h"
 #include "options.h"
-#include "iconset.h"
+#include "screenshoticonset.h"
 #include "optionsdlg.h"
 #include "proxysettingsdlg.h"
 #include "defines.h"
@@ -229,7 +229,7 @@ Screenshot::Screenshot()
 
 	ui_.lb_pixmap->setToolBar(ui_.tb_bar);
 
-	Iconset* icoHost = Iconset::instance();
+	ScreenshotIconset* icoHost = ScreenshotIconset::instance();
 	ui_.pb_upload->setIcon(icoHost->getIcon("psi/upload"));
 	ui_.pb_cancel->setIcon(icoHost->getIcon("psi/cancel"));
 	ui_.pb_open->setIcon(icoHost->getIcon("psi/browse"));

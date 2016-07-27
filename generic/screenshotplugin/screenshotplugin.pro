@@ -25,7 +25,7 @@ HEADERS = screenshot.h \
     options.h \
     optionsdlg.h \
     optionswidget.h \
-    iconset.h \
+    screenshoticonset.h \
     controller.h \
     defines.h \
     proxysettingsdlg.h
@@ -39,7 +39,7 @@ SOURCES = screenshotplugin.cpp \
     options.cpp \
     optionsdlg.cpp \
     optionswidget.cpp \
-    iconset.cpp \
+    screenshoticonset.cpp \
     controller.cpp \
     proxysettingsdlg.cpp
 FORMS += optionswidget.ui \

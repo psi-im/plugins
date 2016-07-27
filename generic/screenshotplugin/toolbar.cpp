@@ -23,7 +23,7 @@
 #include <QAction>
 
 #include "toolbar.h"
-#include "iconset.h"
+#include "screenshoticonset.h"
 
 class Button : public QAction
 {
@@ -66,7 +66,7 @@ ToolBar::~ToolBar()
 
 void ToolBar::init()
 {
-	Iconset* icoHost = Iconset::instance();
+	ScreenshotIconset* icoHost = ScreenshotIconset::instance();
 
 	addWidget(new QLabel(tr("Line Width:")));
 	sb = new QSpinBox(this);

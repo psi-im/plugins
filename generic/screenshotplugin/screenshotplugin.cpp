@@ -35,7 +35,7 @@ class QAction;
 #include "defines.h"
 #include "optionswidget.h"
 #include "options.h"
-#include "iconset.h"
+#include "screenshoticonset.h"
 #include "controller.h"
 
 
@@ -141,7 +141,7 @@ bool ScreenshotPlugin::enable()
 	file.close();
 
 	Options::instance()->setPsiOptions(psiOptions);
-	Iconset::instance()->setIconHost(icoHost);
+	ScreenshotIconset::instance()->setIconHost(icoHost);
 
 	controller_ = new Controller(appInfo);
 	appInfo->getProxyFor(constName); //init proxy settings
