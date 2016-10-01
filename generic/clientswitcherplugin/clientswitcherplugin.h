@@ -101,6 +101,7 @@ public:
 private:
 	struct OsStruct {
 		QString name;
+		OsStruct(const QString &n) : name(n) {}
 	};
 
 	struct ClientStruct {
@@ -108,6 +109,7 @@ private:
 		QString version;
 		QString caps_node;
 		QString caps_version;
+		ClientStruct(const QString &n, const QString &v, const QString &cn, const QString &cv) : name(n), version(v), caps_node(cn), caps_version(cv) {}
 	};
 	Ui::OptionsWidget ui_options;
 	StanzaSendingHost* sender_;
