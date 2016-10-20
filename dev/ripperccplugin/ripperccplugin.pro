@@ -8,7 +8,7 @@ isEmpty(PSISDK) {
     include($$PSISDK/plugins/psiplugin.pri)
 }
 
-equals(QT_VERSION, 4) {
+equals(QT_MAJOR_VERSION, 4) {
    CONFIG += link_pkgconfig
    PKGCONFIG += QJson
 }
