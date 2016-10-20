@@ -72,7 +72,7 @@ public:
 	// from PsiPlugin
 	QString name() const { return "RipperCC"; }
 	QString shortName() const { return "rippercc"; }
-	QString version() const { return "0.0.1"; }
+	QString version() const { return "0.0.2"; }
 
 	QWidget *options();
 	bool enable();

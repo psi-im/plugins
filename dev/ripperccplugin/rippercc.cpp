@@ -38,11 +38,14 @@
 #define RIPPER_DB_URL "https://ripper.cc/api/v1/plugin/jabber?format=json"
 #define RIPPER_PREFIX "Ripper! "
 #define RIPPER_GROUP "Rippers"
+#define NONASCII_PREFIX "non ASCII "
 
 #define ATTENTION_MESSAGE                                                                          \
 	"<b>ATTENTION! WARNING!</b> This man real ripper, read more here in his profile.<br/>"                \
 	"<b>ВНИМАНИЕ! ОСТОРОЖНО!</b> Этот человек реальный обманщик, подробнее прочитать в его профиле.<br/>" \
 	"<a href=\"https://ripper.cc%1\">https://ripper.cc%1</a>"
+
+#define NONASCII_MESSAGE "<b>WARNING!</b> NON ASCII | Jabber с русскими буквами!"
 
 #ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(RipperCC, RipperCC);
@@ -162,6 +165,47 @@ void RipperCC::handleStanza(int account, const QDomElement &stanza, bool incomin
 
 	QString from = incoming ? stanza.attribute(QLatin1String("from")) : stanza.attribute(QLatin1String("to"));
 	QString jid = from.split(QLatin1Char('/')).first();
+	QString contactNick = _contactInfo->name(account, jid);
+
+	// Check for non ascii symbols in JID
+
+	bool needAlert = false;
+	for (int i = 0; i < jid.length(); i++) {
+		if (jid[i].toLatin1() == 0) {
+			needAlert = true;
+			break;
+		}
+	}
+	if (needAlert) {
+		_accountHost->appendSysMsg(account, from, QString::fromUtf8(NONASCII_MESSAGE));
+
+		if (!jid.startsWith(QLatin1String(NONASCII_PREFIX))) {
+			// <iq id="ab1da" type="set">
+			//   <query xmlns="jabber:iq:roster">
+			//     <item name="ripper" jid="juliet@example.com"/>
+			//   </query>
+			// </iq>
+
+			QDomDocument doc;
+			QDomElement iqElement = doc.createElement(QLatin1String("iq"));
+			iqElement.setAttribute(QLatin1String("type"), QLatin1String("set"));
+			iqElement.setAttribute(QLatin1String("id"), _stanzaSending->uniqueId(account));
+
+			QDomElement queryElement = doc.createElement(QLatin1String("query"));
+			queryElement.setAttribute(QLatin1String("xmlns"), QLatin1String("jabber:iq:roster"));
+
+			QDomElement itemElement = doc.createElement(QLatin1String("item"));
+			itemElement.setAttribute(QLatin1String("name"), QLatin1String(NONASCII_PREFIX) + contactNick);
+			itemElement.setAttribute(QLatin1String("jid"), jid);
+
+			queryElement.appendChild(itemElement);
+			iqElement.appendChild(queryElement);
+
+			_stanzaSending->sendStanza(account, iqElement);
+		}
+	}
+
+	// Check for ripper
 
 	int ripperIndex = -1;
 	for (int i = 0; i < _rippers.size(); ++i) {
@@ -183,8 +227,7 @@ void RipperCC::handleStanza(int account, const QDomElement &stanza, bool incomin
 
 	_accountHost->appendSysMsg(account, from, QString::fromUtf8(ATTENTION_MESSAGE).arg(_rippers.at(ripperIndex).url));
 
-	QString ripperNick = _contactInfo->name(account, jid);
-	if (!ripperNick.startsWith(QLatin1String(RIPPER_PREFIX))) {
+	if (!contactNick.startsWith(QLatin1String(RIPPER_PREFIX))) {
 
 		// <iq id="ab1da" type="set">
 		//   <query xmlns="jabber:iq:roster">
@@ -203,7 +246,7 @@ void RipperCC::handleStanza(int account, const QDomElement &stanza, bool incomin
 		queryElement.setAttribute(QLatin1String("xmlns"), QLatin1String("jabber:iq:roster"));
 
 		QDomElement itemElement = doc.createElement(QLatin1String("item"));
-		itemElement.setAttribute(QLatin1String("name"), QLatin1String(RIPPER_PREFIX) + ripperNick);
+		itemElement.setAttribute(QLatin1String("name"), QLatin1String(RIPPER_PREFIX) + contactNick);
 		itemElement.setAttribute(QLatin1String("jid"), jid);
 
 		QDomElement groupElement = doc.createElement(QLatin1String("group"));
