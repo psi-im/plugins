@@ -72,7 +72,7 @@ public:
 	// from PsiPlugin
 	QString name() const { return "RipperCC"; }
 	QString shortName() const { return "rippercc"; }
-	QString version() const { return "0.0.2"; }
+	QString version() const { return "0.0.3"; }
 
 	QWidget *options();
 	bool enable();
@@ -114,6 +114,8 @@ public slots:
 	void parseRipperDb();
 
 private:
+	void updateNameGroup(int account, const QString &jid, const QString &name, const QString &group);
+
 	bool _enabled;
 	PsiAccountControllingHost *_accountHost;
 	OptionAccessingHost *_optionHost;

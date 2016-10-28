@@ -166,6 +166,8 @@ void RipperCC::handleStanza(int account, const QDomElement &stanza, bool incomin
 	QString from = incoming ? stanza.attribute(QLatin1String("from")) : stanza.attribute(QLatin1String("to"));
 	QString jid = from.split(QLatin1Char('/')).first();
 	QString contactNick = _contactInfo->name(account, jid);
+	QString newContactNick = contactNick;
+	QString group;
 
 	// Check for non ascii symbols in JID
 
@@ -176,32 +178,12 @@ void RipperCC::handleStanza(int account, const QDomElement &stanza, bool incomin
 			break;
 		}
 	}
+
 	if (needAlert) {
 		_accountHost->appendSysMsg(account, from, QString::fromUtf8(NONASCII_MESSAGE));
 
-		if (!jid.startsWith(QLatin1String(NONASCII_PREFIX))) {
-			// <iq id="ab1da" type="set">
-			//   <query xmlns="jabber:iq:roster">
-			//     <item name="ripper" jid="juliet@example.com"/>
-			//   </query>
-			// </iq>
-
-			QDomDocument doc;
-			QDomElement iqElement = doc.createElement(QLatin1String("iq"));
-			iqElement.setAttribute(QLatin1String("type"), QLatin1String("set"));
-			iqElement.setAttribute(QLatin1String("id"), _stanzaSending->uniqueId(account));
-
-			QDomElement queryElement = doc.createElement(QLatin1String("query"));
-			queryElement.setAttribute(QLatin1String("xmlns"), QLatin1String("jabber:iq:roster"));
-
-			QDomElement itemElement = doc.createElement(QLatin1String("item"));
-			itemElement.setAttribute(QLatin1String("name"), QLatin1String(NONASCII_PREFIX) + contactNick);
-			itemElement.setAttribute(QLatin1String("jid"), jid);
-
-			queryElement.appendChild(itemElement);
-			iqElement.appendChild(queryElement);
-
-			_stanzaSending->sendStanza(account, iqElement);
+		if (!newContactNick.startsWith(QLatin1String(NONASCII_PREFIX)) && !newContactNick.startsWith(QLatin1String(RIPPER_PREFIX))) {
+			newContactNick.prepend(QLatin1String(NONASCII_PREFIX));
 		}
 	}
 
@@ -215,51 +197,22 @@ void RipperCC::handleStanza(int account, const QDomElement &stanza, bool incomin
 		}
 	}
 
-	if (ripperIndex < 0)
-		return;
+	if (ripperIndex >= 0) {
+		int attentionInterval = _optionHost->getPluginOption("attention-interval", 1).toInt() * 60;
 
-	int attentionInterval = _optionHost->getPluginOption("attention-interval", 1).toInt() * 60;
+		if (!_rippers.at(ripperIndex).lastAttentionTime.isValid() || _rippers.at(ripperIndex).lastAttentionTime.secsTo(QDateTime::currentDateTime()) >= attentionInterval) {
+			_rippers[ripperIndex].lastAttentionTime = QDateTime::currentDateTime();
 
-	if (_rippers.at(ripperIndex).lastAttentionTime.isValid() && _rippers.at(ripperIndex).lastAttentionTime.secsTo(QDateTime::currentDateTime()) < attentionInterval)
-		return;
-
-	_rippers[ripperIndex].lastAttentionTime = QDateTime::currentDateTime();
-
-	_accountHost->appendSysMsg(account, from, QString::fromUtf8(ATTENTION_MESSAGE).arg(_rippers.at(ripperIndex).url));
-
-	if (!contactNick.startsWith(QLatin1String(RIPPER_PREFIX))) {
-
-		// <iq id="ab1da" type="set">
-		//   <query xmlns="jabber:iq:roster">
-		//     <item name="ripper" jid="juliet@example.com">
-		//       <group="rippers"/>
-		//     </item>
-		//   </query>
-		// </iq>
-
-		QDomDocument doc;
-		QDomElement iqElement = doc.createElement(QLatin1String("iq"));
-		iqElement.setAttribute(QLatin1String("type"), QLatin1String("set"));
-		iqElement.setAttribute(QLatin1String("id"), _stanzaSending->uniqueId(account));
-
-		QDomElement queryElement = doc.createElement(QLatin1String("query"));
-		queryElement.setAttribute(QLatin1String("xmlns"), QLatin1String("jabber:iq:roster"));
-
-		QDomElement itemElement = doc.createElement(QLatin1String("item"));
-		itemElement.setAttribute(QLatin1String("name"), QLatin1String(RIPPER_PREFIX) + contactNick);
-		itemElement.setAttribute(QLatin1String("jid"), jid);
-
-		QDomElement groupElement = doc.createElement(QLatin1String("group"));
-
-		QDomText textNode = doc.createTextNode(QLatin1String(RIPPER_GROUP));
-
-		groupElement.appendChild(textNode);
-		itemElement.appendChild(groupElement);
-		queryElement.appendChild(itemElement);
-		iqElement.appendChild(queryElement);
-
-		_stanzaSending->sendStanza(account, iqElement);
+			_accountHost->appendSysMsg(account, from, QString::fromUtf8(ATTENTION_MESSAGE).arg(_rippers.at(ripperIndex).url));
+			if (!newContactNick.startsWith(QLatin1String(RIPPER_PREFIX))) {
+				group = QLatin1String(RIPPER_GROUP);
+				newContactNick.prepend(QLatin1String(RIPPER_PREFIX));
+			}
+		}
 	}
+
+	if (newContactNick != contactNick)
+		updateNameGroup(account, jid, newContactNick, group);
 }
 
 void RipperCC::updateRipperDb()
@@ -301,4 +254,42 @@ void RipperCC::parseRipperDb()
 		ripper.url = item.toMap().value(QLatin1String("link")).toString();
 		_rippers << ripper;
 	}
+}
+
+void RipperCC::updateNameGroup(int account, const QString &jid, const QString &name, const QString &group)
+{
+	if (name.isEmpty())
+		return;
+
+	// <iq id="ab1da" type="set">
+	//   <query xmlns="jabber:iq:roster">
+	//     <item name="ripper" jid="juliet@example.com">
+	//       <group="rippers"/>
+	//     </item>
+	//   </query>
+	// </iq>
+
+	QDomDocument doc;
+	QDomElement iqElement = doc.createElement(QLatin1String("iq"));
+	iqElement.setAttribute(QLatin1String("type"), QLatin1String("set"));
+	iqElement.setAttribute(QLatin1String("id"), _stanzaSending->uniqueId(account));
+
+	QDomElement queryElement = doc.createElement(QLatin1String("query"));
+	queryElement.setAttribute(QLatin1String("xmlns"), QLatin1String("jabber:iq:roster"));
+
+	QDomElement itemElement = doc.createElement(QLatin1String("item"));
+	itemElement.setAttribute(QLatin1String("name"), name);
+	itemElement.setAttribute(QLatin1String("jid"), jid);
+
+	if (!group.isEmpty()) {
+		QDomElement groupElement = doc.createElement(QLatin1String("group"));
+		QDomText textNode = doc.createTextNode(group);
+		groupElement.appendChild(textNode);
+		itemElement.appendChild(groupElement);
+	}
+
+	queryElement.appendChild(itemElement);
+	iqElement.appendChild(queryElement);
+
+	_stanzaSending->sendStanza(account, iqElement);
 }
