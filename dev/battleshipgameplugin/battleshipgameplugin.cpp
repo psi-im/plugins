@@ -27,11 +27,15 @@
 #include "gamesessions.h"
 #include "options.h"
 
+#include <QFileDialog>
+
 #define constVersion            "0.0.1"
 #define constShortPluginName    "battleshipgameplugin"
 #define constPluginName         "Battleship Game Plugin"
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(battleshipgameplugin, BattleshipGamePlugin)
+#endif
 
 BattleshipGamePlugin::BattleshipGamePlugin(QObject *parent) :
 		QObject(parent),
