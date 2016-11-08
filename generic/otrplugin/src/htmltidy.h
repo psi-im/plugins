@@ -52,6 +52,9 @@ public:
     QString output();
     QDomElement output(QDomDocument& document);
     static void putByte(void* sinkData, byte bt);
+#ifdef Q_OS_WIN
+    static void TIDY_CALL callPutByte(void* sinkData, byte bt);
+#endif
 
 
 protected:
