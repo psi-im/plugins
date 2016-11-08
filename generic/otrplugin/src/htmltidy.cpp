@@ -62,7 +62,7 @@ QString HtmlTidy::writeOutput()
 {
     m_output.clear();
     TidyOutputSink sink;
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
     void (*tmpF)(void*, byte) = putByte;
     sink.putByte = (void (TIDY_CALL *)(void*, byte))tmpF;
 #else
