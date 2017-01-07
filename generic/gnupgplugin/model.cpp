@@ -97,6 +97,8 @@ QList<QStandardItem*> parseLine(const QString &line)
 	case 1: rows << new QStandardItem("RSA"); break;
 	case 16: rows << new QStandardItem("ELG-E"); break;
 	case 17: rows << new QStandardItem("DSA"); break;
+	case 18: rows << new QStandardItem("ECC"); break;
+	default: rows << new QStandardItem(""); break;
 	}
 
 	// Short ID
