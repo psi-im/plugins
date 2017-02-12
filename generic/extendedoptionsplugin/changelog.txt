@@ -1,3 +1,7 @@
+2017-02-12
+v.0.4.2
+  + добавлена опция options.history.store-muc-private
+
 2014-03-20
 v0.4.0
   + добавлена опция options.ui.muc.allow-highlight-events

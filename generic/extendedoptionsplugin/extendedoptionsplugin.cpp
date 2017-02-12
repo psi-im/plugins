@@ -40,7 +40,7 @@
 #include "plugininfoprovider.h"
 
 
-#define constVersion "0.4.1"
+#define constVersion "0.4.2"
 
 class ExtToolButton : public QToolButton
 {
@@ -138,6 +138,7 @@ private:
 	QCheckBox *accept_defaults;
 	QCheckBox *auto_configure;
 	QCheckBox *allowMucEvents;
+	QCheckBox *storeMucPrivates;
 
 	//Roster
 	QCheckBox *resolveNicks;
@@ -361,6 +362,7 @@ QWidget* ExtendedOptions::options()
 	hideAutoJoin = new QCheckBox(tr("Hide groupchat on auto-join"));
 	mucHtml = new QCheckBox(tr("Enable HTML rendering in groupchat chat window"));
 	allowMucEvents = new QCheckBox(tr("Allow groupchat highlight events"));
+	storeMucPrivates = new QCheckBox(tr("Store MUC private messages in history"));
 
 	muc_leave_status_message = new QLineEdit;
 	accept_defaults = new QCheckBox(tr("Automatically accept the default room configuration"));
@@ -384,6 +386,7 @@ QWidget* ExtendedOptions::options()
 	mucGeneralLayout->addWidget(skipAutojoin);
 	mucGeneralLayout->addWidget(hideAutoJoin);
 	mucGeneralLayout->addWidget(allowMucEvents);
+	mucGeneralLayout->addWidget(storeMucPrivates);
 	mucGeneralLayout->addWidget(new QLabel(tr("Disable autojoin to folowing groupchats:\n(specify JIDs)")));
 	mucGeneralLayout->addWidget(bookmarksListSkip);
 	mucGeneralLayout->addWidget(new QLabel(tr("Groupchat leave status message:")));
@@ -777,6 +780,7 @@ void ExtendedOptions::applyOptions()
 	psiOptions->setGlobalOption("options.muc.leave-status-message",QVariant(muc_leave_status_message->text()));
 	psiOptions->setGlobalOption("options.muc.accept-defaults",QVariant(accept_defaults->isChecked()));
 	psiOptions->setGlobalOption("options.muc.auto-configure",QVariant(auto_configure->isChecked()));
+	psiOptions->setGlobalOption("options.history.store-muc-private", QVariant(storeMucPrivates->isChecked()));
 
 	//Tabs--------------------
 	psiOptions->setGlobalOption("options.ui.tabs.disable-wheel-scroll",QVariant(disableScroll->isChecked()));
@@ -903,6 +907,7 @@ void ExtendedOptions::restoreOptions()
 	muc_leave_status_message->setText(psiOptions->getGlobalOption("options.muc.leave-status-message").toString());
 	accept_defaults->setChecked(psiOptions->getGlobalOption("options.muc.accept-defaults").toBool());
 	auto_configure->setChecked(psiOptions->getGlobalOption("options.muc.auto-configure").toBool());
+	storeMucPrivates->setChecked(psiOptions->getGlobalOption("options.history.store-muc-private").toBool());
 
 	//Tabs----------------------
 	disableScroll->setChecked(psiOptions->getGlobalOption("options.ui.tabs.disable-wheel-scroll").toBool());
@@ -1105,6 +1110,7 @@ void ExtendedOptions::setWhatThis()
 	muc_leave_status_message->setWhatsThis("options.muc.leave-status-message");
 	accept_defaults->setWhatsThis("options.muc.accept-defaults");
 	auto_configure->setWhatsThis("options.muc.auto-configure");
+	storeMucPrivates->setWhatsThis("options.history.store-muc-private");
 
 	//Tabs----------------------
 	disableScroll->setWhatsThis("options.ui.tabs.disable-wheel-scroll");
