@@ -115,10 +115,10 @@ bool MessageFilter::incomingStanza(int account, const QDomElement &stanza)
 	}
 
 	QString message = stanza.firstChildElement("body").text();
-	QString from = stanza.attribute("from");
-	from = from.split("/").takeFirst();
-	QString to = stanza.attribute("to");
-	to = to.split("/").takeFirst();
+	QString from_full = stanza.attribute("from");
+	QString from = from_full.split("/").takeFirst();
+	QString to_full = stanza.attribute("to");
+	QString to = to_full.split("/").takeFirst();
 
 	foreach (const Rule &rule, _rules) {
 		bool match = true;
@@ -127,6 +127,8 @@ bool MessageFilter::incomingStanza(int account, const QDomElement &stanza)
 			switch (condition.type) {
 			case From: val = from; break;
 			case To: val = to; break;
+			case FromFull: val = from_full; break;
+			case ToFull: val = to_full; break;
 			case Message: val = message; break;
 			}
 
