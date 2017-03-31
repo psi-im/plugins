@@ -29,7 +29,7 @@ class OptionAccessingHost;
 
 namespace Ui { class Options; }
 
-enum ConditionType { From, To, Message };
+enum ConditionType { From, To, FromFull, ToFull, Message };
 enum Comparsion { Equal, NotEqual, Contains, NotContains };
 
 struct Condition

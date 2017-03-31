@@ -266,6 +266,8 @@ void Options::setRulePane(int row)
 			QComboBox *comboBox = new QComboBox();
 			comboBox->addItem("From jid");
 			comboBox->addItem("To jid");
+			comboBox->addItem("From full jid");
+			comboBox->addItem("To full jid");
 			comboBox->addItem("Message");
 			comboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 			ui->twConditions->setCellWidget(i, 0, comboBox);
