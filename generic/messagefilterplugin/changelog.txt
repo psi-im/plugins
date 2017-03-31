@@ -1,0 +1,7 @@
+2015-12-18
+v0.0.1
+  + Initial release
+
+2017-03-31
+v0.0.2
+  + Added full Jid conditions
