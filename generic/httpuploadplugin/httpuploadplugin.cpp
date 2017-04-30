@@ -66,7 +66,9 @@
 #define OPTION_SIZE "httpupload-image-size"
 #define OPTION_QUALITY "httpupload-image-quality"
 #define OPTION_PREVIEW_WIDTH "httpupload-preview-width"
-
+#if (!defined HAVE_QT5 && QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#define HAVE_QT5
+#endif
 QString escape(const QString &plain) {
 #ifdef HAVE_QT5
 	return plain.toHtmlEscaped();
@@ -396,7 +398,15 @@ void HttpUploadPlugin::upload(bool anything) {
 	QPixmap pix(fileName);
 	imageName = fileInfo.fileName();
 	psiOptions->setPluginOption(CONST_LAST_FOLDER, fileInfo.path());
-	QString mimeType("application/octet-stream"); // proper MIME detection is possible with Qt5, for upload purposes this should be fine
+#ifndef HAVE_QT5
+	QString mimeType("application/octet-stream");
+#else // prosody requires a proper type now
+	QMimeDatabase db;
+	QString mimeType(db.mimeTypeForFile(imageName).name());
+#ifdef DEBUG_UPLOAD
+	qDebug() << "MIME type:" << mimeType;
+#endif
+#endif
 	int length;
 	QString lowerImagename = imageName.toLower();
 	// only resize jpg and png
