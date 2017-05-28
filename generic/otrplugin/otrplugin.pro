@@ -12,7 +12,7 @@ win32-msvc* {
 	LIBS += -lotr -ltidy -lgcrypt -lgpg-error
 }
 
-!win32:!exists(/usr/include/tidybuffio.h) {
+!win32:!exists(/usr/include/tidybuffio.h):!exists(/usr/include/tidy/tidybuffio.h) {
 	DEFINES += LEGACY_TIDY
 }
 
