@@ -62,7 +62,20 @@ else()
     find_package(Qt4 REQUIRED)
     find_package(QJSON REQUIRED)
     include(${QT_USE_FILE})
-    set(QT_DEPLIBS ${QT_LIBRARIES} ${QJSON_LIBRARIES})
+    include_directories(
+	    ${QJSON_INCLUDE_DIR}
+	    ${QJSON_INCLUDE_DIR}/../
+	    ${QT_QTCORE_INCLUDE_DIR}
+	    ${QT_QTNETWORK_INCLUDE_DIR}
+	    ${QT_QTXML_INCLUDE_DIR}
+	    )
+    set(QT_LIBRARIES
+	    ${QT_QTCORE_LIBRARY}
+	    ${QT_QTGUI_LIBRARY}
+	    ${QT_QTXML_LIBRARY}
+	    ${QT_QTNETWORK_LIBRARY}
+	)
+    set(QT_DEPLIBS ${QT_LIBRARIES} ${QJSON_LIBRARY})
 endif()
 
 unset(MOC_SOURCES)
