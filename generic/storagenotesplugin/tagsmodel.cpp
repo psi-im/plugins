@@ -18,6 +18,8 @@
  *
  */
 
+#include <QtGlobal>
+
 #include "tagsmodel.h"
 
 static const QString allTags = QObject::tr("All Tags");
