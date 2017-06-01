@@ -49,8 +49,8 @@ public:
         virtual QWidget* options();
 	virtual bool enable();
         virtual bool disable();
-        virtual void applyOptions() {};
-        virtual void restoreOptions(){};
+	virtual void applyOptions() {}
+	virtual void restoreOptions(){}
         virtual bool incomingStanza(int account, const QDomElement& xml);
 	virtual bool outgoingStanza(int account, QDomElement& xml);
         virtual void setContactStateAccessingHost(ContactStateAccessingHost* host);
@@ -290,14 +290,15 @@ bool QipXStatuses::incomingStanza(int account, const QDomElement& stanza) {
      return false;
  }
 
-bool QipXStatuses::outgoingStanza(int account, QDomElement& xml)
+bool QipXStatuses::outgoingStanza(int /*account*/, QDomElement& /*xml*/)
 {
 	return false;
 }
 
-void QipXStatuses::setContactStateAccessingHost(ContactStateAccessingHost* host) {
-     contactState = host;
- }
+void QipXStatuses::setContactStateAccessingHost(ContactStateAccessingHost* host)
+{
+	contactState = host;
+}
 
 QDomElement QipXStatuses::activityToXml(QString type, QString specificType, QString text) {
         QDomDocument doc;

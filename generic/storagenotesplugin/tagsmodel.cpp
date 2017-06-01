@@ -65,9 +65,9 @@ QModelIndex TagModel::parent(const QModelIndex& index) const
 {
 	if(!index.isValid())
 		return QModelIndex();
-	if(index.internalId() == -1)
+	if(index.internalId() == (quintptr)-1)
 		return QModelIndex();
-	if(index.row() == index.internalId())
+	if((quintptr)index.row() == index.internalId())
 		return createAllTagsIndex();
 	return QModelIndex();
 }
@@ -81,10 +81,10 @@ QVariant TagModel::data(const QModelIndex &index, int role) const
 	if (role != Qt::DisplayRole)
 		return QVariant();
 
-	if(index.internalId() == -1)
+	if(index.internalId() == (quintptr)-1)
 		return allTags;
 
-	if (index.row() >= stringList.size() || index.row() != index.internalId())
+	if (index.row() >= stringList.size() || (quintptr)index.row() != index.internalId())
 		return QVariant();
 
 	return stringList.at(index.row());

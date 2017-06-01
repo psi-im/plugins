@@ -396,20 +396,23 @@ bool IcqDie::incomingStanza(int account, const QDomElement& stanza)
 	return false;
 }
 
-bool IcqDie::outgoingStanza(int account, QDomElement& stanza)
+bool IcqDie::outgoingStanza(int /*account*/, QDomElement& /*stanza*/)
 {
 	return false;
 }
 
-void IcqDie::setActiveTabAccessingHost(ActiveTabAccessingHost* host) {
+void IcqDie::setActiveTabAccessingHost(ActiveTabAccessingHost* host)
+{
 	ActiveTabHost = host;
 }
 
-void IcqDie::setAccountInfoAccessingHost(AccountInfoAccessingHost* host) {
+void IcqDie::setAccountInfoAccessingHost(AccountInfoAccessingHost* host)
+{
 	AccInfoHost = host;
 }
 
-QString IcqDie::pluginInfo() {
+QString IcqDie::pluginInfo()
+{
 	return tr("Author: ") +  "ivan1986\n\n"
 			+ trUtf8("This plugin is designed to help you transfer as many contacts as possible from ICQ to Jabber.\n"
 			 "The plugin has a number of simple settings that can help you:\n"
