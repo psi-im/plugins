@@ -239,8 +239,8 @@ void GameSessions::doInviteDialog(int account, QString from)
 	if (idx == -1 || gameSessions.at(idx).status != StatusInviteInDialog)
 		return;
 	InvitationDialog *wnd = new InvitationDialog(account, from, gameSessions.at(idx).element, gameSessions.at(idx).last_iq_id, gameSessions.at(idx).wnd);
-	connect(wnd, SIGNAL(accept(int, QString)), this, SLOT(acceptInvite(int, QString)));
-	connect(wnd, SIGNAL(reject(int, QString)), this, SLOT(rejectInvite(int, QString)));
+	connect(wnd, SIGNAL(accepted(int, QString)), this, SLOT(acceptInvite(int, QString)));
+	connect(wnd, SIGNAL(rejected(int, QString)), this, SLOT(rejectInvite(int, QString)));
 	wnd->show();
 }
 

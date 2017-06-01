@@ -33,10 +33,10 @@ BoardView::BoardView(QWidget *parent) :
 {
 }
 
-void BoardView::setModel(BoardModel* model)
+void BoardView::setModel(QAbstractItemModel *model)
 {
 	QTableView::setModel(model);
-	model_ = model;
+	model_ = static_cast<BoardModel *>(model);
 }
 
 void BoardView::resizeEvent(QResizeEvent */*event*/)

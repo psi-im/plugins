@@ -64,7 +64,7 @@ public:
 
 private:
 	Ui::InvitationDialog ui_;
-	bool accepted;
+	bool accepted_;
 	int account_;
 	QString id_;
 
@@ -72,8 +72,8 @@ private slots:
 	void buttonPressed();
 
 signals:
-	void accept(int, QString);
-	void reject(int, QString);
+	void accepted(int, QString);
+	void rejected(int, QString);
 
 protected:
 	void closeEvent(QCloseEvent *e);

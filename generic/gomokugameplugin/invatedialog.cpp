@@ -69,7 +69,7 @@ void InvateDialog::closeEvent(QCloseEvent *event)
 
 InvitationDialog::InvitationDialog(int account, QString jid, QString color, QString id, QWidget *parent)
 	:  QDialog(parent),
-	accepted(false),
+	accepted_(false),
 	account_(account),
 	id_(id)
 {
@@ -94,15 +94,15 @@ InvitationDialog::InvitationDialog(int account, QString jid, QString color, QStr
 
 void InvitationDialog::buttonPressed()
 {
-	emit accept(account_, id_);
-	accepted = true;
+	emit accepted(account_, id_);
+	accepted_ = true;
 	close();
 }
 
 void InvitationDialog::closeEvent(QCloseEvent *e)
 {
-	if(!accepted)
-		emit reject(account_, id_);
+	if(!accepted_)
+		emit rejected(account_, id_);
 	e->accept();
 	close();
 }
