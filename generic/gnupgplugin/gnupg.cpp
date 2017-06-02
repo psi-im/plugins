@@ -155,7 +155,7 @@ bool GnuPG::incomingStanza(int account, const QDomElement& stanza)
 	res = _stanzaSending->escape(res.mid(0, res.indexOf('\n')));
 	_accountHost->appendSysMsg(account, from, res);
 
-	// Don't hide message if an error occured
+	// Don't hide message if an error occurred
 	if (gpg.exitCode()) {
 		return false;
 	}
@@ -247,7 +247,7 @@ void GnuPG::sendPublicKey()
 	gpg.start(arguments);
 	gpg.waitForFinished();
 
-	// do nothing if error is occured
+	// do nothing if error is occurred
 	if (gpg.exitCode()) {
 		return;
 	}

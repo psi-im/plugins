@@ -111,7 +111,7 @@ private:
 	bool enabled_;
 	bool notTranslate;
 	QMap<QString,QString> map;
-	QMap<QString,QString> mapBakup;
+	QMap<QString,QString> mapBackup;
 	QTableWidget * table;
 	QLineEdit *shortCutWidget;
 	OptionAccessingHost* psiOptions;
@@ -214,7 +214,7 @@ TranslatePlugin::TranslatePlugin()
 	map.insert("/",QString::fromUtf8(".")); map.insert(QString::fromUtf8("."),"/");
 	map.insert(".",QString::fromUtf8("ю")); map.insert(QString::fromUtf8("ю"),".");
 
-	mapBakup = map;
+	mapBackup = map;
 }
 
 QString TranslatePlugin::name() const
@@ -541,10 +541,10 @@ void TranslatePlugin::restoreMap()
 	disconnect(table,SIGNAL(cellChanged(int,int)),this,SLOT(changeItem(int,int)));
 	table->clear();
 	table->setRowCount(0);
-	foreach(const QString& symbol, mapBakup.keys()){
+	foreach(const QString& symbol, mapBackup.keys()){
 		table->insertRow(table->rowCount());
 		table->setItem(table->rowCount()-1,0,new QTableWidgetItem(symbol));
-		table->setItem(table->rowCount()-1,1,new QTableWidgetItem(mapBakup.value(symbol)));
+		table->setItem(table->rowCount()-1,1,new QTableWidgetItem(mapBackup.value(symbol)));
 	}
 	connect(table,SIGNAL(cellChanged(int,int)),this,SLOT(changeItem(int,int)));
 	hack();

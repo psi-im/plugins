@@ -263,7 +263,7 @@ void GameSessions::acceptInvite(int account, QString id)
 			emit sendStanza(account, stanza);
 		} else {
 			sendErrorIq(account, gameSessions.at(idx).full_jid, id, getLastError());
-			emit doPopup(tr("You are allready playing!"));
+			emit doPopup(tr("You are already playing!"));
 		}
 	}
 }
@@ -732,7 +732,7 @@ bool GameSessions::regGameSession(SessionStatus status, int account, QString jid
 		GameSession *sess = &gameSessions[i];
 		if (sess->my_acc == account && sess->full_jid == jid) {
 			if (sess->status != StatusNone) {
-				errorStr = tr("You are allready playing!");
+				errorStr = tr("You are already playing!");
 				return false;
 			}
 			sess->status = status;

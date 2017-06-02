@@ -478,7 +478,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 					caps_node.toElement().setAttribute("ver", as->caps_version);
 				}
 				else {
-					caps_node.toElement().setAttribute("node", "unknow");
+					caps_node.toElement().setAttribute("node", "unknown");
 					caps_node.toElement().setAttribute("ver", "n/a");
 				}
 			}
@@ -504,7 +504,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 					// Подменяем ноду, если она есть
 					QString node = s_child.toElement().attribute("node");
 					if (!node.isEmpty()) {
-						QString new_node = (respMode == AccountSettings::RespAllow) ? as->caps_node : "unknow";
+						QString new_node = (respMode == AccountSettings::RespAllow) ? as->caps_node : "unknown";
 						QStringList split_node = node.split("#");
 						if (split_node.size() > 1) {
 							split_node.removeFirst();
@@ -538,7 +538,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 							}
 						} else if (tag_name == "identity") {
 							if (!q_child.toElement().attribute("name").isEmpty())
-								q_child.toElement().setAttribute("name", (respMode == AccountSettings::RespAllow) ? as->client_name : "unknow");
+								q_child.toElement().setAttribute("name", (respMode == AccountSettings::RespAllow) ? as->client_name : "unknown");
 							if (++update >= 3)
 								break;
 						}

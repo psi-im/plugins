@@ -132,7 +132,7 @@ bool MessageFilter::incomingStanza(int account, const QDomElement &stanza)
 			case Message: val = message; break;
 			}
 
-			switch (condition.comparsion) {
+			switch (condition.comparison) {
 			case Equal:
 				if (val != condition.text)
 					match = false;
@@ -182,7 +182,7 @@ void MessageFilter::loadRules()
 			QString optionName1 = QString("%1conditions.l%2.").arg(optionName).arg(j);
 			Condition condition;
 			condition.type = static_cast<ConditionType>(_optionHost->getPluginOption(optionName1 + "type").toInt());
-			condition.comparsion = static_cast<Comparsion>(_optionHost->getPluginOption(optionName1 + "comparsion").toInt());
+			condition.comparison = static_cast<Comparsion>(_optionHost->getPluginOption(optionName1 + "comparsion").toInt());
 			condition.text = _optionHost->getPluginOption(optionName1 + "text").toString();
 			rule.conditions << condition;
 		}

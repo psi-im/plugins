@@ -370,7 +370,7 @@ void SkinsPlugin::applySkin() {
     QString mes = QString("Skin %1 successfully applied!\n"
                   "Some changes may only have full effect upon restart!").arg(elem.attribute("name"));
     if(backup) {
-        mes += QString("\nBakup skin saved to %2").arg(fileName);
+        mes += QString("\nBackup skin saved to %2").arg(fileName);
     }
 
     QMessageBox::information(0, tr("Apply Skin"), mes);

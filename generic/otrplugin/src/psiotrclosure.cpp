@@ -398,7 +398,7 @@ void AuthenticationDialog::updateSMP(int progress)
         else
         {
             notify(QMessageBox::Warning,
-                   tr("An error occured during the authentication process."));
+                   tr("An error occurred during the authentication process."));
         }
 
         if (m_isSender)

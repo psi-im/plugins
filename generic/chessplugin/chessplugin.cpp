@@ -767,7 +767,7 @@ void ChessPlugin::doInviteDialog(const QString& jid) {
 	Request rec = requests.takeAt(index);
 
 	if(game_) {
-		QMessageBox::information(0, tr("Chess Plugin"), tr("You are allready playing!"));
+		QMessageBox::information(0, tr("Chess Plugin"), tr("You are already playing!"));
 		stanzaSender->sendStanza(rec.account,
 								 QString("<iq type=\"error\" to=\"%1\" id=\"%2\"></iq>")
 								 .arg(rec.jid)

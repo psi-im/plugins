@@ -387,7 +387,7 @@ QWidget* ExtendedOptions::options()
 	mucGeneralLayout->addWidget(hideAutoJoin);
 	mucGeneralLayout->addWidget(allowMucEvents);
 	mucGeneralLayout->addWidget(storeMucPrivates);
-	mucGeneralLayout->addWidget(new QLabel(tr("Disable autojoin to folowing groupchats:\n(specify JIDs)")));
+	mucGeneralLayout->addWidget(new QLabel(tr("Disable autojoin to following groupchats:\n(specify JIDs)")));
 	mucGeneralLayout->addWidget(bookmarksListSkip);
 	mucGeneralLayout->addWidget(new QLabel(tr("Groupchat leave status message:")));
 	mucGeneralLayout->addWidget(muc_leave_status_message);

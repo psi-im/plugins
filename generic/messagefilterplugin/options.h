@@ -35,7 +35,7 @@ enum Comparsion { Equal, NotEqual, Contains, NotContains };
 struct Condition
 {
 	ConditionType type;
-	Comparsion comparsion;
+	Comparsion comparison;
 	QString text;
 };
 
