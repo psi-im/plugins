@@ -182,7 +182,7 @@ void MessageFilter::loadRules()
 			QString optionName1 = QString("%1conditions.l%2.").arg(optionName).arg(j);
 			Condition condition;
 			condition.type = static_cast<ConditionType>(_optionHost->getPluginOption(optionName1 + "type").toInt());
-			condition.comparison = static_cast<Comparsion>(_optionHost->getPluginOption(optionName1 + "comparsion").toInt());
+			condition.comparison = static_cast<Comparison>(_optionHost->getPluginOption(optionName1 + "comparison").toInt());
 			condition.text = _optionHost->getPluginOption(optionName1 + "text").toString();
 			rule.conditions << condition;
 		}

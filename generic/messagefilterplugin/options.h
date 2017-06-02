@@ -30,12 +30,12 @@ class OptionAccessingHost;
 namespace Ui { class Options; }
 
 enum ConditionType { From, To, FromFull, ToFull, Message };
-enum Comparsion { Equal, NotEqual, Contains, NotContains };
+enum Comparison { Equal, NotEqual, Contains, NotContains };
 
 struct Condition
 {
 	ConditionType type;
-	Comparsion comparison;
+	Comparison comparison;
 	QString text;
 };
 

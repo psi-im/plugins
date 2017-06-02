@@ -86,7 +86,7 @@ void Options::saveSettings()
 			Condition condition = rule.conditions.at(j);
 			QString optionName1 = QString("%1conditions.l%2.").arg(optionName).arg(j);
 			_optionHost->setPluginOption(optionName1 + "type", static_cast<int>(condition.type));
-			_optionHost->setPluginOption(optionName1 + "comparison", static_cast<int>(condition.comparsion));
+			_optionHost->setPluginOption(optionName1 + "comparison", static_cast<int>(condition.comparison));
 			_optionHost->setPluginOption(optionName1 + "text", condition.text);
 		}
 	}
@@ -329,6 +329,6 @@ void Options::fillCondition(int row)
 void Options::saveCondition(int rule, int row)
 {
 	_rules[rule].conditions[row].type = static_cast<ConditionType>(qobject_cast<QComboBox*>(ui->twConditions->cellWidget(row, 0))->currentIndex());
-	_rules[rule].conditions[row].comparison = static_cast<Comparsion>(qobject_cast<QComboBox*>(ui->twConditions->cellWidget(row, 1))->currentIndex());
+	_rules[rule].conditions[row].comparison = static_cast<Comparison>(qobject_cast<QComboBox*>(ui->twConditions->cellWidget(row, 1))->currentIndex());
 	_rules[rule].conditions[row].text = qobject_cast<QLineEdit*>(ui->twConditions->cellWidget(row, 2))->text();
 }
