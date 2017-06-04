@@ -26,10 +26,10 @@
 #include <QWebView>
 #include <QWebFrame>
 #include <QWebElement>
-#else
-#ifdef __GNUC__
-#warning "JuickPlugin TODO: add support for webengine"
 #endif
+#ifdef HAVE_WEBENGINE
+#include <QWebEngineView>
+#include <QWebEnginePage>
 #endif
 
 #include "optionaccessinghost.h"
@@ -1106,15 +1106,13 @@ void JuickPlugin::updateWidgets(const QList<QByteArray>& urls)
 				QUrl u(url);
 				td->addResource(QTextDocument::ImageResource, u, QPixmap(u.toLocalFile()));
 			}
-//			td->adjustSize();
-//			te->update();
 			te->setLineWrapColumnOrWidth(te->lineWrapColumnOrWidth());
 		}
-#ifdef HAVE_WEBKIT
 		else {
+			int t = qrand()%(QTime::currentTime().msec() + 1);
+#ifdef HAVE_WEBKIT
 			QWebView *wv = w->findChild<QWebView*>();
 			if(wv) {
-				int t = qrand()%(QTime::currentTime().msec() + 1);
 				QWebFrame* wf = wv->page()->mainFrame();
 				foreach(const QByteArray& url, urls) {
 					QUrl u(url);
@@ -1124,8 +1122,24 @@ void JuickPlugin::updateWidgets(const QList<QByteArray>& urls)
 					}
 				}
 			}
-		}
 #endif
+#ifdef HAVE_WEBENGINE
+#ifdef __GNUC__
+#warning "JuickPlugin TODO: check webengine staff works"
+#endif
+			QWebEngineView *wv = w->findChild<QWebEngineView*>();
+			if(wv) {
+				QWebEnginePage* wf = wv->page();
+				foreach(const QByteArray& url, urls) {
+					QUrl u(url);
+					const QString js = QString("var els=document.querySelectorAll(\"img[src='%1']\");"
+							"for(var i=0;i<els.length;++i){var el=els[i];el.src='%1'+'?%2';}")
+							.arg(u.toString(), QString::number(++t));
+					wf->runJavaScript(js);
+				}
+			}
+#endif
+		}
 	}
 }
 
