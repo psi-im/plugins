@@ -1,5 +1,5 @@
 set( PLUGIN juickplugin )
-cmake_minimum_required( VERSION 2.8.12 )
+cmake_minimum_required(VERSION 3.1.0)
 set( CMAKE_AUTOMOC TRUE )
 
 IF( NOT WIN32 )
@@ -8,6 +8,28 @@ IF( NOT WIN32 )
 ELSE()
 	set( PLUGINS_PATH "psi-plus/plugins" CACHE STRING "Install suffix for plugins" )
 ENDIF()
+
+option( USE_WEBENGINE "Use WebEngine support instead of Webkit" OFF )
+
+if(USE_QT5)
+	add_definitions(-DHAVE_QT5)
+	find_package( Qt5Core REQUIRED )
+	if(${Qt5Core_VERSION} VERSION_GREATER 5.7.0)
+		find_package( Qt5WebEngine QUIET )
+		if( Qt5WebEngine_FOUND )
+			set(USE_WEBENGINE ON)
+			add_definitions(
+				-DWEBENGINE=1
+				-DHAVE_WEBENGINE
+			)
+		else()
+			set(USE_WEBENGINE OFF)
+			add_definitions(
+				-DHAVE_WEBKIT
+			)
+		endif()
+	endif()
+endif()
 
 add_definitions( -DQT_PLUGIN )
 include_directories(
@@ -38,18 +60,26 @@ set( _RSCS
 	resources.qrc
 )
 IF( USE_QT5 )
-	find_package( Qt5Widgets REQUIRED )
-	find_package( Qt5Xml REQUIRED )
-	find_package( Qt5Network REQUIRED )
-	find_package( Qt5WebKit REQUIRED )
-	find_package( Qt5WebKitWidgets REQUIRED )
+	find_package(Qt5 COMPONENTS Widgets Xml Network REQUIRED)
 	set(QT_DEPLIBS
 		Qt5::Widgets
 		Qt5::Xml
 		Qt5::Network
-		Qt5::WebKit
-		Qt5::WebKitWidgets
 	)
+	if( USE_WEBENGINE )
+		find_package(Qt5 COMPONENTS WebEngine WebEngineWidgets REQUIRED)
+		list(APPEND QT_DEPLIBS
+			Qt5::WebEngine
+			Qt5::WebEngineWidgets
+		)
+	else()
+		find_package(Qt5 COMPONENTS WebKit WebKitWidgets REQUIRED)
+		list(APPEND QT_DEPLIBS
+			Qt5::WebKit
+			Qt5::WebKitWidgets
+		)
+	endif()
+
 	qt5_wrap_ui(UIS ${_UIS})
 	qt5_add_resources(RSCS ${_RSCS})
 ELSE()
