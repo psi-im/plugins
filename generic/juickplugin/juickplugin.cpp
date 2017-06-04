@@ -22,9 +22,15 @@
 #include <QMessageBox>
 #include <QColorDialog>
 #include <QTextEdit>
+#ifdef HAVE_WEBKIT
 #include <QWebView>
 #include <QWebFrame>
 #include <QWebElement>
+#else
+#ifdef __GNUC__
+#warning "JuickPlugin TODO: add support for webengine"
+#endif
+#endif
 
 #include "optionaccessinghost.h"
 #include "activetabaccessinghost.h"
@@ -1104,6 +1110,7 @@ void JuickPlugin::updateWidgets(const QList<QByteArray>& urls)
 //			te->update();
 			te->setLineWrapColumnOrWidth(te->lineWrapColumnOrWidth());
 		}
+#ifdef HAVE_WEBKIT
 		else {
 			QWebView *wv = w->findChild<QWebView*>();
 			if(wv) {
@@ -1118,6 +1125,7 @@ void JuickPlugin::updateWidgets(const QList<QByteArray>& urls)
 				}
 			}
 		}
+#endif
 	}
 }
 

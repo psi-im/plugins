@@ -6,13 +6,28 @@
  */
 
 #include "ScrollKeeper.h"
+#ifdef HAVE_WEBKIT
 #include <QWebView>
+#else
+#ifdef __GNUC__
+#warning "ImagePreviewPlugin TODO: add support for webengine"
+#endif
+#endif
 #include <QScrollBar>
 
 //#define SCROLL_DEBUG
 
 ScrollKeeper::ScrollKeeper(QWidget* chatView) :
-		chatView_(chatView), scrollPos_(0), scrollToEnd_(false), ted_(0), mainFrame_(0) {
+		chatView_(chatView),
+		scrollPos_(0),
+		scrollToEnd_(false),
+		ted_(0)
+#ifdef HAVE_WEBKIT
+		,mainFrame_(0)
+#endif
+{
+	Q_UNUSED(chatView_)
+
 	ted_ = qobject_cast<QTextEdit*>(chatView);
 	if (ted_) {
 		scrollPos_ = ted_->verticalScrollBar()->value();
@@ -23,7 +38,9 @@ ScrollKeeper::ScrollKeeper(QWidget* chatView) :
 		qDebug() << "QTED Scroll pos:" << scrollPos_ << "to end:" << scrollToEnd_ << "max:"
 				<< ted_->verticalScrollBar()->maximum();
 #endif
-	} else {
+	}
+#ifdef HAVE_WEBKIT
+	else {
 		QWebView* wv = qobject_cast<QWebView*>(chatView);
 		if (!wv) {
 			return;
@@ -38,6 +55,8 @@ ScrollKeeper::ScrollKeeper(QWidget* chatView) :
 				<< mainFrame_->scrollBarMaximum(Qt::Vertical) << "min:" << mainFrame_->scrollBarMinimum(Qt::Vertical);
 #endif
 	}
+#else
+#endif
 }
 
 ScrollKeeper::~ScrollKeeper() {
@@ -48,6 +67,7 @@ ScrollKeeper::~ScrollKeeper() {
 #endif
 		ted_->verticalScrollBar()->setValue(scrollToEnd_ ? ted_->verticalScrollBar()->maximum() : scrollPos_);
 	}
+#ifdef HAVE_WEBKIT
 	if (mainFrame_) {
 #ifdef SCROLL_DEBUG
 		qDebug() << "QWV restoring scroll pos:" << scrollPos_ << "to end:" << scrollToEnd_ << "max:"
@@ -55,5 +75,6 @@ ScrollKeeper::~ScrollKeeper() {
 #endif
 		mainFrame_->setScrollBarValue(Qt::Vertical,	scrollToEnd_ ? mainFrame_->scrollBarMaximum(Qt::Vertical) : scrollPos_);
 	}
+#endif
 }
 

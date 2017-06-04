@@ -44,9 +44,11 @@
 #include <QSpinBox>
 #include <QComboBox>
 #include <QCheckBox>
+#ifdef HAVE_WEBKIT
 #include <QWebView>
 #include <QWebFrame>
 #include <QWebElementCollection>
+#endif
 #include <stdexcept>
 
 #undef AUTOREDIRECTS
@@ -251,7 +253,9 @@ void ImagePreviewPlugin::messageAppended(const QString &, QWidget* logWidget) {
 			queueUrl(url, new Origin(te_log));
 		};
 		te_log->setTextCursor(cur);
-	} else {
+	}
+#ifdef HAVE_WEBKIT
+	else {
 		QWebView* wv_log = qobject_cast<QWebView*>(logWidget);
 		QWebFrame* mainFrame = wv_log->page()->mainFrame();
 		QWebElementCollection elems = mainFrame->findAllElements("a[href]");
@@ -269,6 +273,7 @@ void ImagePreviewPlugin::messageAppended(const QString &, QWidget* logWidget) {
 			}
 		}
 	}
+#endif
 }
 
 void ImagePreviewPlugin::imageReply(QNetworkReply* reply) {
@@ -362,7 +367,9 @@ void ImagePreviewPlugin::imageReply(QNetworkReply* reply) {
 					}
 				}
 				te_log->setTextCursor(saved);
-			} else {
+			}
+#ifdef HAVE_WEBKIT
+			else {
 				QByteArray imageBytes;
 				QBuffer imageBuf(&imageBytes);
 				image.save(&imageBuf, "jpg", 60);
@@ -374,6 +381,7 @@ void ImagePreviewPlugin::imageReply(QNetworkReply* reply) {
 						"  elem.innerHTML = \"<img src='data:image/jpeg;base64,%2'/>\";"
 						"}").arg(urlStr).arg(QString(imageBytes.toBase64())));
 			}
+#endif
 		} catch (std::exception& e) {
 			failed.insert(origin->originalUrl_);
 			qWarning() << "ERROR: " << e.what();

@@ -1,9 +1,19 @@
-#CONFIG += release
-QT += webkit network
+CONFIG += release
+QT += network
 greaterThan(QT_MAJOR_VERSION, 4) {
-    QT += webkitwidgets
-    CONFIG += c++11
+    greaterThan(QT_MINOR_VERSION, 5) {
+        QT += webengine webenginewidgets
+        DEFINES += HAVE_WEBENGINE
+    }
+    else {
+        QT += webkit webkitwidgets
+        DEFINES += HAVE_WEBKIT
+    }
 } 
+else {
+    QT += webkit
+    DEFINES += HAVE_WEBKIT
+}
 
 isEmpty(PSISDK) {
     include(../../psiplugin.pri)

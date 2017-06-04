@@ -14,9 +14,20 @@ HEADERS += \
     defines.h \
     juickplugin.h
 
-QT += network webkit
+QT += network
 greaterThan(QT_MAJOR_VERSION, 4) {
-  QT += webkitwidgets
+    greaterThan(QT_MINOR_VERSION, 5) {
+        QT += webengine webenginewidgets
+        DEFINES += HAVE_WEBENGINE
+    }
+    else {
+        QT += webkit webkitwidgets
+        DEFINES += HAVE_WEBKIT
+    }
+}
+else {
+    QT += webkit
+    DEFINES += HAVE_WEBKIT
 }
 
 FORMS += \

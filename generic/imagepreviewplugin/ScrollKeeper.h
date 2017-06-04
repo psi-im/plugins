@@ -10,7 +10,8 @@
 
 #include <QWidget>
 #include <QTextEdit>
-#include <QWebFrame>
+
+class QWebFrame;
 
 class ScrollKeeper {
 private:
@@ -18,7 +19,9 @@ private:
 	int scrollPos_;
 	bool scrollToEnd_;
 	QTextEdit* ted_;
+#ifdef HAVE_WEBKIT
 	QWebFrame* mainFrame_;
+#endif
 public:
 	ScrollKeeper(QWidget* chatView);
 	virtual ~ScrollKeeper();
