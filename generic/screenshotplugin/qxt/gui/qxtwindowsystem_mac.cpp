@@ -50,7 +50,7 @@ WindowList qxt_getWindowsForPSN(ProcessSerialNumber *psn)
 WindowList QxtWindowSystem::windows()
 {
     WindowList wlist;
-    ProcessSerialNumber psn = {0, kNoProcess};
+    /*ProcessSerialNumber psn = {0, kNoProcess};
 
     // iterate over list of processes
     OSErr err;
@@ -58,7 +58,7 @@ WindowList QxtWindowSystem::windows()
     {
         wlist += qxt_getWindowsForPSN(&psn);
     }
-
+*/
     return wlist;
 }
 
@@ -78,8 +78,9 @@ WId QxtWindowSystem::activeWindow()
     return WINDOW_NOT_FOUND;
 }
 
-QString QxtWindowSystem::windowTitle(WId window)
+QString QxtWindowSystem::windowTitle(WId /*window*/)
 {
+	/*
     CGSValue windowTitle;
     CGError err(noErr);
     static CGSConnection connection = _CGSDefaultConnection();
@@ -95,18 +96,20 @@ QString QxtWindowSystem::windowTitle(WId window)
     if (err != noErr) return QString();
 
     // this is UTF8 encoded
-    return QCFString::toQString((CFStringRef)windowTitle);
+    return QCFString::toQString((CFStringRef)windowTitle);*/
+    return QString();
 }
 
-QRect QxtWindowSystem::windowGeometry(WId window)
-{
+QRect QxtWindowSystem::windowGeometry(WId /*window*/)
+{/*
     CGRect rect;
     static CGSConnection connection = _CGSDefaultConnection();
 
     CGError err = CGSGetWindowBounds(connection, window, &rect);
     if (err != noErr) return QRect();
 
-    return QRect(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
+    return QRect(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);*/
+    return QRect();
 }
 
 /* This method is the only one that is not a complete hack
@@ -117,16 +120,16 @@ uint QxtWindowSystem::idleTime()
 {
     // CGEventSourceSecondsSinceLastEventType returns time in seconds as a double
     // also has extremely long name
-    double idle = 1000 * ::CGEventSourceSecondsSinceLastEventType(kCGEventSourceStateCombinedSessionState, kCGAnyInputEventType);
+    double idle = 0;//1000 * ::CGEventSourceSecondsSinceLastEventType(kCGEventSourceStateCombinedSessionState, kCGAnyInputEventType);
     return (uint)idle;
 }
 
 
 // these are copied from X11 implementation
-WId QxtWindowSystem::findWindow(const QString& title)
+WId QxtWindowSystem::findWindow(const QString& /*title*/)
 {
     WId result = 0;
-    WindowList list = windows();
+    /*WindowList list = windows();
     foreach(const WId &wid, list)
     {
         if (windowTitle(wid) == title)
@@ -134,14 +137,14 @@ WId QxtWindowSystem::findWindow(const QString& title)
             result = wid;
             break;
         }
-    }
+    }*/
     return result;
 }
 
-WId QxtWindowSystem::windowAt(const QPoint& pos)
+WId QxtWindowSystem::windowAt(const QPoint& /*pos*/)
 {
     WId result = 0;
-    WindowList list = windows();
+    /*WindowList list = windows();
     for (int i = list.size() - 1; i >= 0; --i)
     {
         WId wid = list.at(i);
@@ -150,7 +153,7 @@ WId QxtWindowSystem::windowAt(const QPoint& pos)
             result = wid;
             break;
         }
-    }
+    }*/
     return result;
 }
 
