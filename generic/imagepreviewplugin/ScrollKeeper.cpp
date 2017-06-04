@@ -8,10 +8,9 @@
 #include "ScrollKeeper.h"
 #ifdef HAVE_WEBKIT
 #include <QWebView>
-#else
-#ifdef __GNUC__
-#warning "ImagePreviewPlugin TODO: add support for webengine"
 #endif
+#ifdef HAVE_WEBENGINE
+#include <QWebEnginePage>
 #endif
 #include <QScrollBar>
 
@@ -39,8 +38,8 @@ ScrollKeeper::ScrollKeeper(QWidget* chatView) :
 				<< ted_->verticalScrollBar()->maximum();
 #endif
 	}
-#ifdef HAVE_WEBKIT
 	else {
+#ifdef HAVE_WEBKIT
 		QWebView* wv = qobject_cast<QWebView*>(chatView);
 		if (!wv) {
 			return;
@@ -54,9 +53,14 @@ ScrollKeeper::ScrollKeeper(QWidget* chatView) :
 		qDebug() << "QWV Scroll pos:" << scrollPos_ << "to end:" << scrollToEnd_ << "max:"
 				<< mainFrame_->scrollBarMaximum(Qt::Vertical) << "min:" << mainFrame_->scrollBarMinimum(Qt::Vertical);
 #endif
-	}
-#else
 #endif
+
+#ifdef HAVE_WEBENGINE
+  #ifdef __GNUC__
+  #warning "ImagePreviewPlugin TODO: add support for webengine"
+  #endif
+#endif
+	}
 }
 
 ScrollKeeper::~ScrollKeeper() {

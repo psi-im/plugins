@@ -1,15 +1,15 @@
 CONFIG += release
 QT += network
 greaterThan(QT_MAJOR_VERSION, 4) {
-    greaterThan(QT_MINOR_VERSION, 6) {
+    qtHaveModule(webengine) {
         QT += webengine webenginewidgets
         DEFINES += HAVE_WEBENGINE
     }
-    else {
+    qtHaveModule(webkit) {
         QT += webkit webkitwidgets
         DEFINES += HAVE_WEBKIT
     }
-} 
+}
 else {
     QT += webkit
     DEFINES += HAVE_WEBKIT

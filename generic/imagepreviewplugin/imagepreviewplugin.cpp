@@ -49,6 +49,10 @@
 #include <QWebFrame>
 #include <QWebElementCollection>
 #endif
+#ifdef HAVE_WEBENGINE
+#include <QWebEngineView>
+#include <QWebEnginePage>
+#endif
 #include <stdexcept>
 
 #undef AUTOREDIRECTS
@@ -254,8 +258,8 @@ void ImagePreviewPlugin::messageAppended(const QString &, QWidget* logWidget) {
 		};
 		te_log->setTextCursor(cur);
 	}
-#ifdef HAVE_WEBKIT
 	else {
+#ifdef HAVE_WEBKIT
 		QWebView* wv_log = qobject_cast<QWebView*>(logWidget);
 		QWebFrame* mainFrame = wv_log->page()->mainFrame();
 		QWebElementCollection elems = mainFrame->findAllElements("a[href]");
@@ -272,8 +276,14 @@ void ImagePreviewPlugin::messageAppended(const QString &, QWidget* logWidget) {
 				}
 			}
 		}
-	}
 #endif
+#ifdef HAVE_WEBENGINE
+  #ifdef __GNUC__
+  #warning "ImagePreviewPlugin TODO: add support for webengine"
+  #endif
+#endif
+	}
+
 }
 
 void ImagePreviewPlugin::imageReply(QNetworkReply* reply) {
@@ -368,8 +378,8 @@ void ImagePreviewPlugin::imageReply(QNetworkReply* reply) {
 				}
 				te_log->setTextCursor(saved);
 			}
+			else {		
 #ifdef HAVE_WEBKIT
-			else {
 				QByteArray imageBytes;
 				QBuffer imageBuf(&imageBytes);
 				image.save(&imageBuf, "jpg", 60);
@@ -380,8 +390,13 @@ void ImagePreviewPlugin::imageReply(QNetworkReply* reply) {
 						"  var elem = links[i];"
 						"  elem.innerHTML = \"<img src='data:image/jpeg;base64,%2'/>\";"
 						"}").arg(urlStr).arg(QString(imageBytes.toBase64())));
-			}
 #endif
+#ifdef HAVE_WEBENGINE
+  #ifdef __GNUC__
+  #warning "ImagePreviewPlugin TODO: add support for webengine"
+  #endif
+#endif
+			}
 		} catch (std::exception& e) {
 			failed.insert(origin->originalUrl_);
 			qWarning() << "ERROR: " << e.what();
