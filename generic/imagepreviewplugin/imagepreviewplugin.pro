@@ -1,7 +1,7 @@
 CONFIG += release
 QT += network
 greaterThan(QT_MAJOR_VERSION, 4) {
-    greaterThan(QT_MINOR_VERSION, 5) {
+    greaterThan(QT_MINOR_VERSION, 6) {
         QT += webengine webenginewidgets
         DEFINES += HAVE_WEBENGINE
     }
