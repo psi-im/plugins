@@ -1,42 +1,45 @@
 cmake_minimum_required(VERSION 3.1.0)
 
+#set( deprecated_list
+#	captchaformsplugin
+#	gmailserviceplugin
+#)
+
 set( plugins_list
-	historykeeperplugin
-	stopspamplugin
-	juickplugin
-	translateplugin
-	gomokugameplugin
 	attentionplugin
-	cleanerplugin
 	autoreplyplugin
-	contentdownloaderplugin
-	qipxstatusesplugin
-	skinsplugin
-	icqdieplugin
-	captchaformsplugin
-	watcherplugin
-	videostatusplugin
-	screenshotplugin
-	jabberdiskplugin
-	storagenotesplugin
-	extendedoptionsplugin
-	imageplugin
-	extendedmenuplugin
 	birthdayreminderplugin
-	gmailserviceplugin
-	gnupgplugin
-	pepchangenotifyplugin
-	otrplugin
 	chessplugin
+	cleanerplugin
 	conferenceloggerplugin
-	messagefilterplugin
+	contentdownloaderplugin
 	enummessagesplugin
+	extendedmenuplugin
+	extendedoptionsplugin
+	gnupgplugin
+	gomokugameplugin
+	historykeeperplugin
 	httpuploadplugin
+	icqdieplugin
+	imageplugin
 	imagepreviewplugin
+	jabberdiskplugin
+	juickplugin
+	messagefilterplugin
+	otrplugin
+	pepchangenotifyplugin
+	qipxstatusesplugin
+	screenshotplugin
+	skinsplugin
+	stopspamplugin
+	storagenotesplugin
+	translateplugin
+	videostatusplugin
+	watcherplugin
 )
 
 if( NOT MSVC )
-	set( plugins_list ${plugins_list}
+	list(APPEND plugins_list
 		clientswitcherplugin
 	)
 endif()

@@ -3,7 +3,6 @@ TEMPLATE = subdirs
 SUBDIRS += attentionplugin \
     autoreplyplugin \
     birthdayreminderplugin \
-    captchaformsplugin \
     chessplugin \
     cleanerplugin \
     conferenceloggerplugin \
@@ -11,7 +10,6 @@ SUBDIRS += attentionplugin \
     enummessagesplugin \
     extendedmenuplugin \
     extendedoptionsplugin \
-    gmailserviceplugin \
     gomokugameplugin \
     historykeeperplugin \
     icqdieplugin \
@@ -31,3 +29,5 @@ SUBDIRS += attentionplugin \
 
 # Broken plugins
 #    juickplugin clientswitcherplugin gnupgplugin
+# Deprecated plugins
+#    captchaformsplugin gmailserviceplugin
