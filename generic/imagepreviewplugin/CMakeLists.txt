@@ -14,7 +14,7 @@ option( USE_WEBENGINE "Use WebEngine support instead of Webkit" OFF )
 if(USE_QT5)
 	find_package( Qt5Core REQUIRED )
 	if(${Qt5Core_VERSION} VERSION_GREATER 5.7.0)
-		find_package( Qt5WebEngine QUIET )
+		find_package( Qt5 COMPONENTS WebEngine QUIET )
 		if( Qt5WebEngine_FOUND )
 			set(USE_WEBENGINE ON)
 			add_definitions(
