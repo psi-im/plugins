@@ -7,6 +7,7 @@
 
 #include "ScrollKeeper.h"
 #ifdef HAVE_WEBKIT
+#include <QWebFrame>
 #include <QWebView>
 #endif
 #ifdef HAVE_WEBENGINE
