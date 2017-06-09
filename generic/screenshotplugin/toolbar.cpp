@@ -85,10 +85,10 @@ void ToolBar::init()
 	buttons_.append(new Button(tr("Cut"), icoHost->getIcon("psi/crop"), ToolBar::ButtonCut, false,this) );
 	buttons_.last()->setShortcut(QKeySequence("Ctrl+x"));
 
-	buttons_.append(new Button(tr("Copy"), icoHost->getIcon("psi/action_paste_and_send"), ToolBar::ButtonCopy, false,this) );
+	buttons_.append(new Button(tr("Copy"), icoHost->getIcon("psi/copy"), ToolBar::ButtonCopy, false,this) );
 	buttons_.last()->setShortcut(QKeySequence("Ctrl+c"));
 
-	buttons_.append(new Button(tr("Paste"), icoHost->getIcon("psi/cm_import"), ToolBar::ButtonInsert, false,this) );
+	buttons_.append(new Button(tr("Paste"), icoHost->getIcon("psi/paste"), ToolBar::ButtonInsert, false,this) );
 	buttons_.last()->setShortcut(QKeySequence("Ctrl+v"));
 
 	buttons_.append(new Button(tr("Rotate"), icoHost->getIcon("psi/rotate"), ToolBar::ButtonRotate, false,this) );

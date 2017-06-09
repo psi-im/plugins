@@ -1,6 +1,13 @@
 <RCC>
     <qresource prefix="/screenshotplugin">
-        <file>screenshot.png</file>
-        <file>draw.png</file>
+        <file alias="screenshot">icons/screenshot.png</file>
+        <file alias="psi/crop">icons/crop.png</file>
+        <file alias="psi/draw">icons/draw.png</file>
+        <file alias="psi/frame">icons/frame.png</file>
+        <file alias="psi/palette">icons/palette.png</file>
+        <file alias="psi/print">icons/print.png</file>
+        <file alias="psi/undo">icons/undo.png</file>
+        <file alias="psi/copy">icons/copy.png</file>
+        <file alias="psi/paste">icons/paste.png</file>
     </qresource>
 </RCC>

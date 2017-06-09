@@ -236,7 +236,7 @@ Screenshot::Screenshot()
 	ui_.pb_save->setIcon(icoHost->getIcon("psi/download"));
 	ui_.pb_print->setIcon(icoHost->getIcon("psi/print"));
 	ui_.pb_new_screenshot->setIcon(icoHost->getIcon("screenshotplugin/screenshot"));
-	ui_.tb_copyUrl->setIcon(icoHost->getIcon("psi/action_paste_and_send"));
+	ui_.tb_copyUrl->setIcon(icoHost->getIcon("psi/copy"));
 
 	ui_.pb_save->setShortcut(QKeySequence("Ctrl+s"));
 	ui_.pb_upload->setShortcut(QKeySequence("Ctrl+u"));

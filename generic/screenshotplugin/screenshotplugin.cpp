@@ -134,7 +134,7 @@ QWidget* ScreenshotPlugin::options()
 
 bool ScreenshotPlugin::enable()
 {
-	QFile file(":/screenshotplugin/screenshot.png");
+	QFile file(":/screenshotplugin/screenshot");
 	file.open(QIODevice::ReadOnly);
 	QByteArray image = file.readAll();
 	icoHost->addIcon("screenshotplugin/screenshot",image);
@@ -245,7 +245,7 @@ QString ScreenshotPlugin::pluginInfo()
 
 QPixmap ScreenshotPlugin::icon() const
 {
-	return QPixmap(":/screenshotplugin/screenshot.png");
+	return QPixmap(":/screenshotplugin/screenshot");
 }
 
 #include "screenshotplugin.moc"

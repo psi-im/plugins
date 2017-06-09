@@ -56,6 +56,9 @@ QIcon ScreenshotIconset::getIcon(const QString& name)
 		ico = icoHost->getIcon(name);
 	}
 
+	if(ico.isNull())
+		ico = QIcon(":/screenshotplugin/" + name);
+
 	return ico;
 }
 

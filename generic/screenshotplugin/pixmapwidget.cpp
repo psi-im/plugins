@@ -33,10 +33,12 @@
 #include <QPrintDialog>
 #include <QColorDialog>
 #include <QFontDialog>
+#include <QIcon>
 
 #include "pixmapwidget.h"
 #include "options.h"
 #include "defines.h"
+#include "screenshoticonset.h"
 
 #define ACCURACY 5
 
@@ -606,9 +608,11 @@ void PixmapWidget::saveUndoPixmap()
 void PixmapWidget::checkedButtonChanged(ToolBar::ButtonType type)
 {
 	switch(type) {
-	case(ToolBar::ButtonPen):
-		currentCursor = QCursor(QPixmap(":/screenshotplugin/draw.png"), 2,15);
+	case(ToolBar::ButtonPen): {
+		QIcon ico = ScreenshotIconset::instance()->getIcon("psi/draw");
+		currentCursor = QCursor(ico.pixmap(ico.availableSizes().first()), 2,15);
 		break;
+	}
 	case(ToolBar::ButtonSelect):
 	case(ToolBar::ButtonText):
 		currentCursor = QCursor(Qt::CrossCursor);
