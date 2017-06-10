@@ -155,6 +155,7 @@ private slots:
 	void uploadComplete(QNetworkReply* reply);
 	void timeout();
 	void resizeStateChanged(int state);
+	void handleSslError(QNetworkReply* reply, const QList<QSslError>& errors);
 
 private:
 	void upload(bool anything);
@@ -220,6 +221,8 @@ HttpUploadPlugin::HttpUploadPlugin() :
 				0), sb_quality(0), imageResize(false), imageSize(0), imageQuality(0), previewWidth(0) {
 	connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(uploadComplete(QNetworkReply*)));
 	connect(&slotTimeout, SIGNAL(timeout()), this, SLOT(timeout()));
+	connect(manager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>&)), this,
+			SLOT(handleSslError(QNetworkReply*, const QList<QSslError>&)));
 	slotTimeout.setSingleShot(true);
 }
 
@@ -627,16 +630,16 @@ void HttpUploadPlugin::uploadComplete(QNetworkReply* reply) {
 		}
 		cancelTimeout();
 	} else {
+		cancelTimeout();
 		QMessageBox::critical(0, tr("Error uploading"),
-				tr("Upload error code %1, message: %2").arg(statusCode).arg(
+				tr("Upload error %1; HTTP code %2, message: %3").arg(reply->errorString()).arg(
+						reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString()).arg(
 						reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString()));
 	}
 }
 
 void HttpUploadPlugin::timeout() {
-	if (dataSource) {
-		dataSource->deleteLater();
-	}
+	cancelTimeout();
 	QMessageBox::critical(0, tr("Error requesting slot"), tr("Timeout waiting for an upload slot"));
 }
 
@@ -676,6 +679,10 @@ void HttpUploadPlugin::updateProxy() {
 	QNetworkProxy netProxy(proxy.type == "socks" ? QNetworkProxy::Socks5Proxy : QNetworkProxy::HttpProxy, proxy.host,
 			proxy.port, proxy.user, proxy.pass);
 	manager->setProxy(netProxy);
+}
+
+void HttpUploadPlugin::handleSslError(QNetworkReply* reply, const QList<QSslError>&) {
+	reply->ignoreSslErrors();
 }
 
 #include "httpuploadplugin.moc"
