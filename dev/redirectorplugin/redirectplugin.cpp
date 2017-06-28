@@ -1,6 +1,6 @@
 /*
  * redirectplugin.cpp - plugin
- * Copyright (C) 2013  Il'inykh Sergey
+ * Copyright (C) 2013  Sergey Ilinykh
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

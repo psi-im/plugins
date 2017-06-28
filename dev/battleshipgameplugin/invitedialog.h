@@ -1,6 +1,6 @@
 /*
 * invitedialog.h - Battleship Game plugin
-* Copyright (C) 2014  Aleksey Andleev
+* Copyright (C) 2014  Aleksey Andreev
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License

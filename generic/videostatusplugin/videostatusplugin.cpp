@@ -1,6 +1,6 @@
 /*
  * videostatusplugin.cpp - plugin
- * Copyright (C) 2010  KukuRuzo, Khryukin Evgeny
+ * Copyright (C) 2010  KukuRuzo, Evgeny Khryukin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

@@ -1,6 +1,6 @@
 /*
  * models.h - plugin
- * Copyright (C) 2009-2010  Khryukin Evgeny
+ * Copyright (C) 2009-2010  Evgeny Khryukin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

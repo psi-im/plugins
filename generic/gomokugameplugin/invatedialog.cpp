@@ -1,6 +1,6 @@
 /*
 * invitedialog.cpp - plugin
-* Copyright (C) 2010  Khryukin Evgeny, liuch
+* Copyright (C) 2010  Evgeny Khryukin, liuch
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
