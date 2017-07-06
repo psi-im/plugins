@@ -299,7 +299,7 @@ bool PepPlugin::incomingStanza(int account, const QDomElement& stanza)
 							QMetaObject::invokeMethod(this, "doNotification", Qt::QueuedConnection,
 										  Q_ARG(const QString&, contactInfo->name(account, jid)),
 										  Q_ARG(const QString&, str),
-										  Q_ARG(const QString&, "psi/notification_roster_tune"));
+										  Q_ARG(const QString&, "pep/tune"));
 						}
 						return false;
 					}
