@@ -16,18 +16,17 @@ HEADERS += \
 
 QT += network
 greaterThan(QT_MAJOR_VERSION, 4) {
-    qtHaveModule(webengine) {
+    contains($$psi_features, qtwebengine) {
         QT += webengine webenginewidgets
-        DEFINES += HAVE_WEBENGINE
     }
-    qtHaveModule(webkit) {
+    contains($$psi_features, qtwebkit) {
         QT += webkit webkitwidgets
-        DEFINES += HAVE_WEBKIT
     }
 }
 else {
-    QT += webkit
-    DEFINES += HAVE_WEBKIT
+    contains($$psi_features, qtwebkit) {
+        QT += webkit
+    }
 }
 
 FORMS += \
