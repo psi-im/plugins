@@ -667,7 +667,7 @@ QString OtrInternal::getSessionId(const QString& account,
             }
             firstHalf.append(QString::number(context->sessionid[i], 16));
         }
-        for (unsigned int i = context->sessionid_len / 2;
+        for (size_t i = context->sessionid_len / 2;
              i < context->sessionid_len; i++)
         {
             if (context->sessionid[i] <= 0xf)

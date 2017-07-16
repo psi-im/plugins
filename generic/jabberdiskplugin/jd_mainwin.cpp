@@ -280,8 +280,8 @@ void JDMainWin::indexContextMenu(const QModelIndex& index)
 	}
 	else if(result == actPublic || result == actAlbum || result == actPrivate) {
 		const QString path = result->text();
-		commands_->mv(QString("'//%1\%%2/%3'").arg(yourJid_, model_->disk() ,index.data(JDModel::RoleFullPath).toString()),
-			      QString("'//%1\%%2/%3'").arg(yourJid_, path ,index.data(JDModel::RoleName).toString()));
+		commands_->mv(QString("'//%1%%2/%3'").arg(yourJid_, model_->disk() ,index.data(JDModel::RoleFullPath).toString()),
+					  QString("'//%1%%2/%3'").arg(yourJid_, path ,index.data(JDModel::RoleName).toString()));
 	}
 }
 

@@ -20,7 +20,7 @@
 
 #include "figure.h"
 
-Figure::Figure(GameType game, FigureType type, int x, int y,  QObject */*parent*/)
+Figure::Figure(GameType game, FigureType type, int x, int y,  QObject * /*parent*/)
 	: isMoved(false)
 	, positionX_(x)
 	, positionY_(y)

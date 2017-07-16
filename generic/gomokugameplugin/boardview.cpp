@@ -39,12 +39,12 @@ void BoardView::setModel(QAbstractItemModel *model)
 	model_ = static_cast<BoardModel *>(model);
 }
 
-void BoardView::resizeEvent(QResizeEvent */*event*/)
+void BoardView::resizeEvent(QResizeEvent * /*event*/)
 {
 	setCellsSize();
 }
 
-void BoardView::mouseReleaseEvent(QMouseEvent */*event*/)
+void BoardView::mouseReleaseEvent(QMouseEvent * /*event*/)
 {
 	QModelIndex index = currentIndex();
 	if (index.isValid()) {
