@@ -1,5 +1,6 @@
 set(PLUGIN ripperccplugin)
-
+project(${PLUGIN})
+cmake_minimum_required( VERSION 3.1.0 )
 if(NOT WIN32)
     set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")
     set(PLUGINS_PATH "lib${LIB_SUFFIX}/psi-plus/plugins" CACHE STRING "Install suffix for plugins")
@@ -38,11 +39,7 @@ set(RESOURCES
 )
 
 if(QT5_BUILD)
-    find_package(Qt5Core REQUIRED)
-    find_package(Qt5Gui REQUIRED)
-    find_package(Qt5Widgets REQUIRED)
-    find_package(Qt5Xml REQUIRED)
-    find_package(Qt5Network REQUIRED)
+    find_package(Qt5 COMPONENTS Core Gui Widgets Xml Network REQUIRED)
 
     add_definitions(-DHAVE_QT5)
 
