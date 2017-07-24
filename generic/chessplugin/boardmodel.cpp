@@ -20,6 +20,8 @@
 
 #include "boardmodel.h"
 
+using namespace Chess;
+
 BoardModel::BoardModel(Figure::GameType type, QObject *parent)
         : QAbstractTableModel(parent)
 	, myMove(false)
@@ -281,12 +283,12 @@ bool BoardModel::moveRequested(QModelIndex oldIndex, QModelIndex newIndex)
 	return false;
 }
 
-bool BoardModel::moveRequested(int oldX, int oldY, int newX, int newY) {    
+bool BoardModel::moveRequested(int oldX, int oldY, int newX, int newY) {
 	return  moveRequested(createIndex(7-oldY, oldX), createIndex(7-newY, newX));//7- - for compatibility with tkabber
 }
 
 bool BoardModel::isYourFigure(const QModelIndex &index) const
-{    
+{
 	Figure *figure = findFigure(index);
 	if(!figure)
 		return false;

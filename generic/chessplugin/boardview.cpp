@@ -25,6 +25,8 @@
 #include <QHeaderView>
 #include <QHelpEvent>
 
+using namespace Chess;
+
 BoardView::BoardView(QWidget *parent)
         :QTableView(parent)
 {

@@ -31,6 +31,8 @@ namespace Ui {
     class InvateDialog;
 }
 
+namespace GomokuGame {
+
 class InvateDialog : public QDialog {
 	Q_OBJECT
 public:
@@ -78,5 +80,6 @@ signals:
 protected:
 	void closeEvent(QCloseEvent *e);
 };
+}
 
 #endif // INVATEDIALOG_H

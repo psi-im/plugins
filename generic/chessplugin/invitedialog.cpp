@@ -20,6 +20,8 @@
 
 #include "invitedialog.h"
 
+using namespace Chess;
+
 InviteDialog::InviteDialog(const Request& _r, const QStringList& resources, QWidget *parent)
 	: QDialog(parent)
         , resources_(resources)

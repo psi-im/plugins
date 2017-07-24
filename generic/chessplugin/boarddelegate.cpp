@@ -23,6 +23,7 @@
 
 #include <QPainter>
 
+using namespace Chess;
 void BoardDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
 	BoardModel *model = (BoardModel*)index.model();

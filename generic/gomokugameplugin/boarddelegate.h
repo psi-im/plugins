@@ -31,6 +31,8 @@
 
 #include "boardmodel.h"
 
+namespace GomokuGame {
+
 class BoardPixmaps : public QObject
 {
 
@@ -63,5 +65,6 @@ private:
 	int skin;
 	BoardPixmaps *pixmaps;
 };
+}
 
 #endif // BOARDDELEGATE_H

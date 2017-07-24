@@ -26,11 +26,13 @@
 
 #include "figure.h"
 
+namespace Chess {
+
 class BoardModel : public QAbstractTableModel
 {
 	Q_OBJECT
 
-public:    
+public:
         BoardModel(Figure::GameType type, QObject *parent = 0);
         ~BoardModel() {};
         virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
@@ -68,7 +70,7 @@ private:
         int canMove(Figure *figure, int newX, int newY) const;
         QModelIndex findFigure(Figure::FigureType type, Figure::GameType game) const;
 	QMultiMap<QModelIndex, int> availableMoves(Figure* figure) const;
-        bool doTestMove(Figure *figure, QModelIndex newIndex, int move);        
+        bool doTestMove(Figure *figure, QModelIndex newIndex, int move);
         bool isCheck() const;
         void moveTransfer();
         void setHeaders();
@@ -86,5 +88,5 @@ private:
 	Move lastMove;
 
 };
-
+}
 #endif // BOARDMODEL_H

@@ -32,6 +32,8 @@
 #include "gameelement.h"
 #include "gamemodel.h"
 
+namespace GomokuGame {
+
 class BoardModel : public QAbstractTableModel
 {
 Q_OBJECT
@@ -84,5 +86,6 @@ signals:
 	void playSound(const QString);
 
 };
+}
 
 #endif // BOARDMODEL_H

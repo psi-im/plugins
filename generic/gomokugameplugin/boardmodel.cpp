@@ -26,6 +26,8 @@
 #include "boardmodel.h"
 #include "common.h"
 
+using namespace GomokuGame;
+
 BoardModel::BoardModel(QObject *parent) :
 	QAbstractTableModel(parent),
 	selectX(-1),

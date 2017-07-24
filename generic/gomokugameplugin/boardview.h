@@ -29,6 +29,7 @@
 #include <QTableView>
 
 #include "boardmodel.h"
+namespace GomokuGame {
 
 class BoardView : public QTableView
 {
@@ -48,5 +49,6 @@ signals:
 private slots:
 
 };
+}
 
 #endif // BOARDVIEW_H

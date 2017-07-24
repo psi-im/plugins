@@ -26,6 +26,8 @@
 #include "ui_invitationdialog.h"
 #include "request.h"
 
+namespace Chess {
+
 class InviteDialog : public QDialog
 {
 	Q_OBJECT
@@ -64,6 +66,6 @@ signals:
 protected:
 	void closeEvent(QCloseEvent *e);
 };
-
+}
 
 #endif // INVITEDIALOG_H

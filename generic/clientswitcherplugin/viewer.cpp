@@ -31,7 +31,7 @@
 Viewer::Viewer(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *parent)
         : QDialog(parent)
         , icoHost_(IcoHost)
-        , fileName_(filename)        
+        , fileName_(filename)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 	setWindowTitle(filename);
@@ -42,7 +42,7 @@ Viewer::Viewer(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *par
 	pal.setColor(QPalette::Inactive, QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::HighlightedText));
 	textWid->setPalette(pal);
 	layout->addWidget(textWid);
-	findBar = new TypeAheadFindBar(icoHost_, textWid, tr("Find"), this);
+	findBar = new ClientSwitcher::TypeAheadFindBar(icoHost_, textWid, tr("Find"), this);
 	QPushButton *Close = new QPushButton(icoHost_->getIcon("psi/quit"), tr("Close"));
 	QPushButton *Save = new QPushButton(icoHost_->getIcon("psi/save"), tr("Save Changes"));
 	QPushButton *Delete = new QPushButton(icoHost_->getIcon("psi/remove"), tr("Delete Log"));

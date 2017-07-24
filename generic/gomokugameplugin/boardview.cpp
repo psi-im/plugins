@@ -27,6 +27,8 @@
 
 #include "boardview.h"
 
+using namespace GomokuGame;
+
 BoardView::BoardView(QWidget *parent) :
     QTableView(parent),
     model_(NULL)

@@ -24,6 +24,8 @@
 #include <QTextCodec>
 #include <QTextStream>
 
+using namespace Chess;
+
 SelectFigure::SelectFigure(const QString& player, QWidget *parent)
 	: QWidget(parent)
 {

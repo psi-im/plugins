@@ -28,6 +28,8 @@
 #include "boarddelegate.h"
 #include "common.h"
 
+using namespace GomokuGame;
+
 BoardPixmaps::BoardPixmaps(QObject *parent) :
 	QObject(parent),
 	width(-1), height(-1),

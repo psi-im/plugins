@@ -31,7 +31,7 @@
 Viewer::Viewer(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *parent)
         : QDialog(parent)
         , icoHost_(IcoHost)
-        , fileName_(filename)        
+        , fileName_(filename)
 {
 	setAttribute(Qt::WA_DeleteOnClose);
 	setWindowTitle(filename);
@@ -42,7 +42,7 @@ Viewer::Viewer(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *par
 	pal.setColor(QPalette::Inactive, QPalette::HighlightedText, pal.color(QPalette::Active, QPalette::HighlightedText));
 	textWid->setPalette(pal);
 	layout->addWidget(textWid);
-	findBar = new TypeAheadFindBar(icoHost_, textWid, tr("Find"), this);
+	findBar = new ConfLogger::TypeAheadFindBar(icoHost_, textWid, tr("Find"), this);
 	QPushButton *Close = new QPushButton(icoHost_->getIcon("psi/quit"), tr("Close"));
 	QPushButton *Save = new QPushButton(icoHost_->getIcon("psi/save"), tr("Save Changes"));
 	QPushButton *Delete = new QPushButton(icoHost_->getIcon("psi/remove"), tr("Delete Log"));
@@ -55,15 +55,14 @@ Viewer::Viewer(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *par
 	butLayout->addWidget(Close);
 	layout->addWidget(findBar);
 	layout->addLayout(butLayout);
-	connect(Close, SIGNAL(released()), this, SLOT(close()));
-	connect(Delete, SIGNAL(released()), this, SLOT(deleteLog()));
-	connect(Save, SIGNAL(released()), this, SLOT(saveLog()));
-	connect(Update, SIGNAL(released()), this, SLOT(updateLog()));
-
-	connect(findBar, SIGNAL(firstPage()), this, SLOT(firstPage()));
-	connect(findBar, SIGNAL(lastPage()), this, SLOT(lastPage()));
-	connect(findBar, SIGNAL(prevPage()), this, SLOT(prevPage()));
-	connect(findBar, SIGNAL(nextPage()), this, SLOT(nextPage()));
+	connect(Close, &QPushButton::released, this, &Viewer::close);
+	connect(Delete, &QPushButton::released, this, &Viewer::deleteLog);
+	connect(Save, &QPushButton::released, this, &Viewer::saveLog);
+	connect(Update, &QPushButton::released, this, &Viewer::updateLog);
+	connect(findBar, &ConfLogger::TypeAheadFindBar::firstPage, this, &Viewer::firstPage);
+	connect(findBar, &ConfLogger::TypeAheadFindBar::lastPage, this, &Viewer::lastPage);
+	connect(findBar, &ConfLogger::TypeAheadFindBar::prevPage, this, &Viewer::prevPage);
+	connect(findBar, &ConfLogger::TypeAheadFindBar::nextPage, this, &Viewer::nextPage);
 }
 
 void Viewer::closeEvent(QCloseEvent *e)
@@ -75,7 +74,7 @@ void Viewer::closeEvent(QCloseEvent *e)
 
 void Viewer::deleteLog() {
 	int ret = QMessageBox::question(this, tr("Delete log file"),
-					tr("Are you sure?"), QMessageBox::Yes, QMessageBox::Cancel);
+	                                tr("Are you sure?"), QMessageBox::Yes, QMessageBox::Cancel);
 	if(ret == QMessageBox::Cancel) {
 		return;
 	}
@@ -101,7 +100,7 @@ void Viewer::saveLog() {
 		}
 	} else {
 		int ret = QMessageBox::question(this, tr("Save log"),
-						tr("Are you sure?"), QMessageBox::Yes, QMessageBox::Cancel);
+		                                tr("Are you sure?"), QMessageBox::Yes, QMessageBox::Cancel);
 		if(ret == QMessageBox::Cancel) {
 			return;
 		}
@@ -136,7 +135,7 @@ bool Viewer::init()
 		int numPage = 0;
 		QTextStream in(&file);
 		in.setCodec("UTF-8");
-		while(!in.atEnd()) {
+		while(!in.atEnd()) {	show();
 			page = "";
 			for(int i = 0; i < 500; i++) {
 				if(in.atEnd())

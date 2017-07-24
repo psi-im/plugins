@@ -1,3 +1,9 @@
+unset(_HDRS)
+unset(_UIS)
+unset(_SRCS)
+unset(_RSCS)
+unset(PLUGIN)
+
 set( PLUGIN enummessagesplugin )
 project(${PLUGIN})
 cmake_minimum_required(VERSION 3.1.0)
@@ -10,7 +16,7 @@ ELSE()
 	set( PLUGINS_PATH "psi-plus/plugins" CACHE STRING "Install suffix for plugins" )
 ENDIF()
 
-add_definitions( -DQT_PLUGIN )
+add_definitions( -DQT_PLUGIN -DHAVE_QT5 )
 include_directories(
 	${CMAKE_SOURCE_DIR}
 	${CMAKE_CURRENT_BINARY_DIR}
@@ -30,31 +36,14 @@ set( _UIS
 set( _RSCS
 	resources.qrc
 )
-IF( USE_QT5 )
-	find_package( Qt5Widgets REQUIRED )
-	find_package( Qt5Xml REQUIRED )
-	set(QT_DEPLIBS
-		Qt5::Widgets
-		Qt5::Xml
-	)
-	qt5_wrap_ui(UIS ${_UIS})
-	qt5_add_resources(RSCS ${_RSCS})
-ELSE()
-	find_package( Qt4 REQUIRED )
-	include( ${QT_USE_FILE} )
-	include_directories(
-		${QT_QTCORE_INCLUDE_DIR}
-		${QT_QTGUI_INCLUDE_DIR}
-		${QT_QTXML_INCLUDE_DIR}
-	)
-	set(QT_DEPLIBS
-		${QT_QTCORE_LIBRARY}
-		${QT_QTGUI_LIBRARY}
-		${QT_QTXML_LIBRARY}
-	)
-	QT4_WRAP_UI(UIS ${_UIS})
-	QT4_ADD_RESOURCES(RSCS ${_RSCS})
-ENDIF()
+
+find_package( Qt5 COMPONENTS Widgets Xml REQUIRED )
+set(QT_DEPLIBS
+	Qt5::Widgets
+	Qt5::Xml
+)
+qt5_wrap_ui(UIS ${_UIS})
+qt5_add_resources(RSCS ${_RSCS})
 
 add_library(
 	${PLUGIN}
@@ -63,8 +52,6 @@ add_library(
 	defines.h
 	${UIS}
 	${RSCS}
-	${TRS}
-	${MOCS}
 )
 target_link_libraries(
 	${PLUGIN}

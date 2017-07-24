@@ -1,3 +1,9 @@
+unset(_HDRS)
+unset(_UIS)
+unset(_SRCS)
+unset(_RSCS)
+unset(PLUGIN)
+
 set( PLUGIN screenshotplugin )
 project(${PLUGIN})
 cmake_minimum_required(VERSION 3.1.0)
@@ -11,7 +17,7 @@ ELSE()
 ENDIF()
 
 
-add_definitions( -DQT_PLUGIN )
+add_definitions( -DQT_PLUGIN -DHAVE_QT5 )
 include_directories(
 	${CMAKE_SOURCE_DIR}
 	${CMAKE_CURRENT_BINARY_DIR}
@@ -25,7 +31,6 @@ if( UNIX AND NOT( APPLE OR CYGWIN ) )
 	add_definitions( -DX11 )
 	set( qxt_X11_SRCS
 		qxt/gui/qxtwindowsystem_x11.cpp
-		#qxt/gui/x11info.cpp
 	)
 	set( qxt_X11_HDRS
 		qxt/gui/x11info.h
@@ -95,44 +100,23 @@ set ( _UIS
 set ( _RSCS
 	${PLUGIN}.qrc
 )
-IF( USE_QT5 )
-	find_package( Qt5Widgets REQUIRED )
-	find_package( Qt5Xml REQUIRED )
-	find_package( Qt5Network REQUIRED )
-	find_package( Qt5PrintSupport REQUIRED )
+
+find_package( Qt5 COMPONENTS Widgets Xml Network PrintSupport REQUIRED )
+set(QT_DEPLIBS
+	Qt5::Widgets
+	Qt5::Xml
+	Qt5::Network
+	Qt5::PrintSupport
+)
+if( UNIX AND NOT( APPLE OR CYGWIN ) )
+	find_package( Qt5 COMPONENTS X11Extras REQUIRED )
 	set(QT_DEPLIBS
-		Qt5::Widgets
-		Qt5::Xml
-		Qt5::Network
-		Qt5::PrintSupport
+		${QT_DEPLIBS}
+		Qt5::X11Extras
 	)
-	if( UNIX AND NOT( APPLE OR CYGWIN ) )
-		find_package( Qt5X11Extras REQUIRED )
-		set(QT_DEPLIBS
-			${QT_DEPLIBS}
-			Qt5::X11Extras
-		)
-	endif()
-	qt5_wrap_ui(UIS ${_UIS})
-	qt5_add_resources(RSCS ${_RSCS})
-ELSE()
-	find_package( Qt4 REQUIRED )
-	include( ${QT_USE_FILE} )
-	include_directories(
-		${QT_QTCORE_INCLUDE_DIR}
-		${QT_QTGUI_INCLUDE_DIR}
-		${QT_QTXML_INCLUDE_DIR}
-		${QT_QTNETWORK_INCLUDE_DIR}
-	)
-	set(QT_DEPLIBS
-		${QT_QTCORE_LIBRARY}
-		${QT_QTGUI_LIBRARY}
-		${QT_QTXML_LIBRARY}
-		${QT_QTNETWORK_LIBRARY}
-	)
-	QT4_WRAP_UI(UIS ${_UIS})
-	QT4_ADD_RESOURCES(RSCS ${_RSCS})
-ENDIF()
+endif()
+qt5_wrap_ui(UIS ${_UIS})
+qt5_add_resources(RSCS ${_RSCS})
 
 add_library(
 	${PLUGIN}
@@ -140,8 +124,6 @@ add_library(
 	${_SRCS}
 	${UIS}
 	${RSCS}
-	${TRS}
-	${MOCS}
 )
 if( UNIX AND NOT( APPLE OR CYGWIN ) )
 	target_link_libraries(

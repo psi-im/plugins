@@ -20,6 +20,7 @@
 
 #include "invatedialog.h"
 
+using namespace GomokuGame;
 
 InvateDialog::InvateDialog(int account, const QString jid, const QStringList resources, QWidget *parent) :
     QDialog(parent),

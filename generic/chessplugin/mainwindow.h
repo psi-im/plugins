@@ -29,6 +29,8 @@
 #include "boarddelegate.h"
 #include "boardmodel.h"
 
+using namespace Chess;
+
 class ChessWindow : public QMainWindow
 {
 	Q_OBJECT

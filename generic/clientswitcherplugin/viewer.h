@@ -31,35 +31,35 @@
 
 class Viewer : public QDialog
 {
-    Q_OBJECT
-    public:
-        Viewer(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *parent = 0);
-        bool init();
+	Q_OBJECT
+public:
+	Viewer(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *parent = 0);
+	bool init();
 
-    private:
-        IconFactoryAccessingHost *icoHost_;
-        QString fileName_;
-        QDateTime lastModified_;
-        QTextEdit *textWid;
-        TypeAheadFindBar *findBar;
-        QMap<int, QString> pages_;
-        int currentPage_;
-        void setPage();
+private:
+	IconFactoryAccessingHost *icoHost_;
+	QString fileName_;
+	QDateTime lastModified_;
+	QTextEdit *textWid;
+	ClientSwitcher::TypeAheadFindBar *findBar;
+	QMap<int, QString> pages_;
+	int currentPage_;
+	void setPage();
 
-    private slots:
-        void saveLog();
-        void updateLog();
-        void deleteLog();
-        void nextPage();
-        void prevPage();
-        void firstPage();
-        void lastPage();
+private slots:
+	void saveLog();
+	void updateLog();
+	void deleteLog();
+	void nextPage();
+	void prevPage();
+	void firstPage();
+	void lastPage();
 
-    protected:
-        void closeEvent(QCloseEvent *e);
+protected:
+	void closeEvent(QCloseEvent *e);
 
-    signals:
-        void onClose(int,int);
+signals:
+	void onClose(int,int);
 };
 
 #endif // VIEWER_H

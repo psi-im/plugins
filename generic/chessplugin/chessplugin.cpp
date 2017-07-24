@@ -63,6 +63,7 @@
 #define constDndDisable "dnddsbl"
 #define constDefSoundSettings "defsndstngs"
 
+using namespace Chess;
 
 class ChessPlugin: public QObject, public PsiPlugin, public OptionAccessor, public ActiveTabAccessor, public MenuAccessor, public ApplicationInfoAccessor,
 				   public ToolbarIconAccessor, public IconFactoryAccessor, public StanzaSender, public AccountInfoAccessor, public StanzaFilter,

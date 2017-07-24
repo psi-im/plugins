@@ -33,33 +33,33 @@ class ViewLog : public QDialog
 {
 	Q_OBJECT
 public:
-        ViewLog(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *parent = 0);
-        bool init();
+	ViewLog(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *parent = 0);
+	bool init();
 
 private:
-        IconFactoryAccessingHost *icoHost_;
-        QString fileName_;
-        QDateTime lastModified_;
-        QTextEdit *textWid;
-        TypeAheadFindBar *findBar;
-        QMap<int, QString> pages_;
-        int currentPage_;
-        void setPage();
+	IconFactoryAccessingHost *icoHost_;
+	QString fileName_;
+	QDateTime lastModified_;
+	QTextEdit *textWid;
+	Stopspam::TypeAheadFindBar *findBar;
+	QMap<int, QString> pages_;
+	int currentPage_;
+	void setPage();
 
 private slots:
-        void saveLog();
-        void updateLog();
-        void deleteLog();
-        void nextPage();
-        void prevPage();
-        void firstPage();
-        void lastPage();
+	void saveLog();
+	void updateLog();
+	void deleteLog();
+	void nextPage();
+	void prevPage();
+	void firstPage();
+	void lastPage();
 
 protected:
-        void closeEvent(QCloseEvent *e);
+	void closeEvent(QCloseEvent *e);
 
 signals:
-        void onClose(int,int);
+	void onClose(int,int);
 };
 
 #endif // VIEWER_H

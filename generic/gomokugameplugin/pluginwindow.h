@@ -37,6 +37,8 @@ namespace Ui {
     class PluginWindow;
 }
 
+using namespace GomokuGame;
+
 class HintElementWidget : public QFrame {
 	Q_OBJECT
 public:

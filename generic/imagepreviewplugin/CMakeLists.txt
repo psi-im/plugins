@@ -1,3 +1,9 @@
+unset(_HDRS)
+unset(_UIS)
+unset(_SRCS)
+unset(_RSCS)
+unset(PLUGIN)
+
 set( PLUGIN imagepreviewplugin )
 project(${PLUGIN})
 cmake_minimum_required(VERSION 3.1.0)
@@ -12,30 +18,27 @@ ENDIF()
 
 option( USE_WEBENGINE "Use WebEngine support instead of Webkit" OFF )
 
-if(USE_QT5)
-	find_package( Qt5Core REQUIRED )
-	if(${Qt5Core_VERSION} VERSION_GREATER 5.7.0)
-		find_package( Qt5 COMPONENTS WebEngine QUIET )
-		if( Qt5WebEngine_FOUND )
-			set(USE_WEBENGINE ON)
-			add_definitions(
-				-DWEBENGINE=1
-				-DHAVE_WEBENGINE
-			)
-		else()
-			set(USE_WEBENGINE OFF)
-			add_definitions(
-				-DHAVE_WEBKIT
-			)
-		endif()
+find_package( Qt5 COMPONENTS Core REQUIRED )
+if(${Qt5Core_VERSION} VERSION_GREATER 5.6.0)
+	find_package( Qt5 COMPONENTS WebEngine QUIET )
+	if( Qt5WebEngine_FOUND )
+		set(USE_WEBENGINE ON)
+		add_definitions(
+			-DWEBENGINE=1
+			-DHAVE_WEBENGINE
+		)
+	else()
+		set(USE_WEBENGINE OFF)
+		add_definitions(
+			-DHAVE_WEBKIT
+		)
 	endif()
 endif()
 
-add_definitions( -DQT_PLUGIN )
+add_definitions( -DQT_PLUGIN -DHAVE_QT5 )
 include_directories(
 	${CMAKE_SOURCE_DIR}
 	${CMAKE_CURRENT_BINARY_DIR}
-	#$
 	../../include
 	.
 )
@@ -52,49 +55,29 @@ set( _HDRS
 set( _RSCS
 	${PLUGIN}.qrc
 )
-IF( USE_QT5 )
-	add_definitions(-DHAVE_QT5)
-	find_package(Qt5 COMPONENTS Widgets Xml Network REQUIRED)
-	set(QT_DEPLIBS
-		Qt5::Widgets
-		Qt5::Xml
-		Qt5::Network
+
+add_definitions(-DHAVE_QT5)
+find_package(Qt5 COMPONENTS Widgets Xml Network REQUIRED)
+set(QT_DEPLIBS
+	Qt5::Widgets
+	Qt5::Xml
+	Qt5::Network
+)
+if( USE_WEBENGINE )
+	find_package(Qt5 COMPONENTS WebEngine WebEngineWidgets REQUIRED)
+	list(APPEND QT_DEPLIBS
+		Qt5::WebEngine
+		Qt5::WebEngineWidgets
 	)
-	if( USE_WEBENGINE )
-		find_package(Qt5 COMPONENTS WebEngine WebEngineWidgets REQUIRED)
-		list(APPEND QT_DEPLIBS
-			Qt5::WebEngine
-			Qt5::WebEngineWidgets
-		)
-	else()
-		find_package(Qt5 COMPONENTS WebKit WebKitWidgets REQUIRED)
-		list(APPEND QT_DEPLIBS
-			Qt5::WebKit
-			Qt5::WebKitWidgets
-		)
-	endif()
-	qt5_wrap_ui(UIS ${_UIS})
-	qt5_add_resources(RSCS ${_RSCS})
-ELSE()
-	find_package( Qt4 REQUIRED )
-	include( ${QT_USE_FILE} )
-	include_directories(
-		${QT_QTCORE_INCLUDE_DIR}
-		${QT_QTGUI_INCLUDE_DIR}
-		${QT_QTXML_INCLUDE_DIR}
-		${QT_QTNETWORK_INCLUDE_DIR}
-		${QT_QTWEBKIT_INCLUDE_DIR}
+else()
+	find_package(Qt5 COMPONENTS WebKit WebKitWidgets REQUIRED)
+	list(APPEND QT_DEPLIBS
+		Qt5::WebKit
+		Qt5::WebKitWidgets
 	)
-	set(QT_DEPLIBS
-		${QT_QTCORE_LIBRARY}
-		${QT_QTGUI_LIBRARY}
-		${QT_QTXML_LIBRARY}
-		${QT_QTNETWORK_LIBRARY}
-		${QT_QTWEBKIT_LIBRARY}
-	)
-	QT4_WRAP_UI(UIS ${_UIS})
-	QT4_ADD_RESOURCES(RSCS ${_RSCS})
-ENDIF()
+endif()
+qt5_wrap_ui(UIS ${_UIS})
+qt5_add_resources(RSCS ${_RSCS})
 
 add_library(
 	${PLUGIN}
