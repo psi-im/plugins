@@ -120,7 +120,6 @@ void TypeAheadFindBar::init() {
 	d->first_page->setFixedSize(25,25);
 	d->first_page->setIcon(icoHost_->getIcon("psi/doubleBackArrow"));
 	addWidget(d->first_page);
-	qWarning("d->first_page created");
 
 	d->prev_page = new QPushButton(this);
 	d->prev_page->setToolTip(tr("Previous page"));
@@ -128,7 +127,6 @@ void TypeAheadFindBar::init() {
 	d->prev_page->setFixedSize(25,25);
 	d->prev_page->setIcon(icoHost_->getIcon("psi/arrowLeft"));
 	addWidget(d->prev_page);
-	qWarning("d->prev_page created");
 
 	d->next_page = new QPushButton(this);
 	d->next_page->setToolTip(tr("Next page"));
@@ -136,7 +134,6 @@ void TypeAheadFindBar::init() {
 	d->next_page->setFixedSize(25,25);
 	d->next_page->setIcon(icoHost_->getIcon("psi/arrowRight"));
 	addWidget(d->next_page);
-	qWarning("d->next_page created");
 
 	d->last_page = new QPushButton(this);
 	d->last_page->setToolTip(tr("Last page"));
@@ -144,7 +141,6 @@ void TypeAheadFindBar::init() {
 	d->last_page->setFixedSize(25,25);
 	d->last_page->setIcon(icoHost_->getIcon("psi/doubleNextArrow"));
 	addWidget(d->last_page);
-	qWarning("d->last_page created");
 }
 
 TypeAheadFindBar::~TypeAheadFindBar() {
