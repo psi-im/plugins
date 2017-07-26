@@ -208,7 +208,7 @@ void ChessWindow::createMenu() {
 
 	connect(loadAction, SIGNAL(triggered()), this, SLOT(load()));
 	connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
-	connect(quitAction, SIGNAL(triggered()), this, SLOT(close()));
+	connect(quitAction, SIGNAL(triggered()), this, SLOT(close()), Qt::QueuedConnection);
 	connect(loseAction, SIGNAL(triggered()), this, SIGNAL(lose()));
 	connect(soundAction, SIGNAL(triggered(bool)), this, SIGNAL(toggleEnableSound(bool)));
 }
