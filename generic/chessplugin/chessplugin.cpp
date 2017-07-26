@@ -526,7 +526,7 @@ void ChessPlugin::acceptGame() {
 	waitFor = false;
 	theEnd_ = false;
 	board = new ChessWindow(currentGame_.type, enableSound);
-	connect(board, SIGNAL(closeBoard()), this, SLOT(closeBoardEvent()));
+	connect(board, SIGNAL(closeBoard()), this, SLOT(closeBoardEvent()), Qt::QueuedConnection);
 	connect(board, SIGNAL(move(int,int,int,int, QString)), this, SLOT(move(int,int,int,int, QString)));
 	connect(board, SIGNAL(moveAccepted()), this, SLOT(moveAccepted()));
 	connect(board, SIGNAL(error()), this, SLOT(error()));
