@@ -54,7 +54,7 @@
 #include "invitedialog.h"
 #include "request.h"
 
-#define cVer "0.2.7"
+#define cVer "0.2.8"
 
 #define soundStartConst "soundstart"
 #define soundFinishConst "soundfinish"
