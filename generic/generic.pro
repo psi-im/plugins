@@ -1,33 +1,33 @@
 TEMPLATE = subdirs
 
 SUBDIRS += attentionplugin \
-    autoreplyplugin \
-    birthdayreminderplugin \
-    chessplugin \
-    cleanerplugin \
-    conferenceloggerplugin \
-    contentdownloaderplugin \
-    enummessagesplugin \
-    extendedmenuplugin \
-    extendedoptionsplugin \
-    gomokugameplugin \
-    historykeeperplugin \
-    icqdieplugin \
-    imageplugin \
-    jabberdiskplugin \
-    messagefilterplugin \
-    otrplugin \
-    pepchangenotifyplugin \
-    qipxstatusesplugin \
-    screenshotplugin \
-    skinsplugin \
-    stopspamplugin \
-    storagenotesplugin \
-    translateplugin \
-    videostatusplugin \
-    watcherplugin
-
-# Broken plugins
-#    juickplugin clientswitcherplugin gnupgplugin
-# Deprecated plugins
-#    captchaformsplugin gmailserviceplugin
+autoreplyplugin \
+birthdayreminderplugin \
+chessplugin \
+cleanerplugin \
+clientswitcherplugin \
+conferenceloggerplugin \
+contentdownloaderplugin \
+enummessagesplugin \
+extendedmenuplugin \
+extendedoptionsplugin \
+gnupgplugin \
+gomokugameplugin \
+historykeeperplugin \
+httpuploadplugin \
+icqdieplugin \
+imageplugin \
+imagepreviewplugin \
+jabberdiskplugin \
+juickplugin \
+messagefilterplugin \
+otrplugin \
+pepchangenotifyplugin \
+qipxstatusesplugin \
+screenshotplugin \
+skinsplugin \
+stopspamplugin \
+storagenotesplugin \
+translateplugin \
+videostatusplugin \
+watcherplugin
