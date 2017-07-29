@@ -1,10 +1,10 @@
-!mac {
-CONFIG += release
 isEmpty(PSISDK) {
     include(../../psiplugin.pri)
 } else {
     include($$PSISDK/plugins/psiplugin.pri)
 }
+
+!mac {
 
 RESOURCES += resources.qrc
 
@@ -20,4 +20,4 @@ unix: ! mac {
     HEADERS += x11info.h
 }
 
-win32:LIBS += -lUser32
+win32:LIBS += -luser32

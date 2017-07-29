@@ -1,8 +1,11 @@
-CONFIG += release
-include(../../psiplugin.pri)
+isEmpty(PSISDK) {
+    include(../../psiplugin.pri)
+} else {
+    include($$PSISDK/plugins/psiplugin.pri)
+}
 
 SOURCES += \
-            juickplugin.cpp \
+    juickplugin.cpp \
     juickjidlist.cpp \
     juickparser.cpp \
     juickdownloader.cpp
@@ -14,7 +17,7 @@ HEADERS += \
     defines.h \
     juickplugin.h
 
-QT += network
+QT += network widgets
 greaterThan(QT_MAJOR_VERSION, 4) {
     contains(psi_features, qtwebengine) {
         QT += webengine webenginewidgets

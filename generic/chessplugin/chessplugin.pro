@@ -1,10 +1,11 @@
-CONFIG += release
-RESOURCES = chessplugin.qrc
 isEmpty(PSISDK) {
     include(../../psiplugin.pri)
 } else {
     include($$PSISDK/plugins/psiplugin.pri)
 }
+
+RESOURCES = chessplugin.qrc
+
 INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 SOURCES += chessplugin.cpp \

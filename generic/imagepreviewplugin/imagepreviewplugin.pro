@@ -1,4 +1,9 @@
-CONFIG += release
+isEmpty(PSISDK) {
+    include(../../psiplugin.pri)
+} else {
+    include($$PSISDK/plugins/psiplugin.pri)
+}
+
 QT += network
 greaterThan(QT_MAJOR_VERSION, 4) {
     qtHaveModule(webengine) {
@@ -13,12 +18,6 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 else {
     QT += webkit
     DEFINES += HAVE_WEBKIT
-}
-
-isEmpty(PSISDK) {
-    include(../../psiplugin.pri)
-} else {
-    include($$PSISDK/plugins/psiplugin.pri)
 }
 
 RESOURCES = imagepreviewplugin.qrc

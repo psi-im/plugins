@@ -1,4 +1,3 @@
-CONFIG += release
 TARGET = stopspamplugin
 isEmpty(PSISDK) {
     include(../../psiplugin.pri)

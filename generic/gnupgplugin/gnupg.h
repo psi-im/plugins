@@ -98,7 +98,7 @@ public:
 
 	// from ToolbarIconAccessor
 	QList<QVariantHash> getButtonParam();
-	QAction* getAction(QObject */*parent*/, int /*account*/, const QString &/*contact*/) { return 0; }
+	QAction* getAction(QObject * /*parent*/, int /*account*/, const QString &/*contact*/) { return 0; }
 
 	// from IconFactoryAccessor
 	void setIconFactoryAccessingHost(IconFactoryAccessingHost *host) { _iconFactory = host; }

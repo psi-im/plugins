@@ -1,13 +1,11 @@
-# -------------------------------------------------
-# Project created by QtCreator 2010-08-20T17:55:47
-# -------------------------------------------------
-QT += network xml
-# CONFIG += debug
 isEmpty(PSISDK) {
     include(../../psiplugin.pri)
 } else {
     include($$PSISDK/plugins/psiplugin.pri)
 }
+
+QT += network xml
+
 SOURCES += contentdownloader.cpp \
     cditemmodel.cpp \
     form.cpp \

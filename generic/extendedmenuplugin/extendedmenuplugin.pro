@@ -1,5 +1,3 @@
-CONFIG += release
-
 isEmpty(PSISDK) {
     include(../../psiplugin.pri)
 } else {
