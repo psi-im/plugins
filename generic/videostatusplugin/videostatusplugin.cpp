@@ -90,7 +90,7 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 }
 #endif
 
-#define constVersion "0.2.6"
+#define constVersion "0.2.7"
 
 #define constStatus "status"
 #define constStatusMessage "statusmessage"
@@ -157,11 +157,7 @@ private:
 	};
 	QHash<int, StatusString> statuses_;
 #ifdef Q_OS_WIN
-	void getDesktopSize();
 	bool isFullscreenWindow();
-
-	int desktopWidth;
-	int desktopHeight;
 #endif
 	void setPsiGlobalStatus(const bool set);
 	void setStatusTimer(const int delay, const bool isStart);
@@ -663,51 +659,19 @@ void VideoStatusChanger::fullSTTimeout()
 }
 
 #ifdef Q_OS_WIN
-
-void VideoStatusChanger::getDesktopSize()
-{
-	RECT dSize;
-	if (GetWindowRect(GetDesktopWindow(), &dSize)) {
-		desktopWidth = abs(dSize.right - dSize.left);
-		desktopHeight = abs(dSize.bottom - dSize.top);
-	}
-	else{
-		desktopWidth = GetSystemMetrics(SM_CXSCREEN);
-		desktopHeight = GetSystemMetrics(SM_CYSCREEN);
-	}
-}
-
 bool VideoStatusChanger::isFullscreenWindow()
 {
-	HWND topWindow = GetForegroundWindow();
-	if (topWindow != NULL) {
-		//check for Progman window by GetWindow method
-		bool isDesktop = (GetWindow(GetWindow(GetDesktopWindow(), GW_CHILD), GW_HWNDLAST) == topWindow);
-		if (!isDesktop) {
-			//check for Progman and WorkerW by the name of the windows class
-			QByteArray ba(4 * sizeof(wchar_t), 0);
-			if (GetClassNameW(topWindow, (wchar_t*)ba.data(), ba.size()) > 0) {
-				QString className = QString::fromWCharArray((wchar_t*)ba.data(), ba.size());
-				if (className.contains("Progman", Qt::CaseInsensitive)
-				    || className.contains("WorkerW", Qt::CaseInsensitive)) {
-					isDesktop = true;
-				}
-			}
-		}
-		getDesktopSize();
-		WINDOWINFO info;
-		memset(&info, 0, sizeof(WINDOWINFO));
-		if (GetWindowInfo(topWindow, &info)) {
-			int x = info.rcWindow.left;
-			int y = info.rcWindow.top;
-			int wWidth = info.rcClient.right;
-			int wHeight = info.rcClient.bottom;
-			if (x == 0
-			    && y == 0
-			    && wWidth >= desktopWidth
-			    && wHeight >= desktopHeight
-			    && !isDesktop) {
-				return true;
+	HWND hWnd = GetForegroundWindow();
+	RECT appBounds;
+	RECT rc;
+	if (GetWindowRect(GetDesktopWindow(), &rc)) {
+		if(hWnd != GetDesktopWindow() && hWnd != GetShellWindow())
+		{
+			if (GetWindowRect(hWnd, &appBounds)) {
+				return (appBounds.bottom == rc.bottom
+					&& appBounds.left == rc.left
+					&& appBounds.right == rc.right
+					&& appBounds.top == rc.top);
 			}
 		}
 	}
