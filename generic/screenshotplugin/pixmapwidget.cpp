@@ -440,8 +440,7 @@ void PixmapWidget::mouseDoubleClickEvent(QMouseEvent *e)
 
 void PixmapWidget::mouseReleaseEvent(QMouseEvent *e)
 {
-
-	if(e->buttons() != !Qt::LeftButton ) {
+	if(e->button() != Qt::LeftButton) {
 		e->accept();
 		return;
 	}
