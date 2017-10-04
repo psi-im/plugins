@@ -143,7 +143,7 @@ QString PsiOtrPlugin::shortName() const
 
 QString PsiOtrPlugin::version() const
 {
-    return "1.0.2";
+    return "1.0.3";
 }
 
 // ---------------------------------------------------------------------------
@@ -279,7 +279,9 @@ bool PsiOtrPlugin::processEvent(int accountIndex, QDomElement& e)
     if (m_enabled && e.attribute("type") == "MessageEvent" &&
         !messageElement.isNull() &&
         messageElement.attribute("type") != "error" &&
-        messageElement.attribute("type") != "groupchat")
+        messageElement.attribute("type") != "groupchat" &&
+        e.elementsByTagNameNS("urn:xmpp:carbons:2", "sent").isEmpty() &&
+        e.elementsByTagNameNS("urn:xmpp:carbons:2", "received").isEmpty())
     {
         QString contact = getCorrectJid(accountIndex,
                                         messageElement.attribute("from"));

@@ -1,3 +1,9 @@
+2017-10-04
+v1.0.3 ValdikSS
+  * Do not handle OTR events in MUC
+  * Send OTR messages with proper message hints and disabled carbon copies
+  * Ignore incoming carbon-copied OTR messages
+
 2014-03-26
 v1.0.2 tehnick
   * Fix a queue of events for modal dialogs.
