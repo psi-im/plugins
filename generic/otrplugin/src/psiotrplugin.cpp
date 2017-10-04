@@ -278,7 +278,8 @@ bool PsiOtrPlugin::processEvent(int accountIndex, QDomElement& e)
 
     if (m_enabled && e.attribute("type") == "MessageEvent" &&
         !messageElement.isNull() &&
-        messageElement.attribute("type") != "error")
+        messageElement.attribute("type") != "error" &&
+        messageElement.attribute("type") != "groupchat")
     {
         QString contact = getCorrectJid(accountIndex,
                                         messageElement.attribute("from"));
