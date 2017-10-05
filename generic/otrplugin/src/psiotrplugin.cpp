@@ -565,17 +565,19 @@ bool PsiOtrPlugin::outgoingStanza(int accountIndex, QDomElement& xml)
         xml.removeChild(htmlElement);
     }
 
-    if (xml.attribute("to").contains("/")) {
-        // if not a bare jid
-        htmlElement = xml.ownerDocument().createElementNS("urn:xmpp:hints" ,"no-copy");
+    if (m_onlineUsers[account][contact]->encrypted()) {
+        if (xml.attribute("to").contains("/")) {
+            // if not a bare jid
+            htmlElement = xml.ownerDocument().createElementNS("urn:xmpp:hints" ,"no-copy");
+            xml.appendChild(htmlElement);
+        }
+
+        htmlElement = xml.ownerDocument().createElementNS("urn:xmpp:hints", "no-permanent-store");
+        xml.appendChild(htmlElement);
+
+        htmlElement = xml.ownerDocument().createElementNS("urn:xmpp:carbons:2", "private");
         xml.appendChild(htmlElement);
     }
-
-    htmlElement = xml.ownerDocument().createElementNS("urn:xmpp:hints", "no-permanent-store");
-    xml.appendChild(htmlElement);
-
-    htmlElement = xml.ownerDocument().createElementNS("urn:xmpp:carbons:2", "private");
-    xml.appendChild(htmlElement);
 
     return false;
 }
