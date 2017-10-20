@@ -9,46 +9,43 @@ project(${PLUGIN})
 cmake_minimum_required(VERSION 3.1.0)
 set( CMAKE_AUTOMOC TRUE )
 
-IF( NOT WIN32 )
-	set( LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
-	set( PLUGINS_PATH "lib${LIB_SUFFIX}/psi-plus/plugins" CACHE STRING "Install suffix for plugins" )
-ELSE()
-	set( PLUGINS_PATH "psi-plus/plugins" CACHE STRING "Install suffix for plugins" )
-ENDIF()
+set(PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." CACHE STRING "Plugins root path. Path where include directory placed")
 
-IF( ${PROJECT_SOURCE_DIR} )
-	set( CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/cmake/modules" )
-ELSE()
-	set( CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_SOURCE_DIR}/../../../../cmake/modules")
-ENDIF()
+if(EXISTS "${PLUGINS_ROOT_DIR}/variables.cmake")
+	include("${PLUGINS_ROOT_DIR}/variables.cmake")
+elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../../variables.cmake")
+	include("${CMAKE_CURRENT_LIST_DIR}/../../variables.cmake")
+else()
+	message(FATAL_ERROR "No variables.cmake file found.
+		Please set path to this file to PLUGINS_ROOT_DIR variable")
+endif()
 
 IF( WIN32 )
 	if(NOT LIBGCRYPT_ROOT)
-		set( LIBGCRYPT_ROOT "C:\\build\\psibuild\\psideps\\libgcrypt\\i386" CACHE STRING "Path to libgcrypt library" )
+		set( LIBGCRYPT_ROOT "C:\\build\\psisdk\\libgcrypt\\i386" CACHE STRING "Path to libgcrypt library" )
 	endif()
 	if(NOT LIBGPGERROR_ROOT)
-		set( LIBGPGERROR_ROOT "C:\\build\\psibuild\\psideps\\libgpg-error\\i386" CACHE STRING "Path to libgpg-error library" )
+		set( LIBGPGERROR_ROOT "C:\\build\\psisdk\\libgpg-error\\i386" CACHE STRING "Path to libgpg-error library" )
 	endif()
 	if(NOT LIBOTR_ROOT)
-		set( LIBOTR_ROOT "C:\\build\\psibuild\\psideps\\libotr\\i386" CACHE STRING "Path to libotr library" )
+		set( LIBOTR_ROOT "C:\\build\\psisdk\\libotr\\i386" CACHE STRING "Path to libotr library" )
 	endif()
 	if(NOT LIBGCRYPT_ROOT)
-		set( LIBTIDY_ROOT "C:\\build\\psibuild\\psideps\\libtidy\\i386" CACHE STRING "Path to libtidy library" )
+		set( LIBTIDY_ROOT "C:\\build\\psisdk\\libtidy\\i386" CACHE STRING "Path to libtidy library" )
 	endif()
-	add_definitions( -DQ_WS_WIN )
 ENDIF()
+
 find_package( LibGcrypt REQUIRED )
 find_package( LibOtr REQUIRED )
 find_package( LibTidy REQUIRED )
 find_package( LibGpgError REQUIRED )
 add_definitions(
-		-DQT_PLUGIN
-		-DHAVE_QT5
 		${LIBOTR_DEFINITIONS}
 		${LIBTIDY_DEFINITIONS}
 		${LIBGCRYPT_DEFINITIONS}
 		${LIBGPGERROR_DEFINITIONS}
 )
+
 #dirty hack for windows
 IF( WIN32 )
 	set(TIDY_INCLUDES
@@ -64,9 +61,9 @@ include_directories(
 		${LIBGCRYPT_INCLUDE_DIR}
 		${LIBGPGERROR_INCLUDE_DIR}
 		${TIDY_INCLUDES}
-		../../include
-		./src
-		.
+		${PLUGINS_ROOT_DIR}/include
+		${CMAKE_CURRENT_LIST_DIR}
+		${CMAKE_CURRENT_LIST_DIR}/src
 )
 set( _HDRS
 	src/psiotrplugin.h

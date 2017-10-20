@@ -9,20 +9,22 @@ project(${PLUGIN})
 cmake_minimum_required(VERSION 3.1.0)
 set( CMAKE_AUTOMOC TRUE )
 
-IF( NOT WIN32 )
-	set( LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
-	set( PLUGINS_PATH "lib${LIB_SUFFIX}/psi-plus/plugins" CACHE STRING "Install suffix for plugins" )
-ELSE()
-	set( PLUGINS_PATH "psi-plus/plugins" CACHE STRING "Install suffix for plugins" )
-ENDIF()
+set(PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." CACHE STRING "Plugins root path. Path where include directory placed")
 
+if(EXISTS "${PLUGINS_ROOT_DIR}/variables.cmake")
+	include("${PLUGINS_ROOT_DIR}/variables.cmake")
+elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../../variables.cmake")
+	include("${CMAKE_CURRENT_LIST_DIR}/../../variables.cmake")
+else()
+	message(FATAL_ERROR "No variables.cmake file found.
+		Please set path to this file to PLUGINS_ROOT_DIR variable")
+endif()
 
-add_definitions( -DQT_PLUGIN -DHAVE_QT5 )
 include_directories(
 	${CMAKE_SOURCE_DIR}
 	${CMAKE_CURRENT_BINARY_DIR}
-	../../include
-	.
+	${PLUGINS_ROOT_DIR}/include
+	${CMAKE_CURRENT_LIST_DIR}
 )
 set( _SRCS
 	${PLUGIN}.cpp
