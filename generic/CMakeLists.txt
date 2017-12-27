@@ -38,11 +38,11 @@ set( plugins_list
 	watcherplugin
 )
 
-if( NOT MSVC )
+#if( NOT MSVC )
 	list(APPEND plugins_list
 		clientswitcherplugin
 	)
-endif()
+#endif()
 
 if( "${BUILD_PLUGINS}" STREQUAL "ALL" )
 	set ( plugins ${plugins_list} )
