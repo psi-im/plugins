@@ -1,3 +1,7 @@
+2018-01-14
+v0.2.8
+  + Added SMPlayer support via DBUS (OS Linux)
+
 2017-07-02
 v0.2.7
   + Fixed detection of fullscreen application in OS Windows

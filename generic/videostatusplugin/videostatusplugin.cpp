@@ -56,7 +56,8 @@ static const QList<StringMap> players = QList<StringMap>() << StringMap("vlc", "
 							   << StringMap("Totem", "Totem (>=2.30.2)")
 							   << StringMap("kaffeine", "Kaffeine (>=1.0)")
 							   << StringMap("mplayer", "GNOME MPlayer")
-							   << StringMap("dragonplayer", "Dragon Player");
+							   << StringMap("dragonplayer", "Dragon Player")
+							   << StringMap("smplayer", "SMPlayer");
 struct PlayerStatus
 {
 	int playStatus;
@@ -90,7 +91,7 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 }
 #endif
 
-#define constVersion "0.2.7"
+#define constVersion "0.2.8"
 
 #define constStatus "status"
 #define constStatusMessage "statusmessage"
