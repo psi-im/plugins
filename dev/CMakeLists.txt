@@ -3,6 +3,7 @@ cmake_minimum_required( VERSION 3.1.0 )
 set( plugins_list 
     battleshipgameplugin
     ripperccplugin
+    omemoplugin
 )
 if( "${BUILD_PLUGINS}" STREQUAL "ALL" )
     set( plugins ${plugins_list} )
