@@ -31,7 +31,6 @@
 #include "omemoplugin.h"
 
 namespace psiomemo {
-  //TODO check leaks
   QString OMEMOPlugin::name() const {
     return "OMEMO Plugin";
   }
