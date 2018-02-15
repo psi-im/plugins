@@ -289,7 +289,7 @@ void ConferenceLogger::view() {
 	QStringList List = YourJid.split("/");
 	YourJid = List.takeFirst();
 	YourJid = YourJid.replace("@", "_at_");
-	QString FName = YourJid + "_in_" + Jid;
+	QString FName = YourJid + "_in_" + Jid + ".history";
 	QDir dir(HistoryDir);
 	foreach(QString file, dir.entryList(QDir::Files)) {
 		if(file == FName) {
