@@ -250,7 +250,7 @@ void ConferenceLogger::Logger(QString room, QString from, QString MyJid, QString
 		Stamp.insert(7, "-");
 		Stamp.replace("T", " ");
 	}
-	QFile file(HistoryDir + QDir::separator() + MyJid + room);
+	QFile file(HistoryDir + QDir::separator() + MyJid + room + ".history");
 	if(file.open(QIODevice::WriteOnly | QIODevice::Append)) {
 		QTextStream out(&file);
 		//out.seek(file.size());

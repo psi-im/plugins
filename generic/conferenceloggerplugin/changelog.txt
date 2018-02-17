@@ -1,3 +1,7 @@
+2018-02-17
+v0.2.3
+  * Added .history extension to log files
+
 2013-09-02
 v0.2.2 - taurus
   * Использовать слово Groupchat вместо Conference
