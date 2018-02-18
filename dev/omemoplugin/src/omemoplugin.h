@@ -30,6 +30,7 @@
 #include "accountinfoaccessor.h"
 #include "applicationinfoaccessor.h"
 #include "psiaccountcontroller.h"
+#include "menuaccessor.h"
 #include "storage.h"
 #include "crypto.h"
 #include "omemo.h"
@@ -42,7 +43,8 @@ namespace psiomemo {
                       public EventCreator,
                       public AccountInfoAccessor,
                       public ApplicationInfoAccessor,
-                      public PsiAccountController {
+                      public PsiAccountController,
+                      public MenuAccessor {
   Q_OBJECT
   Q_PLUGIN_METADATA(IID
                         "com.psi.OmemoPlugin")
@@ -52,7 +54,8 @@ namespace psiomemo {
                EventCreator
                AccountInfoAccessor
                ApplicationInfoAccessor
-               PsiAccountController)
+               PsiAccountController
+               MenuAccessor)
   public:
     QString name() const override;
     QString shortName() const override;
@@ -75,6 +78,10 @@ namespace psiomemo {
     void setPsiAccountControllingHost(PsiAccountControllingHost *host) override;
     QStringList pluginFeatures() override;
 
+    QList<QVariantHash> getAccountMenuParam() override;
+    QList<QVariantHash> getContactMenuParam() override;
+    QAction *getContactAction(QObject *parent, int account, const QString &contact) override;
+    QAction *getAccountAction(QObject *parent, int account) override;
   private:
     bool m_enabled;
     QSet<QString> m_encryptedStanzaIds;
@@ -83,6 +90,8 @@ namespace psiomemo {
     AccountInfoAccessingHost *m_accountInfo;
     ApplicationInfoAccessingHost *m_applicationInfo;
     EventCreatingHost *m_eventCreator;
+  private slots:
+    void onDisableOMEMOAction(bool);
   };
 }
 #endif //PSIOMEMO_OMEMOPLUGIN_H

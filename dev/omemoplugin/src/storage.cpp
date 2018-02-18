@@ -93,11 +93,10 @@ namespace psiomemo {
   void Storage::initializeDB(signal_context *signalContext) {
     QSqlDatabase _db = db();
     _db.transaction();
+    QSqlQuery q("PRAGMA table_info(simple_store)", db());
 
     QString error;
-
-    uint32_t deviceId;
-    if (getLocalRegistrationId(this, &deviceId) != SG_SUCCESS) {
+    if (!q.next()) {
       _db.exec("CREATE TABLE IF NOT EXISTS disabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
       _db.exec("CREATE TABLE IF NOT EXISTS devices (jid TEXT NOT NULL, device_id INTEGER NOT NULL, trust INTEGER NOT NULL, PRIMARY KEY(jid, device_id))");
       _db.exec("CREATE TABLE IF NOT EXISTS identity_key_store (jid TEXT NOT NULL, device_id INTEGER NOT NULL, key BLOB NOT NULL, PRIMARY KEY(jid, device_id))");
@@ -107,6 +106,7 @@ namespace psiomemo {
 
       storeValue("db_ver", 1);
 
+      uint32_t deviceId;
       if (signal_protocol_key_helper_generate_registration_id(&deviceId, 1, signalContext) == SG_SUCCESS) {
         storeValue("registration_id", deviceId);
 
@@ -177,10 +177,16 @@ namespace psiomemo {
     return QSqlDatabase::database(m_databaseConnectionName);
   }
 
-  QSet<uint32_t> Storage::retrieveDeviceList(const QString &user) {
+  QSet<uint32_t> Storage::retrieveDeviceList(const QString &user, bool onlyTrusted) {
     QSqlQuery q(db());
-    q.prepare("SELECT device_id FROM devices WHERE jid IS ?");
-    q.addBindValue(user);
+    if (onlyTrusted) {
+      q.prepare("SELECT device_id FROM devices WHERE jid IS ? AND trust IS ?");
+      q.bindValue(1, TRUSTED);
+    }
+    else {
+      q.prepare("SELECT device_id FROM devices WHERE jid IS ?");
+    }
+    q.bindValue(0, user);
     q.exec();
 
     QSet<uint32_t> knownIds;
@@ -190,8 +196,22 @@ namespace psiomemo {
     return knownIds;
   }
 
+  QSet<uint32_t> Storage::retrieveUndecidedDeviceList(const QString &user) {
+    QSqlQuery q(db());
+    q.prepare("SELECT device_id FROM devices WHERE jid IS ? AND trust IS ?");
+    q.addBindValue(user);
+    q.addBindValue(UNDECIDED);
+    q.exec();
+
+    QSet<uint32_t> ids;
+    while (q.next()) {
+      ids.insert(q.value(0).toUInt());
+    }
+    return ids;
+  }
+
   void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds) {
-    QSet<uint32_t> knownIds = retrieveDeviceList(user);
+    QSet<uint32_t> knownIds = retrieveDeviceList(user, false);
 
     auto added = QSet<uint32_t>(actualIds).subtract(knownIds);
     auto removed = QSet<uint32_t>(knownIds).subtract(actualIds);
@@ -199,8 +219,9 @@ namespace psiomemo {
     QSqlQuery q(_db);
 
     if (!added.isEmpty()) {
-      q.prepare("INSERT INTO devices (jid, device_id, trust) VALUES (?, ?, 0)");
+      q.prepare("INSERT INTO devices (jid, device_id, trust) VALUES (?, ?, ?)");
       q.bindValue(0, user);
+      q.bindValue(2, knownIds.isEmpty() ? TRUSTED : UNDECIDED);
       foreach (uint32_t id, added) {
         q.bindValue(1, id);
         q.exec();
@@ -426,6 +447,53 @@ namespace psiomemo {
 
   signal_protocol_store_context *Storage::storeContext() const {
     return m_storeContext;
+  }
+
+  bool Storage::isTrusted(QString const &user, uint32_t deviceId) {
+    QSqlQuery q(db());
+    q.prepare("SELECT trust FROM devices where jid IS ? AND device_id IS ?");
+    q.addBindValue(user);
+    q.addBindValue(deviceId);
+    q.exec();
+    return q.next() && q.value(0).toInt() == TRUSTED;
+  }
+
+  QByteArray Storage::loadDeviceIdentity(const QString &user, uint32_t deviceId) {
+    QSqlQuery q(db());
+    q.prepare("SELECT key FROM identity_key_store WHERE jid IS ? AND device_id IS ?");
+    q.addBindValue(user);
+    q.addBindValue(deviceId);
+    q.exec();
+
+    QByteArray res;
+    if (q.next()) {
+      res = q.value(0).toByteArray();
+    }
+    return res;
+  }
+
+  void Storage::setDeviceTrust(const QString &user, uint32_t deviceId, bool trusted) {
+    QSqlQuery q(db());
+    q.prepare("UPDATE devices SET trust = ? WHERE jid IS ? AND device_id IS ?");
+    q.addBindValue(trusted ? TRUSTED : UNTRUSTED);
+    q.addBindValue(user);
+    q.addBindValue(deviceId);
+    q.exec();
+  }
+
+  bool Storage::isDisabledForUser(const QString &user) {
+    QSqlQuery q(db());
+    q.prepare("SELECT jid FROM disabled_buddies WHERE jid IS ?");
+    q.addBindValue(user);
+    q.exec();
+    return q.next();
+  }
+
+  void Storage::setDisabledForUser(const QString &user, bool disabled) {
+    QSqlQuery q(db());
+    q.prepare(disabled ? "INSERT OR REPLACE INTO disabled_buddies (jid) VALUES (?)" : "DELETE FROM disabled_buddies WHERE jid IS ?");
+    q.addBindValue(user);
+    q.exec();
   }
 
   QByteArray toQByteArray(signal_buffer *buffer) {

@@ -33,18 +33,31 @@ namespace psiomemo {
     void init(signal_context *ctx, const QString &dataPath);
     void deinit();
 
-    QSet<uint32_t> retrieveDeviceList(const QString &user);
+    QSet<uint32_t> retrieveDeviceList(const QString &user, bool onlyTrusted = true);
+    QSet<uint32_t> retrieveUndecidedDeviceList(const QString &user);
     void updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds);
 
     QVector<QPair<uint32_t, QByteArray>> loadAllPreKeys(int limit = 100);
     uint32_t preKeyCount();
     void storePreKeys(QVector<QPair<uint32_t, QByteArray>> keys);
+    bool isTrusted(const QString &user, uint32_t deviceId);
+    QByteArray loadDeviceIdentity(const QString &user, uint32_t deviceId);
+    void setDeviceTrust(const QString &user, uint32_t deviceId, bool trusted);
 
     uint32_t maxPreKeyId();
     signal_protocol_store_context *storeContext() const;
     bool identityExists(const signal_protocol_address *addr_p) const;
     uint32_t signedPreKeyid();
+    bool isDisabledForUser(const QString &user);
+    void setDisabledForUser(const QString &user, bool disabled);
+
   private:
+    enum TRUST_STATE {
+      UNDECIDED,
+      TRUSTED,
+      UNTRUSTED
+    };
+
     QLatin1String m_databaseConnectionName;
 
     signal_protocol_store_context *m_storeContext = nullptr;

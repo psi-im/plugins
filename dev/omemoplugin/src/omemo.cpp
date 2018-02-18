@@ -104,8 +104,8 @@ namespace psiomemo {
     QByteArray encryptedKey = QByteArray::fromBase64(keyElement.firstChild().nodeValue().toUtf8());
 
     uint deviceId = header.attribute("sid").toUInt();
-    QPair<QByteArray, bool> decryptionResult = m_signal.decryptKey(xml.attribute("from").split("/").first(),
-                                                                   EncryptedKey(deviceId, isPreKey, encryptedKey));
+    QString sender = xml.attribute("from").split("/").first();
+    QPair<QByteArray, bool> decryptionResult = m_signal.decryptKey(sender, EncryptedKey(deviceId, isPreKey, encryptedKey));
     QByteArray decryptedKey = decryptionResult.first;
     bool buildSessionWithPreKey = decryptionResult.second;
     if (buildSessionWithPreKey) {
@@ -140,10 +140,20 @@ namespace psiomemo {
 
         QPair<QByteArray, QCA::AuthTag> decryptedBody = Crypto::aes_gcm(QCA::Decode, iv, decryptedKey, payload, tag);
         if (!decryptedBody.first.isNull() && tag == decryptedBody.second) {
+          bool trusted = m_signal.isTrusted(sender, deviceId);
           QDomNode decrypted = xml.cloneNode(true);
           decrypted.removeChild(decrypted.firstChildElement("encrypted"));
           QDomElement body = decrypted.ownerDocument().createElement("body");
-          body.appendChild(body.ownerDocument().createTextNode(decryptedBody.first));
+          QString text = decryptedBody.first;
+
+          if (!trusted) {
+            bool res = m_accountController->appendSysMsg(account, sender, "[OMEMO] The following message is from an untrusted device:");
+            if (!res) {
+              text = "[UNTRUSTED]: " + text;
+            }
+          }
+
+          body.appendChild(body.ownerDocument().createTextNode(text));
           decrypted.appendChild(body);
 
           return decrypted.toElement();
@@ -155,6 +165,9 @@ namespace psiomemo {
 
   bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml, bool buildSessions, const uint32_t *toDeviceId) {
     QString recipient = xml.attribute("to").split("/").first();
+    if (isDisabledForUser(recipient)) {
+      return false;
+    }
 
     if (buildSessions) {
       QVector<uint32_t> invalidSessions = m_signal.invalidSessions(recipient);
@@ -164,6 +177,9 @@ namespace psiomemo {
         return true;
       }
     }
+
+    m_signal.processUndecidedDevices(recipient, false);
+    m_signal.processUndecidedDevices(ownJid, true);
 
     QDomElement encrypted = xml.ownerDocument().createElementNS(OMEMO_XMLNS, "encrypted");
     QDomElement header = xml.ownerDocument().createElement("header");
@@ -400,5 +416,13 @@ namespace psiomemo {
 
   const QString OMEMO::deviceListNodeName() const {
     return QString(OMEMO_XMLNS) + ".devicelist";
+  }
+
+  bool OMEMO::isDisabledForUser(const QString &user) {
+    return m_signal.isDisabledForUser(user);
+  }
+
+  void OMEMO::setDisabledForUser(const QString &user, bool disabled) {
+    m_signal.setDisabledForUser(user, disabled);
   }
 }

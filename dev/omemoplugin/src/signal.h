@@ -60,6 +60,11 @@ namespace psiomemo {
     QPair<QByteArray, bool> decryptKey(const QString &sender, const EncryptedKey &encryptedKey);
     QVector<uint32_t> invalidSessions(const QString &recipient);
     uint32_t preKeyCount();
+    bool isTrusted(const QString &user, uint32_t deviceId);
+    void processUndecidedDevices(const QString &user, bool ownJid);
+    bool isDisabledForUser(const QString &user);
+    void setDisabledForUser(const QString &user, bool disabled);
+
   private:
     signal_context *m_signalContext = nullptr;
     uint32_t m_deviceId = 0;

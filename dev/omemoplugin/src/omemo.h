@@ -22,7 +22,7 @@
 #define PSIOMEMO_OMEMO_H
 
 #include <QtXml>
-#include <src/plugins/include/psiaccountcontrollinghost.h>
+#include "psiaccountcontrollinghost.h"
 #include "stanzasendinghost.h"
 #include "signal.h"
 
@@ -42,6 +42,9 @@ namespace psiomemo {
     void accountConnected(int account, const QString &ownJid);
 
     const QString deviceListNodeName() const;
+    bool isDisabledForUser(const QString &user);
+    void setDisabledForUser(const QString &user, bool disabled);
+
   private:
     class MessageWaitingForBundles {
     public:

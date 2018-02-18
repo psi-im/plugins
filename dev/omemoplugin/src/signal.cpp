@@ -20,6 +20,7 @@
 
 #include "signal.h"
 #include "crypto.h"
+#include <QMessageBox>
 
 extern "C" {
 #include "session_cipher.h"
@@ -201,7 +202,7 @@ namespace psiomemo {
   QVector<uint32_t> Signal::invalidSessions(const QString &recipient) {
     QVector<uint32_t> result;
     const QByteArray &recipientUtf8 = recipient.toUtf8();
-    QSet<uint32_t> recipientDevices = m_storage.retrieveDeviceList(recipient);
+    QSet<uint32_t> recipientDevices = m_storage.retrieveDeviceList(recipient, false);
     foreach (uint32_t deviceId, recipientDevices) {
       if (!sessionIsValid(getAddress(deviceId, recipientUtf8))) {
         result.append(deviceId);
@@ -221,6 +222,10 @@ namespace psiomemo {
 
     QSet<uint32_t> ownDevices = m_storage.retrieveDeviceList(ownJid);
     QSet<uint32_t> recipientDevices = m_storage.retrieveDeviceList(recipient);
+
+    if (recipientDevices.isEmpty()) {
+      return results;
+    }
 
     QSet<uint32_t> devices;
     devices.unite(ownDevices).unite(recipientDevices).remove(m_deviceId);
@@ -295,6 +300,10 @@ namespace psiomemo {
     return qMakePair(key, buildSessionWithPreKey);
   }
 
+  bool Signal::isTrusted(const QString &user, uint32_t deviceId) {
+    return m_storage.isTrusted(user, deviceId);
+  }
+
   template<typename T>
   void Signal::doWithCipher(signal_protocol_address *addr, const QCA::SymmetricKey &key, T&& lambda) {
     session_cipher *cipher = nullptr;
@@ -314,5 +323,36 @@ namespace psiomemo {
 
   uint32_t Signal::preKeyCount() {
     return m_storage.preKeyCount();
+  }
+
+  void Signal::processUndecidedDevices(const QString &user, bool ownJid) {
+    QSet<uint32_t> devices = m_storage.retrieveUndecidedDeviceList(user);
+    foreach (uint32_t deviceId, devices) {
+      QByteArray publicKeyBytes = m_storage.loadDeviceIdentity(user, deviceId);
+      publicKeyBytes = publicKeyBytes.right(publicKeyBytes.size() - 1); // the first byte is DJB_TYPE
+      QString publicKey = publicKeyBytes.toHex().toUpper();
+      for (int pos = 8; pos < publicKey.length(); pos += 9) {
+        publicKey.insert(pos, ' ');
+      }
+      QString message = ownJid ?
+                        "Do you want to trust this device and allow it to receive the encrypted messages from you?" :
+                        "Do you want to trust this device and allow it to decrypt copies of your messages?";
+      QMessageBox messageBox(QMessageBox::Warning, "New OMEMO Device",
+                             QString("New OMEMO device has been discovered for %1.<br/><br/>"
+                                     "%2<br/><br/>"
+                                     "Device public key:<br/><code>%3</code>").arg(user).arg(message).arg(publicKey));
+      messageBox.addButton("Trust", QMessageBox::AcceptRole);
+      messageBox.addButton("Do Not Trust", QMessageBox::RejectRole);
+      int res = messageBox.exec();
+      m_storage.setDeviceTrust(user, deviceId, res == 0);
+    }
+  }
+
+  bool Signal::isDisabledForUser(const QString &user) {
+    return m_storage.isDisabledForUser(user);
+  }
+
+  void Signal::setDisabledForUser(const QString &user, bool disabled) {
+    m_storage.setDisabledForUser(user, disabled);
   }
 }

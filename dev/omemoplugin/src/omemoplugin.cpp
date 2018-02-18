@@ -22,6 +22,7 @@
 #include <QtXml>
 #include <QtCrypto>
 #include <QtSql>
+#include <QAction>
 
 #include "accountinfoaccessinghost.h"
 #include "applicationinfoaccessinghost.h"
@@ -157,5 +158,36 @@ namespace psiomemo {
 
   void OMEMOPlugin::setPsiAccountControllingHost(PsiAccountControllingHost *host) {
     m_omemo.setAccountController(host);
+  }
+
+  QList<QVariantHash> OMEMOPlugin::getAccountMenuParam() {
+    return QList<QVariantHash>();
+  }
+
+  QList<QVariantHash> OMEMOPlugin::getContactMenuParam() {
+    return QList<QVariantHash>();
+  }
+
+  QAction *OMEMOPlugin::getContactAction(QObject *parent, int account, const QString &contact) {
+    if (m_accountInfo->getJid(account) == contact) {
+      return nullptr;
+    }
+
+    QAction *action = new QAction("Disable OMEMO", parent);
+    action->setCheckable(true);
+    action->setChecked(m_omemo.isDisabledForUser(contact));
+    action->setProperty("jid", contact);
+    connect(action, SIGNAL(triggered(bool)), SLOT(onDisableOMEMOAction(bool)));
+    return action;
+  }
+
+  QAction *OMEMOPlugin::getAccountAction(QObject *, int) {
+    return nullptr;
+  }
+
+  void OMEMOPlugin::onDisableOMEMOAction(bool checked) {
+    auto action = dynamic_cast<QAction*>(sender());
+    QString jid = action->property("jid").toString();
+    m_omemo.setDisabledForUser(jid, checked);
   }
 }
