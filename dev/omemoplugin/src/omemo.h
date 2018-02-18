@@ -44,6 +44,10 @@ namespace psiomemo {
     const QString deviceListNodeName() const;
     bool isDisabledForUser(const QString &user);
     void setDisabledForUser(const QString &user, bool disabled);
+    uint32_t getDeviceId();
+    QString getOwnFingerprint();
+    QList<Fingerprint> getKnownFingerprints();
+    void confirmDeviceTrust(const QString &user, uint32_t deviceId);
 
   private:
     class MessageWaitingForBundles {

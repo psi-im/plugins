@@ -29,6 +29,7 @@ set(HEADERS
 	src/crypto.h
 	src/omemo.h
 	src/signal.h
+	src/configwidget.h
 	)
 
 set(SOURCES
@@ -37,6 +38,7 @@ set(SOURCES
 	src/crypto.cpp
 	src/omemo.cpp
 	src/signal.cpp
+	src/configwidget.cpp
 	)
 
 find_package(Qt5Widgets REQUIRED)

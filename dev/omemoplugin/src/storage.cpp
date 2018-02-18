@@ -496,6 +496,18 @@ namespace psiomemo {
     q.exec();
   }
 
+  QVector<std::tuple<QString, QByteArray, uint32_t, TRUST_STATE>> Storage::getKnownFingerprints() {
+    QVector<std::tuple<QString, QByteArray, uint32_t, TRUST_STATE>> res;
+    QSqlQuery q(db());
+    q.prepare("SELECT devices.jid, key, devices.device_id, trust FROM devices, identity_key_store WHERE devices.jid=identity_key_store.jid and devices.device_id=identity_key_store.device_id");
+    q.exec();
+    while (q.next()) {
+      res.append(std::make_tuple(q.value(0).toString(), q.value(1).toByteArray(), q.value(2).toUInt(),
+                                 static_cast<TRUST_STATE>(q.value(3).toInt())));
+    }
+    return res;
+  }
+
   QByteArray toQByteArray(signal_buffer *buffer) {
     return QByteArray(reinterpret_cast<const char *>(signal_buffer_data(buffer)),
                       static_cast<int>(signal_buffer_len(buffer)));

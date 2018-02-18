@@ -30,6 +30,7 @@
 #include "eventcreatinghost.h"
 
 #include "omemoplugin.h"
+#include "configwidget.h"
 
 namespace psiomemo {
   QString OMEMOPlugin::name() const {
@@ -45,7 +46,7 @@ namespace psiomemo {
   }
 
   QWidget *OMEMOPlugin::options() {
-    return nullptr;
+    return new ConfigWidget(&m_omemo);
   }
 
   QStringList OMEMOPlugin::pluginFeatures() {

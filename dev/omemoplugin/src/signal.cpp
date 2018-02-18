@@ -103,34 +103,23 @@ namespace psiomemo {
     QByteArray signedPreKeyPublicKey = getPublicKey(session_signed_pre_key_get_key_pair(signed_pre_key));
     if (!signedPreKeyPublicKey.isNull()) {
       bundle.signedPreKeyPublic = signedPreKeyPublicKey;
+      bundle.identityKeyPublic = getIdentityPublicKey();
 
-      ratchet_identity_key_pair *identity_key_pair = nullptr;
-      if (signal_protocol_identity_get_key_pair(m_storage.storeContext(), &identity_key_pair) == SG_SUCCESS) {
-        ec_public_key *identity_key_public = ratchet_identity_key_pair_get_public(identity_key_pair);
-        signal_buffer *identity_key_public_data = nullptr;
-
-        if (ec_public_key_serialize(&identity_key_public_data, identity_key_public) == SG_SUCCESS) {
-          bundle.identityKeyPublic = toQByteArray(identity_key_public_data);
-          signal_buffer_bzero_free(identity_key_public_data);
-
-          foreach (auto preKey, m_storage.loadAllPreKeys()) {
-            session_pre_key *pre_key = nullptr;
-            if (session_pre_key_deserialize(&pre_key,
-                                            reinterpret_cast<const uint8_t *>(preKey.second.data()),
-                                            static_cast<size_t>(preKey.second.size()),
-                                            m_signalContext) == SG_SUCCESS) {
-              QByteArray preKeyPublicKey = getPublicKey(session_pre_key_get_key_pair(pre_key));
-              if (!preKeyPublicKey.isNull()) {
-                bundle.preKeys.append(qMakePair(preKey.first, preKeyPublicKey));
-              }
-              SIGNAL_UNREF(pre_key);
-            }
+      foreach (auto preKey, m_storage.loadAllPreKeys()) {
+        session_pre_key *pre_key = nullptr;
+        if (session_pre_key_deserialize(&pre_key,
+                                        reinterpret_cast<const uint8_t *>(preKey.second.data()),
+                                        static_cast<size_t>(preKey.second.size()),
+                                        m_signalContext) == SG_SUCCESS) {
+          QByteArray preKeyPublicKey = getPublicKey(session_pre_key_get_key_pair(pre_key));
+          if (!preKeyPublicKey.isNull()) {
+            bundle.preKeys.append(qMakePair(preKey.first, preKeyPublicKey));
           }
-          if (!bundle.preKeys.isEmpty()) {
-            bundle.loaded = true;
-          }
+          SIGNAL_UNREF(pre_key);
         }
-        SIGNAL_UNREF(identity_key_pair);
+      }
+      if (!bundle.preKeys.isEmpty()) {
+        bundle.loaded = true;
       }
     }
     SIGNAL_UNREF(signed_pre_key);
@@ -328,24 +317,34 @@ namespace psiomemo {
   void Signal::processUndecidedDevices(const QString &user, bool ownJid) {
     QSet<uint32_t> devices = m_storage.retrieveUndecidedDeviceList(user);
     foreach (uint32_t deviceId, devices) {
-      QByteArray publicKeyBytes = m_storage.loadDeviceIdentity(user, deviceId);
-      publicKeyBytes = publicKeyBytes.right(publicKeyBytes.size() - 1); // the first byte is DJB_TYPE
-      QString publicKey = publicKeyBytes.toHex().toUpper();
-      for (int pos = 8; pos < publicKey.length(); pos += 9) {
-        publicKey.insert(pos, ' ');
-      }
-      QString message = ownJid ?
-                        "Do you want to trust this device and allow it to receive the encrypted messages from you?" :
-                        "Do you want to trust this device and allow it to decrypt copies of your messages?";
-      QMessageBox messageBox(QMessageBox::Warning, "New OMEMO Device",
-                             QString("New OMEMO device has been discovered for %1.<br/><br/>"
-                                     "%2<br/><br/>"
-                                     "Device public key:<br/><code>%3</code>").arg(user).arg(message).arg(publicKey));
-      messageBox.addButton("Trust", QMessageBox::AcceptRole);
-      messageBox.addButton("Do Not Trust", QMessageBox::RejectRole);
-      int res = messageBox.exec();
-      m_storage.setDeviceTrust(user, deviceId, res == 0);
+      confirmDeviceTrust(user, deviceId, false, ownJid);
     }
+  }
+
+  void Signal::confirmDeviceTrust(const QString &user, uint32_t deviceId, bool skipNewDevicePart, bool ownJid) {
+    QString publicKey = getFingerprint(m_storage.loadDeviceIdentity(user, deviceId));
+    QString message;
+    if (!skipNewDevicePart) {
+      message += QString("New OMEMO device has been discovered for %1.<br/><br/>").arg(user);
+    }
+    message += ownJid ?
+               "Do you want to trust this device and allow it to decrypt copies of your messages?<br/><br/>" :
+               "Do you want to trust this device and allow it to receive the encrypted messages from you?<br/><br/>";
+    message += QString("Device public key:<br/><code>%1</code>").arg(publicKey);
+    QMessageBox messageBox(QMessageBox::Warning, "New OMEMO Device", message);
+    messageBox.addButton("Trust", QMessageBox::AcceptRole);
+    messageBox.addButton("Do Not Trust", QMessageBox::RejectRole);
+    int res = messageBox.exec();
+    m_storage.setDeviceTrust(user, deviceId, res == 0);
+  }
+
+  QString Signal::getFingerprint(const QByteArray &publicKeyBytes) const {
+    QByteArray bytes = publicKeyBytes.right(publicKeyBytes.size() - 1); // the first byte is DJB_TYPE
+    QString publicKey = bytes.toHex().toUpper();
+    for (int pos = 8, groups = 0; pos < publicKey.length(); pos += 9, groups++) {
+      publicKey.insert(pos, ' ');
+    }
+    return publicKey;
   }
 
   bool Signal::isDisabledForUser(const QString &user) {
@@ -355,4 +354,32 @@ namespace psiomemo {
   void Signal::setDisabledForUser(const QString &user, bool disabled) {
     m_storage.setDisabledForUser(user, disabled);
   }
+
+  QString Signal::getOwnFingerprint() {
+    return getFingerprint(getIdentityPublicKey());
+  }
+
+  QByteArray Signal::getIdentityPublicKey() const {
+    QByteArray res;
+    ratchet_identity_key_pair *key_pair = nullptr;
+    if (signal_protocol_identity_get_key_pair(m_storage.storeContext(), &key_pair) == SG_SUCCESS) {
+      ec_public_key *identity_key_public = ratchet_identity_key_pair_get_public(key_pair);
+      signal_buffer *identity_key_public_data = nullptr;
+      if (ec_public_key_serialize(&identity_key_public_data, identity_key_public) == SG_SUCCESS) {
+        res = toQByteArray(identity_key_public_data);
+        signal_buffer_bzero_free(identity_key_public_data);
+      }
+      SIGNAL_UNREF(key_pair);
+    }
+    return res;
+  }
+
+  QList<Fingerprint> Signal::getKnownFingerprints() {
+    QList<Fingerprint> res;
+    foreach (auto item, m_storage.getKnownFingerprints()) {
+      Fingerprint fp(std::get<0>(item), getFingerprint(std::get<1>(item)), std::get<2>(item), std::get<3>(item));
+      res.append(fp);
+    }
+    return res;
+  };
 }

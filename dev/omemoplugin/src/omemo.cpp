@@ -425,4 +425,20 @@ namespace psiomemo {
   void OMEMO::setDisabledForUser(const QString &user, bool disabled) {
     m_signal.setDisabledForUser(user, disabled);
   }
+
+  uint32_t OMEMO::getDeviceId() {
+    return m_signal.getDeviceId();
+  }
+
+  QString OMEMO::getOwnFingerprint() {
+    return m_signal.getOwnFingerprint();
+  }
+
+  QList<Fingerprint> OMEMO::getKnownFingerprints() {
+    return m_signal.getKnownFingerprints();
+  }
+
+  void OMEMO::confirmDeviceTrust(const QString &user, uint32_t deviceId) {
+    m_signal.confirmDeviceTrust(user, deviceId, true);
+  }
 }

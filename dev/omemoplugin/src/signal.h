@@ -48,6 +48,16 @@ namespace psiomemo {
     QByteArray key;
   };
 
+  class Fingerprint {
+  public:
+    Fingerprint(QString contact, QString fingerprint, uint32_t deviceId, TRUST_STATE trust)
+        : contact(qMove(contact)), fingerprint(qMove(fingerprint)), deviceId(deviceId), trust(trust) {}
+    QString contact;
+    QString fingerprint;
+    uint32_t deviceId;
+    TRUST_STATE trust;
+  };
+
   class Signal {
   public:
     void init(const QString &string);
@@ -65,6 +75,10 @@ namespace psiomemo {
     bool isDisabledForUser(const QString &user);
     void setDisabledForUser(const QString &user, bool disabled);
 
+    QString getOwnFingerprint();
+    QList<Fingerprint> getKnownFingerprints();
+    void confirmDeviceTrust(const QString &user, uint32_t deviceId, bool skipNewDevicePart, bool ownJid = false);
+
   private:
     signal_context *m_signalContext = nullptr;
     uint32_t m_deviceId = 0;
@@ -78,6 +92,8 @@ namespace psiomemo {
     static void signal_log(int __unused level, const char *message, size_t len, void *user_data);
     ec_public_key* curveDecodePoint(const QByteArray &bytes) const;
     void generatePreKeys();
+    QString getFingerprint(const QByteArray &publicKeyBytes) const;
+    QByteArray getIdentityPublicKey() const;
   };
 }
 #endif //PSIOMEMO_SIGNAL_H

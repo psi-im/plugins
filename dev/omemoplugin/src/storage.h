@@ -28,6 +28,12 @@ extern "C" {
 }
 
 namespace psiomemo {
+  enum TRUST_STATE {
+    UNDECIDED,
+    TRUSTED,
+    UNTRUSTED
+  };
+
   class Storage {
   public:
     void init(signal_context *ctx, const QString &dataPath);
@@ -43,6 +49,7 @@ namespace psiomemo {
     bool isTrusted(const QString &user, uint32_t deviceId);
     QByteArray loadDeviceIdentity(const QString &user, uint32_t deviceId);
     void setDeviceTrust(const QString &user, uint32_t deviceId, bool trusted);
+    QVector<std::tuple<QString, QByteArray, uint32_t, TRUST_STATE>> getKnownFingerprints();
 
     uint32_t maxPreKeyId();
     signal_protocol_store_context *storeContext() const;
@@ -52,12 +59,6 @@ namespace psiomemo {
     void setDisabledForUser(const QString &user, bool disabled);
 
   private:
-    enum TRUST_STATE {
-      UNDECIDED,
-      TRUSTED,
-      UNTRUSTED
-    };
-
     QLatin1String m_databaseConnectionName;
 
     signal_protocol_store_context *m_storeContext = nullptr;
