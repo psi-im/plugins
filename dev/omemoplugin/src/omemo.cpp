@@ -90,7 +90,7 @@ namespace psiomemo {
     QDomElement header = encrypted.firstChildElement("header");
 
     QDomElement keyElement = header.firstChildElement("key");
-    while (!keyElement.isNull() && keyElement.attribute("rid").toInt() != m_signal.getDeviceId()) {
+    while (!keyElement.isNull() && keyElement.attribute("rid").toUInt() != m_signal.getDeviceId()) {
       keyElement = keyElement.nextSiblingElement("key");
     }
     if (keyElement.isNull()) {
