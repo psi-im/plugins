@@ -72,8 +72,9 @@ namespace psiomemo {
     uint32_t preKeyCount();
     bool isTrusted(const QString &user, uint32_t deviceId);
     void processUndecidedDevices(const QString &user, bool ownJid);
-    bool isDisabledForUser(const QString &user);
-    void setDisabledForUser(const QString &user, bool disabled);
+    bool isAvailableForUser(const QString &user);
+    bool isEnabledForUser(const QString &user);
+    void setEnabledForUser(const QString &user, bool enabled);
 
     QString getOwnFingerprint();
     QList<Fingerprint> getKnownFingerprints();

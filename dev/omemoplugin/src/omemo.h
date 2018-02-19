@@ -42,8 +42,9 @@ namespace psiomemo {
     void accountConnected(int account, const QString &ownJid);
 
     const QString deviceListNodeName() const;
-    bool isDisabledForUser(const QString &user);
-    void setDisabledForUser(const QString &user, bool disabled);
+    bool isAvailableForUser(const QString &user);
+    bool isEnabledForUser(const QString &user);
+    void setEnabledForUser(const QString &user, bool enabled);
     uint32_t getDeviceId();
     QString getOwnFingerprint();
     QList<Fingerprint> getKnownFingerprints();

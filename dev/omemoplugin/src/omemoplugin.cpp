@@ -72,7 +72,11 @@ namespace psiomemo {
   }
 
   QPixmap OMEMOPlugin::icon() const {
-    return QPixmap(1, 1);
+    return getIcon();
+  }
+
+  QPixmap OMEMOPlugin::getIcon() const {
+    return QPixmap(QGuiApplication::primaryScreen()->devicePixelRatio() >= 2 ? ":/omemoplugin/omemo@2x.png" : ":/omemoplugin/omemo.png");
   }
 
   void OMEMOPlugin::applyOptions() {
@@ -81,6 +85,17 @@ namespace psiomemo {
 
   void OMEMOPlugin::restoreOptions() {
 
+  }
+
+  QString OMEMOPlugin::pluginInfo() {
+    return QString("<strong>OMEMO Multi-End Message and Object Encryption</strong><br/>"
+                   "Author: Vyacheslav Karpukhin (vyacheslav@karpukhin.com)<br/><br/>"
+                   "Credits:<br/>"
+                   "<dl>"
+                   "<dt>libsignal-protocol-c</dt><dd>Copyright 2015-2016 Open Whisper Systems</dd>"
+                   "<dt>OMEMO logo</dt><dd>fiaxh (https://github.com/fiaxh)</dd>"
+                   "</dl>"
+                   );
   }
 
   bool OMEMOPlugin::stanzaWasEncrypted(const QString &stanzaId) {
@@ -101,6 +116,7 @@ namespace psiomemo {
     }
 
     if (m_omemo.processDeviceList(m_accountInfo->getJid(account), account, xml)) {
+      updateActions(xml.attribute("from"));
       return true;
     }
 
@@ -174,21 +190,45 @@ namespace psiomemo {
       return nullptr;
     }
 
-    QAction *action = new QAction("Disable OMEMO", parent);
-    action->setCheckable(true);
-    action->setChecked(m_omemo.isDisabledForUser(contact));
-    action->setProperty("jid", contact);
-    connect(action, SIGNAL(triggered(bool)), SLOT(onDisableOMEMOAction(bool)));
-    return action;
+    return createAction(parent, contact);
   }
 
   QAction *OMEMOPlugin::getAccountAction(QObject *, int) {
     return nullptr;
   }
 
-  void OMEMOPlugin::onDisableOMEMOAction(bool checked) {
+  void OMEMOPlugin::onEnableOMEMOAction(bool checked) {
     auto action = dynamic_cast<QAction*>(sender());
     QString jid = action->property("jid").toString();
-    m_omemo.setDisabledForUser(jid, checked);
+    m_omemo.setEnabledForUser(jid, checked);
+    updateActions(jid);
+  }
+
+  QList<QVariantHash> OMEMOPlugin::getButtonParam() {
+    return QList<QVariantHash>();
+  }
+
+  QAction *OMEMOPlugin::getAction(QObject *parent, __unused int account, const QString &contact) {
+    return createAction(parent, contact);
+  }
+
+  QAction *OMEMOPlugin::createAction(QObject *parent, const QString &contact) {
+    QAction *action = new QAction(getIcon(), "Enable OMEMO", parent);
+    action->setCheckable(true);
+    connect(action, SIGNAL(triggered(bool)), SLOT(onEnableOMEMOAction(bool)));
+    m_actions.insert(contact, action);
+    updateActions(contact);
+    return action;
+  }
+
+  void OMEMOPlugin::updateActions(const QString &user) {
+    bool available = m_omemo.isAvailableForUser(user);
+    bool enabled = available && m_omemo.isEnabledForUser(user);
+    foreach (QAction *action, m_actions.values(user)) {
+      action->setEnabled(available);
+      action->setChecked(enabled);
+      action->setProperty("jid", user);
+      action->setText(!available ? "OMEMO is not available for this contact" : enabled ? "OMEMO is enabled" : "Enable OMEMO");
+    }
   }
 }

@@ -347,12 +347,16 @@ namespace psiomemo {
     return publicKey;
   }
 
-  bool Signal::isDisabledForUser(const QString &user) {
-    return m_storage.isDisabledForUser(user);
+  bool Signal::isAvailableForUser(const QString &user) {
+    return !m_storage.retrieveDeviceList(user, false).isEmpty();
+  };
+
+  bool Signal::isEnabledForUser(const QString &user) {
+    return m_storage.isEnabledForUser(user);
   }
 
-  void Signal::setDisabledForUser(const QString &user, bool disabled) {
-    m_storage.setDisabledForUser(user, disabled);
+  void Signal::setEnabledForUser(const QString &user, bool enabled) {
+    m_storage.setEnabledForUser(user, enabled);
   }
 
   QString Signal::getOwnFingerprint() {

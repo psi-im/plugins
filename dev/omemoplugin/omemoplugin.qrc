@@ -1,0 +1,7 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/omemoplugin">
+        <file alias="omemo.png">resources/omemo.png</file>
+        <file alias="omemo@2x.png">resources/omemo@2x.png</file>
+    </qresource>
+</RCC>

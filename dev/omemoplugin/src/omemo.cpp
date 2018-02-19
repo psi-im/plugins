@@ -165,7 +165,7 @@ namespace psiomemo {
 
   bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml, bool buildSessions, const uint32_t *toDeviceId) {
     QString recipient = xml.attribute("to").split("/").first();
-    if (isDisabledForUser(recipient)) {
+    if (!isEnabledForUser(recipient)) {
       return false;
     }
 
@@ -418,12 +418,16 @@ namespace psiomemo {
     return QString(OMEMO_XMLNS) + ".devicelist";
   }
 
-  bool OMEMO::isDisabledForUser(const QString &user) {
-    return m_signal.isDisabledForUser(user);
+  bool OMEMO::isAvailableForUser(const QString &user) {
+    return m_signal.isAvailableForUser(user);
   }
 
-  void OMEMO::setDisabledForUser(const QString &user, bool disabled) {
-    m_signal.setDisabledForUser(user, disabled);
+  bool OMEMO::isEnabledForUser(const QString &user) {
+    return m_signal.isEnabledForUser(user);
+  }
+
+  void OMEMO::setEnabledForUser(const QString &user, bool enabled) {
+    m_signal.setEnabledForUser(user, enabled);
   }
 
   uint32_t OMEMO::getDeviceId() {

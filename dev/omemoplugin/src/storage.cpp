@@ -93,18 +93,17 @@ namespace psiomemo {
   void Storage::initializeDB(signal_context *signalContext) {
     QSqlDatabase _db = db();
     _db.transaction();
-    QSqlQuery q("PRAGMA table_info(simple_store)", db());
 
     QString error;
-    if (!q.next()) {
-      _db.exec("CREATE TABLE IF NOT EXISTS disabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
+    if (!_db.exec("PRAGMA table_info(simple_store)").next()) {
+      _db.exec("CREATE TABLE IF NOT EXISTS enabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
       _db.exec("CREATE TABLE IF NOT EXISTS devices (jid TEXT NOT NULL, device_id INTEGER NOT NULL, trust INTEGER NOT NULL, PRIMARY KEY(jid, device_id))");
       _db.exec("CREATE TABLE IF NOT EXISTS identity_key_store (jid TEXT NOT NULL, device_id INTEGER NOT NULL, key BLOB NOT NULL, PRIMARY KEY(jid, device_id))");
       _db.exec("CREATE TABLE IF NOT EXISTS pre_key_store (id INTEGER NOT NULL PRIMARY KEY, pre_key BLOB NOT NULL)");
       _db.exec("CREATE TABLE IF NOT EXISTS session_store (jid TEXT NOT NULL, device_id INTEGER NOT NULL, session BLOB NOT NULL, PRIMARY KEY(jid, device_id))");
       _db.exec("CREATE TABLE IF NOT EXISTS simple_store (key TEXT NOT NULL PRIMARY KEY, value BLOB NOT NULL)");
 
-      storeValue("db_ver", 1);
+      storeValue("db_ver", 2);
 
       uint32_t deviceId;
       if (signal_protocol_key_helper_generate_registration_id(&deviceId, 1, signalContext) == SG_SUCCESS) {
@@ -163,6 +162,9 @@ namespace psiomemo {
         error = "Could not generate registration ID";
       }
     }
+    else if (lookupValue(this, "db_ver").toInt() != 2) {
+      migrateDatabase();
+    }
 
     if (!error.isNull()) {
       qWarning() << error;
@@ -171,6 +173,13 @@ namespace psiomemo {
     else {
       _db.commit();
     }
+  }
+
+  void Storage::migrateDatabase() {
+    QSqlDatabase _db = db();
+    _db.exec("CREATE TABLE IF NOT EXISTS enabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
+    _db.exec("DROP TABLE disabled_buddies");
+    storeValue("db_ver", 2);
   }
 
   QSqlDatabase Storage::db() const {
@@ -481,17 +490,17 @@ namespace psiomemo {
     q.exec();
   }
 
-  bool Storage::isDisabledForUser(const QString &user) {
+  bool Storage::isEnabledForUser(const QString &user) {
     QSqlQuery q(db());
-    q.prepare("SELECT jid FROM disabled_buddies WHERE jid IS ?");
+    q.prepare("SELECT jid FROM enabled_buddies WHERE jid IS ?");
     q.addBindValue(user);
     q.exec();
     return q.next();
   }
 
-  void Storage::setDisabledForUser(const QString &user, bool disabled) {
+  void Storage::setEnabledForUser(const QString &user, bool enabled) {
     QSqlQuery q(db());
-    q.prepare(disabled ? "INSERT OR REPLACE INTO disabled_buddies (jid) VALUES (?)" : "DELETE FROM disabled_buddies WHERE jid IS ?");
+    q.prepare(enabled ? "INSERT OR REPLACE INTO enabled_buddies (jid) VALUES (?)" : "DELETE FROM enabled_buddies WHERE jid IS ?");
     q.addBindValue(user);
     q.exec();
   }

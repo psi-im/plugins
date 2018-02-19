@@ -55,8 +55,8 @@ namespace psiomemo {
     signal_protocol_store_context *storeContext() const;
     bool identityExists(const signal_protocol_address *addr_p) const;
     uint32_t signedPreKeyid();
-    bool isDisabledForUser(const QString &user);
-    void setDisabledForUser(const QString &user, bool disabled);
+    bool isEnabledForUser(const QString &user);
+    void setEnabledForUser(const QString &user, bool enabled);
 
   private:
     QLatin1String m_databaseConnectionName;
@@ -64,6 +64,7 @@ namespace psiomemo {
     signal_protocol_store_context *m_storeContext = nullptr;
 
     void initializeDB(signal_context *signalContext);
+    void migrateDatabase();
 
     QSqlDatabase db() const;
     static QSqlQuery getQuery(const void *user_data);

@@ -41,6 +41,8 @@ set(SOURCES
 	src/configwidget.cpp
 	)
 
+qt5_add_resources(RESOURCES omemoplugin.qrc)
+
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Xml REQUIRED)
 find_package(Qt5Sql REQUIRED)
@@ -57,6 +59,7 @@ add_library(
 	MODULE
 	${SOURCES}
 	${HEADERS}
+	${RESOURCES}
 	)
 
 target_link_libraries(

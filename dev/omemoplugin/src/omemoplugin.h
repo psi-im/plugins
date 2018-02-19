@@ -31,6 +31,8 @@
 #include "applicationinfoaccessor.h"
 #include "psiaccountcontroller.h"
 #include "menuaccessor.h"
+#include "plugininfoprovider.h"
+#include "toolbariconaccessor.h"
 #include "storage.h"
 #include "crypto.h"
 #include "omemo.h"
@@ -44,7 +46,9 @@ namespace psiomemo {
                       public AccountInfoAccessor,
                       public ApplicationInfoAccessor,
                       public PsiAccountController,
-                      public MenuAccessor {
+                      public MenuAccessor,
+                      public PluginInfoProvider,
+                      public ToolbarIconAccessor {
   Q_OBJECT
   Q_PLUGIN_METADATA(IID
                         "com.psi.OmemoPlugin")
@@ -55,7 +59,9 @@ namespace psiomemo {
                AccountInfoAccessor
                ApplicationInfoAccessor
                PsiAccountController
-               MenuAccessor)
+               MenuAccessor
+               PluginInfoProvider
+               ToolbarIconAccessor)
   public:
     QString name() const override;
     QString shortName() const override;
@@ -66,6 +72,8 @@ namespace psiomemo {
     QPixmap icon() const override;
     void applyOptions() override;
     void restoreOptions() override;
+
+    QString pluginInfo() override;
 
     bool incomingStanza(int account, const QDomElement &xml) override;
     bool outgoingStanza(int account, QDomElement &xml) override;
@@ -82,16 +90,25 @@ namespace psiomemo {
     QList<QVariantHash> getContactMenuParam() override;
     QAction *getContactAction(QObject *parent, int account, const QString &contact) override;
     QAction *getAccountAction(QObject *parent, int account) override;
+
+    QList<QVariantHash> getButtonParam() override;
+    QAction *getAction(QObject *parent, int __unused account, const QString &contact) override;
+
   private:
     bool m_enabled;
     QSet<QString> m_encryptedStanzaIds;
+    QMultiMap<QString, QAction*> m_actions;
     OMEMO m_omemo;
 
     AccountInfoAccessingHost *m_accountInfo;
     ApplicationInfoAccessingHost *m_applicationInfo;
     EventCreatingHost *m_eventCreator;
+
+    QPixmap getIcon() const;
+    void updateActions(const QString &user);
+    QAction *createAction(QObject *parent, const QString &contact);
   private slots:
-    void onDisableOMEMOAction(bool);
+    void onEnableOMEMOAction(bool);
   };
 }
 #endif //PSIOMEMO_OMEMOPLUGIN_H
