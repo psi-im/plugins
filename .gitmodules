@@ -1,0 +1,3 @@
+[submodule "libsignal"]
+	path = dev/omemoplugin/lib/libsignal-protocol-c
+	url = https://github.com/signalapp/libsignal-protocol-c
