@@ -7,6 +7,9 @@ unset(PLUGIN)
 set( PLUGIN pepchangenotifyplugin )
 project(${PLUGIN})
 cmake_minimum_required(VERSION 3.1.0)
+if(POLICY CMP0071)
+    cmake_policy(SET CMP0071 OLD)
+endif()
 set( CMAKE_AUTOMOC TRUE )
 
 set(PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." CACHE STRING "Plugins root path. Path where include directory placed")
@@ -55,24 +58,13 @@ target_link_libraries(
     ${PLUGIN}
     ${QT_DEPLIBS}
 )
-if( UNIX AND NOT( APPLE OR CYGWIN ) )
-    install(
-        TARGETS
-        ${PLUGIN}
-        LIBRARY
-        DESTINATION
-        ${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}
-        RUNTIME DESTINATION
-        ${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}
-    )
-endif()
-if( WIN32 )
-    install(
-        TARGETS
-        ${PLUGIN}
-        LIBRARY
-        DESTINATION
-        ${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}
-    )
-endif()
+
+install(
+    TARGETS
+    ${PLUGIN}
+    LIBRARY
+    DESTINATION
+    ${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}
+    RUNTIME DESTINATION
+    ${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}
+)
