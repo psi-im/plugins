@@ -238,15 +238,15 @@ namespace psiomemo {
     }
 
     if (!removed.isEmpty()) {
-      q.prepare("REMOVE FROM devices WHERE jid IS ? AND device_id IS ?");
+      q.prepare("DELETE FROM devices WHERE jid IS ? AND device_id IS ?");
       q.bindValue(0, user);
 
       QSqlQuery q2(_db);
-      q2.prepare("REMOVE FROM identity_key_store WHERE jid IS ? AND device_id IS ?");
+      q2.prepare("DELETE FROM identity_key_store WHERE jid IS ? AND device_id IS ?");
       q2.bindValue(0, user);
 
       QSqlQuery q3(_db);
-      q3.prepare("REMOVE FROM session_store WHERE jid IS ? AND device_id IS ?");
+      q3.prepare("DELETE FROM session_store WHERE jid IS ? AND device_id IS ?");
       q3.bindValue(0, user);
 
       _db.transaction();
