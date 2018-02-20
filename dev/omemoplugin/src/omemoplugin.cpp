@@ -116,7 +116,6 @@ namespace psiomemo {
     }
 
     if (m_omemo.processDeviceList(m_accountInfo->getJid(account), account, xml)) {
-      updateActions(xml.attribute("from"));
       return true;
     }
 
@@ -177,31 +176,10 @@ namespace psiomemo {
     m_omemo.setAccountController(host);
   }
 
-  QList<QVariantHash> OMEMOPlugin::getAccountMenuParam() {
-    return QList<QVariantHash>();
-  }
-
-  QList<QVariantHash> OMEMOPlugin::getContactMenuParam() {
-    return QList<QVariantHash>();
-  }
-
-  QAction *OMEMOPlugin::getContactAction(QObject *parent, int account, const QString &contact) {
-    if (m_accountInfo->getJid(account) == contact) {
-      return nullptr;
-    }
-
-    return createAction(parent, contact);
-  }
-
-  QAction *OMEMOPlugin::getAccountAction(QObject *, int) {
-    return nullptr;
-  }
-
   void OMEMOPlugin::onEnableOMEMOAction(bool checked) {
     auto action = dynamic_cast<QAction*>(sender());
     QString jid = action->property("jid").toString();
     m_omemo.setEnabledForUser(jid, checked);
-    updateActions(jid);
   }
 
   QList<QVariantHash> OMEMOPlugin::getButtonParam() {
@@ -209,26 +187,17 @@ namespace psiomemo {
   }
 
   QAction *OMEMOPlugin::getAction(QObject *parent, __unused int account, const QString &contact) {
-    return createAction(parent, contact);
-  }
+    bool available = m_omemo.isAvailableForUser(contact);
+    bool enabled = available && m_omemo.isEnabledForUser(contact);
 
-  QAction *OMEMOPlugin::createAction(QObject *parent, const QString &contact) {
     QAction *action = new QAction(getIcon(), "Enable OMEMO", parent);
     action->setCheckable(true);
     connect(action, SIGNAL(triggered(bool)), SLOT(onEnableOMEMOAction(bool)));
-    m_actions.insert(contact, action);
-    updateActions(contact);
-    return action;
-  }
 
-  void OMEMOPlugin::updateActions(const QString &user) {
-    bool available = m_omemo.isAvailableForUser(user);
-    bool enabled = available && m_omemo.isEnabledForUser(user);
-    foreach (QAction *action, m_actions.values(user)) {
-      action->setEnabled(available);
-      action->setChecked(enabled);
-      action->setProperty("jid", user);
-      action->setText(!available ? "OMEMO is not available for this contact" : enabled ? "OMEMO is enabled" : "Enable OMEMO");
-    }
+    action->setEnabled(available);
+    action->setChecked(enabled);
+    action->setProperty("jid", contact);
+    action->setText(!available ? "OMEMO is not available for this contact" : enabled ? "OMEMO is enabled" : "Enable OMEMO");
+    return action;
   }
 }
