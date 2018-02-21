@@ -116,6 +116,7 @@ namespace psiomemo {
     }
 
     if (m_omemo.processDeviceList(m_accountInfo->getJid(account), account, xml)) {
+      updateAction(xml.attribute("from"));
       return true;
     }
 
@@ -180,6 +181,7 @@ namespace psiomemo {
     auto action = dynamic_cast<QAction*>(sender());
     QString jid = action->property("jid").toString();
     m_omemo.setEnabledForUser(jid, checked);
+    updateAction(jid);
   }
 
   QList<QVariantHash> OMEMOPlugin::getButtonParam() {
@@ -188,17 +190,29 @@ namespace psiomemo {
 
   QAction *OMEMOPlugin::getAction(QObject *parent, int account, const QString &contact) {
     Q_UNUSED(account);
-    bool available = m_omemo.isAvailableForUser(contact);
-    bool enabled = available && m_omemo.isEnabledForUser(contact);
 
     QAction *action = new QAction(getIcon(), "Enable OMEMO", parent);
     action->setCheckable(true);
     connect(action, SIGNAL(triggered(bool)), SLOT(onEnableOMEMOAction(bool)));
-
-    action->setEnabled(available);
-    action->setChecked(enabled);
-    action->setProperty("jid", contact);
-    action->setText(!available ? "OMEMO is not available for this contact" : enabled ? "OMEMO is enabled" : "Enable OMEMO");
+    connect(action, SIGNAL(destroyed(QObject*)), SLOT(onActionDestroyed(QObject*)));
+    m_actions.insert(contact, action);
+    updateAction(contact);
     return action;
+  }
+
+  void OMEMOPlugin::onActionDestroyed(QObject *action) {
+    m_actions.remove(action->property("jid").toString());
+  }
+
+  void OMEMOPlugin::updateAction(const QString &user) {
+    QAction *action = m_actions.value(user, nullptr);
+    if (action != nullptr) {
+      bool available = m_omemo.isAvailableForUser(user);
+      bool enabled = available && m_omemo.isEnabledForUser(user);
+      action->setEnabled(available);
+      action->setChecked(enabled);
+      action->setProperty("jid", user);
+      action->setText(!available ? "OMEMO is not available for this contact" : enabled ? "OMEMO is enabled" : "Enable OMEMO");
+    }
   }
 }

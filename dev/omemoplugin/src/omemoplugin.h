@@ -89,6 +89,7 @@ namespace psiomemo {
   private:
     bool m_enabled;
     QSet<QString> m_encryptedStanzaIds;
+    QMap<QString, QAction*> m_actions;
     OMEMO m_omemo;
 
     AccountInfoAccessingHost *m_accountInfo;
@@ -96,8 +97,10 @@ namespace psiomemo {
     EventCreatingHost *m_eventCreator;
 
     QPixmap getIcon() const;
+    void updateAction(const QString &user);
   private slots:
     void onEnableOMEMOAction(bool);
+    void onActionDestroyed(QObject *action);
   };
 }
 #endif //PSIOMEMO_OMEMOPLUGIN_H
