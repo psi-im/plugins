@@ -90,7 +90,7 @@ namespace psiomemo {
     void doWithCipher(signal_protocol_address *addr, const QCA::SymmetricKey &key, T&&);
     signal_protocol_address getAddress(uint32_t deviceId, const QByteArray &name) const;
     bool sessionIsValid(const signal_protocol_address &addr) const;
-    static void signal_log(int __unused level, const char *message, size_t len, void *user_data);
+    static void signal_log(int level, const char *message, size_t len, void *user_data);
     ec_public_key* curveDecodePoint(const QByteArray &bytes) const;
     void generatePreKeys();
     QString getFingerprint(const QByteArray &publicKeyBytes) const;

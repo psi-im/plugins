@@ -84,7 +84,7 @@ namespace psiomemo {
     QStringList pluginFeatures() override;
 
     QList<QVariantHash> getButtonParam() override;
-    QAction *getAction(QObject *parent, int __unused account, const QString &contact) override;
+    QAction *getAction(QObject *parent, int account, const QString &contact) override;
 
   private:
     bool m_enabled;

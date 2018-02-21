@@ -30,7 +30,9 @@ extern "C" {
 }
 
 namespace psiomemo {
-  void Signal::signal_log(__unused int level, const char *message, size_t len, __unused void *user_data) {
+  void Signal::signal_log(int level, const char *message, size_t len, void *user_data) {
+    Q_UNUSED(level);
+    Q_UNUSED(user_data);
     qDebug() << "Signal: " << QByteArray(message, static_cast<int>(len));
   }
 

@@ -186,7 +186,8 @@ namespace psiomemo {
     return QList<QVariantHash>();
   }
 
-  QAction *OMEMOPlugin::getAction(QObject *parent, __unused int account, const QString &contact) {
+  QAction *OMEMOPlugin::getAction(QObject *parent, int account, const QString &contact) {
+    Q_UNUSED(account);
     bool available = m_omemo.isAvailableForUser(contact);
     bool enabled = available && m_omemo.isEnabledForUser(contact);
 

@@ -447,10 +447,14 @@ namespace psiomemo {
     return q.exec() ? SG_SUCCESS : -1;
   }
 
-  int Storage::isTrustedIdentity(__unused const signal_protocol_address *addr_p,
-                                 __unused uint8_t *key_data,
-                                 __unused size_t key_len,
-                                 __unused void *user_data) {
+  int Storage::isTrustedIdentity(const signal_protocol_address *addr_p,
+                                 uint8_t *key_data,
+                                 size_t key_len,
+                                 void *user_data) {
+    Q_UNUSED(addr_p);
+    Q_UNUSED(key_data);
+    Q_UNUSED(key_len);
+    Q_UNUSED(user_data);
     return 1;
   }
 

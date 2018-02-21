@@ -67,29 +67,34 @@ namespace psiomemo {
     return qMakePair(cryptoText, cipher.tag());
   }
 
-  int random(uint8_t *data, size_t len, __unused void *user_data) {
+  int random(uint8_t *data, size_t len, void *user_data) {
+    Q_UNUSED(user_data);
     SecureArray array = Random::randomArray(static_cast<int>(len));
     memcpy(data, array.data(), len);
     return SG_SUCCESS;
   }
 
-  int hmac_sha256_init(void **context, const uint8_t *key, size_t key_len, __unused void *user_data) {
+  int hmac_sha256_init(void **context, const uint8_t *key, size_t key_len, void *user_data) {
+    Q_UNUSED(user_data);
     *context = new MessageAuthenticationCode("hmac(sha256)", SymmetricKey(toQByteArray(key, key_len)));
     return SG_SUCCESS;
   }
 
-  int sha512_digest_init(void **context, __unused void *user_data) {
+  int sha512_digest_init(void **context, void *user_data) {
+    Q_UNUSED(user_data);
     *context = new Hash("sha512");
     return SG_SUCCESS;
   }
 
-  int algo_update(void *context, const uint8_t *data, size_t data_len, __unused void *user_data) {
+  int algo_update(void *context, const uint8_t *data, size_t data_len, void *user_data) {
+    Q_UNUSED(user_data);
     auto mac = static_cast<BufferedComputation *>(context);
     mac->update(MemoryRegion(toQByteArray(data, data_len)));
     return SG_SUCCESS;
   }
 
-  int algo_final(void *context, signal_buffer **output, __unused void *user_data) {
+  int algo_final(void *context, signal_buffer **output, void *user_data) {
+    Q_UNUSED(user_data);
     auto mac = static_cast<BufferedComputation *>(context);
     MemoryRegion result = mac->final();
     *output = signal_buffer_create(reinterpret_cast<const uint8_t *>(result.constData()),
@@ -97,7 +102,8 @@ namespace psiomemo {
     return SG_SUCCESS;
   }
 
-  void algo_cleanup(void *context, __unused void *user_data) {
+  void algo_cleanup(void *context, void *user_data) {
+    Q_UNUSED(user_data);
     auto mac = static_cast<BufferedComputation *>(context);
     delete mac;
   }
@@ -144,12 +150,14 @@ namespace psiomemo {
   }
 
   int aes_decrypt(signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len, const uint8_t *iv,
-                  size_t iv_len, const uint8_t *ciphertext, size_t ciphertext_len, __unused void *user_data) {
+                  size_t iv_len, const uint8_t *ciphertext, size_t ciphertext_len, void *user_data) {
+    Q_UNUSED(user_data);
     return aes(Decode, output, cipherMode, key, key_len, iv, iv_len, ciphertext, ciphertext_len);
   }
 
   int aes_encrypt(signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len, const uint8_t *iv,
-                  size_t iv_len, const uint8_t *plaintext, size_t plaintext_len, __unused void *user_data) {
+                  size_t iv_len, const uint8_t *plaintext, size_t plaintext_len, void *user_data) {
+    Q_UNUSED(user_data);
     return aes(Encode, output, cipherMode, key, key_len, iv, iv_len, plaintext, plaintext_len);
   }
 
