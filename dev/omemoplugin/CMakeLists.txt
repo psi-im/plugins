@@ -1,6 +1,9 @@
 set(PLUGIN omemoplugin)
 project(${PLUGIN})
 cmake_minimum_required(VERSION 3.1.0)
+if(POLICY CMP0071)
+	cmake_policy(SET CMP0071 OLD)
+endif()
 set(CMAKE_AUTOMOC TRUE)
 
 set(PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." CACHE STRING "Plugins root path. Path where include directory placed")
@@ -14,12 +17,18 @@ else()
         Please set path to this file to PLUGINS_ROOT_DIR variable")
 endif()
 
-add_subdirectory(lib/libsignal-protocol-c)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake" )
+
+find_package(Qt5Widgets REQUIRED)
+find_package(Qt5Xml REQUIRED)
+find_package(Qt5Sql REQUIRED)
+find_package(Qca REQUIRED)
+find_package(SignalProtocolC REQUIRED)
 
 include_directories(
     ${CMAKE_SOURCE_DIR}
 	${Qca_INCLUDE_DIR}
-	${signal-protocol-c_SOURCE_DIR}/src
+	${SIGNAL_PROTOCOL_C_INCLUDE_DIR}
 	${PLUGINS_ROOT_DIR}/include
 	)
 
@@ -43,11 +52,6 @@ set(SOURCES
 
 qt5_add_resources(RESOURCES omemoplugin.qrc)
 
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5Xml REQUIRED)
-find_package(Qt5Sql REQUIRED)
-find_package(Qca REQUIRED)
-
 set(QT_DEPLIBS
 	Qt5::Widgets
 	Qt5::Xml
@@ -66,27 +70,15 @@ target_link_libraries(
 	${PLUGIN}
 	${QT_DEPLIBS}
 	${Qca_LIBRARY}
-	signal-protocol-c
+	${SIGNAL_PROTOCOL_C_LIBRARY}
 	)
 
-if( UNIX AND NOT( APPLE OR CYGWIN ) )
-	install(
-			TARGETS
-			${PLUGIN}
-			LIBRARY
-			DESTINATION
-			${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}
-			RUNTIME DESTINATION
-			${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}
-	)
-endif()
-if( WIN32 )
-	install(
-			TARGETS
-			${PLUGIN}
-			LIBRARY
-			DESTINATION
-			${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}
-			RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}
-	)
-endif()
+install(
+		TARGETS
+		${PLUGIN}
+		LIBRARY
+		DESTINATION
+		${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}
+		RUNTIME DESTINATION
+		${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}
+)

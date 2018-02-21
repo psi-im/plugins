@@ -6,8 +6,6 @@ isEmpty(PSISDK) {
     include($$PSISDK/../psiplugin.pri)
 }
 
-include(libsignal.pri)
-
 LIBS += $$LINKAGE
 QT += sql
 
