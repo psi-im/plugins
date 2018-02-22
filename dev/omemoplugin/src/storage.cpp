@@ -81,6 +81,7 @@ namespace psiomemo {
   }
 
   void Storage::deinit() {
+    db().exec("VACUUM");
     QSqlDatabase::database(m_databaseConnectionName).close();
     QSqlDatabase::removeDatabase(m_databaseConnectionName);
 
