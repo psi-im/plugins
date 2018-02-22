@@ -26,6 +26,7 @@ endif()
 if( NOT WIN32 )
     add_definitions( -Ddbus -DHAVE_DBUS )
     find_package( X11 REQUIRED )
+    set(EXTRA_LIBS ${X11_LIBRARIES})
 endif()
 
 include_directories(
@@ -80,6 +81,12 @@ add_library(
     ${_SRCS}
     ${UIS}
     ${RSCS}
+)
+
+target_link_libraries(
+    ${PLUGIN}
+    ${QT_DEPLIBS}
+    ${EXTRA_LIBS}
 )
 
 install(

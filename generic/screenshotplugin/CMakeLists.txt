@@ -33,6 +33,7 @@ include_directories(
 )
 if( UNIX AND NOT( APPLE OR CYGWIN ) )
     find_package( X11 REQUIRED )
+    set(EXTRA_LIBS ${X11_LIBRARIES})
     add_definitions( -DX11 )
     set( qxt_X11_SRCS
         qxt/gui/qxtwindowsystem_x11.cpp
@@ -129,6 +130,12 @@ add_library(
     ${_SRCS}
     ${UIS}
     ${RSCS}
+)
+
+target_link_libraries(
+    ${PLUGIN}
+    ${QT_DEPLIBS}
+    ${EXTRA_LIBS}
 )
 
 install(
