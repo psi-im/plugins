@@ -73,8 +73,8 @@ namespace psiomemo {
 
     static int toSignalBuffer(const QVariant &q, signal_buffer **record);
     static QSqlQuery lookupSession(const signal_protocol_address *address, const void *user_data);
-    static int loadSession(signal_buffer **record, const signal_protocol_address *address, void *user_data);
-    static int storeSession(const signal_protocol_address *address, uint8_t *record, size_t record_len, void *user_data);
+    static int loadSession(signal_buffer **record, signal_buffer **user_record, const signal_protocol_address *address, void *user_data);
+    static int storeSession(const signal_protocol_address *address, uint8_t *record, size_t record_len, uint8_t *user_record, size_t user_record_len, void *user_data);
 
     static int containsSession(const signal_protocol_address *address, void *user_data);
     static int loadPreKey(signal_buffer **record, uint32_t pre_key_id, void *user_data);

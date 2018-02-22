@@ -23,6 +23,7 @@
 
 #include <QObject>
 #include <utility>
+#include <random>
 #include <qca_core.h>
 #include "storage.h"
 
@@ -84,6 +85,8 @@ namespace psiomemo {
     signal_context *m_signalContext = nullptr;
     uint32_t m_deviceId = 0;
     Storage m_storage;
+    std::mt19937 randomGen;
+
     QByteArray getPublicKey(const ec_key_pair *key_pair) const;
 
     template<typename T>
