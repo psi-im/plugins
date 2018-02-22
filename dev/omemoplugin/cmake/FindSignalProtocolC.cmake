@@ -43,9 +43,11 @@ set( SIGNAL_PROTOCOL_C_ROOT "" CACHE STRING "Path to signal-protocol-c library" 
 find_path(
     SIGNAL_PROTOCOL_C_INCLUDE_DIR signal_protocol.h
     HINTS
-    ${PC_SIGNAL_PROTOCOL_C_INCLUDEDIR}/signal
+    ${PC_SIGNAL_PROTOCOL_C_INCLUDEDIR}
     ${PC_SIGNAL_PROTOCOL_C_INCLUDE_DIRS}
-    ${SIGNAL_PROTOCOL_C_ROOT}/include/signal
+    ${SIGNAL_PROTOCOL_C_ROOT}/include
+    PATH_SUFFIXES
+    signal
 )
 
 find_library(
