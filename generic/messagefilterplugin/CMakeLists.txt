@@ -56,6 +56,11 @@ add_library(
     ${RSCS}
 )
 
+target_link_libraries(
+    ${PLUGIN}
+    ${QT_DEPLIBS}
+)
+
 install(
     TARGETS
     ${PLUGIN}
