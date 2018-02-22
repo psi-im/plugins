@@ -9,6 +9,9 @@ unix {
 	PKGCONFIG += libsignal-protocol-c
 }
 
+load(configure)
+qtCompileTest(oldSignal):DEFINES += OLD_SIGNAL
+
 CONFIG += crypto
 
 LIBS += $$LINKAGE

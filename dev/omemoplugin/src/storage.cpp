@@ -336,15 +336,23 @@ namespace psiomemo {
     return q;
   }
 
+#ifdef OLD_SIGNAL
+  int Storage::loadSession(signal_buffer **record, const signal_protocol_address *address, void *user_data) {
+#else
   int Storage::loadSession(signal_buffer **record, signal_buffer **user_record, const signal_protocol_address *address, void *user_data) {
     (void)user_record;
+#endif
     QSqlQuery q = lookupSession(address, user_data);
     return q.next() ? toSignalBuffer(q.value(0), record) : 0;
   }
 
+#ifdef OLD_SIGNAL
+  int Storage::storeSession(const signal_protocol_address *address, uint8_t *record, size_t record_len, void *user_data) {
+#else
   int Storage::storeSession(const signal_protocol_address *address, uint8_t *record, size_t record_len, uint8_t *user_record, size_t user_record_len, void *user_data) {
     (void)user_record;
     (void)user_record_len;
+#endif
     QSqlQuery q = getQuery(user_data);
     q.prepare("INSERT OR REPLACE INTO session_store (jid, device_id, session) VALUES (?, ?, ?)");
     q.addBindValue(addrName(address));
