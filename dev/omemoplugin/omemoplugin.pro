@@ -6,6 +6,13 @@ isEmpty(PSISDK) {
     include($$PSISDK/../psiplugin.pri)
 }
 
+unix {
+	CONFIG += link_pkgconfig
+	PKGCONFIG += libsignal-protocol-c
+}
+
+CONFIG += crypto
+
 LIBS += $$LINKAGE
 QT += sql
 
