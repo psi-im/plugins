@@ -1,2 +1,11 @@
 *.pro.user*
-*.swp
+*.sw?
+
+# generated files
+.obj
+.qmake.*
+config.log
+Makefile
+.moc
+.rcc
+*.so
