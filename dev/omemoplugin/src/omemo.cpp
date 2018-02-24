@@ -304,8 +304,12 @@ namespace psiomemo {
 
   void OMEMO::buildSessionsFromBundle(const QVector<uint32_t> &invalidSessions, const QString &ownJid, int account,
                                       const QDomElement &messageToResend) {
+    QTextStream stream;
+    stream.setString(new QString());
+    messageToResend.save(stream, 0);
+
     MessageWaitingForBundles message;
-    message.xml = messageToResend;
+    message.xml = *stream.string();
 
     QString recipient = messageToResend.attribute("to").split("/").first();
 
@@ -363,7 +367,9 @@ namespace psiomemo {
     }
 
     if (message->pendingBundles.isEmpty()) {
-      QDomElement messageXml = message->xml;
+      QDomDocument xmlDoc;
+      xmlDoc.setContent(message->xml);
+      QDomElement messageXml = xmlDoc.firstChild().toElement();
       if (!messageXml.hasAttribute("id")) {
         messageXml.setAttribute("id", m_stanzaSender->uniqueId(account));
       }
