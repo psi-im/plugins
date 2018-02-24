@@ -59,7 +59,7 @@ namespace psiomemo {
     void setEnabledForUser(const QString &user, bool enabled);
 
   private:
-    QLatin1String m_databaseConnectionName;
+    QString m_databaseConnectionName;
 
     signal_protocol_store_context *m_storeContext = nullptr;
 

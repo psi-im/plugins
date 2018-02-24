@@ -28,7 +28,7 @@ extern "C" {
 namespace psiomemo {
   void Storage::init(signal_context *ctx, const QString &dataPath) {
     m_storeContext = nullptr;
-    m_databaseConnectionName = QLatin1String("OMEMO db");
+    m_databaseConnectionName = "OMEMO db";
     QSqlDatabase _db = QSqlDatabase::addDatabase("QSQLITE", m_databaseConnectionName);
 
     _db.setDatabaseName(QDir(dataPath).filePath("omemo.sqlite"));
