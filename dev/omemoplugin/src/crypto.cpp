@@ -44,11 +44,12 @@ namespace psiomemo {
   }
 
   bool Crypto::isSupported() {
-    QStringList requiredQcaFeatures({"hmac(sha256)", "sha512",
-                                     Cipher::withAlgorithms("aes128", Cipher::GCM, Cipher::DefaultPadding),
-                                     Cipher::withAlgorithms("aes128", Cipher::CBC, Cipher::DefaultPadding),
-                                     Cipher::withAlgorithms("aes192", Cipher::CBC, Cipher::DefaultPadding),
-                                     Cipher::withAlgorithms("aes256", Cipher::CBC, Cipher::DefaultPadding)});
+    QStringList requiredQcaFeatures;
+    requiredQcaFeatures << "hmac(sha256)" << "sha512"
+                        << Cipher::withAlgorithms("aes128", Cipher::GCM, Cipher::DefaultPadding)
+                        << Cipher::withAlgorithms("aes128", Cipher::CBC, Cipher::DefaultPadding)
+                        << Cipher::withAlgorithms("aes192", Cipher::CBC, Cipher::DefaultPadding)
+                        << Cipher::withAlgorithms("aes256", Cipher::CBC, Cipher::DefaultPadding);
     if (!QCA::isSupported(requiredQcaFeatures)) {
       qWarning("Required QCA features are not supported:");
       qWarning() << requiredQcaFeatures;
