@@ -12,7 +12,7 @@ unix {
 load(configure)
 qtCompileTest(oldSignal):DEFINES += OLD_SIGNAL
 
-CONFIG += crypto
+CONFIG += crypto c++11
 
 LIBS += $$LINKAGE
 QT += sql

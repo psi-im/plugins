@@ -5,6 +5,7 @@ if(POLICY CMP0071)
     cmake_policy(SET CMP0071 OLD)
 endif()
 set(CMAKE_AUTOMOC TRUE)
+set(CMAKE_CXX_STANDARD 11)
 
 set(PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." CACHE STRING "Plugins root path. Path where include directory placed")
 
@@ -45,6 +46,7 @@ if(SignalProtocolC_FOUND)
                 ${CMAKE_BINARY_DIR}/oldSignal
                 ${PROJECT_SOURCE_DIR}/config.tests/oldSignal/main.cpp
                 LINK_LIBRARIES ${SIGNAL_PROTOCOL_C_LIBRARY}
+                CMAKE_FLAGS -DINCLUDE_DIRECTORIES=${SIGNAL_PROTOCOL_C_INCLUDE_DIR}
     )
     set(MSG_TEST "Performing test: OLD_SIGNAL")
     if(OLD_SIGNAL)
