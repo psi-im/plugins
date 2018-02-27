@@ -7,14 +7,15 @@ isEmpty(PSISDK) {
 unix {
 	CONFIG += link_pkgconfig
 	PKGCONFIG += libsignal-protocol-c
+} else {
+    LIBS += $$LINKAGE
+    #LIBS += -lsignal-protocol-c
 }
 
 load(configure)
 qtCompileTest(oldSignal):DEFINES += OLD_SIGNAL
 
 CONFIG += crypto c++11
-
-LIBS += $$LINKAGE
 QT += sql
 
 RESOURCES = omemoplugin.qrc
