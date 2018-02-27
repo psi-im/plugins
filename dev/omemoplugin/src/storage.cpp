@@ -39,38 +39,38 @@ namespace psiomemo {
     initializeDB(ctx);
 
     signal_protocol_session_store session_store = {
-        .load_session_func = &loadSession,
-        .get_sub_device_sessions_func = nullptr,
-        .store_session_func = &storeSession,
-        .contains_session_func = &containsSession,
-        .delete_session_func = nullptr,
-        .delete_all_sessions_func = nullptr,
-        .destroy_func = nullptr,
-        .user_data = this
+        /*.load_session_func =*/ &loadSession,
+        /*.get_sub_device_sessions_func =*/ nullptr,
+        /*.store_session_func =*/ &storeSession,
+        /*.contains_session_func =*/ &containsSession,
+        /*.delete_session_func =*/ nullptr,
+        /*.delete_all_sessions_func =*/ nullptr,
+        /*.destroy_func =*/ nullptr,
+        /*.user_data =*/ this
     };
     signal_protocol_pre_key_store pre_key_store = {
-        .load_pre_key = &loadPreKey,
-        .store_pre_key = nullptr,
-        .contains_pre_key = nullptr,
-        .remove_pre_key = &removePreKey,
-        .destroy_func = nullptr,
-        .user_data = this
+        /*.load_pre_key =*/ &loadPreKey,
+        /*.store_pre_key =*/ nullptr,
+        /*.contains_pre_key =*/ nullptr,
+        /*.remove_pre_key =*/ &removePreKey,
+        /*.destroy_func =*/ nullptr,
+        /*.user_data =*/ this
     };
     signal_protocol_signed_pre_key_store signed_pre_key_store = {
-        .load_signed_pre_key = &loadSignedPreKey,
-        .store_signed_pre_key = nullptr,
-        .contains_signed_pre_key = nullptr,
-        .remove_signed_pre_key = nullptr,
-        .destroy_func = nullptr,
-        .user_data = this
+        /*.load_signed_pre_key =*/ &loadSignedPreKey,
+        /*.store_signed_pre_key =*/ nullptr,
+        /*.contains_signed_pre_key =*/ nullptr,
+        /*.remove_signed_pre_key =*/ nullptr,
+        /*.destroy_func =*/ nullptr,
+        /*.user_data =*/ this
     };
     signal_protocol_identity_key_store identity_key_store = {
-        .get_identity_key_pair = &getIdentityKeyPair,
-        .get_local_registration_id = &getLocalRegistrationId,
-        .save_identity = &saveIdentity,
-        .is_trusted_identity = &isTrustedIdentity,
-        .destroy_func = nullptr,
-        .user_data = this
+        /*.get_identity_key_pair =*/ &getIdentityKeyPair,
+        /*.get_local_registration_id =*/ &getLocalRegistrationId,
+        /*.save_identity =*/ &saveIdentity,
+        /*.is_trusted_identity =*/ &isTrustedIdentity,
+        /*.destroy_func =*/ nullptr,
+        /*.user_data =*/ this
     };
 
     signal_protocol_store_context_create(&m_storeContext, ctx);
