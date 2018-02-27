@@ -39,7 +39,7 @@ namespace psiomemo {
 
   void OMEMO::publishOwnBundle(int account) {
     Bundle b = m_signal.collectBundle();
-    if (!b.loaded)  return;
+    if (!b.isValid()) return;
 
     QDomDocument doc;
     QDomElement publish = doc.createElement("publish");
@@ -363,7 +363,9 @@ namespace psiomemo {
         prekey = prekey.nextSiblingElement("preKeyPublic");
       }
 
-      m_signal.processBundle(from, deviceId, bundle);
+      if (bundle.isValid()) {
+        m_signal.processBundle(from, deviceId, bundle);
+      }
     }
 
     if (message->pendingBundles.isEmpty()) {

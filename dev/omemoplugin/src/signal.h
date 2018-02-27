@@ -30,14 +30,14 @@
 namespace psiomemo {
   class Bundle {
   public:
-    Bundle() : signedPreKeyId(), signedPreKeyPublic(), signedPreKeySignature(), identityKeyPublic(), preKeys(), loaded(false) {
+    Bundle() : signedPreKeyId(), signedPreKeyPublic(), signedPreKeySignature(), identityKeyPublic(), preKeys() {
     };
     uint32_t signedPreKeyId;
     QByteArray signedPreKeyPublic;
     QByteArray signedPreKeySignature;
     QByteArray identityKeyPublic;
     QVector<QPair<uint32_t, QByteArray>> preKeys;
-    bool loaded;
+    bool isValid();
   };
 
   class EncryptedKey {

@@ -122,9 +122,6 @@ namespace psiomemo {
           SIGNAL_UNREF(pre_key);
         }
       }
-      if (!bundle.preKeys.isEmpty()) {
-        bundle.loaded = true;
-      }
     }
     SIGNAL_UNREF(signed_pre_key);
     return bundle;
@@ -391,4 +388,8 @@ namespace psiomemo {
     }
     return res;
   };
+
+  bool Bundle::isValid() {
+    return !signedPreKeyPublic.isNull() && !signedPreKeySignature.isNull() && !identityKeyPublic.isNull() && !preKeys.isEmpty();
+  }
 }
