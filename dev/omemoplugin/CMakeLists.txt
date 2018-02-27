@@ -69,7 +69,8 @@ set(HEADERS
 set(SOURCES
     src/omemoplugin.cpp
     src/storage.cpp
-    src/crypto.cpp
+    src/crypto_qca.cpp
+    src/crypto_common.cpp
     src/omemo.cpp
     src/signal.cpp
     src/configwidget.cpp

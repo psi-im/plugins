@@ -37,8 +37,6 @@ namespace psiomemo {
   }
 
   void Signal::init(const QString &dataPath) {
-    std::random_device rd;
-    randomGen.seed(rd());
     signal_context_create(&m_signalContext, nullptr);
     signal_context_set_log_function(m_signalContext, &signal_log);
 
@@ -128,8 +126,7 @@ namespace psiomemo {
   }
 
   void Signal::processBundle(const QString &from, uint32_t deviceId, const Bundle &bundle) {
-    std::uniform_int_distribution<> randDis(0, bundle.preKeys.size() - 1);
-    QPair<uint32_t, QByteArray> preKey = bundle.preKeys.at(randDis(randomGen));// starting from Qt5.10 QRandomGenerator::global()->bounded(bundle.preKeys.size())
+    QPair<uint32_t, QByteArray> preKey = bundle.preKeys.at(Crypto::randomInt() % bundle.preKeys.size());
 
     ec_public_key *pre_key_public = curveDecodePoint(preKey.second);
     if (pre_key_public != nullptr) {
@@ -206,7 +203,7 @@ namespace psiomemo {
     return signal_protocol_session_contains_session(m_storage.storeContext(), &addr) && m_storage.identityExists(&addr);
   }
 
-  QList<EncryptedKey> Signal::encryptKey(const QString &ownJid, const QString &recipient, const QCA::SymmetricKey &key) {
+  QList<EncryptedKey> Signal::encryptKey(const QString &ownJid, const QString &recipient, const QByteArray &key) {
     QList<EncryptedKey> results;
     const QByteArray &recipientUtf8 = recipient.toUtf8();
     const QByteArray &ownJidUtf8 = ownJid.toUtf8();
@@ -296,7 +293,7 @@ namespace psiomemo {
   }
 
   template<typename T>
-  void Signal::doWithCipher(signal_protocol_address *addr, const QCA::SymmetricKey &key, T&& lambda) {
+  void Signal::doWithCipher(signal_protocol_address *addr, const QByteArray &key, T&& lambda) {
     session_cipher *cipher = nullptr;
     if (session_cipher_create(&cipher, m_storage.storeContext(), addr, m_signalContext) == SG_SUCCESS) {
       lambda(cipher, reinterpret_cast<const uint8_t *>(key.data()), static_cast<size_t>(key.size()));

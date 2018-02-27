@@ -20,29 +20,11 @@
 
 #include <qdebug.h>
 #include "crypto.h"
+#include <QtCrypto>
 
 using namespace QCA;
 
 namespace psiomemo {
-  void Crypto::initCryptoProvider(signal_context *ctx) {
-    signal_crypto_provider crypto_provider = {
-        /*.random_func =*/ random,
-        /*.hmac_sha256_init_func =*/ hmac_sha256_init,
-        /*.hmac_sha256_update_func =*/ algo_update,
-        /*.hmac_sha256_final_func =*/ algo_final,
-        /*.hmac_sha256_cleanup_func =*/ algo_cleanup,
-        /*.sha512_digest_init_func =*/ sha512_digest_init,
-        /*.sha512_digest_update_func =*/ algo_update,
-        /*.sha512_digest_final_func =*/ algo_final,
-        /*.sha512_digest_cleanup_func =*/ algo_cleanup,
-        /*.encrypt_func =*/ aes_encrypt,
-        /*.decrypt_func =*/ aes_decrypt,
-        /*.user_data =*/ nullptr
-    };
-
-    signal_context_set_crypto_provider(ctx, &crypto_provider);
-  }
-
   bool Crypto::isSupported() {
     QStringList requiredQcaFeatures;
     requiredQcaFeatures << "hmac(sha256)" << "sha512"
@@ -58,14 +40,22 @@ namespace psiomemo {
     return true;
   }
 
-  QPair<QByteArray, QCA::AuthTag> Crypto::aes_gcm(QCA::Direction direction,
-                                                  const InitializationVector &iv,
-                                                  const SymmetricKey &key,
-                                                  const QByteArray &input,
-                                                  const AuthTag &tag) {
-    Cipher cipher("aes128", Cipher::GCM, Cipher::NoPadding, direction, key, iv, tag);
+  QPair<QByteArray, QByteArray> Crypto::aes_gcm(Crypto::Direction direction,
+                                                const QByteArray &iv,
+                                                const QByteArray &key,
+                                                const QByteArray &input,
+                                                const QByteArray &tag) {
+    Cipher cipher("aes128", Cipher::GCM, Cipher::NoPadding, direction == Encode ? QCA::Encode : QCA::Decode, key, iv, AuthTag(tag));
     QByteArray cryptoText = cipher.process(input).toByteArray();
-    return qMakePair(cryptoText, cipher.tag());
+    return qMakePair(cryptoText, cipher.tag().toByteArray());
+  }
+
+  QByteArray Crypto::randomBytes(int length) {
+    return Random::randomArray(length).toByteArray();
+  }
+
+  uint32_t Crypto::randomInt() {
+    return static_cast<uint32_t>(Random::randomInt());
   }
 
   int random(uint8_t *data, size_t len, void *user_data) {
@@ -109,7 +99,7 @@ namespace psiomemo {
     delete mac;
   }
 
-  int aes(Direction direction, signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len,
+  int aes(Crypto::Direction direction, signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len,
           const uint8_t *iv, size_t iv_len, const uint8_t *ciphertext, size_t ciphertext_len) {
     const char *cipherName;
     Cipher::Mode mode;
@@ -139,7 +129,8 @@ namespace psiomemo {
         return SG_ERR_UNKNOWN;
     }
 
-    Cipher cipher(cipherName, mode, Cipher::DefaultPadding, direction, toQByteArray(key, key_len), toQByteArray(iv, iv_len));
+    Cipher cipher(cipherName, mode, Cipher::DefaultPadding, direction == Crypto::Encode ? Encode : Decode,
+                  toQByteArray(key, key_len), toQByteArray(iv, iv_len));
     MemoryRegion result = cipher.process(toQByteArray(ciphertext, ciphertext_len));
     if (!cipher.ok()) {
       return SG_ERR_UNKNOWN;
@@ -149,20 +140,16 @@ namespace psiomemo {
 
     return SG_SUCCESS;
   }
-
+  
   int aes_decrypt(signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len, const uint8_t *iv,
                   size_t iv_len, const uint8_t *ciphertext, size_t ciphertext_len, void *user_data) {
     Q_UNUSED(user_data);
-    return aes(Decode, output, cipherMode, key, key_len, iv, iv_len, ciphertext, ciphertext_len);
+    return aes(Crypto::Decode, output, cipherMode, key, key_len, iv, iv_len, ciphertext, ciphertext_len);
   }
 
   int aes_encrypt(signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len, const uint8_t *iv,
                   size_t iv_len, const uint8_t *plaintext, size_t plaintext_len, void *user_data) {
     Q_UNUSED(user_data);
-    return aes(Encode, output, cipherMode, key, key_len, iv, iv_len, plaintext, plaintext_len);
-  }
-
-  QByteArray toQByteArray(const uint8_t *key, size_t key_len) {
-    return QByteArray(reinterpret_cast<const char *>(key), static_cast<int>(key_len));
+    return aes(Crypto::Encode, output, cipherMode, key, key_len, iv, iv_len, plaintext, plaintext_len);
   }
 }

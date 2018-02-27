@@ -127,8 +127,8 @@ namespace psiomemo {
       }
       if (!payloadElement.isNull()) {
         QByteArray payload(QByteArray::fromBase64(payloadElement.firstChild().nodeValue().toUtf8()));
-        QCA::InitializationVector iv(QByteArray::fromBase64(header.firstChildElement("iv").firstChild().nodeValue().toUtf8()));
-        QCA::AuthTag tag(OMEMO_AES_GCM_TAG_LENGTH);
+        QByteArray iv(QByteArray::fromBase64(header.firstChildElement("iv").firstChild().nodeValue().toUtf8()));
+        QByteArray tag(OMEMO_AES_GCM_TAG_LENGTH, Qt::Uninitialized);
 
         if (decryptedKey.size() > OMEMO_AES_128_KEY_LENGTH) {
           tag = decryptedKey.right(decryptedKey.size() - OMEMO_AES_128_KEY_LENGTH);
@@ -138,7 +138,7 @@ namespace psiomemo {
           payload.chop(OMEMO_AES_GCM_TAG_LENGTH);
         }
 
-        QPair<QByteArray, QCA::AuthTag> decryptedBody = Crypto::aes_gcm(QCA::Decode, iv, decryptedKey, payload, tag);
+        QPair<QByteArray, QByteArray> decryptedBody = Crypto::aes_gcm(Crypto::Decode, iv, decryptedKey, payload, tag);
         if (!decryptedBody.first.isNull() && tag == decryptedBody.second) {
           bool trusted = m_signal.isTrusted(sender, deviceId);
           QDomNode decrypted = xml.cloneNode(true);
@@ -187,18 +187,18 @@ namespace psiomemo {
     encrypted.appendChild(header);
     xml.appendChild(encrypted);
 
-    QCA::InitializationVector iv(OMEMO_AES_GCM_IV_LENGTH);
+    QByteArray iv = Crypto::randomBytes(OMEMO_AES_GCM_IV_LENGTH);
 
     QDomElement ivElement = xml.ownerDocument().createElement("iv");
-    ivElement.appendChild(xml.ownerDocument().createTextNode(iv.toByteArray().toBase64()));
+    ivElement.appendChild(xml.ownerDocument().createTextNode(iv.toBase64()));
     header.appendChild(ivElement);
 
-    QCA::SymmetricKey key(OMEMO_AES_128_KEY_LENGTH);
+    QByteArray key = Crypto::randomBytes(OMEMO_AES_128_KEY_LENGTH);
     QDomElement body = xml.firstChildElement("body");
-    QPair<QByteArray, QCA::AuthTag> encryptedBody;
+    QPair<QByteArray, QByteArray> encryptedBody;
     if (!body.isNull()) {
       QString plainText = body.firstChild().nodeValue();
-      encryptedBody = Crypto::aes_gcm(QCA::Encode, iv, key, plainText.toUtf8());
+      encryptedBody = Crypto::aes_gcm(Crypto::Encode, iv, key, plainText.toUtf8());
       key += encryptedBody.second;
     }
     QList<EncryptedKey> encryptedKeys = m_signal.encryptKey(ownJid, recipient, key);

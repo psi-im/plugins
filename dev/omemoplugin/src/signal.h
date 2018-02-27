@@ -23,8 +23,6 @@
 
 #include <QObject>
 #include <utility>
-#include <random>
-#include <qca_core.h>
 #include "storage.h"
 
 namespace psiomemo {
@@ -67,7 +65,7 @@ namespace psiomemo {
     void processBundle(const QString &from, uint32_t deviceId, const Bundle &bundle);
     uint32_t getDeviceId();
     void updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds);
-    QList<EncryptedKey> encryptKey(const QString &ownJid, const QString &recipient, const QCA::SymmetricKey &key);
+    QList<EncryptedKey> encryptKey(const QString &ownJid, const QString &recipient, const QByteArray &key);
     QPair<QByteArray, bool> decryptKey(const QString &sender, const EncryptedKey &encryptedKey);
     QVector<uint32_t> invalidSessions(const QString &recipient);
     uint32_t preKeyCount();
@@ -85,12 +83,11 @@ namespace psiomemo {
     signal_context *m_signalContext = nullptr;
     uint32_t m_deviceId = 0;
     Storage m_storage;
-    std::mt19937 randomGen;
 
     QByteArray getPublicKey(const ec_key_pair *key_pair) const;
 
     template<typename T>
-    void doWithCipher(signal_protocol_address *addr, const QCA::SymmetricKey &key, T&&);
+    void doWithCipher(signal_protocol_address *addr, const QByteArray &key, T&&);
     signal_protocol_address getAddress(uint32_t deviceId, const QByteArray &name) const;
     bool sessionIsValid(const signal_protocol_address &addr) const;
     static void signal_log(int level, const char *message, size_t len, void *user_data);

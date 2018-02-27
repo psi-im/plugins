@@ -20,7 +20,6 @@
 
 #include <QtGui>
 #include <QtXml>
-#include <QtCrypto>
 #include <QtSql>
 #include <QAction>
 

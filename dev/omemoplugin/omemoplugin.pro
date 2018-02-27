@@ -30,7 +30,8 @@ HEADERS += \
 
 SOURCES += \
     src/configwidget.cpp \
-    src/crypto.cpp \
+    src/crypto_qca.cpp \
+    src/crypto_common.cpp \
     src/omemo.cpp \
     src/omemoplugin.cpp \
     src/signal.cpp \
