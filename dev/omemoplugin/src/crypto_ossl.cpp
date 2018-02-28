@@ -4,6 +4,10 @@ extern "C" {
 #include <openssl/rand.h>
 }
 
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+#define OSSL_110
+#endif
+
 namespace psiomemo {
   void Crypto::doInit() {
     OpenSSL_add_all_algorithms();
@@ -41,11 +45,17 @@ namespace psiomemo {
 
   int hmac_sha256_init(void **context, const uint8_t *key, size_t key_len, void *user_data) {
     Q_UNUSED(user_data);
+#ifdef OSSL_110
+    auto ctx = HMAC_CTX_new();
+#else
     auto ctx = static_cast<HMAC_CTX *>(OPENSSL_malloc(sizeof(HMAC_CTX)));
+#endif
     if (ctx != nullptr) {
       *context = ctx;
 
+#ifndef OSSL_110
       HMAC_CTX_init(ctx);
+#endif
       if (HMAC_Init_ex(ctx, key, static_cast<int>(key_len), EVP_sha256(), nullptr) == 1) {
         return SG_SUCCESS;
       }
@@ -71,11 +81,15 @@ namespace psiomemo {
     Q_UNUSED(user_data);
     auto ctx = static_cast<HMAC_CTX *>(context);
     if (ctx != nullptr) {
+#ifdef OSSL_110
+      HMAC_CTX_reset(ctx);
+#else
       HMAC_CTX_cleanup(ctx);
       EVP_MD_CTX_cleanup(&ctx->i_ctx);
       EVP_MD_CTX_cleanup(&ctx->o_ctx);
       EVP_MD_CTX_cleanup(&ctx->md_ctx);
       OPENSSL_free(ctx);
+#endif
     }
   }
 
