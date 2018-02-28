@@ -29,13 +29,13 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-find_package(Qt5 COMPONENTS Widgets Xml Sql REQUIRED )
-find_package(Qca REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Xml Sql REQUIRED)
+find_package(OpenSSL COMPONENTS Crypto REQUIRED)
 find_package(SignalProtocolC REQUIRED)
 
 include_directories(
     ${CMAKE_SOURCE_DIR}
-    ${Qca_INCLUDE_DIR}
+    ${OPENSSL_INCLUDE_DIR}
     ${SIGNAL_PROTOCOL_C_INCLUDE_DIR}
     ${PLUGINS_ROOT_DIR}/include
 )
@@ -69,7 +69,7 @@ set(HEADERS
 set(SOURCES
     src/omemoplugin.cpp
     src/storage.cpp
-    src/crypto_qca.cpp
+    src/crypto_ossl.cpp
     src/crypto_common.cpp
     src/omemo.cpp
     src/signal.cpp
@@ -95,7 +95,7 @@ add_library(
 target_link_libraries(
     ${PLUGIN}
     ${QT_DEPLIBS}
-    ${Qca_LIBRARY}
+    ${OPENSSL_CRYPTO_LIBRARY}
     ${SIGNAL_PROTOCOL_C_LIBRARY}
 )
 

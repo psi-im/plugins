@@ -25,6 +25,9 @@
 using namespace QCA;
 
 namespace psiomemo {
+  void Crypto::doInit() {
+  }
+
   bool Crypto::isSupported() {
     QStringList requiredQcaFeatures;
     requiredQcaFeatures << "hmac(sha256)" << "sha512"
@@ -84,6 +87,14 @@ namespace psiomemo {
     return SG_SUCCESS;
   }
 
+  int hmac_sha256_update(void *context, const uint8_t *data, size_t data_len, void *user_data) {
+    algo_update(context, data, data_len, user_data);
+  }
+
+  int sha512_digest_update(void *context, const uint8_t *data, size_t data_len, void *user_data) {
+    algo_update(context, data, data_len, user_data);
+  }
+
   int algo_final(void *context, signal_buffer **output, void *user_data) {
     Q_UNUSED(user_data);
     auto mac = static_cast<BufferedComputation *>(context);
@@ -93,10 +104,26 @@ namespace psiomemo {
     return SG_SUCCESS;
   }
 
+  int hmac_sha256_final(void *context, signal_buffer **output, void *user_data) {
+    algo_final(context, output, user_data);
+  }
+
+  int sha512_digest_final(void *context, signal_buffer **output, void *user_data) {
+    algo_final(context, output, user_data);
+  }
+
   void algo_cleanup(void *context, void *user_data) {
     Q_UNUSED(user_data);
     auto mac = static_cast<BufferedComputation *>(context);
     delete mac;
+  }
+
+  void hmac_sha256_cleanup(void *context, void *user_data) {
+    algo_cleanup(context, user_data);
+  }
+
+  void sha512_digest_cleanup(void *context, void *user_data) {
+    algo_cleanup(context, user_data);
   }
 
   int aes(Crypto::Direction direction, signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len,

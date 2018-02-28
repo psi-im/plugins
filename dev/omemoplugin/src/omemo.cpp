@@ -139,7 +139,7 @@ namespace psiomemo {
         }
 
         QPair<QByteArray, QByteArray> decryptedBody = Crypto::aes_gcm(Crypto::Decode, iv, decryptedKey, payload, tag);
-        if (!decryptedBody.first.isNull() && tag == decryptedBody.second) {
+        if (!decryptedBody.first.isNull()) {
           bool trusted = m_signal.isTrusted(sender, deviceId);
           QDomNode decrypted = xml.cloneNode(true);
           decrypted.removeChild(decrypted.firstChildElement("encrypted"));

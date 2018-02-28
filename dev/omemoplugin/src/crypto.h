@@ -54,16 +54,20 @@ namespace psiomemo {
 
     static QByteArray randomBytes(int length);
     static uint32_t randomInt();
+
+  private:
+    static void doInit();
   };
 
   int random(uint8_t *data, size_t len, void *user_data);
   int hmac_sha256_init(void **context, const uint8_t *key, size_t key_len, void *user_data);
+  int hmac_sha256_update(void *context, const uint8_t *data, size_t data_len, void *user_data);
+  int hmac_sha256_final(void *context, signal_buffer **output, void *user_data);
+  void hmac_sha256_cleanup(void *context, void *user_data);
   int sha512_digest_init(void **context, void *user_data);
-  int algo_update(void *context, const uint8_t *data, size_t data_len, void *user_data);
-  int algo_final(void *context, signal_buffer **output, void *user_data);
-  void algo_cleanup(void *context, void *user_data);
-  int aes(Crypto::Direction direction, signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len,
-          const uint8_t *iv, size_t iv_len, const uint8_t *ciphertext, size_t ciphertext_len);
+  int sha512_digest_update(void *context, const uint8_t *data, size_t data_len, void *user_data);
+  int sha512_digest_final(void *context, signal_buffer **output, void *user_data);
+  void sha512_digest_cleanup(void *context, void *user_data);
   int aes_decrypt(signal_buffer **output,
                   int cipherMode,
                   const uint8_t *key, size_t key_len,
