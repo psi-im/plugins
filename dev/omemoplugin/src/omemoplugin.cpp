@@ -189,13 +189,13 @@ namespace psiomemo {
 
   QAction *OMEMOPlugin::getAction(QObject *parent, int account, const QString &contact) {
     Q_UNUSED(account);
-
+    QString bareJid = contact.split("/").first();
     QAction *action = new QAction(getIcon(), "Enable OMEMO", parent);
     action->setCheckable(true);
     connect(action, SIGNAL(triggered(bool)), SLOT(onEnableOMEMOAction(bool)));
     connect(action, SIGNAL(destroyed(QObject*)), SLOT(onActionDestroyed(QObject*)));
-    m_actions.insert(contact, action);
-    updateAction(contact);
+    m_actions.insert(bareJid, action);
+    updateAction(bareJid);
     return action;
   }
 
@@ -204,13 +204,14 @@ namespace psiomemo {
   }
 
   void OMEMOPlugin::updateAction(const QString &user) {
-    QAction *action = m_actions.value(user, nullptr);
+    QString bareJid = user.split("/").first();
+    QAction *action = m_actions.value(bareJid, nullptr);
     if (action != nullptr) {
-      bool available = m_omemo.isAvailableForUser(user);
-      bool enabled = available && m_omemo.isEnabledForUser(user);
+      bool available = m_omemo.isAvailableForUser(bareJid);
+      bool enabled = available && m_omemo.isEnabledForUser(bareJid);
       action->setEnabled(available);
       action->setChecked(enabled);
-      action->setProperty("jid", user);
+      action->setProperty("jid", bareJid);
       action->setText(!available ? "OMEMO is not available for this contact" : enabled ? "OMEMO is enabled" : "Enable OMEMO");
     }
   }
