@@ -43,19 +43,26 @@ set( SIGNAL_PROTOCOL_C_ROOT "" CACHE STRING "Path to signal-protocol-c library" 
 find_path(
     SIGNAL_PROTOCOL_C_INCLUDE_DIR signal_protocol.h
     HINTS
+    ${SIGNAL_PROTOCOL_C_ROOT}/include
     ${PC_SIGNAL_PROTOCOL_C_INCLUDEDIR}
     ${PC_SIGNAL_PROTOCOL_C_INCLUDE_DIRS}
-    ${SIGNAL_PROTOCOL_C_ROOT}/include
     PATH_SUFFIXES
+    ""
     signal
 )
 
+set(SIGNAL_PROTOCOL_C_NAMES
+    signal-protocol-c
+    libsignal-protocol-c
+)
 find_library(
     SIGNAL_PROTOCOL_C_LIBRARY signal-protocol-c
+    NAMES ${SIGNAL_PROTOCOL_C_NAMES}
     HINTS
     ${PC_SIGNAL_PROTOCOL_C_LIBDIR}
     ${PC_SIGNAL_PROTOCOL_C_LIBRARY_DIRS}
     ${SIGNAL_PROTOCOL_C_ROOT}/lib
+    ${SIGNAL_PROTOCOL_C_ROOT}/bin
 )
 
 include(FindPackageHandleStandardArgs)
@@ -65,5 +72,10 @@ find_package_handle_standard_args(
     SIGNAL_PROTOCOL_C_LIBRARY
     SIGNAL_PROTOCOL_C_INCLUDE_DIR
 )
+
+if( SIGNAL_PROTOCOL_C_FOUND )
+    set( SIGNAL_PROTOCOL_C_LIBRARIES ${SIGNAL_PROTOCOL_C_LIBRARY} )
+    set( SIGNAL_PROTOCOL_C_INCLUDE_DIRS ${SIGNAL_PROTOCOL_C_INCLUDE_DIR} )
+endif( SIGNAL_PROTOCOL_C_FOUND )
 
 mark_as_advanced( SIGNAL_PROTOCOL_C_INCLUDE_DIR SIGNAL_PROTOCOL_C_LIBRARY )
