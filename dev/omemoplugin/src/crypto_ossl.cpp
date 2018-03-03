@@ -1,3 +1,5 @@
+#include <QVector>
+
 #include "crypto.h"
 extern "C" {
 #include <openssl/hmac.h>
@@ -26,9 +28,9 @@ namespace psiomemo {
   }
 
   QByteArray Crypto::randomBytes(int length) {
-    uint8_t data[length];
-    while (RAND_bytes(data, length) != 1);
-    return toQByteArray(data, static_cast<size_t>(length));
+    QVector<uint8_t> vector(length);
+    while (RAND_bytes(vector.data(), length) != 1);
+    return toQByteArray(vector.data(), vector.size());
   }
 
   uint32_t Crypto::randomInt() {
@@ -71,9 +73,9 @@ namespace psiomemo {
   int hmac_sha256_final(void *context, signal_buffer **output, void *user_data) {
     Q_UNUSED(user_data);
     int length = EVP_MD_size(EVP_sha256());
-    uint8_t data[length];
-    int res = HMAC_Final(static_cast<HMAC_CTX *>(context), data, nullptr);
-    *output = signal_buffer_create(reinterpret_cast<const uint8_t *>(data), static_cast<size_t>(length));
+    QVector<uint8_t> vector(length);
+    int res = HMAC_Final(static_cast<HMAC_CTX *>(context), vector.data(), nullptr);
+    *output = signal_buffer_create(vector.data(), vector.size());
     return res == 1 ? SG_SUCCESS : SG_ERR_INVAL;
   }
 
@@ -114,9 +116,9 @@ namespace psiomemo {
   int sha512_digest_final(void *context, signal_buffer **output, void *user_data) {
     Q_UNUSED(user_data);
     int length = EVP_MD_size(EVP_sha512());
-    uint8_t data[length];
-    int res = EVP_DigestFinal(static_cast<EVP_MD_CTX *>(context), data, nullptr);
-    *output = signal_buffer_create(reinterpret_cast<const uint8_t *>(data), static_cast<size_t>(length));
+    QVector<uint8_t> vector(length);
+    int res = EVP_DigestFinal(static_cast<EVP_MD_CTX *>(context), vector.data(), nullptr);
+    *output = signal_buffer_create(vector.data(), vector.size());
     return res == 1 ? SG_SUCCESS : SG_ERR_INVAL;
   }
 
@@ -145,16 +147,17 @@ namespace psiomemo {
 
     int res;
     int length;
-    uint8_t data[ciphertext.length() + EVP_CIPHER_CTX_block_size(ctx)];
+    QVector<uint8_t> vector(ciphertext.length() + EVP_CIPHER_CTX_block_size(ctx));
 
-    res = updateF(ctx, data, &length, reinterpret_cast<const unsigned char *>(ciphertext.data()), ciphertext.length());
+
+    res = updateF(ctx, vector.data(), &length, reinterpret_cast<const unsigned char *>(ciphertext.data()), ciphertext.length());
 
     if (res == 1) {
       if (!isEncode && !inputTag.isNull()) {
         EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, inputTag.length(), (void *) inputTag.data());
       }
       int finalLength;
-      res = finalF(ctx, data + length, &finalLength);
+      res = finalF(ctx, vector.data() + length, &finalLength);
       length += finalLength;
     }
 
@@ -163,11 +166,11 @@ namespace psiomemo {
 
     if (res == 1) {
       if (isEncode) {
-        uint8_t tagData[inputTag.length()];
-        EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, inputTag.length(), tagData);
-        outTag = toQByteArray(tagData, static_cast<size_t>(inputTag.length()));
+        QVector<uint8_t> tagVactor(inputTag.length());
+        EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, inputTag.length(), tagVactor.data());
+        outTag = toQByteArray(tagVactor.data(), tagVactor.size());
       }
-      cryptoText = toQByteArray(data, static_cast<size_t>(length));
+      cryptoText = toQByteArray(vector.data(), static_cast<size_t>(length));
     }
 
     EVP_CIPHER_CTX_cleanup(ctx);
