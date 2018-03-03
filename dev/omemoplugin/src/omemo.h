@@ -53,7 +53,7 @@ namespace psiomemo {
   private:
     class MessageWaitingForBundles {
     public:
-      QString xml;
+      QDomElement xml;
       QSet<QString> sentStanzas;
       QSet<uint32_t> pendingBundles;
       friend bool operator==(const MessageWaitingForBundles &rhs, const MessageWaitingForBundles &lhs) {
