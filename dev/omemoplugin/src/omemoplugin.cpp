@@ -128,6 +128,12 @@ namespace psiomemo {
       return false;
     }
 
+    QString jid = xml.attribute("from").split("/").first();
+    if (!m_omemo.isEnabledForUser(jid)) {
+      m_omemo.setEnabledForUser(jid, true);
+      updateAction(jid);
+    }
+
     m_encryptedStanzaIds.insert(xml.attribute("id"));
     m_eventCreator->createNewMessageEvent(account, decrypted);
 
