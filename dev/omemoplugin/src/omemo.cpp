@@ -304,15 +304,15 @@ namespace psiomemo {
 
   void OMEMO::buildSessionsFromBundle(const QVector<uint32_t> &invalidSessions, const QString &ownJid, int account,
                                       const QDomElement &messageToResend) {
-    MessageWaitingForBundles message;
-    message.xml = messageToResend;
+    std::shared_ptr<MessageWaitingForBundles> message(new MessageWaitingForBundles);
+    message->xml = messageToResend;
 
     QString recipient = messageToResend.attribute("to").split("/").first();
 
     foreach (uint32_t deviceId, invalidSessions) {
       QString stanza = pepRequest(account, ownJid, recipient, bundleNodeName(deviceId));
-      message.sentStanzas.insert(stanza);
-      message.pendingBundles.insert(deviceId);
+      message->sentStanzas.insert(stanza);
+      message->pendingBundles.insert(deviceId);
     }
     m_pendingMessages.append(message);
   }
@@ -321,10 +321,10 @@ namespace psiomemo {
     QString stanzaId = xml.attribute("id");
     if (stanzaId.isNull()) return false;
 
-    MessageWaitingForBundles *message = nullptr;
-    foreach (MessageWaitingForBundles msg, m_pendingMessages) {
-      if (msg.sentStanzas.contains(stanzaId)) {
-        message = &msg;
+    std::shared_ptr<MessageWaitingForBundles> message;
+    foreach (std::shared_ptr<MessageWaitingForBundles> msg, m_pendingMessages) {
+      if (msg->sentStanzas.contains(stanzaId)) {
+        message = msg;
         break;
       }
     }
@@ -371,7 +371,7 @@ namespace psiomemo {
       }
       encryptMessage(ownJid, account, messageXml, false, messageXml.firstChildElement("body").isNull() ? &deviceId : nullptr);
       m_stanzaSender->sendStanza(account, messageXml);
-      m_pendingMessages.removeOne(*message);
+      m_pendingMessages.removeOne(message);
     }
 
     return true;

@@ -56,14 +56,11 @@ namespace psiomemo {
       QDomElement xml;
       QSet<QString> sentStanzas;
       QSet<uint32_t> pendingBundles;
-      friend bool operator==(const MessageWaitingForBundles &rhs, const MessageWaitingForBundles &lhs) {
-        return rhs.xml == lhs.xml;
-      }
     };
 
     StanzaSendingHost *m_stanzaSender = nullptr;
     PsiAccountControllingHost *m_accountController = nullptr;
-    QVector<MessageWaitingForBundles> m_pendingMessages;
+    QVector<std::shared_ptr<MessageWaitingForBundles>> m_pendingMessages;
     Signal m_signal;
     void pepPublish(int account, const QString &dl_xml) const;
     void publishOwnBundle(int account);
