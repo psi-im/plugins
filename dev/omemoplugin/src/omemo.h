@@ -21,6 +21,7 @@
 #ifndef PSIOMEMO_OMEMO_H
 #define PSIOMEMO_OMEMO_H
 
+#include <memory>
 #include <QtXml>
 #include "psiaccountcontrollinghost.h"
 #include "stanzasendinghost.h"
