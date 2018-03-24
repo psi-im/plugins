@@ -835,25 +835,29 @@ void OtrInternal::create_privkey(const char* accountname,
         return;
     }
 
-    is_generating = true;
+    void *newkeyp;
+    if (otrl_privkey_generate_start(m_userstate, accountname, protocol, &newkeyp) == gcry_error(GPG_ERR_EEXIST)) {
+        qWarning("libotr reports it's still generating a previous key while it shouldn't be");
+        return;
+    }
 
-    QByteArray keysfile = QFile::encodeName(m_keysFile);
+    is_generating = true;
 
     QEventLoop loop;
     QFutureWatcher<gcry_error_t> watcher;
 
     QObject::connect(&watcher, SIGNAL(finished()), &loop, SLOT(quit()));
 
-    QFuture<gcry_error_t> future = QtConcurrent::run(otrl_privkey_generate,
-                                              m_userstate,
-                                              keysfile.constData(),
-                                              accountname,
-                                              protocol);
+    QFuture<gcry_error_t> future = QtConcurrent::run(otrl_privkey_generate_calculate, newkeyp);
     watcher.setFuture(future);
 
     loop.exec();
 
     is_generating = false;
+
+    if (future.result() == gcry_error(GPG_ERR_NO_ERROR)) {
+        otrl_privkey_generate_finish(m_userstate, newkeyp, QFile::encodeName(m_keysFile));
+    }
 
     char fingerprint[OTRL_PRIVKEY_FPRINT_HUMAN_LEN];
     if (otrl_privkey_fingerprint(m_userstate, fingerprint, accountname,

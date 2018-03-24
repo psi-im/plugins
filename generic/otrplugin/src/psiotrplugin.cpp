@@ -143,7 +143,7 @@ QString PsiOtrPlugin::shortName() const
 
 QString PsiOtrPlugin::version() const
 {
-    return "1.0.3";
+    return "1.0.4";
 }
 
 // ---------------------------------------------------------------------------
