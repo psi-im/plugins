@@ -619,6 +619,9 @@ void HttpUploadPlugin::uploadComplete(QNetworkReply* reply) {
 						&& psiOptions->getGlobalOption("options.ui.notifications.request-receipts").toBool() ?
 						"<request xmlns='urn:xmpp:receipts'/>" : "");
 		QString message = QString("<message type=\"%1\" to=\"%2\" id=\"%3\">"
+				"<x xmlns=\"jabber:x:oob\">"
+				"<url>%4</url>"
+				"</x>"
 				"<body>%4</body>"
 				"%5"
 				"</message>").arg(currentUpload.type).arg(currentUpload.to).arg(id).arg(currentUpload.getUrl).arg(
