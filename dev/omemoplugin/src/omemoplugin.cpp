@@ -134,10 +134,74 @@ namespace psiomemo {
       updateAction(jid);
     }
 
+    if (decrypted.firstChildElement("body").firstChild().nodeValue().startsWith("aesgcm://")) {
+      processEncryptedFile(account, decrypted);
+    }
+
     m_encryptedStanzaIds.insert(xml.attribute("id"));
     m_eventCreator->createNewMessageEvent(account, decrypted);
 
     return true;
+  }
+
+  void OMEMOPlugin::processEncryptedFile(int account, QDomElement &xml) {
+    QDomElement body = xml.firstChildElement("body");
+    QUrl url(body.firstChild().nodeValue().replace("aesgcm://", "https://"));
+
+    QByteArray keyData = QByteArray::fromHex(url.fragment().toLatin1());
+    url.setFragment(QString());
+
+    QDir cacheDir(m_applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation) + "/aesgcm_files");
+    if (!cacheDir.exists()) {
+      cacheDir.mkpath(".");
+    }
+    QFile f(cacheDir.filePath(QString::number(qHash(url)) + "_" + url.fileName()));
+    QString fileUrl = QUrl::fromLocalFile(f.fileName()).toString();
+    if (f.exists()) {
+      body.firstChild().setNodeValue(fileUrl);
+      return;
+    }
+
+    QNetworkReply *reply = m_networkManager.get(QNetworkRequest(url));
+
+    connect(reply, SIGNAL(finished()), SLOT(onFileDownloadFinished()));
+    reply->setProperty("keyData", keyData);
+    reply->setProperty("account", account);
+    reply->setProperty("filePath", f.fileName());
+
+    QDomElement newXml = xml.cloneNode(true).toElement();
+    newXml.firstChildElement("body").firstChild().setNodeValue(fileUrl);
+    QString string;
+    QTextStream stream(&string);
+    newXml.save(stream, 0);
+    reply->setProperty("xml", string);
+  }
+
+  void OMEMOPlugin::onFileDownloadFinished() {
+    auto reply = dynamic_cast<QNetworkReply *>(sender());
+    reply->deleteLater();
+
+    QByteArray data = reply->readAll();
+    QByteArray tag = data.right(OMEMO_AES_GCM_TAG_LENGTH);
+    data.chop(OMEMO_AES_GCM_TAG_LENGTH);
+
+    QByteArray keyData = reply->property("keyData").toByteArray();
+    QByteArray iv = keyData.left(OMEMO_AES_GCM_IV_LENGTH);
+    QByteArray key = keyData.right(keyData.size() - OMEMO_AES_GCM_IV_LENGTH);
+
+    QByteArray decrypted = Crypto::aes_gcm(Crypto::Decode, iv, key, data, tag).first;
+    if (!decrypted.isNull()) {
+      QFile f(reply->property("filePath").toString());
+      f.open(QIODevice::WriteOnly);
+      f.write(decrypted);
+      f.close();
+
+      QDomDocument doc;
+      doc.setContent(reply->property("xml").toString());
+      QDomElement xml = doc.firstChild().toElement();
+      m_encryptedStanzaIds.insert(xml.attribute("id"));
+      m_eventCreator->createNewMessageEvent(reply->property("account").toInt(), xml);
+    }
   }
 
   bool OMEMOPlugin::outgoingStanza(int account, QDomElement &xml) {

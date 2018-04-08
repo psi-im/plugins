@@ -29,7 +29,7 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-find_package(Qt5 COMPONENTS Widgets Xml Sql REQUIRED)
+find_package(Qt5 COMPONENTS Network Widgets Xml Sql REQUIRED)
 find_package(OpenSSL COMPONENTS Crypto REQUIRED)
 find_package(SignalProtocolC REQUIRED)
 
@@ -79,6 +79,7 @@ set(SOURCES
 qt5_add_resources(RESOURCES omemoplugin.qrc)
 
 set(QT_DEPLIBS
+    Qt5::Network
     Qt5::Widgets
     Qt5::Xml
     Qt5::Sql

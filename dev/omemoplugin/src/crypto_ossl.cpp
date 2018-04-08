@@ -30,7 +30,7 @@ namespace psiomemo {
   QByteArray Crypto::randomBytes(int length) {
     QVector<uint8_t> vector(length);
     while (RAND_bytes(vector.data(), length) != 1);
-    return toQByteArray(vector.data(), vector.size());
+    return toQByteArray(vector.data(), static_cast<size_t>(vector.size()));
   }
 
   uint32_t Crypto::randomInt() {
@@ -75,7 +75,7 @@ namespace psiomemo {
     int length = EVP_MD_size(EVP_sha256());
     QVector<uint8_t> vector(length);
     int res = HMAC_Final(static_cast<HMAC_CTX *>(context), vector.data(), nullptr);
-    *output = signal_buffer_create(vector.data(), vector.size());
+    *output = signal_buffer_create(vector.data(), static_cast<size_t>(vector.size()));
     return res == 1 ? SG_SUCCESS : SG_ERR_INVAL;
   }
 
@@ -118,7 +118,7 @@ namespace psiomemo {
     int length = EVP_MD_size(EVP_sha512());
     QVector<uint8_t> vector(length);
     int res = EVP_DigestFinal(static_cast<EVP_MD_CTX *>(context), vector.data(), nullptr);
-    *output = signal_buffer_create(vector.data(), vector.size());
+    *output = signal_buffer_create(vector.data(), static_cast<size_t>(vector.size()));
     return res == 1 ? SG_SUCCESS : SG_ERR_INVAL;
   }
 
@@ -127,8 +127,8 @@ namespace psiomemo {
     EVP_MD_CTX_destroy(static_cast<EVP_MD_CTX *>(context));
   }
 
-  QPair<QByteArray, QByteArray> aes(Crypto::Direction direction, const EVP_CIPHER *cipher, bool padding, QByteArray key,
-                                    QByteArray iv, QByteArray ciphertext, QByteArray inputTag) {
+  QPair<QByteArray, QByteArray> aes(Crypto::Direction direction, const EVP_CIPHER *cipher, bool padding, const QByteArray &key,
+                                    const QByteArray &iv, const QByteArray &ciphertext, const QByteArray &inputTag) {
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
     EVP_CIPHER_CTX_init(ctx);
 
@@ -166,9 +166,9 @@ namespace psiomemo {
 
     if (res == 1) {
       if (isEncode) {
-        QVector<uint8_t> tagVactor(inputTag.length());
-        EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, inputTag.length(), tagVactor.data());
-        outTag = toQByteArray(tagVactor.data(), tagVactor.size());
+        QVector<uint8_t> tagVector(inputTag.length());
+        EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, inputTag.length(), tagVector.data());
+        outTag = toQByteArray(tagVector.data(), static_cast<size_t>(tagVector.size()));
       }
       cryptoText = toQByteArray(vector.data(), static_cast<size_t>(length));
     }
@@ -185,7 +185,21 @@ namespace psiomemo {
                                                 const QByteArray &key,
                                                 const QByteArray &input,
                                                 const QByteArray &inputTag) {
-    return aes(direction, EVP_aes_128_gcm(), false, key, iv, input, inputTag);
+    const EVP_CIPHER *cipher;
+    switch (key.size()) {
+      case 16:
+        cipher = EVP_aes_128_gcm();
+        break;
+      case 24:
+        cipher = EVP_aes_192_gcm();
+        break;
+      case 32:
+        cipher = EVP_aes_256_gcm();
+        break;
+      default:
+        return qMakePair(QByteArray(), QByteArray());
+    }
+    return aes(direction, cipher, false, key, iv, input, inputTag);
   }
 
   int aes(Crypto::Direction direction, signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len, const uint8_t *iv,

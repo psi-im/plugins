@@ -43,12 +43,25 @@ namespace psiomemo {
     return true;
   }
 
+  QString getCipherName(int keyLength) {
+    switch (keyLength) {
+      case 16:
+        return "aes128";
+      case 24:
+        return "aes192";
+      case 32:
+        return "aes256";
+      default:
+        return QString();
+    }
+  }
+
   QPair<QByteArray, QByteArray> Crypto::aes_gcm(Crypto::Direction direction,
                                                 const QByteArray &iv,
                                                 const QByteArray &key,
                                                 const QByteArray &input,
                                                 const QByteArray &tag) {
-    Cipher cipher("aes128", Cipher::GCM, Cipher::NoPadding, direction == Encode ? QCA::Encode : QCA::Decode, key, iv, AuthTag(tag));
+    Cipher cipher(getCipherName(key.size()), Cipher::GCM, Cipher::NoPadding, direction == Encode ? QCA::Encode : QCA::Decode, key, iv, AuthTag(tag));
     QByteArray cryptoText = cipher.process(input).toByteArray();
     return qMakePair(cryptoText, cipher.tag().toByteArray());
   }
@@ -88,11 +101,11 @@ namespace psiomemo {
   }
 
   int hmac_sha256_update(void *context, const uint8_t *data, size_t data_len, void *user_data) {
-    algo_update(context, data, data_len, user_data);
+    return algo_update(context, data, data_len, user_data);
   }
 
   int sha512_digest_update(void *context, const uint8_t *data, size_t data_len, void *user_data) {
-    algo_update(context, data, data_len, user_data);
+    return algo_update(context, data, data_len, user_data);
   }
 
   int algo_final(void *context, signal_buffer **output, void *user_data) {
@@ -105,11 +118,11 @@ namespace psiomemo {
   }
 
   int hmac_sha256_final(void *context, signal_buffer **output, void *user_data) {
-    algo_final(context, output, user_data);
+    return algo_final(context, output, user_data);
   }
 
   int sha512_digest_final(void *context, signal_buffer **output, void *user_data) {
-    algo_final(context, output, user_data);
+    return algo_final(context, output, user_data);
   }
 
   void algo_cleanup(void *context, void *user_data) {
@@ -128,23 +141,12 @@ namespace psiomemo {
 
   int aes(Crypto::Direction direction, signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len,
           const uint8_t *iv, size_t iv_len, const uint8_t *ciphertext, size_t ciphertext_len) {
-    const char *cipherName;
-    Cipher::Mode mode;
-
-    switch (key_len) {
-      case 16:
-        cipherName = "aes128";
-        break;
-      case 24:
-        cipherName = "aes192";
-        break;
-      case 32:
-        cipherName = "aes256";
-        break;
-      default:
-        return SG_ERR_UNKNOWN;
+    QString cipherName = getCipherName(static_cast<int>(key_len));
+    if (cipherName.isNull()) {
+      return SG_ERR_UNKNOWN;
     }
 
+    Cipher::Mode mode;
     switch (cipherMode) {
       case SG_CIPHER_AES_CBC_PKCS5:
         mode = Cipher::CBC;

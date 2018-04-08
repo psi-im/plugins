@@ -22,6 +22,7 @@
 #define PSIOMEMO_OMEMOPLUGIN_H
 
 #include <QObject>
+#include <QtNetwork/QtNetwork>
 
 #include "psiplugin.h"
 #include "stanzafilter.h"
@@ -91,6 +92,7 @@ namespace psiomemo {
     QSet<QString> m_encryptedStanzaIds;
     QMap<QString, QAction*> m_actions;
     OMEMO m_omemo;
+    QNetworkAccessManager m_networkManager;
 
     AccountInfoAccessingHost *m_accountInfo;
     ApplicationInfoAccessingHost *m_applicationInfo;
@@ -98,8 +100,10 @@ namespace psiomemo {
 
     QPixmap getIcon() const;
     void updateAction(const QString &user);
+    void processEncryptedFile(int account, QDomElement &xml);
   private slots:
     void onEnableOMEMOAction(bool);
+    void onFileDownloadFinished();
     void onActionDestroyed(QObject *action);
   };
 }
