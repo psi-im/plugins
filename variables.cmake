@@ -1,10 +1,19 @@
 set(PLUGINS_ROOT_DIR "." CACHE STRING "Plugins root path. Path where include directory placed")
 
+if(NOT MAIN_PROGRAM_NAME)
+    message(WARNING "You have to set MAIN_PROGRAM_NAME or PLUGINS_PATH variable before build ${PLUGIN} plugin as a separate project. Otherwise plugin will be installed to ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/psi/plugins directory")
+    set(MAIN_PROGRAM_NAME "psi" CACHE STRING "Main program name: psi or psi-plus")
+endif()
+
+if(IS_PSIPLUS)
+    set(MAIN_PROGRAM_NAME "psi-plus")
+endif()
+
 if( NOT WIN32 )
     set( LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
-    set( PLUGINS_PATH "lib${LIB_SUFFIX}/psi-plus/plugins" CACHE STRING "Install suffix for plugins" )
+    set( PLUGINS_PATH "lib${LIB_SUFFIX}/${MAIN_PROGRAM_NAME}/plugins" CACHE STRING "Install suffix for plugins" )
 else()
-    set( PLUGINS_PATH "psi-plus/plugins" CACHE STRING "Install suffix for plugins" )
+    set( PLUGINS_PATH "${MAIN_PROGRAM_NAME}/plugins" CACHE STRING "Install suffix for plugins" )
     if(MSVC)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
         set(DEFAULT_DEBUG_FLAG "/ENTRY:mainCRTStartup /DEBUG /INCREMENTAL /SAFESEH:NO /MANIFEST:NO")

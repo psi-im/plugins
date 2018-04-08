@@ -1,6 +1,7 @@
 cmake_minimum_required( VERSION 3.1.0 )
-if(NOT ${PROJECT_SOURCE_DIR})
+if(NOT PROJECT_NAME)
     project(psi-plugins)
+    message(WARNING "You have to set IS_PSIPLUS variable before build plugins outside of the main project. Otherwise plugins will be installed to ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/psi/plugins directory")
 endif()
 set_directory_properties(PROPERTIES
     INCLUDE_DIRECTORIES ""
@@ -10,6 +11,7 @@ set_directory_properties(PROPERTIES
 set(QT5_BUILD ON)
 
 option( BUILD_DEV_PLUGINS "Build plugins from dev directory" OFF )
+set(MAIN_PROGRAM_NAME "psi" CACHE STRING "Main program name: psi or psi-plus")
 
 if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/generic")
     set(GENERIC_PLUGINS_FOUND ON)
@@ -63,11 +65,15 @@ else()
     add_definitions( -Wall )
 endif()
 
+if(IS_PSIPLUS)
+    set(MAIN_PROGRAM_NAME "psi-plus")
+endif()
+
 if(NOT WIN32)
     set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")
-    set(PLUGINS_PATH "lib${LIB_SUFFIX}/psi-plus/plugins" CACHE STRING "Install suffix for plugins")
+    set(PLUGINS_PATH "lib${LIB_SUFFIX}/${MAIN_PROGRAM_NAME}/plugins" CACHE STRING "Install suffix for plugins")
 else()
-    set(PLUGINS_PATH "psi-plus/plugins" CACHE STRING "Install suffix for plugins")
+    set(PLUGINS_PATH "${MAIN_PROGRAM_NAME}/plugins" CACHE STRING "Install suffix for plugins")
 endif()
 
 if(GENERIC_PLUGINS_FOUND)
