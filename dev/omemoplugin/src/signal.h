@@ -59,7 +59,7 @@ namespace psiomemo {
 
   class Signal {
   public:
-    void init(const QString &string);
+    void init(const QString &dataPath, const QString &accountId);
     void deinit();
     Bundle collectBundle();
     void processBundle(const QString &from, uint32_t deviceId, const Bundle &bundle);

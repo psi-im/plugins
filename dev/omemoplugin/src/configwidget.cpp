@@ -20,33 +20,58 @@
 
 #include "configwidget.h"
 #include <QVBoxLayout>
-#include <QLabel>
 #include <QPushButton>
 #include <QHeaderView>
 
 namespace psiomemo {
-  ConfigWidget::ConfigWidget(OMEMO *omemo) : QWidget() {
+  ConfigWidget::ConfigWidget(OMEMO *omemo, AccountInfoAccessingHost *accountInfo) : QWidget(), m_accountInfo(accountInfo) {
     auto mainLayout = new QVBoxLayout(this);
-    auto tabWidget = new QTabWidget(this);
-    tabWidget->addTab(new KnownFingerprints(omemo, this), "Fingerprints");
-    tabWidget->addTab(new OwnFingerprint(omemo, this), "Own Fingerprint");
-    mainLayout->addWidget(tabWidget);
+
+    int curIndex = 0;
+    auto accountBox = new QComboBox(this);
+    while (m_accountInfo->getId(curIndex) != "-1") {
+      accountBox->addItem(m_accountInfo->getName(curIndex), curIndex);
+      curIndex++;
+    }
+    mainLayout->addWidget(accountBox);
+
+    int account = accountBox->itemData(accountBox->currentIndex()).toInt();
+
+    m_tabWidget = new QTabWidget(this);
+    m_tabWidget->addTab(new KnownFingerprints(account, omemo, this), "Fingerprints");
+    m_tabWidget->addTab(new OwnFingerprint(account, omemo, this), "Own Fingerprint");
+    mainLayout->addWidget(m_tabWidget);
     setLayout(mainLayout);
+
+    connect(accountBox, SIGNAL(currentIndexChanged(int)), SLOT(currentAccountChanged(int)));
   }
 
-  OwnFingerprint::OwnFingerprint(OMEMO *omemo, QWidget *parent) : QWidget(parent) {
-    auto mainLayout = new QVBoxLayout(this);
-    auto deviceId = new QLabel("Device ID: " + QString::number(omemo->getDeviceId()), this);
-    deviceId->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    mainLayout->addWidget(deviceId);
-    auto fingerprint = new QLabel(QString("Fingerprint: <code>%1</code>").arg(omemo->getOwnFingerprint()), this);
-    fingerprint->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    fingerprint->setWordWrap(true);
-    mainLayout->addWidget(fingerprint);
-    setLayout(mainLayout);
+  void ConfigWidget::currentAccountChanged(int index) {
+    int account = dynamic_cast<QComboBox *>(sender())->itemData(index).toInt();
+    for (int i = 0; i < m_tabWidget->count(); i++) {
+      dynamic_cast<ConfigWidgetTab *>(m_tabWidget->widget(i))->setAccount(account);
+    }
   }
 
-  KnownFingerprints::KnownFingerprints(OMEMO *omemo, QWidget *parent) : QWidget(parent) {
+  OwnFingerprint::OwnFingerprint(int account, OMEMO *omemo, QWidget *parent) : ConfigWidgetTab(account, omemo, parent) {
+    auto mainLayout = new QVBoxLayout(this);
+    m_deviceLabel = new QLabel(this);
+    m_deviceLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    mainLayout->addWidget(m_deviceLabel);
+    m_fingerprintLabel = new QLabel(this);
+    m_fingerprintLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    m_fingerprintLabel->setWordWrap(true);
+    mainLayout->addWidget(m_fingerprintLabel);
+    setLayout(mainLayout);
+    updateData();
+  }
+
+  void OwnFingerprint::updateData() {
+    m_deviceLabel->setText("Device ID: " + QString::number(m_omemo->getDeviceId(m_account)));
+    m_fingerprintLabel->setText(QString("Fingerprint: <code>%1</code>").arg(m_omemo->getOwnFingerprint(m_account)));
+  }
+
+  KnownFingerprints::KnownFingerprints(int account, OMEMO *omemo, QWidget *parent) : ConfigWidgetTab(account, omemo, parent) {
     auto mainLayout = new QVBoxLayout(this);
     m_omemo = omemo;
     m_table = new QTableView(this);
@@ -75,7 +100,7 @@ namespace psiomemo {
     m_tableModel->clear();
     m_tableModel->setColumnCount(3);
     m_tableModel->setHorizontalHeaderLabels({"Contact", "Trust" , "Fingerprint"});
-    foreach (auto fingerprint, m_omemo->getKnownFingerprints()) {
+    foreach (auto fingerprint, m_omemo->getKnownFingerprints(m_account)) {
       QList<QStandardItem*> row;
       auto contact = new QStandardItem(fingerprint.contact);
       contact->setData(QVariant(fingerprint.deviceId));
@@ -98,7 +123,7 @@ namespace psiomemo {
     }
 
     QStandardItem *item = m_tableModel->item(m_table->selectionModel()->selectedRows(0).at(0).row(), 0);
-    m_omemo->confirmDeviceTrust(item->text(), item->data().toUInt());
+    m_omemo->confirmDeviceTrust(m_account, item->text(), item->data().toUInt());
     updateData();
   }
 }

@@ -45,7 +45,7 @@ namespace psiomemo {
   }
 
   QWidget *OMEMOPlugin::options() {
-    return new ConfigWidget(&m_omemo);
+    return new ConfigWidget(&m_omemo, m_accountInfo);
   }
 
   QStringList OMEMOPlugin::pluginFeatures() {
@@ -115,7 +115,7 @@ namespace psiomemo {
     }
 
     if (m_omemo.processDeviceList(m_accountInfo->getJid(account), account, xml)) {
-      updateAction(xml.attribute("from"));
+      updateAction(account, xml.attribute("from"));
       return true;
     }
 
@@ -129,9 +129,9 @@ namespace psiomemo {
     }
 
     QString jid = xml.attribute("from").split("/").first();
-    if (!m_omemo.isEnabledForUser(jid)) {
-      m_omemo.setEnabledForUser(jid, true);
-      updateAction(jid);
+    if (!m_omemo.isEnabledForUser(account, jid)) {
+      m_omemo.setEnabledForUser(account, jid, true);
+      updateAction(account, jid);
     }
 
     if (decrypted.firstChildElement("body").firstChild().nodeValue().startsWith("aesgcm://")) {
@@ -228,6 +228,7 @@ namespace psiomemo {
 
   void OMEMOPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost *host) {
     m_accountInfo = host;
+    m_omemo.setAccountInfoAccessor(host);
   }
 
   void OMEMOPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) {
@@ -249,8 +250,9 @@ namespace psiomemo {
   void OMEMOPlugin::onEnableOMEMOAction(bool checked) {
     auto action = dynamic_cast<QAction*>(sender());
     QString jid = action->property("jid").toString();
-    m_omemo.setEnabledForUser(jid, checked);
-    updateAction(jid);
+    int account = action->property("account").toInt();
+    m_omemo.setEnabledForUser(account, jid, checked);
+    updateAction(account, jid);
   }
 
   QList<QVariantHash> OMEMOPlugin::getButtonParam() {
@@ -265,7 +267,7 @@ namespace psiomemo {
     connect(action, SIGNAL(triggered(bool)), SLOT(onEnableOMEMOAction(bool)));
     connect(action, SIGNAL(destroyed(QObject*)), SLOT(onActionDestroyed(QObject*)));
     m_actions.insert(bareJid, action);
-    updateAction(bareJid);
+    updateAction(account, bareJid);
     return action;
   }
 
@@ -273,15 +275,16 @@ namespace psiomemo {
     m_actions.remove(action->property("jid").toString());
   }
 
-  void OMEMOPlugin::updateAction(const QString &user) {
+  void OMEMOPlugin::updateAction(int account, const QString &user) {
     QString bareJid = user.split("/").first();
     QAction *action = m_actions.value(bareJid, nullptr);
     if (action != nullptr) {
-      bool available = m_omemo.isAvailableForUser(bareJid);
-      bool enabled = available && m_omemo.isEnabledForUser(bareJid);
+      bool available = m_omemo.isAvailableForUser(account, bareJid);
+      bool enabled = available && m_omemo.isEnabledForUser(account, bareJid);
       action->setEnabled(available);
       action->setChecked(enabled);
       action->setProperty("jid", bareJid);
+      action->setProperty("account", account);
       action->setText(!available ? "OMEMO is not available for this contact" : enabled ? "OMEMO is enabled" : "Enable OMEMO");
     }
   }

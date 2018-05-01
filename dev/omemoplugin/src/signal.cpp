@@ -36,12 +36,12 @@ namespace psiomemo {
     qDebug() << "Signal: " << QByteArray(message, static_cast<int>(len));
   }
 
-  void Signal::init(const QString &dataPath) {
+  void Signal::init(const QString &dataPath, const QString &accountId) {
     signal_context_create(&m_signalContext, nullptr);
     signal_context_set_log_function(m_signalContext, &signal_log);
 
     Crypto::initCryptoProvider(m_signalContext);
-    m_storage.init(m_signalContext, dataPath);
+    m_storage.init(m_signalContext, dataPath, accountId);
 
     signal_protocol_identity_get_local_registration_id(m_storage.storeContext(), &m_deviceId);
   }

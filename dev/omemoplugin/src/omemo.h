@@ -25,6 +25,7 @@
 #include <QtXml>
 #include "psiaccountcontrollinghost.h"
 #include "stanzasendinghost.h"
+#include "accountinfoaccessinghost.h"
 #include "signal.h"
 
 namespace psiomemo {
@@ -33,6 +34,7 @@ namespace psiomemo {
     void init(const QString &dataPath);
     void setStanzaSender(StanzaSendingHost *stanzaSender);
     void setAccountController(PsiAccountControllingHost *accountController);
+    void setAccountInfoAccessor(AccountInfoAccessingHost *accountInfoAccessor);
 
     QDomElement decryptMessage(int account, const QDomElement &xml);
     bool encryptMessage(const QString &ownJid, int account, QDomElement &xml, bool buildSessions = true, const uint32_t *toDeviceId = nullptr);
@@ -43,14 +45,13 @@ namespace psiomemo {
     void accountConnected(int account, const QString &ownJid);
 
     const QString deviceListNodeName() const;
-    bool isAvailableForUser(const QString &user);
-    bool isEnabledForUser(const QString &user);
-    void setEnabledForUser(const QString &user, bool enabled);
-    uint32_t getDeviceId();
-    QString getOwnFingerprint();
-    QList<Fingerprint> getKnownFingerprints();
-    void confirmDeviceTrust(const QString &user, uint32_t deviceId);
-
+    bool isAvailableForUser(int account, const QString &user);
+    bool isEnabledForUser(int account, const QString &user);
+    void setEnabledForUser(int account, const QString &user, bool enabled);
+    uint32_t getDeviceId(int account);
+    QString getOwnFingerprint(int account);
+    QList<Fingerprint> getKnownFingerprints(int account);
+    void confirmDeviceTrust(int account, const QString &user, uint32_t deviceId);
   private:
     class MessageWaitingForBundles {
     public:
@@ -61,8 +62,11 @@ namespace psiomemo {
 
     StanzaSendingHost *m_stanzaSender = nullptr;
     PsiAccountControllingHost *m_accountController = nullptr;
+    AccountInfoAccessingHost *m_accountInfoAccessor = nullptr;
     QVector<std::shared_ptr<MessageWaitingForBundles>> m_pendingMessages;
-    Signal m_signal;
+    QString m_dataPath;
+    QHash<int, std::shared_ptr<Signal>> m_accountToSignal;
+    std::shared_ptr<Signal> getSignal(int account);
     void pepPublish(int account, const QString &dl_xml) const;
     void publishOwnBundle(int account);
 

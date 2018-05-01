@@ -26,11 +26,13 @@
 
 namespace psiomemo {
   void OMEMO::init(const QString &dataPath) {
-    m_signal.init(dataPath);
+    m_dataPath = dataPath;
   }
 
   void OMEMO::deinit() {
-    m_signal.deinit();
+    foreach (auto signal, m_accountToSignal.values()) {
+      signal->deinit();
+    }
   }
 
   void OMEMO::accountConnected(int account, const QString &ownJid) {
@@ -38,7 +40,7 @@ namespace psiomemo {
   }
 
   void OMEMO::publishOwnBundle(int account) {
-    Bundle b = m_signal.collectBundle();
+    Bundle b = getSignal(account)->collectBundle();
     if (!b.isValid()) return;
 
     QDomDocument doc;
@@ -51,7 +53,7 @@ namespace psiomemo {
     QDomElement bundle = doc.createElementNS(OMEMO_XMLNS, "bundle");
     item.appendChild(bundle);
 
-    publish.setAttribute("node", QString("%1.bundles:%2").arg(OMEMO_XMLNS).arg(m_signal.getDeviceId()));
+    publish.setAttribute("node", QString("%1.bundles:%2").arg(OMEMO_XMLNS).arg(getSignal(account)->getDeviceId()));
 
     QDomElement signedPreKey = doc.createElement("signedPreKeyPublic");
     signedPreKey.setAttribute("signedPreKeyId", b.signedPreKeyId);
@@ -80,6 +82,7 @@ namespace psiomemo {
   }
 
   QDomElement OMEMO::decryptMessage(int account, const QDomElement &xml) {
+    std::shared_ptr<Signal> signal = getSignal(account);
     QDomElement result;
 
     QDomElement encrypted = xml.firstChildElement("encrypted");
@@ -90,7 +93,7 @@ namespace psiomemo {
     QDomElement header = encrypted.firstChildElement("header");
 
     QDomElement keyElement = header.firstChildElement("key");
-    while (!keyElement.isNull() && keyElement.attribute("rid").toUInt() != m_signal.getDeviceId()) {
+    while (!keyElement.isNull() && keyElement.attribute("rid").toUInt() != signal->getDeviceId()) {
       keyElement = keyElement.nextSiblingElement("key");
     }
     if (keyElement.isNull()) {
@@ -99,13 +102,13 @@ namespace psiomemo {
 
     QString preKeyAttr = keyElement.attribute("prekey");
     bool isPreKey = preKeyAttr == "true" || preKeyAttr == "1";
-    uint32_t preKeyCount = isPreKey ? m_signal.preKeyCount() : 0;
+    uint32_t preKeyCount = isPreKey ? signal->preKeyCount() : 0;
 
     QByteArray encryptedKey = QByteArray::fromBase64(keyElement.firstChild().nodeValue().toUtf8());
 
     uint deviceId = header.attribute("sid").toUInt();
     QString sender = xml.attribute("from").split("/").first();
-    QPair<QByteArray, bool> decryptionResult = m_signal.decryptKey(sender, EncryptedKey(deviceId, isPreKey, encryptedKey));
+    QPair<QByteArray, bool> decryptionResult = signal->decryptKey(sender, EncryptedKey(deviceId, isPreKey, encryptedKey));
     QByteArray decryptedKey = decryptionResult.first;
     bool buildSessionWithPreKey = decryptionResult.second;
     if (buildSessionWithPreKey) {
@@ -122,7 +125,7 @@ namespace psiomemo {
 
     QDomElement payloadElement = encrypted.firstChildElement("payload");
     if (!decryptedKey.isNull()) {
-      if (isPreKey && m_signal.preKeyCount() < preKeyCount) {
+      if (isPreKey && signal->preKeyCount() < preKeyCount) {
         publishOwnBundle(account);
       }
       if (!payloadElement.isNull()) {
@@ -140,7 +143,7 @@ namespace psiomemo {
 
         QPair<QByteArray, QByteArray> decryptedBody = Crypto::aes_gcm(Crypto::Decode, iv, decryptedKey, payload, tag);
         if (!decryptedBody.first.isNull()) {
-          bool trusted = m_signal.isTrusted(sender, deviceId);
+          bool trusted = signal->isTrusted(sender, deviceId);
           QDomNode decrypted = xml.cloneNode(true);
           decrypted.removeChild(decrypted.firstChildElement("encrypted"));
           QDomElement body = decrypted.ownerDocument().createElement("body");
@@ -164,13 +167,14 @@ namespace psiomemo {
   }
 
   bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml, bool buildSessions, const uint32_t *toDeviceId) {
+    std::shared_ptr<Signal> signal = getSignal(account);
     QString recipient = xml.attribute("to").split("/").first();
-    if (!isEnabledForUser(recipient)) {
+    if (!isEnabledForUser(account, recipient)) {
       return false;
     }
 
     if (buildSessions) {
-      QVector<uint32_t> invalidSessions = m_signal.invalidSessions(recipient);
+      QVector<uint32_t> invalidSessions = signal->invalidSessions(recipient);
       if (!invalidSessions.isEmpty()) {
         buildSessionsFromBundle(invalidSessions, ownJid, account, xml);
         xml = QDomElement();
@@ -178,12 +182,12 @@ namespace psiomemo {
       }
     }
 
-    m_signal.processUndecidedDevices(recipient, false);
-    m_signal.processUndecidedDevices(ownJid, true);
+    signal->processUndecidedDevices(recipient, false);
+    signal->processUndecidedDevices(ownJid, true);
 
     QDomElement encrypted = xml.ownerDocument().createElementNS(OMEMO_XMLNS, "encrypted");
     QDomElement header = xml.ownerDocument().createElement("header");
-    header.setAttribute("sid", m_signal.getDeviceId());
+    header.setAttribute("sid", signal->getDeviceId());
     encrypted.appendChild(header);
     xml.appendChild(encrypted);
 
@@ -201,7 +205,7 @@ namespace psiomemo {
       encryptedBody = Crypto::aes_gcm(Crypto::Encode, iv, key, plainText.toUtf8());
       key += encryptedBody.second;
     }
-    QList<EncryptedKey> encryptedKeys = m_signal.encryptKey(ownJid, recipient, key);
+    QList<EncryptedKey> encryptedKeys = signal->encryptKey(ownJid, recipient, key);
 
     if (encryptedKeys.isEmpty()) {
       m_accountController->appendSysMsg(account, recipient, "[OMEMO] Unable to build any sessions, the message was not sent");
@@ -270,9 +274,10 @@ namespace psiomemo {
       return false;
     }
 
+    std::shared_ptr<Signal> signal = getSignal(account);
     if (ownJid == from) {
-      if (!actualIds.contains(m_signal.getDeviceId())) {
-        actualIds.insert(m_signal.getDeviceId());
+      if (!actualIds.contains(signal->getDeviceId())) {
+        actualIds.insert(signal->getDeviceId());
 
         QDomDocument doc;
         QDomElement publish = doc.createElement("publish");
@@ -297,7 +302,7 @@ namespace psiomemo {
       }
     }
 
-    m_signal.updateDeviceList(from, actualIds);
+    signal->updateDeviceList(from, actualIds);
 
     return true;
   }
@@ -360,7 +365,7 @@ namespace psiomemo {
       }
 
       if (bundle.isValid()) {
-        m_signal.processBundle(from, deviceId, bundle);
+        getSignal(account)->processBundle(from, deviceId, bundle);
       }
     }
 
@@ -412,6 +417,10 @@ namespace psiomemo {
     m_accountController = accountController;
   }
 
+  void OMEMO::setAccountInfoAccessor(AccountInfoAccessingHost *accountInfoAccessor) {
+    m_accountInfoAccessor = accountInfoAccessor;
+  }
+
   const QString OMEMO::bundleNodeName(uint32_t deviceId) const {
     return QString("%1.bundles:%2").arg(OMEMO_XMLNS).arg(deviceId);
   }
@@ -420,31 +429,41 @@ namespace psiomemo {
     return QString(OMEMO_XMLNS) + ".devicelist";
   }
 
-  bool OMEMO::isAvailableForUser(const QString &user) {
-    return m_signal.isAvailableForUser(user);
+  bool OMEMO::isAvailableForUser(int account, const QString &user) {
+    return getSignal(account)->isAvailableForUser(user);
   }
 
-  bool OMEMO::isEnabledForUser(const QString &user) {
-    return m_signal.isEnabledForUser(user);
+  bool OMEMO::isEnabledForUser(int account, const QString &user) {
+    return getSignal(account)->isEnabledForUser(user);
   }
 
-  void OMEMO::setEnabledForUser(const QString &user, bool enabled) {
-    m_signal.setEnabledForUser(user, enabled);
+  void OMEMO::setEnabledForUser(int account, const QString &user, bool enabled) {
+    getSignal(account)->setEnabledForUser(user, enabled);
   }
 
-  uint32_t OMEMO::getDeviceId() {
-    return m_signal.getDeviceId();
+  uint32_t OMEMO::getDeviceId(int account) {
+    return getSignal(account)->getDeviceId();
   }
 
-  QString OMEMO::getOwnFingerprint() {
-    return m_signal.getOwnFingerprint();
+  QString OMEMO::getOwnFingerprint(int account) {
+    return getSignal(account)->getOwnFingerprint();
   }
 
-  QList<Fingerprint> OMEMO::getKnownFingerprints() {
-    return m_signal.getKnownFingerprints();
+  QList<Fingerprint> OMEMO::getKnownFingerprints(int account) {
+    return getSignal(account)->getKnownFingerprints();
   }
 
-  void OMEMO::confirmDeviceTrust(const QString &user, uint32_t deviceId) {
-    m_signal.confirmDeviceTrust(user, deviceId, true);
+  void OMEMO::confirmDeviceTrust(int account, const QString &user, uint32_t deviceId) {
+    getSignal(account)->confirmDeviceTrust(user, deviceId, true);
+  }
+
+  std::shared_ptr<Signal> OMEMO::getSignal(int account) {
+    if (!m_accountToSignal.contains(account)) {
+      std::shared_ptr<Signal> signal(new Signal);
+      QString accountId = m_accountInfoAccessor->getId(account).replace('{', "").replace('}', "");
+      signal->init(m_dataPath, accountId);
+      m_accountToSignal[account] = signal;
+    }
+    return m_accountToSignal[account];
   }
 }

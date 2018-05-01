@@ -1,2 +1,5 @@
+2018-05-01
+    * using dedicated OMEMO identities per account instead of per profile
+
 2018-04-08
     * added auto-downloading and decrypting of aesgcm:// links

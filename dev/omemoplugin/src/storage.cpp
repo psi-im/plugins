@@ -26,12 +26,16 @@ extern "C" {
 }
 
 namespace psiomemo {
-  void Storage::init(signal_context *ctx, const QString &dataPath) {
+  void Storage::init(signal_context *ctx, const QString &dataPath, const QString &accountId) {
     m_storeContext = nullptr;
-    m_databaseConnectionName = "OMEMO db";
+    m_databaseConnectionName = "OMEMO db " + accountId;
     QSqlDatabase _db = QSqlDatabase::addDatabase("QSQLITE", m_databaseConnectionName);
 
-    _db.setDatabaseName(QDir(dataPath).filePath("omemo.sqlite"));
+    if (QDir(dataPath).exists("omemo.sqlite")) {
+      QDir(dataPath).rename("omemo.sqlite", "omemo-" + accountId + ".sqlite");
+    }
+
+    _db.setDatabaseName(QDir(dataPath).filePath("omemo-" + accountId + ".sqlite"));
     if (!_db.open()) {
       qWarning() << _db.lastError();
     }

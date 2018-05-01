@@ -24,33 +24,58 @@
 #include <QtGui>
 #include <QWidget>
 #include <QTableView>
+#include <QLabel>
 #include "omemo.h"
 
 namespace psiomemo {
-  class ConfigWidget: public QWidget {
+  class ConfigWidgetTab: public QWidget {
   Q_OBJECT
   public:
-    ConfigWidget(OMEMO *omemo);
+    ConfigWidgetTab(int account, OMEMO *omemo, QWidget *parent): QWidget(parent), m_account(account), m_omemo(omemo) { }
+    void setAccount(int account) {
+      m_account = account;
+      updateData();
+    }
+  protected:
+    virtual void updateData() = 0;
+  protected:
+    int m_account;
+    OMEMO *m_omemo;
   };
 
-  class OwnFingerprint: public QWidget {
+  class OwnFingerprint: public ConfigWidgetTab {
   Q_OBJECT
   public:
-    OwnFingerprint(OMEMO *omemo, QWidget *parent);
+    OwnFingerprint(int account, OMEMO *omemo, QWidget *parent);
+  protected:
+    void updateData() override;
+  private:
+    QLabel *m_deviceLabel;
+    QLabel *m_fingerprintLabel;
   };
 
-  class KnownFingerprints: public QWidget {
+  class KnownFingerprints: public ConfigWidgetTab {
   Q_OBJECT
   public:
-    KnownFingerprints(OMEMO *omemo, QWidget *parent);
+    KnownFingerprints(int account, OMEMO *omemo, QWidget *parent);
+  protected:
+    void updateData() override;
   private:
     QTableView *m_table;
     QStandardItemModel* m_tableModel;
-    OMEMO *m_omemo;
-
-    void updateData();
   private slots:
     void trustRevokeFingerprint();
+  };
+
+  class ConfigWidget: public QWidget {
+  Q_OBJECT
+  public:
+    ConfigWidget(OMEMO *omemo, AccountInfoAccessingHost *accountInfo);
+  private:
+    AccountInfoAccessingHost *m_accountInfo;
+    QTabWidget *m_tabWidget;
+  private slots:
+    void currentAccountChanged(int index);
   };
 }
 

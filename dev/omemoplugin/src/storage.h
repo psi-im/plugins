@@ -36,7 +36,7 @@ namespace psiomemo {
 
   class Storage {
   public:
-    void init(signal_context *ctx, const QString &dataPath);
+    void init(signal_context *ctx, const QString &dataPath, const QString &accountId);
     void deinit();
 
     QSet<uint32_t> retrieveDeviceList(const QString &user, bool onlyTrusted = true);

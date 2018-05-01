@@ -99,7 +99,7 @@ namespace psiomemo {
     EventCreatingHost *m_eventCreator;
 
     QPixmap getIcon() const;
-    void updateAction(const QString &user);
+    void updateAction(int account, const QString &user);
     void processEncryptedFile(int account, QDomElement &xml);
   private slots:
     void onEnableOMEMOAction(bool);
