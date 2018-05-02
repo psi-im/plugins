@@ -39,7 +39,7 @@ namespace psiomemo {
     m_tabWidget = new QTabWidget(this);
     m_tabWidget->addTab(new KnownFingerprints(account, omemo, this), "Fingerprints");
     m_tabWidget->addTab(new OwnFingerprint(account, omemo, this), "Own Fingerprint");
-    m_tabWidget->addTab(new ManageKeys(account, omemo, this), "Manage Keys");
+    m_tabWidget->addTab(new ManageDevices(account, omemo, this), "Manage Devices");
     mainLayout->addWidget(m_tabWidget);
     setLayout(mainLayout);
 
@@ -136,7 +136,7 @@ namespace psiomemo {
     updateData();
   }
 
-  ManageKeys::ManageKeys(int account, OMEMO *omemo, QWidget *parent) : ConfigWidgetTabWithTable(account, omemo, parent) {
+  ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) : ConfigWidgetTabWithTable(account, omemo, parent) {
     m_ourDeviceId = m_omemo->getDeviceId(account);
 
     auto mainLayout = new QVBoxLayout(this);
@@ -157,18 +157,18 @@ namespace psiomemo {
     updateData();
   }
   
-  void ManageKeys::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
+  void ManageDevices::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
     QModelIndexList selection = selected.indexes();
     if (!selection.isEmpty()) {
       m_deleteButton->setEnabled(selectedDeviceId(selection) != m_ourDeviceId);
     }
   }
 
-  uint32_t ManageKeys::selectedDeviceId(const QModelIndexList &selection) const {
+  uint32_t ManageDevices::selectedDeviceId(const QModelIndexList &selection) const {
     return m_tableModel->itemFromIndex(selection.first())->data().toUInt();
   }
 
-  void ManageKeys::doUpdateData() {
+  void ManageDevices::doUpdateData() {
     m_tableModel->setColumnCount(1);
     m_tableModel->setHorizontalHeaderLabels({"Device ID"});
     foreach (auto deviceId, m_omemo->getOwnDeviceList(m_account)) {
@@ -178,14 +178,14 @@ namespace psiomemo {
     }
   }
 
-  void ManageKeys::deleteDevice() {
+  void ManageDevices::deleteDevice() {
     QModelIndexList selection = m_table->selectionModel()->selectedIndexes();
     if (!selection.isEmpty()) {
       m_omemo->unpublishDevice(m_account, selectedDeviceId(selection));
     }
   }
 
-  void ManageKeys::deviceListUpdated(int account) {
+  void ManageDevices::deviceListUpdated(int account) {
     if (account == m_account) {
       updateData();
     }

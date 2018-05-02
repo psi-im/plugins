@@ -76,10 +76,10 @@ namespace psiomemo {
     void trustRevokeFingerprint();
   };
 
-  class ManageKeys: public ConfigWidgetTabWithTable {
+  class ManageDevices: public ConfigWidgetTabWithTable {
   Q_OBJECT
   public:
-    ManageKeys(int account, OMEMO *omemo, QWidget *parent);
+    ManageDevices(int account, OMEMO *omemo, QWidget *parent);
   private:
     int m_ourDeviceId;
     QPushButton *m_deleteButton;
