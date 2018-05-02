@@ -190,7 +190,7 @@ namespace psiomemo {
   QVector<uint32_t> Signal::invalidSessions(const QString &recipient) {
     QVector<uint32_t> result;
     const QByteArray &recipientUtf8 = recipient.toUtf8();
-    QSet<uint32_t> recipientDevices = m_storage.retrieveDeviceList(recipient, false);
+    QSet<uint32_t> recipientDevices = m_storage.getDeviceList(recipient, false);
     foreach (uint32_t deviceId, recipientDevices) {
       if (!sessionIsValid(getAddress(deviceId, recipientUtf8))) {
         result.append(deviceId);
@@ -208,8 +208,8 @@ namespace psiomemo {
     const QByteArray &recipientUtf8 = recipient.toUtf8();
     const QByteArray &ownJidUtf8 = ownJid.toUtf8();
 
-    QSet<uint32_t> ownDevices = m_storage.retrieveDeviceList(ownJid);
-    QSet<uint32_t> recipientDevices = m_storage.retrieveDeviceList(recipient);
+    QSet<uint32_t> ownDevices = m_storage.getDeviceList(ownJid);
+    QSet<uint32_t> recipientDevices = m_storage.getDeviceList(recipient);
 
     if (recipientDevices.isEmpty()) {
       return results;
@@ -314,7 +314,7 @@ namespace psiomemo {
   }
 
   void Signal::processUndecidedDevices(const QString &user, bool ownJid) {
-    QSet<uint32_t> devices = m_storage.retrieveUndecidedDeviceList(user);
+    QSet<uint32_t> devices = m_storage.getUndecidedDeviceList(user);
     foreach (uint32_t deviceId, devices) {
       confirmDeviceTrust(user, deviceId, false, ownJid);
     }
@@ -347,7 +347,7 @@ namespace psiomemo {
   }
 
   bool Signal::isAvailableForUser(const QString &user) {
-    return !m_storage.retrieveDeviceList(user, false).isEmpty();
+    return !m_storage.getDeviceList(user, false).isEmpty();
   };
 
   bool Signal::isEnabledForUser(const QString &user) {
@@ -360,6 +360,10 @@ namespace psiomemo {
 
   QString Signal::getOwnFingerprint() {
     return getFingerprint(getIdentityPublicKey());
+  }
+
+  QSet<uint32_t> Signal::getDeviceList(const QString &user) {
+    return m_storage.getDeviceList(user, false);
   }
 
   QByteArray Signal::getIdentityPublicKey() const {

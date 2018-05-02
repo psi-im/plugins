@@ -1,3 +1,6 @@
+2018-05-02
+    * provided ability to delete published devices from PEP
+
 2018-05-01
     * using dedicated OMEMO identities per account instead of per profile
 

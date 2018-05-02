@@ -53,7 +53,7 @@ namespace psiomemo {
     QDomElement bundle = doc.createElementNS(OMEMO_XMLNS, "bundle");
     item.appendChild(bundle);
 
-    publish.setAttribute("node", QString("%1.bundles:%2").arg(OMEMO_XMLNS).arg(getSignal(account)->getDeviceId()));
+    publish.setAttribute("node", bundleNodeName(getSignal(account)->getDeviceId()));
 
     QDomElement signedPreKey = doc.createElement("signedPreKeyPublic");
     signedPreKey.setAttribute("signedPreKeyId", b.signedPreKeyId);
@@ -278,33 +278,37 @@ namespace psiomemo {
     if (ownJid == from) {
       if (!actualIds.contains(signal->getDeviceId())) {
         actualIds.insert(signal->getDeviceId());
-
-        QDomDocument doc;
-        QDomElement publish = doc.createElement("publish");
-        doc.appendChild(publish);
-
-        QDomElement item = doc.createElement("item");
-        publish.appendChild(item);
-
-        QDomElement list = doc.createElementNS(OMEMO_XMLNS, "list");
-        item.appendChild(list);
-
-        publish.setAttribute("node", deviceListNodeName());
-
-        foreach (uint32_t id, actualIds) {
-          QDomElement device = doc.createElement("device");
-          device.setAttribute("id", id);
-          list.appendChild(device);
-        }
-
-        pepPublish(account, doc.toString());
+        publishDeviceList(account, actualIds);
         publishOwnBundle(account);
       }
     }
 
     signal->updateDeviceList(from, actualIds);
+    emit deviceListUpdated(account);
 
     return true;
+  }
+
+  void OMEMO::publishDeviceList(int account, const QSet<uint32_t> &devices) const {
+    QDomDocument doc;
+    QDomElement publish = doc.createElement("publish");
+    doc.appendChild(publish);
+
+    QDomElement item = doc.createElement("item");
+    publish.appendChild(item);
+
+    QDomElement list = doc.createElementNS(OMEMO_XMLNS, "list");
+    item.appendChild(list);
+
+    publish.setAttribute("node", deviceListNodeName());
+
+    foreach (uint32_t id, devices) {
+      QDomElement device = doc.createElement("device");
+      device.setAttribute("id", id);
+      list.appendChild(device);
+    }
+
+    pepPublish(account, doc.toString());
   }
 
   void OMEMO::buildSessionsFromBundle(const QVector<uint32_t> &invalidSessions, const QString &ownJid, int account,
@@ -404,6 +408,16 @@ namespace psiomemo {
     m_stanzaSender->sendStanza(account, stanza);
   }
 
+  void OMEMO::pepUnpublish(int account, const QString &node) const {
+    QString stanza = QString("<iq id='%1' type='set'>"
+                             "<pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>"
+                             "<delete node='%2'/>"
+                             "</pubsub>"
+                             "</iq>").arg(m_stanzaSender->uniqueId(account)).arg(node);
+
+    m_stanzaSender->sendStanza(account, stanza);
+  }
+
   void OMEMO::setNodeText(QDomElement &node, const QByteArray &byteArray) const {
     QByteArray array = byteArray.toBase64();
     node.appendChild(node.ownerDocument().createTextNode(array));
@@ -449,12 +463,24 @@ namespace psiomemo {
     return getSignal(account)->getOwnFingerprint();
   }
 
+  QSet<uint32_t> OMEMO::getOwnDeviceList(int account) {
+    return getSignal(account)->getDeviceList(m_accountInfoAccessor->getJid(account));
+  }
+
   QList<Fingerprint> OMEMO::getKnownFingerprints(int account) {
     return getSignal(account)->getKnownFingerprints();
   }
 
   void OMEMO::confirmDeviceTrust(int account, const QString &user, uint32_t deviceId) {
     getSignal(account)->confirmDeviceTrust(user, deviceId, true);
+  }
+
+  void OMEMO::unpublishDevice(int account, uint32_t deviceId) {
+    pepUnpublish(account, bundleNodeName(deviceId));
+
+    QSet<uint32_t> devices = getOwnDeviceList(account);
+    devices.remove(deviceId);
+    publishDeviceList(account, devices);
   }
 
   std::shared_ptr<Signal> OMEMO::getSignal(int account) {

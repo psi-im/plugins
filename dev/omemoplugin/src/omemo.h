@@ -29,7 +29,8 @@
 #include "signal.h"
 
 namespace psiomemo {
-  class OMEMO {
+  class OMEMO: public QObject {
+  Q_OBJECT
   public:
     void init(const QString &dataPath);
     void setStanzaSender(StanzaSendingHost *stanzaSender);
@@ -51,7 +52,9 @@ namespace psiomemo {
     uint32_t getDeviceId(int account);
     QString getOwnFingerprint(int account);
     QList<Fingerprint> getKnownFingerprints(int account);
+    QSet<uint32_t> getOwnDeviceList(int account);
     void confirmDeviceTrust(int account, const QString &user, uint32_t deviceId);
+    void unpublishDevice(int account, uint32_t deviceId);
   private:
     class MessageWaitingForBundles {
     public:
@@ -68,13 +71,17 @@ namespace psiomemo {
     QHash<int, std::shared_ptr<Signal>> m_accountToSignal;
     std::shared_ptr<Signal> getSignal(int account);
     void pepPublish(int account, const QString &dl_xml) const;
+    void pepUnpublish(int account, const QString &dl_xml) const;
     void publishOwnBundle(int account);
 
     void setNodeText(QDomElement &node, const QByteArray &byteArray) const;
     void buildSessionsFromBundle(const QVector<uint32_t> &invalidSessions, const QString &ownJid, int account,
                                  const QDomElement &messageToResend);
     QString pepRequest(int account, const QString &ownJid, const QString &recipient, const QString &node) const;
+    void publishDeviceList(int account, const QSet<uint32_t> &devices) const;
     const QString bundleNodeName(uint32_t deviceId) const;
+  signals:
+    void deviceListUpdated(int account);
   };
 }
 

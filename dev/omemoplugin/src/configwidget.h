@@ -25,6 +25,7 @@
 #include <QWidget>
 #include <QTableView>
 #include <QLabel>
+#include <QPushButton>
 #include "omemo.h"
 
 namespace psiomemo {
@@ -43,6 +44,17 @@ namespace psiomemo {
     OMEMO *m_omemo;
   };
 
+  class ConfigWidgetTabWithTable: public ConfigWidgetTab {
+  Q_OBJECT
+  public:
+    ConfigWidgetTabWithTable(int account, OMEMO *omemo, QWidget *parent);
+  protected:
+    void updateData() override;
+    virtual void doUpdateData() = 0;
+    QTableView *m_table;
+    QStandardItemModel* m_tableModel;
+  };
+
   class OwnFingerprint: public ConfigWidgetTab {
   Q_OBJECT
   public:
@@ -54,17 +66,30 @@ namespace psiomemo {
     QLabel *m_fingerprintLabel;
   };
 
-  class KnownFingerprints: public ConfigWidgetTab {
+  class KnownFingerprints: public ConfigWidgetTabWithTable {
   Q_OBJECT
   public:
     KnownFingerprints(int account, OMEMO *omemo, QWidget *parent);
   protected:
-    void updateData() override;
-  private:
-    QTableView *m_table;
-    QStandardItemModel* m_tableModel;
+    void doUpdateData() override;
   private slots:
     void trustRevokeFingerprint();
+  };
+
+  class ManageKeys: public ConfigWidgetTabWithTable {
+  Q_OBJECT
+  public:
+    ManageKeys(int account, OMEMO *omemo, QWidget *parent);
+  private:
+    int m_ourDeviceId;
+    QPushButton *m_deleteButton;
+    uint32_t selectedDeviceId(const QModelIndexList &selection) const;
+  protected:
+    void doUpdateData() override;
+  private slots:
+    void selectionChanged(const QItemSelection &, const QItemSelection &);
+    void deleteDevice();
+    void deviceListUpdated(int account);
   };
 
   class ConfigWidget: public QWidget {

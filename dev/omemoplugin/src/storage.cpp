@@ -191,7 +191,7 @@ namespace psiomemo {
     return QSqlDatabase::database(m_databaseConnectionName);
   }
 
-  QSet<uint32_t> Storage::retrieveDeviceList(const QString &user, bool onlyTrusted) {
+  QSet<uint32_t> Storage::getDeviceList(const QString &user, bool onlyTrusted) {
     QSqlQuery q(db());
     if (onlyTrusted) {
       q.prepare("SELECT device_id FROM devices WHERE jid IS ? AND trust IS ?");
@@ -210,7 +210,7 @@ namespace psiomemo {
     return knownIds;
   }
 
-  QSet<uint32_t> Storage::retrieveUndecidedDeviceList(const QString &user) {
+  QSet<uint32_t> Storage::getUndecidedDeviceList(const QString &user) {
     QSqlQuery q(db());
     q.prepare("SELECT device_id FROM devices WHERE jid IS ? AND trust IS ?");
     q.addBindValue(user);
@@ -225,7 +225,7 @@ namespace psiomemo {
   }
 
   void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds) {
-    QSet<uint32_t> knownIds = retrieveDeviceList(user, false);
+    QSet<uint32_t> knownIds = getDeviceList(user, false);
 
     auto added = QSet<uint32_t>(actualIds).subtract(knownIds);
     auto removed = QSet<uint32_t>(knownIds).subtract(actualIds);
