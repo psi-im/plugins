@@ -75,8 +75,8 @@ namespace psiomemo {
     void publishOwnBundle(int account);
 
     void setNodeText(QDomElement &node, const QByteArray &byteArray) const;
-    void buildSessionsFromBundle(const QVector<uint32_t> &invalidSessions, const QString &ownJid, int account,
-                                 const QDomElement &messageToResend);
+    void buildSessionsFromBundle(const QVector<uint32_t> &recipientInvalidSessions, const QVector<uint32_t> &ownInvalidSessions,
+                                 const QString &ownJid, int account, const QDomElement &messageToResend);
     QString pepRequest(int account, const QString &ownJid, const QString &recipient, const QString &node) const;
     void publishDeviceList(int account, const QSet<uint32_t> &devices) const;
     const QString bundleNodeName(uint32_t deviceId) const;
