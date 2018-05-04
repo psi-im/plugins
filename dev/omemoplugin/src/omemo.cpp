@@ -150,7 +150,7 @@ namespace psiomemo {
           QString text = decryptedBody.first;
 
           if (!trusted) {
-            bool res = m_accountController->appendSysMsg(account, sender, "[OMEMO] The following message is from an untrusted device:");
+            bool res = m_accountController->appendSysMsg(account, xml.attribute("from"), "[OMEMO] The following message is from an untrusted device:");
             if (!res) {
               text = "[UNTRUSTED]: " + text;
             }
@@ -210,7 +210,7 @@ namespace psiomemo {
     QList<EncryptedKey> encryptedKeys = signal->encryptKey(ownJid, recipient, key);
 
     if (encryptedKeys.isEmpty()) {
-      m_accountController->appendSysMsg(account, recipient, "[OMEMO] Unable to build any sessions, the message was not sent");
+      m_accountController->appendSysMsg(account, xml.attribute("to"), "[OMEMO] Unable to build any sessions, the message was not sent");
       xml = QDomElement();
     }
     else {
