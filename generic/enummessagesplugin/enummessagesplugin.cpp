@@ -23,6 +23,7 @@
 #include <QFile>
 #include <QDataStream>
 #include <QColorDialog>
+#include <QAction>
 //#include <QTextStream>
 
 #include "enummessagesplugin.h"
