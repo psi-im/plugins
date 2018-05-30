@@ -21,6 +21,7 @@
 #include <QFileDialog>
 #include <QDomElement>
 #include <QHash>
+#include <QAction>
 
 #include "view.h"
 #include "model.h"

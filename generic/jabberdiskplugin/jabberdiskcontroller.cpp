@@ -19,6 +19,7 @@
  */
 
 #include <QDomElement>
+#include <QAction>
 
 #include "jabberdiskcontroller.h"
 #include "jd_mainwin.h"

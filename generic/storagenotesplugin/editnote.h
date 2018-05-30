@@ -23,6 +23,7 @@
 
 #include "ui_editnote.h"
 #include <QDomElement>
+#include <QModelIndex>
 
 class EditNote : public QDialog
 {
