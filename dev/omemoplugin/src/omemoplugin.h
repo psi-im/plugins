@@ -34,6 +34,7 @@
 #include "plugininfoprovider.h"
 #include "toolbariconaccessor.h"
 #include "encryptionsupport.h"
+#include "commandexecutor.h"
 #include "storage.h"
 #include "crypto.h"
 #include "omemo.h"
@@ -49,7 +50,8 @@ namespace psiomemo {
                       public PsiAccountController,
                       public PluginInfoProvider,
                       public ToolbarIconAccessor,
-                      public EncryptionSupport {
+                      public EncryptionSupport,
+                      public CommandExecutor {
   Q_OBJECT
   Q_PLUGIN_METADATA(IID
                         "com.psi.OmemoPlugin")
@@ -62,7 +64,8 @@ namespace psiomemo {
                PsiAccountController
                PluginInfoProvider
                ToolbarIconAccessor
-               EncryptionSupport)
+               EncryptionSupport
+               CommandExecutor)
   public:
     QString name() const override;
     QString shortName() const override;
@@ -89,6 +92,8 @@ namespace psiomemo {
 
     QList<QVariantHash> getButtonParam() override;
     QAction *getAction(QObject *parent, int account, const QString &contact) override;
+
+    bool execute(int account, const QHash<QString, QVariant> &args, QHash<QString, QVariant> *result) override;
 
   private:
     bool m_enabled;

@@ -14,6 +14,8 @@ struct CurrentUpload {
 	int account;
 	QString getUrl;
 	QString type;
+	QByteArray aesgcmAnchor;
+	QString localFilePath;
 	CurrentUpload(): account(-1) {}
 };
 

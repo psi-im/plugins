@@ -36,6 +36,9 @@
 #include "optionaccessor.h"
 #include "applicationinfoaccessor.h"
 #include "applicationinfoaccessinghost.h"
+#include "pluginaccessor.h"
+#include "pluginaccessinghost.h"
+#include "commandexecutor.h"
 #include <QByteArray>
 #include <QFile>
 #include <QFileDialog>
@@ -90,7 +93,8 @@ class HttpUploadPlugin: public QObject,
 		public OptionAccessor,
 		public ChatTabAccessor,
 		public StanzaFilter,
-		public ApplicationInfoAccessor {
+		public ApplicationInfoAccessor,
+		public PluginAccessor {
 Q_OBJECT
 #ifdef HAVE_QT5
 Q_PLUGIN_METADATA(IID "com.psi-plus.HttpUploadPlugin")
@@ -98,7 +102,7 @@ Q_PLUGIN_METADATA(IID "com.psi-plus.HttpUploadPlugin")
 Q_INTERFACES(PsiPlugin ToolbarIconAccessor GCToolbarIconAccessor
 		StanzaSender ActiveTabAccessor PsiAccountController OptionAccessor
 		IconFactoryAccessor AccountInfoAccessor PluginInfoProvider ChatTabAccessor
-		StanzaFilter ApplicationInfoAccessor)
+		StanzaFilter ApplicationInfoAccessor PluginAccessor)
 public:
 	HttpUploadPlugin();
 	virtual QString name() const;
@@ -124,6 +128,7 @@ public:
 	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
 	virtual void setPsiAccountControllingHost(PsiAccountControllingHost *host);
 	virtual void setOptionAccessingHost(OptionAccessingHost *host);
+	virtual void setPluginAccessingHost(PluginAccessingHost *host);
 	virtual void optionChanged(const QString &) {
 	}
 	virtual QString pluginInfo();
@@ -179,6 +184,8 @@ private:
 	void processServices(const QDomElement& query, int account);
 	void processOneService(const QDomElement& query, const QString& service, int account);
 	void processUploadSlot(const QDomElement& xml);
+	void omemoEncryptData();
+	QString omemoEncryptMessage(const QString &message);
 
 	IconFactoryAccessingHost* iconHost;
 	StanzaSendingHost* stanzaSender;
@@ -186,6 +193,7 @@ private:
 	AccountInfoAccessingHost* accInfo;
 	PsiAccountControllingHost *psiController;
 	OptionAccessingHost *psiOptions;
+	PluginAccessingHost *pluginHost;
 	ApplicationInfoAccessingHost* appInfoHost;
 	bool enabled;
 	QNetworkAccessManager* manager;
@@ -329,6 +337,10 @@ void HttpUploadPlugin::setOptionAccessingHost(OptionAccessingHost *host) {
 	psiOptions = host;
 }
 
+void HttpUploadPlugin::setPluginAccessingHost(PluginAccessingHost *host) {
+	pluginHost = host;
+}
+
 void HttpUploadPlugin::setStanzaSendingHost(StanzaSendingHost *host) {
 	stanzaSender = host;
 }
@@ -432,8 +444,11 @@ void HttpUploadPlugin::upload(bool anything) {
 	currentUpload.account = account;
 	currentUpload.from = jid;
 	currentUpload.to = jidToSend;
+	currentUpload.localFilePath = fileName;
 	currentUpload.type =
 			QLatin1String(sender()->parent()->metaObject()->className()) == "PsiChatDlg" ? "chat" : "groupchat";
+
+	omemoEncryptData();
 
 	QString slotRequestStanza = QString("<iq from='%1' id='%2' to='%3' type='get'>"
 			"<request xmlns='urn:xmpp:http:upload'>"
@@ -593,6 +608,7 @@ bool HttpUploadPlugin::incomingStanza(int account, const QDomElement& xml) {
 }
 
 void HttpUploadPlugin::uploadComplete(QNetworkReply* reply) {
+	cancelTimeout();
 	bool ok;
 	int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt(&ok);
 	if (ok && (statusCode == 201 || statusCode == 200)) {
@@ -601,22 +617,42 @@ void HttpUploadPlugin::uploadComplete(QNetworkReply* reply) {
 				currentUpload.type == "chat"
 						&& psiOptions->getGlobalOption("options.ui.notifications.request-receipts").toBool() ?
 						"<request xmlns='urn:xmpp:receipts'/>" : "");
-		QString message = QString("<message type=\"%1\" to=\"%2\" id=\"%3\">"
-				"<x xmlns=\"jabber:x:oob\">"
-				"<url>%4</url>"
-				"</x>"
-				"<body>%4</body>"
-				"%5"
-				"</message>").arg(currentUpload.type).arg(currentUpload.to).arg(id).arg(currentUpload.getUrl).arg(
-				receipt);
-		stanzaSender->sendStanza(currentUpload.account, message);
+		QString &url = currentUpload.getUrl;
+		bool omemoEncrypted = !currentUpload.aesgcmAnchor.isNull();
+		if (omemoEncrypted) {
+			url += "#" + currentUpload.aesgcmAnchor.toHex();
+			url.replace(QRegExp("https?://"), "aesgcm://");
+		}
+		QString message = QString(R"(<message type="%1" to="%2" id="%3">)");
+		if (!omemoEncrypted) {
+			message += R"(<x xmlns="jabber:x:oob">)"
+					   "<url>%4</url>"
+					   "</x>";
+		}
+		message += "<body>%4</body>"
+				   "%5"
+				   "</message>";
+		message = message.arg(currentUpload.type).arg(currentUpload.to).arg(id).arg(url).arg(receipt);
+		if (omemoEncrypted) {
+			message = omemoEncryptMessage(message);
+			if (message.isNull()) {
+				QMessageBox::critical(nullptr, tr("Error uploading"), tr("Something has gone wrong, please try again or disable OMEMO encryption"));
+				return;
+			}
+		}
+		// if the message is empty, then omemo will send the message asynchronously
+		if (!omemoEncrypted || !message.isEmpty()) {
+			stanzaSender->sendStanza(currentUpload.account, message);
+		}
 		if (currentUpload.type == "chat") {
 			// manually add outgoing message to the regular chats, in MUC this isn't needed
-			psiController->appendMsg(currentUpload.account, currentUpload.to, currentUpload.getUrl, id);
+			psiController->appendMsg(currentUpload.account, currentUpload.to, url, id, omemoEncrypted);
+			if (omemoEncrypted) {
+				psiController->appendMsg(currentUpload.account, currentUpload.to,
+								QUrl::fromLocalFile(currentUpload.localFilePath).toString(QUrl::FullyEncoded), id, omemoEncrypted);
+			}
 		}
-		cancelTimeout();
 	} else {
-		cancelTimeout();
 		QMessageBox::critical(0, tr("Error uploading"),
 				tr("Upload error %1; HTTP code %2, message: %3").arg(reply->errorString()).arg(
 						reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString()).arg(
@@ -669,6 +705,37 @@ void HttpUploadPlugin::updateProxy() {
 
 void HttpUploadPlugin::handleSslError(QNetworkReply* reply, const QList<QSslError>&) {
 	reply->ignoreSslErrors();
+}
+
+void HttpUploadPlugin::omemoEncryptData() {
+	if (currentUpload.type != "chat") return;
+
+	CommandExecutor *plugin = qobject_cast<CommandExecutor*>(pluginHost->getPlugin("omemo"));
+	if (plugin == nullptr) return;
+
+	if (!plugin->execute(currentUpload.account, QHash<QString, QVariant>{{"is_enabled_for", currentUpload.to}})) {
+		return;
+	}
+
+	QHash<QString, QVariant> result;
+	if (!plugin->execute(currentUpload.account, QHash<QString, QVariant>{{"encrypt_data", *dataSource}}, &result)) {
+		return;
+	}
+
+	dataSource->clear();
+	dataSource->insert(0, result["data"].toByteArray());
+	currentUpload.aesgcmAnchor = result["anchor"].toByteArray();
+}
+
+QString HttpUploadPlugin::omemoEncryptMessage(const QString &message) {
+	CommandExecutor *plugin = qobject_cast<CommandExecutor*>(pluginHost->getPlugin("omemo"));
+
+	QHash<QString, QVariant> result;
+	if (!plugin->execute(currentUpload.account, QHash<QString, QVariant>{{"encrypt_message", message}}, &result)) {
+		return QString();
+	}
+
+	return result.contains("message") ? result["message"].toString() : QString("");
 }
 
 #include "httpuploadplugin.moc"
