@@ -174,13 +174,7 @@ private:
 
 	void cancelTimeout() {
 		slotTimeout.stop();
-		if (dataSource) {
-			dataSource->deleteLater();
-		}
-		if (imageBytes) {
-			delete imageBytes;
-			imageBytes = 0;
-		}
+		dataSource = nullptr;
 	}
 	void processServices(const QDomElement& query, int account);
 	void processOneService(const QDomElement& query, const QString& service, int account);
@@ -194,11 +188,9 @@ private:
 	OptionAccessingHost *psiOptions;
 	ApplicationInfoAccessingHost* appInfoHost;
 	bool enabled;
-	QHash<QString, int> accounts_;
 	QNetworkAccessManager* manager;
 	QMap<QString, UploadService> serviceNames;
-	QPointer<QIODevice> dataSource;
-	QByteArray* imageBytes;
+	std::unique_ptr<QByteArray> dataSource;
 	CurrentUpload currentUpload;
 	QTimer slotTimeout;
 	QSpinBox *sb_previewWidth;
@@ -217,7 +209,7 @@ Q_EXPORT_PLUGIN(HttpUploadPlugin)
 
 HttpUploadPlugin::HttpUploadPlugin() :
 		iconHost(0), stanzaSender(0), activeTab(0), accInfo(0), psiController(0), psiOptions(0), appInfoHost(0), enabled(
-				false), manager(new QNetworkAccessManager(this)), imageBytes(0), sb_previewWidth(0), cb_resize(0), sb_size(
+				false), manager(new QNetworkAccessManager(this)), sb_previewWidth(0), cb_resize(0), sb_size(
 				0), sb_quality(0), imageResize(false), imageSize(0), imageQuality(0), previewWidth(0) {
 	connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(uploadComplete(QNetworkReply*)));
 	connect(&slotTimeout, SIGNAL(timeout()), this, SLOT(timeout()));
@@ -363,10 +355,6 @@ void HttpUploadPlugin::upload(bool anything) {
 				SLOT_TIMEOUT / 1000));
 		return;
 	}
-	if (imageBytes) {
-		delete imageBytes;
-		imageBytes = 0;
-	}
 	QString serviceName;
 	int sizeLimit = -1;
 	int account = accountNumber();
@@ -410,40 +398,35 @@ void HttpUploadPlugin::upload(bool anything) {
 	qDebug() << "MIME type:" << mimeType;
 #endif
 #endif
-	int length;
+	dataSource = std::unique_ptr<QByteArray>(new QByteArray);
 	QString lowerImagename = imageName.toLower();
 	// only resize jpg and png
 	if (!anything && imageResize
 			&& (lowerImagename.endsWith(".jpg") || lowerImagename.endsWith(".jpeg") || lowerImagename.endsWith(".png"))
 			&& (pix.width() > imageSize || pix.height() > imageSize)) {
-		imageBytes = new QByteArray();
-		dataSource = new QBuffer(imageBytes);
 		QString type = "jpg";
 		if (lowerImagename.endsWith(".png")) {
 			type = "png";
 		}
-		pix.scaled(imageSize, imageSize, Qt::KeepAspectRatio, Qt::SmoothTransformation).save(dataSource,
+		QBuffer buffer(dataSource.get());
+		pix.scaled(imageSize, imageSize, Qt::KeepAspectRatio, Qt::SmoothTransformation).save(&buffer,
 				type.toLatin1().constData(), imageQuality);
-		length = imageBytes->length();
 #ifdef DEBUG_UPLOAD
 		qDebug() << "Resized length:" << length;
 #endif
-		dataSource->open(QIODevice::ReadOnly);
 	} else {
-		length = fileInfo.size();
-		dataSource = new QFile(fileName, this);
-		if (!dataSource->open(QIODevice::ReadOnly)) {
-			dataSource->deleteLater();
+		if (!file.open(QIODevice::ReadOnly)) {
+			dataSource = nullptr;
 			QMessageBox::critical(0, tr("Error"), tr("Error opening file %1").arg(fileName));
 			return;
 		}
+		dataSource->resize(static_cast<int>(fileInfo.size()));
+		file.read(dataSource->data(), fileInfo.size());
 	}
-	if (length > sizeLimit) {
+	if (dataSource->length() > sizeLimit) {
 		QMessageBox::critical(0, tr("The file size is too large."),
 				tr("File size must be less than %1 bytes").arg(sizeLimit));
-		if (dataSource) {
-			dataSource->deleteLater();
-		}
+		dataSource = nullptr;
 		return;
 	}
 	currentUpload.account = account;
@@ -458,7 +441,7 @@ void HttpUploadPlugin::upload(bool anything) {
 			"<size>%5</size>"
 			"<content-type>%6</content-type>"
 			"</request>"
-			"</iq>").arg(jid).arg(getId(account)).arg(serviceName).arg(escape(imageName)).arg(length).arg(mimeType);
+			"</iq>").arg(jid).arg(getId(account)).arg(serviceName).arg(escape(imageName)).arg(dataSource->size()).arg(mimeType);
 #ifdef DEBUG_UPLOAD
 	qDebug() << "Requesting slot:" << slotRequestStanza;
 #endif
@@ -588,7 +571,7 @@ void HttpUploadPlugin::processUploadSlot(const QDomElement& xml) {
 		}
 		qint64 size = dataSource->size();
 		req.setHeader(QNetworkRequest::ContentLengthHeader, size);
-		manager->put(req, dataSource);
+		manager->put(req, *dataSource);
 	}
 }
 
