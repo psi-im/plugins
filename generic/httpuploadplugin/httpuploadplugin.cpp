@@ -179,7 +179,7 @@ private:
 
 	void cancelTimeout() {
 		slotTimeout.stop();
-		dataSource = nullptr;
+		dataSource = QByteArray();
 	}
 	void processServices(const QDomElement& query, int account);
 	void processOneService(const QDomElement& query, const QString& service, int account);
@@ -198,7 +198,7 @@ private:
 	bool enabled;
 	QNetworkAccessManager* manager;
 	QMap<QString, UploadService> serviceNames;
-	std::unique_ptr<QByteArray> dataSource;
+	QByteArray dataSource;
 	CurrentUpload currentUpload;
 	QTimer slotTimeout;
 	QSpinBox *sb_previewWidth;
@@ -360,7 +360,7 @@ void HttpUploadPlugin::uploadImage() {
 void HttpUploadPlugin::upload(bool anything) {
 	if (!enabled)
 		return;
-	if (dataSource) {
+	if (!dataSource.isNull()) {
 		QMessageBox::warning(0, tr("Please wait"),
 				tr(
 						"Another upload operation is already in progress. Please wait up to %1 sec for it to complete or fail.").arg(
@@ -410,7 +410,6 @@ void HttpUploadPlugin::upload(bool anything) {
 	qDebug() << "MIME type:" << mimeType;
 #endif
 #endif
-	dataSource = std::unique_ptr<QByteArray>(new QByteArray);
 	QString lowerImagename = imageName.toLower();
 	// only resize jpg and png
 	if (!anything && imageResize
@@ -420,7 +419,7 @@ void HttpUploadPlugin::upload(bool anything) {
 		if (lowerImagename.endsWith(".png")) {
 			type = "png";
 		}
-		QBuffer buffer(dataSource.get());
+		QBuffer buffer(&dataSource);
 		pix.scaled(imageSize, imageSize, Qt::KeepAspectRatio, Qt::SmoothTransformation).save(&buffer,
 				type.toLatin1().constData(), imageQuality);
 #ifdef DEBUG_UPLOAD
@@ -428,17 +427,17 @@ void HttpUploadPlugin::upload(bool anything) {
 #endif
 	} else {
 		if (!file.open(QIODevice::ReadOnly)) {
-			dataSource = nullptr;
+			dataSource.clear();
 			QMessageBox::critical(0, tr("Error"), tr("Error opening file %1").arg(fileName));
 			return;
 		}
-		dataSource->resize(static_cast<int>(fileInfo.size()));
-		file.read(dataSource->data(), fileInfo.size());
+		dataSource.resize(static_cast<int>(fileInfo.size()));
+		file.read(dataSource.data(), fileInfo.size());
 	}
-	if (dataSource->length() > sizeLimit) {
+	if (dataSource.length() > sizeLimit) {
 		QMessageBox::critical(0, tr("The file size is too large."),
 				tr("File size must be less than %1 bytes").arg(sizeLimit));
-		dataSource = nullptr;
+		dataSource = QByteArray();
 		return;
 	}
 	currentUpload.account = account;
@@ -456,7 +455,7 @@ void HttpUploadPlugin::upload(bool anything) {
 			"<size>%5</size>"
 			"<content-type>%6</content-type>"
 			"</request>"
-			"</iq>").arg(jid).arg(getId(account)).arg(serviceName).arg(escape(imageName)).arg(dataSource->size()).arg(mimeType);
+			"</iq>").arg(jid).arg(getId(account)).arg(serviceName).arg(escape(imageName)).arg(dataSource.size()).arg(mimeType);
 #ifdef DEBUG_UPLOAD
 	qDebug() << "Requesting slot:" << slotRequestStanza;
 #endif
@@ -578,15 +577,15 @@ void HttpUploadPlugin::processUploadSlot(const QDomElement& xml) {
 		currentUpload.getUrl = get;
 		QNetworkRequest req;
 		req.setUrl(QUrl(put));
-		if (!dataSource) {
+		if (dataSource.isNull()) {
 			QMessageBox::critical(0, tr("Error uploading"),
 					tr("No data to upload, this maybe a result of timeout or other error."));
 			cancelTimeout();
 			return;
 		}
-		qint64 size = dataSource->size();
+		qint64 size = dataSource.size();
 		req.setHeader(QNetworkRequest::ContentLengthHeader, size);
-		manager->put(req, *dataSource);
+		manager->put(req, dataSource);
 	}
 }
 
@@ -718,12 +717,12 @@ void HttpUploadPlugin::omemoEncryptData() {
 	}
 
 	QHash<QString, QVariant> result;
-	if (!plugin->execute(currentUpload.account, QHash<QString, QVariant>{{"encrypt_data", *dataSource}}, &result)) {
+	if (!plugin->execute(currentUpload.account, QHash<QString, QVariant>{{"encrypt_data", dataSource}}, &result)) {
 		return;
 	}
 
-	dataSource->clear();
-	dataSource->insert(0, result["data"].toByteArray());
+	dataSource.clear();
+	dataSource.insert(0, result["data"].toByteArray());
 	currentUpload.aesgcmAnchor = result["anchor"].toByteArray();
 }
 
