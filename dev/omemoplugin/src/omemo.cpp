@@ -81,9 +81,16 @@ namespace psiomemo {
     pepPublish(account, doc.toString());
   }
 
-  bool OMEMO::decryptMessage(int account, QDomElement &message) {
+  bool OMEMO::decryptMessage(int account, QDomElement &xml) {
     std::shared_ptr<Signal> signal = getSignal(account);
-    QDomElement result;
+
+    bool isCarbon = false;
+    QDomElement message = xml;
+
+    if (message.firstChild().toElement().attribute("xmlns") == "urn:xmpp:carbons:2") {
+      message = message.firstChild().firstChildElement("forwarded").firstChildElement("message");
+      isCarbon = true;
+    }
 
     QDomElement encrypted = message.firstChildElement("encrypted");
     if (encrypted.isNull() || encrypted.attribute("xmlns") != OMEMO_XMLNS || message.attribute("type") != "chat") {
@@ -97,7 +104,7 @@ namespace psiomemo {
       keyElement = keyElement.nextSiblingElement("key");
     }
     if (keyElement.isNull()) {
-      message = QDomElement();
+      xml = QDomElement();
       return true;
     }
 
@@ -121,7 +128,7 @@ namespace psiomemo {
       emptyMessage.setAttribute("to", from);
 
       buildSessionsFromBundle(QVector<uint32_t>({deviceId}), QVector<uint32_t>(), to.split("/").first(), account, emptyMessage);
-      message = QDomElement();
+      xml = QDomElement();
       return true;
     }
 
@@ -151,7 +158,8 @@ namespace psiomemo {
           QString text = decryptedBody.first;
 
           if (!trusted) {
-            bool res = m_accountController->appendSysMsg(account, message.attribute("from"), "[OMEMO] The following message is from an untrusted device:");
+            bool res = !isCarbon && m_accountController->appendSysMsg(account, message.attribute("from"),
+                                                                      "[OMEMO] The following message is from an untrusted device:");
             if (!res) {
               text = "[UNTRUSTED]: " + text;
             }
@@ -164,7 +172,7 @@ namespace psiomemo {
         }
       }
     }
-    message = QDomElement();
+    xml = QDomElement();
     return true;
   }
 
