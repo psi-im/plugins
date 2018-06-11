@@ -1,3 +1,7 @@
+2018-06-11
+    * provided a way for httpuploadplugin to encrypt files before uploading
+    * correctly decrypting carbons now
+
 2018-05-02
     * provided ability to delete published devices from PEP
 
