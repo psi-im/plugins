@@ -33,6 +33,7 @@
 #include "psiaccountcontroller.h"
 #include "plugininfoprovider.h"
 #include "toolbariconaccessor.h"
+#include "encryptionsupport.h"
 #include "storage.h"
 #include "crypto.h"
 #include "omemo.h"
@@ -47,7 +48,8 @@ namespace psiomemo {
                       public ApplicationInfoAccessor,
                       public PsiAccountController,
                       public PluginInfoProvider,
-                      public ToolbarIconAccessor {
+                      public ToolbarIconAccessor,
+                      public EncryptionSupport {
   Q_OBJECT
   Q_PLUGIN_METADATA(IID
                         "com.psi.OmemoPlugin")
@@ -59,7 +61,8 @@ namespace psiomemo {
                ApplicationInfoAccessor
                PsiAccountController
                PluginInfoProvider
-               ToolbarIconAccessor)
+               ToolbarIconAccessor
+               EncryptionSupport)
   public:
     QString name() const override;
     QString shortName() const override;
@@ -75,8 +78,8 @@ namespace psiomemo {
 
     bool incomingStanza(int account, const QDomElement &xml) override;
     bool outgoingStanza(int account, QDomElement &xml) override;
-    bool stanzaWasEncrypted(const QString &stanzaId) override;
-
+    bool decryptMessageElement(int account, QDomElement &message) override;
+    bool encryptMessageElement(int account, QDomElement &message) override;
     void setAccountInfoAccessingHost(AccountInfoAccessingHost *host) override;
     void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) override;
     void setStanzaSendingHost(StanzaSendingHost *host) override;
@@ -89,7 +92,6 @@ namespace psiomemo {
 
   private:
     bool m_enabled;
-    QSet<QString> m_encryptedStanzaIds;
     QMap<QString, QAction*> m_actions;
     OMEMO m_omemo;
     QNetworkAccessManager m_networkManager;

@@ -97,14 +97,6 @@ namespace psiomemo {
                    );
   }
 
-  bool OMEMOPlugin::stanzaWasEncrypted(const QString &stanzaId) {
-    if (m_encryptedStanzaIds.contains(stanzaId)) {
-      m_encryptedStanzaIds.remove(stanzaId);
-      return true;
-    }
-    return false;
-  }
-
   bool OMEMOPlugin::incomingStanza(int account, const QDomElement &xml) {
     if (!m_enabled) {
       return false;
@@ -119,27 +111,28 @@ namespace psiomemo {
       return true;
     }
 
-    if (xml.nodeName() != "message") {
+    return false;
+  }
+
+  bool OMEMOPlugin::decryptMessageElement(int account, QDomElement &message) {
+    if (!m_enabled) {
       return false;
     }
 
-    QDomElement decrypted = m_omemo.decryptMessage(account, xml);
-    if (decrypted.isNull()) {
+    bool decrypted = m_omemo.decryptMessage(account, message);
+    if (!decrypted) {
       return false;
     }
 
-    QString jid = xml.attribute("from").split("/").first();
+    QString jid = message.attribute("from").split("/").first();
     if (!m_omemo.isEnabledForUser(account, jid)) {
       m_omemo.setEnabledForUser(account, jid, true);
       updateAction(account, jid);
     }
 
-    if (decrypted.firstChildElement("body").firstChild().nodeValue().startsWith("aesgcm://")) {
-      processEncryptedFile(account, decrypted);
+    if (message.firstChildElement("body").firstChild().nodeValue().startsWith("aesgcm://")) {
+      processEncryptedFile(account, message);
     }
-
-    m_encryptedStanzaIds.insert(xml.attribute("id"));
-    m_eventCreator->createNewMessageEvent(account, decrypted);
 
     return true;
   }
@@ -199,7 +192,6 @@ namespace psiomemo {
       QDomDocument doc;
       doc.setContent(reply->property("xml").toString());
       QDomElement xml = doc.firstChild().toElement();
-      m_encryptedStanzaIds.insert(xml.attribute("id"));
       m_eventCreator->createNewMessageEvent(reply->property("account").toInt(), xml);
     }
   }
@@ -213,17 +205,20 @@ namespace psiomemo {
       m_omemo.accountConnected(account, m_accountInfo->getJid(account));
     }
 
-    if (xml.nodeName() != "message" || xml.firstChildElement("body").isNull() ||
-        !xml.firstChildElement("encrypted").isNull() || xml.attribute("type") != "chat") {
+    return false;
+  }
+
+  bool OMEMOPlugin::encryptMessageElement(int account, QDomElement &message) {
+    if (!m_enabled) {
       return false;
     }
 
-    QString stanzaId = xml.attribute("id");
-    bool encrypted = m_omemo.encryptMessage(m_accountInfo->getJid(account), account, xml);
-    if (encrypted) {
-      m_encryptedStanzaIds.insert(stanzaId);
+    if (message.firstChildElement("body").isNull() || !message.firstChildElement("encrypted").isNull() ||
+        message.attribute("type") != "chat") {
+      return false;
     }
-    return encrypted;
+
+    return m_omemo.encryptMessage(m_accountInfo->getJid(account), account, message);
   }
 
   void OMEMOPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost *host) {

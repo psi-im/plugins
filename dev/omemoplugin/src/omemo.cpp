@@ -81,13 +81,13 @@ namespace psiomemo {
     pepPublish(account, doc.toString());
   }
 
-  QDomElement OMEMO::decryptMessage(int account, const QDomElement &xml) {
+  bool OMEMO::decryptMessage(int account, QDomElement &message) {
     std::shared_ptr<Signal> signal = getSignal(account);
     QDomElement result;
 
-    QDomElement encrypted = xml.firstChildElement("encrypted");
-    if (encrypted.isNull() || encrypted.attribute("xmlns") != OMEMO_XMLNS || xml.attribute("type") != "chat") {
-      return result;
+    QDomElement encrypted = message.firstChildElement("encrypted");
+    if (encrypted.isNull() || encrypted.attribute("xmlns") != OMEMO_XMLNS || message.attribute("type") != "chat") {
+      return false;
     }
 
     QDomElement header = encrypted.firstChildElement("header");
@@ -97,7 +97,8 @@ namespace psiomemo {
       keyElement = keyElement.nextSiblingElement("key");
     }
     if (keyElement.isNull()) {
-      return result;
+      message = QDomElement();
+      return true;
     }
 
     QString preKeyAttr = keyElement.attribute("prekey");
@@ -107,20 +108,21 @@ namespace psiomemo {
     QByteArray encryptedKey = QByteArray::fromBase64(keyElement.firstChild().nodeValue().toUtf8());
 
     uint deviceId = header.attribute("sid").toUInt();
-    QString sender = xml.attribute("from").split("/").first();
+    QString sender = message.attribute("from").split("/").first();
     QPair<QByteArray, bool> decryptionResult = signal->decryptKey(sender, EncryptedKey(deviceId, isPreKey, encryptedKey));
     QByteArray decryptedKey = decryptionResult.first;
     bool buildSessionWithPreKey = decryptionResult.second;
     if (buildSessionWithPreKey) {
       // remote has an invalid session, let's recover by overwriting it with a fresh one
-      QDomElement emptyMessage = xml.cloneNode(false).toElement();
-      QString to = xml.attribute("to");
-      QString from = xml.attribute("from");
+      QDomElement emptyMessage = message.cloneNode(false).toElement();
+      QString to = message.attribute("to");
+      QString from = message.attribute("from");
       emptyMessage.setAttribute("from", to);
       emptyMessage.setAttribute("to", from);
 
       buildSessionsFromBundle(QVector<uint32_t>({deviceId}), QVector<uint32_t>(), to.split("/").first(), account, emptyMessage);
-      return result;
+      message = QDomElement();
+      return true;
     }
 
     QDomElement payloadElement = encrypted.firstChildElement("payload");
@@ -144,26 +146,26 @@ namespace psiomemo {
         QPair<QByteArray, QByteArray> decryptedBody = Crypto::aes_gcm(Crypto::Decode, iv, decryptedKey, payload, tag);
         if (!decryptedBody.first.isNull()) {
           bool trusted = signal->isTrusted(sender, deviceId);
-          QDomNode decrypted = xml.cloneNode(true);
-          decrypted.removeChild(decrypted.firstChildElement("encrypted"));
-          QDomElement body = decrypted.ownerDocument().createElement("body");
+          message.removeChild(encrypted);
+          QDomElement body = message.ownerDocument().createElement("body");
           QString text = decryptedBody.first;
 
           if (!trusted) {
-            bool res = m_accountController->appendSysMsg(account, xml.attribute("from"), "[OMEMO] The following message is from an untrusted device:");
+            bool res = m_accountController->appendSysMsg(account, message.attribute("from"), "[OMEMO] The following message is from an untrusted device:");
             if (!res) {
               text = "[UNTRUSTED]: " + text;
             }
           }
 
           body.appendChild(body.ownerDocument().createTextNode(text));
-          decrypted.appendChild(body);
+          message.appendChild(body);
 
-          return decrypted.toElement();
+          return true;
         }
       }
     }
-    return result;
+    message = QDomElement();
+    return true;
   }
 
   bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml, bool buildSessions, const uint32_t *toDeviceId) {

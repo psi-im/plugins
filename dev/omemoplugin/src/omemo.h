@@ -37,7 +37,7 @@ namespace psiomemo {
     void setAccountController(PsiAccountControllingHost *accountController);
     void setAccountInfoAccessor(AccountInfoAccessingHost *accountInfoAccessor);
 
-    QDomElement decryptMessage(int account, const QDomElement &xml);
+    bool decryptMessage(int account, QDomElement &message);
     bool encryptMessage(const QString &ownJid, int account, QDomElement &xml, bool buildSessions = true, const uint32_t *toDeviceId = nullptr);
     bool processDeviceList(const QString &ownJid, int account, const QDomElement &xml);
     void deinit();
