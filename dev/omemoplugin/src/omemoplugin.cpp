@@ -201,7 +201,7 @@ namespace psiomemo {
       return false;
     }
 
-    if (xml.nodeName() == "presence" && xml.attribute("type").isNull()) {
+    if (xml.nodeName() == "presence" && !xml.hasAttributes()) {
       m_omemo.accountConnected(account, m_accountInfo->getJid(account));
     }
 
