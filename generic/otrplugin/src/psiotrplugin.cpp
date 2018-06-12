@@ -272,16 +272,20 @@ QString PsiOtrPlugin::pluginInfo() {
 
 bool PsiOtrPlugin::processEvent(int accountIndex, QDomElement& e)
 {
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+
+bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageElement)
+{
     bool ignore = false;
 
-    QDomElement messageElement = e.firstChildElement("message");
-
-    if (m_enabled && e.attribute("type") == "MessageEvent" &&
+    if (m_enabled &&
         !messageElement.isNull() &&
         messageElement.attribute("type") != "error" &&
         messageElement.attribute("type") != "groupchat" &&
-        e.elementsByTagNameNS("urn:xmpp:carbons:2", "sent").isEmpty() &&
-        e.elementsByTagNameNS("urn:xmpp:carbons:2", "received").isEmpty())
+        messageElement.firstChild().toElement().attribute("xmlns") != "urn:xmpp:carbons:2")
     {
         QString contact = getCorrectJid(accountIndex,
                                         messageElement.attribute("from"));
@@ -339,7 +343,7 @@ bool PsiOtrPlugin::processEvent(int accountIndex, QDomElement& e)
                     // replace html body
                     if (htmlElement.isNull())
                     {
-                        htmlElement = e.ownerDocument().createElement("html");
+                        htmlElement = messageElement.ownerDocument().createElement("html");
                         htmlElement.setAttribute("xmlns",
                                                  "http://jabber.org/protocol/xhtml-im");
                         messageElement.appendChild(htmlElement);
@@ -368,11 +372,15 @@ bool PsiOtrPlugin::processEvent(int accountIndex, QDomElement& e)
 
                 // replace plaintext body
                 plainBody.removeChild(plainBody.firstChild());
-                plainBody.appendChild(e.ownerDocument().createTextNode(unescape(bodyText)));
+                plainBody.appendChild(messageElement.ownerDocument().createTextNode(unescape(bodyText)));
                 break;
         }
     }
-    return ignore;
+    if (ignore)
+    {
+        messageElement = QDomElement();
+    }
+    return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -389,29 +397,45 @@ bool PsiOtrPlugin::processOutgoingMessage(int accountIndex, const QString& conta
                                           QString& body, const QString& type,
                                           QString&)
 {
-    if (!m_enabled || type == "groupchat")
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+
+bool PsiOtrPlugin::encryptMessageElement(int accountIndex, QDomElement &message)
+{
+    if (!m_enabled || message.attribute("type") == "groupchat")
     {
         return false;
     }
 
     QString account = m_accountInfo->getId(accountIndex);
+    QDomElement bodyElement = message.firstChildElement("body");
+
+    if (bodyElement.isNull())
+    {
+        return false;
+    }
+
+    QDomNode body = bodyElement.firstChild();
 
     QString encrypted = m_otrConnection->encryptMessage(
         account,
-        getCorrectJid(accountIndex, contact),
+        getCorrectJid(accountIndex, message.attribute("to")),
 #ifdef HAVE_QT5
-        body.toHtmlEscaped());
+        body.nodeValue().toHtmlEscaped());
 #else
-        Qt::escape(body));
+        Qt::escape(body.nodeValue()));
 #endif
 
     //if there has been an error, drop the message
     if (encrypted.isEmpty())
     {
-        return true;
+        message = QDomElement();
+        return false;
     }
 
-    body = unescape(encrypted);
+    body.setNodeValue(unescape(encrypted));
 
     return false;
 }

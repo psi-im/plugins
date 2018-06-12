@@ -48,6 +48,7 @@
 #include "iconfactoryaccessor.h"
 #include "eventcreatinghost.h"
 #include "eventcreator.h"
+#include "encryptionsupport.h"
 
 class ApplicationInfoAccessingHost;
 class PsiAccountControllingHost;
@@ -80,7 +81,8 @@ class PsiOtrPlugin : public QObject,
                      public AccountInfoAccessor,
                      public ContactInfoAccessor,
                      public IconFactoryAccessor,
-                     public OtrCallback
+                     public OtrCallback,
+                     public EncryptionSupport
 {
     Q_OBJECT
 #ifdef HAVE_QT5
@@ -98,7 +100,8 @@ class PsiOtrPlugin : public QObject,
                  ToolbarIconAccessor
                  AccountInfoAccessor
                  ContactInfoAccessor
-                 IconFactoryAccessor)
+                 IconFactoryAccessor
+                 EncryptionSupport)
 
 public:
     PsiOtrPlugin();
@@ -160,6 +163,10 @@ public:
 
     // IconFactoryAccessingHost
     virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
+
+    // EncryptionSupport
+    virtual bool decryptMessageElement(int account, QDomElement &message);
+    virtual bool encryptMessageElement(int account, QDomElement &message);
 
     // OtrCallback
     virtual QString dataDir();
