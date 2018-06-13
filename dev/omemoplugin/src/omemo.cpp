@@ -243,6 +243,11 @@ namespace psiomemo {
         QDomElement payload = xml.ownerDocument().createElement("payload");
         payload.appendChild(xml.ownerDocument().createTextNode(encryptedBody.first.toBase64()));
         encrypted.appendChild(payload);
+
+        QDomElement html = xml.firstChildElement("html");
+        if (!html.isNull()) {
+          xml.removeChild(html);
+        }
       }
 
       xml.appendChild(xml.ownerDocument().createElementNS("urn:xmpp:hints", "store"));
