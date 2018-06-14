@@ -40,6 +40,23 @@ include_directories(
     ${PLUGINS_ROOT_DIR}/include
 )
 
+#Hack to check signal-protocol-c version
+if(SignalProtocolC_FOUND)
+    try_compile(OLD_SIGNAL
+                ${CMAKE_BINARY_DIR}/oldSignal
+                ${PROJECT_SOURCE_DIR}/config.tests/oldSignal/main.cpp
+                LINK_LIBRARIES ${SIGNAL_PROTOCOL_C_LIBRARY}
+                CMAKE_FLAGS -DINCLUDE_DIRECTORIES=${SIGNAL_PROTOCOL_C_INCLUDE_DIR}
+    )
+    set(MSG_TEST "Performing test: OLD_SIGNAL")
+    if(OLD_SIGNAL)
+        message(STATUS "${MSG_TEST} - Complete")
+        add_definitions(-DOLD_SIGNAL)
+    else()
+        message(STATUS "${MSG_TEST}  - Failed")
+    endif()
+endif()
+
 set(HEADERS
     src/omemoplugin.h
     src/storage.h
