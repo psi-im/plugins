@@ -13,7 +13,6 @@ unix {
 }
 
 load(configure)
-qtCompileTest(oldSignal):DEFINES += OLD_SIGNAL
 
 CONFIG += c++11
 QT += sql network
