@@ -147,7 +147,7 @@ namespace psiomemo {
     EVP_MD_CTX_destroy(static_cast<EVP_MD_CTX *>(context));
   }
 
-  QPair<QByteArray, QByteArray> aes(Crypto::Direction direction, const EVP_CIPHER *cipher, bool padding, const QByteArray &key,
+  QPair<QByteArray, QByteArray> aes(Crypto::Direction direction, const EVP_CIPHER *cipher, bool cbcMode, const QByteArray &key,
                                     const QByteArray &iv, const QByteArray &ciphertext, const QByteArray &inputTag) {
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
     EVP_CIPHER_CTX_init(ctx);
@@ -163,7 +163,7 @@ namespace psiomemo {
     }
     initF(ctx, nullptr, nullptr, reinterpret_cast<const unsigned char *>(key.data()),
           reinterpret_cast<const unsigned char *>(iv.data()));
-    EVP_CIPHER_CTX_set_padding(ctx, padding ? 1 : 0);
+    EVP_CIPHER_CTX_set_padding(ctx, cbcMode ? 1 : 0);
 
     int res;
     int length;
@@ -185,7 +185,7 @@ namespace psiomemo {
     QByteArray outTag;
 
     if (res == 1) {
-      if (isEncode) {
+      if (isEncode && !cbcMode) {
         QVector<uint8_t> tagVector(inputTag.length());
         EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, inputTag.length(), tagVector.data());
         outTag = toQByteArray(tagVector.data(), static_cast<size_t>(tagVector.size()));
