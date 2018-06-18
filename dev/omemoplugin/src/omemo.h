@@ -69,6 +69,7 @@ namespace psiomemo {
     QVector<std::shared_ptr<MessageWaitingForBundles>> m_pendingMessages;
     QString m_dataPath;
     QHash<int, std::shared_ptr<Signal>> m_accountToSignal;
+    QSet<QString> m_ownDeviceListRequests;
     std::shared_ptr<Signal> getSignal(int account);
     void pepPublish(int account, const QString &dl_xml) const;
     void pepUnpublish(int account, const QString &dl_xml) const;

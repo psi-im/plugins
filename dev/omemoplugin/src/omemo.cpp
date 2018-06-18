@@ -36,7 +36,8 @@ namespace psiomemo {
   }
 
   void OMEMO::accountConnected(int account, const QString &ownJid) {
-    pepRequest(account, ownJid, ownJid, deviceListNodeName());
+    QString stanzaId = pepRequest(account, ownJid, ownJid, deviceListNodeName());
+    m_ownDeviceListRequests.insert(QString::number(account) + "-" + stanzaId);
   }
 
   void OMEMO::publishOwnBundle(int account) {
@@ -263,6 +264,10 @@ namespace psiomemo {
 
   bool OMEMO::processDeviceList(const QString &ownJid, int account, const QDomElement &xml) {
     QString from = xml.attribute("from");
+    bool expectedOwnList = m_ownDeviceListRequests.remove(QString::number(account) + "-" + xml.attribute("id"));
+    if (from.isNull() && expectedOwnList) {
+      from = ownJid;
+    }
     if (from.isNull()) {
       return false;
     }
@@ -286,8 +291,7 @@ namespace psiomemo {
         deviceElement = deviceElement.nextSiblingElement("device");
       }
     }
-    else if (xml.nodeName() != "iq" || xml.attribute("type") != "error" || from != ownJid ||
-             xml.firstChildElement("pubsub").firstChildElement("items").attribute("node") != deviceListNodeName()) {
+    else if (xml.nodeName() != "iq" || xml.attribute("type") != "error" || !expectedOwnList) {
       return false;
     }
 
