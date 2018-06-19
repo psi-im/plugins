@@ -21,6 +21,7 @@ imagepreviewplugin \
 jabberdiskplugin \
 juickplugin \
 messagefilterplugin \
+omemoplugin \
 otrplugin \
 pepchangenotifyplugin \
 qipxstatusesplugin \
