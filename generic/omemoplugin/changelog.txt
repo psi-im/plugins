@@ -1,3 +1,6 @@
+2018-07-15
+    * added a hacky MUC support
+
 2018-06-11
     * provided a way for httpuploadplugin to encrypt files before uploading
     * correctly decrypting carbons now

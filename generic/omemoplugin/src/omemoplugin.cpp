@@ -111,6 +111,18 @@ namespace psiomemo {
       return true;
     }
 
+    if (xml.nodeName() == "presence") {
+      QDomNodeList nodes = xml.childNodes();
+      for (int i = 0; i < nodes.length(); i++) {
+        QDomNode node = nodes.item(i);
+        if (node.nodeName() == "x" && node.toElement().attribute("xmlns") == "http://jabber.org/protocol/muc#user") {
+          QString bareJid = xml.attribute("from").split("/").first();
+          QTimer::singleShot(0, [=]() { updateAction(account, bareJid); });
+          break;
+        }
+      }
+    }
+
     return false;
   }
 
@@ -124,7 +136,7 @@ namespace psiomemo {
       return false;
     }
 
-    QString jid = message.attribute("from").split("/").first();
+    QString jid = m_contactInfo->realJid(account, message.attribute("from")).split("/").first();
     if (!m_omemo.isEnabledForUser(account, jid)) {
       m_omemo.setEnabledForUser(account, jid, true);
       updateAction(account, jid);
@@ -213,8 +225,7 @@ namespace psiomemo {
       return false;
     }
 
-    if (message.firstChildElement("body").isNull() || !message.firstChildElement("encrypted").isNull() ||
-        message.attribute("type") != "chat") {
+    if (message.firstChildElement("body").isNull() || !message.firstChildElement("encrypted").isNull()) {
       return false;
     }
 
@@ -242,6 +253,11 @@ namespace psiomemo {
     m_omemo.setAccountController(host);
   }
 
+  void OMEMOPlugin::setContactInfoAccessingHost(ContactInfoAccessingHost *host) {
+    m_contactInfo = host;
+    m_omemo.setContactInfoAccessor(host);
+  }
+
   void OMEMOPlugin::onEnableOMEMOAction(bool checked) {
     auto action = dynamic_cast<QAction*>(sender());
     QString jid = action->property("jid").toString();
@@ -255,10 +271,14 @@ namespace psiomemo {
   }
 
   QAction *OMEMOPlugin::getAction(QObject *parent, int account, const QString &contact) {
-    Q_UNUSED(account);
-    QString bareJid = contact.split("/").first();
+    return createAction(parent, account, contact, false);
+  }
+
+  QAction *OMEMOPlugin::createAction(QObject *parent, int account, const QString &contact, bool isGroup) {
+    QString bareJid = m_contactInfo->realJid(account, contact).split("/").first();
     QAction *action = new QAction(getIcon(), "Enable OMEMO", parent);
     action->setCheckable(true);
+    action->setProperty("isGroup", isGroup);
     connect(action, SIGNAL(triggered(bool)), SLOT(onEnableOMEMOAction(bool)));
     connect(action, SIGNAL(destroyed(QObject*)), SLOT(onActionDestroyed(QObject*)));
     m_actions.insert(bareJid, action);
@@ -266,21 +286,32 @@ namespace psiomemo {
     return action;
   }
 
+  QList<QVariantHash> OMEMOPlugin::getGCButtonParam() {
+    return getButtonParam();
+  }
+
+  QAction *OMEMOPlugin::getGCAction(QObject *parent, int account, const QString &contact) {
+    return createAction(parent, account, contact, true);
+  }
+
   void OMEMOPlugin::onActionDestroyed(QObject *action) {
-    m_actions.remove(action->property("jid").toString());
+    m_actions.remove(action->property("jid").toString(), reinterpret_cast<QAction*>(action));
   }
 
   void OMEMOPlugin::updateAction(int account, const QString &user) {
-    QString bareJid = user.split("/").first();
-    QAction *action = m_actions.value(bareJid, nullptr);
-    if (action != nullptr) {
-      bool available = m_omemo.isAvailableForUser(account, bareJid);
+    QString bareJid = m_contactInfo->realJid(account, user).split("/").first();
+    foreach (QAction *action, m_actions.values(bareJid)) {
+      bool isGroup = action->property("isGroup").toBool();
+      bool available = isGroup ?
+              m_omemo.isAvailableForGroup(account, m_accountInfo->getJid(account).split("/").first(), bareJid) :
+              m_omemo.isAvailableForUser(account, bareJid);
       bool enabled = available && m_omemo.isEnabledForUser(account, bareJid);
       action->setEnabled(available);
       action->setChecked(enabled);
       action->setProperty("jid", bareJid);
       action->setProperty("account", account);
-      action->setText(!available ? "OMEMO is not available for this contact" : enabled ? "OMEMO is enabled" : "Enable OMEMO");
+      action->setText(!available ? (QString("OMEMO is not available for this ") + (isGroup ? "group" : "contact")) :
+                      enabled ? "OMEMO is enabled" : "Enable OMEMO");
     }
   }
 
@@ -290,7 +321,7 @@ namespace psiomemo {
       }
 
       if (args.contains("is_enabled_for")) {
-        return m_omemo.isEnabledForUser(account, args["is_enabled_for"].toString().split("/").first());
+        return m_omemo.isEnabledForUser(account, m_contactInfo->realJid(account, args["is_enabled_for"].toString()).split("/").first());
       }
       else if (args.contains("encrypt_data")) {
         QByteArray data = args["encrypt_data"].toByteArray();

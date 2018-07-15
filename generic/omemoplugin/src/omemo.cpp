@@ -94,8 +94,18 @@ namespace psiomemo {
     }
 
     QDomElement encrypted = message.firstChildElement("encrypted");
-    if (encrypted.isNull() || encrypted.attribute("xmlns") != OMEMO_XMLNS || message.attribute("type") != "chat") {
+    if (encrypted.isNull() || encrypted.attribute("xmlns") != OMEMO_XMLNS) {
       return false;
+    }
+
+    QString messageId = message.attribute("id");
+    if (message.attribute("type") == "groupchat" && m_encryptedGroupMessages.contains(messageId)) {
+      message.removeChild(encrypted);
+      QDomElement body = message.ownerDocument().createElement("body");
+      body.appendChild(body.ownerDocument().createTextNode(m_encryptedGroupMessages.value(messageId)));
+      m_encryptedGroupMessages.remove(messageId);
+      message.appendChild(body);
+      return true;
     }
 
     QDomElement header = encrypted.firstChildElement("header");
@@ -116,7 +126,8 @@ namespace psiomemo {
     QByteArray encryptedKey = QByteArray::fromBase64(keyElement.firstChild().nodeValue().toUtf8());
 
     uint deviceId = header.attribute("sid").toUInt();
-    QString sender = message.attribute("from").split("/").first();
+    QString from = message.attribute("from");
+    QString sender = m_contactInfoAccessor->realJid(account, from).split("/").first();
     QPair<QByteArray, bool> decryptionResult = signal->decryptKey(sender, EncryptedKey(deviceId, isPreKey, encryptedKey));
     QByteArray decryptedKey = decryptionResult.first;
     bool buildSessionWithPreKey = decryptionResult.second;
@@ -124,11 +135,11 @@ namespace psiomemo {
       // remote has an invalid session, let's recover by overwriting it with a fresh one
       QDomElement emptyMessage = message.cloneNode(false).toElement();
       QString to = message.attribute("to");
-      QString from = message.attribute("from");
       emptyMessage.setAttribute("from", to);
       emptyMessage.setAttribute("to", from);
 
-      buildSessionsFromBundle(QVector<uint32_t>({deviceId}), QVector<uint32_t>(), to.split("/").first(), account, emptyMessage);
+      auto recipientInvalidSessions = QMap<QString, QVector<uint32_t>>({{to, QVector<uint32_t>({deviceId})}});
+      buildSessionsFromBundle(recipientInvalidSessions, QVector<uint32_t>(), to.split("/").first(), account, emptyMessage);
       xml = QDomElement();
       return true;
     }
@@ -179,14 +190,31 @@ namespace psiomemo {
 
   bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml, bool buildSessions, const uint32_t *toDeviceId) {
     std::shared_ptr<Signal> signal = getSignal(account);
-    QString recipient = xml.attribute("to").split("/").first();
+    QString recipient = m_contactInfoAccessor->realJid(account, xml.attribute("to")).split("/").first();
+    bool isGroup = xml.attribute("type") == "groupchat";
     if (!isEnabledForUser(account, recipient)) {
       return false;
     }
 
     if (buildSessions) {
-      QVector<uint32_t> invalidSessions = signal->invalidSessions(recipient);
-      QVector<uint32_t> invalidSessionsWithOwnDevices = signal->invalidSessions(ownJid);
+      QMap<QString, QVector<uint32_t>> invalidSessions;
+      QVector<uint32_t> invalidSessionsWithOwnDevices;
+      if (isGroup) {
+        forEachMucParticipant(account, ownJid, recipient, [&](const QString &userJid) {
+          QVector<uint32_t> sessions = signal->invalidSessions(userJid);
+          if (!sessions.isEmpty()) {
+            invalidSessions.insert(userJid, sessions);
+          }
+          return true;
+        });
+      }
+      else {
+        QVector<uint32_t> sessions = signal->invalidSessions(recipient);
+        if (!sessions.isEmpty()) {
+          invalidSessions.insert(recipient, sessions);
+        }
+      }
+      invalidSessionsWithOwnDevices = signal->invalidSessions(ownJid);
       invalidSessionsWithOwnDevices.removeOne(signal->getDeviceId());
       if (!invalidSessions.isEmpty() || !invalidSessionsWithOwnDevices.isEmpty()) {
         buildSessionsFromBundle(invalidSessions, invalidSessionsWithOwnDevices, ownJid, account, xml);
@@ -218,7 +246,16 @@ namespace psiomemo {
       encryptedBody = Crypto::aes_gcm(Crypto::Encode, iv, key, plainText.toUtf8());
       key += encryptedBody.second;
     }
-    QList<EncryptedKey> encryptedKeys = signal->encryptKey(ownJid, recipient, key);
+    QList<EncryptedKey> encryptedKeys;
+    if (isGroup) {
+      forEachMucParticipant(account, ownJid, recipient, [&](const QString &userJid) {
+        encryptedKeys.append(signal->encryptKey(ownJid, userJid, key));
+        return true;
+      });
+    }
+    else {
+      encryptedKeys = signal->encryptKey(ownJid, recipient, key);
+    }
 
     if (encryptedKeys.isEmpty()) {
       m_accountController->appendSysMsg(account, xml.attribute("to"), "[OMEMO] Unable to build any sessions, the message was not sent");
@@ -239,6 +276,9 @@ namespace psiomemo {
       }
 
       if (!body.isNull()) {
+        if (isGroup) {
+          m_encryptedGroupMessages.insert(xml.attribute("id"), body.firstChild().nodeValue());
+        }
         xml.removeChild(body);
 
         QDomElement payload = xml.ownerDocument().createElement("payload");
@@ -332,14 +372,12 @@ namespace psiomemo {
     pepPublish(account, doc.toString());
   }
 
-  void OMEMO::buildSessionsFromBundle(const QVector<uint32_t> &recipientInvalidSessions,
+  void OMEMO::buildSessionsFromBundle(const QMap<QString, QVector<uint32_t>> &recipientInvalidSessions,
                                       const QVector<uint32_t> &ownInvalidSessions,
                                       const QString &ownJid, int account,
                                       const QDomElement &messageToResend) {
     std::shared_ptr<MessageWaitingForBundles> message(new MessageWaitingForBundles);
     message->xml = messageToResend;
-
-    QString recipient = messageToResend.attribute("to").split("/").first();
 
     auto requestBundle = [&](uint32_t deviceId, const QString &recipient) {
       QString stanza = pepRequest(account, ownJid, recipient, bundleNodeName(deviceId));
@@ -347,8 +385,11 @@ namespace psiomemo {
       message->pendingBundles.insert(deviceId);
     };
 
-    foreach (uint32_t deviceId, recipientInvalidSessions) {
-      requestBundle(deviceId, recipient);
+    foreach (QString recipient, recipientInvalidSessions.keys()) {
+      QString bareRecipient = recipient.split("/").first();
+      foreach (uint32_t deviceId, recipientInvalidSessions.value(recipient)) {
+        requestBundle(deviceId, bareRecipient);
+      }
     }
     foreach (uint32_t deviceId, ownInvalidSessions) {
       requestBundle(deviceId, ownJid);
@@ -466,6 +507,10 @@ namespace psiomemo {
     m_accountInfoAccessor = accountInfoAccessor;
   }
 
+  void OMEMO::setContactInfoAccessor(ContactInfoAccessingHost *contactInfoAccessor) {
+    m_contactInfoAccessor = contactInfoAccessor;
+  }
+
   const QString OMEMO::bundleNodeName(uint32_t deviceId) const {
     return QString("%1.bundles:%2").arg(OMEMO_XMLNS).arg(deviceId);
   }
@@ -476,6 +521,24 @@ namespace psiomemo {
 
   bool OMEMO::isAvailableForUser(int account, const QString &user) {
     return getSignal(account)->isAvailableForUser(user);
+  }
+
+  bool OMEMO::isAvailableForGroup(int account, const QString &ownJid, const QString &bareJid) {
+    bool any = false;
+    bool result = forEachMucParticipant(account, ownJid, bareJid, [&](const QString &userJid) {
+      any = true;
+      if (!isAvailableForUser(account, userJid)) {
+        if (isEnabledForUser(account, bareJid)) {
+          QString message = QString("[OMEMO] %1 does not seem to support OMEMO, disabling for the entire group!").arg(userJid);
+          m_accountController->appendSysMsg(account, bareJid, message);
+          setEnabledForUser(account, bareJid, false);
+        }
+        return false;
+      }
+      return true;
+    });
+
+    return any && result;
   }
 
   bool OMEMO::isEnabledForUser(int account, const QString &user) {
@@ -522,5 +585,30 @@ namespace psiomemo {
       m_accountToSignal[account] = signal;
     }
     return m_accountToSignal[account];
+  }
+
+  template<typename T>
+  bool OMEMO::forEachMucParticipant(int account, const QString &ownJid, const QString &conferenceJid, T&& lambda) {
+    QStringList list;
+
+    foreach (QString nick, m_contactInfoAccessor->mucNicks(account, conferenceJid)) {
+      QString contactMucJid = conferenceJid + "/" + nick;
+      QString realJid = m_contactInfoAccessor->realJid(account, contactMucJid);
+      if (realJid == contactMucJid) {
+        // a contact does not have a real JID, give up
+        return false;
+      }
+      QString bareJid = realJid.split("/").first();
+      if (bareJid != ownJid) {
+        list.append(bareJid);
+      }
+    }
+
+    foreach (QString jid, list) {
+      if (!lambda(jid)) {
+        return false;
+      }
+    }
+    return true;
   }
 }

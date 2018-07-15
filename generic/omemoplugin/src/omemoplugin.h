@@ -33,8 +33,10 @@
 #include "psiaccountcontroller.h"
 #include "plugininfoprovider.h"
 #include "toolbariconaccessor.h"
+#include "gctoolbariconaccessor.h"
 #include "encryptionsupport.h"
 #include "commandexecutor.h"
+#include "contactinfoaccessor.h"
 #include "storage.h"
 #include "crypto.h"
 #include "omemo.h"
@@ -50,8 +52,10 @@ namespace psiomemo {
                       public PsiAccountController,
                       public PluginInfoProvider,
                       public ToolbarIconAccessor,
+                      public GCToolbarIconAccessor,
                       public EncryptionSupport,
-                      public CommandExecutor {
+                      public CommandExecutor,
+                      public ContactInfoAccessor {
   Q_OBJECT
   Q_PLUGIN_METADATA(IID
                         "com.psi.OmemoPlugin")
@@ -64,8 +68,10 @@ namespace psiomemo {
                PsiAccountController
                PluginInfoProvider
                ToolbarIconAccessor
+               GCToolbarIconAccessor
                EncryptionSupport
-               CommandExecutor)
+               CommandExecutor
+               ContactInfoAccessor)
   public:
     QString name() const override;
     QString shortName() const override;
@@ -88,24 +94,29 @@ namespace psiomemo {
     void setStanzaSendingHost(StanzaSendingHost *host) override;
     void setEventCreatingHost(EventCreatingHost *host) override;
     void setPsiAccountControllingHost(PsiAccountControllingHost *host) override;
+    void setContactInfoAccessingHost(ContactInfoAccessingHost *host) override;
     QStringList pluginFeatures() override;
 
     QList<QVariantHash> getButtonParam() override;
     QAction *getAction(QObject *parent, int account, const QString &contact) override;
+    QList<QVariantHash> getGCButtonParam() override;
+    QAction *getGCAction(QObject *parent, int account, const QString &contact) override;
 
     bool execute(int account, const QHash<QString, QVariant> &args, QHash<QString, QVariant> *result) override;
 
   private:
     bool m_enabled;
-    QMap<QString, QAction*> m_actions;
+    QMultiMap<QString, QAction*> m_actions;
     OMEMO m_omemo;
     QNetworkAccessManager m_networkManager;
 
     AccountInfoAccessingHost *m_accountInfo;
+    ContactInfoAccessingHost *m_contactInfo;
     ApplicationInfoAccessingHost *m_applicationInfo;
     EventCreatingHost *m_eventCreator;
 
     QPixmap getIcon() const;
+    QAction *createAction(QObject *parent, int account, const QString &contact, bool isGroup);
     void updateAction(int account, const QString &user);
     void processEncryptedFile(int account, QDomElement &xml);
   private slots:
