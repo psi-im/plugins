@@ -62,8 +62,7 @@ namespace psiomemo {
     class MessageWaitingForBundles {
     public:
       QDomElement xml;
-      QSet<QString> sentStanzas;
-      QSet<uint32_t> pendingBundles;
+      QHash<QString, uint32_t> sentStanzas;
     };
 
     StanzaSendingHost *m_stanzaSender = nullptr;

@@ -381,8 +381,7 @@ namespace psiomemo {
 
     auto requestBundle = [&](uint32_t deviceId, const QString &recipient) {
       QString stanza = pepRequest(account, ownJid, recipient, bundleNodeName(deviceId));
-      message->sentStanzas.insert(stanza);
-      message->pendingBundles.insert(deviceId);
+      message->sentStanzas.insert(stanza, deviceId);
     };
 
     foreach (QString recipient, recipientInvalidSessions.keys()) {
@@ -416,8 +415,8 @@ namespace psiomemo {
     Bundle bundle;
 
     QDomElement items = xml.firstChildElement("pubsub").firstChildElement("items");
-    uint32_t deviceId = items.attribute("node").split(':').last().toUInt();
-    message->pendingBundles.remove(deviceId);
+    uint32_t deviceId = message->sentStanzas.value(stanzaId);
+    message->sentStanzas.remove(stanzaId);
 
     if (xml.firstChildElement("error").isNull()) {
       QString from = xml.attribute("from");
@@ -445,7 +444,7 @@ namespace psiomemo {
       }
     }
 
-    if (message->pendingBundles.isEmpty()) {
+    if (message->sentStanzas.isEmpty()) {
       QDomElement messageXml = message->xml;
       if (!messageXml.hasAttribute("id")) {
         messageXml.setAttribute("id", m_stanzaSender->uniqueId(account));
