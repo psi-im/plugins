@@ -43,7 +43,7 @@
 
 #include "viewer.h"
 
-#define cVer "0.2.2"
+#define cVer "0.2.3"
 #define constHeight "Height"
 #define constWidth "Width"
 #define constlastItem "lastItem"
@@ -250,7 +250,7 @@ void ConferenceLogger::Logger(QString room, QString from, QString MyJid, QString
 		Stamp.insert(7, "-");
 		Stamp.replace("T", " ");
 	}
-	QFile file(HistoryDir + QDir::separator() + MyJid + room);
+	QFile file(HistoryDir + QDir::separator() + MyJid + room + ".conferencehistory");
 	if(file.open(QIODevice::WriteOnly | QIODevice::Append)) {
 		QTextStream out(&file);
 		//out.seek(file.size());
@@ -289,7 +289,7 @@ void ConferenceLogger::view() {
 	QStringList List = YourJid.split("/");
 	YourJid = List.takeFirst();
 	YourJid = YourJid.replace("@", "_at_");
-	QString FName = YourJid + "_in_" + Jid;
+	QString FName = YourJid + "_in_" + Jid + ".conferencehistory";
 	QDir dir(HistoryDir);
 	foreach(QString file, dir.entryList(QDir::Files)) {
 		if(file == FName) {
