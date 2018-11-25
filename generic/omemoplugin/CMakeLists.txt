@@ -5,7 +5,7 @@ if(POLICY CMP0071)
     cmake_policy(SET CMP0071 OLD)
 endif()
 set(CMAKE_AUTOMOC TRUE)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 set(PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." CACHE STRING "Plugins root path. Path where include directory placed")
 
