@@ -12,31 +12,7 @@ if(POLICY CMP0071)
 endif()
 set( CMAKE_AUTOMOC TRUE )
 
-#This option will be enabled automatically if Qt5Webengine found and USE_WEBKIT disabled
-option( USE_WEBENGINE "Use WebEngine support instead of Webkit" OFF )
-#Enable this option only if you need to disable Webengine support
-option( USE_WEBKIT "Use Webkit support instead of WebEngine" OFF )
-
 find_package( Qt5 COMPONENTS Core REQUIRED )
-find_package( Qt5 COMPONENTS WebEngine QUIET )
-if( Qt5WebEngine_FOUND AND (NOT USE_WEBKIT) )
-    if(NOT ${Qt5Core_VERSION} VERSION_GREATER 5.6.0)
-        message(FATAL_ERROR "Qt version ${Qt5Core_VERSION} is not supported by psi with Webengine
-please enable flag USE_WEBKIT")
-    endif()
-    set(USE_WEBENGINE ON)
-    add_definitions(
-        -DWEBENGINE=1
-        -DHAVE_WEBENGINE
-    )
-    message(STATUS "${PLUGIN}: Webengine ENABLED")
-else()
-    set(USE_WEBENGINE OFF)
-    add_definitions(
-        -DHAVE_WEBKIT
-    )
-    message(STATUS "${PLUGIN}: Webkit ENABLED")
-endif()
 
 set(PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." CACHE STRING "Plugins root path. Path where include directory placed")
 
@@ -76,19 +52,6 @@ set(QT_DEPLIBS
     Qt5::Xml
     Qt5::Network
 )
-if( USE_WEBENGINE )
-    find_package(Qt5 COMPONENTS WebEngine WebEngineWidgets REQUIRED)
-    list(APPEND QT_DEPLIBS
-        Qt5::WebEngine
-        Qt5::WebEngineWidgets
-    )
-else()
-    find_package(Qt5 COMPONENTS WebKit WebKitWidgets REQUIRED)
-    list(APPEND QT_DEPLIBS
-        Qt5::WebKit
-        Qt5::WebKitWidgets
-    )
-endif()
 qt5_wrap_ui(UIS ${_UIS})
 qt5_add_resources(RSCS ${_RSCS})
 

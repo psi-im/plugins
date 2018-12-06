@@ -44,15 +44,6 @@
 #include <QSpinBox>
 #include <QComboBox>
 #include <QCheckBox>
-#ifdef HAVE_WEBKIT
-#include <QWebView>
-#include <QWebFrame>
-#include <QWebElementCollection>
-#endif
-#ifdef HAVE_WEBENGINE
-#include <QWebEngineView>
-#include <QWebEnginePage>
-#endif
 #include <stdexcept>
 
 #undef AUTOREDIRECTS
@@ -211,7 +202,7 @@ void ImagePreviewPlugin::setOptionAccessingHost(OptionAccessingHost *host) {
 }
 
 QString ImagePreviewPlugin::pluginInfo() {
-	return tr("Author: ") + "rkfg\n\n" + trUtf8("This plugin shows the preview image for an image URL.\n");
+	return tr("Author: ") + "rkfg\n\n" + trUtf8("This plugin shows images URLs' previews in chats for non-webkit Psi version.\n");
 }
 
 QPixmap ImagePreviewPlugin::icon() const {
@@ -258,32 +249,6 @@ void ImagePreviewPlugin::messageAppended(const QString &, QWidget* logWidget) {
 		};
 		te_log->setTextCursor(cur);
 	}
-	else {
-#ifdef HAVE_WEBKIT
-		QWebView* wv_log = qobject_cast<QWebView*>(logWidget);
-		QWebFrame* mainFrame = wv_log->page()->mainFrame();
-		QWebElementCollection elems = mainFrame->findAllElements("a[href]");
-		for (QWebElementCollection::const_iterator i = elems.constEnd() - 1;; i--) {
-			if ((*i).isNull()) {
-				break;
-			}
-			// skip nick links and already processed anchors
-			if (!(*i).classes().contains("nicklink", Qt::CaseInsensitive)
-					&& (*i).firstChild().tagName().toLower() != "img") {
-				QString url = (*i).attribute("href", "");
-				if (url.startsWith("http://") || url.startsWith("https://")) {
-					queueUrl(url, new Origin(wv_log));
-				}
-			}
-		}
-#endif
-#ifdef HAVE_WEBENGINE
-  #ifdef __GNUC__
-  #warning "ImagePreviewPlugin TODO: add support for webengine"
-  #endif
-#endif
-	}
-
 }
 
 void ImagePreviewPlugin::imageReply(QNetworkReply* reply) {
@@ -377,25 +342,6 @@ void ImagePreviewPlugin::imageReply(QNetworkReply* reply) {
 					}
 				}
 				te_log->setTextCursor(saved);
-			}
-			else {		
-#ifdef HAVE_WEBKIT
-				QByteArray imageBytes;
-				QBuffer imageBuf(&imageBytes);
-				image.save(&imageBuf, "jpg", 60);
-				QWebView* wv_log = qobject_cast<QWebView*>(origin->chat_);
-				QWebFrame* mainFrame = wv_log->page()->mainFrame();
-				mainFrame->evaluateJavaScript(QString("var links = document.body.querySelectorAll('a[href=\"%1\"]');"
-						"for (var i = 0; i < links.length; i++) {"
-						"  var elem = links[i];"
-						"  elem.innerHTML = \"<img src='data:image/jpeg;base64,%2'/>\";"
-						"}").arg(urlStr).arg(QString(imageBytes.toBase64())));
-#endif
-#ifdef HAVE_WEBENGINE
-  #ifdef __GNUC__
-  #warning "ImagePreviewPlugin TODO: add support for webengine"
-  #endif
-#endif
 			}
 		} catch (std::exception& e) {
 			failed.insert(origin->originalUrl_);
