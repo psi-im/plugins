@@ -52,7 +52,7 @@
 #endif
 
 //#define IMGPREVIEW_DEBUG
-#define constVersion "0.1.1"
+#define constVersion "0.1.2"
 #define sizeLimitName "imgpreview-size-limit"
 #define previewSizeName "imgpreview-preview-size"
 #define allowUpscaleName "imgpreview-allow-upscale"
