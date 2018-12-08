@@ -13,27 +13,28 @@ endif ()
 set( CMAKE_AUTOMOC TRUE )
 
 set(PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." CACHE STRING "Plugins root path. Path where include directory placed")
-
-if(EXISTS "${PLUGINS_ROOT_DIR}/variables.cmake")
-    include("${PLUGINS_ROOT_DIR}/variables.cmake")
-elseif(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../../variables.cmake")
-    include("${CMAKE_CURRENT_LIST_DIR}/../../variables.cmake")
-else()
-    message(FATAL_ERROR "No variables.cmake file found.
-        Please set path to this file to PLUGINS_ROOT_DIR variable")
+set( CMAKE_MODULE_PATH
+    ${CMAKE_MODULE_PATH}
+    ${PLUGINS_ROOT_DIR}/cmake/modules
+)
+find_package(PsiPluginsApi REQUIRED)
+include(${PsiPluginsApi_DIR}/variables.cmake)
+include_directories(
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_LIST_DIR}
+    ${PsiPluginsApi_INCLUDE_DIR}
+)
+if(NOT PLUGINS_INSTALL_PATH)
+    set(PLUGINS_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}")
 endif()
+
 
 set( _SRCS
     ${PLUGIN}.cpp
 )
 set( _RSCS
     resources.qrc
-)
-include_directories(
-    ${CMAKE_SOURCE_DIR}
-    ${CMAKE_CURRENT_BINARY_DIR}
-    ${PLUGINS_ROOT_DIR}/include
-    ${CMAKE_CURRENT_LIST_DIR}
 )
 
 find_package( Qt5 COMPONENTS Widgets Xml REQUIRED )
@@ -60,7 +61,7 @@ install(
     ${PLUGIN}
     LIBRARY
     DESTINATION
-    ${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}
+    ${PLUGINS_INSTALL_PATH}
     RUNTIME DESTINATION
-    ${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}
+    ${PLUGINS_INSTALL_PATH}
 )

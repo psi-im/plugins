@@ -9,6 +9,8 @@ if(IS_PSIPLUS)
     set(MAIN_PROGRAM_NAME "psi-plus")
 endif()
 
+set(CMAKE_CXX_STANDARD 14)
+
 if( NOT WIN32 )
     set( LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
     set( PLUGINS_PATH "lib${LIB_SUFFIX}/${MAIN_PROGRAM_NAME}/plugins" CACHE STRING "Install suffix for plugins" )
@@ -45,11 +47,3 @@ else()
 endif()
 
 add_definitions( -DQT_PLUGIN -DHAVE_QT5 )
-
-set( CMAKE_MODULE_PATH
-    ${CMAKE_MODULE_PATH}
-    ${PROJECT_SOURCE_DIR}/cmake/modules
-    ${PLUGINS_ROOT_DIR}/cmake/modules
-    ${PLUGINS_ROOT_DIR}/../../cmake/modules
-    ${CMAKE_CURRENT_LIST_DIR}/cmake/modules
-)

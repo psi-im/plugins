@@ -8,6 +8,12 @@ set_directory_properties(PROPERTIES
     COMPILE_DEFINITIONS ""
 )
 
+set( CMAKE_MODULE_PATH
+    ${CMAKE_MODULE_PATH}
+    ${PROJECT_SOURCE_DIR}/cmake/modules
+    ${CMAKE_CURRENT_LIST_DIR}/cmake/modules
+)
+
 set(QT5_BUILD ON)
 
 option( BUILD_DEV_PLUGINS "Build plugins from dev directory" OFF )
@@ -88,7 +94,7 @@ endif()
 
 unset(BUILD_PLUGINS CACHE)
 unset(PLUGINS_PATH CACHE)
-#Restore default psi-plsu runtime output path
+#Restore default psi runtime output path
 if(WIN32)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${OLD_RUNTIME_TARGETS}")
 endif()
