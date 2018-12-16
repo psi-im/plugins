@@ -541,7 +541,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 					if(getAv) {
 						QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
 						const QString path(QString("%1/%2").arg(dir.absolutePath()).arg(unick));
-						const QString url = QString("http://i.juick.com%1").arg(ava);
+						const QString url = QString("https://i.juick.com%1").arg(ava);
 						JuickDownloadItem it(path, url);
 						downloader_->get(it);
 					}
