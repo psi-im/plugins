@@ -22,19 +22,11 @@
 #include <QMessageBox>
 #include <QColorDialog>
 #include <QTextEdit>
-#ifdef HAVE_WEBKIT
-#include <QWebView>
-#include <QWebFrame>
-#include <QWebElement>
-#endif
-#ifdef HAVE_WEBENGINE
-#include <QWebEngineView>
-#include <QWebEnginePage>
-#endif
 
 #include "optionaccessinghost.h"
 #include "activetabaccessinghost.h"
 #include "applicationinfoaccessinghost.h"
+#include "webkitaccessinghost.h"
 
 #include "juickplugin.h"
 #include "juickdownloader.h"
@@ -468,7 +460,12 @@ void JuickPlugin::setActiveTabAccessingHost(ActiveTabAccessingHost* host)
 
 void JuickPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host)
 {
-	applicationInfo = host;
+    applicationInfo = host;
+}
+
+void JuickPlugin::setWebkitAccessingHost(WebkitAccessingHost *host)
+{
+    webkit = host;
 }
 
 bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
@@ -1110,35 +1107,17 @@ void JuickPlugin::updateWidgets(const QList<QByteArray>& urls)
 		}
 		else {
 			int t = qrand()%(QTime::currentTime().msec() + 1);
-#ifdef HAVE_WEBKIT
-			QWebView *wv = w->findChild<QWebView*>();
-			if(wv) {
-				QWebFrame* wf = wv->page()->mainFrame();
-				foreach(const QByteArray& url, urls) {
-					QUrl u(url);
-					QWebElement elem = wf->findFirstElement(QString("img[src=\"%1\"]").arg(u.toString()));
-					if(!elem.isNull()) {
-						elem.setAttribute("src", u.toString() + "?" + QString::number(++t));
-					}
-				}
-			}
-#endif
-#ifdef HAVE_WEBENGINE
-#ifdef __GNUC__
-#warning "JuickPlugin TODO: check webengine staff works"
-#endif
-			QWebEngineView *wv = w->findChild<QWebEngineView*>();
-			if(wv) {
-				QWebEnginePage* wf = wv->page();
-				foreach(const QByteArray& url, urls) {
-					QUrl u(url);
-					const QString js = QString("var els=document.querySelectorAll(\"img[src='%1']\");"
-							"for(var i=0;i<els.length;++i){var el=els[i];el.src='%1'+'?%2';}")
-							.arg(u.toString(), QString::number(++t));
-					wf->runJavaScript(js);
-				}
-			}
-#endif
+            if (webkit->chatLogRenderType() == WebkitAccessingHost::RT_WebKit ||
+                    webkit->chatLogRenderType() == WebkitAccessingHost::RT_WebEngine)
+            {
+                foreach(const QByteArray& url, urls) {
+                    QUrl u(url);
+                    const QString js = QString("var els=document.querySelectorAll(\"img[src='%1']\");"
+                            "for(var i=0;i<els.length;++i){var el=els[i];el.src='%1'+'?%2';}")
+                            .arg(u.toString(), QString::number(++t));
+                    webkit->executeChatLogJavaScript(w, js);
+                }
+            }
 		}
 	}
 }

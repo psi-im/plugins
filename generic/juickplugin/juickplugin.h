@@ -28,6 +28,7 @@
 #include "plugininfoprovider.h"
 #include "chattabaccessor.h"
 #include "applicationinfoaccessor.h"
+#include "webkitaccessor.h"
 #include "ui_settings.h"
 
 class OptionAccessingHost;
@@ -36,15 +37,22 @@ class ApplicationInfoAccessingHost;
 class JuickDownloader;
 class QDomDocument;
 
-class JuickPlugin : public QObject, public PsiPlugin, public OptionAccessor, public ActiveTabAccessor,
-			public StanzaFilter, public ApplicationInfoAccessor, public PluginInfoProvider, public ChatTabAccessor
+class JuickPlugin : public QObject,
+        public PsiPlugin,
+        public OptionAccessor,
+        public ActiveTabAccessor,
+		public StanzaFilter,
+        public ApplicationInfoAccessor,
+        public PluginInfoProvider,
+        public ChatTabAccessor,
+        public WebkitAccessor
 {
 	Q_OBJECT
 #ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.JuickPlugin")
 #endif
 	Q_INTERFACES(PsiPlugin OptionAccessor ActiveTabAccessor StanzaFilter
-			ApplicationInfoAccessor PluginInfoProvider ChatTabAccessor)
+			ApplicationInfoAccessor PluginInfoProvider ChatTabAccessor WebkitAccessor)
 
 public:
 	JuickPlugin();
@@ -61,6 +69,7 @@ public:
 	virtual void optionChanged(const QString& ) {}
 	virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
 	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
+    virtual void setWebkitAccessingHost(WebkitAccessingHost* host);
 	virtual QString pluginInfo();
 
 	// ChatTabAccessor
@@ -96,23 +105,24 @@ private:
 	void addAvatar(QDomElement *body, QDomDocument *doc, const QString &msg, const QString &jidToSend, const QString &ujid);
 
 private:
-	bool enabled;
-	OptionAccessingHost* psiOptions;
-	ActiveTabAccessingHost* activeTab;
-	ApplicationInfoAccessingHost* applicationInfo;
-	QColor userColor, tagColor, msgColor, quoteColor, lineColor;
-	bool userBold,tagBold,msgBold,quoteBold,lineBold;
-	bool userItalic,tagItalic,msgItalic,quoteItalic,lineItalic;
-	bool userUnderline,tagUnderline,msgUnderline,quoteUnderline,lineUnderline;
+	bool enabled = false;
+	OptionAccessingHost* psiOptions = nullptr;
+	ActiveTabAccessingHost* activeTab = nullptr;
+	ApplicationInfoAccessingHost* applicationInfo = nullptr;
+    WebkitAccessingHost *webkit = nullptr;
+	QColor userColor = false, tagColor = false, msgColor = false, quoteColor = false, lineColor = false;
+	bool userBold = false,tagBold = false,msgBold = false,quoteBold = false,lineBold = false;
+	bool userItalic = false,tagItalic = false,msgItalic = false,quoteItalic = false,lineItalic = false;
+	bool userUnderline = false,tagUnderline = false,msgUnderline = false,quoteUnderline = false,lineUnderline = false;
 	QString idStyle,userStyle,tagStyle,quoteStyle,linkStyle;
 	QRegExp tagRx, regx, idRx, nickRx, linkRx;
 	QString userLinkPattern,messageLinkPattern,altTextUser,altTextMsg,commonLinkColor;
-	bool idAsResource,showPhoto,showAvatars,workInGroupChat;
+	bool idAsResource = false,showPhoto = false,showAvatars = false,workInGroupChat = false;
 	QStringList jidList_;
 	QPointer<QWidget> optionsWid;
 	QList<QWidget*> logs_;
 	Ui::settings ui_;
-	JuickDownloader* downloader_;
+	JuickDownloader* downloader_ = nullptr;
 };
 
 #endif // JUICKPLUGIN_H
