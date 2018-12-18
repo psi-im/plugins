@@ -84,19 +84,12 @@ Q_EXPORT_PLUGIN(JuickPlugin)
 #endif
 
 JuickPlugin::JuickPlugin()
-	: enabled(false)
-	, psiOptions(0), activeTab(0), applicationInfo(0)
-	, userColor(0, 85, 255), tagColor(131, 145, 145), msgColor(87, 165, 87), quoteColor(187, 187, 187), lineColor(0, 0, 255)
-	, userBold(true), tagBold(false), msgBold(false), quoteBold(false), lineBold(false)
-	, userItalic(false), tagItalic(true), msgItalic(false), quoteItalic(false), lineItalic(false)
-	, userUnderline(false), tagUnderline(false), msgUnderline(true), quoteUnderline(false), lineUnderline(true)
+	: userColor(0, 85, 255), tagColor(131, 145, 145), msgColor(87, 165, 87), quoteColor(187, 187, 187), lineColor(0, 0, 255)
 	, tagRx	("^\\s*(?!\\*\\S+\\*)(\\*\\S+)")
 	, regx	("(\\s+\\S?)(#\\d+/{0,1}\\d*(?:\\S+)|@\\S+|_[^\\n]+_|\\*[^\\n]+\\*|/[^\\n]+/|http://\\S+|ftp://\\S+|https://\\S+|\\[[^\\]]+\\]\\[[^\\]]+\\]){1}(\\S?\\s+)")
 	, idRx	("(#\\d+)(/\\d+){0,1}(\\S+){0,1}")
 	, nickRx("(@[\\w\\-\\.@\\|]*)(\\b.*)")
 	, linkRx("\\[([^\\]]+)\\]\\[([^\\]]+)\\]")
-	, idAsResource(false), showPhoto(false), showAvatars(true), workInGroupChat(false)
-	, downloader_(0)
 
 {
 	regx.setMinimal(true);
@@ -121,7 +114,7 @@ QString JuickPlugin::version() const
 QWidget* JuickPlugin::options()
 {
 	if (!enabled) {
-		return 0;
+		return nullptr;
 	}
 	optionsWid = new QWidget();
 	ui_.setupUi(optionsWid);
@@ -473,6 +466,9 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 	if(!enabled)
 		return false;
 
+    bool isWebkit = (webkit->chatLogRenderType() == WebkitAccessingHost::RT_WebKit ||
+                        webkit->chatLogRenderType() == WebkitAccessingHost::RT_WebEngine);
+    QString avatarUrl;
 	if (stanza.tagName() == "message" ) {
 		const QString jid(stanza.attribute("from").split('/').first());
 		const QString usernameJ(jid.split("@").first());
@@ -515,7 +511,10 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 
 			if (showAvatars) {
 				const QString ava = jp.avatarLink();
-				if(!ava.isEmpty()) {
+                if(!ava.isEmpty()) {
+                    avatarUrl = QString("https://i.juick.com%1").arg(ava);
+                }
+				if(!ava.isEmpty() && !isWebkit) {
 					const QString unick("@" + jp.nick());
 					bool getAv = true;
 					QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
@@ -538,9 +537,8 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 					if(getAv) {
 						QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
 						const QString path(QString("%1/%2").arg(dir.absolutePath()).arg(unick));
-						const QString url = QString("https://i.juick.com%1").arg(ava);
-						JuickDownloadItem it(path, url);
-						downloader_->get(it);
+						JuickDownloadItem it(path, avatarUrl);
+                        downloader_->get(it);
 					}
 				}
 			}
@@ -654,7 +652,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 				msg = " " + m.body + " ";
 
 				if (showAvatars) {
-					addAvatar(&body, &doc, msg, jidToSend, m.unick);
+					addAvatar(&body, &doc, msg, jidToSend, m.unick, avatarUrl);
 				} else {
 					body.appendChild(doc.createElement("br"));
 					//обрабатываем текст сообщения
@@ -709,7 +707,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 				msg = " " + m.body + " ";
 				body.appendChild(blockquote);
 				if (showAvatars) {
-					addAvatar(&body, &doc, msg, jidToSend, m.unick);
+					addAvatar(&body, &doc, msg, jidToSend, m.unick, avatarUrl);
 					//td2.appendChild(blockquote);
 				} else {
 					//body.appendChild(blockquote);
@@ -834,17 +832,25 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 			if (!photo.isEmpty()) {
 				if(showPhoto) {
 					//photo post
-					const QUrl photoUrl(photo);
-					const QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/photos");
-					const QString path(QString("%1/%2").arg(dir.absolutePath()).arg(photoUrl.path().replace("/", "%")));
-					JuickDownloadItem it(path, photoUrl.toString().replace("/photos-1024/","/ps/"));
-					downloader_->get(it);
 					QDomElement link = doc.createElement("a");
 					link.setAttribute("href", photo);
+
 					QDomElement img = doc.createElement("img");
-					QString imgdata = photoUrl.path().replace("/", "%");
-					img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/%2").arg(dir.absolutePath()).arg(imgdata)).toEncoded()));
-					link.appendChild(img);
+
+                    const QUrl photoUrl(photo);
+                    QString dlUrl(photoUrl.toString().replace("/photos-1024/","/ps/"));
+                    if (isWebkit) {
+                        img.setAttribute("src", dlUrl);
+                    } else {
+                        const QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick/photos");
+                        const QString path(QString("%1/%2").arg(dir.absolutePath()).arg(photoUrl.path().replace("/", "%")));
+                        QString imgdata = photoUrl.path().replace("/", "%");
+                        img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/%2").arg(dir.absolutePath()).arg(imgdata)).toEncoded()));
+                        JuickDownloadItem it(path, dlUrl);
+                        downloader_->get(it);
+                    }
+
+                    link.appendChild(img);
 					link.appendChild(doc.createElement("br"));
 					body.insertAfter(link, body.lastChildElement("table"));
 				}
@@ -950,8 +956,11 @@ void JuickPlugin::elementFromString(QDomElement* body,QDomDocument* e, const QSt
 	body->appendChild(e->createElement("br"));
 }
 
-void JuickPlugin::addAvatar(QDomElement* body, QDomDocument* doc, const QString& msg, const QString& jidToSend, const QString& ujid)
+void JuickPlugin::addAvatar(QDomElement* body, QDomDocument* doc, const QString& msg, const QString& jidToSend,
+                            const QString& ujid, const QString &avatarUrl)
 {
+    bool isWebkit = (webkit->chatLogRenderType() == WebkitAccessingHost::RT_WebKit ||
+                        webkit->chatLogRenderType() == WebkitAccessingHost::RT_WebEngine);
 	QDomElement table = doc->createElement("table");
 	table.setAttribute("style", "word-wrap:break-word; table-layout: fixed; width:100%");
 	QDomElement tableRow = doc->createElement("tr");
@@ -962,7 +971,11 @@ void JuickPlugin::addAvatar(QDomElement* body, QDomDocument* doc, const QString&
 	QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick");
 	if (dir.exists()) {
 		QDomElement img = doc->createElement("img");
-		img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/@%2").arg(dir.absolutePath()).arg(ujid)).toEncoded()));
+        if (isWebkit) {
+            img.setAttribute("src", avatarUrl);
+        } else {
+            img.setAttribute("src", QString(QUrl::fromLocalFile(QString("%1/@%2").arg(dir.absolutePath()).arg(ujid)).toEncoded()));
+        }
 		td1.appendChild(img);
 	}
 //	td2.appendChild(blockquote);

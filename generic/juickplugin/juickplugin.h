@@ -102,7 +102,7 @@ private:
 	void addUnsubscribe(QDomElement* body, QDomDocument* e, const QString &msg, const QString &jid, const QString &resource = "");
 	void addDelete(QDomElement* body ,QDomDocument* e, const QString& msg, const QString& jid, const QString& resource = "");
 	void addFavorite(QDomElement* body, QDomDocument* e, const QString &msg, const QString &jid, const QString &resource = "");
-	void addAvatar(QDomElement *body, QDomDocument *doc, const QString &msg, const QString &jidToSend, const QString &ujid);
+	void addAvatar(QDomElement *body, QDomDocument *doc, const QString &msg, const QString &jidToSend, const QString &ujid, const QString &avatarUrl);
 
 private:
 	bool enabled = false;
@@ -111,13 +111,13 @@ private:
 	ApplicationInfoAccessingHost* applicationInfo = nullptr;
     WebkitAccessingHost *webkit = nullptr;
 	QColor userColor = false, tagColor = false, msgColor = false, quoteColor = false, lineColor = false;
-	bool userBold = false,tagBold = false,msgBold = false,quoteBold = false,lineBold = false;
-	bool userItalic = false,tagItalic = false,msgItalic = false,quoteItalic = false,lineItalic = false;
-	bool userUnderline = false,tagUnderline = false,msgUnderline = false,quoteUnderline = false,lineUnderline = false;
+	bool userBold = true,tagBold = false,msgBold = false,quoteBold = false,lineBold = false;
+	bool userItalic = false,tagItalic = true,msgItalic = false,quoteItalic = false,lineItalic = false;
+	bool userUnderline = false,tagUnderline = false,msgUnderline = true,quoteUnderline = false,lineUnderline = true;
 	QString idStyle,userStyle,tagStyle,quoteStyle,linkStyle;
 	QRegExp tagRx, regx, idRx, nickRx, linkRx;
 	QString userLinkPattern,messageLinkPattern,altTextUser,altTextMsg,commonLinkColor;
-	bool idAsResource = false,showPhoto = false,showAvatars = false,workInGroupChat = false;
+	bool idAsResource = false,showPhoto = false,showAvatars = true,workInGroupChat = false;
 	QStringList jidList_;
 	QPointer<QWidget> optionsWid;
 	QList<QWidget*> logs_;
