@@ -110,7 +110,7 @@ private:
 	ActiveTabAccessingHost* activeTab = nullptr;
 	ApplicationInfoAccessingHost* applicationInfo = nullptr;
     WebkitAccessingHost *webkit = nullptr;
-	QColor userColor = false, tagColor = false, msgColor = false, quoteColor = false, lineColor = false;
+	QColor userColor, tagColor, msgColor, quoteColor, lineColor;
 	bool userBold = true,tagBold = false,msgBold = false,quoteBold = false,lineBold = false;
 	bool userItalic = false,tagItalic = true,msgItalic = false,quoteItalic = false,lineItalic = false;
 	bool userUnderline = false,tagUnderline = false,msgUnderline = true,quoteUnderline = false,lineUnderline = true;
