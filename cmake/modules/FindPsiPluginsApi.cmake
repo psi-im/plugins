@@ -50,6 +50,7 @@ find_path(
     "variables.cmake"
     PATHS
     ${ABS_CURRENT_DIR}
+    ${ABS_CURRENT_DIR}/../psi
     ${ABS_PLUGINS_ROOT_DIR}/cmake/modules
     PATH_SUFFIXES
     src/plugins/cmake/modules
@@ -64,6 +65,7 @@ find_path(
     "applicationinfoaccessor.h"
     PATHS
     ${ABS_CURRENT_DIR}
+    ${ABS_CURRENT_DIR}/../psi
     ${ABS_PLUGINS_ROOT_DIR}/include
     PATH_SUFFIXES
     src/plugins/include
