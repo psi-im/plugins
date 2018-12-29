@@ -1,7 +1,9 @@
 cmake_minimum_required( VERSION 3.1.0 )
 if(NOT PROJECT_NAME)
     project(psi-plugins)
-    message(WARNING "You have to set IS_PSIPLUS variable before build plugins outside of the main project. Otherwise plugins will be installed to ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/psi/plugins directory")
+    if(NOT MAIN_PROGRAM_NAME)
+        message(WARNING "You have to set MAIN_PROGRAM_NAME variable before build plugins outside of the main project. Otherwise plugins will be installed to ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/psi/plugins directory")
+    endif()
 endif()
 set_directory_properties(PROPERTIES
     INCLUDE_DIRECTORIES ""
