@@ -1,9 +1,6 @@
 cmake_minimum_required( VERSION 3.1.0 )
 if(NOT PROJECT_NAME)
     project(psi-plugins)
-    if(NOT MAIN_PROGRAM_NAME)
-        message(WARNING "You have to set MAIN_PROGRAM_NAME variable before build plugins outside of the main project. Otherwise plugins will be installed to ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/psi/plugins directory")
-    endif()
 endif()
 set_directory_properties(PROPERTIES
     INCLUDE_DIRECTORIES ""
@@ -16,7 +13,17 @@ set( CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_LIST_DIR}/cmake/modules
 )
 
-set(QT5_BUILD ON)
+#Find Psi Plugins API
+find_package(PsiPluginsApi REQUIRED)
+include(${PsiPluginsApi_DIR}/variables.cmake)
+#Check MAIN_PROGRAM_NAME variable is set
+if(NOT PROJECT_NAME AND (NOT MAIN_PROGRAM_NAME))
+    message(WARNING "You have to set MAIN_PROGRAM_NAME variable before build plugins outside of the main project. Otherwise plugins will be installed to ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/psi/plugins directory")
+else()
+    message(STATUS "Main Program: ${MAIN_PROGRAM_NAME}")
+    message(STATUS "Plugins Install Path: ${PLUGINS_INSTALL_PATH}")
+    message(STATUS "Plugins Data Path: ${PLUGINS_DATA_PATH}")
+endif()
 
 option( BUILD_DEV_PLUGINS "Build plugins from dev directory" OFF )
 set(MAIN_PROGRAM_NAME "psi" CACHE STRING "Main program name: psi or psi-plus")

@@ -27,6 +27,7 @@
 #include "options.h"
 #include "defines.h"
 
+namespace screenshotplugin {
 //--------------------------------------------------------
 //---GrepShortcutKeyDialog from libpsi with some changes--
 //--------------------------------------------------------
@@ -132,7 +133,7 @@ private:
 	bool gotKey;
 	QLineEdit* le;
 };
-
+}
 
 
 //---------------------------------------------------
@@ -253,7 +254,7 @@ void OptionsWidget::restoreOptions()
 
 void OptionsWidget::requstNewShortcut()
 {
-	GrepShortcutKeyDialog *gs = new GrepShortcutKeyDialog(this);
+	screenshotplugin::GrepShortcutKeyDialog *gs = new screenshotplugin::GrepShortcutKeyDialog(this);
 	connect(gs, SIGNAL(newShortcutKey(QKeySequence)), this, SLOT(onNewShortcut(QKeySequence)));
 	gs->show();
 }

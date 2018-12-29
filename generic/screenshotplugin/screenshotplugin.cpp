@@ -64,8 +64,8 @@ public:
 	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
 	virtual QList < QVariantHash > getAccountMenuParam();
 	virtual QList < QVariantHash > getContactMenuParam();
-	virtual QAction* getContactAction(QObject* , int , const QString& ) { return 0; };
-	virtual QAction* getAccountAction(QObject* , int ) { return 0; };
+	virtual QAction* getContactAction(QObject* , int , const QString& ) { return nullptr; };
+	virtual QAction* getAccountAction(QObject* , int ) { return nullptr; };
 	virtual void setShortcuts();
 
 	virtual void applyOptions();
@@ -98,11 +98,11 @@ Q_EXPORT_PLUGIN(ScreenshotPlugin);
 
 ScreenshotPlugin::ScreenshotPlugin()
 	: enabled_(false)
-	, psiOptions(0)
-	, psiShortcuts(0)
-	, icoHost(0)
-	, appInfo(0)
-	, controller_(0)
+	, psiOptions(nullptr)
+	, psiShortcuts(nullptr)
+	, icoHost(nullptr)
+	, appInfo(nullptr)
+	, controller_(nullptr)
 {
 }
 
@@ -124,7 +124,7 @@ QString ScreenshotPlugin::version() const
 QWidget* ScreenshotPlugin::options()
 {
 	if (!enabled_) {
-		return 0;
+		return nullptr;
 	}
 	optionsWid = new OptionsWidget();
 
@@ -155,7 +155,7 @@ bool ScreenshotPlugin::disable()
 	disconnectShortcut();
 
 	delete controller_;
-	controller_ = 0;
+	controller_ = nullptr;
 	enabled_ = false;
 
 	return true;
@@ -184,13 +184,13 @@ void ScreenshotPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingH
 void ScreenshotPlugin::setShortcuts()
 {
 	const QString shortCut = psiOptions->getPluginOption(constShortCut).toString();
-	psiShortcuts->connectShortcut(QKeySequence(shortCut), controller_, SLOT(onShortCutActivated()));
+	psiShortcuts->connectShortcut(QKeySequence::fromString(shortCut, QKeySequence::NativeText), controller_, SLOT(onShortCutActivated()));
 }
 
 void ScreenshotPlugin::disconnectShortcut()
 {
 	const QString shortCut = psiOptions->getPluginOption(constShortCut).toString();
-	psiShortcuts->disconnectShortcut(QKeySequence(shortCut), controller_,  SLOT(onShortCutActivated()));
+	psiShortcuts->disconnectShortcut(QKeySequence::fromString(shortCut, QKeySequence::NativeText), controller_,  SLOT(onShortCutActivated()));
 }
 
 QList < QVariantHash > ScreenshotPlugin::getAccountMenuParam()
