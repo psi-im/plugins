@@ -35,7 +35,7 @@ class GrepShortcutKeyDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	GrepShortcutKeyDialog(QWidget* p = 0)
+	GrepShortcutKeyDialog(QWidget* p = nullptr)
 		: QDialog(p)
 		, gotKey(false)
 	{
@@ -242,6 +242,8 @@ void OptionsWidget::restoreOptions()
 		ui_.cb_format->setCurrentIndex(index);
 	ui_.le_filename->setText(fileName);
 	ui_.le_shortcut->setText(shortCut);
+	if(ui_.lw_servers->count() > 0)
+		ui_.lw_servers->clear();
 	foreach(QString settings, servers) {
 		Server *s = new Server(ui_.lw_servers);
 		s->setFromString(settings);

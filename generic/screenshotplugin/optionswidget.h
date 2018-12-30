@@ -26,7 +26,7 @@ class OptionsWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	OptionsWidget(QWidget* p = 0);
+	OptionsWidget(QWidget* p = nullptr);
 
 	void applyOptions();
 	void restoreOptions();
