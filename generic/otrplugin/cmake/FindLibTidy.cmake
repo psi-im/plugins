@@ -56,9 +56,9 @@ find_path(
 )
 
 if( EXISTS "${LIBTIDY_INCLUDE_DIR}/tidybuffio.h" OR (EXISTS "${LIBTIDY_INCLUDE_DIR}/tidy/tidybuffio.h") )
-    message("-- Tidy-html5 detected")
+    message(STATUS "Tidy-html5 detected")
 else()
-    message("-- Tidy-html legacy detected")
+    message(STATUS "Tidy-html legacy detected")
     set( LIBTIDY_DEFINITIONS "${LIBTIDY_DEFINITIONS} -DLEGACY_TIDY" )
 endif()
 set(LIBTIDY_NAMES
