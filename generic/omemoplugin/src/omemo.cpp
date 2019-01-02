@@ -178,6 +178,7 @@ namespace psiomemo {
           }
 
           body.appendChild(body.ownerDocument().createTextNode(text));
+          message.removeChild(message.firstChildElement("body"));
           message.appendChild(body);
 
           return true;
