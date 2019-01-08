@@ -24,7 +24,7 @@
 
 #include <QDialog>
 
-//for psi+ pluign only
+//for psi+ plugin only
 #include "applicationinfoaccessinghost.h"
 
 namespace Ui

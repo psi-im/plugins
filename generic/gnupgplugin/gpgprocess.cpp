@@ -122,7 +122,7 @@ QString GpgProcess::findBin() const
 
 #ifdef Q_OS_MAC
 	// On Mac OS bundled always uses system default PATH
-	// so it need explicity add extra paths which can
+	// so it need explicitly add extra paths which can
 	// contain gpg
 	// Mac GPG and brew use /usr/local/bin
 	// MacPorts uses /opt/local/bin

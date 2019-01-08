@@ -137,7 +137,7 @@ private:
 #ifdef HAVE_DBUS
 	bool playerGMPlayer_; //только для не MPRIS плеера GMPlayer
 	QHash<QString, bool> playerDictList;
-	QPointer<QTimer> checkTimer; //Таймер Gnome Mplayer
+	QPointer<QTimer> checkTimer; //Таймер GNOME Mplayer
 	QStringList validPlayers_; //список включенных плееров
 	QStringList services_; //очередь плееров которые слушает плагин
 	void connectToBus(const QString &service_);
@@ -168,7 +168,7 @@ private slots:
 	void checkMprisService(const QString &name, const QString &oldOwner, const QString &newOwner);
 	void onPlayerStatusChange(const PlayerStatus &ps);
 	void onPropertyChange(const QDBusMessage &msg);
-	void timeOut(); //здесь проверяем проигрыватель Gnome Mplayer
+	void timeOut(); //здесь проверяем проигрыватель GNOME Mplayer
 	void asyncCallFinished(QDBusPendingCallWatcher *watcher);
 #endif
 
@@ -450,7 +450,7 @@ void VideoStatusChanger::checkMprisService(const QString &name, const QString &o
 
 void VideoStatusChanger::startCheckTimer()
 {
-	//работа с таймером для плеера Gnome MPlayer
+	//работа с таймером для плеера GNOME MPlayer
 	if(!checkTimer) {
 		checkTimer = new QTimer();
 		checkTimer->setInterval(timeout);

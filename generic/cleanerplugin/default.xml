@@ -8,7 +8,7 @@
 	accounts : This is used for account data in Psi.
 	plugins : This is reserved for plugin options and so there's not a terribly good reason to be defining anything in the default option file; it may be interesting for the system defaults file, however.
 	
-	Naming: All tags should use lower case throughout, please use dashes ("-") to seperate words.
+	Naming: All tags should use lower case throughout, please use dashes ("-") to separate words.
 	
 	Comments: please add a "comment" attribute to every option you add, describing its use and, if appropriate, possible values.
 	
@@ -492,7 +492,7 @@ QLineEdit#le_status_text {
 				<mouse-middle-button type="QString">close</mouse-middle-button>
 				<mouse-doubleclick-action type="QString">detach</mouse-doubleclick-action>
 				<size type="QString"></size> <!-- will be invalid when converted to QSize so we can detect first load -->
-				<grouping type="QString" comment="A ':' seperated list of groups of kinds of tabs to keep in the same tabset. 'C' for chat and 'M' for mucs. 'A' means using all in one window patch.">CM</grouping>
+				<grouping type="QString" comment="A ':' separated list of groups of kinds of tabs to keep in the same tabset. 'C' for chat and 'M' for mucs. 'A' means using all in one window patch.">CM</grouping>
 				<group-state comment="Saved state data of the tabsets defined by options.ui.tabs.grouping"/>
 				<tab-singles type="QString" comment="Tab types that would have been untabbed are given their own tabset. 'C' for chat and 'M' for mucs"/>
 				<show-tab-buttons type="bool">true</show-tab-buttons>

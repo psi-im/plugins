@@ -10,7 +10,7 @@ To compile the plugin you need to have installed the following libraries:
 
 Perform the following steps:
 
-- Get Psi+ and apply the patches to the latest sources of Psi. Therefor you can
+- Get Psi+ and apply the patches to the latest sources of Psi. Therefore you can
   use one of the scripts provided by Psi+.
 
 - Make the Psi/Psi+ include files available to the plugin. To achieve this, copy

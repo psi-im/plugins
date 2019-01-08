@@ -83,9 +83,9 @@ void AddKeyDlg::checkPass()
 void AddKeyDlg::fillLenght(const QString &type)
 {
 	QStringList lenghts;
-	lenghts << "1024" << "2048" << "3072";
+	lengths << "1024" << "2048" << "3072";
 	if (!type.contains("DSA")) {
-		lenghts << "4096";
+		lengths << "4096";
 	}
 	ui->cmbLength->clear();
 	ui->cmbLength->addItems(lenghts);
