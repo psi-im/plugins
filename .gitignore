@@ -1,5 +1,6 @@
 *.pro.user*
 *.sw?
+build*
 
 # generated files
 .obj
