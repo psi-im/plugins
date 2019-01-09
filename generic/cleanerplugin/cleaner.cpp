@@ -385,7 +385,7 @@ void CleanerMainWindow::clearJuick()
 
 void CleanerMainWindow::clearBirhday()
 {
-	int ret = QMessageBox::warning(this, tr("Clear Birthdays Cach"),
+	int ret = QMessageBox::warning(this, tr("Clear Birthdays Cache"),
 				       tr("Are You Sure?"),
 				       QMessageBox::Ok  | QMessageBox::Cancel);
 	if(ret == QMessageBox::Cancel) return;

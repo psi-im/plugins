@@ -200,7 +200,7 @@ Revision: 1034
 Author: ivan.borzenkov
 Date: 0:45:09, 29 сентября 2009 г.
 Message:
-  * patch gmailnotifyplugin for compatible whis const options
+  * patch gmailnotifyplugin for compatible this const options
 
 
 Revision: 977

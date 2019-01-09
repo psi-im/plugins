@@ -85,7 +85,7 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>Unselect All Files</string>
+         <string>Deselect All Files</string>
         </property>
         <property name="text">
          <string/>

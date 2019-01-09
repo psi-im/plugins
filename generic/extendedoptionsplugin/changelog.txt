@@ -174,7 +174,6 @@ v0.1.4
 
 2010-02-02
 v0.1.3
-  * фикс имени опции (s/messsage/message)
   * options.ui.muc.roster-at-left
 
 

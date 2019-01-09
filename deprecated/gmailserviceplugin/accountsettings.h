@@ -62,7 +62,7 @@ public:
 	bool isAttributesEnabled;
 	QString status;
 	QString message;
-	QMap<QString, QStringList> sharedStatuses; // < staus, list of status messages >
+	QMap<QString, QStringList> sharedStatuses; // < status, list of status messages >
 	int listMax;
 	int listContentsMax;
 	int statusMax;

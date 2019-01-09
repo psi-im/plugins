@@ -454,7 +454,7 @@ void OtrInternal::startSession(const QString& account, const QString& contact)
         create_privkey(account.toUtf8().constData(), OTR_PROTOCOL_STRING);
     }
 
-    //TODO: make allowed otr versions configureable
+    //TODO: make allowed otr versions configurable
     char* msg = otrl_proto_default_query_msg(m_callback->humanAccountPublic(account).toUtf8().constData(),
                                              OTRL_POLICY_DEFAULT);
 
