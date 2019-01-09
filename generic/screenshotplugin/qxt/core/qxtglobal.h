@@ -223,7 +223,7 @@ public:
 private:
     QxtPrivateInterface(const QxtPrivateInterface&) { }
     QxtPrivateInterface& operator=(const QxtPrivateInterface&) { }
-    QxtPrivate<PUB>* pvt;
+    QxtPrivate<PUB>* pvt = nullptr;
 };
 
 #endif // QXT_GLOBAL

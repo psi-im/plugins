@@ -31,6 +31,8 @@ Q_EXPORT_PLUGIN(ContentDownloader);
 
 ContentDownloader::ContentDownloader()
 	: enabled(false)
+        , psiOptions(nullptr)
+        , appInfoHost(nullptr)
 	, form_(NULL)
 {
 }

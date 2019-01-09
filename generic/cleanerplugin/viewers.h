@@ -38,7 +38,7 @@ public:
         void init(IconFactoryAccessingHost *iconHost);
 
 private:
-        IconFactoryAccessingHost *iconHost_;
+        IconFactoryAccessingHost *iconHost_ = nullptr;
 
 protected:
         void keyPressEvent(QKeyEvent *e);

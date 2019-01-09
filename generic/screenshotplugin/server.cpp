@@ -30,6 +30,7 @@ Server::Server(QListWidget *parent)
 	, servPostdata_("")
 	, servFileinput_("")
 	, servRegexp_("")
+        , useProxy_(false)
 {
 }
 

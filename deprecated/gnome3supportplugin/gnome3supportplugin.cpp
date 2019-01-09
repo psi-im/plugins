@@ -84,9 +84,10 @@ Q_EXPORT_PLUGIN(Gnome3StatusWatcher);
 
 Gnome3StatusWatcher::Gnome3StatusWatcher() {
 	enabled = false;
-	psiOptions = 0;
-	accInfo = 0;
-	accControl = 0;
+	psiOptions = nullptr;
+	accInfo = nullptr;
+	accControl = nullptr;
+        isDBUSConnected = false;
 }
 
 QString Gnome3StatusWatcher::name() const {

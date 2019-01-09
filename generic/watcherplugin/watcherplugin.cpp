@@ -134,7 +134,7 @@ private:
 	bool disablePopupDnd;
 	int popupId;
 	QHash<QString, QAction*> actions_;
-	bool showInContext_;
+	bool showInContext_ = true;
 
 	bool checkWatchedItem(const QString& from, const QString& body, WatchedItem *wi);
 

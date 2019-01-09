@@ -36,6 +36,7 @@ JDItem::JDItem(Type t, const QString& name, const QString& size, const QString& 
 
 JDItem::JDItem(Type t, JDItem* parent)
 	: parent_(parent)
+        , number_(0)
 	, type_(t)
 {
 }

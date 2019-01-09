@@ -29,7 +29,8 @@ static const QString constJids_ = "jids";
 
 JabberDiskPlugin::JabberDiskPlugin()
 	: enabled(false)
-	, psiOptions(0)
+	, psiOptions(nullptr)
+        , iconHost(nullptr)
 {
 	jids_ = QStringList() << "disk.jabbim.cz";
 }

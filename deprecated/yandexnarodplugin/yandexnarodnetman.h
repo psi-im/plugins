@@ -32,11 +32,6 @@ public:
 
 	struct FileItem
 	{
-		FileItem()
-		{
-			deleted = false;
-		}
-
 		int prolong() const
 		{
 			int d = 1;
@@ -55,8 +50,8 @@ public:
 		QString size;
 		QString date;
 		QString passtoken;
-		bool passset;
-		bool deleted;
+		bool passset = false;
+		bool deleted = false;
 	};
 
 	bool startAuth(const QString& login, const QString& pass);
