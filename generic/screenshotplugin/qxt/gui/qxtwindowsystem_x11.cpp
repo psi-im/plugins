@@ -181,9 +181,12 @@ uint QxtWindowSystem::idleTime()
         const int screen = QX11Info::appScreen();
         unsigned long rootWindow = (unsigned long)QX11Info::appRootWindow(screen);
         _xScreenSaverQueryInfo(QX11Info::display(), (Drawable) rootWindow, info);
-        idle = info->idle;
-        if (info)
+        if (info) {
+            idle = info->idle;
+        }
+        if (info) {
             XFree(info);
+        }
     }
     return idle;
 }
