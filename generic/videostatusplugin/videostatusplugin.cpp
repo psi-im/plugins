@@ -182,6 +182,7 @@ Q_EXPORT_PLUGIN(VideoStatusChanger);
 #endif
 
 VideoStatusChanger::VideoStatusChanger()
+	: status("dnd")
 {
 	enabled = false;
 #ifdef HAVE_DBUS
@@ -190,8 +191,6 @@ VideoStatusChanger::VideoStatusChanger()
 		playerDictList.insert(item.first, false);
 	}
 #endif
-	status = "dnd";
-	statusMessage = "";
 	psiOptions = 0;
 	accInfo = 0;
 	accControl = 0;

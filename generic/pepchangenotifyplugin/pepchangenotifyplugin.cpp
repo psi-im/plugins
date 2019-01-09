@@ -113,10 +113,7 @@ private:
 
 	struct ContactState
 	{
-		ContactState(const QString& j = QString())
-		{
-			jid = j;
-		}
+		ContactState(const QString& j = QString()) : jid(j) {}
 		enum Event {
 			EventTune,
 			EventMood,

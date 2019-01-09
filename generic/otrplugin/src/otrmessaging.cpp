@@ -53,9 +53,10 @@ Fingerprint::Fingerprint(unsigned char* fingerprint,
     : fingerprint(fingerprint),
       account(account),
       username(username),
+      fingerprintHuman(OtrInternal::humanFingerprint(fingerprint)),
       trust(trust)
 {
-    fingerprintHuman = OtrInternal::humanFingerprint(fingerprint);
+
 }
 
 //-----------------------------------------------------------------------------

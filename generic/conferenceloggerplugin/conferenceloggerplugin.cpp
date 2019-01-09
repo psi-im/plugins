@@ -60,7 +60,7 @@ class ConferenceLogger: public QObject, public PsiPlugin, public StanzaFilter, p
 				 ActiveTabAccessor GCToolbarIconAccessor IconFactoryAccessor PluginInfoProvider)
 
 	public:
-	ConferenceLogger();
+	ConferenceLogger() = default;
 	virtual QString name() const;
 	virtual QString shortName() const;
 	virtual QString version() const;
@@ -84,20 +84,23 @@ class ConferenceLogger: public QObject, public PsiPlugin, public StanzaFilter, p
 
 
 private:
-	bool enabled;
-	AccountInfoAccessingHost *AccInfoHost;
-	ApplicationInfoAccessingHost *AppInfoHost;
-	OptionAccessingHost *psiOptions;
-	ActiveTabAccessingHost* activeTab;
-	IconFactoryAccessingHost *IcoHost;
-	QString HistoryDir;
 	void Logger(QString room, QString from, QString MyJid, QString Text, QString Stamp);
-	QComboBox *FilesBox;
-	QPushButton *viewButton;
-	int Height;
-	int Width;
-	QString lastItem;
 	void showLog(QString filename);
+
+	AccountInfoAccessingHost *AccInfoHost = nullptr;
+	ApplicationInfoAccessingHost *AppInfoHost = nullptr;
+	OptionAccessingHost *psiOptions = nullptr;
+	ActiveTabAccessingHost *activeTab = nullptr;
+	IconFactoryAccessingHost *IcoHost = nullptr;
+	QComboBox *FilesBox = nullptr;
+	QPushButton *viewButton = nullptr;
+
+	bool enabled = false;
+	int Height = 500;
+	int Width = 600;
+
+	QString HistoryDir;
+	QString lastItem;
 
 private slots:
 	void view();
@@ -108,21 +111,6 @@ private slots:
 #ifndef HAVE_QT5
 Q_EXPORT_PLUGIN(ConferenceLogger);
 #endif
-
-ConferenceLogger::ConferenceLogger() {
-	enabled = false;
-	AppInfoHost = 0;
-	AccInfoHost = 0;
-	psiOptions = 0;
-	IcoHost = 0;
-	activeTab = 0;
-	HistoryDir = "";
-	FilesBox = 0;
-	viewButton = 0;
-	Height = 500;
-	Width = 600;
-	lastItem = "";
-}
 
 QString ConferenceLogger::name() const {
 	return "Conference Logger Plugin";

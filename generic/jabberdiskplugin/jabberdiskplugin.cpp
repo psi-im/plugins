@@ -31,8 +31,8 @@ JabberDiskPlugin::JabberDiskPlugin()
 	: enabled(false)
 	, psiOptions(nullptr)
         , iconHost(nullptr)
+        , jids_({"disk.jabbim.cz"})
 {
-	jids_ = QStringList() << "disk.jabbim.cz";
 }
 
 QString JabberDiskPlugin::name() const
