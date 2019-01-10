@@ -28,6 +28,7 @@ cmake ..
 make -j4
 make install DESTDIR="../installdir"
 # If necessary replace "../installdir" from command above to any path you need
+# or copy them manually from "../installdir".
 
 ```
 
