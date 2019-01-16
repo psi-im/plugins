@@ -18,10 +18,8 @@ find_package(PsiPluginsApi QUIET)
 if(PsiPluginsApi_DIR)
     include(${PsiPluginsApi_DIR}/variables.cmake)
 endif()
-#Check MAIN_PROGRAM_NAME variable is set
-if(NOT PROJECT_NAME AND (NOT MAIN_PROGRAM_NAME))
-    message(WARNING "You have to set MAIN_PROGRAM_NAME variable before build plugins outside of the main project. Otherwise plugins will be installed to ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/psi/plugins directory")
-else()
+
+if(PROJECT_NAME AND MAIN_PROGRAM_NAME)
     message(STATUS "Main Program: ${MAIN_PROGRAM_NAME}")
     message(STATUS "Plugins Install Path: ${PLUGINS_INSTALL_PATH}")
     message(STATUS "Plugins Data Path: ${PLUGINS_DATA_PATH}")
