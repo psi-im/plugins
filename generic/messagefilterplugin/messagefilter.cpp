@@ -36,10 +36,6 @@
 #include <QCursor>
 #include <QMenu>
 
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(MessageFilter);
-#endif
-
 MessageFilter::MessageFilter()
 	: _enabled(false)
 	, _optionsForm(0)

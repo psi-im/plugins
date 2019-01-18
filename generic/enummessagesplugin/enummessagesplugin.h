@@ -44,9 +44,7 @@ class EnumMessagesPlugin : public QObject, public PsiPlugin, public OptionAccess
 			public ChatTabAccessor, public PsiAccountController, public ToolbarIconAccessor
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.EnumMessagesPlugin")
-#endif
 	Q_INTERFACES(PsiPlugin OptionAccessor ActiveTabAccessor StanzaFilter
 			ApplicationInfoAccessor PluginInfoProvider ChatTabAccessor
 			PsiAccountController ToolbarIconAccessor)

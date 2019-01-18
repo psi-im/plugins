@@ -25,9 +25,6 @@
 #include "contentdownloader.h"
 #include "form.h"
 
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(ContentDownloader);
-#endif
 
 ContentDownloader::ContentDownloader()
 	: enabled(false)

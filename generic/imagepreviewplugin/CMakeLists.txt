@@ -44,7 +44,6 @@ set( _RSCS
     ${PLUGIN}.qrc
 )
 
-add_definitions(-DHAVE_QT5)
 find_package(Qt5 COMPONENTS Widgets Xml Network REQUIRED)
 set(QT_DEPLIBS
     Qt5::Widgets

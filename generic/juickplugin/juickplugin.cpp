@@ -79,10 +79,6 @@ static void nl2br(QDomElement *body,QDomDocument* e, const QString& msg)
 //-----------------------------
 //------JuickPlugin------------
 //-----------------------------
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(JuickPlugin)
-#endif
-
 JuickPlugin::JuickPlugin()
 	: userColor(0, 85, 255), tagColor(131, 145, 145), msgColor(87, 165, 87), quoteColor(187, 187, 187), lineColor(0, 0, 255)
 	, tagRx	("^\\s*(?!\\*\\S+\\*)(\\*\\S+)")

@@ -56,9 +56,7 @@ public:
 class ExtendedOptions : public QObject, public PsiPlugin, public OptionAccessor, public ApplicationInfoAccessor, public PluginInfoProvider
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.ExtendedOptions")
-#endif
 	Q_INTERFACES(PsiPlugin OptionAccessor ApplicationInfoAccessor PluginInfoProvider)
 
 public:
@@ -212,10 +210,6 @@ private:
 	QCheckBox *popupsSuppressDnd;
 	QCheckBox *popupsSuppressAway;
 };
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(ExtendedOptions)
-#endif
 
 ExtendedOptions::ExtendedOptions()
 	: psiOptions(0)

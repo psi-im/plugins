@@ -46,9 +46,7 @@ public AccountInfoAccessor, public ApplicationInfoAccessor,
 public PluginInfoProvider, public ContactInfoAccessor
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.Redirector")
-#endif
 	Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter AccountInfoAccessor ApplicationInfoAccessor
 				 PluginInfoProvider ContactInfoAccessor)
 

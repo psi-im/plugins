@@ -48,9 +48,7 @@ class IcqDie: public QObject, public PsiPlugin, public OptionAccessor, public St
 		public AccountInfoAccessor, public PluginInfoProvider
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.IcqDie")
-#endif
 		Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter ActiveTabAccessor
 			     AccountInfoAccessor PluginInfoProvider)
 
@@ -98,9 +96,6 @@ private:
 
 };
 
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(IcqDie);
-#endif
 
 IcqDie::IcqDie()
 {

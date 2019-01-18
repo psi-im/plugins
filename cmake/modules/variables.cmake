@@ -46,4 +46,4 @@ else()
     add_definitions( -DQ_OS_WIN )
 endif()
 
-add_definitions( -DQT_PLUGIN -DHAVE_QT5 )
+add_definitions( -DQT_PLUGIN )

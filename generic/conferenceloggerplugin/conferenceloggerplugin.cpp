@@ -53,9 +53,7 @@ class ConferenceLogger: public QObject, public PsiPlugin, public StanzaFilter, p
 						public ActiveTabAccessor, public GCToolbarIconAccessor, public IconFactoryAccessor, public PluginInfoProvider
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.ConferenceLogger")
-#endif
 	Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor ApplicationInfoAccessor OptionAccessor
 				 ActiveTabAccessor GCToolbarIconAccessor IconFactoryAccessor PluginInfoProvider)
 
@@ -107,10 +105,6 @@ private slots:
 	void viewFromOpt();
 	void onClose(int, int);
 };
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(ConferenceLogger);
-#endif
 
 QString ConferenceLogger::name() const {
 	return "Conference Logger Plugin";

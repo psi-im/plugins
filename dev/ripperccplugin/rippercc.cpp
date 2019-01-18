@@ -47,9 +47,6 @@
 
 #define NONASCII_MESSAGE "<b>WARNING!</b> NON ASCII | Jabber с русскими буквами!"
 
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(RipperCC, RipperCC);
-#endif
 
 RipperCC::RipperCC()
 	: _enabled(false)

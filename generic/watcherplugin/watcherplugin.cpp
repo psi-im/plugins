@@ -73,9 +73,7 @@ class Watcher : public QObject, public PsiPlugin, public PopupAccessor, public M
 				public ToolbarIconAccessor
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.Watcher")
-#endif
 	Q_INTERFACES(PsiPlugin PopupAccessor OptionAccessor StanzaFilter IconFactoryAccessor AccountInfoAccessor
 				 PluginInfoProvider MenuAccessor ApplicationInfoAccessor ActiveTabAccessor ContactInfoAccessor
 				 SoundAccessor ToolbarIconAccessor)
@@ -157,10 +155,6 @@ private slots:
 	void actionActivated();
 	void removeFromActions(QObject *object);
 };
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(Watcher)
-#endif
 
 Watcher::Watcher()
 	: psiOptions(0)

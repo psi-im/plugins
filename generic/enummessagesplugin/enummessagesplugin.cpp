@@ -467,8 +467,3 @@ QString EnumMessagesPlugin::pluginInfo()
 	"and notification of missed messages. \n"
 	"Supports per contact on / off message enumeration via the buttons on the chats toolbar.");
 }
-
-
-#ifndef HAVE_QT5
-	Q_EXPORT_PLUGIN(EnumMessagesPlugin)
-#endif

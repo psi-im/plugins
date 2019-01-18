@@ -32,10 +32,6 @@
 #define constVersion            "0.1.2"
 #define constShortPluginName    "gomokugameplugin"
 
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(GomokuGamePlugin);
-#endif
-
 GomokuGamePlugin::GomokuGamePlugin(QObject *parent) :
 		QObject(parent),
 		enabled_(false),

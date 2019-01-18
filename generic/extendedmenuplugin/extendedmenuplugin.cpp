@@ -66,9 +66,7 @@ class ExtendedMenuPlugin: public QObject, public PsiPlugin, public OptionAccesso
 						  public PsiAccountController
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.ExtendedMenuPlugin")
-#endif
 	Q_INTERFACES(PsiPlugin	AccountInfoAccessor OptionAccessor IconFactoryAccessor PopupAccessor  MenuAccessor
 				 ContactInfoAccessor PluginInfoProvider StanzaFilter StanzaSender ToolbarIconAccessor
 				 PsiAccountController)
@@ -149,9 +147,6 @@ private:
 	void doCommand(int account, const QString &jid, const QString& command, ActionType type_);
 };
 
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(ExtendedMenuPlugin)
-#endif
 
 ExtendedMenuPlugin::ExtendedMenuPlugin()
 	: enabled(false)

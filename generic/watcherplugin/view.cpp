@@ -37,11 +37,7 @@ void Viewer::init(IconFactoryAccessingHost *iconHost)
 	setItemDelegateForColumn(2, new LineEditDelegate(this));
 
 	QHeaderView *header = horizontalHeader();
-#ifdef HAVE_QT5
 	header->setSectionResizeMode(QHeaderView::ResizeToContents);
-#else
-	header->setResizeMode(QHeaderView::ResizeToContents);
-#endif
 	verticalHeader()->setDefaultAlignment( Qt::AlignHCenter );
 
 	resizeColumnsToContents();

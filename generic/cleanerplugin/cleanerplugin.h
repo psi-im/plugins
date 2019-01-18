@@ -37,9 +37,7 @@ class CleanerPlugin : public QObject, public PsiPlugin, public ApplicationInfoAc
 					  public IconFactoryAccessor, public OptionAccessor, public PluginInfoProvider
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.CleanerPlugin")
-#endif
 	Q_INTERFACES(PsiPlugin ApplicationInfoAccessor IconFactoryAccessor OptionAccessor PluginInfoProvider)
 
 public:

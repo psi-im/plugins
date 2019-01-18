@@ -301,11 +301,7 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
         }
         else if (!plainBody.isNull())
         {
-#ifdef HAVE_QT5
             cyphertext = plainBody.firstChild().toText().nodeValue().toHtmlEscaped();
-#else
-            cyphertext = Qt::escape(plainBody.firstChild().toText().nodeValue());
-#endif
         }
         else
         {
@@ -422,11 +418,7 @@ bool PsiOtrPlugin::encryptMessageElement(int accountIndex, QDomElement &message)
     QString encrypted = m_otrConnection->encryptMessage(
         account,
         getCorrectJid(accountIndex, message.attribute("to")),
-#ifdef HAVE_QT5
         body.nodeValue().toHtmlEscaped());
-#else
-        Qt::escape(body.nodeValue()));
-#endif
 
     //if there has been an error, drop the message
     if (encrypted.isEmpty())
@@ -923,8 +915,4 @@ QString PsiOtrPlugin::getCorrectJid(int accountIndex, const QString& fullJid)
 
 } // namespace psiotr
 
-//-----------------------------------------------------------------------------
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(psiOtrPlugin, psiotr::PsiOtrPlugin)
-#endif
 //-----------------------------------------------------------------------------

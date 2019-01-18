@@ -53,9 +53,7 @@ class RipperCC : public QObject
 			   , public ContactInfoAccessor
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.RipperCC")
-#endif
 	Q_INTERFACES(PsiPlugin
 				 PluginInfoProvider
 				 StanzaFilter

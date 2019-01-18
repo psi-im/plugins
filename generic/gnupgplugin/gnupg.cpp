@@ -34,10 +34,6 @@
 #include "accountinfoaccessinghost.h"
 #include "stanzasendinghost.h"
 
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(GnuPG);
-#endif
-
 GnuPG::GnuPG()
 	: _enabled(false)
 	, _optionsForm(0)

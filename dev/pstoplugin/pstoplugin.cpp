@@ -464,7 +464,3 @@ QPixmap PstoPlugin::icon() const
 {
 	return QPixmap(":/icons/psto.png");
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(PstoPlugin);
-#endif

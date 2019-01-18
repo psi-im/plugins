@@ -37,12 +37,8 @@ void BoardModel::init(GameModel *gm)
 {
 	gameModel_ = gm;
 	//
-#ifdef HAVE_QT5
 	QAbstractTableModel::beginResetModel();
 	QAbstractTableModel::endResetModel();
-#else
-	QAbstractTableModel::reset();
-#endif
 	connect(gameModel_, SIGNAL(myBoardUpdated(int,int,int,int)), this, SLOT(updateMyBoard(int,int,int,int)));
 	connect(gameModel_, SIGNAL(oppBoardUpdated(int,int,int,int)), this, SLOT(updateOppBoard(int,int,int,int)));
 }

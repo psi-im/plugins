@@ -81,9 +81,7 @@ class ImagePreviewPlugin: public QObject,
 		public ChatTabAccessor,
 		public ApplicationInfoAccessor {
 Q_OBJECT
-#ifdef HAVE_QT5
 Q_PLUGIN_METADATA(IID "com.psi-plus.ImagePreviewPlugin")
-#endif
 Q_INTERFACES(PsiPlugin PluginInfoProvider OptionAccessor ChatTabAccessor ApplicationInfoAccessor)
 public:
 	ImagePreviewPlugin();
@@ -135,10 +133,6 @@ private:
 	ApplicationInfoAccessingHost* appInfoHost;
 	void queueUrl(const QString& url, Origin* origin);
 };
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(ImagePreviewPlugin)
-#endif
 
 ImagePreviewPlugin::ImagePreviewPlugin() :
 		psiOptions(0), enabled(false), manager(new QNetworkAccessManager(this)), previewSize(0), sizeLimit(0), allowUpscale(

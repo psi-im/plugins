@@ -20,9 +20,6 @@
 
 #include <QFileDialog>
 #include <QDomElement>
-#ifndef HAVE_QT5
-#include <QTextDocument>
-#endif
 #include "psiplugin.h"
 #include "stanzafilter.h"
 #include "accountinfoaccessor.h"
@@ -63,9 +60,7 @@ class PepPlugin: public QObject, public PsiPlugin, public StanzaFilter, public A
 			public ApplicationInfoAccessor, public ContactInfoAccessor, public IconFactoryAccessor
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.PepPlugin")
-#endif
 	Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor OptionAccessor PopupAccessor SoundAccessor
 		     PluginInfoProvider ApplicationInfoAccessor ContactInfoAccessor IconFactoryAccessor)
 
@@ -74,17 +69,17 @@ public:
 	virtual QString name() const;
 	virtual QString shortName() const;
 	virtual QString version() const;
-        virtual QWidget* options();
+	virtual QWidget* options();
 	virtual bool enable();
-        virtual bool disable();
-        virtual void applyOptions();
-        virtual void restoreOptions();
-        virtual bool incomingStanza(int account, const QDomElement& xml);
+	virtual bool disable();
+	virtual void applyOptions();
+	virtual void restoreOptions();
+	virtual bool incomingStanza(int account, const QDomElement& xml);
 	virtual bool outgoingStanza(int account, QDomElement& xml);
-        virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
-        virtual void setOptionAccessingHost(OptionAccessingHost* host);
+	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+	virtual void setOptionAccessingHost(OptionAccessingHost* host);
 	virtual void optionChanged(const QString& /*option*/) {};
-        virtual void setPopupAccessingHost(PopupAccessingHost* host);
+	virtual void setPopupAccessingHost(PopupAccessingHost* host);
 	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
 	virtual void setContactInfoAccessingHost(ContactInfoAccessingHost* host);
 	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
@@ -94,10 +89,10 @@ public:
 
 
 private:
-        bool enabled;
-        OptionAccessingHost* psiOptions;
+	bool enabled;
+	OptionAccessingHost* psiOptions;
 	AccountInfoAccessingHost *accInfoHost;
-        PopupAccessingHost* popup;
+	PopupAccessingHost* popup;
 	ApplicationInfoAccessingHost* appInfo;
 	ContactInfoAccessingHost* contactInfo;
 	IconFactoryAccessingHost* iconHost;
@@ -144,10 +139,6 @@ private slots:
         void getSound();
 	void doNotification(const QString& title, const QString& text, const QString& icon);
     };
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(PepPlugin);
-#endif
 
 PepPlugin::PepPlugin()
 	: enabled(false)
@@ -484,11 +475,7 @@ void PepPlugin::showPopup(const QString &title, const QString &text, const QStri
 
 	int interval = popup->popupDuration(POPUP_OPTION_NAME);
 	if(interval) {
-#ifdef HAVE_QT5
 		popup->initPopup(text.toHtmlEscaped(), title.toHtmlEscaped(), icon, popupId);
-#else
-		popup->initPopup(Qt::escape(text), Qt::escape(title), icon, popupId);
-#endif
 	}
 	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd", suppressDnd);
 }

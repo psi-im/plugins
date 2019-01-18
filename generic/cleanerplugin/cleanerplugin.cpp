@@ -26,10 +26,6 @@
 #define constHeight "height"
 #define constWidth "width"
 
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(CleanerPlugin);
-#endif
-
 CleanerPlugin::CleanerPlugin()
 	: enabled(false)
 	, appInfo(0)

@@ -106,9 +106,7 @@ class VideoStatusChanger : public QObject, public PsiPlugin, public PluginInfoPr
 			, public PsiAccountController, public AccountInfoAccessor
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.VideoStatusChanger")
-#endif
 	Q_INTERFACES(PsiPlugin PluginInfoProvider OptionAccessor PsiAccountController AccountInfoAccessor)
 public:
 	VideoStatusChanger();
@@ -176,10 +174,6 @@ private slots:
 	void fullSTTimeout();
 
 };
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(VideoStatusChanger);
-#endif
 
 VideoStatusChanger::VideoStatusChanger()
 	: status("dnd")

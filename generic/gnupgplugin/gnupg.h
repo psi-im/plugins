@@ -49,9 +49,7 @@ class GnuPG : public QObject
 			, public AccountInfoAccessor
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.GnuPG")
-#endif
 	Q_INTERFACES(PsiPlugin
 				 PluginInfoProvider
 				 StanzaFilter

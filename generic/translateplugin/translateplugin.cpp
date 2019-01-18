@@ -59,9 +59,7 @@ class TranslatePlugin : public QObject
 					  , public ChatTabAccessor
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.TranslatePlugin")
-#endif
 	Q_INTERFACES(PsiPlugin OptionAccessor ShortcutAccessor ActiveTabAccessor PluginInfoProvider ChatTabAccessor)
 
 public:
@@ -123,10 +121,6 @@ private:
 	QPointer<QWidget> options_;
 	QList<QAction *> actions_;
 };
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(TranslatePlugin);
-#endif
 
 TranslatePlugin::TranslatePlugin()
 	: enabled_(false)

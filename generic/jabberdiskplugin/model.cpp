@@ -27,11 +27,7 @@
 JDModel::JDModel(const QString &diskName, QObject *parent)
 	: QAbstractItemModel(parent)
 	, diskName_(diskName)
-#ifdef HAVE_QT5
 	, rootIndex_(createIndex(0, 0, static_cast<quintptr>(0)))
-#else
-	, rootIndex_(createIndex(0, 0, 0))
-#endif
 {
 }
 

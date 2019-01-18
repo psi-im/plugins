@@ -43,9 +43,7 @@ class HistoryKeeperPlugin: public QObject, public PsiPlugin, public ApplicationI
 			public MenuAccessor, public PluginInfoProvider, public IconFactoryAccessor
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.HistoryKeeperPlugin")
-#endif
 	Q_INTERFACES(PsiPlugin OptionAccessor ApplicationInfoAccessor MenuAccessor PluginInfoProvider IconFactoryAccessor)
 
 public:
@@ -88,10 +86,6 @@ private:
 	QStringList contacts;
 
 };
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(HistoryKeeperPlugin);
-#endif
 
 HistoryKeeperPlugin::HistoryKeeperPlugin()
 	: enabled(false)

@@ -48,9 +48,7 @@ class JuickPlugin : public QObject,
         public WebkitAccessor
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.JuickPlugin")
-#endif
 	Q_INTERFACES(PsiPlugin OptionAccessor ActiveTabAccessor StanzaFilter
 			ApplicationInfoAccessor PluginInfoProvider ChatTabAccessor WebkitAccessor)
 

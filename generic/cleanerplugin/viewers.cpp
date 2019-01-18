@@ -36,11 +36,7 @@ void ClearingViewer::init(IconFactoryAccessingHost *iconHost)
 {
         iconHost_ = iconHost;
         resizeColumnsToContents();
-#ifdef HAVE_QT5
         horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-#else
-        horizontalHeader()->setResizeMode(0, QHeaderView::ResizeToContents);
-#endif
         horizontalHeader()->setStretchLastSection(true);
         horizontalHeader()->setSortIndicator(-1, Qt::AscendingOrder);
         verticalHeader()->setDefaultAlignment( Qt::AlignHCenter );

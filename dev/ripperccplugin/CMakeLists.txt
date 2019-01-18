@@ -49,7 +49,6 @@ set(RESOURCES
     )
 
 find_package(Qt5 COMPONENTS Core Gui Widgets Xml Network REQUIRED)
-add_definitions(-DHAVE_QT5)
 set(QT_DEPLIBS Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Xml Qt5::Network)
 
 unset(MOC_SOURCES)

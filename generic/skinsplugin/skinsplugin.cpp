@@ -39,9 +39,7 @@
 class SkinsPlugin: public QObject, public PsiPlugin, public ApplicationInfoAccessor, public OptionAccessor, public PluginInfoProvider
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.SkinsPlugin")
-#endif
 	Q_INTERFACES(PsiPlugin OptionAccessor ApplicationInfoAccessor PluginInfoProvider)
 
 public:
@@ -87,10 +85,6 @@ private slots:
         void overwrite();
 
     };
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(SkinsPlugin);
-#endif
 
 SkinsPlugin::SkinsPlugin() {
         enabled = false;

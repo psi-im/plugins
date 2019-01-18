@@ -61,9 +61,7 @@ class AutoReply: public QObject, public PsiPlugin, public OptionAccessor, public
 				 public ActiveTabAccessor, public AccountInfoAccessor, public PluginInfoProvider
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.AutoReplyPlugin")
-#endif
 	Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter ActiveTabAccessor AccountInfoAccessor PluginInfoProvider)
 
 	public:
@@ -132,10 +130,6 @@ private:
 private slots:
 	void setEnableDisableText(int Arg);
 };
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(AutoReply);
-#endif
 
 AutoReply::AutoReply() {
 	ActiveTabIsEnable = true;

@@ -31,28 +31,16 @@ BoardView::BoardView(QWidget *parent)
         :QTableView(parent)
 {
 	QHeaderView *hHeader = horizontalHeader();
-#ifdef HAVE_QT5
 	hHeader->setSectionResizeMode(QHeaderView::Fixed);
 	hHeader->setSectionsMovable(false);
 	hHeader->setSectionsClickable(false);
-#else
-	hHeader->setMovable(false);
-	hHeader->setResizeMode(QHeaderView::Fixed);
-	hHeader->setClickable(false);
-#endif
 	hHeader->setDefaultAlignment( Qt::AlignHCenter );
 	hHeader->setDefaultSectionSize(50);
 
 	QHeaderView *vHeader = verticalHeader();
-#ifdef HAVE_QT5
 	vHeader->setSectionResizeMode(QHeaderView::Fixed);
 	vHeader->setSectionsClickable(false);
 	vHeader->setSectionsMovable(false);
-#else
-	vHeader->setResizeMode(QHeaderView::Fixed);
-	vHeader->setClickable(false);
-	vHeader->setMovable(false);
-#endif
 	vHeader->setDefaultAlignment( Qt::AlignVCenter );
 	vHeader->setDefaultSectionSize(50);
 

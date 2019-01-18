@@ -83,10 +83,8 @@ public AccountInfoAccessor, public ApplicationInfoAccessor, public PopupAccessor
 public PluginInfoProvider, public EventFilter, public ContactInfoAccessor
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.StopSpam")
-#endif
-        Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter AccountInfoAccessor ApplicationInfoAccessor
+	Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter AccountInfoAccessor ApplicationInfoAccessor
 		     PopupAccessor IconFactoryAccessor PluginInfoProvider EventFilter ContactInfoAccessor)
 
 public:
@@ -95,21 +93,21 @@ public:
 	virtual QString shortName() const;
 	virtual QString version() const;
 	virtual PsiPlugin::Priority priority();
-        virtual QWidget* options();
+	virtual QWidget* options();
 	virtual bool enable();
-        virtual bool disable();
-        virtual void applyOptions();
-        virtual void restoreOptions();
+	virtual bool disable();
+	virtual void applyOptions();
+	virtual void restoreOptions();
 	virtual QPixmap icon() const;
-        virtual void setOptionAccessingHost(OptionAccessingHost* host);
+	virtual void setOptionAccessingHost(OptionAccessingHost* host);
 	virtual void optionChanged(const QString& ) {}
-        virtual void setStanzaSendingHost(StanzaSendingHost *host);
-        virtual bool incomingStanza(int account, const QDomElement& xml);
+	virtual void setStanzaSendingHost(StanzaSendingHost *host);
+	virtual bool incomingStanza(int account, const QDomElement& xml);
 	virtual bool outgoingStanza(int account, QDomElement& xml);
-        virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
-        virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
-        virtual void setPopupAccessingHost(PopupAccessingHost* host);
-        virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
+	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
+	virtual void setPopupAccessingHost(PopupAccessingHost* host);
+	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
 	virtual void setContactInfoAccessingHost(ContactInfoAccessingHost* host);
 	virtual QString pluginInfo();
 
@@ -185,10 +183,6 @@ private:
 	Ui::Options ui_;
 	int popupId;
 };
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(StopSpam);
-#endif
 
 StopSpam::StopSpam()
 	: enabled(false)

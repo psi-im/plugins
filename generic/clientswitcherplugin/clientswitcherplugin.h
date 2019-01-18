@@ -58,9 +58,7 @@ class ClientSwitcherPlugin: public QObject, public PsiPlugin, public OptionAcces
 
 {
 	Q_OBJECT
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "com.psi-plus.ClientSwitcherPlugin")
-#endif
 	Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter PluginInfoProvider PopupAccessor ApplicationInfoAccessor AccountInfoAccessor PsiAccountController ContactInfoAccessor IconFactoryAccessor)
 
 public:

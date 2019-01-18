@@ -69,15 +69,9 @@
 #define OPTION_SIZE "httpupload-image-size"
 #define OPTION_QUALITY "httpupload-image-quality"
 #define OPTION_PREVIEW_WIDTH "httpupload-preview-width"
-#if (!defined HAVE_QT5 && QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#define HAVE_QT5
-#endif
+
 QString escape(const QString &plain) {
-#ifdef HAVE_QT5
 	return plain.toHtmlEscaped();
-#else
-	return Qt::escape(plain);
-#endif
 }
 
 class HttpUploadPlugin: public QObject,
@@ -96,9 +90,7 @@ class HttpUploadPlugin: public QObject,
 		public ApplicationInfoAccessor,
 		public PluginAccessor {
 Q_OBJECT
-#ifdef HAVE_QT5
 Q_PLUGIN_METADATA(IID "com.psi-plus.HttpUploadPlugin")
-#endif
 Q_INTERFACES(PsiPlugin ToolbarIconAccessor GCToolbarIconAccessor
 		StanzaSender ActiveTabAccessor PsiAccountController OptionAccessor
 		IconFactoryAccessor AccountInfoAccessor PluginInfoProvider ChatTabAccessor
@@ -210,10 +202,6 @@ private:
 	int imageQuality;
 	int previewWidth;
 };
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN(HttpUploadPlugin)
-#endif
 
 HttpUploadPlugin::HttpUploadPlugin() :
 		iconHost(0), stanzaSender(0), activeTab(0), accInfo(0), psiController(0), psiOptions(0), appInfoHost(0), enabled(
@@ -401,14 +389,11 @@ void HttpUploadPlugin::upload(bool anything) {
 	QPixmap pix(fileName);
 	imageName = fileInfo.fileName();
 	psiOptions->setPluginOption(CONST_LAST_FOLDER, fileInfo.path());
-#ifndef HAVE_QT5
-	QString mimeType("application/octet-stream");
-#else // prosody requires a proper type now
+// prosody requires a proper type now
 	QMimeDatabase db;
 	QString mimeType(db.mimeTypeForFile(imageName).name());
 #ifdef DEBUG_UPLOAD
 	qDebug() << "MIME type:" << mimeType;
-#endif
 #endif
 	QString lowerImagename = imageName.toLower();
 	// only resize jpg and png

@@ -531,11 +531,7 @@ QRect GameBoard::shipRect(int snum, bool margin) const
 	if (margin)
 	{
 		r.adjust(-1, -1, 1, 1);
-#ifdef HAVE_QT5
 		r = r.intersected(QRect(0, 0, 10, 10));
-#else
-		r = r.intersect(QRect(0, 0, 10, 10));
-#endif
 	}
 	return r;
 }
