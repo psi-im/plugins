@@ -30,11 +30,11 @@ Server::Server(QListWidget *parent)
     , servPostdata_("")
     , servFileinput_("")
     , servRegexp_("")
-        , useProxy_(false)
+    , useProxy_(false)
 {
 }
 
-void Server::setDisplayName(QString n)
+void Server::setDisplayName(const QString &n)
 {
     displayName_ = n;
 }

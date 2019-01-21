@@ -57,9 +57,9 @@ protected:
 class PluginWindow : public QMainWindow {
     Q_OBJECT
 public:
-    PluginWindow(QString full_jid, QWidget *parent = 0);
+    PluginWindow(const QString &full_jid, QWidget *parent = nullptr);
     ~PluginWindow();
-    void init(QString element);
+    void init(const QString &element);
 
 private:
     Ui::PluginWindow *ui;
@@ -69,21 +69,21 @@ private:
 
 private:
     void endGame();
-    void appendTurn(int num, int x, int y, bool my_turn);
-    bool tryLoadGame(const QString &load_str, bool local);
+    void appendTurn(const int num, const int x, const int y, const bool my_turn);
+    bool tryLoadGame(const QString &load_str, const bool local);
     void showDraw();
 
 protected:
     virtual void closeEvent (QCloseEvent *event);
 
 private slots:
-    void changeGameStatus(GameModel::GameStatus status);
+    void changeGameStatus(const GameModel::GameStatus status);
     void turnSelected();
-    void setupElement(int x, int y);
+    void setupElement(const int x, const int y);
     void acceptStep();
     void setAccept();
     void setError();
-    void setTurn(int, int);
+    void setTurn(const int, const int);
     void setSwitchColor();
     void doSwitchColor();
     void setLose();
@@ -94,7 +94,7 @@ private slots:
     void newGame();
     void saveGame();
     void loadGame();
-    void loadRemoteGame(QString);
+    void loadRemoteGame(const QString &);
     void opponentDraw();
     void setSkin();
 

@@ -73,7 +73,7 @@ private:
         Item(ItemType t, StringStanzaItem s)
             : type(t)
             , stringItem(s) {}
-        Item(ItemType t, MessageItem m)
+        Item(ItemType t, const MessageItem &m)
             : type(t)
             , messageItem(m) {}
 

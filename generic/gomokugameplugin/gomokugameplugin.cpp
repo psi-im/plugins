@@ -267,11 +267,11 @@ void GomokuGamePlugin::getSound() {
     le->setText(file_name);
 }
 
-void GomokuGamePlugin::doPopup(const QString text) {
+void GomokuGamePlugin::doPopup(const QString &text) {
     psiPopup->initPopup(text, tr(constPluginName), "gomokugameplugin/gomoku");
 }
 
-void GomokuGamePlugin::playSound(const QString sound_id) {
+void GomokuGamePlugin::playSound(const QString &sound_id) {
     Options *options = Options::instance();
     if (options->getOption(constDefSoundSettings).toBool() || Options::psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool()) {
         if (sound_id == constSoundMove) {

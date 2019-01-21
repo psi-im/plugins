@@ -138,7 +138,7 @@ QString Model::tmpSoundFile(const QModelIndex & index) const
     return tmpSounds_.at(index.row());
 }
 
-bool Model::setData(const QModelIndex & index, const QVariant & value, int role)
+bool Model::setData(const QModelIndex & index, const QVariant & value, const int role)
 {
     if(!index.isValid() || role != Qt::EditRole)
         return false;

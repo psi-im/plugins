@@ -70,7 +70,7 @@ void HintElementWidget::paintEvent(QPaintEvent *event)
 
 //------------------------ PluginWindow --------------------------
 
-PluginWindow::PluginWindow(QString full_jid, QWidget *parent) :
+PluginWindow::PluginWindow(const QString &full_jid, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::PluginWindow),
     bmodel(NULL),
@@ -87,7 +87,7 @@ PluginWindow::~PluginWindow()
     delete ui;
 }
 
-void PluginWindow::init(QString element)
+void PluginWindow::init(const QString &element)
 {
     GameElement::ElementType elemType;
     if (element == "white") {
@@ -125,7 +125,7 @@ void PluginWindow::init(QString element)
     gameActive = true;
 }
 
-void PluginWindow::changeGameStatus(GameModel::GameStatus status)
+void PluginWindow::changeGameStatus(const GameModel::GameStatus status)
 {
     int step = bmodel->turnNum();
     if (step == 4) {
@@ -190,7 +190,7 @@ void PluginWindow::turnSelected()
 /**
  * Пришел сигнал с модели доски об установки игроком нового элемента
  */
-void PluginWindow::setupElement(int x, int y)
+void PluginWindow::setupElement(const int x, const int y)
 {
     appendTurn(bmodel->turnNum() - 1, x, y, true);
     emit setElement(x, y);
@@ -199,7 +199,7 @@ void PluginWindow::setupElement(int x, int y)
 /**
  * Добавление хода в список ходов
  */
-void PluginWindow::appendTurn(int num, int x, int y, bool my_turn)
+void PluginWindow::appendTurn(const int num, const int x, const int y, const bool my_turn)
 {
     QString str1;
     if (my_turn) {
@@ -243,7 +243,7 @@ void PluginWindow::setAccept()
 /**
  * Пришел ход от противника
  */
-void PluginWindow::setTurn(int x, int y)
+void PluginWindow::setTurn(const int x, const int y)
 {
     if (bmodel) {
         if (bmodel->opponentTurn(x, y)) {
@@ -446,7 +446,7 @@ void PluginWindow::loadGame()
 /**
  * Обработчик загрузки игры, посланной оппонентом
  */
-void PluginWindow::loadRemoteGame(QString load_str)
+void PluginWindow::loadRemoteGame(const QString &load_str)
 {
     if (tryLoadGame(load_str, false)) {
         emit accepted();
@@ -459,7 +459,7 @@ void PluginWindow::loadRemoteGame(QString load_str)
  * Попытка создать модель игры по данным из строки load_str
  * При удачной попытке модель игровой доски инициируется с новыми данными игры
  */
-bool PluginWindow::tryLoadGame(const QString &load_str, bool local)
+bool PluginWindow::tryLoadGame(const QString &load_str, const bool local)
 {
     if (!load_str.isEmpty()) {
         GameModel *gm = new GameModel(load_str, local);

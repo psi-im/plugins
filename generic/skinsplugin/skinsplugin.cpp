@@ -78,7 +78,7 @@ private slots:
         void updateButtonPressed();
         void openButtonPressed();
         void enableButton();
-        void createSkin(QString name, QString author, QString version);
+        void createSkin(const QString &name, const QString &author, const QString &version);
         void getSkinName();
         void applySkin();
         void removeSkin();
@@ -265,7 +265,7 @@ void SkinsPlugin::getSkinName() {
     getName->show();
 }
 
-void SkinsPlugin::createSkin(QString name, QString author, QString version) {
+void SkinsPlugin::createSkin(const QString &name, const QString &author, const QString &version) {
     QFile file(":/skinsplugin/defskin.skn");
     QDomDocument doc, newDoc;
     if(!doc.setContent(&file)) {

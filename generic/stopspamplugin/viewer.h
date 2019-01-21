@@ -33,7 +33,7 @@ class ViewLog : public QDialog
 {
     Q_OBJECT
 public:
-    ViewLog(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *parent = 0);
+    ViewLog(const QString &filename, IconFactoryAccessingHost *IcoHost, QWidget *parent = nullptr);
     bool init();
 
 private:

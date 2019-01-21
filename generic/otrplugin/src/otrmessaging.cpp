@@ -48,8 +48,9 @@ Fingerprint::Fingerprint(const Fingerprint &fp)
 }
 
 Fingerprint::Fingerprint(unsigned char* fingerprint,
-                         QString account, QString username,
-                         QString trust)
+                         const QString &account,
+                         const QString &username,
+                         const QString &trust)
     : fingerprint(fingerprint),
       account(account),
       username(username),

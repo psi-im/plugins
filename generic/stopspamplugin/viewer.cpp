@@ -28,7 +28,7 @@
 #include <QFileInfo>
 
 
-ViewLog::ViewLog(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *parent)
+ViewLog::ViewLog(const QString &filename, IconFactoryAccessingHost *IcoHost, QWidget *parent)
         : QDialog(parent)
         , icoHost_(IcoHost)
         , fileName_(filename)

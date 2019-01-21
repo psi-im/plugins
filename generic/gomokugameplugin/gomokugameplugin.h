@@ -136,8 +136,8 @@ private slots:
     void sendGameStanza(int account, const QString stanza);
     void testSound();
     void getSound();
-    void doPopup(const QString text);
-    void playSound(const QString);
+    void doPopup(const QString &text);
+    void playSound(const QString &);
 
 };
 

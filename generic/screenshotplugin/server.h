@@ -37,8 +37,8 @@ public:
     //QString servFilefilter() { return servFilefilter_; };
     void setServer(const QString& url, const QString& user = "", const QString& pass = "");
     void setServerData(const QString& post = "", const QString& fInput = "", const QString& reg = ""/*, QString fFilter = ""*/);
-    void setDisplayName(QString n);
-    void setUseProxy(bool use) { useProxy_ = use; };
+    void setDisplayName(const QString &n);
+    void setUseProxy(const bool use) { useProxy_ = use; };
     bool useProxy() const { return useProxy_; };
 
     QString settingsToString() const ;

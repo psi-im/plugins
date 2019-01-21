@@ -161,7 +161,7 @@ bool GameSessions::processIncomingIqStanza(int account, const QDomElement &xml, 
 /**
  * Вызов окна для приглашения к игре
  */
-void GameSessions::invite(int account, const QString jid, const QStringList res_list, QWidget *parent)
+void GameSessions::invite(int account, const QString &jid, const QStringList &res_list, QWidget *parent)
 {
     InvateDialog *dialog = new InvateDialog(account, jid, res_list, parent);
     connect(dialog, SIGNAL(acceptGame(int, QString, QString)), this, SLOT(sendInvite(int, QString, QString)));
@@ -172,7 +172,7 @@ void GameSessions::invite(int account, const QString jid, const QStringList res_
 /**
  * Отправка приглашения поиграть выбранному джиду
  */
-void GameSessions::sendInvite(int account, QString full_jid, QString element)
+void GameSessions::sendInvite(const int account, const QString &full_jid, const QString &element)
 {
     QString new_id = newId(true);
     if (!regGameSession(StatusInviteSend, account, full_jid, new_id, element)) {
@@ -190,7 +190,7 @@ void GameSessions::sendInvite(int account, QString full_jid, QString element)
 /**
  * Отмена приглашения. Мы передумали приглашать. :)
  */
-void GameSessions::cancelInvite(int account, QString full_jid)
+void GameSessions::cancelInvite(const int account, const QString &full_jid)
 {
     removeGameSession(account, full_jid);
 }
@@ -198,7 +198,7 @@ void GameSessions::cancelInvite(int account, QString full_jid)
 /**
  * Обработка и регистрация входящего приглашения
  */
-bool GameSessions::incomingInvitation(int account, QString from, QString color, QString iq_id)
+bool GameSessions::incomingInvitation(const int account, const QString &from, const QString &color, const QString &iq_id)
 {
     errorStr = "";
     if (color != "black" && color != "white") {
@@ -220,7 +220,7 @@ bool GameSessions::incomingInvitation(int account, QString from, QString color, 
 /**
  * Отображение окна приглашения
  */
-void GameSessions::showInvitation(QString from)
+void GameSessions::showInvitation(const QString &from)
 {
     int account_ = 0;
     const int idx = findGameSessionByJid(from);
@@ -233,7 +233,7 @@ void GameSessions::showInvitation(QString from)
 /**
  * Отображение формы входящего приглашения.
  */
-void GameSessions::doInviteDialog(int account, QString from)
+void GameSessions::doInviteDialog(const int account, const QString &from)
 {
     const int idx = findGameSessionByJid(account, from);
     if (idx == -1 || gameSessions.at(idx).status != StatusInviteInDialog)
@@ -247,7 +247,7 @@ void GameSessions::doInviteDialog(int account, QString from)
 /**
  * Принимаем приглашение на игру
  */
-void GameSessions::acceptInvite(int account, QString id)
+void GameSessions::acceptInvite(const int account, const QString &id)
 {
     const int idx = findGameSessionById(account, id);
     if (idx != -1) {
@@ -271,7 +271,7 @@ void GameSessions::acceptInvite(int account, QString id)
 /**
  * Отклоняем приглашение на игру
  */
-void GameSessions::rejectInvite(int account, QString id)
+void GameSessions::rejectInvite(const int account, QString id)
 {
     const int idx = findGameSessionById(account, id);
     if (idx != -1 && gameSessions.at(idx).status == StatusInviteInDialog) {
@@ -288,7 +288,7 @@ void GameSessions::rejectInvite(int account, QString id)
 /**
  * Инициализация сессии игры и игровой доски
  */
-void GameSessions::startGame(int sess_index)
+void GameSessions::startGame(const int sess_index)
 {
     newId(true);
     GameSession *sess = &gameSessions[sess_index];
@@ -335,7 +335,7 @@ void GameSessions::startGame(int sess_index)
 /**
  * Обработка iq ответа result для игры.
  */
-bool GameSessions::doResult(int account, QString from, QString iq_id)
+bool GameSessions::doResult(const int account, const QString &from, const QString &iq_id)
 {
     if (iq_id.isEmpty())
         return false;
@@ -362,7 +362,7 @@ bool GameSessions::doResult(int account, QString from, QString iq_id)
 /**
  * Отклонение игры или приглашения на основании iq ответа об ошибке
  */
-bool GameSessions::doReject(int account, QString from, QString iq_id)
+bool GameSessions::doReject(const int account, const QString &from, const QString &iq_id)
 {
     if (iq_id.isEmpty())
         return false;
@@ -396,7 +396,7 @@ bool GameSessions::doReject(int account, QString from, QString iq_id)
 /**
  * Обработка действия оппонента
  */
-bool GameSessions::doTurnAction(int account, QString from, QString iq_id, QString value)
+bool GameSessions::doTurnAction(const int account, const QString &from, const QString &iq_id, const QString &value)
 {
     if (iq_id.isEmpty())
         return false;
@@ -433,7 +433,7 @@ bool GameSessions::doTurnAction(int account, QString from, QString iq_id, QStrin
 /**
  * Пришло сообщение оппонента о нашей победе
  */
-bool GameSessions::youWin(int account, QString from, QString iq_id) {
+bool GameSessions::youWin(const int account, const QString &from, const QString &iq_id) {
     const int idx = findGameSessionByJid(account, from);
     if (idx == -1)
         return false;
@@ -454,7 +454,7 @@ bool GameSessions::youWin(int account, QString from, QString iq_id) {
 /**
  * Пришло собщение оппонента о ничьей
  */
-bool GameSessions::setDraw(int account, QString from, QString iq_id)
+bool GameSessions::setDraw(const int account, const QString &from, const QString &iq_id)
 {
     const int idx = findGameSessionByJid(account, from);
     if (idx != -1) {
@@ -477,7 +477,7 @@ bool GameSessions::setDraw(int account, QString from, QString iq_id)
 /**
  * Оппонент закрыл доску
  */
-bool GameSessions::closeRemoteGameBoard(int account, QString from, QString iq_id)
+bool GameSessions::closeRemoteGameBoard(const int account, const QString &from, const QString &iq_id)
 {
     const int idx = findGameSessionByJid(account, from);
     if (idx == -1)
@@ -500,7 +500,7 @@ bool GameSessions::closeRemoteGameBoard(int account, QString from, QString iq_id
 /**
  * Оппонент прислал загруженную игру
  */
-bool GameSessions::remoteLoad(int account, QString from, QString iq_id, QString value)
+bool GameSessions::remoteLoad(const int account, const QString &from, const QString &iq_id, const QString &value)
 {
     const int idx = findGameSessionByJid(account, from);
     if (idx == -1)
@@ -529,7 +529,7 @@ int GameSessions::activeCount() const
  * Этот статус только сессии передачи данных игры и отвечает за минимальную целостность и безопасность.
  * Не имеет ни какого отношения к статусу самой игры.
  */
-void GameSessions::setSessionStatus(QString status_str)
+void GameSessions::setSessionStatus(const QString &status_str)
 {
     // Ищем сессию по отославшему статус объекту
     const int idx = findGameSessionByWnd(sender());
@@ -577,7 +577,7 @@ void GameSessions::closeGameWindow(bool send_for_opponent, int top, int left, in
 /**
  * Мы походили, отправляем станзу нашего хода оппоненту
  */
-void GameSessions::sendMove(int x, int y)
+void GameSessions::sendMove(const int x, const int y)
 {
     const int idx = findGameSessionByWnd(sender());
     if (idx == -1)
@@ -686,7 +686,7 @@ void GameSessions::youLose() {
 /**
  * Посылаем оппоненту загруженную игру
  */
-void GameSessions::sendLoad(QString save_str)
+void GameSessions::sendLoad(const QString &save_str)
 {
     const int idx = findGameSessionByWnd(sender());
     if (idx == -1)
@@ -724,7 +724,7 @@ void GameSessions::newGame()
 
 // -----------------------------------------
 
-bool GameSessions::regGameSession(SessionStatus status, int account, QString jid, QString id, QString element)
+bool GameSessions::regGameSession(const SessionStatus status, const int account, const QString &jid, const QString &id, const QString &element)
 {
     const int cnt = gameSessions.size();
     errorStr = "";
@@ -765,7 +765,7 @@ int GameSessions::findGameSessionByWnd(QObject *wnd) const
     return res;
 }
 
-int GameSessions::findGameSessionById(int account, const QString id) const
+int GameSessions::findGameSessionById(const int account, const QString &id) const
 {
     int res = -1;
     int cnt = gameSessions.size();
@@ -778,7 +778,7 @@ int GameSessions::findGameSessionById(int account, const QString id) const
     return res;
 }
 
-int GameSessions::findGameSessionByJid(int account, QString jid) const
+int GameSessions::findGameSessionByJid(const int account, const QString &jid) const
 {
     int cnt = gameSessions.size();
     for (int i = 0; i < cnt; i++) {
@@ -791,7 +791,7 @@ int GameSessions::findGameSessionByJid(int account, QString jid) const
     return -1;
 }
 
-int GameSessions::findGameSessionByJid(QString jid) const
+int GameSessions::findGameSessionByJid(const QString &jid) const
 {
     int cnt = gameSessions.size();
     for (int i = 0; i < cnt; i++) {
@@ -802,7 +802,7 @@ int GameSessions::findGameSessionByJid(QString jid) const
     return -1;
 }
 
-bool GameSessions::removeGameSession(int account, QString jid)
+bool GameSessions::removeGameSession(const int account, const QString &jid)
 {
     const int idx = findGameSessionByJid(account, jid);
     if (idx != -1) {
@@ -816,7 +816,7 @@ bool GameSessions::removeGameSession(int account, QString jid)
     return false;
 }
 
-void GameSessions::sendErrorIq(int account, QString jid, QString id, const QString &/*err_str*/)
+void GameSessions::sendErrorIq(const int account, const QString &jid, const QString &id, const QString &/*err_str*/)
 {
     emit sendStanza(account, XML::iqErrorString(jid, id));
 }
@@ -834,7 +834,7 @@ QString XML::iqErrorString(const QString &jid, const QString &id)
     return stanza;
 }
 
-QString GameSessions::newId(bool big_add)
+QString GameSessions::newId(const bool big_add)
 {
     stanzaId += 1;
     if (big_add) {

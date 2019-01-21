@@ -49,7 +49,7 @@ public:
     static GameSessions *instance();
     static void reset();
     bool processIncomingIqStanza(int accont, const QDomElement& xml, const QString &acc_status, bool conf_priv);
-    void invite(int account, const QString jid, const QStringList res_list, QWidget *parent = NULL);
+    void invite(int account, const QString &jid, const QStringList &res_list, QWidget *parent = nullptr);
     int  activeCount() const;
 
 private:
@@ -76,41 +76,41 @@ private:
     QString errorStr;
 
 private:
-    bool incomingInvitation(int account, QString from, QString color, QString iq_id);
-    bool doResult(int account, QString from, QString iq_id);
-    bool doReject(int account, QString from, QString iq_id);
-    bool doTurnAction(int account, QString from, QString iq_id, QString value);
-    bool youWin(int account, QString from, QString iq_id);
-    bool setDraw(int account, QString from, QString iq_id);
-    bool closeRemoteGameBoard(int account, QString from, QString iq_id);
-    bool remoteLoad(int account, QString from, QString iq_id, QString value);
-    bool regGameSession(SessionStatus status, int account, QString jid, QString id = "", QString element = "");
-    void startGame(int sess_index);
+    bool incomingInvitation(const int account, const QString &from, const QString &color, const QString &iq_id);
+    bool doResult(const int account, const QString &from, const QString &iq_id);
+    bool doReject(const int account, const QString &from, const QString &iq_id);
+    bool doTurnAction(const int account, const QString &from, const QString &iq_id, const QString &value);
+    bool youWin(const int account, const QString &from, const QString &iq_id);
+    bool setDraw(const int account, const QString &from, const QString &iq_id);
+    bool closeRemoteGameBoard(const int account, const QString &from, const QString &iq_id);
+    bool remoteLoad(const int account, const QString &from, const QString &iq_id, const QString &value);
+    bool regGameSession(const SessionStatus status, const int account, const QString &jid, const QString &id = "", const QString &element = "");
+    void startGame(const int sess_index);
     int  findGameSessionByWnd(QObject *wnd) const;
-    int  findGameSessionById(int account, const QString id) const;
-    int  findGameSessionByJid(int account, const QString jid) const;
-    int  findGameSessionByJid(const QString jid) const;
-    bool removeGameSession(int account, const QString jid);
-    QString newId(bool big_add = false);
+    int  findGameSessionById(const int account, const QString &id) const;
+    int  findGameSessionByJid(const int account, const QString &jid) const;
+    int  findGameSessionByJid(const QString &jid) const;
+    bool removeGameSession(const int account, const QString &jid);
+    QString newId(const bool big_add = false);
     QString getLastError() const;
-    void sendErrorIq(int account, const QString jid, const QString id, const QString &/*err_str*/);
+    void sendErrorIq(const int account, const QString &jid, const QString &id, const QString &/*err_str*/);
 
 private slots:
-    void showInvitation(QString from);
-    void doInviteDialog(int account, QString from);
-    void sendInvite(int account, QString full_jid, QString element);
-    void cancelInvite(int account, QString full_jid);
-    void acceptInvite(int, QString);
-    void rejectInvite(int, QString);
-    void setSessionStatus(QString);
+    void showInvitation(const QString &from);
+    void doInviteDialog(const int account, const QString &from);
+    void sendInvite(const int account, const QString &full_jid, const QString &element);
+    void cancelInvite(const int account, const QString &full_jid);
+    void acceptInvite(const int, const QString &);
+    void rejectInvite(const int, QString);
+    void setSessionStatus(const QString &);
     void closeGameWindow(bool, int, int, int, int);
-    void sendMove(int, int);
+    void sendMove(const int, const int);
     void switchColor();
     void sendAccept();
     void sendError();
     void sendDraw();
     void youLose();
-    void sendLoad(QString);
+    void sendLoad(const QString &);
     void newGame();
 
 signals:

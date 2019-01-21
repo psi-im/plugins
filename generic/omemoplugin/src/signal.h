@@ -49,7 +49,7 @@ namespace psiomemo {
 
   class Fingerprint {
   public:
-    Fingerprint(QString contact, QString fingerprint, uint32_t deviceId, TRUST_STATE trust)
+    Fingerprint(const QString &contact, const QString &fingerprint, const uint32_t deviceId, const TRUST_STATE trust)
         : contact(qMove(contact)), fingerprint(qMove(fingerprint)), deviceId(deviceId), trust(trust) {}
     QString contact;
     QString fingerprint;

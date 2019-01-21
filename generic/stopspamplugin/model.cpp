@@ -20,7 +20,7 @@
 
 #include "model.h"
 
-Model::Model(QStringList Jids_, QVariantList Sounds_, QObject* parent)
+Model::Model(const QStringList &Jids_, QVariantList Sounds_, QObject* parent)
         : QAbstractTableModel(parent)
         , Jids(Jids_)
 {
@@ -144,7 +144,7 @@ void Model::addRow()
     endInsertRows();
 }
 
-void Model::deleteRow(int row)
+void Model::deleteRow(const int row)
 {
     if(tmpJids_.isEmpty() || tmpJids_.size() <= row || row < 0)
         return;
