@@ -28,35 +28,35 @@ class JDModel;
 
 class JDMainWin : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	JDMainWin(const QString& name,const QString& jid, int acc, QWidget* p = 0);
-	~JDMainWin();
+    JDMainWin(const QString& name,const QString& jid, int acc, QWidget* p = 0);
+    ~JDMainWin();
 
 private slots:
-	void incomingMessage(const QString& message, JDCommands::Command command);
-	void refresh();
-	void doSend();
-	void outgoingMessage(const QString& message);
-	void indexChanged(const QModelIndex& index);
-	void indexContextMenu(const QModelIndex& index);
-	void moveItem(const QString& oldPath, const QString& newPath);
-	void clearLog();
+    void incomingMessage(const QString& message, JDCommands::Command command);
+    void refresh();
+    void doSend();
+    void outgoingMessage(const QString& message);
+    void indexChanged(const QModelIndex& index);
+    void indexContextMenu(const QModelIndex& index);
+    void moveItem(const QString& oldPath, const QString& newPath);
+    void clearLog();
 
 private:
-	void parse(QString message);
-	void appendMessage(const QString& message, bool outgoing = true);
-	void recursiveFind(const QString& dir);
+    void parse(QString message);
+    void appendMessage(const QString& message, bool outgoing = true);
+    void recursiveFind(const QString& dir);
 
 protected:
 
 private:
-	Ui::JDMainWin ui_;
-	JDModel* model_;
-	JDCommands* commands_;
-	QString currentDir_;
-	bool refreshInProgres_;
-	QString yourJid_;
+    Ui::JDMainWin ui_;
+    JDModel* model_;
+    JDCommands* commands_;
+    QString currentDir_;
+    bool refreshInProgres_;
+    QString yourJid_;
 };
 
 #endif // JD_MAINWIN_H

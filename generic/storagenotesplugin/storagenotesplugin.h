@@ -44,13 +44,13 @@ class Notes;
 #define NOTES_ID "strnotes_1"
 
 class StorageNotesPlugin : public QObject, public PsiPlugin, public StanzaSender, public IconFactoryAccessor, public PluginInfoProvider,
-		public AccountInfoAccessor, public StanzaFilter, public PopupAccessor, public MenuAccessor
+        public AccountInfoAccessor, public StanzaFilter, public PopupAccessor, public MenuAccessor
 {
         Q_OBJECT
-	Q_PLUGIN_METADATA(IID "com.psi-plus.StorageNotesPlugin")
-	Q_INTERFACES(PsiPlugin StanzaSender IconFactoryAccessor AccountInfoAccessor StanzaFilter PopupAccessor MenuAccessor PluginInfoProvider)
+    Q_PLUGIN_METADATA(IID "com.psi-plus.StorageNotesPlugin")
+    Q_INTERFACES(PsiPlugin StanzaSender IconFactoryAccessor AccountInfoAccessor StanzaFilter PopupAccessor MenuAccessor PluginInfoProvider)
 public:
-	StorageNotesPlugin();
+    StorageNotesPlugin();
         virtual QString name() const;
         virtual QString shortName() const;
         virtual QString version() const;
@@ -58,23 +58,23 @@ public:
         virtual bool enable();
         virtual bool disable();
 
-	virtual void applyOptions() {}
-	virtual void restoreOptions() {}
+    virtual void applyOptions() {}
+    virtual void restoreOptions() {}
         virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
         virtual void setStanzaSendingHost(StanzaSendingHost *host);
         virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
         virtual bool incomingStanza(int account, const QDomElement& xml);
-	virtual bool outgoingStanza(int account, QDomElement& xml);
+    virtual bool outgoingStanza(int account, QDomElement& xml);
         virtual void setPopupAccessingHost(PopupAccessingHost* host);
-	virtual QList < QVariantHash > getAccountMenuParam();
-	virtual QList < QVariantHash > getContactMenuParam();
-	virtual QAction* getContactAction(QObject* , int , const QString& ) { return 0; }
-	virtual QAction* getAccountAction(QObject* , int ) { return 0; }
-	virtual QString pluginInfo();
-	virtual QPixmap icon() const;
+    virtual QList < QVariantHash > getAccountMenuParam();
+    virtual QList < QVariantHash > getContactMenuParam();
+    virtual QAction* getContactAction(QObject* , int , const QString& ) { return 0; }
+    virtual QAction* getAccountAction(QObject* , int ) { return 0; }
+    virtual QString pluginInfo();
+    virtual QPixmap icon() const;
 
 private slots:
-	void start();
+    void start();
 
 private:
         StanzaSendingHost* stanzaSender;
@@ -82,9 +82,9 @@ private:
         AccountInfoAccessingHost* accInfo;
         PopupAccessingHost* popup;
         bool enabled;
-	NotesController* controller_;
+    NotesController* controller_;
 
-	friend class Notes;
+    friend class Notes;
 };
 
 #endif // STORAGENOTESPLUGIN_H

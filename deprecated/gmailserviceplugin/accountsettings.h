@@ -27,49 +27,49 @@
 
 struct Attributes
 {
-//	int mc;
-//	int emc;
-//	int w;
-//	bool rejected;
-	QString t;
-//	bool autosub;
-//	QString alias_for;
-//	QCString inv;
+//    int mc;
+//    int emc;
+//    int w;
+//    bool rejected;
+    QString t;
+//    bool autosub;
+//    QString alias_for;
+//    QCString inv;
 };
 
 
 class AccountSettings
 {
 public:
-	AccountSettings(int acc = -1, QString j = QString());
-	~AccountSettings() {};
-	void fromString(const QString& settings);
-	QString toString() const;
+    AccountSettings(int acc = -1, QString j = QString());
+    ~AccountSettings() {};
+    void fromString(const QString& settings);
+    QString toString() const;
 
-	int account;
-	QString jid;
-	QString fullJid;
-	bool isMailEnabled;
-	bool isMailSupported;
-	bool isArchivingEnabled;
-	bool isSuggestionsEnabled;
-	bool notifyAllUnread;
-	QString lastMailTime;
-	QString lastMailTid;
-	bool isSharedStatusEnabled;
-	bool isSharedStatusSupported;
-	bool isAttributesSupported;
-	bool isAttributesEnabled;
-	QString status;
-	QString message;
-	QMap<QString, QStringList> sharedStatuses; // < status, list of status messages >
-	int listMax;
-	int listContentsMax;
-	int statusMax;
-	bool isNoSaveSupported;
-	bool isNoSaveEnbaled;
-	QMap<QString, bool> noSaveList; // < jid, is no-save enabled >
-	QMap<QString, Attributes> attributes; //jid, Attributes
+    int account;
+    QString jid;
+    QString fullJid;
+    bool isMailEnabled;
+    bool isMailSupported;
+    bool isArchivingEnabled;
+    bool isSuggestionsEnabled;
+    bool notifyAllUnread;
+    QString lastMailTime;
+    QString lastMailTid;
+    bool isSharedStatusEnabled;
+    bool isSharedStatusSupported;
+    bool isAttributesSupported;
+    bool isAttributesEnabled;
+    QString status;
+    QString message;
+    QMap<QString, QStringList> sharedStatuses; // < status, list of status messages >
+    int listMax;
+    int listContentsMax;
+    int statusMax;
+    bool isNoSaveSupported;
+    bool isNoSaveEnbaled;
+    QMap<QString, bool> noSaveList; // < jid, is no-save enabled >
+    QMap<QString, Attributes> attributes; //jid, Attributes
 };
 
 Q_DECLARE_METATYPE(AccountSettings*)

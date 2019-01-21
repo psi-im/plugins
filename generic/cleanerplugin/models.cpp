@@ -31,92 +31,92 @@
 //----------------------------------------
 void BaseModel::reset()
 {
-	selected_.clear();
+    selected_.clear();
     beginResetModel();
     endResetModel();
 }
 
 int BaseModel::selectedCount(const QModelIndex &) const
 {
-	return selected_.size();
+    return selected_.size();
 }
 
 void BaseModel::selectAll(const QModelIndexList& list)
 {
-	emit layoutAboutToBeChanged();
-	selected_.clear();
-	selected_ = list.toSet();
-	emit updateLabel(0);
-	emit layoutChanged();
+    emit layoutAboutToBeChanged();
+    selected_.clear();
+    selected_ = list.toSet();
+    emit updateLabel(0);
+    emit layoutChanged();
 }
 
 void BaseModel::unselectAll()
 {
-	emit layoutAboutToBeChanged();
-	selected_.clear();
-	emit updateLabel(0);
-	emit layoutChanged();
+    emit layoutAboutToBeChanged();
+    selected_.clear();
+    emit updateLabel(0);
+    emit layoutChanged();
 }
 
 bool BaseModel::isSelected(const QModelIndex &index) const
 {
-	return selected_.contains(index);
+    return selected_.contains(index);
 }
 
 Qt::ItemFlags BaseModel::flags(const QModelIndex &index) const
 {
-	Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 
-	if(index.column() == 0)
-		flags |= Qt::ItemIsUserCheckable;
+    if(index.column() == 0)
+        flags |= Qt::ItemIsUserCheckable;
 
-	return flags;
+    return flags;
 }
 
 bool BaseModel::setData(const QModelIndex & index, const QVariant & value, int role)
 {
-	if(!index.isValid() || role != Qt::EditRole || index.column() != 0)
-		return false;
+    if(!index.isValid() || role != Qt::EditRole || index.column() != 0)
+        return false;
 
-	switch(value.toInt()) {
-	case(0):
-		if(selected_.contains(index))
-			selected_.remove(index);
-		break;
-	case(2):
-		if(!selected_.contains(index))
-			selected_ << index;
-		break;
-	case(3):
-		if(selected_.contains(index))
-			selected_.remove(index);
-		else
-			selected_ << index;
-		break;
-	}
+    switch(value.toInt()) {
+    case(0):
+        if(selected_.contains(index))
+            selected_.remove(index);
+        break;
+    case(2):
+        if(!selected_.contains(index))
+            selected_ << index;
+        break;
+    case(3):
+        if(selected_.contains(index))
+            selected_.remove(index);
+        else
+            selected_ << index;
+        break;
+    }
 
-	emit dataChanged(index, index);
-	emit updateLabel(0);
+    emit dataChanged(index, index);
+    emit updateLabel(0);
 
-	return true;
+    return true;
 }
 
 QVariant BaseModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-	if (role == Qt::DisplayRole) {
-		if (orientation == Qt::Horizontal) {
-			return headers.at(section);
-		}
-		else {
-			return section+1;
-		}
-	} else
-		return QVariant();
+    if (role == Qt::DisplayRole) {
+        if (orientation == Qt::Horizontal) {
+            return headers.at(section);
+        }
+        else {
+            return section+1;
+        }
+    } else
+        return QVariant();
 }
 
 int BaseModel::columnCount(const QModelIndex & /*parent*/) const
 {
-	return headers.size();
+    return headers.size();
 }
 
 
@@ -125,91 +125,91 @@ int BaseModel::columnCount(const QModelIndex & /*parent*/) const
 //---------------------------------------
 void BaseFileModel::reset()
 {
-	files_.clear();
-	BaseModel::reset();
+    files_.clear();
+    BaseModel::reset();
 }
 
 
 int BaseFileModel::rowCount(const QModelIndex &/* parent*/) const
 {
-	return files_.size();
+    return files_.size();
 }
 
 QString BaseFileModel::fileName(const QModelIndex & index) const
 {
-	if(!index.isValid())
-		return QString();
+    if(!index.isValid())
+        return QString();
 
-	int i = index.row();
-	if(i < 0 || i >= files_.size())
-		return QString();
+    int i = index.row();
+    if(i < 0 || i >= files_.size())
+        return QString();
 
-	QString name = files_.at(i);
-	return name.split("/", QString::SkipEmptyParts).last();
+    QString name = files_.at(i);
+    return name.split("/", QString::SkipEmptyParts).last();
 }
 
 QString BaseFileModel::filePass(const QModelIndex & index) const
 {
-	if(!index.isValid())
-		return QString();
+    if(!index.isValid())
+        return QString();
 
-	int i = index.row();
-	if(i < 0 || i >= files_.size())
-		return QString();
+    int i = index.row();
+    if(i < 0 || i >= files_.size())
+        return QString();
 
-	return files_.at(i);
+    return files_.at(i);
 }
 
 int BaseFileModel::fileSize(const QModelIndex & index) const
 {
-	if(!index.isValid())
-		return 0;
+    if(!index.isValid())
+        return 0;
 
-	QFile file(filePass(index));
+    QFile file(filePass(index));
 
-	return file.size();
+    return file.size();
 }
 
 QString BaseFileModel::fileDate(const QModelIndex & index) const
 {
-	if(!index.isValid())
-		return QString();
+    if(!index.isValid())
+        return QString();
 
-	return QFileInfo(filePass(index)).created().toString("yyyy-MM-dd");
+    return QFileInfo(filePass(index)).created().toString("yyyy-MM-dd");
 }
 
 void BaseFileModel::deleteSelected()
 {
-	emit layoutAboutToBeChanged ();
+    emit layoutAboutToBeChanged ();
 
-	foreach(const QModelIndex& index, selected_) {
-		const QString fileName = filePass(index);
-		if(fileName.isEmpty())
-			continue;
+    foreach(const QModelIndex& index, selected_) {
+        const QString fileName = filePass(index);
+        if(fileName.isEmpty())
+            continue;
 
-		QFile file(fileName);
-		if(file.open(QIODevice::ReadWrite)) {
-			file.remove();
-		}
-	}
+        QFile file(fileName);
+        if(file.open(QIODevice::ReadWrite)) {
+            file.remove();
+        }
+    }
 
-	setDirs(dirs_);
+    setDirs(dirs_);
 
-	emit updateLabel(0);
+    emit updateLabel(0);
 }
 
 void BaseFileModel::setDirs(const QStringList& dirs)
 {
-	reset();
-	dirs_ = dirs;
-	foreach(const QString& dirName, dirs_) {
-		QDir Dir(dirName);
-		foreach(const QString& fileName, Dir.entryList(QDir::Files)) {
-			files_.append(Dir.absoluteFilePath(fileName));
-		}
-	}
+    reset();
+    dirs_ = dirs;
+    foreach(const QString& dirName, dirs_) {
+        QDir Dir(dirName);
+        foreach(const QString& fileName, Dir.entryList(QDir::Files)) {
+            files_.append(Dir.absoluteFilePath(fileName));
+        }
+    }
 
-	emit layoutChanged();
+    emit layoutChanged();
 }
 
 
@@ -217,31 +217,31 @@ void BaseFileModel::setDirs(const QStringList& dirs)
 //--ClearingModel-------------------------
 //----------------------------------------
 ClearingModel::ClearingModel(const QString& dir, QObject* parent)
-	: BaseFileModel(parent)
+    : BaseFileModel(parent)
 {
-	headers << tr("")
-			<< tr("Nick")
-			<< tr("Domain")
-			<< tr("Size")
-			<< tr("Creation Date");
+    headers << tr("")
+            << tr("Nick")
+            << tr("Domain")
+            << tr("Size")
+            << tr("Creation Date");
 
-	setDirs(QStringList() << dir);
+    setDirs(QStringList() << dir);
 }
 
 QVariant ClearingModel::data(const QModelIndex & index, int role) const
 {
-	if(!index.isValid())
-		return QVariant();
+    if(!index.isValid())
+        return QVariant();
 
-	int i = index.column();
-	QString filename = fileName(index);
-	filename = filename.replace("%5f", "_");
-	filename = filename.replace("%2d", "-");
-	filename = filename.replace("%25", "@");
-	switch(i) {
-	case(0):
+    int i = index.column();
+    QString filename = fileName(index);
+    filename = filename.replace("%5f", "_");
+    filename = filename.replace("%2d", "-");
+    filename = filename.replace("%25", "@");
+    switch(i) {
+    case(0):
                 if (role == Qt::CheckStateRole) {
-			return isSelected(index) ? 2:0;
+            return isSelected(index) ? 2:0;
                 } else if (role == Qt::TextAlignmentRole) {
                         return (int)(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::DisplayRole)
@@ -250,28 +250,28 @@ QVariant ClearingModel::data(const QModelIndex & index, int role) const
                 if (role == Qt::TextAlignmentRole) {
                         return (int)(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::DisplayRole) {
-			if(filename.contains("_at_"))
-				return QVariant(filename.split("_at_").first());
-			else
-				return QVariant();
+            if(filename.contains("_at_"))
+                return QVariant(filename.split("_at_").first());
+            else
+                return QVariant();
                 }
              case(2):
                 if (role == Qt::TextAlignmentRole) {
                         return (int)(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::DisplayRole)
-			return QVariant(filename.split("_at_").last());
+            return QVariant(filename.split("_at_").last());
              case(3):
-		if (role == Qt::TextAlignmentRole) {
+        if (role == Qt::TextAlignmentRole) {
                         return (int)(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::DisplayRole)
-			return QVariant(fileSize(index));
+            return QVariant(fileSize(index));
              case(4):
-		if (role == Qt::TextAlignmentRole) {
+        if (role == Qt::TextAlignmentRole) {
                         return (int)(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::DisplayRole)
-			return QVariant(fileDate(index));
+            return QVariant(fileDate(index));
         }
-	return QVariant();
+    return QVariant();
 }
 
 //----------------------------------------
@@ -279,17 +279,17 @@ QVariant ClearingModel::data(const QModelIndex & index, int role) const
 //----------------------------------------
 QVariant ClearingVcardModel::data(const QModelIndex & index, int role) const
 {
-	if(index.column() == 2) {
-		if (role == Qt::DisplayRole) {
-			QString domain = fileName(index).split("_at_").last();
-			domain.chop(4);
-			domain = domain.replace("%5f", "_");
-			domain = domain.replace("%2d", "-");
-			domain = domain.replace("%25", "@");
-			return QVariant(domain);
-		}
-	}
-	return ClearingModel::data(index, role);
+    if(index.column() == 2) {
+        if (role == Qt::DisplayRole) {
+            QString domain = fileName(index).split("_at_").last();
+            domain.chop(4);
+            domain = domain.replace("%5f", "_");
+            domain = domain.replace("%2d", "-");
+            domain = domain.replace("%25", "@");
+            return QVariant(domain);
+        }
+    }
+    return ClearingModel::data(index, role);
 }
 
 
@@ -298,39 +298,39 @@ QVariant ClearingVcardModel::data(const QModelIndex & index, int role) const
 //----------------------------------------
 QVariant ClearingHistoryModel::data(const QModelIndex & index, int role) const
 {
-	QString filename = fileName(index);
-	filename = filename.replace("%5f", "_");
-	filename = filename.replace("%2d", "-");
-	filename = filename.replace("%25", "@");
-	if (role == Qt::DisplayRole) {
-		if(index.column() == 2) {
-			QString domain;
-			if(filename.contains("_in_")){
-				domain = filename.split("_in_").last();
-				domain = domain.replace("_at_", "@");
-			}
-			else {
-				domain = filename.split("_at_").last();
-				domain.remove(".history");
-			}
-			return QVariant(domain);
-		}
-		else if(index.column() == 1) {
-			QString jid;
-			if(filename.contains("_in_")){
-				jid = filename.split("_in_").first();
-				jid = jid.replace("_at_", "@");
-			}
-			else {
-				if(filename.contains("_at_"))
-					return QVariant(filename.split("_at_").first());
-				else
-					return QVariant();
-			}
-		}
-	}
+    QString filename = fileName(index);
+    filename = filename.replace("%5f", "_");
+    filename = filename.replace("%2d", "-");
+    filename = filename.replace("%25", "@");
+    if (role == Qt::DisplayRole) {
+        if(index.column() == 2) {
+            QString domain;
+            if(filename.contains("_in_")){
+                domain = filename.split("_in_").last();
+                domain = domain.replace("_at_", "@");
+            }
+            else {
+                domain = filename.split("_at_").last();
+                domain.remove(".history");
+            }
+            return QVariant(domain);
+        }
+        else if(index.column() == 1) {
+            QString jid;
+            if(filename.contains("_in_")){
+                jid = filename.split("_in_").first();
+                jid = jid.replace("_at_", "@");
+            }
+            else {
+                if(filename.contains("_at_"))
+                    return QVariant(filename.split("_at_").first());
+                else
+                    return QVariant();
+            }
+        }
+    }
 
-	return ClearingModel::data(index, role);
+    return ClearingModel::data(index, role);
 }
 
 
@@ -339,27 +339,27 @@ QVariant ClearingHistoryModel::data(const QModelIndex & index, int role) const
 //--ClearingAvatarModel-------------------
 //----------------------------------------
 ClearingAvatarModel::ClearingAvatarModel(const QStringList& dir, QObject* parent)
-	: BaseFileModel(parent)
+    : BaseFileModel(parent)
 {
-	headers << tr("")
-			<< tr("Avatar")
-			<< tr("Size")
-			<< tr("Creation Date");
+    headers << tr("")
+            << tr("Avatar")
+            << tr("Size")
+            << tr("Creation Date");
 
-	setDirs(dir);
+    setDirs(dir);
 }
 
 QVariant ClearingAvatarModel::data(const QModelIndex & index, int role) const
 {
-	if(!index.isValid())
-		return QVariant();
+    if(!index.isValid())
+        return QVariant();
 
-	int i = index.column();
-	QString filename = filePass(index);
-	switch(i) {
-	case(0):
+    int i = index.column();
+    QString filename = filePass(index);
+    switch(i) {
+    case(0):
                 if (role == Qt::CheckStateRole) {
-			return isSelected(index) ? 2:0;
+            return isSelected(index) ? 2:0;
                 } else if (role == Qt::TextAlignmentRole) {
                         return (int)(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::DisplayRole)
@@ -368,55 +368,55 @@ QVariant ClearingAvatarModel::data(const QModelIndex & index, int role) const
                 if (role == Qt::TextAlignmentRole) {
                         return (int)(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::DisplayRole) {
-			QPixmap pix = QPixmap(filename);
-			if(pix.isNull())
-				return QVariant();
-			return QVariant(pix);
+            QPixmap pix = QPixmap(filename);
+            if(pix.isNull())
+                return QVariant();
+            return QVariant(pix);
                 }
              case(2):
-		if (role == Qt::TextAlignmentRole) {
+        if (role == Qt::TextAlignmentRole) {
                         return (int)(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::DisplayRole)
-			return QVariant(fileSize(index));
+            return QVariant(fileSize(index));
              case(3):
-		if (role == Qt::TextAlignmentRole) {
+        if (role == Qt::TextAlignmentRole) {
                         return (int)(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::DisplayRole)
-			return QVariant(fileDate(index));
+            return QVariant(fileDate(index));
         }
-	return QVariant();
+    return QVariant();
 }
 
 //----------------------------------------
 //--ClearingOptionsModel------------------
 //----------------------------------------
 ClearingOptionsModel::ClearingOptionsModel(const QString& fileName, QObject* parent)
-	: BaseModel(parent)
-	, fileName_(fileName)
+    : BaseModel(parent)
+    , fileName_(fileName)
 {
-	headers << tr("")
-			<< tr("Options")
-			<< tr("Values");
+    headers << tr("")
+            << tr("Options")
+            << tr("Values");
 
-	parser_ = new OptionsParser(fileName_, this);
-	options = parser_->getMissingNodesString();
+    parser_ = new OptionsParser(fileName_, this);
+    options = parser_->getMissingNodesString();
 }
 
 int ClearingOptionsModel::rowCount(const QModelIndex &/* parent*/) const
 {
-	return options.size();
+    return options.size();
 }
 
 QVariant ClearingOptionsModel::data(const QModelIndex & index, int role) const
 {
-	if(!index.isValid())
-		return QVariant();
+    if(!index.isValid())
+        return QVariant();
 
-	int i = index.column();
-	switch(i) {
-	case(0):
+    int i = index.column();
+    switch(i) {
+    case(0):
                 if (role == Qt::CheckStateRole) {
-			return isSelected(index) ? 2:0;
+            return isSelected(index) ? 2:0;
                 } else if (role == Qt::TextAlignmentRole) {
                         return (int)(Qt::AlignRight | Qt::AlignVCenter);
                 } else if (role == Qt::DisplayRole)
@@ -435,35 +435,35 @@ QVariant ClearingOptionsModel::data(const QModelIndex & index, int role) const
                         return QVariant(node.toElement().text());
                 }
         }
-	return QVariant();
+    return QVariant();
 }
 
 void ClearingOptionsModel::deleteSelected()
 {
-	emit layoutAboutToBeChanged ();
+    emit layoutAboutToBeChanged ();
 
-	setFile(fileName_);
+    setFile(fileName_);
 
-	emit updateLabel(0);
+    emit updateLabel(0);
 }
 
 void ClearingOptionsModel::reset()
 {
-	options.clear();
-	BaseModel::reset();
+    options.clear();
+    BaseModel::reset();
 }
 
 void ClearingOptionsModel::setFile(const QString& fileName)
 {
-	emit layoutAboutToBeChanged ();
+    emit layoutAboutToBeChanged ();
 
-	reset();
-	fileName_ = fileName;
-	delete parser_;
-	parser_ = new OptionsParser(fileName_, this);
-	options = parser_->getMissingNodesString();
+    reset();
+    fileName_ = fileName;
+    delete parser_;
+    parser_ = new OptionsParser(fileName_, this);
+    options = parser_->getMissingNodesString();
 
-	emit layoutChanged();
+    emit layoutChanged();
 }
 
 
@@ -473,16 +473,16 @@ void ClearingOptionsModel::setFile(const QString& fileName)
 //--ClearingProxyModel--------------------
 //----------------------------------------
 ClearingProxyModel::ClearingProxyModel(QObject *parent)
-	: QSortFilterProxyModel(parent)
+    : QSortFilterProxyModel(parent)
 {
-	setDynamicSortFilter(true);
+    setDynamicSortFilter(true);
 }
 
 bool ClearingProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &parent) const
 {
-	QModelIndex index1 = sourceModel()->index(sourceRow, 1, parent);
-	QModelIndex index2 = sourceModel()->index(sourceRow, 2, parent);
-	bool b = index1.data(Qt::DisplayRole).toString().contains(filterRegExp());
-	bool c = index2.data(Qt::DisplayRole).toString().contains(filterRegExp());
-	return (b | c);
+    QModelIndex index1 = sourceModel()->index(sourceRow, 1, parent);
+    QModelIndex index2 = sourceModel()->index(sourceRow, 2, parent);
+    bool b = index1.data(Qt::DisplayRole).toString().contains(filterRegExp());
+    bool c = index2.data(Qt::DisplayRole).toString().contains(filterRegExp());
+    return (b | c);
 }

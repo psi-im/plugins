@@ -22,76 +22,76 @@
 
 
 InviteDialog::InviteDialog(const QString &jid, const QStringList &resources, QWidget *parent)
-	: QDialog(parent)
-	, ui(new Ui::InviteDialog)
-	, accepted_(false)
-	, jid_(jid)
+    : QDialog(parent)
+    , ui(new Ui::InviteDialog)
+    , accepted_(false)
+    , jid_(jid)
 {
-	setAttribute(Qt::WA_DeleteOnClose);
-	ui->setupUi(this);
-	ui->leJid->setText(jid_);
-	ui->cbResource->addItems(resources);
-	adjustSize();
-	connect(ui->btnFirst, SIGNAL(clicked()), this, SLOT(acceptFirst()));
-	connect(ui->btnSecond, SIGNAL(clicked()), this, SLOT(acceptSecond()));
-	connect(ui->btnCancel, SIGNAL(clicked()), this, SLOT(close()));
+    setAttribute(Qt::WA_DeleteOnClose);
+    ui->setupUi(this);
+    ui->leJid->setText(jid_);
+    ui->cbResource->addItems(resources);
+    adjustSize();
+    connect(ui->btnFirst, SIGNAL(clicked()), this, SLOT(acceptFirst()));
+    connect(ui->btnSecond, SIGNAL(clicked()), this, SLOT(acceptSecond()));
+    connect(ui->btnCancel, SIGNAL(clicked()), this, SLOT(close()));
 }
 
 InviteDialog::~InviteDialog()
 {
-	delete ui;
+    delete ui;
 }
 
 void InviteDialog::acceptFirst()
 {
-	emit acceptGame(jid_ + "/" + ui->cbResource->currentText(), true);
-	accepted_ = true;
-	accept();
-	close();
+    emit acceptGame(jid_ + "/" + ui->cbResource->currentText(), true);
+    accepted_ = true;
+    accept();
+    close();
 }
 
 void InviteDialog::acceptSecond()
 {
-	emit acceptGame(jid_ + "/" + ui->cbResource->currentText(), false);
-	accepted_ = true;
-	accept();
-	close();
+    emit acceptGame(jid_ + "/" + ui->cbResource->currentText(), false);
+    accepted_ = true;
+    accept();
+    close();
 }
 
 void InviteDialog::closeEvent(QCloseEvent *event)
 {
-	if (!accepted_)
-		reject();
-	event->accept();
+    if (!accepted_)
+        reject();
+    event->accept();
 }
 
 // ----------------------------------------
 
 InvitationDialog::InvitationDialog(const QString &jid, bool first, QWidget *parent)
-	: QDialog(parent)
+    : QDialog(parent)
 {
-	setAttribute(Qt::WA_DeleteOnClose);
-	setModal(false);
-	ui_.setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
+    setModal(false);
+    ui_.setupUi(this);
 
-	QString posStr;
-	if(first)
-		posStr = tr("second", "He wants to play second");
-	else
-		posStr = tr("first", "He wants to play first");
+    QString posStr;
+    if(first)
+        posStr = tr("second", "He wants to play second");
+    else
+        posStr = tr("first", "He wants to play first");
 
-	ui_.lbl_text->setText(tr("Player %1 invites you \nto play battleship. He wants to play %2.")
-				  .arg(jid).arg(posStr));
+    ui_.lbl_text->setText(tr("Player %1 invites you \nto play battleship. He wants to play %2.")
+                  .arg(jid).arg(posStr));
 
-	connect(ui_.pb_accept, SIGNAL(clicked()), this, SLOT(okPressed()));
-	connect(ui_.pb_reject, SIGNAL(clicked()), this, SLOT(close()));
+    connect(ui_.pb_accept, SIGNAL(clicked()), this, SLOT(okPressed()));
+    connect(ui_.pb_reject, SIGNAL(clicked()), this, SLOT(close()));
 
-	adjustSize();
-	setFixedSize(size());
+    adjustSize();
+    setFixedSize(size());
 }
 
 void InvitationDialog::okPressed()
 {
-	accept();
-	close();
+    accept();
+    close();
 }

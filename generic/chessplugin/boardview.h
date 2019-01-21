@@ -26,7 +26,7 @@
 
 class BoardView : public QTableView
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
         BoardView(QWidget *parent = 0);
@@ -36,7 +36,7 @@ protected:
         virtual void mouseReleaseEvent(QMouseEvent *e);
         virtual void mouseMoveEvent(QMouseEvent *e);
         virtual void keyPressEvent(QKeyEvent *e);
-	virtual bool event(QEvent *e);
+    virtual bool event(QEvent *e);
 
 };
 

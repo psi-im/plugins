@@ -463,5 +463,5 @@ void PstoPlugin::processMessageString(const int /*pos_number*/,
 
 QPixmap PstoPlugin::icon() const
 {
-	return QPixmap(":/icons/psto.png");
+    return QPixmap(":/icons/psto.png");
 }

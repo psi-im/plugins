@@ -29,25 +29,25 @@
 
 namespace Ui
 {
-	class ProxySettingsDlg;
+    class ProxySettingsDlg;
 }
 
 class ProxySettingsDlg : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	ProxySettingsDlg(QWidget *parent = 0);
-	~ProxySettingsDlg();
+    ProxySettingsDlg(QWidget *parent = 0);
+    ~ProxySettingsDlg();
 
-	void setProxySettings(const Proxy& p);
-	Proxy getSettings() const { return proxy_; };
+    void setProxySettings(const Proxy& p);
+    Proxy getSettings() const { return proxy_; };
 
 public slots:
-	void accept();
+    void accept();
 
 private:
-	Ui::ProxySettingsDlg *ui;
-	Proxy proxy_;
+    Ui::ProxySettingsDlg *ui;
+    Proxy proxy_;
 };
 
 #endif // PROXYSETTINGS_H

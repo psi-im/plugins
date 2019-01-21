@@ -37,18 +37,18 @@ class BoardPixmaps : public QObject
 {
 
 public:
-	BoardPixmaps(QObject *parent = 0);
-	~BoardPixmaps();
-	void clearPix();
-	QPixmap *getBoardPixmap(int, int, double, double);
+    BoardPixmaps(QObject *parent = 0);
+    ~BoardPixmaps();
+    void clearPix();
+    QPixmap *getBoardPixmap(int, int, double, double);
 
 private:
-	QPixmap *boardPixmap;
-	double width;
-	double height;
-	int w_cnt;
-	int h_cnt;
-	QHash<int, QPixmap *> scaledPixmap;
+    QPixmap *boardPixmap;
+    double width;
+    double height;
+    int w_cnt;
+    int h_cnt;
+    QHash<int, QPixmap *> scaledPixmap;
 
 };
 
@@ -56,14 +56,14 @@ class BoardDelegate : public QItemDelegate
 {
 Q_OBJECT
 public:
-	explicit BoardDelegate(BoardModel *model, QObject *parent = 0);
-	void setSkin(int skin_num);
-	virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    explicit BoardDelegate(BoardModel *model, QObject *parent = 0);
+    void setSkin(int skin_num);
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
 private:
-	BoardModel *model_;
-	int skin;
-	BoardPixmaps *pixmaps;
+    BoardModel *model_;
+    int skin;
+    BoardPixmaps *pixmaps;
 };
 }
 

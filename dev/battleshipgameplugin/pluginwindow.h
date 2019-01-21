@@ -26,31 +26,31 @@
 
 class PluginWindow : public QMainWindow
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	PluginWindow(const QString &jid, QWidget *parent = 0);
-	void initBoard();
-	void setError();
-	QStringList dataExchange(const QStringList &data);
+    PluginWindow(const QString &jid, QWidget *parent = 0);
+    void initBoard();
+    void setError();
+    QStringList dataExchange(const QStringList &data);
 
 private:
-	QString stringStatus(bool short_) const;
+    QString stringStatus(bool short_) const;
 
 private:
-	Ui::PluginWindow ui;
-	GameModel *gm_;
+    Ui::PluginWindow ui;
+    GameModel *gm_;
 
 private:
-	void updateWidgets();
+    void updateWidgets();
 
 private slots:
-	void updateStatus();
-	void freezeShips();
-	void newGame();
+    void updateStatus();
+    void freezeShips();
+    void newGame();
 
 signals:
-	void gameEvent(QString data);
+    void gameEvent(QString data);
 
 };
 

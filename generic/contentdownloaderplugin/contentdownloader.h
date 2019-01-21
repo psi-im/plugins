@@ -9,7 +9,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -33,40 +33,40 @@
 class Form;
 
 class ContentDownloader : public QObject, public PsiPlugin, public OptionAccessor, public ApplicationInfoAccessor , public PluginInfoProvider {
-	Q_OBJECT
-	Q_PLUGIN_METADATA(IID "com.psi-plus.ContentDownloader")
-	Q_INTERFACES(PsiPlugin OptionAccessor ApplicationInfoAccessor PluginInfoProvider)
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "com.psi-plus.ContentDownloader")
+    Q_INTERFACES(PsiPlugin OptionAccessor ApplicationInfoAccessor PluginInfoProvider)
 public:
-	ContentDownloader();
-	~ContentDownloader();
+    ContentDownloader();
+    ~ContentDownloader();
 
-	// from PsiPlugin
-	QString name() const;
-	QString shortName() const;
-	QString version() const;
-	QWidget *options();
-	bool enable();
-	bool disable();
-	void applyOptions();
-	void restoreOptions();
-	QPixmap icon() const;
+    // from PsiPlugin
+    QString name() const;
+    QString shortName() const;
+    QString version() const;
+    QWidget *options();
+    bool enable();
+    bool disable();
+    void applyOptions();
+    void restoreOptions();
+    QPixmap icon() const;
 
-	// from OptionAccessor
-	void setOptionAccessingHost(OptionAccessingHost* host);
-	void optionChanged(const QString& option);
+    // from OptionAccessor
+    void setOptionAccessingHost(OptionAccessingHost* host);
+    void optionChanged(const QString& option);
 
-	// from ApplicationInfoAccessor
-	void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
+    // from ApplicationInfoAccessor
+    void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
 
-	// from PluginInfoProvider
-	QString pluginInfo();
+    // from PluginInfoProvider
+    QString pluginInfo();
 
 private:
-	bool enabled;
-	OptionAccessingHost *psiOptions;
-	ApplicationInfoAccessingHost *appInfoHost;
-	QString texto;
-	Form *form_;
+    bool enabled;
+    OptionAccessingHost *psiOptions;
+    ApplicationInfoAccessingHost *appInfoHost;
+    QString texto;
+    Form *form_;
 };
 
 #endif // CONTENTDOWLOADER_H

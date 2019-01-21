@@ -22,19 +22,19 @@
 
 
 EditNote::EditNote( QWidget *parent, const QString& tags, const QString& title, const QString& text, const QModelIndex& index)
-	: QDialog(parent)
+    : QDialog(parent)
         , index_(index)
 {
-	setAttribute(Qt::WA_DeleteOnClose);
-	setModal(false);
-	ui_.setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
+    setModal(false);
+    ui_.setupUi(this);
 
-	ui_.le_title->setText(title);
-	ui_.le_tags->setText(tags);
-	ui_.pte_text->insertPlainText(text);
+    ui_.le_title->setText(title);
+    ui_.le_tags->setText(tags);
+    ui_.pte_text->insertPlainText(text);
 
-	connect(ui_.buttonBox, SIGNAL(accepted()), this, SLOT(ok()));
-	connect(ui_.buttonBox, SIGNAL(rejected()), this, SLOT(close()));
+    connect(ui_.buttonBox, SIGNAL(accepted()), this, SLOT(ok()));
+    connect(ui_.buttonBox, SIGNAL(rejected()), this, SLOT(close()));
 
 }
 
@@ -44,26 +44,26 @@ EditNote::~EditNote()
 
 void EditNote::ok()
 {
-	QString text = ui_.pte_text->toPlainText();
-	QString title = ui_.le_title->text();
-	QString tags = ui_.le_tags->text();
+    QString text = ui_.pte_text->toPlainText();
+    QString title = ui_.le_title->text();
+    QString tags = ui_.le_tags->text();
 
-	QDomDocument doc;
-	QDomElement noteElem = doc.createElement("note");
-	QDomElement titleElem = doc.createElement("title");
-	QDomElement textElem = doc.createElement("text");
-	textElem.appendChild(doc.createTextNode(text));
-	titleElem.appendChild(doc.createTextNode(title));
-	noteElem.setAttribute("tags", tags);
-	noteElem.appendChild(titleElem);
-	noteElem.appendChild(textElem);
-	doc.appendChild(noteElem);
+    QDomDocument doc;
+    QDomElement noteElem = doc.createElement("note");
+    QDomElement titleElem = doc.createElement("title");
+    QDomElement textElem = doc.createElement("text");
+    textElem.appendChild(doc.createTextNode(text));
+    titleElem.appendChild(doc.createTextNode(title));
+    noteElem.setAttribute("tags", tags);
+    noteElem.appendChild(titleElem);
+    noteElem.appendChild(textElem);
+    doc.appendChild(noteElem);
 
-	if(!text.isEmpty() || !title.isEmpty() || !tags.isEmpty())
-		newNote(doc.documentElement());
+    if(!text.isEmpty() || !title.isEmpty() || !tags.isEmpty())
+        newNote(doc.documentElement());
 
-	editNote(doc.documentElement(), index_);
+    editNote(doc.documentElement(), index_);
 
-	close();
+    close();
 }
 

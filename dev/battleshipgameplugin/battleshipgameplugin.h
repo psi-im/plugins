@@ -64,82 +64,82 @@ public IconFactoryAccessor, public ToolbarIconAccessor, public ActiveTabAccessor
 public ContactInfoAccessor, public StanzaSender, public StanzaFilter, public EventCreator, public SoundAccessor,
 public MenuAccessor, public PopupAccessor
 {
-	Q_OBJECT
-	Q_PLUGIN_METADATA(IID "com.psi-plus.BattleshipGame")
-	Q_INTERFACES(PsiPlugin PluginInfoProvider OptionAccessor IconFactoryAccessor ToolbarIconAccessor
-		     ActiveTabAccessor AccountInfoAccessor ContactInfoAccessor StanzaSender StanzaFilter
-		     EventCreator SoundAccessor MenuAccessor PopupAccessor)
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "com.psi-plus.BattleshipGame")
+    Q_INTERFACES(PsiPlugin PluginInfoProvider OptionAccessor IconFactoryAccessor ToolbarIconAccessor
+             ActiveTabAccessor AccountInfoAccessor ContactInfoAccessor StanzaSender StanzaFilter
+             EventCreator SoundAccessor MenuAccessor PopupAccessor)
 
 public:
-	explicit BattleshipGamePlugin(QObject *parent = 0);
-	// Psiplugin
-	virtual QString name() const;
-	virtual QString shortName() const;
-	virtual QString version() const;
-	virtual QWidget* options();
-	virtual bool enable();
-	virtual bool disable();
-	virtual void applyOptions();
-	virtual void restoreOptions();
-	virtual QPixmap icon() const;
-	// Plugin info provider
-	virtual QString pluginInfo();
-	// Option accessor
-	virtual void setOptionAccessingHost(OptionAccessingHost*);
-	virtual void optionChanged(const QString&);
-	// Iconfactory accessor
-	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost*);
-	// Toolbar icon accessor
-	virtual QList<QVariantHash> getButtonParam();
-	virtual QAction* getAction(QObject* , int , const QString& );
-	// Activetab accessor
-	virtual void setActiveTabAccessingHost(ActiveTabAccessingHost*);
-	// Account info accessor
-	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost*);
-	// Contact info accessor
-	virtual void setContactInfoAccessingHost(ContactInfoAccessingHost*);
-	// Stanza sender
-	virtual void setStanzaSendingHost(StanzaSendingHost*);
-	// Stanza filter
-	virtual bool incomingStanza(int account, const QDomElement& xml);
-	virtual bool outgoingStanza(int account, QDomElement& xml);
-	// Event creator
-	virtual void setEventCreatingHost(EventCreatingHost*);
-	// Sound accessor
-	virtual void setSoundAccessingHost(SoundAccessingHost*);
-	// Menu accessor
-	virtual QList<QVariantHash> getAccountMenuParam();
-	virtual QList<QVariantHash> getContactMenuParam();
-	virtual QAction* getContactAction(QObject*, int, const QString&);
-	virtual QAction* getAccountAction(QObject*, int);
-	// Popup accessor
-	virtual void setPopupAccessingHost(PopupAccessingHost*);
+    explicit BattleshipGamePlugin(QObject *parent = 0);
+    // Psiplugin
+    virtual QString name() const;
+    virtual QString shortName() const;
+    virtual QString version() const;
+    virtual QWidget* options();
+    virtual bool enable();
+    virtual bool disable();
+    virtual void applyOptions();
+    virtual void restoreOptions();
+    virtual QPixmap icon() const;
+    // Plugin info provider
+    virtual QString pluginInfo();
+    // Option accessor
+    virtual void setOptionAccessingHost(OptionAccessingHost*);
+    virtual void optionChanged(const QString&);
+    // Iconfactory accessor
+    virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost*);
+    // Toolbar icon accessor
+    virtual QList<QVariantHash> getButtonParam();
+    virtual QAction* getAction(QObject* , int , const QString& );
+    // Activetab accessor
+    virtual void setActiveTabAccessingHost(ActiveTabAccessingHost*);
+    // Account info accessor
+    virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost*);
+    // Contact info accessor
+    virtual void setContactInfoAccessingHost(ContactInfoAccessingHost*);
+    // Stanza sender
+    virtual void setStanzaSendingHost(StanzaSendingHost*);
+    // Stanza filter
+    virtual bool incomingStanza(int account, const QDomElement& xml);
+    virtual bool outgoingStanza(int account, QDomElement& xml);
+    // Event creator
+    virtual void setEventCreatingHost(EventCreatingHost*);
+    // Sound accessor
+    virtual void setSoundAccessingHost(SoundAccessingHost*);
+    // Menu accessor
+    virtual QList<QVariantHash> getAccountMenuParam();
+    virtual QList<QVariantHash> getContactMenuParam();
+    virtual QAction* getContactAction(QObject*, int, const QString&);
+    virtual QAction* getAccountAction(QObject*, int);
+    // Popup accessor
+    virtual void setPopupAccessingHost(PopupAccessingHost*);
 
 private:
-	bool enabled_;
-	ActiveTabAccessingHost *psiTab;
-	IconFactoryAccessingHost *psiIcon;
-	AccountInfoAccessingHost *psiAccInfo;
-	ContactInfoAccessingHost *psiContactInfo;
-	StanzaSendingHost *psiSender;
-	EventCreatingHost *psiEvent;
-	SoundAccessingHost *psiSound;
-	PopupAccessingHost *psiPopup;
-	// --
-	Ui::options ui_;
+    bool enabled_;
+    ActiveTabAccessingHost *psiTab;
+    IconFactoryAccessingHost *psiIcon;
+    AccountInfoAccessingHost *psiAccInfo;
+    ContactInfoAccessingHost *psiContactInfo;
+    StanzaSendingHost *psiSender;
+    EventCreatingHost *psiEvent;
+    SoundAccessingHost *psiSound;
+    PopupAccessingHost *psiPopup;
+    // --
+    Ui::options ui_;
 
 private:
-	void inviteDlg(int account, QString full_jid);
+    void inviteDlg(int account, QString full_jid);
 
 private slots:
-	void toolButtonPressed();
-	void menuActivated();
-	void doPsiEvent(int, QString, QString, QObject *, const char *);
-	void sendGameStanza(int account, const QString stanza);
-	void testSound();
-	void getSound();
-	void doPopup(QString text);
-	void playSound(QString);
+    void toolButtonPressed();
+    void menuActivated();
+    void doPsiEvent(int, QString, QString, QObject *, const char *);
+    void sendGameStanza(int account, const QString stanza);
+    void testSound();
+    void getSound();
+    void doPopup(QString text);
+    void playSound(QString);
 
 };
 

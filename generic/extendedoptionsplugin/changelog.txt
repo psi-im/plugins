@@ -20,7 +20,7 @@ v0.3.8 - taurus
 2012-04-03
 v0.3.7
   + добавлены опции "options.service-discovery.last-activity", "options.ui.notifications.sounds.notify-every-muc-message",
-	"options.ui.notifications.passive-popups.suppress-while-dnd", "options.ui.notifications.passive-popups.suppress-while-away"
+    "options.ui.notifications.passive-popups.suppress-while-dnd", "options.ui.notifications.passive-popups.suppress-while-away"
 
 
 2011-12-15
@@ -39,29 +39,29 @@ v0.3.5
 2011-07-18
 v0.3.4
   + добавлены опции:
-	options.ui.muc.show-initial-joins
-	options.ui.muc.status-with-priority
-	options.ui.muc.userlist.show-status-icons
-	options.ui.muc.userlist.use-slim-group-headings
-	options.ui.muc.userlist.contact-sort-style
-	options.ui.muc.userlist.avatars.avatars-at-left
-	options.ui.muc.userlist.avatars.show
-	options.ui.muc.userlist.avatars.size
-	options.ui.muc.userlist.avatars.radius
-	options.ui.chat.auto-capitalize
-	options.ui.chat.auto-scroll-to-bottom
-	options.ui.chat.caption
-	options.ui.chat.default-jid-mode
-	options.ui.chat.default-jid-mode-ignorelist
-	options.ui.chat.show-status-changes
-	options.ui.chat.status-with-priority
-	options.ui.contactlist.auto-delete-unlisted
-	options.ui.account.single
-	options.xml-console.enable-at-login
-	options.muc.leave-status-message
-	options.muc.accept-defaults
-	options.muc.auto-configure
-	options.ui.flash-windows
+    options.ui.muc.show-initial-joins
+    options.ui.muc.status-with-priority
+    options.ui.muc.userlist.show-status-icons
+    options.ui.muc.userlist.use-slim-group-headings
+    options.ui.muc.userlist.contact-sort-style
+    options.ui.muc.userlist.avatars.avatars-at-left
+    options.ui.muc.userlist.avatars.show
+    options.ui.muc.userlist.avatars.size
+    options.ui.muc.userlist.avatars.radius
+    options.ui.chat.auto-capitalize
+    options.ui.chat.auto-scroll-to-bottom
+    options.ui.chat.caption
+    options.ui.chat.default-jid-mode
+    options.ui.chat.default-jid-mode-ignorelist
+    options.ui.chat.show-status-changes
+    options.ui.chat.status-with-priority
+    options.ui.contactlist.auto-delete-unlisted
+    options.ui.account.single
+    options.xml-console.enable-at-login
+    options.muc.leave-status-message
+    options.muc.accept-defaults
+    options.muc.auto-configure
+    options.ui.flash-windows
   * некоторый редизайнинг
 
 

@@ -35,14 +35,14 @@ class BoardView : public QTableView
 {
 Q_OBJECT
 public:
-	explicit BoardView(QWidget *parent = 0);
-	void setModel(QAbstractItemModel * model);
+    explicit BoardView(QWidget *parent = 0);
+    void setModel(QAbstractItemModel * model);
 
 private:
-	BoardModel *model_;
-	virtual void resizeEvent(QResizeEvent *event);
-	virtual void mouseReleaseEvent(QMouseEvent *event);
-	void setCellsSize();
+    BoardModel *model_;
+    virtual void resizeEvent(QResizeEvent *event);
+    virtual void mouseReleaseEvent(QMouseEvent *event);
+    void setCellsSize();
 
 signals:
 

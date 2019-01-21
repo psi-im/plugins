@@ -21,56 +21,56 @@
 #include "watcheditem.h"
 
 WatchedItem::WatchedItem(QListWidget *parent)
-	: QListWidgetItem(parent)
-	, jid_("")
-	, text_("")
-	, sFile_("")
-	, aUse_(false)
-	, groupChat_(false)
+    : QListWidgetItem(parent)
+    , jid_("")
+    , text_("")
+    , sFile_("")
+    , aUse_(false)
+    , groupChat_(false)
 {
 }
 
 WatchedItem::WatchedItem(const QString &jid, const QString &text, const QString &sFile, bool aUse, QListWidget *parent)
-	: QListWidgetItem(parent)
-	, jid_(jid)
-	, text_(text)
-	, sFile_(sFile)
-	, aUse_(aUse)
-	, groupChat_(false)
+    : QListWidgetItem(parent)
+    , jid_(jid)
+    , text_(text)
+    , sFile_(sFile)
+    , aUse_(aUse)
+    , groupChat_(false)
 {
 }
 
 QString WatchedItem::settingsString() const
 {
-	QStringList l = QStringList() << jid_ << text_ << sFile_;
-	l << (aUse_ ? "1" : "0");
-	l << (groupChat_ ? "1" : "0");
-	return l.join(splitStr);
+    QStringList l = QStringList() << jid_ << text_ << sFile_;
+    l << (aUse_ ? "1" : "0");
+    l << (groupChat_ ? "1" : "0");
+    return l.join(splitStr);
 }
 
 void WatchedItem::setSettings(const QString &settings)
 {
-	QStringList l = settings.split(splitStr);
-	if(!l.isEmpty())
-		jid_ = l.takeFirst();
-	if(!l.isEmpty())
-		text_ = l.takeFirst();
-	if(!l.isEmpty())
-		sFile_ = l.takeFirst();
-	if(!l.isEmpty())
-		aUse_ = l.takeFirst().toInt();
-	if(!l.isEmpty())
-		groupChat_ = l.takeFirst().toInt();
+    QStringList l = settings.split(splitStr);
+    if(!l.isEmpty())
+        jid_ = l.takeFirst();
+    if(!l.isEmpty())
+        text_ = l.takeFirst();
+    if(!l.isEmpty())
+        sFile_ = l.takeFirst();
+    if(!l.isEmpty())
+        aUse_ = l.takeFirst().toInt();
+    if(!l.isEmpty())
+        groupChat_ = l.takeFirst().toInt();
 }
 
 WatchedItem* WatchedItem::copy()
 {
-	WatchedItem *wi = new WatchedItem();
-	wi->setWatchedText(text_);
-	wi->setJid(jid_);
-	wi->setUse(aUse_);
-	wi->setSFile(sFile_);
-	wi->setText(text());
-	wi->setGroupChat(groupChat_);
-	return wi;
+    WatchedItem *wi = new WatchedItem();
+    wi->setWatchedText(text_);
+    wi->setJid(jid_);
+    wi->setUse(aUse_);
+    wi->setSFile(sFile_);
+    wi->setText(text());
+    wi->setGroupChat(groupChat_);
+    return wi;
 }

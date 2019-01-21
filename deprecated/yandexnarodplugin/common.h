@@ -1,7 +1,7 @@
 /*
     common.h
 
-	Copyright (c) 2011 by Evgeny Khryukin
+    Copyright (c) 2011 by Evgeny Khryukin
 
  ***************************************************************************
  *                                                                         *

@@ -15,13 +15,13 @@ class QWebFrame;
 
 class ScrollKeeper {
 private:
-	QWidget* chatView_;
-	int scrollPos_;
-	bool scrollToEnd_;
-	QTextEdit* ted_;
+    QWidget* chatView_;
+    int scrollPos_;
+    bool scrollToEnd_;
+    QTextEdit* ted_;
 public:
-	ScrollKeeper(QWidget* chatView);
-	virtual ~ScrollKeeper();
+    ScrollKeeper(QWidget* chatView);
+    virtual ~ScrollKeeper();
 };
 
 #endif /* SRC_PLUGINS_GENERIC_IMAGEPREVIEWPLUGIN_SCROLLKEEPER_H_ */

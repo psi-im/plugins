@@ -26,11 +26,11 @@ namespace Chess {
 
 class BoardDelegate : public QItemDelegate
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	BoardDelegate(QObject *parent) : QItemDelegate(parent) {};
-	virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    BoardDelegate(QObject *parent) : QItemDelegate(parent) {};
+    virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 
 };
 }

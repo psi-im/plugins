@@ -78,7 +78,7 @@ void PreferencesWidget::showChangeButtonColorDialog(QAbstractButton * button) {
 void PreferencesWidget::colorDialogOk() {
     if (now_changing_button) {
         QColor new_color = color_dialog.currentColor();
-	now_changing_button->setStyleSheet(QString("background-color: %1;").arg(new_color.name()));
+    now_changing_button->setStyleSheet(QString("background-color: %1;").arg(new_color.name()));
 
         if (now_changing_button == preferences_ui.usernameColorButton) {
             emit usernameColorChanged(new_color);

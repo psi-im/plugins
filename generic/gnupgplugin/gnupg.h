@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -37,90 +37,90 @@ class Options;
 class QMenu;
 
 class GnuPG : public QObject
-			, public PsiPlugin
-			, public PluginInfoProvider
-			, public StanzaFilter
-			, public PsiAccountController
-			, public OptionAccessor
-			, public ToolbarIconAccessor
-			, public IconFactoryAccessor
-			, public StanzaSender
-			, public ActiveTabAccessor
-			, public AccountInfoAccessor
+            , public PsiPlugin
+            , public PluginInfoProvider
+            , public StanzaFilter
+            , public PsiAccountController
+            , public OptionAccessor
+            , public ToolbarIconAccessor
+            , public IconFactoryAccessor
+            , public StanzaSender
+            , public ActiveTabAccessor
+            , public AccountInfoAccessor
 {
-	Q_OBJECT
-	Q_PLUGIN_METADATA(IID "com.psi-plus.GnuPG")
-	Q_INTERFACES(PsiPlugin
-				 PluginInfoProvider
-				 StanzaFilter
-				 PsiAccountController
-				 OptionAccessor
-				 ToolbarIconAccessor
-				 IconFactoryAccessor
-				 StanzaSender
-				 ActiveTabAccessor
-				 AccountInfoAccessor)
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "com.psi-plus.GnuPG")
+    Q_INTERFACES(PsiPlugin
+                 PluginInfoProvider
+                 StanzaFilter
+                 PsiAccountController
+                 OptionAccessor
+                 ToolbarIconAccessor
+                 IconFactoryAccessor
+                 StanzaSender
+                 ActiveTabAccessor
+                 AccountInfoAccessor)
 
 public:
-	GnuPG();
-	~GnuPG();
+    GnuPG();
+    ~GnuPG();
 
-	// from PsiPlugin
-	QString name() const { return "GnuPG Key Manager"; }
-	QString shortName() const { return "gnupg"; }
-	QString version() const { return "0.3.9"; }
+    // from PsiPlugin
+    QString name() const { return "GnuPG Key Manager"; }
+    QString shortName() const { return "gnupg"; }
+    QString version() const { return "0.3.9"; }
 
-	QWidget *options();
-	bool enable();
-	bool disable();
-	void applyOptions();
-	void restoreOptions();
-	QPixmap icon() const;
+    QWidget *options();
+    bool enable();
+    bool disable();
+    void applyOptions();
+    void restoreOptions();
+    QPixmap icon() const;
 
-	// from PluginInfoProvider
-	QString pluginInfo();
+    // from PluginInfoProvider
+    QString pluginInfo();
 
-	// from StanzaSender
-	void setStanzaSendingHost(StanzaSendingHost *host) { _stanzaSending = host; }
+    // from StanzaSender
+    void setStanzaSendingHost(StanzaSendingHost *host) { _stanzaSending = host; }
 
-	// from StanzaFilter
-	bool incomingStanza(int account, const QDomElement &stanza);
-	bool outgoingStanza(int /*account*/, QDomElement &/*stanza*/) { return false; }
+    // from StanzaFilter
+    bool incomingStanza(int account, const QDomElement &stanza);
+    bool outgoingStanza(int /*account*/, QDomElement &/*stanza*/) { return false; }
 
-	// from PsiAccountController
-	void setPsiAccountControllingHost(PsiAccountControllingHost *host) { _accountHost = host; }
+    // from PsiAccountController
+    void setPsiAccountControllingHost(PsiAccountControllingHost *host) { _accountHost = host; }
 
-	// from OptionAccessor
-	void setOptionAccessingHost(OptionAccessingHost *host) { _optionHost = host; }
-	void optionChanged(const QString &/*option*/) { }
+    // from OptionAccessor
+    void setOptionAccessingHost(OptionAccessingHost *host) { _optionHost = host; }
+    void optionChanged(const QString &/*option*/) { }
 
-	// from ToolbarIconAccessor
-	QList<QVariantHash> getButtonParam();
-	QAction* getAction(QObject * /*parent*/, int /*account*/, const QString &/*contact*/) { return 0; }
+    // from ToolbarIconAccessor
+    QList<QVariantHash> getButtonParam();
+    QAction* getAction(QObject * /*parent*/, int /*account*/, const QString &/*contact*/) { return 0; }
 
-	// from IconFactoryAccessor
-	void setIconFactoryAccessingHost(IconFactoryAccessingHost *host) { _iconFactory = host; }
+    // from IconFactoryAccessor
+    void setIconFactoryAccessingHost(IconFactoryAccessingHost *host) { _iconFactory = host; }
 
-	// from ActiveTabAccessor
-	void setActiveTabAccessingHost(ActiveTabAccessingHost* host) { _activeTab = host; }
+    // from ActiveTabAccessor
+    void setActiveTabAccessingHost(ActiveTabAccessingHost* host) { _activeTab = host; }
 
-	// from AccountInfoAccessor
-	void setAccountInfoAccessingHost(AccountInfoAccessingHost* host) { _accountInfo = host; }
+    // from AccountInfoAccessor
+    void setAccountInfoAccessingHost(AccountInfoAccessingHost* host) { _accountInfo = host; }
 
 private slots:
-	void actionActivated();
-	void sendPublicKey();
+    void actionActivated();
+    void sendPublicKey();
 
 private:
-	bool _enabled;
-	Options *_optionsForm;
-	PsiAccountControllingHost *_accountHost;
-	OptionAccessingHost *_optionHost;
-	IconFactoryAccessingHost *_iconFactory;
-	QMenu *_menu;
-	StanzaSendingHost *_stanzaSending;
-	ActiveTabAccessingHost *_activeTab;
-	AccountInfoAccessingHost *_accountInfo;
+    bool _enabled;
+    Options *_optionsForm;
+    PsiAccountControllingHost *_accountHost;
+    OptionAccessingHost *_optionHost;
+    IconFactoryAccessingHost *_iconFactory;
+    QMenu *_menu;
+    StanzaSendingHost *_stanzaSending;
+    ActiveTabAccessingHost *_activeTab;
+    AccountInfoAccessingHost *_accountInfo;
 };
 
 #endif // GNUPG_H

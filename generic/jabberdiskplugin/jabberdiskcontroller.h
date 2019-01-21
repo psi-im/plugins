@@ -35,37 +35,37 @@ class QDomElement;
 
 class JabberDiskController : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	static JabberDiskController* instance();
-	static void reset();
-	virtual ~JabberDiskController();
+    static JabberDiskController* instance();
+    static void reset();
+    virtual ~JabberDiskController();
 
-	//void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
-	void setStanzaSendingHost(StanzaSendingHost *host);
-	void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
-	bool incomingStanza(int account, const QDomElement& xml);
+    //void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
+    void setStanzaSendingHost(StanzaSendingHost *host);
+    void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+    bool incomingStanza(int account, const QDomElement& xml);
 
-	void sendStanza(int account, const QString& to, const QString& message, QString* id);
+    void sendStanza(int account, const QString& to, const QString& message, QString* id);
 
 signals:
-	void stanza(int account, const QDomElement& xml);
+    void stanza(int account, const QDomElement& xml);
 
 public slots:
-	void initSession();
+    void initSession();
 
 private slots:
-	void viewerDestroyed();
+    void viewerDestroyed();
 
 private:
-	JabberDiskController();
-	static JabberDiskController* instance_;
+    JabberDiskController();
+    static JabberDiskController* instance_;
 
 private:
-	StanzaSendingHost* stanzaSender;
-	//IconFactoryAccessingHost* iconHost;
-	AccountInfoAccessingHost* accInfo;
-	QList<Session> sessions_;
+    StanzaSendingHost* stanzaSender;
+    //IconFactoryAccessingHost* iconHost;
+    AccountInfoAccessingHost* accInfo;
+    QList<Session> sessions_;
 
 };
 

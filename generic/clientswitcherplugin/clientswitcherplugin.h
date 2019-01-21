@@ -57,105 +57,105 @@
 class ClientSwitcherPlugin: public QObject, public PsiPlugin, public OptionAccessor, public StanzaSender, public StanzaFilter, public PluginInfoProvider, public PopupAccessor, public ApplicationInfoAccessor, public AccountInfoAccessor, public PsiAccountController, public ContactInfoAccessor, public IconFactoryAccessor
 
 {
-	Q_OBJECT
-	Q_PLUGIN_METADATA(IID "com.psi-plus.ClientSwitcherPlugin")
-	Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter PluginInfoProvider PopupAccessor ApplicationInfoAccessor AccountInfoAccessor PsiAccountController ContactInfoAccessor IconFactoryAccessor)
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "com.psi-plus.ClientSwitcherPlugin")
+    Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter PluginInfoProvider PopupAccessor ApplicationInfoAccessor AccountInfoAccessor PsiAccountController ContactInfoAccessor IconFactoryAccessor)
 
 public:
-	ClientSwitcherPlugin();
-	~ClientSwitcherPlugin();
-	virtual QString name() const;
-	virtual QString shortName() const;
-	virtual QString version() const;
-	virtual bool enable();
-	virtual bool disable();
-	virtual QWidget* options();
-	virtual void applyOptions();
-	virtual void restoreOptions();
-	virtual QPixmap icon() const;
-	// OptionAccessor
-	virtual void setOptionAccessingHost(OptionAccessingHost*);
-	virtual void optionChanged(const QString&);
-	// StanzaSender
-	virtual void setStanzaSendingHost(StanzaSendingHost*);
-	// StanzaFilter
-	virtual bool incomingStanza(int, const QDomElement&);
-	virtual bool outgoingStanza(int, QDomElement&);
-	// EventFilter
-	virtual QString pluginInfo();
-	// PopupAccessor
-	virtual void setPopupAccessingHost(PopupAccessingHost*);
-	// ApplicationInfoAccessor
-	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost*);
-	// AccountInfoAccessing
-	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost*);
-	// PsiAccountController
-	virtual void setPsiAccountControllingHost(PsiAccountControllingHost*);
-	// ContactInfoAccessor
-	virtual void setContactInfoAccessingHost(ContactInfoAccessingHost*);
-	// IconFactoryAccessor
-	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
+    ClientSwitcherPlugin();
+    ~ClientSwitcherPlugin();
+    virtual QString name() const;
+    virtual QString shortName() const;
+    virtual QString version() const;
+    virtual bool enable();
+    virtual bool disable();
+    virtual QWidget* options();
+    virtual void applyOptions();
+    virtual void restoreOptions();
+    virtual QPixmap icon() const;
+    // OptionAccessor
+    virtual void setOptionAccessingHost(OptionAccessingHost*);
+    virtual void optionChanged(const QString&);
+    // StanzaSender
+    virtual void setStanzaSendingHost(StanzaSendingHost*);
+    // StanzaFilter
+    virtual bool incomingStanza(int, const QDomElement&);
+    virtual bool outgoingStanza(int, QDomElement&);
+    // EventFilter
+    virtual QString pluginInfo();
+    // PopupAccessor
+    virtual void setPopupAccessingHost(PopupAccessingHost*);
+    // ApplicationInfoAccessor
+    virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost*);
+    // AccountInfoAccessing
+    virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost*);
+    // PsiAccountController
+    virtual void setPsiAccountControllingHost(PsiAccountControllingHost*);
+    // ContactInfoAccessor
+    virtual void setContactInfoAccessingHost(ContactInfoAccessingHost*);
+    // IconFactoryAccessor
+    virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
 
 private:
-	struct OsStruct {
-		QString name;
-		OsStruct(const QString &n) : name(n) {}
-	};
+    struct OsStruct {
+        QString name;
+        OsStruct(const QString &n) : name(n) {}
+    };
 
-	struct ClientStruct {
-		QString name;
-		QString version;
-		QString caps_node;
-		QString caps_version;
-		ClientStruct(const QString &n, const QString &v, const QString &cn, const QString &cv) : name(n), version(v), caps_node(cn), caps_version(cv) {}
-	};
-	Ui::OptionsWidget ui_options;
-	StanzaSendingHost* sender_;
-	OptionAccessingHost* psiOptions;
-	PopupAccessingHost* psiPopup;
-	ApplicationInfoAccessingHost* psiInfo;
-	AccountInfoAccessingHost* psiAccount;
-	PsiAccountControllingHost* psiAccountCtl;
-	ContactInfoAccessingHost* psiContactInfo;
-	IconFactoryAccessingHost* psiIcon;
-	//--
-	bool enabled;
-	bool for_all_acc;
-	QList<AccountSettings*> settingsList;
-	//--
-	QString def_os_name;
-	QString def_client_name;
-	QString def_client_version;
-	QString def_caps_node;
-	QString def_caps_version;
-	QList<struct OsStruct> os_presets;
-	QList<struct ClientStruct> client_presets;
-	QString logsDir;
-	int heightLogsView;
-	int widthLogsView;
-	QString lastLogItem;
-	int popupId;
-	//--
+    struct ClientStruct {
+        QString name;
+        QString version;
+        QString caps_node;
+        QString caps_version;
+        ClientStruct(const QString &n, const QString &v, const QString &cn, const QString &cv) : name(n), version(v), caps_node(cn), caps_version(cv) {}
+    };
+    Ui::OptionsWidget ui_options;
+    StanzaSendingHost* sender_;
+    OptionAccessingHost* psiOptions;
+    PopupAccessingHost* psiPopup;
+    ApplicationInfoAccessingHost* psiInfo;
+    AccountInfoAccessingHost* psiAccount;
+    PsiAccountControllingHost* psiAccountCtl;
+    ContactInfoAccessingHost* psiContactInfo;
+    IconFactoryAccessingHost* psiIcon;
+    //--
+    bool enabled;
+    bool for_all_acc;
+    QList<AccountSettings*> settingsList;
+    //--
+    QString def_os_name;
+    QString def_client_name;
+    QString def_client_version;
+    QString def_caps_node;
+    QString def_caps_version;
+    QList<struct OsStruct> os_presets;
+    QList<struct ClientStruct> client_presets;
+    QString logsDir;
+    int heightLogsView;
+    int widthLogsView;
+    QString lastLogItem;
+    int popupId;
+    //--
 
-	int getOsTemplateIndex(QString&);
-	int getClientTemplateIndex(QString&, QString&, QString&, QString&);
-	int getAccountById(QString&);
-	AccountSettings* getAccountSetting(const QString&);
-	bool isSkipStanza(AccountSettings*, int, QString);
-	QString jidToNick(int account, const QString &jid);
-	void showPopup(const QString &nick);
-	void showLog(QString filename);
-	void saveToLog(int, QString, QString);
+    int getOsTemplateIndex(QString&);
+    int getClientTemplateIndex(QString&, QString&, QString&, QString&);
+    int getAccountById(QString&);
+    AccountSettings* getAccountSetting(const QString&);
+    bool isSkipStanza(AccountSettings*, int, QString);
+    QString jidToNick(int account, const QString &jid);
+    void showPopup(const QString &nick);
+    void showLog(QString filename);
+    void saveToLog(int, QString, QString);
 
 private slots:
-	void enableAccountsList(int);
-	void restoreOptionsAcc(int);
-	void enableMainParams(int);
-	void enableOsParams(int);
-	void enableClientParams(int);
-	void setNewCaps(int);
-	void viewFromOpt();
-	void onCloseView(int, int);
+    void enableAccountsList(int);
+    void restoreOptionsAcc(int);
+    void enableMainParams(int);
+    void enableOsParams(int);
+    void enableClientParams(int);
+    void setNewCaps(int);
+    void viewFromOpt();
+    void onCloseView(int, int);
 
 };
 

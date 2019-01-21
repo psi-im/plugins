@@ -28,31 +28,31 @@
 
 Display* X11Info::display()
 {
-	if (!_display) {
-		_display = XOpenDisplay(NULL);
-	}
-	return _display;
+    if (!_display) {
+        _display = XOpenDisplay(NULL);
+    }
+    return _display;
 }
 
 unsigned long X11Info::appRootWindow(int screen)
 {
-	return screen == -1?
-				XDefaultRootWindow(display()) :
-				XRootWindowOfScreen(XScreenOfDisplay(display(), screen));
+    return screen == -1?
+                XDefaultRootWindow(display()) :
+                XRootWindowOfScreen(XScreenOfDisplay(display(), screen));
 }
 
 int X11Info::appScreen()
 {
-	#error X11Info::appScreen not implemented for Qt5! You must skip this plugin.
+    #error X11Info::appScreen not implemented for Qt5! You must skip this plugin.
 }
 
 xcb_connection_t *X11Info::xcbConnection()
 {
-	if (!_xcb) {
-		_xcb = xcb_connect(NULL, &_xcbPreferredScreen);
-		Q_ASSERT(_xcb);
-	}
-	return _xcb;
+    if (!_xcb) {
+        _xcb = xcb_connect(NULL, &_xcbPreferredScreen);
+        Q_ASSERT(_xcb);
+    }
+    return _xcb;
 }
 
 xcb_connection_t* X11Info::_xcb = 0;

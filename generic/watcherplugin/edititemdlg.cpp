@@ -26,65 +26,65 @@
 static const QString splitStr = "&split&";
 
 EditItemDlg::EditItemDlg(IconFactoryAccessingHost* icoHost, OptionAccessingHost *psiOptions_, QWidget *p)
-	: QDialog(p, Qt::Window)
-	, psiOptions(psiOptions_)
+    : QDialog(p, Qt::Window)
+    , psiOptions(psiOptions_)
 {
-	setAttribute(Qt::WA_DeleteOnClose);
-	//setModal(true);
-	ui_.setupUi(this);
-	ui_.tb_open->setIcon(icoHost->getIcon("psi/browse"));
-	ui_.tb_test->setIcon(icoHost->getIcon("psi/play"));
+    setAttribute(Qt::WA_DeleteOnClose);
+    //setModal(true);
+    ui_.setupUi(this);
+    ui_.tb_open->setIcon(icoHost->getIcon("psi/browse"));
+    ui_.tb_test->setIcon(icoHost->getIcon("psi/play"));
 
-	connect(ui_.tb_test, SIGNAL(pressed()), SLOT(doTestSound()));
-	connect(ui_.tb_open, SIGNAL(pressed()), SLOT(getFileName()));
+    connect(ui_.tb_test, SIGNAL(pressed()), SLOT(doTestSound()));
+    connect(ui_.tb_open, SIGNAL(pressed()), SLOT(getFileName()));
 }
 
 void EditItemDlg::init(const QString &settings)
 {
-	QStringList l = settings.split(splitStr);
-	if(!l.isEmpty()) {
-		ui_.le_jid->setText(l.takeFirst());
-		ui_.le_jid->setEnabled(!ui_.le_jid->text().isEmpty());
-		ui_.rb_text->setChecked(ui_.le_jid->text().isEmpty());
-	}
-	if(!l.isEmpty()) {
-		ui_.te_text->setText(l.takeFirst());
-		ui_.te_text->setEnabled(!ui_.te_text->toPlainText().isEmpty());
-		ui_.rb_jid->setChecked(ui_.te_text->toPlainText().isEmpty());
-	}
-	if(!l.isEmpty())
-		ui_.le_sound->setText(l.takeFirst());
-	if(!l.isEmpty())
-		ui_.cb_always_play->setChecked(l.takeFirst().toInt());
-	if(!l.isEmpty())
-		ui_.rb_groupchat->setChecked(l.takeFirst().toInt());
+    QStringList l = settings.split(splitStr);
+    if(!l.isEmpty()) {
+        ui_.le_jid->setText(l.takeFirst());
+        ui_.le_jid->setEnabled(!ui_.le_jid->text().isEmpty());
+        ui_.rb_text->setChecked(ui_.le_jid->text().isEmpty());
+    }
+    if(!l.isEmpty()) {
+        ui_.te_text->setText(l.takeFirst());
+        ui_.te_text->setEnabled(!ui_.te_text->toPlainText().isEmpty());
+        ui_.rb_jid->setChecked(ui_.te_text->toPlainText().isEmpty());
+    }
+    if(!l.isEmpty())
+        ui_.le_sound->setText(l.takeFirst());
+    if(!l.isEmpty())
+        ui_.cb_always_play->setChecked(l.takeFirst().toInt());
+    if(!l.isEmpty())
+        ui_.rb_groupchat->setChecked(l.takeFirst().toInt());
 
 }
 
 void EditItemDlg::getFileName()
 {
-	QString fileName = QFileDialog::getOpenFileName(0,tr("Choose a sound file"),
-													psiOptions->getPluginOption(constLastFile, QVariant("")).toString(),
-													tr("Sound (*.wav)"));
-	if(fileName.isEmpty())
-		return;
-	QFileInfo fi(fileName);
-	psiOptions->setPluginOption(constLastFile, QVariant(fi.absolutePath()));
-	ui_.le_sound->setText(fileName);
+    QString fileName = QFileDialog::getOpenFileName(0,tr("Choose a sound file"),
+                                                    psiOptions->getPluginOption(constLastFile, QVariant("")).toString(),
+                                                    tr("Sound (*.wav)"));
+    if(fileName.isEmpty())
+        return;
+    QFileInfo fi(fileName);
+    psiOptions->setPluginOption(constLastFile, QVariant(fi.absolutePath()));
+    ui_.le_sound->setText(fileName);
 }
 
 void EditItemDlg::doTestSound()
 {
-	emit testSound(ui_.le_sound->text());
+    emit testSound(ui_.le_sound->text());
 }
 
 void EditItemDlg::accept()
 {
-	QString str = (ui_.rb_jid->isChecked() ? ui_.le_jid->text() : "") + splitStr;
-	str += (ui_.rb_text->isChecked() ? ui_.te_text->toPlainText() : "") + splitStr;
-	str += ui_.le_sound->text() + splitStr;
-	str += (ui_.cb_always_play->isChecked() ? "1" : "0") + splitStr;
-	str += ui_.rb_groupchat->isChecked() ? "1" : "0";
-	emit dlgAccepted(str);
-	close();
+    QString str = (ui_.rb_jid->isChecked() ? ui_.le_jid->text() : "") + splitStr;
+    str += (ui_.rb_text->isChecked() ? ui_.te_text->toPlainText() : "") + splitStr;
+    str += ui_.le_sound->text() + splitStr;
+    str += (ui_.cb_always_play->isChecked() ? "1" : "0") + splitStr;
+    str += ui_.rb_groupchat->isChecked() ? "1" : "0";
+    emit dlgAccepted(str);
+    close();
 }

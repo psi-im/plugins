@@ -9,7 +9,7 @@
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
@@ -36,50 +36,50 @@ namespace Ui { class Form; }
 
 class Form : public QWidget 
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	Form(QWidget *parent = 0);
-	~Form();
+    Form(QWidget *parent = 0);
+    ~Form();
 
-	void setDataDir(const QString &path);
-	void setCacheDir(const QString &path);
-	void setResourcesDir(const QString &path);
-	void setPsiOption(OptionAccessingHost *host);
-	void setProxy(const QNetworkProxy &proxy);
-		   
+    void setDataDir(const QString &path);
+    void setCacheDir(const QString &path);
+    void setResourcesDir(const QString &path);
+    void setPsiOption(OptionAccessingHost *host);
+    void setProxy(const QNetworkProxy &proxy);
+           
 public slots:
-	void on_btnInstall_clicked();
-	void on_btnLoadList_clicked();
+    void on_btnInstall_clicked();
+    void on_btnLoadList_clicked();
 
 protected:
-	void changeEvent(QEvent *e);
+    void changeEvent(QEvent *e);
 
 private:
-	void parseContentList(const QString &text);
-	void startDownload();
+    void parseContentList(const QString &text);
+    void startDownload();
 
-	Ui::Form *ui;
-	QNetworkAccessManager *nam_;
-	QString dataDir_;
-	QString tmpDir_;
-	QString listUrl_;
-	QList<ContentItem*> toDownload_;
-	OptionAccessingHost *psiOptions_;
-	QNetworkReply *replyLastHtml_;
-								 
+    Ui::Form *ui;
+    QNetworkAccessManager *nam_;
+    QString dataDir_;
+    QString tmpDir_;
+    QString listUrl_;
+    QList<ContentItem*> toDownload_;
+    OptionAccessingHost *psiOptions_;
+    QNetworkReply *replyLastHtml_;
+                                 
 
 private slots:
-	void downloadContentListProgress(qint64 bytesReceived, qint64 bytesTotal);
-	void downloadContentListFinished();
+    void downloadContentListProgress(qint64 bytesReceived, qint64 bytesTotal);
+    void downloadContentListFinished();
 
-	void downloadContentProgress(qint64 bytesReceived, qint64 bytesTotal);
-	void downloadContentFinished();
+    void downloadContentProgress(qint64 bytesReceived, qint64 bytesTotal);
+    void downloadContentFinished();
 
-	void downloadHtmlFinished();
-	void downloadImgFinished();
+    void downloadHtmlFinished();
+    void downloadImgFinished();
 
-	void modelSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
-	void modelSelectedItem();
+    void modelSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
+    void modelSelectedItem();
 };
 
 #endif // FORM_H

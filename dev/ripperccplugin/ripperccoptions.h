@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -35,15 +35,15 @@ public:
     explicit RipperCCOptions(QWidget *parent = 0);
     ~RipperCCOptions();
 
-	void update();
-	void setOptionAccessingHost(OptionAccessingHost* host) { _optionHost = host; }
+    void update();
+    void setOptionAccessingHost(OptionAccessingHost* host) { _optionHost = host; }
 
-	void loadSettings();
-	void saveSettings();
+    void loadSettings();
+    void saveSettings();
 
 private:
     Ui::RipperCCOptions *ui;
-	OptionAccessingHost *_optionHost;
+    OptionAccessingHost *_optionHost;
 };
 
 #endif // RIPPERCCOPTIONS_H

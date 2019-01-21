@@ -2,7 +2,7 @@
     uploadDialog
 
     Copyright (c) 2008 by Alexander Kazarin <boiler@co.ru>
-		  2011 Evgeny Khryukin
+          2011 Evgeny Khryukin
 
 
  ***************************************************************************
@@ -26,30 +26,30 @@ class UploadManager;
 
 class uploadDialog : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	uploadDialog(QWidget* p = 0);
-	~uploadDialog();
-	void start(const QString& fileName);
+    uploadDialog(QWidget* p = 0);
+    ~uploadDialog();
+    void start(const QString& fileName);
 
 private:
-	void setFilename(const QString& str);
-	Ui::uploadDialogClass ui;
-	QTime utime;
-	UploadManager* netman;
+    void setFilename(const QString& str);
+    Ui::uploadDialogClass ui;
+    QTime utime;
+    UploadManager* netman;
 
 
 signals:
-	void canceled();
-	void finished();
-	void fileUrl(const QString&);
+    void canceled();
+    void finished();
+    void fileUrl(const QString&);
 
 private slots:
-	void progress(qint64, qint64);
-	void setStatus(const QString& str) { ui.labelStatus->setText(str); }
-	void setDone();
-	void setLink(const QString& link);
+    void progress(qint64, qint64);
+    void setStatus(const QString& str) { ui.labelStatus->setText(str); }
+    void setDone();
+    void setLink(const QString& link);
 
 };
 #endif

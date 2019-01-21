@@ -25,15 +25,15 @@ typedef struct xcb_connection_t xcb_connection_t;
 
 class X11Info
 {
-	static Display *_display;
-	static xcb_connection_t *_xcb;
-	static int _xcbPreferredScreen;
+    static Display *_display;
+    static xcb_connection_t *_xcb;
+    static int _xcbPreferredScreen;
 
 public:
-	static Display* display();
-	static unsigned long appRootWindow(int screen = -1);
-	static xcb_connection_t* xcbConnection();
-	static inline int xcbPreferredScreen() { return _xcbPreferredScreen; }
+    static Display* display();
+    static unsigned long appRootWindow(int screen = -1);
+    static xcb_connection_t* xcbConnection();
+    static inline int xcbPreferredScreen() { return _xcbPreferredScreen; }
 };
 
 #endif // X11INFO_H

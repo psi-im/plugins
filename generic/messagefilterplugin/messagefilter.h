@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -39,69 +39,69 @@ class Options;
 class QMenu;
 
 class MessageFilter : public QObject
-					, public PsiPlugin
-					, public PluginInfoProvider
-					, public StanzaFilter
-					, public PsiAccountController
-					, public OptionAccessor
-					, public StanzaSender
-					, public AccountInfoAccessor
+                    , public PsiPlugin
+                    , public PluginInfoProvider
+                    , public StanzaFilter
+                    , public PsiAccountController
+                    , public OptionAccessor
+                    , public StanzaSender
+                    , public AccountInfoAccessor
 {
-	Q_OBJECT
-	Q_PLUGIN_METADATA(IID "com.psi-plus.MessageFilter")
-	Q_INTERFACES(PsiPlugin
-				 PluginInfoProvider
-				 StanzaFilter
-				 PsiAccountController
-				 OptionAccessor
-				 StanzaSender
-				 AccountInfoAccessor)
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "com.psi-plus.MessageFilter")
+    Q_INTERFACES(PsiPlugin
+                 PluginInfoProvider
+                 StanzaFilter
+                 PsiAccountController
+                 OptionAccessor
+                 StanzaSender
+                 AccountInfoAccessor)
 
 public:
-	MessageFilter();
-	~MessageFilter();
+    MessageFilter();
+    ~MessageFilter();
 
-	// from PsiPlugin
-	QString name() const { return "Message Filter Plugin"; }
-	QString shortName() const { return "messagefilter"; }
-	QString version() const { return "0.0.2"; }
+    // from PsiPlugin
+    QString name() const { return "Message Filter Plugin"; }
+    QString shortName() const { return "messagefilter"; }
+    QString version() const { return "0.0.2"; }
 
-	QWidget *options();
-	bool enable();
-	bool disable();
-	void applyOptions();
-	void restoreOptions();
-	QPixmap icon() const;
+    QWidget *options();
+    bool enable();
+    bool disable();
+    void applyOptions();
+    void restoreOptions();
+    QPixmap icon() const;
 
-	// from PluginInfoProvider
-	QString pluginInfo();
+    // from PluginInfoProvider
+    QString pluginInfo();
 
-	// from StanzaSender
-	void setStanzaSendingHost(StanzaSendingHost *host) { _stanzaSending = host; }
+    // from StanzaSender
+    void setStanzaSendingHost(StanzaSendingHost *host) { _stanzaSending = host; }
 
-	// from StanzaFilter
-	bool incomingStanza(int account, const QDomElement &stanza);
-	bool outgoingStanza(int /*account*/, QDomElement &/*stanza*/) { return false; }
+    // from StanzaFilter
+    bool incomingStanza(int account, const QDomElement &stanza);
+    bool outgoingStanza(int /*account*/, QDomElement &/*stanza*/) { return false; }
 
-	// from PsiAccountController
-	void setPsiAccountControllingHost(PsiAccountControllingHost *host) { _accountHost = host; }
+    // from PsiAccountController
+    void setPsiAccountControllingHost(PsiAccountControllingHost *host) { _accountHost = host; }
 
-	// from OptionAccessor
-	void setOptionAccessingHost(OptionAccessingHost *host) { _optionHost = host; }
-	void optionChanged(const QString &/*option*/) { }
+    // from OptionAccessor
+    void setOptionAccessingHost(OptionAccessingHost *host) { _optionHost = host; }
+    void optionChanged(const QString &/*option*/) { }
 
-	// from AccountInfoAccessor
-	void setAccountInfoAccessingHost(AccountInfoAccessingHost* host) { _accountInfo = host; }
+    // from AccountInfoAccessor
+    void setAccountInfoAccessingHost(AccountInfoAccessingHost* host) { _accountInfo = host; }
 
 private:
-	void loadRules();
-	bool _enabled;
-	Options *_optionsForm;
-	PsiAccountControllingHost *_accountHost;
-	OptionAccessingHost *_optionHost;
-	StanzaSendingHost *_stanzaSending;
-	AccountInfoAccessingHost *_accountInfo;
-	QList<Rule> _rules;
+    void loadRules();
+    bool _enabled;
+    Options *_optionsForm;
+    PsiAccountControllingHost *_accountHost;
+    OptionAccessingHost *_optionHost;
+    StanzaSendingHost *_stanzaSending;
+    AccountInfoAccessingHost *_accountInfo;
+    QList<Rule> _rules;
 };
 
 #endif // MESSAGEFILTER_H

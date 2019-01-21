@@ -80,7 +80,7 @@ WId QxtWindowSystem::activeWindow()
 
 QString QxtWindowSystem::windowTitle(WId /*window*/)
 {
-	/*
+    /*
     CGSValue windowTitle;
     CGError err(noErr);
     static CGSConnection connection = _CGSDefaultConnection();

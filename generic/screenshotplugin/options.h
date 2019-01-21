@@ -28,24 +28,24 @@ class OptionAccessingHost;
 
 class Options : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	static Options* instance();
-	static void reset();
-	~Options();
+    static Options* instance();
+    static void reset();
+    ~Options();
 
-	QVariant getOption(const QString& name, const QVariant& defValue = QVariant::Invalid);
-	void setOption(const QString& name, const QVariant& value);
+    QVariant getOption(const QString& name, const QVariant& defValue = QVariant::Invalid);
+    void setOption(const QString& name, const QVariant& value);
 
-	//for Psi plugin only
-	void setPsiOptions(OptionAccessingHost* psiOptions);
+    //for Psi plugin only
+    void setPsiOptions(OptionAccessingHost* psiOptions);
 
 private:
-	Options();
-	static Options* instance_;
+    Options();
+    static Options* instance_;
 
-	//for Psi plugin only
-	OptionAccessingHost* psiOptions;
+    //for Psi plugin only
+    OptionAccessingHost* psiOptions;
 };
 
 #endif // OPTIONS_H

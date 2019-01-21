@@ -22,80 +22,80 @@
 #include "captchadialog.h"
 
 CaptchaDialog::CaptchaDialog(const QString& id, QWidget *p)
-	: QDialog(p)
-	, id_(id)
+    : QDialog(p)
+    , id_(id)
 {
-	setAttribute(Qt::WA_DeleteOnClose);
-	ui_.setupUi(this);
-	toggleTEVisible(false);
+    setAttribute(Qt::WA_DeleteOnClose);
+    ui_.setupUi(this);
+    toggleTEVisible(false);
 
-	connect(ui_.buttonBox, SIGNAL(accepted()), SLOT(okPressed()));
-	connect(ui_.buttonBox, SIGNAL(rejected()), SLOT(cancelPressed()));
-	connect(ui_.cb_message, SIGNAL(toggled(bool)), SLOT(toggleTEVisible(bool)));
+    connect(ui_.buttonBox, SIGNAL(accepted()), SLOT(okPressed()));
+    connect(ui_.buttonBox, SIGNAL(rejected()), SLOT(cancelPressed()));
+    connect(ui_.cb_message, SIGNAL(toggled(bool)), SLOT(toggleTEVisible(bool)));
 
-	ui_.le_answer->installEventFilter(this);
+    ui_.le_answer->installEventFilter(this);
 }
 
 void CaptchaDialog::setQuestion(const QString &quest)
 {
-	ui_.lb_question->setText(quest);
-	adjustSize();
+    ui_.lb_question->setText(quest);
+    adjustSize();
 }
 
 void CaptchaDialog::toggleTEVisible(bool b)
 {
-	ui_.textEdit->setVisible(b);
-	adjustSize();
+    ui_.textEdit->setVisible(b);
+    adjustSize();
 }
 
 void CaptchaDialog::setPixmap(const QPixmap &pix)
 {
-	ui_.lb_image->setText("");
-	ui_.lb_image->setFixedSize(pix.size());
-	ui_.lb_image->setPixmap(pix);
-	adjustSize();
+    ui_.lb_image->setText("");
+    ui_.lb_image->setFixedSize(pix.size());
+    ui_.lb_image->setPixmap(pix);
+    adjustSize();
 }
 
 void CaptchaDialog::setText(const QString &text)
 {
-	ui_.lb_image->setText(text);
-	adjustSize();
+    ui_.lb_image->setText(text);
+    adjustSize();
 }
 
 void CaptchaDialog::setBody(const QString &body)
 {
-	ui_.textEdit->setPlainText(body);
+    ui_.textEdit->setPlainText(body);
 }
 
 void CaptchaDialog::okPressed()
 {
-	QString text = ui_.le_answer->text();
-	if(text.isEmpty())
-		emit cancel(id_);
-	else
-		emit ok(id_, text);
+    QString text = ui_.le_answer->text();
+    if(text.isEmpty())
+        emit cancel(id_);
+    else
+        emit ok(id_, text);
 
-	close();
+    close();
 }
 void CaptchaDialog::cancelPressed()
 {
-	emit cancel(id_);
-	close();
+    emit cancel(id_);
+    close();
 }
 
 bool CaptchaDialog::eventFilter(QObject *o, QEvent *e)
 {
-	if(o == ui_.le_answer && e->type() == QEvent::KeyPress) {
-		QKeyEvent *ke = static_cast<QKeyEvent*>(e);
-		if(ke->key() == Qt::Key_Escape) {
-			cancelPressed();
-			return true;
-		}
-		else if(ke->key() == Qt::Key_Enter) {
-			okPressed();
-			return true;
-		}
-	}
+    if(o == ui_.le_answer && e->type() == QEvent::KeyPress) {
+        QKeyEvent *ke = static_cast<QKeyEvent*>(e);
+        if(ke->key() == Qt::Key_Escape) {
+            cancelPressed();
+            return true;
+        }
+        else if(ke->key() == Qt::Key_Enter) {
+            okPressed();
+            return true;
+        }
+    }
 
-	return QDialog::eventFilter(o,e);
+    return QDialog::eventFilter(o,e);
 }

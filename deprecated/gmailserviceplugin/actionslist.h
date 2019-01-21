@@ -26,23 +26,23 @@
 
 class ActionsList : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	ActionsList(QObject* p);
-	~ActionsList();
-	QAction* newAction(QObject* p, int account, const QString& contact, QIcon ico);
-	void updateActionsVisibility(int account, bool isVisible);
-	void updateAction(int account, const QString& jid, bool isChecked);
+    ActionsList(QObject* p);
+    ~ActionsList();
+    QAction* newAction(QObject* p, int account, const QString& contact, QIcon ico);
+    void updateActionsVisibility(int account, bool isVisible);
+    void updateAction(int account, const QString& jid, bool isChecked);
 
 signals:
-	void changeNoSaveState(int account, QString jid, bool val);
+    void changeNoSaveState(int account, QString jid, bool val);
 
 private slots:
-	void actionActivated(bool val);
+    void actionActivated(bool val);
 
 private:
-	typedef QList< QPointer<QAction> > AList;
-	QHash<int, AList > list_;
+    typedef QList< QPointer<QAction> > AList;
+    QHash<int, AList > list_;
 };
 
 #endif // ACTIONSLIST_H

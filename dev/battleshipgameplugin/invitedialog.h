@@ -32,39 +32,39 @@ namespace Ui {
 }
 
 class InviteDialog : public QDialog {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	InviteDialog(const QString &jid, const QStringList &resources, QWidget *parent = 0);
-	~InviteDialog();
+    InviteDialog(const QString &jid, const QStringList &resources, QWidget *parent = 0);
+    ~InviteDialog();
 
 private:
-	Ui::InviteDialog *ui;
-	bool accepted_;
-	QString jid_;
+    Ui::InviteDialog *ui;
+    bool accepted_;
+    QString jid_;
 
 protected:
-	void closeEvent(QCloseEvent *event);
+    void closeEvent(QCloseEvent *event);
 
 private slots:
-	void acceptFirst();
-	void acceptSecond();
+    void acceptFirst();
+    void acceptSecond();
 
 signals:
-	void acceptGame(QString jid, bool first);
+    void acceptGame(QString jid, bool first);
 
 };
 
 class InvitationDialog : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	InvitationDialog(const QString &jid, bool first, QWidget *parent = 0);
+    InvitationDialog(const QString &jid, bool first, QWidget *parent = 0);
 
 private:
-	Ui::InvitationDialog ui_;
+    Ui::InvitationDialog ui_;
 
 private slots:
-	void okPressed();
+    void okPressed();
 
 };
 

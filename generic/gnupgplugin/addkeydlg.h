@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -28,26 +28,26 @@ namespace Ui { class AddKeyDlg; }
 
 class AddKeyDlg : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	explicit AddKeyDlg(QWidget *parent = 0);
-	~AddKeyDlg();
+    explicit AddKeyDlg(QWidget *parent = 0);
+    ~AddKeyDlg();
 
-	QString name() const;
-	QString email() const;
-	QString comment() const;
-	int type() const;
-	int length() const;
-	QDate expiration() const;
-	QString pass() const;
+    QString name() const;
+    QString email() const;
+    QString comment() const;
+    int type() const;
+    int length() const;
+    QDate expiration() const;
+    QString pass() const;
 
 private slots:
-	void checkPass();
-	void fillLenght(const QString &type);
+    void checkPass();
+    void fillLenght(const QString &type);
 
 private:
-	Ui::AddKeyDlg *ui;
+    Ui::AddKeyDlg *ui;
 };
 
 #endif // ADDKEYDLG_H

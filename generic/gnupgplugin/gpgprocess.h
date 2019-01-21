@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -25,18 +25,18 @@
 
 class GpgProcess : public QProcess
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	GpgProcess(QObject *parent = 0);
-	inline void start(const QStringList &arguments, OpenMode mode = ReadWrite) { QProcess::start(_bin, arguments, mode); }
-	inline void start(OpenMode mode = ReadWrite) { QProcess::start(_bin, mode); }
+    GpgProcess(QObject *parent = 0);
+    inline void start(const QStringList &arguments, OpenMode mode = ReadWrite) { QProcess::start(_bin, arguments, mode); }
+    inline void start(OpenMode mode = ReadWrite) { QProcess::start(_bin, mode); }
 
-	bool info(QString &message);
+    bool info(QString &message);
 
 private:
-	QString findBin() const;
-	QString _bin;
+    QString findBin() const;
+    QString _bin;
 };
 
 #endif // GPGPROCESS_H

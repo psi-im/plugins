@@ -50,7 +50,7 @@ class PstoPlugin : public QObject
                  , public PluginInfoProvider
 {
     Q_OBJECT
-	Q_PLUGIN_METADATA(IID "com.psi-plus.PstoPlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.PstoPlugin")
     Q_INTERFACES(PsiPlugin EventFilter StanzaFilter OptionAccessor PluginInfoProvider)
 
 public:
@@ -83,7 +83,7 @@ public:
         Q_UNUSED(account); Q_UNUSED(stanza); return false; }
 
     virtual QString pluginInfo();
-	virtual QPixmap icon() const;
+    virtual QPixmap icon() const;
 
 private:
     const QStringList psto_jids;

@@ -27,16 +27,16 @@ Options* Options::instance_ = 0;
 
 Options* Options::instance()
 {
-	if(!instance_) {
-		instance_ = new Options();
-	}
+    if(!instance_) {
+        instance_ = new Options();
+    }
 
-	return instance_;
+    return instance_;
 }
 
 Options::Options()
-	: QObject(0)
-	, psiOptions(0)
+    : QObject(0)
+    , psiOptions(0)
 {
 }
 
@@ -46,30 +46,30 @@ Options::~Options()
 
 void Options::reset()
 {
-	delete instance_;
-	instance_ = 0;
+    delete instance_;
+    instance_ = 0;
 }
 
 QVariant Options::getOption(const QString& name, const QVariant& defValue)
 {
-	QVariant val = defValue;
-	if(psiOptions) {
-		val = psiOptions->getPluginOption(name, val);
-	}
+    QVariant val = defValue;
+    if(psiOptions) {
+        val = psiOptions->getPluginOption(name, val);
+    }
 
-	return val;
+    return val;
 }
 
 void Options::setOption(const QString& name, const QVariant& value)
 {
-	if(psiOptions) {
-		psiOptions->setPluginOption(name, value);
-	}
+    if(psiOptions) {
+        psiOptions->setPluginOption(name, value);
+    }
 }
 
 //for Psi plugin only
 void Options::setPsiOptions(OptionAccessingHost* _psiOptions)
 {
-	psiOptions = _psiOptions;
+    psiOptions = _psiOptions;
 }
 

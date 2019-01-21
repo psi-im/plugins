@@ -30,23 +30,23 @@ class IconFactoryAccessingHost;
 
 class EditItemDlg : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	EditItemDlg(IconFactoryAccessingHost* icoHost, OptionAccessingHost *psiOptions_, QWidget *p = 0);
-	void init(const QString &settings);
+    EditItemDlg(IconFactoryAccessingHost* icoHost, OptionAccessingHost *psiOptions_, QWidget *p = 0);
+    void init(const QString &settings);
 
 signals:
-	void dlgAccepted(const QString&);
-	void testSound(const QString&);
+    void dlgAccepted(const QString&);
+    void testSound(const QString&);
 
 private slots:
-	void accept();
-	void getFileName();
-	void doTestSound();
+    void accept();
+    void getFileName();
+    void doTestSound();
 
 private:
-	Ui::EditItemDlg ui_;
-	OptionAccessingHost *psiOptions;
+    Ui::EditItemDlg ui_;
+    OptionAccessingHost *psiOptions;
 };
 
 #endif // EDITITEMDLG_H

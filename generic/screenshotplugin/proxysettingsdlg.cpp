@@ -23,43 +23,43 @@
 #include "ui_proxysettingsdlg.h"
 
 ProxySettingsDlg::ProxySettingsDlg(QWidget *parent)
-	: QDialog(parent)
-	, ui(new Ui::ProxySettingsDlg)
+    : QDialog(parent)
+    , ui(new Ui::ProxySettingsDlg)
 {
-	ui->setupUi(this);
-	ui->cb_type->addItems(QStringList() << "HTTP" << "SOCKS5");
-	ui->cb_type->setCurrentIndex(0);
+    ui->setupUi(this);
+    ui->cb_type->addItems(QStringList() << "HTTP" << "SOCKS5");
+    ui->cb_type->setCurrentIndex(0);
 }
 
 ProxySettingsDlg::~ProxySettingsDlg()
 {
-	delete ui;
+    delete ui;
 }
 
 void ProxySettingsDlg::setProxySettings(const Proxy &p)
 {
-	proxy_ = p;
-	ui->le_host->setText(p.host);
-	ui->le_pass->setText(p.pass);
-	ui->le_port->setText(QString::number(p.port));
-	ui->le_user->setText(p.user);
-	if(p.type == "socks") {
-		ui->cb_type->setCurrentIndex(1);
-	}
+    proxy_ = p;
+    ui->le_host->setText(p.host);
+    ui->le_pass->setText(p.pass);
+    ui->le_port->setText(QString::number(p.port));
+    ui->le_user->setText(p.user);
+    if(p.type == "socks") {
+        ui->cb_type->setCurrentIndex(1);
+    }
 }
 
 void ProxySettingsDlg::accept()
 {
-	if(ui->cb_type->currentText() == "HTTP") {
-		proxy_.type = "http";
-	}
-	else {
-		proxy_.type = "socks";
-	}
-	proxy_.host = ui->le_host->text();
-	proxy_.port = ui->le_port->text().toInt();
-	proxy_.user = ui->le_user->text();
-	proxy_.pass = ui->le_pass->text();
+    if(ui->cb_type->currentText() == "HTTP") {
+        proxy_.type = "http";
+    }
+    else {
+        proxy_.type = "socks";
+    }
+    proxy_.host = ui->le_host->text();
+    proxy_.port = ui->le_port->text().toInt();
+    proxy_.user = ui->le_user->text();
+    proxy_.pass = ui->le_pass->text();
 
-	QDialog::accept();
+    QDialog::accept();
 }

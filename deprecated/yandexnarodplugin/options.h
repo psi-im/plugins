@@ -1,7 +1,7 @@
 /*
     proxy.h
 
-	Copyright (c) 2011 by Evgeny Khryukin
+    Copyright (c) 2011 by Evgeny Khryukin
 
  ***************************************************************************
  *                                                                         *
@@ -41,31 +41,31 @@ enum MessageType { MAuthStart, MAuthOk, MAuthError, MCancel, MChooseFile, MUploa
 
 class Options : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	static Options * instance();
-	static void reset();
-	static QString message(MessageType type);
+    static Options * instance();
+    static void reset();
+    static QString message(MessageType type);
 
-	static QString encodePassword(const QString &pass);
-	static QString decodePassword(const QString &pass);
+    static QString encodePassword(const QString &pass);
+    static QString decodePassword(const QString &pass);
 
-	void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
-	void setOptionAccessingHost(OptionAccessingHost* host);
-	void setOption(const QString& name, const QVariant& value);
-	QVariant getOption(const QString& name, const QVariant& def = QVariant::Invalid);
-	QNetworkProxy getProxy() const;
-	bool useProxy() const;
-	void saveCookies(const QList<QNetworkCookie>& cooks);
-	QList<QNetworkCookie> loadCookies();
+    void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
+    void setOptionAccessingHost(OptionAccessingHost* host);
+    void setOption(const QString& name, const QVariant& value);
+    QVariant getOption(const QString& name, const QVariant& def = QVariant::Invalid);
+    QNetworkProxy getProxy() const;
+    bool useProxy() const;
+    void saveCookies(const QList<QNetworkCookie>& cooks);
+    QList<QNetworkCookie> loadCookies();
 
 private:
-	static Options * instance_;
-	Options ();
-	virtual ~Options();
+    static Options * instance_;
+    Options ();
+    virtual ~Options();
 
-	ApplicationInfoAccessingHost* appInfo;
-	OptionAccessingHost* options;
+    ApplicationInfoAccessingHost* appInfo;
+    OptionAccessingHost* options;
 };
 
 #endif // PROXY_H

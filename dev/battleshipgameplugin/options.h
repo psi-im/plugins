@@ -49,30 +49,30 @@ class Options : public QObject
 {
 Q_OBJECT
 public:
-	static OptionAccessingHost *psiOptions;
-	static Options *instance();
-	static void reset();
-	QVariant getOption(const QString &option_name) const;
-	void     setOption(const QString &option_name, const QVariant &option_value);
+    static OptionAccessingHost *psiOptions;
+    static Options *instance();
+    static void reset();
+    QVariant getOption(const QString &option_name) const;
+    void     setOption(const QString &option_name, const QVariant &option_value);
 
 private:
-	static Options *instance_;
-	bool dndDisable;
-	bool confDisable;
-	bool saveWndPosition;
-	bool saveWndWidthHeight;
-	int  windowTop;
-	int  windowLeft;
-	int  windowWidth;
-	int  windowHeight;
-	bool defSoundSettings;
-	QString soundStart;
-	QString soundFinish;
-	QString soundMove;
-	QString soundError;
+    static Options *instance_;
+    bool dndDisable;
+    bool confDisable;
+    bool saveWndPosition;
+    bool saveWndWidthHeight;
+    int  windowTop;
+    int  windowLeft;
+    int  windowWidth;
+    int  windowHeight;
+    bool defSoundSettings;
+    QString soundStart;
+    QString soundFinish;
+    QString soundMove;
+    QString soundError;
 
 private:
-	Options(QObject *parent = 0);
+    Options(QObject *parent = 0);
 
 signals:
 

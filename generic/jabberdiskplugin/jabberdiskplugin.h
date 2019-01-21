@@ -44,15 +44,15 @@ class QDomElement;
 #define constVersion "0.0.4"
 
 class JabberDiskPlugin : public QObject, public PsiPlugin, public StanzaSender, public IconFactoryAccessor,
-	public PluginInfoProvider, public StanzaFilter, public MenuAccessor, public AccountInfoAccessor, public OptionAccessor
-	/*, public PopupAccessor,*/
+    public PluginInfoProvider, public StanzaFilter, public MenuAccessor, public AccountInfoAccessor, public OptionAccessor
+    /*, public PopupAccessor,*/
 {
-	Q_OBJECT
-	Q_PLUGIN_METADATA(IID "com.psi-plus.JabberDiskPlugin")
-	Q_INTERFACES(PsiPlugin StanzaFilter StanzaSender IconFactoryAccessor AccountInfoAccessor//  PopupAccessor
-		     MenuAccessor PluginInfoProvider OptionAccessor)
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "com.psi-plus.JabberDiskPlugin")
+    Q_INTERFACES(PsiPlugin StanzaFilter StanzaSender IconFactoryAccessor AccountInfoAccessor//  PopupAccessor
+             MenuAccessor PluginInfoProvider OptionAccessor)
 public:
-	JabberDiskPlugin();
+    JabberDiskPlugin();
         virtual QString name() const;
         virtual QString shortName() const;
         virtual QString version() const;
@@ -60,43 +60,43 @@ public:
         virtual bool enable();
         virtual bool disable();
 
-	virtual Priority priority() { return PsiPlugin::PriorityHigh; }
+    virtual Priority priority() { return PsiPlugin::PriorityHigh; }
 
-	virtual void applyOptions();
-	virtual void restoreOptions();
-	virtual void setOptionAccessingHost(OptionAccessingHost* host);
-	virtual void optionChanged(const QString& ) {};
-	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
-	virtual void setStanzaSendingHost(StanzaSendingHost *host);
-	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
-	virtual bool incomingStanza(int account, const QDomElement& xml);
-	virtual bool outgoingStanza(int account, QDomElement& xml);
-	//virtual void setPopupAccessingHost(PopupAccessingHost* host);
-	virtual QList < QVariantHash > getAccountMenuParam();
-	virtual QList < QVariantHash > getContactMenuParam();
-	virtual QAction* getContactAction(QObject* , int , const QString& );
-	virtual QAction* getAccountAction(QObject* , int ) { return 0; };
-	virtual QString pluginInfo();
-	virtual QPixmap icon() const;
+    virtual void applyOptions();
+    virtual void restoreOptions();
+    virtual void setOptionAccessingHost(OptionAccessingHost* host);
+    virtual void optionChanged(const QString& ) {};
+    virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
+    virtual void setStanzaSendingHost(StanzaSendingHost *host);
+    virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+    virtual bool incomingStanza(int account, const QDomElement& xml);
+    virtual bool outgoingStanza(int account, QDomElement& xml);
+    //virtual void setPopupAccessingHost(PopupAccessingHost* host);
+    virtual QList < QVariantHash > getAccountMenuParam();
+    virtual QList < QVariantHash > getContactMenuParam();
+    virtual QAction* getContactAction(QObject* , int , const QString& );
+    virtual QAction* getAccountAction(QObject* , int ) { return 0; };
+    virtual QString pluginInfo();
+    virtual QPixmap icon() const;
 
 
 //signals:
 
 private slots:
-	void addJid();
-	void removeJid();
+    void addJid();
+    void removeJid();
 
 private:
-	void hack();
+    void hack();
 
 
 private:
-	bool enabled;
-	QPointer<QWidget> options_;
-	Ui::Options ui_;
-	OptionAccessingHost* psiOptions;
-	QStringList jids_;
-	IconFactoryAccessingHost* iconHost;
+    bool enabled;
+    QPointer<QWidget> options_;
+    Ui::Options ui_;
+    OptionAccessingHost* psiOptions;
+    QStringList jids_;
+    IconFactoryAccessingHost* iconHost;
 //
 //        PopupAccessingHost* popup;
 };

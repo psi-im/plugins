@@ -22,73 +22,73 @@
 #include "notes.h"
 
 NotesController::NotesController(StorageNotesPlugin* plugin)
-	: QObject(0)
-	, plugin_(plugin)
+    : QObject(0)
+    , plugin_(plugin)
 {
 }
 
 NotesController::~NotesController()
 {
-	foreach(Notes* n, notesList_.values()) {
-		delete n;
-		n = 0;
-	}
-	notesList_.clear();
+    foreach(Notes* n, notesList_.values()) {
+        delete n;
+        n = 0;
+    }
+    notesList_.clear();
 }
 
 void NotesController::incomingNotes(int account, const QList<QDomElement>& notes)
 {
-	if(notesList_.contains(account)) {
-		Notes* note = notesList_.value(account);
-		if(note)
-			note->incomingNotes(notes);
-	}
+    if(notesList_.contains(account)) {
+        Notes* note = notesList_.value(account);
+        if(note)
+            note->incomingNotes(notes);
+    }
 }
 
 void NotesController::start(int account)
 {
-	QPointer<Notes> note = 0;
+    QPointer<Notes> note = 0;
 
-	if(notesList_.contains(account)) {
-		note = notesList_.value(account);
-	}
-	if(note) {
-		note->load();
-		note->raise();
-	}
-	else {
-		note = new Notes(plugin_, account);
-		connect(note, SIGNAL(notesDeleted(int)), this, SLOT(notesDeleted(int)));
+    if(notesList_.contains(account)) {
+        note = notesList_.value(account);
+    }
+    if(note) {
+        note->load();
+        note->raise();
+    }
+    else {
+        note = new Notes(plugin_, account);
+        connect(note, SIGNAL(notesDeleted(int)), this, SLOT(notesDeleted(int)));
 
-		notesList_.insert(account, note);
-		note->load();
-		note->show();
-	}
+        notesList_.insert(account, note);
+        note->load();
+        note->show();
+    }
 }
 
 void NotesController::error(int account)
 {
-	if(notesList_.contains(account)) {
-		Notes* note = notesList_.value(account);
-		if(note)
-			note->error();
-	}
+    if(notesList_.contains(account)) {
+        Notes* note = notesList_.value(account);
+        if(note)
+            note->error();
+    }
 }
 
 void NotesController::saved(int account)
 {
-	if(notesList_.contains(account)) {
-		Notes* note = notesList_.value(account);
-		if(note)
-			note->saved();
-	}
+    if(notesList_.contains(account)) {
+        Notes* note = notesList_.value(account);
+        if(note)
+            note->saved();
+    }
 }
 
 void NotesController::notesDeleted(int account)
 {
-	if(notesList_.contains(account)) {
-		Notes* note = notesList_.value(account);
-		note->deleteLater();
-		notesList_.remove(account);
-	}
+    if(notesList_.contains(account)) {
+        Notes* note = notesList_.value(account);
+        note->deleteLater();
+        notesList_.remove(account);
+    }
 }

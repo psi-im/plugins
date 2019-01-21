@@ -30,22 +30,22 @@ class Notes;
 
 class NotesController : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	NotesController(StorageNotesPlugin* plugin);
-	~NotesController();
+    NotesController(StorageNotesPlugin* plugin);
+    ~NotesController();
 
-	void incomingNotes(int account, const QList<QDomElement>& notes);
-	void start(int account);
-	void error(int account);
-	void saved(int account);
+    void incomingNotes(int account, const QList<QDomElement>& notes);
+    void start(int account);
+    void error(int account);
+    void saved(int account);
 
 private slots:
-	void notesDeleted(int account);
+    void notesDeleted(int account);
 
 private:
-	QHash<int, QPointer<Notes> > notesList_;
-	StorageNotesPlugin* plugin_;
+    QHash<int, QPointer<Notes> > notesList_;
+    StorageNotesPlugin* plugin_;
 };
 
 #endif // NOTESCONTROLLER_H

@@ -29,81 +29,81 @@ InvateDialog::InvateDialog(int account, const QString jid, const QStringList res
     myAcc(account),
     jid_(jid)
 {
-	setAttribute(Qt::WA_DeleteOnClose);
-	ui->setupUi(this);
-	ui->leJid->setText(jid_);
-	ui->cbResource->addItems(resources);
-	adjustSize();
+    setAttribute(Qt::WA_DeleteOnClose);
+    ui->setupUi(this);
+    ui->leJid->setText(jid_);
+    ui->cbResource->addItems(resources);
+    adjustSize();
 }
 
 InvateDialog::~InvateDialog()
 {
-	delete ui;
+    delete ui;
 }
 
 void InvateDialog::acceptBlack()
 {
-	emit acceptGame(myAcc, jid_ + "/" + ui->cbResource->currentText(), "black");
-	accepted = true;
-	accept();
-	close();
+    emit acceptGame(myAcc, jid_ + "/" + ui->cbResource->currentText(), "black");
+    accepted = true;
+    accept();
+    close();
 }
 
 void InvateDialog::acceptWhite()
 {
-	emit acceptGame(myAcc, jid_ + "/" + ui->cbResource->currentText(), "white");
-	accepted = true;
-	accept();
-	close();
+    emit acceptGame(myAcc, jid_ + "/" + ui->cbResource->currentText(), "white");
+    accepted = true;
+    accept();
+    close();
 }
 
 void InvateDialog::closeEvent(QCloseEvent *event)
 {
-	if (!accepted) {
-		reject();
-		emit rejectGame(myAcc, jid_);
-	}
-	event->accept();
+    if (!accepted) {
+        reject();
+        emit rejectGame(myAcc, jid_);
+    }
+    event->accept();
 }
 
 // ----------------------------------------
 
 InvitationDialog::InvitationDialog(int account, QString jid, QString color, QString id, QWidget *parent)
-	:  QDialog(parent),
-	accepted_(false),
-	account_(account),
-	id_(id)
+    :  QDialog(parent),
+    accepted_(false),
+    account_(account),
+    id_(id)
 {
-	setAttribute(Qt::WA_DeleteOnClose);
-	setModal(false);
-	ui_.setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
+    setModal(false);
+    ui_.setupUi(this);
 
-	if(color == "white")
-		color = tr("white");
-	else
-		color = tr("black");
+    if(color == "white")
+        color = tr("white");
+    else
+        color = tr("black");
 
-	ui_.lbl_text->setText(tr("Player %1 invites you \nto play gomoku. He wants to play %2.")
-			      .arg(jid).arg(color));
+    ui_.lbl_text->setText(tr("Player %1 invites you \nto play gomoku. He wants to play %2.")
+                  .arg(jid).arg(color));
 
-	connect(ui_.pb_accept, SIGNAL(clicked()), this, SLOT(buttonPressed()));
-	connect(ui_.pb_reject, SIGNAL(clicked()), this, SLOT(close()));
+    connect(ui_.pb_accept, SIGNAL(clicked()), this, SLOT(buttonPressed()));
+    connect(ui_.pb_reject, SIGNAL(clicked()), this, SLOT(close()));
 
-	adjustSize();
-	setFixedSize(size());
+    adjustSize();
+    setFixedSize(size());
 }
 
 void InvitationDialog::buttonPressed()
 {
-	emit accepted(account_, id_);
-	accepted_ = true;
-	close();
+    emit accepted(account_, id_);
+    accepted_ = true;
+    close();
 }
 
 void InvitationDialog::closeEvent(QCloseEvent *e)
 {
-	if(!accepted_)
-		emit rejected(account_, id_);
-	e->accept();
-	close();
+    if(!accepted_)
+        emit rejected(account_, id_);
+    e->accept();
+    close();
 }

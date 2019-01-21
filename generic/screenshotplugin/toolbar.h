@@ -29,42 +29,42 @@ class QSpinBox;
 
 class ToolBar : public QToolBar
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	enum ButtonType {
-		ButtonSelect,
-		ButtonPen,
-		ButtonCut,
-		ButtonText,
-		ButtonColor,
-		ButtonUndo,
-		ButtonRotate,
-		ButtonCopy,
-		ButtonInsert,
-		ButtonNoButton
-	};
+    enum ButtonType {
+        ButtonSelect,
+        ButtonPen,
+        ButtonCut,
+        ButtonText,
+        ButtonColor,
+        ButtonUndo,
+        ButtonRotate,
+        ButtonCopy,
+        ButtonInsert,
+        ButtonNoButton
+    };
 
-	ToolBar(QWidget *parent);
-	~ToolBar();
-	void init();
-	ToolBar::ButtonType currentButton() const;
-	void checkButton(ToolBar::ButtonType);
-	void enableButton(bool enable, ToolBar::ButtonType type);
-	void setColorForColorButton(const QColor &color);
-	void setLineWidth(int width);
+    ToolBar(QWidget *parent);
+    ~ToolBar();
+    void init();
+    ToolBar::ButtonType currentButton() const;
+    void checkButton(ToolBar::ButtonType);
+    void enableButton(bool enable, ToolBar::ButtonType type);
+    void setColorForColorButton(const QColor &color);
+    void setLineWidth(int width);
 
 private slots:
-	void buttonChecked(bool);
-	void buttonClicked();
+    void buttonChecked(bool);
+    void buttonClicked();
 
 signals:
-	void buttonClicked(ToolBar::ButtonType);
-	void checkedButtonChanged(ToolBar::ButtonType);
-	void newWidth(int);
+    void buttonClicked(ToolBar::ButtonType);
+    void checkedButtonChanged(ToolBar::ButtonType);
+    void newWidth(int);
 
 private:
-	QList<Button*> buttons_;
-	QSpinBox *sb;
+    QList<Button*> buttons_;
+    QSpinBox *sb;
 
 };
 

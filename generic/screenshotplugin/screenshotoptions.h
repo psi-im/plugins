@@ -25,23 +25,23 @@
 
 class ScreenshotOptions : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	ScreenshotOptions(int delay, QWidget *parent = 0);
+    ScreenshotOptions(int delay, QWidget *parent = 0);
 
 signals:
-	void captureDesktop(int);
-	void captureWindow(int);
-	void captureArea(int);
-	void screenshotCanceled();
+    void captureDesktop(int);
+    void captureWindow(int);
+    void captureArea(int);
+    void screenshotCanceled();
 
 private slots:
-	void okPressed();
-	void cancelPressed();
-	void hideTimeout();
+    void okPressed();
+    void cancelPressed();
+    void hideTimeout();
 
 private:
-	Ui::ScreenshotOptions ui_;
+    Ui::ScreenshotOptions ui_;
 };
 
 #endif // SCREENSHOTOPTIONS_H

@@ -28,22 +28,22 @@
 
 class OptionsParser : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	OptionsParser(const QString& fileName, QObject *parent = 0);
-	QStringList getMissingNodesString() const;
-	QList<QDomNode> getMissingNodes() const;
-	QDomNode nodeByString(const QString& key) const;
+    OptionsParser(const QString& fileName, QObject *parent = 0);
+    QStringList getMissingNodesString() const;
+    QList<QDomNode> getMissingNodes() const;
+    QDomNode nodeByString(const QString& key) const;
 
 
 private:
-	QString fileName_;
-	QDomElement optionsElement_, defaultsElement_;
-	QMap<QString, QDomNode> missingNodes;
+    QString fileName_;
+    QDomElement optionsElement_, defaultsElement_;
+    QMap<QString, QDomNode> missingNodes;
 
-	void findMissingOptions(const QDomElement& optElement, QString *root);
-	bool findNode(const QDomElement& elem) const;
+    void findMissingOptions(const QDomElement& optElement, QString *root);
+    bool findNode(const QDomElement& elem) const;
 };
 
 #endif // OPTIONSPARSER_H

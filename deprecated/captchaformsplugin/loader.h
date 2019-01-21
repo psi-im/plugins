@@ -27,23 +27,23 @@ class QNetworkAccessManager;
 
 class Loader : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	Loader(const QString& id, QObject *p);
-	~Loader();
-	void start(const QString& url);
-	void setProxy(const QString& host, int port, const QString& user = QString(), const QString& pass = QString());
+    Loader(const QString& id, QObject *p);
+    ~Loader();
+    void start(const QString& url);
+    void setProxy(const QString& host, int port, const QString& user = QString(), const QString& pass = QString());
 
 private slots:
-	void onRequestFinish(QNetworkReply*);
+    void onRequestFinish(QNetworkReply*);
 
 signals:
-	void error(const QString&);
-	void data(const QString&, const QByteArray&);
+    void error(const QString&);
+    void data(const QString&, const QByteArray&);
 
 private:
-	QNetworkAccessManager* manager_;
-	QString id_;
+    QNetworkAccessManager* manager_;
+    QString id_;
 };
 
 #endif // LOADER_H

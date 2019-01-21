@@ -35,93 +35,93 @@ static const QStringList staticHostsList = QStringList() /*<< imageShack*/ << pi
 
 static bool isListContainsServer(const QString& server, const QStringList& servers)
 {
-	foreach(QString serv, servers) {
-		if(serv.split(Server::splitString()).first() == server.split(Server::splitString()).first())
-			return true;
-	}
-	return false;
+    foreach(QString serv, servers) {
+        if(serv.split(Server::splitString()).first() == server.split(Server::splitString()).first())
+            return true;
+    }
+    return false;
 }
 
 static void updateServer(QStringList *const servers, const QString& serv)
 {
-	QStringList::iterator it = servers->begin();
-	while(++it != servers->end()) {
-		const QStringList tmpOld = (*it).split(Server::splitString());
-		const QStringList tmpNew = serv.split(Server::splitString());
-		if(tmpOld.first() == tmpNew.first()) {
-			*it = serv;
-		}
-	}
+    QStringList::iterator it = servers->begin();
+    while(++it != servers->end()) {
+        const QStringList tmpOld = (*it).split(Server::splitString());
+        const QStringList tmpNew = serv.split(Server::splitString());
+        if(tmpOld.first() == tmpNew.first()) {
+            *it = serv;
+        }
+    }
 }
 
 
 Controller::Controller(ApplicationInfoAccessingHost* appInfo)
-	: QObject()
-	, appInfo_(appInfo)
+    : QObject()
+    , appInfo_(appInfo)
 {
-	Options* o = Options::instance();
-	QVariant vServers = o->getOption(constServerList);
+    Options* o = Options::instance();
+    QVariant vServers = o->getOption(constServerList);
 
-	if(!vServers.isValid()) { //приложение запущено впервые
-		o->setOption(constShortCut, QVariant("Alt+Shift+p"));
-		o->setOption(constFormat, QVariant("png"));
-		o->setOption(constFileName, QVariant("pic-yyyyMMdd-hhmmss"));
-		o->setOption(constDelay, QVariant(0));
-		o->setOption(constVersionOption, cVersion);
-		o->setOption(constDefaultAction, QVariant(Desktop));
-	}
+    if(!vServers.isValid()) { //приложение запущено впервые
+        o->setOption(constShortCut, QVariant("Alt+Shift+p"));
+        o->setOption(constFormat, QVariant("png"));
+        o->setOption(constFileName, QVariant("pic-yyyyMMdd-hhmmss"));
+        o->setOption(constDelay, QVariant(0));
+        o->setOption(constVersionOption, cVersion);
+        o->setOption(constDefaultAction, QVariant(Desktop));
+    }
 
-	QStringList servers = vServers.toStringList();
-	foreach(const QString& host, staticHostsList) {
-		if(!isListContainsServer(host, servers))
-			servers.append(host);
-	}
+    QStringList servers = vServers.toStringList();
+    foreach(const QString& host, staticHostsList) {
+        if(!isListContainsServer(host, servers))
+            servers.append(host);
+    }
 
-	if(o->getOption(constVersionOption).toString() != cVersion) {
-//		foreach(const QString& host, staticHostsList) {
-//			updateServer(&servers, host);
-//		}
-		//updateServer(&servers, ompldr);
+    if(o->getOption(constVersionOption).toString() != cVersion) {
+//        foreach(const QString& host, staticHostsList) {
+//            updateServer(&servers, host);
+//        }
+        //updateServer(&servers, ompldr);
 
-		doUpdate();
-		o->setOption(constVersionOption, cVersion);
-	}
+        doUpdate();
+        o->setOption(constVersionOption, cVersion);
+    }
 
-	o->setOption(constServerList, servers); //сохраняем обновленный список серверов
+    o->setOption(constServerList, servers); //сохраняем обновленный список серверов
 }
 
 Controller::~Controller()
 {
-	if (screenshot) {
-		delete screenshot;
-	}
+    if (screenshot) {
+        delete screenshot;
+    }
 
-	Options::reset();
-	ScreenshotIconset::reset();
+    Options::reset();
+    ScreenshotIconset::reset();
 }
 
 
 void Controller::onShortCutActivated()
 {
-	if(!screenshot) {
-		screenshot = new Screenshot();
-		screenshot->setProxy(appInfo_->getProxyFor(constName));
-	}
+    if(!screenshot) {
+        screenshot = new Screenshot();
+        screenshot->setProxy(appInfo_->getProxyFor(constName));
+    }
 
-	screenshot->action(Options::instance()->getOption(constDefaultAction).toInt());
+    screenshot->action(Options::instance()->getOption(constDefaultAction).toInt());
 }
 
 void Controller::openImage()
 {
-	if(!screenshot) {
-		screenshot = new Screenshot();
-		screenshot->setProxy(appInfo_->getProxyFor(constName));
-	}
+    if(!screenshot) {
+        screenshot = new Screenshot();
+        screenshot->setProxy(appInfo_->getProxyFor(constName));
+    }
 
-	screenshot->openImage();
+    screenshot->openImage();
 }
 
 void Controller::doUpdate()
 {
-	// do some updates
+    // do some updates
 }

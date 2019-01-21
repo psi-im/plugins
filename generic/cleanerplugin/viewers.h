@@ -30,11 +30,11 @@ class IconFactoryAccessingHost;
 
 class ClearingViewer : public QTableView
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
         ClearingViewer(QWidget *parent = 0) : QTableView(parent) {};
-	// virtual ~ClearingViewer() {};
+    // virtual ~ClearingViewer() {};
         void init(IconFactoryAccessingHost *iconHost);
 
 private:
@@ -45,7 +45,7 @@ protected:
         void contextMenuEvent( QContextMenuEvent * e );
 
 private slots:
-	void itemClicked(const QModelIndex& index);
+    void itemClicked(const QModelIndex& index);
 
 };
 
@@ -53,12 +53,12 @@ private slots:
 
 class AvatarDelegate : public QItemDelegate
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	AvatarDelegate(QObject *parent) : QItemDelegate(parent) {};
-	virtual QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
-	virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    AvatarDelegate(QObject *parent) : QItemDelegate(parent) {};
+    virtual QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 
 };
 

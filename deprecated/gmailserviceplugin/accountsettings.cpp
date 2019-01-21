@@ -23,58 +23,58 @@
 static const QString splitString = "&split&";
 
 AccountSettings::AccountSettings(int acc, QString j)
-	: account(acc)
-	, jid(j)
-	, fullJid(j)
-	, isMailEnabled(false)
-	, isMailSupported(false)
-	, isArchivingEnabled(false)
-	, isSuggestionsEnabled(false)
-	, notifyAllUnread(false)
-	, lastMailTime("")
-	, lastMailTid("")
-	, isSharedStatusEnabled(false)
-	, isSharedStatusSupported(false)
-	, isAttributesSupported(false)
-	, isAttributesEnabled(true)
-	, status("offline")
-	, message("")
-	, listMax(3)
-	, listContentsMax(5)
-	, statusMax(512)
-	, isNoSaveSupported(false)
-	, isNoSaveEnbaled(false)
+    : account(acc)
+    , jid(j)
+    , fullJid(j)
+    , isMailEnabled(false)
+    , isMailSupported(false)
+    , isArchivingEnabled(false)
+    , isSuggestionsEnabled(false)
+    , notifyAllUnread(false)
+    , lastMailTime("")
+    , lastMailTid("")
+    , isSharedStatusEnabled(false)
+    , isSharedStatusSupported(false)
+    , isAttributesSupported(false)
+    , isAttributesEnabled(true)
+    , status("offline")
+    , message("")
+    , listMax(3)
+    , listContentsMax(5)
+    , statusMax(512)
+    , isNoSaveSupported(false)
+    , isNoSaveEnbaled(false)
 {
 }
 
 void AccountSettings::fromString(const QString& settings)
 {
-	QStringList list = settings.split(splitString);
-	if(!list.isEmpty())
-		jid = list.takeFirst();
-	if(!list.isEmpty())
-		lastMailTime = list.takeFirst();
-	if(!list.isEmpty())
-		lastMailTid = list.takeFirst();
-	if(!list.isEmpty())
-		notifyAllUnread = (list.takeFirst() == "true");
-	if(!list.isEmpty())
-		isSharedStatusEnabled = (list.takeFirst() == "true");
-	if(!list.isEmpty())
-		isNoSaveEnbaled = (list.takeFirst() == "true");
-	if(!list.isEmpty())
-		isAttributesEnabled = (list.takeFirst() == "true");
+    QStringList list = settings.split(splitString);
+    if(!list.isEmpty())
+        jid = list.takeFirst();
+    if(!list.isEmpty())
+        lastMailTime = list.takeFirst();
+    if(!list.isEmpty())
+        lastMailTid = list.takeFirst();
+    if(!list.isEmpty())
+        notifyAllUnread = (list.takeFirst() == "true");
+    if(!list.isEmpty())
+        isSharedStatusEnabled = (list.takeFirst() == "true");
+    if(!list.isEmpty())
+        isNoSaveEnbaled = (list.takeFirst() == "true");
+    if(!list.isEmpty())
+        isAttributesEnabled = (list.takeFirst() == "true");
 }
 
 QString AccountSettings::toString() const
 {
-	QStringList list;
-	list <<  jid
-	     << lastMailTime
-	     << lastMailTid
-	     << (notifyAllUnread ? "true" : "false")
-	     << (isSharedStatusEnabled ? "true" : "false")
-	     << (isNoSaveEnbaled ? "true" : "false")
-	     << (isAttributesEnabled ? "true" : "false");
-	     return list.join(splitString);
+    QStringList list;
+    list <<  jid
+         << lastMailTime
+         << lastMailTid
+         << (notifyAllUnread ? "true" : "false")
+         << (isSharedStatusEnabled ? "true" : "false")
+         << (isNoSaveEnbaled ? "true" : "false")
+         << (isAttributesEnabled ? "true" : "false");
+         return list.join(splitString);
 }

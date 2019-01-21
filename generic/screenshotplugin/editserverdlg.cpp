@@ -23,75 +23,75 @@
 
 
 EditServerDlg::EditServerDlg(QWidget *parent)
-	: QDialog(parent)
+    : QDialog(parent)
 {
-	setAttribute(Qt::WA_DeleteOnClose);
-	setModal(false);
-	ui_.setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
+    setModal(false);
+    ui_.setupUi(this);
 
-	connect(ui_.buttonBox, SIGNAL(accepted()), SLOT(onOkPressed()));
+    connect(ui_.buttonBox, SIGNAL(accepted()), SLOT(onOkPressed()));
 }
 
 void EditServerDlg::onOkPressed()
 {
-	QStringList l = QStringList() << ui_.le_name->text() << ui_.le_url->text() << ui_.le_user->text() << ui_.le_pass->text();
-	l <<  ui_.le_post_data->text() << ui_.le_file_input->text() << ui_.le_regexp->text();
-	l << (ui_.cb_proxy->isChecked() ? "true" : "false");
-	const QString str = l.join(Server::splitString());
-	if(server_) {
-		server_->setFromString(str);
-		server_->setText(server_->displayName());
-	}
-	emit okPressed(str);
-	close();
+    QStringList l = QStringList() << ui_.le_name->text() << ui_.le_url->text() << ui_.le_user->text() << ui_.le_pass->text();
+    l <<  ui_.le_post_data->text() << ui_.le_file_input->text() << ui_.le_regexp->text();
+    l << (ui_.cb_proxy->isChecked() ? "true" : "false");
+    const QString str = l.join(Server::splitString());
+    if(server_) {
+        server_->setFromString(str);
+        server_->setText(server_->displayName());
+    }
+    emit okPressed(str);
+    close();
 }
 
 void EditServerDlg::setSettings(const QString& settings)
 {
-		QStringList l = settings.split(Server::splitString());
-		if(l.size() == 11) {
-			processOldSettingString(l);
-			return;
-		}
+        QStringList l = settings.split(Server::splitString());
+        if(l.size() == 11) {
+            processOldSettingString(l);
+            return;
+        }
 
-		if(!l.isEmpty())
-			ui_.le_name->setText(l.takeFirst());
-		if(!l.isEmpty())
-			ui_.le_url->setText(l.takeFirst());
-		if(!l.isEmpty())
-			ui_.le_user->setText(l.takeFirst());
-		if(!l.isEmpty())
-			ui_.le_pass->setText(l.takeFirst());
-		if(!l.isEmpty())
-			ui_.le_post_data->setText(l.takeFirst());
-		if(!l.isEmpty())
-			ui_.le_file_input->setText(l.takeFirst());
-		if(!l.isEmpty())
-			ui_.le_regexp->setText(l.takeFirst());
-		if(!l.isEmpty())
-			ui_.cb_proxy->setChecked(l.takeFirst() == "true");
+        if(!l.isEmpty())
+            ui_.le_name->setText(l.takeFirst());
+        if(!l.isEmpty())
+            ui_.le_url->setText(l.takeFirst());
+        if(!l.isEmpty())
+            ui_.le_user->setText(l.takeFirst());
+        if(!l.isEmpty())
+            ui_.le_pass->setText(l.takeFirst());
+        if(!l.isEmpty())
+            ui_.le_post_data->setText(l.takeFirst());
+        if(!l.isEmpty())
+            ui_.le_file_input->setText(l.takeFirst());
+        if(!l.isEmpty())
+            ui_.le_regexp->setText(l.takeFirst());
+        if(!l.isEmpty())
+            ui_.cb_proxy->setChecked(l.takeFirst() == "true");
 }
 
 void EditServerDlg::processOldSettingString(QStringList l)
 {
-	ui_.le_name->setText(l.takeFirst());
-	ui_.le_url->setText(l.takeFirst());
-	ui_.le_user->setText(l.takeFirst());
-	ui_.le_pass->setText(l.takeFirst());
+    ui_.le_name->setText(l.takeFirst());
+    ui_.le_url->setText(l.takeFirst());
+    ui_.le_user->setText(l.takeFirst());
+    ui_.le_pass->setText(l.takeFirst());
 
-	//remove old useless proxy settings
-	l.takeFirst();
-	l.takeFirst();
-	l.takeFirst();
-	l.takeFirst();
+    //remove old useless proxy settings
+    l.takeFirst();
+    l.takeFirst();
+    l.takeFirst();
+    l.takeFirst();
 
-	ui_.le_post_data->setText(l.takeFirst());
-	ui_.le_file_input->setText(l.takeFirst());
-	ui_.le_regexp->setText(l.takeFirst());
+    ui_.le_post_data->setText(l.takeFirst());
+    ui_.le_file_input->setText(l.takeFirst());
+    ui_.le_regexp->setText(l.takeFirst());
 }
 
 void EditServerDlg::setServer(Server *const s)
 {
-	server_ = s;
-	setSettings(s->settingsToString());
+    server_ = s;
+    setSettings(s->settingsToString());
 }

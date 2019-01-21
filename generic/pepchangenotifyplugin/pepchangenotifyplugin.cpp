@@ -56,514 +56,514 @@
 const int connectDelay = 30;
 
 class PepPlugin: public QObject, public PsiPlugin, public StanzaFilter, public AccountInfoAccessor,
-			public OptionAccessor, public PopupAccessor, public PluginInfoProvider, public SoundAccessor,
-			public ApplicationInfoAccessor, public ContactInfoAccessor, public IconFactoryAccessor
+            public OptionAccessor, public PopupAccessor, public PluginInfoProvider, public SoundAccessor,
+            public ApplicationInfoAccessor, public ContactInfoAccessor, public IconFactoryAccessor
 {
-	Q_OBJECT
-	Q_PLUGIN_METADATA(IID "com.psi-plus.PepPlugin")
-	Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor OptionAccessor PopupAccessor SoundAccessor
-		     PluginInfoProvider ApplicationInfoAccessor ContactInfoAccessor IconFactoryAccessor)
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "com.psi-plus.PepPlugin")
+    Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor OptionAccessor PopupAccessor SoundAccessor
+             PluginInfoProvider ApplicationInfoAccessor ContactInfoAccessor IconFactoryAccessor)
 
 public:
-	PepPlugin();
-	virtual QString name() const;
-	virtual QString shortName() const;
-	virtual QString version() const;
-	virtual QWidget* options();
-	virtual bool enable();
-	virtual bool disable();
-	virtual void applyOptions();
-	virtual void restoreOptions();
-	virtual bool incomingStanza(int account, const QDomElement& xml);
-	virtual bool outgoingStanza(int account, QDomElement& xml);
-	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
-	virtual void setOptionAccessingHost(OptionAccessingHost* host);
-	virtual void optionChanged(const QString& /*option*/) {};
-	virtual void setPopupAccessingHost(PopupAccessingHost* host);
-	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
-	virtual void setContactInfoAccessingHost(ContactInfoAccessingHost* host);
-	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
-	virtual void setSoundAccessingHost(SoundAccessingHost* host);
-	virtual QString pluginInfo();
-	virtual QPixmap icon() const;
+    PepPlugin();
+    virtual QString name() const;
+    virtual QString shortName() const;
+    virtual QString version() const;
+    virtual QWidget* options();
+    virtual bool enable();
+    virtual bool disable();
+    virtual void applyOptions();
+    virtual void restoreOptions();
+    virtual bool incomingStanza(int account, const QDomElement& xml);
+    virtual bool outgoingStanza(int account, QDomElement& xml);
+    virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+    virtual void setOptionAccessingHost(OptionAccessingHost* host);
+    virtual void optionChanged(const QString& /*option*/) {};
+    virtual void setPopupAccessingHost(PopupAccessingHost* host);
+    virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
+    virtual void setContactInfoAccessingHost(ContactInfoAccessingHost* host);
+    virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
+    virtual void setSoundAccessingHost(SoundAccessingHost* host);
+    virtual QString pluginInfo();
+    virtual QPixmap icon() const;
 
 
 private:
-	bool enabled;
-	OptionAccessingHost* psiOptions;
-	AccountInfoAccessingHost *accInfoHost;
-	PopupAccessingHost* popup;
-	ApplicationInfoAccessingHost* appInfo;
-	ContactInfoAccessingHost* contactInfo;
-	IconFactoryAccessingHost* iconHost;
-	SoundAccessingHost* sound_;
-	QString soundFile;
-	//int interval;
-	int delay;
-	bool showMood, showTune, showActivity;//, showGeoloc;
-	bool disableDnd;
-	int popupId;
-	QPointer<QWidget> options_;
-	Ui::Options ui_;
+    bool enabled;
+    OptionAccessingHost* psiOptions;
+    AccountInfoAccessingHost *accInfoHost;
+    PopupAccessingHost* popup;
+    ApplicationInfoAccessingHost* appInfo;
+    ContactInfoAccessingHost* contactInfo;
+    IconFactoryAccessingHost* iconHost;
+    SoundAccessingHost* sound_;
+    QString soundFile;
+    //int interval;
+    int delay;
+    bool showMood, showTune, showActivity;//, showGeoloc;
+    bool disableDnd;
+    int popupId;
+    QPointer<QWidget> options_;
+    Ui::Options ui_;
 
-	struct ContactState
-	{
-		ContactState(const QString& j = QString()) : jid(j) {}
-		enum Event {
-			EventTune,
-			EventMood,
-			EventActivity
-			//,EventGeolocation
-		};
-		QString jid;
-		QMap<Event, QTime> events;
-		bool operator==(const ContactState& s)
-		{
-			return jid == s.jid;
-		}
-	};
-	QList<ContactState> states_;
-	QHash<int, QTime> lastConnectionTime_; // <int account, QTime connection_time>
-	QHash<QString, QTime> contactsOnlineTime_; // <JID, time when contact goes online>
+    struct ContactState
+    {
+        ContactState(const QString& j = QString()) : jid(j) {}
+        enum Event {
+            EventTune,
+            EventMood,
+            EventActivity
+            //,EventGeolocation
+        };
+        QString jid;
+        QMap<Event, QTime> events;
+        bool operator==(const ContactState& s)
+        {
+            return jid == s.jid;
+        }
+    };
+    QList<ContactState> states_;
+    QHash<int, QTime> lastConnectionTime_; // <int account, QTime connection_time>
+    QHash<QString, QTime> contactsOnlineTime_; // <JID, time when contact goes online>
 
-	QList<ContactState>::iterator findContactStateIndex(const QString& jid);
-	bool checkContactState(QList<ContactState>::iterator it, ContactState::Event e);
-	bool checkContactStatus(const QString& jid);
-	bool processJid(const QString& jid, ContactState::Event e);
-	void playSound(const QString& soundFile);
-	void showPopup(const QString& title, const QString& text, const QString& icon);
-	QDomElement getFirstChildElement(const QDomElement& elem);
+    QList<ContactState>::iterator findContactStateIndex(const QString& jid);
+    bool checkContactState(QList<ContactState>::iterator it, ContactState::Event e);
+    bool checkContactStatus(const QString& jid);
+    bool processJid(const QString& jid, ContactState::Event e);
+    void playSound(const QString& soundFile);
+    void showPopup(const QString& title, const QString& text, const QString& icon);
+    QDomElement getFirstChildElement(const QDomElement& elem);
 
 private slots:
         void checkSound();
         void getSound();
-	void doNotification(const QString& title, const QString& text, const QString& icon);
+    void doNotification(const QString& title, const QString& text, const QString& icon);
     };
 
 PepPlugin::PepPlugin()
-	: enabled(false)
-	, psiOptions(0)
-	, accInfoHost(0)
-	, popup(0)
-	, appInfo(0)
-	, contactInfo(0)
-	, iconHost(0)
-	, sound_(0)
-	, soundFile("sound/pepnotify.wav")
-	//, interval(5)
-	, delay(60)
-	, showMood(false)
-	, showTune(true)
-	, showActivity(false)
-//	, showGeoloc(false)
-	, disableDnd(false)
-	, popupId(0)
+    : enabled(false)
+    , psiOptions(0)
+    , accInfoHost(0)
+    , popup(0)
+    , appInfo(0)
+    , contactInfo(0)
+    , iconHost(0)
+    , sound_(0)
+    , soundFile("sound/pepnotify.wav")
+    //, interval(5)
+    , delay(60)
+    , showMood(false)
+    , showTune(true)
+    , showActivity(false)
+//    , showGeoloc(false)
+    , disableDnd(false)
+    , popupId(0)
 {
 }
 
 QString PepPlugin::name() const
 {
-	return "PEP Change Notify Plugin";
+    return "PEP Change Notify Plugin";
 }
 
 QString PepPlugin::shortName() const
 {
-	return "pepplugin";
+    return "pepplugin";
 }
 
 QString PepPlugin::version() const
 {
-	return cVer;
+    return cVer;
 }
 
 bool PepPlugin::enable()
 {
-	states_.clear();
-	lastConnectionTime_.clear();
-	contactsOnlineTime_.clear();
-	if(psiOptions) {
-		enabled = true;
-		soundFile = psiOptions->getPluginOption(constSoundFile, QVariant(soundFile)).toString();
-		showMood = psiOptions->getPluginOption(constMood, QVariant(showMood)).toBool();
-		showTune = psiOptions->getPluginOption(constTune, QVariant(showTune)).toBool();
-		showActivity = psiOptions->getPluginOption(constActivity, QVariant(showActivity)).toBool();
-//		showGeoloc = psiOptions->getPluginOption(constGeoloc, QVariant(showGeoloc)).toBool();
-		disableDnd = psiOptions->getPluginOption(constDisableDnd, QVariant(disableDnd)).toBool();
-		delay = psiOptions->getPluginOption(constContactDelay, QVariant(delay)).toInt();
+    states_.clear();
+    lastConnectionTime_.clear();
+    contactsOnlineTime_.clear();
+    if(psiOptions) {
+        enabled = true;
+        soundFile = psiOptions->getPluginOption(constSoundFile, QVariant(soundFile)).toString();
+        showMood = psiOptions->getPluginOption(constMood, QVariant(showMood)).toBool();
+        showTune = psiOptions->getPluginOption(constTune, QVariant(showTune)).toBool();
+        showActivity = psiOptions->getPluginOption(constActivity, QVariant(showActivity)).toBool();
+//        showGeoloc = psiOptions->getPluginOption(constGeoloc, QVariant(showGeoloc)).toBool();
+        disableDnd = psiOptions->getPluginOption(constDisableDnd, QVariant(disableDnd)).toBool();
+        delay = psiOptions->getPluginOption(constContactDelay, QVariant(delay)).toInt();
 
-		int interval = psiOptions->getPluginOption(constInterval, QVariant(5000)).toInt()/1000;
-		popupId = popup->registerOption(POPUP_OPTION_NAME, interval, "plugins.options."+shortName()+"."+constInterval);
-	}
-	return enabled;
+        int interval = psiOptions->getPluginOption(constInterval, QVariant(5000)).toInt()/1000;
+        popupId = popup->registerOption(POPUP_OPTION_NAME, interval, "plugins.options."+shortName()+"."+constInterval);
+    }
+    return enabled;
 }
 
 bool PepPlugin::disable()
 {
-	states_.clear();
-	lastConnectionTime_.clear();
-	contactsOnlineTime_.clear();
-	popup->unregisterOption(POPUP_OPTION_NAME);
-	enabled = false;
-	return true;
+    states_.clear();
+    lastConnectionTime_.clear();
+    contactsOnlineTime_.clear();
+    popup->unregisterOption(POPUP_OPTION_NAME);
+    enabled = false;
+    return true;
 }
 
 QWidget* PepPlugin::options()
 {
-	if(!enabled)
-		return 0;
+    if(!enabled)
+        return 0;
 
-	options_ = new QWidget();
-	ui_.setupUi(options_);
+    options_ = new QWidget();
+    ui_.setupUi(options_);
 
-	ui_.cb_geoloc->setVisible(false); //FIXME
+    ui_.cb_geoloc->setVisible(false); //FIXME
 
-	ui_.pb_check->setIcon(iconHost->getIcon("psi/play"));
-	ui_.pb_get->setIcon(iconHost->getIcon("psi/browse"));
+    ui_.pb_check->setIcon(iconHost->getIcon("psi/play"));
+    ui_.pb_get->setIcon(iconHost->getIcon("psi/browse"));
 
-	connect(ui_.pb_check, SIGNAL(clicked()), SLOT(checkSound()));
-	connect(ui_.pb_get, SIGNAL(clicked()), SLOT(getSound()));
+    connect(ui_.pb_check, SIGNAL(clicked()), SLOT(checkSound()));
+    connect(ui_.pb_get, SIGNAL(clicked()), SLOT(getSound()));
 
-	restoreOptions();
+    restoreOptions();
 
-	return options_;
+    return options_;
 }
 
 bool PepPlugin::incomingStanza(int account, const QDomElement& stanza)
 {
-	if (enabled) {
-		if(stanza.tagName() == "presence") {
-			QString type = stanza.attribute("type");
-			QString jid = stanza.attribute("from").split("/").first().toLower();
-			if(type == "unavailable") {
-				contactsOnlineTime_.remove(jid);
-			}
-			else if(!contactsOnlineTime_.contains(jid)) {
-				contactsOnlineTime_.insert(jid, QTime::currentTime());
-			}
-			return false;
-		}
+    if (enabled) {
+        if(stanza.tagName() == "presence") {
+            QString type = stanza.attribute("type");
+            QString jid = stanza.attribute("from").split("/").first().toLower();
+            if(type == "unavailable") {
+                contactsOnlineTime_.remove(jid);
+            }
+            else if(!contactsOnlineTime_.contains(jid)) {
+                contactsOnlineTime_.insert(jid, QTime::currentTime());
+            }
+            return false;
+        }
 
-		if(stanza.tagName() == "message") {
-			if(lastConnectionTime_.value(account).secsTo(QTime::currentTime()) < connectDelay) {
-				return false;
-			}
-			if(disableDnd && accInfoHost->getStatus(account) == "dnd") {
-				return false;
-			}
+        if(stanza.tagName() == "message") {
+            if(lastConnectionTime_.value(account).secsTo(QTime::currentTime()) < connectDelay) {
+                return false;
+            }
+            if(disableDnd && accInfoHost->getStatus(account) == "dnd") {
+                return false;
+            }
 
-			QString jid = stanza.attribute("from").split("/").first().toLower();
-			if(jid == accInfoHost->getJid(account).toLower())
-				return false;
+            QString jid = stanza.attribute("from").split("/").first().toLower();
+            if(jid == accInfoHost->getJid(account).toLower())
+                return false;
 
-			QDomElement event = stanza.firstChildElement("event");
-			if(!event.isNull() && event.attribute("xmlns").contains("http://jabber.org/protocol/pubsub")) {
-				QDomElement items = event.firstChildElement("items");
-				if(items.isNull())
-					return false;
-				QDomElement item = items.firstChildElement("item");
-				if(item.isNull())
-					return false;
+            QDomElement event = stanza.firstChildElement("event");
+            if(!event.isNull() && event.attribute("xmlns").contains("http://jabber.org/protocol/pubsub")) {
+                QDomElement items = event.firstChildElement("items");
+                if(items.isNull())
+                    return false;
+                QDomElement item = items.firstChildElement("item");
+                if(item.isNull())
+                    return false;
 
-				if(showTune) {
-					QDomElement tune = item.firstChildElement("tune");
-					if(!tune.isNull()
-					 && tune.attribute("xmlns") == "http://jabber.org/protocol/tune") {
-						if(!processJid(jid, ContactState::EventTune)) {
-							return false;
-						}
-						QString artist = tune.firstChildElement("artist").text();
-						QString title = tune.firstChildElement("title").text();
-						if(!artist.isEmpty() || !title.isEmpty()) {
-							QString str = tr("Now listening: ");
-							if(artist.isEmpty()) {
-								str += title;
-							}
-							else {
-								str += artist;
-								if(!title.isEmpty()) {
-									str += " - " + title;
-								}
-							}
-							QMetaObject::invokeMethod(this, "doNotification", Qt::QueuedConnection,
-										  Q_ARG(const QString&, contactInfo->name(account, jid)),
-										  Q_ARG(const QString&, str),
-										  Q_ARG(const QString&, "pep/tune"));
-						}
-						return false;
-					}
-				}
-				if(showMood) {
-					QDomElement mood = item.firstChildElement("mood");
-					if(!mood.isNull()
-					 && mood.attribute("xmlns") == "http://jabber.org/protocol/mood") {
-						if(!processJid(jid, ContactState::EventMood)) {
-							return false;
-						}
+                if(showTune) {
+                    QDomElement tune = item.firstChildElement("tune");
+                    if(!tune.isNull()
+                     && tune.attribute("xmlns") == "http://jabber.org/protocol/tune") {
+                        if(!processJid(jid, ContactState::EventTune)) {
+                            return false;
+                        }
+                        QString artist = tune.firstChildElement("artist").text();
+                        QString title = tune.firstChildElement("title").text();
+                        if(!artist.isEmpty() || !title.isEmpty()) {
+                            QString str = tr("Now listening: ");
+                            if(artist.isEmpty()) {
+                                str += title;
+                            }
+                            else {
+                                str += artist;
+                                if(!title.isEmpty()) {
+                                    str += " - " + title;
+                                }
+                            }
+                            QMetaObject::invokeMethod(this, "doNotification", Qt::QueuedConnection,
+                                          Q_ARG(const QString&, contactInfo->name(account, jid)),
+                                          Q_ARG(const QString&, str),
+                                          Q_ARG(const QString&, "pep/tune"));
+                        }
+                        return false;
+                    }
+                }
+                if(showMood) {
+                    QDomElement mood = item.firstChildElement("mood");
+                    if(!mood.isNull()
+                     && mood.attribute("xmlns") == "http://jabber.org/protocol/mood") {
+                        if(!processJid(jid, ContactState::EventMood)) {
+                            return false;
+                        }
 
-						QString type = getFirstChildElement(mood).tagName();
-						if(!type.isEmpty()) {
-							QString text = mood.firstChildElement("text").text();
-							QString str = tr("Mood changed to \"%1").arg(type);
-							if(!text.isEmpty()) {
-								str += ": " + text;
-							}
-							str += "\"";
-							QMetaObject::invokeMethod(this, "doNotification", Qt::QueuedConnection,
-										  Q_ARG(const QString&, contactInfo->name(account, jid)),
-										  Q_ARG(const QString&, str),
-										  Q_ARG(const QString&, "mood/"+type));
-						}
-						return false;
-					}
-				}
-				if(showActivity) {
-					QDomElement act = item.firstChildElement("activity");
-					if(!act.isNull()
-					 && act.attribute("xmlns") == "http://jabber.org/protocol/activity") {
-						if(!processJid(jid, ContactState::EventActivity)) {
-							return false;
-						}
+                        QString type = getFirstChildElement(mood).tagName();
+                        if(!type.isEmpty()) {
+                            QString text = mood.firstChildElement("text").text();
+                            QString str = tr("Mood changed to \"%1").arg(type);
+                            if(!text.isEmpty()) {
+                                str += ": " + text;
+                            }
+                            str += "\"";
+                            QMetaObject::invokeMethod(this, "doNotification", Qt::QueuedConnection,
+                                          Q_ARG(const QString&, contactInfo->name(account, jid)),
+                                          Q_ARG(const QString&, str),
+                                          Q_ARG(const QString&, "mood/"+type));
+                        }
+                        return false;
+                    }
+                }
+                if(showActivity) {
+                    QDomElement act = item.firstChildElement("activity");
+                    if(!act.isNull()
+                     && act.attribute("xmlns") == "http://jabber.org/protocol/activity") {
+                        if(!processJid(jid, ContactState::EventActivity)) {
+                            return false;
+                        }
 
-						QString icon;
-						QString type, secType;
-						QDomElement t = getFirstChildElement(act);
-						if(!t.isNull()) {
-							icon = type = t.tagName();
-							secType = getFirstChildElement(t).tagName();
-							if(!secType.isEmpty())
-								icon += "_"+secType;
-						}
-						if(!type.isEmpty()) {
-							QString text = act.firstChildElement("text").text();
-							QString str = tr("Activity changed to \"%1").arg(type);
-							if(!secType.isEmpty()) {
-								str += " - " + secType;
-							}
-							if(!text.isEmpty()) {
-								str += ": " + text;
-							}
-							str += "\"";
-							QMetaObject::invokeMethod(this, "doNotification", Qt::QueuedConnection,
-										  Q_ARG(const QString&, contactInfo->name(account, jid)),
-										  Q_ARG(const QString&, str),
-										  Q_ARG(const QString&, "activities/"+icon));
-						}
-						return false;
-					}
-				}
-			}
-		}
-	}
-	return false;
+                        QString icon;
+                        QString type, secType;
+                        QDomElement t = getFirstChildElement(act);
+                        if(!t.isNull()) {
+                            icon = type = t.tagName();
+                            secType = getFirstChildElement(t).tagName();
+                            if(!secType.isEmpty())
+                                icon += "_"+secType;
+                        }
+                        if(!type.isEmpty()) {
+                            QString text = act.firstChildElement("text").text();
+                            QString str = tr("Activity changed to \"%1").arg(type);
+                            if(!secType.isEmpty()) {
+                                str += " - " + secType;
+                            }
+                            if(!text.isEmpty()) {
+                                str += ": " + text;
+                            }
+                            str += "\"";
+                            QMetaObject::invokeMethod(this, "doNotification", Qt::QueuedConnection,
+                                          Q_ARG(const QString&, contactInfo->name(account, jid)),
+                                          Q_ARG(const QString&, str),
+                                          Q_ARG(const QString&, "activities/"+icon));
+                        }
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+    return false;
  }
 
 bool PepPlugin::outgoingStanza(int account, QDomElement &xml)
 {
-	if(enabled) {
-		if(xml.tagName() == "iq"
-		   && xml.attribute("type") == "set"
-		   && !xml.firstChildElement("session").isNull()) {
-			lastConnectionTime_.insert(account, QTime::currentTime());
-		}
-	}
+    if(enabled) {
+        if(xml.tagName() == "iq"
+           && xml.attribute("type") == "set"
+           && !xml.firstChildElement("session").isNull()) {
+            lastConnectionTime_.insert(account, QTime::currentTime());
+        }
+    }
 
-	return false;
+    return false;
 }
 
 void PepPlugin::applyOptions()
 {
-	if(!options_)
-		return;
+    if(!options_)
+        return;
 
-	soundFile = ui_.le_sound->text();
-	psiOptions->setPluginOption(constSoundFile, QVariant(soundFile));
+    soundFile = ui_.le_sound->text();
+    psiOptions->setPluginOption(constSoundFile, QVariant(soundFile));
 
-//	interval = ui_.sb_interval->value();
-//	psiOptions->setPluginOption(constInterval, QVariant(interval));
+//    interval = ui_.sb_interval->value();
+//    psiOptions->setPluginOption(constInterval, QVariant(interval));
 
-	showActivity = ui_.cb_activity->isChecked();
-	psiOptions->setPluginOption(constActivity, QVariant(showActivity));
+    showActivity = ui_.cb_activity->isChecked();
+    psiOptions->setPluginOption(constActivity, QVariant(showActivity));
 
-//	showGeoloc = ui_.cb_geoloc->isChecked();
-//	psiOptions->setPluginOption(constGeoloc, QVariant(showGeoloc));
+//    showGeoloc = ui_.cb_geoloc->isChecked();
+//    psiOptions->setPluginOption(constGeoloc, QVariant(showGeoloc));
 
-	showMood = ui_.cb_mood->isChecked();
-	psiOptions->setPluginOption(constMood, QVariant(showMood));
+    showMood = ui_.cb_mood->isChecked();
+    psiOptions->setPluginOption(constMood, QVariant(showMood));
 
-	showTune = ui_.cb_tune->isChecked();
-	psiOptions->setPluginOption(constTune, QVariant(showTune));
+    showTune = ui_.cb_tune->isChecked();
+    psiOptions->setPluginOption(constTune, QVariant(showTune));
 
-	disableDnd = ui_.cb_disable_dnd->isChecked();
-	psiOptions->setPluginOption(constDisableDnd, QVariant(disableDnd));
+    disableDnd = ui_.cb_disable_dnd->isChecked();
+    psiOptions->setPluginOption(constDisableDnd, QVariant(disableDnd));
 
-	delay = ui_.sb_delay->value();
-	psiOptions->setPluginOption(constContactDelay, QVariant(delay));
+    delay = ui_.sb_delay->value();
+    psiOptions->setPluginOption(constContactDelay, QVariant(delay));
 }
 
 void PepPlugin::restoreOptions()
 {
-	if(!options_)
-		return;
+    if(!options_)
+        return;
 
-	ui_.le_sound->setText(soundFile);
-//	ui_.sb_interval->setValue(interval);
-	ui_.cb_activity->setChecked(showActivity);
-//	ui_.cb_geoloc->setChecked(showGeoloc);
-	ui_.cb_mood->setChecked(showMood);
-	ui_.cb_tune->setChecked(showTune);
-	ui_.cb_disable_dnd->setChecked(disableDnd);
-	ui_.sb_delay->setValue(delay);
+    ui_.le_sound->setText(soundFile);
+//    ui_.sb_interval->setValue(interval);
+    ui_.cb_activity->setChecked(showActivity);
+//    ui_.cb_geoloc->setChecked(showGeoloc);
+    ui_.cb_mood->setChecked(showMood);
+    ui_.cb_tune->setChecked(showTune);
+    ui_.cb_disable_dnd->setChecked(disableDnd);
+    ui_.sb_delay->setValue(delay);
 }
 
 void PepPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost* host)
 {
-	accInfoHost = host;
+    accInfoHost = host;
 }
 
 void PepPlugin::setOptionAccessingHost(OptionAccessingHost* host)
 {
-	psiOptions = host;
+    psiOptions = host;
 }
 
 void PepPlugin::setPopupAccessingHost(PopupAccessingHost* host)
 {
-	popup = host;
+    popup = host;
 }
 
 void PepPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host)
 {
-	appInfo = host;
+    appInfo = host;
 }
 
 void PepPlugin::setContactInfoAccessingHost(ContactInfoAccessingHost *host)
 {
-	contactInfo = host;
+    contactInfo = host;
 }
 
 void PepPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost *host)
 {
-	iconHost = host;
+    iconHost = host;
 }
 
 void PepPlugin::setSoundAccessingHost(SoundAccessingHost *host)
 {
-	sound_ = host;
+    sound_ = host;
 }
 
 void PepPlugin::playSound(const QString& f)
 {
-	sound_->playSound(f);
+    sound_->playSound(f);
 }
 
 void PepPlugin::getSound()
 {
-	QString fileName = QFileDialog::getOpenFileName(0,tr("Choose a sound file"),"", tr("Sound (*.wav)"));
-	if(fileName.isEmpty())
-		return;
-	ui_.le_sound->setText(fileName);
+    QString fileName = QFileDialog::getOpenFileName(0,tr("Choose a sound file"),"", tr("Sound (*.wav)"));
+    if(fileName.isEmpty())
+        return;
+    ui_.le_sound->setText(fileName);
 }
 
 void PepPlugin::checkSound()
 {
-	playSound(ui_.le_sound->text());
+    playSound(ui_.le_sound->text());
 }
 
 void PepPlugin::showPopup(const QString &title, const QString &text, const QString& icon)
 {
-	QVariant suppressDnd = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd");
-	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd", disableDnd);
+    QVariant suppressDnd = psiOptions->getGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd");
+    psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd", disableDnd);
 
-	int interval = popup->popupDuration(POPUP_OPTION_NAME);
-	if(interval) {
-		popup->initPopup(text.toHtmlEscaped(), title.toHtmlEscaped(), icon, popupId);
-	}
-	psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd", suppressDnd);
+    int interval = popup->popupDuration(POPUP_OPTION_NAME);
+    if(interval) {
+        popup->initPopup(text.toHtmlEscaped(), title.toHtmlEscaped(), icon, popupId);
+    }
+    psiOptions->setGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd", suppressDnd);
 }
 
 void PepPlugin::doNotification(const QString &title, const QString &text, const QString &icon)
 {
-	showPopup(title, text, icon);
-	if(psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool()) {
-		playSound(soundFile);
-	}
+    showPopup(title, text, icon);
+    if(psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool()) {
+        playSound(soundFile);
+    }
 }
 
 QList<PepPlugin::ContactState>::iterator PepPlugin::findContactStateIndex(const QString &jid)
 {
-	QList<ContactState>::iterator it = states_.begin();
-	ContactState s(jid);
-	for(; it != states_.end(); ++it) {
-		if(s == *it) {
-			break;
-		}
-	}
-	if(it == states_.end()) {
-		it = states_.insert(--it, s);
-	}
-	return it;
+    QList<ContactState>::iterator it = states_.begin();
+    ContactState s(jid);
+    for(; it != states_.end(); ++it) {
+        if(s == *it) {
+            break;
+        }
+    }
+    if(it == states_.end()) {
+        it = states_.insert(--it, s);
+    }
+    return it;
 }
 
 bool PepPlugin::checkContactState(QList<ContactState>::iterator it, ContactState::Event e)
 {
-	QTime time = QTime::currentTime();
-	if((*it).events.contains(e)) {
-		QTime oldTime = (*it).events.value(e);
-		if(oldTime.secsTo(time) < delay) {
-			return false;
-		}
-	}
-	(*it).events.insert(e, time);
-	return true;
+    QTime time = QTime::currentTime();
+    if((*it).events.contains(e)) {
+        QTime oldTime = (*it).events.value(e);
+        if(oldTime.secsTo(time) < delay) {
+            return false;
+        }
+    }
+    (*it).events.insert(e, time);
+    return true;
 }
 
 bool PepPlugin::checkContactStatus(const QString& jid)
 {
-	if(!contactsOnlineTime_.contains(jid)) {//такое может произойти, если плагин включили, когда аккаунт уже был в онлайне
-		return true;			//а вообще, ивенты от контактов не должны приходить раньше презенсов.
-	}					//если такое произойдет - таймаут не сработает
-	QTime contactTime = contactsOnlineTime_.value(jid);
-	return (contactTime.secsTo(QTime::currentTime()) < delay) ? false : true;
+    if(!contactsOnlineTime_.contains(jid)) {//такое может произойти, если плагин включили, когда аккаунт уже был в онлайне
+        return true;            //а вообще, ивенты от контактов не должны приходить раньше презенсов.
+    }                    //если такое произойдет - таймаут не сработает
+    QTime contactTime = contactsOnlineTime_.value(jid);
+    return (contactTime.secsTo(QTime::currentTime()) < delay) ? false : true;
 }
 
 bool PepPlugin::processJid(const QString &jid, ContactState::Event e)
 {
-	if(!checkContactStatus(jid)) {
-		return false;
-	}
-	QList<ContactState>::iterator it = findContactStateIndex(jid);
-	if(!checkContactState(it, e)) {
-		return false;
-	}
-	return true;
+    if(!checkContactStatus(jid)) {
+        return false;
+    }
+    QList<ContactState>::iterator it = findContactStateIndex(jid);
+    if(!checkContactState(it, e)) {
+        return false;
+    }
+    return true;
 }
 
 QDomElement PepPlugin::getFirstChildElement(const QDomElement &elem)
 {
-	QDomElement newElem;
-	QDomNode node = elem.firstChild();
-	while(!node.isNull()) {
-		if(!node.isElement()) {
-			node = node.nextSibling();
-			continue;
-		}
+    QDomElement newElem;
+    QDomNode node = elem.firstChild();
+    while(!node.isNull()) {
+        if(!node.isElement()) {
+            node = node.nextSibling();
+            continue;
+        }
 
-		newElem = node.toElement();
-		break;
-	}
+        newElem = node.toElement();
+        break;
+    }
 
-	return newElem;
+    return newElem;
 }
 
 QString PepPlugin::pluginInfo()
 {
-	return tr("Author: ") +  "Dealer_WeARE\n"
-			+ tr("Email: ") + "wadealer@gmail.com\n\n"
-			+ tr("This plugin shows popup notifications when users from your roster changes their mood, tune or activity.");
+    return tr("Author: ") +  "Dealer_WeARE\n"
+            + tr("Email: ") + "wadealer@gmail.com\n\n"
+            + tr("This plugin shows popup notifications when users from your roster changes their mood, tune or activity.");
 }
 
 QPixmap PepPlugin::icon() const
 {
-	return QPixmap(":/icons/pepchangenotify.png");
+    return QPixmap(":/icons/pepchangenotify.png");
 }
 
 #include "pepchangenotifyplugin.moc"

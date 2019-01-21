@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -37,10 +37,10 @@ RipperCCOptions::~RipperCCOptions()
 
 void RipperCCOptions::loadSettings()
 {
-	ui->sbInterval->setValue(_optionHost->getPluginOption("attention-interval", 1).toInt());
+    ui->sbInterval->setValue(_optionHost->getPluginOption("attention-interval", 1).toInt());
 }
 
 void RipperCCOptions::saveSettings()
 {
-	_optionHost->setPluginOption("attention-interval", ui->sbInterval->value());
+    _optionHost->setPluginOption("attention-interval", ui->sbInterval->value());
 }

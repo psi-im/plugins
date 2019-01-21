@@ -45,89 +45,89 @@
 #define constTransports "transp"
 
 class IcqDie: public QObject, public PsiPlugin, public OptionAccessor, public StanzaSender,  public StanzaFilter, public ActiveTabAccessor,
-		public AccountInfoAccessor, public PluginInfoProvider
+        public AccountInfoAccessor, public PluginInfoProvider
 {
-	Q_OBJECT
-	Q_PLUGIN_METADATA(IID "com.psi-plus.IcqDie")
-		Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter ActiveTabAccessor
-			     AccountInfoAccessor PluginInfoProvider)
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "com.psi-plus.IcqDie")
+        Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter ActiveTabAccessor
+                 AccountInfoAccessor PluginInfoProvider)
 
 public:
-	IcqDie();
-	virtual QString name() const;
-	virtual QString shortName() const;
-	virtual QString version() const;
-	virtual QWidget* options();
-	virtual bool enable();
-	virtual bool disable();
-	virtual void applyOptions();
-	virtual void restoreOptions();
-	virtual void setOptionAccessingHost(OptionAccessingHost* host);
-	virtual void optionChanged(const QString& option);
-	virtual void setStanzaSendingHost(StanzaSendingHost *host);
-	virtual bool incomingStanza(int account, const QDomElement& stanza);
-	virtual bool outgoingStanza(int account, QDomElement& stanza);
-	virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
-	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
-	virtual QString pluginInfo();
-	virtual QPixmap icon() const;
+    IcqDie();
+    virtual QString name() const;
+    virtual QString shortName() const;
+    virtual QString version() const;
+    virtual QWidget* options();
+    virtual bool enable();
+    virtual bool disable();
+    virtual void applyOptions();
+    virtual void restoreOptions();
+    virtual void setOptionAccessingHost(OptionAccessingHost* host);
+    virtual void optionChanged(const QString& option);
+    virtual void setStanzaSendingHost(StanzaSendingHost *host);
+    virtual bool incomingStanza(int account, const QDomElement& stanza);
+    virtual bool outgoingStanza(int account, QDomElement& stanza);
+    virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
+    virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+    virtual QString pluginInfo();
+    virtual QPixmap icon() const;
 
 private:
-	bool enabled;
-	AccountInfoAccessingHost* AccInfoHost;
-	ActiveTabAccessingHost* ActiveTabHost;
-	OptionAccessingHost* psiOptions;
-	StanzaSendingHost* StanzaHost;
-	QString MessageRecv;
-	QString MessageNoRecv;
-	typedef QPair<QDateTime,int> CounterInfo;
-	QMap<QString, CounterInfo> Counter;
-	enum stat {
-		ignore = '-', send = '+', block = '!',
-	};
-	typedef QMap<QString, stat> CustomList;
-	CustomList Custom;
-	QVector<QString> Transports;
-	CustomList ParseCustomText(QString sCustom);
-	int PauseTime;
-	int MessageCount;
-	bool ActiveTabIsEnable;
-	Ui::options ui;
+    bool enabled;
+    AccountInfoAccessingHost* AccInfoHost;
+    ActiveTabAccessingHost* ActiveTabHost;
+    OptionAccessingHost* psiOptions;
+    StanzaSendingHost* StanzaHost;
+    QString MessageRecv;
+    QString MessageNoRecv;
+    typedef QPair<QDateTime,int> CounterInfo;
+    QMap<QString, CounterInfo> Counter;
+    enum stat {
+        ignore = '-', send = '+', block = '!',
+    };
+    typedef QMap<QString, stat> CustomList;
+    CustomList Custom;
+    QVector<QString> Transports;
+    CustomList ParseCustomText(QString sCustom);
+    int PauseTime;
+    int MessageCount;
+    bool ActiveTabIsEnable;
+    Ui::options ui;
 
 };
 
 
 IcqDie::IcqDie()
 {
-	ActiveTabIsEnable = true;
+    ActiveTabIsEnable = true;
 
-	Custom.clear();
-	Custom["other"] = send;
-	Custom["nil"] = ignore;
+    Custom.clear();
+    Custom["other"] = send;
+    Custom["nil"] = ignore;
 
-	Counter.clear();
+    Counter.clear();
 
-	Transports.clear();
-	Transports << "icq" << "jit";
+    Transports.clear();
+    Transports << "icq" << "jit";
 
-	PauseTime = 120;
-	MessageCount = 0;
+    PauseTime = 120;
+    MessageCount = 0;
 
-	enabled = false;
-	MessageRecv = trUtf8("I can tell you as a Linux, but do not be mad at me. "
+    enabled = false;
+    MessageRecv = trUtf8("I can tell you as a Linux, but do not be mad at me. "
             "Certainly this human will receive this message. But it's much better to chat to him by Jabber. "
             "You are risking, one never knows when ICQ can die, granny already outlived its. His JID: %1.\n\n"
             "Sincerely yours, Debian Sid.");
-	MessageNoRecv = trUtf8("I can tell you as a Linux, but do not be mad at me. "
+    MessageNoRecv = trUtf8("I can tell you as a Linux, but do not be mad at me. "
             "This human do not use ICQ anymore, so if you are still use that network he will not receive your message and you have to chat to him by Jabber. His JID: %1.\n\n"
             "If you don't know what Jabber is - use Google. It knows everything and ready to help everyone who ask it.\n"
             "Sincerely yours, Debian Sid.");
 
 
-	ActiveTabHost = 0;
-	AccInfoHost = 0;
-	psiOptions = 0;
-	StanzaHost = 0;
+    ActiveTabHost = 0;
+    AccInfoHost = 0;
+    psiOptions = 0;
+    StanzaHost = 0;
 }
 
 QString IcqDie::name() const { return "Icq Must Die Plugin"; }
@@ -138,137 +138,137 @@ QString IcqDie::version() const { return cVer; }
 
 IcqDie::CustomList IcqDie::ParseCustomText(QString sCustom)
 {
-	IcqDie::CustomList Custom;
-	Custom.clear();
-	QStringList Clist;
-	Clist = sCustom.split(QRegExp("\n"), QString::SkipEmptyParts);
-	while(!Clist.isEmpty())
-	{
-		//удаляем пробелы и комментарии
-		QString C = Clist.takeFirst().remove(QRegExp("\\s+")).remove(QRegExp("\\#.*$"));
-		stat s;
-		QString id = C;
-		id.remove(0,1);
-		if (C[0] == '-')
-			s = ignore;
-		else if (C[0] == '!')
-			s = block;
-		else if (C[0] == '+')
-			s = send;
-		else
-		{
-			s = send;
-			//прилепляем назад
-			id = C[0] + id;
-		}
-		Custom[id] = s;
-	}
-	//если удалили дефолтовые, то восстанавливаем
-	if (Custom.find("nil") == Custom.end())
-		Custom["nil"] = ignore;
-	if (Custom.find("other") == Custom.end())
-		Custom["other"] = send;
-	//qDebug() << "ParseCustomText" << Custom;
-	return Custom;
+    IcqDie::CustomList Custom;
+    Custom.clear();
+    QStringList Clist;
+    Clist = sCustom.split(QRegExp("\n"), QString::SkipEmptyParts);
+    while(!Clist.isEmpty())
+    {
+        //удаляем пробелы и комментарии
+        QString C = Clist.takeFirst().remove(QRegExp("\\s+")).remove(QRegExp("\\#.*$"));
+        stat s;
+        QString id = C;
+        id.remove(0,1);
+        if (C[0] == '-')
+            s = ignore;
+        else if (C[0] == '!')
+            s = block;
+        else if (C[0] == '+')
+            s = send;
+        else
+        {
+            s = send;
+            //прилепляем назад
+            id = C[0] + id;
+        }
+        Custom[id] = s;
+    }
+    //если удалили дефолтовые, то восстанавливаем
+    if (Custom.find("nil") == Custom.end())
+        Custom["nil"] = ignore;
+    if (Custom.find("other") == Custom.end())
+        Custom["other"] = send;
+    //qDebug() << "ParseCustomText" << Custom;
+    return Custom;
 }
 
 bool IcqDie::enable() {
-	if (!psiOptions)
-		return enabled;
+    if (!psiOptions)
+        return enabled;
 
-	enabled = true;
+    enabled = true;
 
-	MessageRecv = psiOptions->getPluginOption(constMessageRecv, QVariant(MessageRecv)).toString();
-	MessageNoRecv = psiOptions->getPluginOption(constMessageNoRecv, QVariant(MessageNoRecv)).toString();
+    MessageRecv = psiOptions->getPluginOption(constMessageRecv, QVariant(MessageRecv)).toString();
+    MessageNoRecv = psiOptions->getPluginOption(constMessageNoRecv, QVariant(MessageNoRecv)).toString();
 
-	PauseTime = psiOptions->getPluginOption(constPauseTime, QVariant(PauseTime)).toInt();
-	MessageCount = psiOptions->getPluginOption(constMessageCount, QVariant(MessageCount)).toInt();
-	ActiveTabIsEnable = psiOptions->getPluginOption(constActiveTab, QVariant(ActiveTabIsEnable)).toBool();
+    PauseTime = psiOptions->getPluginOption(constPauseTime, QVariant(PauseTime)).toInt();
+    MessageCount = psiOptions->getPluginOption(constMessageCount, QVariant(MessageCount)).toInt();
+    ActiveTabIsEnable = psiOptions->getPluginOption(constActiveTab, QVariant(ActiveTabIsEnable)).toBool();
 
-	QVariant vCustom;
-	vCustom = psiOptions->getPluginOption(constCustom);
-	if (!vCustom.isNull())
-		Custom = ParseCustomText(vCustom.toString());
+    QVariant vCustom;
+    vCustom = psiOptions->getPluginOption(constCustom);
+    if (!vCustom.isNull())
+        Custom = ParseCustomText(vCustom.toString());
 
-	QVariant vTransports;
-	vTransports = psiOptions->getPluginOption(constTransports);
-	if (!vTransports.isNull())
-	{
-		QString sTransports = vTransports.toString();
-		Transports.clear();
-		QStringList Tlist;
-		Tlist = sTransports.split(QRegExp("\n"), QString::SkipEmptyParts);
-		while(!Tlist.isEmpty())
-			Transports << Tlist.takeFirst().remove(QRegExp("\\s+"));
-	}
+    QVariant vTransports;
+    vTransports = psiOptions->getPluginOption(constTransports);
+    if (!vTransports.isNull())
+    {
+        QString sTransports = vTransports.toString();
+        Transports.clear();
+        QStringList Tlist;
+        Tlist = sTransports.split(QRegExp("\n"), QString::SkipEmptyParts);
+        while(!Tlist.isEmpty())
+            Transports << Tlist.takeFirst().remove(QRegExp("\\s+"));
+    }
 
-	return enabled;
+    return enabled;
 }
 
 bool IcqDie::disable()
 {
-	enabled = false;
-	return true;
+    enabled = false;
+    return true;
 }
 
 void IcqDie::applyOptions()
 {
-	psiOptions->setPluginOption(constMessageRecv, QVariant(MessageRecv = ui.messageRecv->toPlainText()));
-	psiOptions->setPluginOption(constMessageNoRecv, QVariant(MessageNoRecv = ui.messageNoRecv->toPlainText()));
+    psiOptions->setPluginOption(constMessageRecv, QVariant(MessageRecv = ui.messageRecv->toPlainText()));
+    psiOptions->setPluginOption(constMessageNoRecv, QVariant(MessageNoRecv = ui.messageNoRecv->toPlainText()));
 
-	QString sCustom;
-	psiOptions->setPluginOption(constCustom, QVariant(sCustom = ui.custom->toPlainText()));
-	Custom = ParseCustomText(sCustom);
+    QString sCustom;
+    psiOptions->setPluginOption(constCustom, QVariant(sCustom = ui.custom->toPlainText()));
+    Custom = ParseCustomText(sCustom);
 
-	psiOptions->setPluginOption(constActiveTab, QVariant(ActiveTabIsEnable = ui.activetabWidget->isChecked()));
-	psiOptions->setPluginOption(constMessageCount, QVariant(MessageCount = ui.messageCount->value()));
-	psiOptions->setPluginOption(constPauseTime, QVariant(PauseTime = ui.pauseWidget->value()));
+    psiOptions->setPluginOption(constActiveTab, QVariant(ActiveTabIsEnable = ui.activetabWidget->isChecked()));
+    psiOptions->setPluginOption(constMessageCount, QVariant(MessageCount = ui.messageCount->value()));
+    psiOptions->setPluginOption(constPauseTime, QVariant(PauseTime = ui.pauseWidget->value()));
 
-	//сохранили и разобрали парсеры
-	QString sTransports;
-	psiOptions->setPluginOption(constTransports, QVariant(sTransports = ui.transportsWidget->toPlainText()));
+    //сохранили и разобрали парсеры
+    QString sTransports;
+    psiOptions->setPluginOption(constTransports, QVariant(sTransports = ui.transportsWidget->toPlainText()));
 
-	Transports.clear();
-	QStringList Tlist;
-	Tlist = sTransports.split(QRegExp("\n"), QString::SkipEmptyParts);
-	while(!Tlist.isEmpty())
-		Transports << Tlist.takeFirst().remove(QRegExp("\\s+"));
+    Transports.clear();
+    QStringList Tlist;
+    Tlist = sTransports.split(QRegExp("\n"), QString::SkipEmptyParts);
+    while(!Tlist.isEmpty())
+        Transports << Tlist.takeFirst().remove(QRegExp("\\s+"));
 }
 
 void IcqDie::restoreOptions()
 {
 
-	ui.messageRecv->setText(MessageRecv);
-	ui.messageNoRecv->setText(MessageNoRecv);
-	ui.messageCount->setValue(MessageCount);
-	ui.pauseWidget->setValue(PauseTime);
-	ui.activetabWidget->setChecked(ActiveTabIsEnable);
+    ui.messageRecv->setText(MessageRecv);
+    ui.messageNoRecv->setText(MessageNoRecv);
+    ui.messageCount->setValue(MessageCount);
+    ui.pauseWidget->setValue(PauseTime);
+    ui.activetabWidget->setChecked(ActiveTabIsEnable);
 
-	ui.custom->setText(psiOptions->getPluginOption(constCustom, QVariant("+other\n-nil")).toString());
+    ui.custom->setText(psiOptions->getPluginOption(constCustom, QVariant("+other\n-nil")).toString());
 
-	QString text;
-	foreach(QString t,Transports)
-	{
-		if (!text.isEmpty())
-			text += "\n";
-		text += t;
-	}
-	ui.transportsWidget->setText(text);
+    QString text;
+    foreach(QString t,Transports)
+    {
+        if (!text.isEmpty())
+            text += "\n";
+        text += t;
+    }
+    ui.transportsWidget->setText(text);
 }
 
 QWidget* IcqDie::options()
 {
-	if (!enabled)
-		return 0;
+    if (!enabled)
+        return 0;
 
-	QWidget *options = new QWidget;
-	ui.setupUi(options);
-	ui.wiki->setText(tr("<a href=\"https://psi-plus.com/wiki/plugins#icq_must_die_plugin\">Wiki (Online)</a>"));
-	ui.wiki->setOpenExternalLinks(true);
+    QWidget *options = new QWidget;
+    ui.setupUi(options);
+    ui.wiki->setText(tr("<a href=\"https://psi-plus.com/wiki/plugins#icq_must_die_plugin\">Wiki (Online)</a>"));
+    ui.wiki->setOpenExternalLinks(true);
 
-	restoreOptions();
+    restoreOptions();
 
-	return options;
+    return options;
 }
 
 void IcqDie::setOptionAccessingHost(OptionAccessingHost* host) { psiOptions = host; }
@@ -279,149 +279,149 @@ void IcqDie::setStanzaSendingHost(StanzaSendingHost *host) { StanzaHost = host; 
 
 bool IcqDie::incomingStanza(int account, const QDomElement& stanza)
 {
-	if (!enabled)
-		return false;
-	if (stanza.tagName() != "message")
-		return false;
+    if (!enabled)
+        return false;
+    if (stanza.tagName() != "message")
+        return false;
 
-	//реагируем только на чат и на сообщение
-	QString type = stanza.attribute("type");
-	if(type != "chat" && type != "")
-		return false;
+    //реагируем только на чат и на сообщение
+    QString type = stanza.attribute("type");
+    if(type != "chat" && type != "")
+        return false;
 
-	QDomElement Body = stanza.firstChildElement("body");
-	//если пустое сообщение, то ничего не делаем
-	if(Body.isNull())
-		return false;
-	QDomElement rec =  stanza.firstChildElement("received");
-	if(!rec.isNull())
-		return false;
+    QDomElement Body = stanza.firstChildElement("body");
+    //если пустое сообщение, то ничего не делаем
+    if(Body.isNull())
+        return false;
+    QDomElement rec =  stanza.firstChildElement("received");
+    if(!rec.isNull())
+        return false;
 
-	QString from = stanza.attribute("from"); QStringList f = from.split("/");
-	QString valF = f.takeFirst(); QStringList fid = valF.split("@");
-	if (fid.count() < 2)
-		return false;
-	QString idF = fid.takeFirst();
-	QString server = fid.takeFirst();
-	QString to = stanza.attribute("to"); QStringList t = to.split("/");
-	QString valT = t.takeFirst();
+    QString from = stanza.attribute("from"); QStringList f = from.split("/");
+    QString valF = f.takeFirst(); QStringList fid = valF.split("@");
+    if (fid.count() < 2)
+        return false;
+    QString idF = fid.takeFirst();
+    QString server = fid.takeFirst();
+    QString to = stanza.attribute("to"); QStringList t = to.split("/");
+    QString valT = t.takeFirst();
 
-	//игнорируем сообщения от всех, кромя транспортов
-	bool fromTransport = false;
-	foreach(QString Transport, Transports)
-		if (server.indexOf(Transport, Qt::CaseInsensitive) == 0)
-			fromTransport = true;
-	if(!fromTransport)
-		return false;
+    //игнорируем сообщения от всех, кромя транспортов
+    bool fromTransport = false;
+    foreach(QString Transport, Transports)
+        if (server.indexOf(Transport, Qt::CaseInsensitive) == 0)
+            fromTransport = true;
+    if(!fromTransport)
+        return false;
 
-	//разбираемся от кого оно
-	stat todo = Custom["nil"];
-	if (Custom.find(idF) != Custom.end()) //нашли в списке - делаем что указано
-		todo = Custom[idF];
-	else //проверяем, есть ли он в ростере
-	{
-		QStringList Roster = AccInfoHost->getRoster(account);
-		while(!Roster.isEmpty())
-		{
-			QString jid = Roster.takeFirst();
-			if(valF.toLower() == jid.toLower())
-				todo = Custom["other"];
-		}
-	}
+    //разбираемся от кого оно
+    stat todo = Custom["nil"];
+    if (Custom.find(idF) != Custom.end()) //нашли в списке - делаем что указано
+        todo = Custom[idF];
+    else //проверяем, есть ли он в ростере
+    {
+        QStringList Roster = AccInfoHost->getRoster(account);
+        while(!Roster.isEmpty())
+        {
+            QString jid = Roster.takeFirst();
+            if(valF.toLower() == jid.toLower())
+                todo = Custom["other"];
+        }
+    }
 
-	//если игнорировать - пропускаем и ничего
-	if (todo == ignore)
-		return false;
+    //если игнорировать - пропускаем и ничего
+    if (todo == ignore)
+        return false;
 
-	//если блокировать - отправляем сообщение и давим его
-	if (todo == block)
-	{
-		if(!Counter.contains(from))
-			Counter[from].second = 0;
-		Counter[from].second++;
-		//не посылать больше N раз
-		if (MessageCount > 0 && Counter[from].second > MessageCount)
-			return true;
+    //если блокировать - отправляем сообщение и давим его
+    if (todo == block)
+    {
+        if(!Counter.contains(from))
+            Counter[from].second = 0;
+        Counter[from].second++;
+        //не посылать больше N раз
+        if (MessageCount > 0 && Counter[from].second > MessageCount)
+            return true;
 
-		QString mes = "<message to='" + from + "'";
-		if(type != "")
-			mes += " type='" + type + "'";
-		else
-			mes += "><subject>IcqDie</subject";
-		mes += "><body>" + MessageNoRecv.arg(valT) + "</body></message>";
-		StanzaHost->sendStanza(account, mes);
-		return true;
-	}
+        QString mes = "<message to='" + from + "'";
+        if(type != "")
+            mes += " type='" + type + "'";
+        else
+            mes += "><subject>IcqDie</subject";
+        mes += "><body>" + MessageNoRecv.arg(valT) + "</body></message>";
+        StanzaHost->sendStanza(account, mes);
+        return true;
+    }
 
-	//если уже посылали, то таймаут
-	if(!Counter.contains(from))
-		Counter[from].first = QDateTime::currentDateTime();
-	else
-	{
-		QDateTime old = Counter[from].first;
-		Counter[from].first = QDateTime::currentDateTime();
-		if(QDateTime::currentDateTime().secsTo(old) >= -PauseTime*60)
-			return false;
-	}
+    //если уже посылали, то таймаут
+    if(!Counter.contains(from))
+        Counter[from].first = QDateTime::currentDateTime();
+    else
+    {
+        QDateTime old = Counter[from].first;
+        Counter[from].first = QDateTime::currentDateTime();
+        if(QDateTime::currentDateTime().secsTo(old) >= -PauseTime*60)
+            return false;
+    }
 
-	//если пришло сообщение в активный чат, то не посылать
-	if(ActiveTabIsEnable)
-	{
-		QString getJid = ActiveTabHost->getJid();
-		if(getJid.toLower() == from.toLower())
-			return false;
-	}
+    //если пришло сообщение в активный чат, то не посылать
+    if(ActiveTabIsEnable)
+    {
+        QString getJid = ActiveTabHost->getJid();
+        if(getJid.toLower() == from.toLower())
+            return false;
+    }
 
-	if(!Counter.contains(from))
-		Counter[from].second = 0;
-	Counter[from].second++;
-	//не посылать больше N раз
-	if (MessageCount > 0 && Counter[from].second > MessageCount)
-		return false;
+    if(!Counter.contains(from))
+        Counter[from].second = 0;
+    Counter[from].second++;
+    //не посылать больше N раз
+    if (MessageCount > 0 && Counter[from].second > MessageCount)
+        return false;
 
-	//отправляем сообщение
-	QString mes = "<message to='" + from + "'";
-	if(type != "")
-		mes += " type='" + type + "'";
-	else
-		mes += "><subject>IcqDie</subject";
-	mes += "><body>" + MessageRecv.arg(valT) + "</body></message>";
-	StanzaHost->sendStanza(account, mes);
+    //отправляем сообщение
+    QString mes = "<message to='" + from + "'";
+    if(type != "")
+        mes += " type='" + type + "'";
+    else
+        mes += "><subject>IcqDie</subject";
+    mes += "><body>" + MessageRecv.arg(valT) + "</body></message>";
+    StanzaHost->sendStanza(account, mes);
 
-	return false;
+    return false;
 }
 
 bool IcqDie::outgoingStanza(int /*account*/, QDomElement& /*stanza*/)
 {
-	return false;
+    return false;
 }
 
 void IcqDie::setActiveTabAccessingHost(ActiveTabAccessingHost* host)
 {
-	ActiveTabHost = host;
+    ActiveTabHost = host;
 }
 
 void IcqDie::setAccountInfoAccessingHost(AccountInfoAccessingHost* host)
 {
-	AccInfoHost = host;
+    AccInfoHost = host;
 }
 
 QString IcqDie::pluginInfo()
 {
-	return tr("Author: ") +  "ivan1986\n\n"
-			+ trUtf8("This plugin is designed to help you transfer as many contacts as possible from ICQ to Jabber.\n"
-			 "The plugin has a number of simple settings that can help you:\n"
-			 "* set a special message text\n"
-			 "* exclude specific ICQ numbers\n"
-			 "* set the time interval after which the message will be repeated\n"
-			 "* set the max count of messages by contact\n"
-			 "* disable the message for the active window/tab\n"
-			 "* disable messages for contacts that are not in your roster");
+    return tr("Author: ") +  "ivan1986\n\n"
+            + trUtf8("This plugin is designed to help you transfer as many contacts as possible from ICQ to Jabber.\n"
+             "The plugin has a number of simple settings that can help you:\n"
+             "* set a special message text\n"
+             "* exclude specific ICQ numbers\n"
+             "* set the time interval after which the message will be repeated\n"
+             "* set the max count of messages by contact\n"
+             "* disable the message for the active window/tab\n"
+             "* disable messages for contacts that are not in your roster");
 }
 
 QPixmap IcqDie::icon() const
 {
-	return QPixmap(":/icons/icqdie.png");
+    return QPixmap(":/icons/icqdie.png");
 }
 
 #include "icqdieplugin.moc"

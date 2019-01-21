@@ -30,7 +30,7 @@ namespace Chess {
 
 class BoardModel : public QAbstractTableModel
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
         BoardModel(Figure::GameType type, QObject *parent = 0);
@@ -49,43 +49,43 @@ public:
         QModelIndex invert(QModelIndex index) const; //for black player
         Figure* findFigure(QModelIndex index) const;
         void reset();
-	void updateFigure(QModelIndex index, const QString& newFigure);
-	QString saveString() const;
-	void loadSettings(const QString& settings, bool myLoad = true);
+    void updateFigure(QModelIndex index, const QString& newFigure);
+    QString saveString() const;
+    void loadSettings(const QString& settings, bool myLoad = true);
         void updateView();
-	int checkGameState(); //0 - in progress; 1 - draw; 2 - lose;
+    int checkGameState(); //0 - in progress; 1 - draw; 2 - lose;
 
         bool myMove;
         bool waitForFigure;
-	bool check;
+    bool check;
         Figure::GameType gameType_;
         int gameState_; //0 - in progress, 1 - draw, 2 - win, 3 - lose;
 
 signals:
-	void move(int, int, int, int, QString);
-	void figureKilled(Figure*);
-	void needNewFigure(QModelIndex index, QString player);
+    void move(int, int, int, int, QString);
+    void figureKilled(Figure*);
+    void needNewFigure(QModelIndex index, QString player);
 
 private:
         int canMove(Figure *figure, int newX, int newY) const;
         QModelIndex findFigure(Figure::FigureType type, Figure::GameType game) const;
-	QMultiMap<QModelIndex, int> availableMoves(Figure* figure) const;
+    QMultiMap<QModelIndex, int> availableMoves(Figure* figure) const;
         bool doTestMove(Figure *figure, QModelIndex newIndex, int move);
         bool isCheck() const;
         void moveTransfer();
         void setHeaders();
 
-	QStringList hHeader, vHeader;
-	QList<Figure*> whiteFigures_, blackFigures_;
-	QModelIndex tempIndex_;
+    QStringList hHeader, vHeader;
+    QList<Figure*> whiteFigures_, blackFigures_;
+    QModelIndex tempIndex_;
 
-	struct Move {
-		QModelIndex oldIndex;
-		QModelIndex newIndex;
-		Figure *figure;
-		Figure *killedFigure;
-	};
-	Move lastMove;
+    struct Move {
+        QModelIndex oldIndex;
+        QModelIndex newIndex;
+        Figure *figure;
+        Figure *killedFigure;
+    };
+    Move lastMove;
 
 };
 }

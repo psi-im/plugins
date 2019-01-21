@@ -28,26 +28,26 @@ class IconFactoryAccessingHost;
 
 class Viewer : public QTableView
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	Viewer(QWidget *parent = 0) : QTableView(parent) {};
-	void init(IconFactoryAccessingHost *iconHost);
-	void deleteSelected();
+    Viewer(QWidget *parent = 0) : QTableView(parent) {};
+    void init(IconFactoryAccessingHost *iconHost);
+    void deleteSelected();
 
 private:
-	IconFactoryAccessingHost *iconHost_ = nullptr;
+    IconFactoryAccessingHost *iconHost_ = nullptr;
 
 protected:
-	void keyPressEvent(QKeyEvent *e);
-	void contextMenuEvent( QContextMenuEvent * e );
+    void keyPressEvent(QKeyEvent *e);
+    void contextMenuEvent( QContextMenuEvent * e );
 
 private slots:
-	void itemClicked(const QModelIndex& index);
+    void itemClicked(const QModelIndex& index);
 
 signals:
-	void getSound(const QModelIndex&);
-	void checkSound(const QModelIndex&);
+    void getSound(const QModelIndex&);
+    void checkSound(const QModelIndex&);
 
 };
 

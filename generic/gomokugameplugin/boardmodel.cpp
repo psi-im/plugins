@@ -29,87 +29,87 @@
 using namespace GomokuGame;
 
 BoardModel::BoardModel(QObject *parent) :
-	QAbstractTableModel(parent),
-	selectX(-1),
-	selectY(-1),
-	columnCount_(0),
-	rowCount_(0),
-	gameModel(NULL)
+    QAbstractTableModel(parent),
+    selectX(-1),
+    selectY(-1),
+    columnCount_(0),
+    rowCount_(0),
+    gameModel(NULL)
 {
 }
 
 BoardModel::~BoardModel()
 {
-	if (gameModel)
-		delete gameModel;
+    if (gameModel)
+        delete gameModel;
 }
 
 void BoardModel::init(GameModel *gm)
 {
-	if (gameModel)
-		delete gameModel;
-	gameModel = gm;
-	selectX = -1;
-	selectY = -1;
-	setHeaders();
-	beginResetModel();
-	endResetModel();
-	connect(gameModel, SIGNAL(statusUpdated(GameModel::GameStatus)), this, SIGNAL(changeGameStatus(GameModel::GameStatus)));
-	emit changeGameStatus(gm->gameStatus());
+    if (gameModel)
+        delete gameModel;
+    gameModel = gm;
+    selectX = -1;
+    selectY = -1;
+    setHeaders();
+    beginResetModel();
+    endResetModel();
+    connect(gameModel, SIGNAL(statusUpdated(GameModel::GameStatus)), this, SIGNAL(changeGameStatus(GameModel::GameStatus)));
+    emit changeGameStatus(gm->gameStatus());
 }
 
 void BoardModel::setHeaders()
 {
-	rowCount_ = gameModel->boardSizeY() + 4;
-	columnCount_ = gameModel->boardSizeX() + 4;
+    rowCount_ = gameModel->boardSizeY() + 4;
+    columnCount_ = gameModel->boardSizeX() + 4;
 }
 
 Qt::ItemFlags BoardModel::flags(const QModelIndex &index) const
 {
-	Qt::ItemFlags flags = Qt::NoItemFlags | Qt::ItemIsEnabled;
-	int row = index.row();
-	if (row < 2 || row > rowCount_ - 2) {
-		return flags;
-	}
-	int col = index.column();
-	if (col < 2 || col > columnCount_ - 2) {
-		return flags;
-	}
-	return (flags |  Qt::ItemIsSelectable);
+    Qt::ItemFlags flags = Qt::NoItemFlags | Qt::ItemIsEnabled;
+    int row = index.row();
+    if (row < 2 || row > rowCount_ - 2) {
+        return flags;
+    }
+    int col = index.column();
+    if (col < 2 || col > columnCount_ - 2) {
+        return flags;
+    }
+    return (flags |  Qt::ItemIsSelectable);
 }
 
 QVariant BoardModel::headerData(int /*section*/, Qt::Orientation /*orientation*/, int /*role*/) const
 {
-	return QVariant();
+    return QVariant();
 }
 
 QVariant BoardModel::data(const QModelIndex & /*index*/, int /*role*/) const
 {
-	return QVariant();
+    return QVariant();
 }
 
 bool BoardModel::setData(const QModelIndex &index, const QVariant &/*value*/, int role)
 {
-	if (index.isValid() && role == Qt::DisplayRole) {
-		emit dataChanged(index, index);
-		return true;
-	}
-	return false;
+    if (index.isValid() && role == Qt::DisplayRole) {
+        emit dataChanged(index, index);
+        return true;
+    }
+    return false;
 }
 
 int BoardModel::rowCount(const QModelIndex & /*parent*/) const
 {
-	return rowCount_;
+    return rowCount_;
 }
 
 int BoardModel::columnCount(const QModelIndex & /*parent*/) const
 {
-	return columnCount_;
+    return columnCount_;
 }
 
 const GameElement *BoardModel::getGameElement(int x, int y)
 {
-	return gameModel->getElement(x - 2, y - 2);
+    return gameModel->getElement(x - 2, y - 2);
 }
 
 /**
@@ -117,15 +117,15 @@ const GameElement *BoardModel::getGameElement(int x, int y)
  */
 bool BoardModel::clickToBoard(QModelIndex index)
 {
-	if (index.isValid()) {
-		int x = index.column() - 2;
-		int y = index.row() - 2;
-		if (setElementToBoard(x, y, true)) {
-			emit setupElement(x, y);
-			return true;
-		}
-	}
-	return false;
+    if (index.isValid()) {
+        int x = index.column() - 2;
+        int y = index.row() - 2;
+        if (setElementToBoard(x, y, true)) {
+            emit setupElement(x, y);
+            return true;
+        }
+    }
+    return false;
 }
 
 /**
@@ -133,42 +133,42 @@ bool BoardModel::clickToBoard(QModelIndex index)
  */
 bool BoardModel::opponentTurn(int x, int y)
 {
-	if (setElementToBoard(x, y, false)) {
-		// После хода оппонента в модели производится проверка на проигрыш и ничью.
-		GameModel::GameStatus status = gameModel->gameStatus();
-		if (status == GameModel::StatusLose)
-			emit lose(); // Сообщаем оппоненту что мы проиграли
-		else if (status == GameModel::StatusDraw)
-			emit draw(); // Сообщаем оппоненту об ничьей
-		return true;
-	}
-	gameModel->setErrorStatus();
-	return false;
+    if (setElementToBoard(x, y, false)) {
+        // После хода оппонента в модели производится проверка на проигрыш и ничью.
+        GameModel::GameStatus status = gameModel->gameStatus();
+        if (status == GameModel::StatusLose)
+            emit lose(); // Сообщаем оппоненту что мы проиграли
+        else if (status == GameModel::StatusDraw)
+            emit draw(); // Сообщаем оппоненту об ничьей
+        return true;
+    }
+    gameModel->setErrorStatus();
+    return false;
 }
 
 void BoardModel::setAccept()
 {
-	gameModel->accept();
+    gameModel->accept();
 }
 
 void BoardModel::setError()
 {
-	gameModel->setErrorStatus();
+    gameModel->setErrorStatus();
 }
 
 void BoardModel::setClose()
 {
-	gameModel->breakGame();
+    gameModel->breakGame();
 }
 
 void BoardModel::setWin()
 {
-	gameModel->setWin();
+    gameModel->setWin();
 }
 
 void BoardModel::opponentDraw()
 {
-	gameModel->setDraw();
+    gameModel->setDraw();
 }
 
 /**
@@ -176,8 +176,8 @@ void BoardModel::opponentDraw()
  */
 void BoardModel::setResign()
 {
-	emit lose();
-	gameModel->setLose();
+    emit lose();
+    gameModel->setLose();
 }
 
 /**
@@ -186,15 +186,15 @@ void BoardModel::setResign()
  */
 bool BoardModel::setElementToBoard(int x, int y, bool local)
 {
-	if (gameModel->doTurn(x, y, local)) {
-		const QModelIndex mi = index(y + 2, x + 2); // Offset for margin
-		emit dataChanged(mi, mi);
-		return true;
-	}
-	const QString msg = gameModel->getLastError();
-	if (!msg.isEmpty())
-		emit doPopup(msg);
-	return false;
+    if (gameModel->doTurn(x, y, local)) {
+        const QModelIndex mi = index(y + 2, x + 2); // Offset for margin
+        emit dataChanged(mi, mi);
+        return true;
+    }
+    const QString msg = gameModel->getLastError();
+    if (!msg.isEmpty())
+        emit doPopup(msg);
+    return false;
 }
 
 /**
@@ -202,7 +202,7 @@ bool BoardModel::setElementToBoard(int x, int y, bool local)
  */
 int BoardModel::turnNum()
 {
-	return (gameModel->turnsCount() + 1);
+    return (gameModel->turnsCount() + 1);
 }
 
 /**
@@ -210,12 +210,12 @@ int BoardModel::turnNum()
  */
 bool BoardModel::doSwitchColor(bool local)
 {
-	if (gameModel->doSwitchColor(local)) {
-		if (local)
-			emit switchColor();
-		return true;
-	}
-	return false;
+    if (gameModel->doSwitchColor(local)) {
+        if (local)
+            emit switchColor();
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -223,7 +223,7 @@ bool BoardModel::doSwitchColor(bool local)
  */
 QString BoardModel::saveToString() const
 {
-	return gameModel->toString();
+    return gameModel->toString();
 }
 
 /**
@@ -231,24 +231,24 @@ QString BoardModel::saveToString() const
  */
 void BoardModel::setSelect(int x, int y)
 {
-	int old_x = selectX;
-	int old_y = selectY;
-	selectX = x + 2;
-	selectY = y + 2;
-	if (old_x != selectX || old_y != selectY) {
-		if (old_x != -1 && old_y != -1) {
-			QModelIndex idx = index(old_y, old_x);
-			emit dataChanged(idx, idx);
-		}
-		QModelIndex idx = index(selectY, selectX);
-		emit dataChanged(idx, idx);
-	}
+    int old_x = selectX;
+    int old_y = selectY;
+    selectX = x + 2;
+    selectY = y + 2;
+    if (old_x != selectX || old_y != selectY) {
+        if (old_x != -1 && old_y != -1) {
+            QModelIndex idx = index(old_y, old_x);
+            emit dataChanged(idx, idx);
+        }
+        QModelIndex idx = index(selectY, selectX);
+        emit dataChanged(idx, idx);
+    }
 }
 
 GameElement::ElementType BoardModel::myElementType() const
 {
-	if (gameModel) {
-		return gameModel->myElementType();
-	}
-	return GameElement::TypeNone;
+    if (gameModel) {
+        return gameModel->myElementType();
+    }
+    return GameElement::TypeNone;
 }

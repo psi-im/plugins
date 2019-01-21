@@ -1,7 +1,7 @@
 /*
     authmanger.h
 
-	Copyright (c) 2011 by Evgeny Khryukin
+    Copyright (c) 2011 by Evgeny Khryukin
 
  ***************************************************************************
  *                                                                         *
@@ -25,24 +25,24 @@ class QTimer;
 
 class AuthManager : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	AuthManager(QObject* p = 0);
-	~AuthManager();
+    AuthManager(QObject* p = 0);
+    ~AuthManager();
 
-	bool go(const QString& login, const QString& pass, const QString& captcha = "");
-	QList<QNetworkCookie> cookies() const;
+    bool go(const QString& login, const QString& pass, const QString& captcha = "");
+    QList<QNetworkCookie> cookies() const;
 
 private slots:
-	void timeout();
-	void replyFinished(QNetworkReply* r);
+    void timeout();
+    void replyFinished(QNetworkReply* r);
 
 private:
-	bool authorized_;
-	QString narodLogin, narodPass;
-	QNetworkAccessManager *manager_;
-	QEventLoop *loop_;
-	QTimer *timer_;
+    bool authorized_;
+    QString narodLogin, narodPass;
+    QNetworkAccessManager *manager_;
+    QEventLoop *loop_;
+    QTimer *timer_;
 };
 
 #endif // AUTHMANAGER_H

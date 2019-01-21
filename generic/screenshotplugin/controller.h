@@ -29,21 +29,21 @@ class ApplicationInfoAccessingHost;
 
 class Controller : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	Controller(ApplicationInfoAccessingHost* appInfo);
-	~Controller();
+    Controller(ApplicationInfoAccessingHost* appInfo);
+    ~Controller();
 
 
 public slots:
-	void onShortCutActivated();
-	void openImage();
+    void onShortCutActivated();
+    void openImage();
 
 private:
-	void doUpdate();
+    void doUpdate();
 
-	QPointer<Screenshot> screenshot;
-	ApplicationInfoAccessingHost* appInfo_;
+    QPointer<Screenshot> screenshot;
+    ApplicationInfoAccessingHost* appInfo_;
 
 };
 

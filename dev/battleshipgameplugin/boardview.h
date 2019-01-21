@@ -27,18 +27,18 @@
 
 class BoardView : public QTableView
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	BoardView(QWidget *parent = 0);
-	void setModel(BoardModel *model);
+    BoardView(QWidget *parent = 0);
+    void setModel(BoardModel *model);
 
 private:
-	virtual void resizeEvent(QResizeEvent *event);
-	virtual void mouseReleaseEvent(QMouseEvent *event);
-	void setCellsSize();
+    virtual void resizeEvent(QResizeEvent *event);
+    virtual void mouseReleaseEvent(QMouseEvent *event);
+    void setCellsSize();
 
 private:
-	BoardModel *bmodel_;
+    BoardModel *bmodel_;
 
 };
 

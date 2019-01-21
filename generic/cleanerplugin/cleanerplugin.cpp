@@ -27,122 +27,122 @@
 #define constWidth "width"
 
 CleanerPlugin::CleanerPlugin()
-	: enabled(false)
-	, appInfo(0)
-	, iconHost(0)
-	, psiOptions(0)
-	, cln(0)
-	, height(650)
-	, width(900)
+    : enabled(false)
+    , appInfo(0)
+    , iconHost(0)
+    , psiOptions(0)
+    , cln(0)
+    , height(650)
+    , width(900)
 {
 }
 
 QString CleanerPlugin::name() const
 {
-	return "Cleaner Plugin";
+    return "Cleaner Plugin";
 }
 
 QString CleanerPlugin::shortName() const
 {
-	return "cleaner";
+    return "cleaner";
 }
 
 QString CleanerPlugin::version() const
 {
-	return constVersion;
+    return constVersion;
 }
 
 bool CleanerPlugin::enable()
 {
-	if(psiOptions) {
-		enabled = true;
-		height = psiOptions->getPluginOption(constHeight, QVariant(height)).toInt();
-		width = psiOptions->getPluginOption(constWidth, QVariant(width)).toInt();
-	}
+    if(psiOptions) {
+        enabled = true;
+        height = psiOptions->getPluginOption(constHeight, QVariant(height)).toInt();
+        width = psiOptions->getPluginOption(constWidth, QVariant(width)).toInt();
+    }
 
-	return enabled;
+    return enabled;
 }
 
 bool CleanerPlugin::disable()
 {
-	if (cln) {
-		delete cln;
-	}
+    if (cln) {
+        delete cln;
+    }
 
-	enabled = false;
-	return true;
+    enabled = false;
+    return true;
 }
 
 QWidget* CleanerPlugin::options()
 {
-	if (!enabled) {
-		return 0;
-	}
-	QWidget *options = new QWidget();
-	QVBoxLayout *hbox= new QVBoxLayout(options);
-	QPushButton *goButton = new QPushButton(tr("Launch Cleaner"));
-	QHBoxLayout *h = new QHBoxLayout;
-	h->addWidget(goButton);
-	h->addStretch();
-	hbox->addLayout(h);
-	QLabel *wikiLink = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#cleaner_plugin\">Wiki (Online)</a>"));
-	wikiLink->setOpenExternalLinks(true);
-	hbox->addStretch();
-	hbox->addWidget(wikiLink);
-	connect(goButton, SIGNAL(released()), SLOT(start()));
+    if (!enabled) {
+        return 0;
+    }
+    QWidget *options = new QWidget();
+    QVBoxLayout *hbox= new QVBoxLayout(options);
+    QPushButton *goButton = new QPushButton(tr("Launch Cleaner"));
+    QHBoxLayout *h = new QHBoxLayout;
+    h->addWidget(goButton);
+    h->addStretch();
+    hbox->addLayout(h);
+    QLabel *wikiLink = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#cleaner_plugin\">Wiki (Online)</a>"));
+    wikiLink->setOpenExternalLinks(true);
+    hbox->addStretch();
+    hbox->addWidget(wikiLink);
+    connect(goButton, SIGNAL(released()), SLOT(start()));
 
-	return options;
+    return options;
 }
 
 void CleanerPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost * host)
 {
-	appInfo = host;
+    appInfo = host;
 }
 
 void CleanerPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost* host)
 {
-	iconHost = host;
+    iconHost = host;
 }
 
 void CleanerPlugin::setOptionAccessingHost(OptionAccessingHost* host)
 {
-	psiOptions = host;
+    psiOptions = host;
 }
 
 void CleanerPlugin::start()
 {
-	if(!enabled)
-		return;
+    if(!enabled)
+        return;
 
-	if(!cln) {
-		cln = new CleanerMainWindow(this);
-		cln->resize(width, height);
-		cln->showCleaner();
-	}
-	else {
-		cln->raise();
-		cln->activateWindow();
-	}
+    if(!cln) {
+        cln = new CleanerMainWindow(this);
+        cln->resize(width, height);
+        cln->showCleaner();
+    }
+    else {
+        cln->raise();
+        cln->activateWindow();
+    }
 }
 
 void CleanerPlugin::deleteCln()
 {
-	height = cln->height();
-	psiOptions->setPluginOption(constHeight, QVariant(height));
-	width = cln->width();
-	psiOptions->setPluginOption(constWidth, QVariant(width));
-	delete cln;
+    height = cln->height();
+    psiOptions->setPluginOption(constHeight, QVariant(height));
+    width = cln->width();
+    psiOptions->setPluginOption(constWidth, QVariant(width));
+    delete cln;
 }
 
 QString CleanerPlugin::pluginInfo()
 {
-	return tr("Author: ") +	 "Dealer_WeARE\n"
-		 + tr("Email: ") + "wadealer@gmail.com\n\n"
-		 + trUtf8("This plugin is designed to clear the avatar cache, saved local copies of vCards and history logs.\n"
-				  "You can preview items before deleting them from your hard drive.");
+    return tr("Author: ") +     "Dealer_WeARE\n"
+         + tr("Email: ") + "wadealer@gmail.com\n\n"
+         + trUtf8("This plugin is designed to clear the avatar cache, saved local copies of vCards and history logs.\n"
+                  "You can preview items before deleting them from your hard drive.");
 }
 
 QPixmap CleanerPlugin::icon() const
 {
-	return QPixmap(":/cleanerplugin/cleaner.png");
+    return QPixmap(":/cleanerplugin/cleaner.png");
 }

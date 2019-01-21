@@ -9,7 +9,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -31,47 +31,47 @@ class QTimer;
 
 struct JuickDownloadItem
 {
-	JuickDownloadItem() {} //need for Q_DECLARE_METATYPE
-	JuickDownloadItem(const QString& _path, const QString& _url)
-		: path(_path), url(_url)
-	{}
+    JuickDownloadItem() {} //need for Q_DECLARE_METATYPE
+    JuickDownloadItem(const QString& _path, const QString& _url)
+        : path(_path), url(_url)
+    {}
 
-	QString path;
-	QString url;
+    QString path;
+    QString url;
 };
 
 Q_DECLARE_METATYPE(JuickDownloadItem)
 
 class JuickDownloader : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	JuickDownloader(ApplicationInfoAccessingHost * host, QObject *p = 0);
-	~JuickDownloader() {}
+    JuickDownloader(ApplicationInfoAccessingHost * host, QObject *p = 0);
+    ~JuickDownloader() {}
 
-	void get(const JuickDownloadItem& item);
+    void get(const JuickDownloadItem& item);
 
 private slots:
-	void requestFinished(QNetworkReply *reply);
-	void timeOut();
+    void requestFinished(QNetworkReply *reply);
+    void timeOut();
 
 signals:
-	void finished(const QList<QByteArray>& urls);
+    void finished(const QList<QByteArray>& urls);
 
 private:
-	void dataReady(const QByteArray& ba, const JuickDownloadItem &it);
-	void setProxyHostPort(const QString& host, int port, const QString& username = "",
-			      const QString& pass = "", const QString& type = "http");
-	void peekNext();
+    void dataReady(const QByteArray& ba, const JuickDownloadItem &it);
+    void setProxyHostPort(const QString& host, int port, const QString& username = "",
+                  const QString& pass = "", const QString& type = "http");
+    void peekNext();
 
 private:
-	bool inProgress_;
-	QNetworkAccessManager *manager_;
-	ApplicationInfoAccessingHost *appInfo_;
-	QQueue<JuickDownloadItem> items_;
-	QList<QByteArray> urls_;
-	QTimer *waitTimer_;
+    bool inProgress_;
+    QNetworkAccessManager *manager_;
+    ApplicationInfoAccessingHost *appInfo_;
+    QQueue<JuickDownloadItem> items_;
+    QList<QByteArray> urls_;
+    QTimer *waitTimer_;
 }; 
 
 #endif

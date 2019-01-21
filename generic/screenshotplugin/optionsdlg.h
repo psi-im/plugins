@@ -25,15 +25,15 @@
 
 class OptionsDlg : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	OptionsDlg(QWidget* p = 0);
+    OptionsDlg(QWidget* p = 0);
 
 public slots:
-	void accept();
+    void accept();
 
 private:
-	Ui::OptionsDlg ui_;
+    Ui::OptionsDlg ui_;
 };
 
 #endif // OPTIONSDLG_H

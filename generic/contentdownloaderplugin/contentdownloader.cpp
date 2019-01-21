@@ -9,7 +9,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -27,10 +27,10 @@
 
 
 ContentDownloader::ContentDownloader()
-	: enabled(false)
+    : enabled(false)
         , psiOptions(nullptr)
         , appInfoHost(nullptr)
-	, form_(NULL)
+    , form_(NULL)
 {
 }
 
@@ -41,62 +41,62 @@ ContentDownloader::~ContentDownloader()
 // PsiPlugin
 QString ContentDownloader::name() const
 {
-	return "Content Downloader Plugin";
+    return "Content Downloader Plugin";
 }
 
 QString ContentDownloader::shortName() const
 {
-	return "cdownloader";
+    return "cdownloader";
 }
 
 QString ContentDownloader::version() const
 {
-	return "0.2.5";
+    return "0.2.5";
 }
 
 QWidget *ContentDownloader::options()
 {
-	if ( !enabled ) {
-		return 0;
-	}
+    if ( !enabled ) {
+        return 0;
+    }
 
-	if ( !appInfoHost || !psiOptions ) {
-		return 0;
-	}
+    if ( !appInfoHost || !psiOptions ) {
+        return 0;
+    }
 
-	Proxy psiProxy = appInfoHost->getProxyFor(name());
-	QNetworkProxy::ProxyType type;
-	if(psiProxy.type == "socks") {
-		type = QNetworkProxy::Socks5Proxy;
-	} else {
-		type = QNetworkProxy::HttpProxy;
-	}
+    Proxy psiProxy = appInfoHost->getProxyFor(name());
+    QNetworkProxy::ProxyType type;
+    if(psiProxy.type == "socks") {
+        type = QNetworkProxy::Socks5Proxy;
+    } else {
+        type = QNetworkProxy::HttpProxy;
+    }
 
-	QNetworkProxy proxy(type, psiProxy.host, psiProxy.port, psiProxy.user, psiProxy.pass);
+    QNetworkProxy proxy(type, psiProxy.host, psiProxy.port, psiProxy.user, psiProxy.pass);
 
-	form_ = new Form();
-	form_->setDataDir(appInfoHost->appHomeDir(ApplicationInfoAccessingHost::DataLocation));
-	form_->setCacheDir(appInfoHost->appHomeDir(ApplicationInfoAccessingHost::CacheLocation));
-	form_->setResourcesDir(appInfoHost->appResourcesDir());
-	form_->setPsiOption(psiOptions);
-	form_->setProxy(proxy);
-	return qobject_cast<QWidget*>(form_);
+    form_ = new Form();
+    form_->setDataDir(appInfoHost->appHomeDir(ApplicationInfoAccessingHost::DataLocation));
+    form_->setCacheDir(appInfoHost->appHomeDir(ApplicationInfoAccessingHost::CacheLocation));
+    form_->setResourcesDir(appInfoHost->appResourcesDir());
+    form_->setPsiOption(psiOptions);
+    form_->setProxy(proxy);
+    return qobject_cast<QWidget*>(form_);
 }
 
 bool ContentDownloader::enable()
 {
-	if ( psiOptions ) {
-		enabled = true;
-	}
+    if ( psiOptions ) {
+        enabled = true;
+    }
 
-	appInfoHost->getProxyFor(name());
-	return enabled;
+    appInfoHost->getProxyFor(name());
+    return enabled;
 }
 
 bool ContentDownloader::disable()
 {
-	enabled = false;
-	return true;
+    enabled = false;
+    return true;
 }
 
 void ContentDownloader::applyOptions()
@@ -109,28 +109,28 @@ void ContentDownloader::restoreOptions()
 
 QPixmap ContentDownloader::icon() const
 {
-	return QPixmap(":/icons/download.png");
+    return QPixmap(":/icons/download.png");
 }
 
 void ContentDownloader::setOptionAccessingHost(OptionAccessingHost *host)
 {
-	psiOptions = host;
+    psiOptions = host;
 }
 
 void ContentDownloader::optionChanged(const QString &option)
 {
-	Q_UNUSED(option);
+    Q_UNUSED(option);
 }
 
 void ContentDownloader::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host)
 {
-	appInfoHost = host;
+    appInfoHost = host;
 }
 
 QString ContentDownloader::pluginInfo()
 {
-	return tr("Author: ") +	 "Ivan Romanov\n"
-		   + tr("e-mail: ") + "drizt@land.ru\n\n"
-		   + tr("This plugin is designed to make it easy to download and install iconsets and other resources for Psi+.");
+    return tr("Author: ") +     "Ivan Romanov\n"
+           + tr("e-mail: ") + "drizt@land.ru\n\n"
+           + tr("This plugin is designed to make it easy to download and install iconsets and other resources for Psi+.");
 
 }

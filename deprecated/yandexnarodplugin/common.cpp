@@ -1,7 +1,7 @@
 /*
     common.cpp
 
-	Copyright (c) 2011 by Evgeny Khryukin
+    Copyright (c) 2011 by Evgeny Khryukin
 
  ***************************************************************************
  *                                                                         *
@@ -20,19 +20,19 @@
 
 QNetworkRequest newRequest()
 {
-	QNetworkRequest nr;
-	nr.setRawHeader("Cache-Control", "no-cache");
-	nr.setRawHeader("Accept", "*/*");
-	nr.setRawHeader("User-Agent", "PsiPlus/0.15 (U; YB/4.2.0; MRA/5.5; en)");
-	return nr;
+    QNetworkRequest nr;
+    nr.setRawHeader("Cache-Control", "no-cache");
+    nr.setRawHeader("Accept", "*/*");
+    nr.setRawHeader("User-Agent", "PsiPlus/0.15 (U; YB/4.2.0; MRA/5.5; en)");
+    return nr;
 }
 
 QNetworkAccessManager* newManager(QObject* parent)
 {
-	QNetworkAccessManager* netman = new QNetworkAccessManager(parent);
-	if(Options::instance()->useProxy()) {
-		netman->setProxy(Options::instance()->getProxy());
-	}
+    QNetworkAccessManager* netman = new QNetworkAccessManager(parent);
+    if(Options::instance()->useProxy()) {
+        netman->setProxy(Options::instance()->getProxy());
+    }
 
-	return netman;
+    return netman;
 }

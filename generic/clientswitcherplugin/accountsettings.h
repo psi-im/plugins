@@ -32,35 +32,35 @@ class AccountSettings
 {
 
 public:
-	enum {RespAllow = 0, RespNotImpl = 1, RespIgnore = 2}; // как номер индекса в combobox
-	enum {LogNever = 0, LogIfReplace = 1, LogAlways = 2};
+    enum {RespAllow = 0, RespNotImpl = 1, RespIgnore = 2}; // как номер индекса в combobox
+    enum {LogNever = 0, LogIfReplace = 1, LogAlways = 2};
 
-	AccountSettings();
-	AccountSettings(const QString&);
-	~AccountSettings();
-	bool isValid();
-	bool isEmpty();
-	void fromString(const QString&);
-	QString toString();
-	//--
-	QString account_id;
-	bool enable_contacts;
-	bool enable_conferences;
-	int  response_mode;
-	bool lock_time_requ;
-	int  show_requ_mode;
-	QString os_name;
-	QString client_name;
-	QString client_version;
-	QString caps_node;
-	QString caps_version;
-	int  log_mode;
+    AccountSettings();
+    AccountSettings(const QString&);
+    ~AccountSettings();
+    bool isValid();
+    bool isEmpty();
+    void fromString(const QString&);
+    QString toString();
+    //--
+    QString account_id;
+    bool enable_contacts;
+    bool enable_conferences;
+    int  response_mode;
+    bool lock_time_requ;
+    int  show_requ_mode;
+    QString os_name;
+    QString client_name;
+    QString client_version;
+    QString caps_node;
+    QString caps_version;
+    int  log_mode;
 
 private:
-	//--
-	void init();
-	QString addSlashes(QString&);
-	QString stripSlashes(QString&);
+    //--
+    void init();
+    QString addSlashes(QString&);
+    QString stripSlashes(QString&);
 
 };
 

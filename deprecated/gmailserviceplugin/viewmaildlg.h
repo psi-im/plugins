@@ -25,43 +25,43 @@
 #include "iconfactoryaccessinghost.h"
 
 struct MailItem {
-	QString account;
-	QString from;
-	QString subject;
-	QString text;
-	QString url;
+    QString account;
+    QString from;
+    QString subject;
+    QString text;
+    QString url;
 };
 
 class ViewMailDlg : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	ViewMailDlg(QList<MailItem> l, IconFactoryAccessingHost* host, QWidget *p = 0);
-	~ViewMailDlg() {};
+    ViewMailDlg(QList<MailItem> l, IconFactoryAccessingHost* host, QWidget *p = 0);
+    ~ViewMailDlg() {};
 
-	void appendItems(QList<MailItem> l);
-	QString caption() const;
+    void appendItems(QList<MailItem> l);
+    QString caption() const;
 
-	static QString mailItemToText(const MailItem& mi);
+    static QString mailItemToText(const MailItem& mi);
 
 private slots:
-	void updateButtons();
-	void showNext();
-	void showPrev();
-	void browse();
-	void anchorClicked(const QUrl& url);
+    void updateButtons();
+    void showNext();
+    void showPrev();
+    void browse();
+    void anchorClicked(const QUrl& url);
 
 private:
-	void showItem(int num);
-	void updateCaption();
+    void showItem(int num);
+    void updateCaption();
 
 protected:
-	void wheelEvent(QWheelEvent *e);
+    void wheelEvent(QWheelEvent *e);
 
 private:
-	Ui::ViewMailDlg ui_;
-	QList<MailItem> items_;
-	int currentItem_;
+    Ui::ViewMailDlg ui_;
+    QList<MailItem> items_;
+    int currentItem_;
 };
 
 #endif // VIEWMAILDLG_H

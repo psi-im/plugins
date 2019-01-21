@@ -40,77 +40,77 @@ namespace Ui {
 using namespace GomokuGame;
 
 class HintElementWidget : public QFrame {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	HintElementWidget(QWidget *parent = 0);
-	~HintElementWidget();
-	void setElementType(GameElement::ElementType type);
+    HintElementWidget(QWidget *parent = 0);
+    ~HintElementWidget();
+    void setElementType(GameElement::ElementType type);
 
 private:
-	GameElement* hintElement;
+    GameElement* hintElement;
 
 protected:
-	virtual void paintEvent(QPaintEvent *event);
+    virtual void paintEvent(QPaintEvent *event);
 
 };
 
 class PluginWindow : public QMainWindow {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	PluginWindow(QString full_jid, QWidget *parent = 0);
-	~PluginWindow();
-	void init(QString element);
+    PluginWindow(QString full_jid, QWidget *parent = 0);
+    ~PluginWindow();
+    void init(QString element);
 
 private:
-	Ui::PluginWindow *ui;
-	BoardModel *bmodel;
-	BoardDelegate *delegate;
-	bool gameActive;
+    Ui::PluginWindow *ui;
+    BoardModel *bmodel;
+    BoardDelegate *delegate;
+    bool gameActive;
 
 private:
-	void endGame();
-	void appendTurn(int num, int x, int y, bool my_turn);
-	bool tryLoadGame(const QString &load_str, bool local);
-	void showDraw();
+    void endGame();
+    void appendTurn(int num, int x, int y, bool my_turn);
+    bool tryLoadGame(const QString &load_str, bool local);
+    void showDraw();
 
 protected:
-	virtual void closeEvent (QCloseEvent *event);
+    virtual void closeEvent (QCloseEvent *event);
 
 private slots:
-	void changeGameStatus(GameModel::GameStatus status);
-	void turnSelected();
-	void setupElement(int x, int y);
-	void acceptStep();
-	void setAccept();
-	void setError();
-	void setTurn(int, int);
-	void setSwitchColor();
-	void doSwitchColor();
-	void setLose();
-	void setDraw();
-	void setResign();
-	void setWin();
-	void setClose();
-	void newGame();
-	void saveGame();
-	void loadGame();
-	void loadRemoteGame(QString);
-	void opponentDraw();
-	void setSkin();
+    void changeGameStatus(GameModel::GameStatus status);
+    void turnSelected();
+    void setupElement(int x, int y);
+    void acceptStep();
+    void setAccept();
+    void setError();
+    void setTurn(int, int);
+    void setSwitchColor();
+    void doSwitchColor();
+    void setLose();
+    void setDraw();
+    void setResign();
+    void setWin();
+    void setClose();
+    void newGame();
+    void saveGame();
+    void loadGame();
+    void loadRemoteGame(QString);
+    void opponentDraw();
+    void setSkin();
 
 signals:
-	void changeGameSession(QString);
-	void closeBoard(bool, int, int, int, int);
-	void setElement(int, int);
-	void accepted();
-	void error();
-	void lose();
-	void draw();
-	void switchColor();
-	void load(QString);
-	void sendNewInvite();
-	void doPopup(const QString);
-	void playSound(const QString);
+    void changeGameSession(QString);
+    void closeBoard(bool, int, int, int, int);
+    void setElement(int, int);
+    void accepted();
+    void error();
+    void lose();
+    void draw();
+    void switchColor();
+    void load(QString);
+    void sendNewInvite();
+    void doPopup(const QString);
+    void playSound(const QString);
 
 };
 

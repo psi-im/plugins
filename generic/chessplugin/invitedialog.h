@@ -30,41 +30,41 @@ namespace Chess {
 
 class InviteDialog : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	InviteDialog(const Request& r, const QStringList& resources, QWidget *parent = 0);
+    InviteDialog(const Request& r, const QStringList& resources, QWidget *parent = 0);
 
 private:
-	Ui::InviteDialog ui_;
-	QStringList resources_;
-	Request r;
+    Ui::InviteDialog ui_;
+    QStringList resources_;
+    Request r;
 
 private slots:
-	void buttonPressed();
+    void buttonPressed();
 
 signals:
-	void play(const Request& r, const QString&, const QString&);
+    void play(const Request& r, const QString&, const QString&);
 };
 
 class InvitationDialog : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	InvitationDialog(const QString& jid, QString color, QWidget *parent = 0);
+    InvitationDialog(const QString& jid, QString color, QWidget *parent = 0);
 
 private:
-	Ui::InvitationDialog ui_;
-	bool accepted;
+    Ui::InvitationDialog ui_;
+    bool accepted;
 
 private slots:
-	void buttonPressed();
+    void buttonPressed();
 
 signals:
-	void accept();
-	void reject();
+    void accept();
+    void reject();
 
 protected:
-	void closeEvent(QCloseEvent *e);
+    void closeEvent(QCloseEvent *e);
 };
 }
 

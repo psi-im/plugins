@@ -9,7 +9,7 @@
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
@@ -24,109 +24,109 @@
 #include "contentitem.h"
 
 ContentItem::ContentItem(const QString &name, ContentItem *parent)
-	: parentItem_(parent)
-	, name_(name)
-	, url_("")
-	, html_("")
-	, toInstall_(false)
-	, isInstalled_(false)
+    : parentItem_(parent)
+    , name_(name)
+    , url_("")
+    , html_("")
+    , toInstall_(false)
+    , isInstalled_(false)
 {
 }
 
 ContentItem::~ContentItem()
 {
-	qDeleteAll(childItems_);
+    qDeleteAll(childItems_);
 }
 
 void ContentItem::appendChild(ContentItem *item)
 {
-	childItems_.append(item);
+    childItems_.append(item);
 }
 
 ContentItem *ContentItem::child(int row)
 {
-	return childItems_.value(row);
+    return childItems_.value(row);
 }
 
 int ContentItem::childCount() const
 {
-	return childItems_.count();
+    return childItems_.count();
 }
 
 ContentItem *ContentItem::parent()
 {
-	return parentItem_;
+    return parentItem_;
 }
 
 int ContentItem::row() const
 {
-	if (parentItem_) {
-		return parentItem_->childItems_.indexOf(const_cast<ContentItem*>(this));
-	}
+    if (parentItem_) {
+        return parentItem_->childItems_.indexOf(const_cast<ContentItem*>(this));
+    }
 
-	return 0;
+    return 0;
 }
 
 QString ContentItem::group() const
 {
-	return group_;
+    return group_;
 }
 
 void ContentItem::setGroup(const QString &group)
 {
-	group_ = group;
+    group_ = group;
 }
 
 QString ContentItem::name() const
 {
-	return name_;
+    return name_;
 }
 
 void ContentItem::setName(const QString &name)
 {
-	name_ = name;
+    name_ = name;
 }
-	
+    
 QString ContentItem::url() const
 {
-	return url_;
+    return url_;
 }
 
 void ContentItem::setUrl(const QString &url)
 {
-	url_ = url;
+    url_ = url;
 }
 
 QString ContentItem::html() const
 {
-	return html_;
+    return html_;
 }
 
 void ContentItem::setHtml(const QString &html)
 {
-	html_ = html;
+    html_ = html;
 }
 
 bool ContentItem::toInstall() const
 {
-	return toInstall_;
+    return toInstall_;
 }
 
 void ContentItem::setToInstall(bool b)
 {
-	if(!isInstalled_) {
-		toInstall_ = b;
-	}
+    if(!isInstalled_) {
+        toInstall_ = b;
+    }
 }
-	
+    
 bool ContentItem::isInstalled() const
 {
-	return isInstalled_;
+    return isInstalled_;
 }
 
 void ContentItem::setIsInstalled(bool b)
 {
-	isInstalled_ = b;
-	toInstall_ = b ? false : toInstall_;
+    isInstalled_ = b;
+    toInstall_ = b ? false : toInstall_;
 }
 

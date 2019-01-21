@@ -9,7 +9,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -24,28 +24,28 @@
 #include <QDialog>
 
 namespace Ui {
-	class JuickJidDialog;
+    class JuickJidDialog;
 }
 
 class JuickJidList : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	JuickJidList(const QStringList& jids, QWidget *p = 0);
-	~JuickJidList();
+    JuickJidList(const QStringList& jids, QWidget *p = 0);
+    ~JuickJidList();
 
 signals:
-	void listUpdated(const QStringList&);
+    void listUpdated(const QStringList&);
 
 private slots:
-	void addPressed();
-	void delPressed();
-	void okPressed();
-	void enableButtons();
+    void addPressed();
+    void delPressed();
+    void okPressed();
+    void enableButtons();
 
 private:
-	Ui::JuickJidDialog *ui_;
-	QStringList jidList_;
+    Ui::JuickJidDialog *ui_;
+    QStringList jidList_;
 };
 
 #endif // JUICKJIDLIST_H

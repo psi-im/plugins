@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -34,58 +34,58 @@ enum Comparison { Equal, NotEqual, Contains, NotContains };
 
 struct Condition
 {
-	ConditionType type;
-	Comparison comparison;
-	QString text;
+    ConditionType type;
+    Comparison comparison;
+    QString text;
 };
 
 struct Rule
 {
-	QString name;
-	bool showMessage;
-	QList<Condition> conditions;
+    QString name;
+    bool showMessage;
+    QList<Condition> conditions;
 };
 
 class Options : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	explicit Options(const QList<Rule> &rules, QWidget *parent = 0);
-	~Options();
+    explicit Options(const QList<Rule> &rules, QWidget *parent = 0);
+    ~Options();
 
-	void update();
-	void setOptionAccessingHost(OptionAccessingHost* host) { _optionHost = host; }
+    void update();
+    void setOptionAccessingHost(OptionAccessingHost* host) { _optionHost = host; }
 
-	void saveSettings();
+    void saveSettings();
 
 public slots:
-	void addRule();
-	void removeRule();
-	void upRule();
-	void downRule();
-	void updateRuleButtons();
-	
-	void addCondition();
-	void removeCondition();
-	void upCondition();
-	void downCondition();
-	void updateConditionButtons();
+    void addRule();
+    void removeRule();
+    void upRule();
+    void downRule();
+    void updateRuleButtons();
+    
+    void addCondition();
+    void removeCondition();
+    void upCondition();
+    void downCondition();
+    void updateConditionButtons();
 
-	void updateRuleName(const QString &name);
-	void setRulePane(int row);
+    void updateRuleName(const QString &name);
+    void setRulePane(int row);
 
-	void hack();
-	
+    void hack();
+    
 private:
-	void clearConditionsTable();
-	void fillCondition(int row);
-	void saveCondition(int rule, int row);
+    void clearConditionsTable();
+    void fillCondition(int row);
+    void saveCondition(int rule, int row);
 
-	Ui::Options *ui;
-	OptionAccessingHost* _optionHost;
-	QList<Rule> _rules;
-	int _currentRule;
+    Ui::Options *ui;
+    OptionAccessingHost* _optionHost;
+    QList<Rule> _rules;
+    int _currentRule;
 };
 
 #endif // OPTIONS_H

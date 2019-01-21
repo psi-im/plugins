@@ -21,16 +21,16 @@
 #include "optionsdlg.h"
 
 OptionsDlg::OptionsDlg(QWidget* p)
-	: QDialog(p)
+    : QDialog(p)
 {
-	ui_.setupUi(this);
-	ui_.options->restoreOptions();
+    ui_.setupUi(this);
+    ui_.options->restoreOptions();
 
-//	ui_.options->ui_.lb_wiki->setVisible(false); // from psi+ plugin
+//    ui_.options->ui_.lb_wiki->setVisible(false); // from psi+ plugin
 }
 
 void OptionsDlg::accept()
 {
-	ui_.options->applyOptions();
-	QDialog::accept();
+    ui_.options->applyOptions();
+    QDialog::accept();
 }

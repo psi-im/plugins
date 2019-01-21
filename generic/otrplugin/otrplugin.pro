@@ -5,22 +5,22 @@ isEmpty(PSISDK) {
 }
 
 win32-msvc* {
-	# consider compiling https://github.com/Ri0n/libotr/tree/master/vs2015
-	LIBS += -lotr -ltidy
+    # consider compiling https://github.com/Ri0n/libotr/tree/master/vs2015
+    LIBS += -lotr -ltidy
 } else {
-	LIBS += -lotr -ltidy -lgcrypt -lgpg-error
+    LIBS += -lotr -ltidy -lgcrypt -lgpg-error
 }
 
 !win32:!exists(/usr/include/tidybuffio.h):!exists(/usr/include/tidy/tidybuffio.h) {
-	DEFINES += LEGACY_TIDY
+    DEFINES += LEGACY_TIDY
 }
 
 RESOURCES = otrplugin.qrc
 unix {
-	INCLUDEPATH += /usr/include/tidy
+    INCLUDEPATH += /usr/include/tidy
 }
 greaterThan(QT_MAJOR_VERSION, 4) {
-	QT += concurrent
+    QT += concurrent
 }
 
 HEADERS += src/psiotrplugin.h

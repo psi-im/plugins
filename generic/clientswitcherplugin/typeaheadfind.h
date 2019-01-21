@@ -30,29 +30,29 @@ namespace ClientSwitcher {
 
 class TypeAheadFindBar : public QToolBar
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	TypeAheadFindBar(IconFactoryAccessingHost *IcoHost, QTextEdit *textedit, const QString &title, QWidget *parent = 0);
+    TypeAheadFindBar(IconFactoryAccessingHost *IcoHost, QTextEdit *textedit, const QString &title, QWidget *parent = 0);
 
-	~TypeAheadFindBar();
-	void init();
+    ~TypeAheadFindBar();
+    void init();
 
 signals:
-	void firstPage();
-	void lastPage();
-	void nextPage();
-	void prevPage();
+    void firstPage();
+    void lastPage();
+    void nextPage();
+    void prevPage();
 
 private slots:
-	void textChanged(const QString &);
-	void findNext();
-	void findPrevious();
-	void caseToggled();
+    void textChanged(const QString &);
+    void findNext();
+    void findPrevious();
+    void caseToggled();
 
 private:
-	class Private;
-	Private *d;
-	IconFactoryAccessingHost *icoHost_;
+    class Private;
+    Private *d;
+    IconFactoryAccessingHost *icoHost_;
 };
 
 }

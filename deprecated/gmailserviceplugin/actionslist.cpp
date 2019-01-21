@@ -21,61 +21,61 @@
 #include "actionslist.h"
 
 ActionsList::ActionsList(QObject *p)
-	: QObject(p)
+    : QObject(p)
 {
 }
 
 ActionsList::~ActionsList()
 {
-	list_.clear();
+    list_.clear();
 }
 
 QAction* ActionsList::newAction(QObject *p, int account, const QString &contact, QIcon ico)
 {
-	QAction* act = new QAction(ico, tr(" Enable Off the Record Chat.\n"
-					   "When checked, the server will not\n"
-					   "save the history for this contact."), p);
-	AList l = list_.value(account);
-	act->setProperty("account", account);
-	act->setProperty("jid", contact);
-	act->setVisible(false);
-	act->setCheckable(true);
-	l.push_back(QPointer<QAction>(act));
-	list_.insert(account, l);
-	connect(act, SIGNAL(triggered(bool)), SLOT(actionActivated(bool)));
-	return act;
+    QAction* act = new QAction(ico, tr(" Enable Off the Record Chat.\n"
+                       "When checked, the server will not\n"
+                       "save the history for this contact."), p);
+    AList l = list_.value(account);
+    act->setProperty("account", account);
+    act->setProperty("jid", contact);
+    act->setVisible(false);
+    act->setCheckable(true);
+    l.push_back(QPointer<QAction>(act));
+    list_.insert(account, l);
+    connect(act, SIGNAL(triggered(bool)), SLOT(actionActivated(bool)));
+    return act;
 }
 
 void ActionsList::updateActionsVisibility(int account, bool isVisible)
 {
-	if(!list_.contains(account))
-		return;
+    if(!list_.contains(account))
+        return;
 
-	foreach(QPointer<QAction> act, list_.value(account)) {
-		if(act) {
-			act->setVisible(isVisible);
-		}
-	}
+    foreach(QPointer<QAction> act, list_.value(account)) {
+        if(act) {
+            act->setVisible(isVisible);
+        }
+    }
 }
 
 void ActionsList::updateAction(int account, const QString &jid, bool isChecked)
 {
-	foreach(QPointer<QAction> act, list_.value(account)) {
-		if(!act)
-			continue;
-		if(act->property("jid").toString() == jid) {
-			act->setChecked(isChecked);
-			break;
-		}
-	}
+    foreach(QPointer<QAction> act, list_.value(account)) {
+        if(!act)
+            continue;
+        if(act->property("jid").toString() == jid) {
+            act->setChecked(isChecked);
+            break;
+        }
+    }
 }
 
 void ActionsList::actionActivated(bool val)
 {
-	QAction* act = qobject_cast<QAction*>(sender());
-	if(act) {
-		int account = act->property("account").toInt();
-		QString jid = act->property("jid").toString();
-		emit changeNoSaveState(account, jid, val);
-	}
+    QAction* act = qobject_cast<QAction*>(sender());
+    if(act) {
+        int account = act->property("account").toInt();
+        QString jid = act->property("jid").toString();
+        emit changeNoSaveState(account, jid, val);
+    }
 }

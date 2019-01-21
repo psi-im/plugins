@@ -51,25 +51,25 @@ FORMS += optionswidget.ui \
 RESOURCES += screenshotplugin.qrc
 
 #QXT
-HEADERS  +=	qxt/core/qxtglobal.h \
-		qxt/gui/qxtwindowsystem.h
+HEADERS  +=    qxt/core/qxtglobal.h \
+        qxt/gui/qxtwindowsystem.h
 
-SOURCES  +=	qxt/core/qxtglobal.cpp \
-		qxt/gui/qxtwindowsystem.cpp
+SOURCES  +=    qxt/core/qxtglobal.cpp \
+        qxt/gui/qxtwindowsystem.cpp
 
 unix:!macx {
-	CONFIG += X11
-	SOURCES += qxt/gui/qxtwindowsystem_x11.cpp
-	HEADERS += qxt/gui/x11info.h
+    CONFIG += X11
+    SOURCES += qxt/gui/qxtwindowsystem_x11.cpp
+    HEADERS += qxt/gui/x11info.h
 }
 macx {
-	SOURCES += qxt/gui/qxtwindowsystem_mac.cpp
+    SOURCES += qxt/gui/qxtwindowsystem_mac.cpp
 
-	HEADERS  += qxt/gui/qxtwindowsystem_mac.h
+    HEADERS  += qxt/gui/qxtwindowsystem_mac.h
 
-	QMAKE_LFLAGS += -framework Carbon -framework CoreFoundation
+    QMAKE_LFLAGS += -framework Carbon -framework CoreFoundation
 }
 win32 {
-	SOURCES += qxt/gui/qxtwindowsystem_win.cpp
-	LIBS += -lUser32
+    SOURCES += qxt/gui/qxtwindowsystem_win.cpp
+    LIBS += -lUser32
 }

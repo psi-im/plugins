@@ -25,10 +25,10 @@
 
 class Viewer : public QTableView
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	Viewer(QWidget *parent = 0) : QTableView(parent) {}
+    Viewer(QWidget *parent = 0) : QTableView(parent) {}
         void init();
 
 private slots:

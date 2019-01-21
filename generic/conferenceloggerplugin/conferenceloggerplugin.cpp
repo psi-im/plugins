@@ -50,286 +50,286 @@
 #define constShortCut "shortcut"
 
 class ConferenceLogger: public QObject, public PsiPlugin, public StanzaFilter, public AccountInfoAccessor, public ApplicationInfoAccessor, public OptionAccessor,
-						public ActiveTabAccessor, public GCToolbarIconAccessor, public IconFactoryAccessor, public PluginInfoProvider
+                        public ActiveTabAccessor, public GCToolbarIconAccessor, public IconFactoryAccessor, public PluginInfoProvider
 {
-	Q_OBJECT
-	Q_PLUGIN_METADATA(IID "com.psi-plus.ConferenceLogger")
-	Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor ApplicationInfoAccessor OptionAccessor
-				 ActiveTabAccessor GCToolbarIconAccessor IconFactoryAccessor PluginInfoProvider)
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "com.psi-plus.ConferenceLogger")
+    Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor ApplicationInfoAccessor OptionAccessor
+                 ActiveTabAccessor GCToolbarIconAccessor IconFactoryAccessor PluginInfoProvider)
 
-	public:
-	ConferenceLogger() = default;
-	virtual QString name() const;
-	virtual QString shortName() const;
-	virtual QString version() const;
-	virtual QWidget* options();
-	virtual bool enable();
-	virtual bool disable();
-	virtual void applyOptions();
-	virtual void restoreOptions(){};
-	virtual bool incomingStanza(int account, const QDomElement& xml);
-	virtual bool outgoingStanza(int account, QDomElement& xml);
-	virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
-	virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
-	virtual void setOptionAccessingHost(OptionAccessingHost* host);
-	virtual void optionChanged(const QString& /*option*/){};
-	virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
-	virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
-	virtual QList < QVariantHash > getGCButtonParam();
-	virtual QAction* getGCAction(QObject* , int , const QString& ) { return 0; };
-	virtual QString pluginInfo();
-	virtual QPixmap icon() const;
+    public:
+    ConferenceLogger() = default;
+    virtual QString name() const;
+    virtual QString shortName() const;
+    virtual QString version() const;
+    virtual QWidget* options();
+    virtual bool enable();
+    virtual bool disable();
+    virtual void applyOptions();
+    virtual void restoreOptions(){};
+    virtual bool incomingStanza(int account, const QDomElement& xml);
+    virtual bool outgoingStanza(int account, QDomElement& xml);
+    virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+    virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
+    virtual void setOptionAccessingHost(OptionAccessingHost* host);
+    virtual void optionChanged(const QString& /*option*/){};
+    virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
+    virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
+    virtual QList < QVariantHash > getGCButtonParam();
+    virtual QAction* getGCAction(QObject* , int , const QString& ) { return 0; };
+    virtual QString pluginInfo();
+    virtual QPixmap icon() const;
 
 
 private:
-	void Logger(QString room, QString from, QString MyJid, QString Text, QString Stamp);
-	void showLog(QString filename);
+    void Logger(QString room, QString from, QString MyJid, QString Text, QString Stamp);
+    void showLog(QString filename);
 
-	AccountInfoAccessingHost *AccInfoHost = nullptr;
-	ApplicationInfoAccessingHost *AppInfoHost = nullptr;
-	OptionAccessingHost *psiOptions = nullptr;
-	ActiveTabAccessingHost *activeTab = nullptr;
-	IconFactoryAccessingHost *IcoHost = nullptr;
-	QComboBox *FilesBox = nullptr;
-	QPushButton *viewButton = nullptr;
+    AccountInfoAccessingHost *AccInfoHost = nullptr;
+    ApplicationInfoAccessingHost *AppInfoHost = nullptr;
+    OptionAccessingHost *psiOptions = nullptr;
+    ActiveTabAccessingHost *activeTab = nullptr;
+    IconFactoryAccessingHost *IcoHost = nullptr;
+    QComboBox *FilesBox = nullptr;
+    QPushButton *viewButton = nullptr;
 
-	bool enabled = false;
-	int Height = 500;
-	int Width = 600;
+    bool enabled = false;
+    int Height = 500;
+    int Width = 600;
 
-	QString HistoryDir;
-	QString lastItem;
+    QString HistoryDir;
+    QString lastItem;
 
 private slots:
-	void view();
-	void viewFromOpt();
-	void onClose(int, int);
+    void view();
+    void viewFromOpt();
+    void onClose(int, int);
 };
 
 QString ConferenceLogger::name() const {
-	return "Conference Logger Plugin";
+    return "Conference Logger Plugin";
 }
 
 QString ConferenceLogger::shortName() const {
-	return "logger";
+    return "logger";
 }
 
 QString ConferenceLogger::version() const {
-	return cVer;
+    return cVer;
 }
 
 bool ConferenceLogger::enable() {
-	QFile file(":/conferenceloggerplugin/conferencelogger.png");
-	if ( file.open(QIODevice::ReadOnly) ) {
-		QByteArray image = file.readAll();
-		IcoHost->addIcon("loggerplugin/openlog",image);
-		file.close();
-	} else {
-		enabled = false;
-		return enabled;
-	}
-	if(psiOptions) {
-		enabled = true;
-		HistoryDir = AppInfoHost->appHistoryDir();
-		Height = psiOptions->getPluginOption(constHeight, QVariant(Height)).toInt();
-		Width = psiOptions->getPluginOption(constWidth, QVariant(Width)).toInt();
-		lastItem = psiOptions->getPluginOption(constlastItem, QVariant(lastItem)).toString();
-	}
-	return enabled;
+    QFile file(":/conferenceloggerplugin/conferencelogger.png");
+    if ( file.open(QIODevice::ReadOnly) ) {
+        QByteArray image = file.readAll();
+        IcoHost->addIcon("loggerplugin/openlog",image);
+        file.close();
+    } else {
+        enabled = false;
+        return enabled;
+    }
+    if(psiOptions) {
+        enabled = true;
+        HistoryDir = AppInfoHost->appHistoryDir();
+        Height = psiOptions->getPluginOption(constHeight, QVariant(Height)).toInt();
+        Width = psiOptions->getPluginOption(constWidth, QVariant(Width)).toInt();
+        lastItem = psiOptions->getPluginOption(constlastItem, QVariant(lastItem)).toString();
+    }
+    return enabled;
 }
 
 bool ConferenceLogger::disable() {
-	enabled = false;
-	return true;
+    enabled = false;
+    return true;
 }
 
 QWidget* ConferenceLogger::options() {
-	if(!enabled) {
-		return 0;
-	}
-	QWidget *options = new QWidget();
-	QVBoxLayout *layout = new QVBoxLayout(options);
-	QLabel *label = new QLabel(tr("You can find your logs here:"));
-	QLineEdit *path = new QLineEdit;
-	path->setText(HistoryDir);
-	path->setEnabled(false);
-	FilesBox = new QComboBox();
-	QDir dir(HistoryDir);
-	foreach(QString file, dir.entryList(QDir::Files)) {
-		if(file.contains("_in_")) {
-			FilesBox->addItem(file);
-		}
-	}
-	for(int i = FilesBox->count(); i > 0; --i) {
-		if(FilesBox->itemText(i) == lastItem) {
-			FilesBox->setCurrentIndex(i);
-		}
-	}
-	QHBoxLayout *filesLayout = new QHBoxLayout();
-	filesLayout->addWidget(new QLabel(tr("Logs:")));
-	filesLayout->addWidget(FilesBox);
-	filesLayout->addStretch();
-	viewButton = new QPushButton(IcoHost->getIcon("psi/search"), tr("View Log"));
-	connect(viewButton, SIGNAL(released()), SLOT(viewFromOpt()));
-	QLabel *wikiLink = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#conference_logger_plugin\">Wiki (Online)</a>"));
-	wikiLink->setOpenExternalLinks(true);
-	filesLayout->addWidget(viewButton);
-	layout->addWidget(label);
-	layout->addWidget(path);
-	layout->addLayout(filesLayout);
-	layout->addStretch();
-	layout->addWidget(wikiLink);
-	return options;
+    if(!enabled) {
+        return 0;
+    }
+    QWidget *options = new QWidget();
+    QVBoxLayout *layout = new QVBoxLayout(options);
+    QLabel *label = new QLabel(tr("You can find your logs here:"));
+    QLineEdit *path = new QLineEdit;
+    path->setText(HistoryDir);
+    path->setEnabled(false);
+    FilesBox = new QComboBox();
+    QDir dir(HistoryDir);
+    foreach(QString file, dir.entryList(QDir::Files)) {
+        if(file.contains("_in_")) {
+            FilesBox->addItem(file);
+        }
+    }
+    for(int i = FilesBox->count(); i > 0; --i) {
+        if(FilesBox->itemText(i) == lastItem) {
+            FilesBox->setCurrentIndex(i);
+        }
+    }
+    QHBoxLayout *filesLayout = new QHBoxLayout();
+    filesLayout->addWidget(new QLabel(tr("Logs:")));
+    filesLayout->addWidget(FilesBox);
+    filesLayout->addStretch();
+    viewButton = new QPushButton(IcoHost->getIcon("psi/search"), tr("View Log"));
+    connect(viewButton, SIGNAL(released()), SLOT(viewFromOpt()));
+    QLabel *wikiLink = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#conference_logger_plugin\">Wiki (Online)</a>"));
+    wikiLink->setOpenExternalLinks(true);
+    filesLayout->addWidget(viewButton);
+    layout->addWidget(label);
+    layout->addWidget(path);
+    layout->addLayout(filesLayout);
+    layout->addStretch();
+    layout->addWidget(wikiLink);
+    return options;
 }
 
 bool ConferenceLogger::incomingStanza(int account, const QDomElement& stanza) {
-	if (enabled) {
-		if(stanza.tagName() == "message") {
-			if(stanza.attribute("type") == "groupchat") {
-				QString from = stanza.attribute("from");
-				QStringList List = from.split("/");
-				QString room = List.takeFirst();
-				from = "";
-				if(!List.isEmpty()) {
-					from = List.join("/");
-				}
-				QString Stamp = "";
-				Stamp = stanza.firstChildElement("x").attribute("stamp");
-				QDomElement body = stanza.firstChildElement("body");
-				if(!body.isNull()) {
-					QString Text = body.text();
-					QString MyJid = AccInfoHost->getJid(account);
-					MyJid = MyJid.replace("@", "_at_");
-					Logger(room, from, MyJid, Text, Stamp);
-				}
-			}
-		}
-	}
-	return false;
+    if (enabled) {
+        if(stanza.tagName() == "message") {
+            if(stanza.attribute("type") == "groupchat") {
+                QString from = stanza.attribute("from");
+                QStringList List = from.split("/");
+                QString room = List.takeFirst();
+                from = "";
+                if(!List.isEmpty()) {
+                    from = List.join("/");
+                }
+                QString Stamp = "";
+                Stamp = stanza.firstChildElement("x").attribute("stamp");
+                QDomElement body = stanza.firstChildElement("body");
+                if(!body.isNull()) {
+                    QString Text = body.text();
+                    QString MyJid = AccInfoHost->getJid(account);
+                    MyJid = MyJid.replace("@", "_at_");
+                    Logger(room, from, MyJid, Text, Stamp);
+                }
+            }
+        }
+    }
+    return false;
 }
 
 bool ConferenceLogger::outgoingStanza(int /*account*/, QDomElement& /*xml*/)
 {
-	return false;
+    return false;
 }
 
 void ConferenceLogger::setAccountInfoAccessingHost(AccountInfoAccessingHost* host) {
-	AccInfoHost = host;
+    AccInfoHost = host;
 }
 
 void ConferenceLogger::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host) {
-	AppInfoHost = host;
+    AppInfoHost = host;
 }
 
 void ConferenceLogger::Logger(QString room, QString from, QString MyJid, QString Text, QString Stamp) {
-	room = room.replace("@", "_at_");
-	room = "_in_" + room;
-	if(Stamp == "") {
-		Stamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-	}
-	else {
-		Stamp.insert(4, "-");
-		Stamp.insert(7, "-");
-		Stamp.replace("T", " ");
-	}
-	QFile file(HistoryDir + QDir::separator() + MyJid + room + ".conferencehistory");
-	if(file.open(QIODevice::WriteOnly | QIODevice::Append)) {
-		QTextStream out(&file);
-		//out.seek(file.size());
-		out.setCodec("UTF-8");
-		out.setGenerateByteOrderMark(false);
-		out << Stamp << "  " << from << ": " << Text << endl;
-	}
+    room = room.replace("@", "_at_");
+    room = "_in_" + room;
+    if(Stamp == "") {
+        Stamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    }
+    else {
+        Stamp.insert(4, "-");
+        Stamp.insert(7, "-");
+        Stamp.replace("T", " ");
+    }
+    QFile file(HistoryDir + QDir::separator() + MyJid + room + ".conferencehistory");
+    if(file.open(QIODevice::WriteOnly | QIODevice::Append)) {
+        QTextStream out(&file);
+        //out.seek(file.size());
+        out.setCodec("UTF-8");
+        out.setGenerateByteOrderMark(false);
+        out << Stamp << "  " << from << ": " << Text << endl;
+    }
 }
 
 void ConferenceLogger::applyOptions() {
-	if (FilesBox == 0)	return;
+    if (FilesBox == 0)    return;
 
-	QVariant vlastItem(FilesBox->currentText());
-	lastItem = vlastItem.toString();
-	psiOptions->setPluginOption(constlastItem, vlastItem);
+    QVariant vlastItem(FilesBox->currentText());
+    lastItem = vlastItem.toString();
+    psiOptions->setPluginOption(constlastItem, vlastItem);
 }
 
 void ConferenceLogger::setOptionAccessingHost(OptionAccessingHost* host) {
-	psiOptions = host;
+    psiOptions = host;
 }
 
 void ConferenceLogger::viewFromOpt() {
-	lastItem = FilesBox->currentText();
-	psiOptions->setPluginOption(constlastItem, QVariant(lastItem));
-	showLog(lastItem);
+    lastItem = FilesBox->currentText();
+    psiOptions->setPluginOption(constlastItem, QVariant(lastItem));
+    showLog(lastItem);
 }
 
 void ConferenceLogger::view() {
-	if(!enabled) return;
-	QString Jid = activeTab->getJid();
-	QString YourJid = activeTab->getYourJid();
-	if(Jid == "" || YourJid == "") {
-		return;
-	}
-	Jid = Jid.replace("@", "_at_");
-	QStringList List = YourJid.split("/");
-	YourJid = List.takeFirst();
-	YourJid = YourJid.replace("@", "_at_");
-	QString FName = YourJid + "_in_" + Jid + ".conferencehistory";
-	QDir dir(HistoryDir);
-	foreach(QString file, dir.entryList(QDir::Files)) {
-		if(file == FName) {
-			showLog(file);
-			break;
-		}
-	}
+    if(!enabled) return;
+    QString Jid = activeTab->getJid();
+    QString YourJid = activeTab->getYourJid();
+    if(Jid == "" || YourJid == "") {
+        return;
+    }
+    Jid = Jid.replace("@", "_at_");
+    QStringList List = YourJid.split("/");
+    YourJid = List.takeFirst();
+    YourJid = YourJid.replace("@", "_at_");
+    QString FName = YourJid + "_in_" + Jid + ".conferencehistory";
+    QDir dir(HistoryDir);
+    foreach(QString file, dir.entryList(QDir::Files)) {
+        if(file == FName) {
+            showLog(file);
+            break;
+        }
+    }
 }
 
 void ConferenceLogger::showLog(QString filename) {
-	filename = HistoryDir + "/" + filename;
-	Viewer *v = new Viewer(filename, IcoHost);
-	v->resize(Width, Height);
-	if(!v->init()) {
-		delete(v);
-		return;
-	}
-	connect(v, SIGNAL(onClose(int,int)), this, SLOT(onClose(int,int)));
-	v->show();
+    filename = HistoryDir + "/" + filename;
+    Viewer *v = new Viewer(filename, IcoHost);
+    v->resize(Width, Height);
+    if(!v->init()) {
+        delete(v);
+        return;
+    }
+    connect(v, SIGNAL(onClose(int,int)), this, SLOT(onClose(int,int)));
+    v->show();
 }
 
 void ConferenceLogger::onClose(int w, int h) {
-	Width = w;
-	Height = h;
-	psiOptions->setPluginOption(constWidth, QVariant(Width));
-	psiOptions->setPluginOption(constHeight, QVariant(Height));
+    Width = w;
+    Height = h;
+    psiOptions->setPluginOption(constWidth, QVariant(Width));
+    psiOptions->setPluginOption(constHeight, QVariant(Height));
 }
 
 void ConferenceLogger::setActiveTabAccessingHost(ActiveTabAccessingHost* host) {
-	activeTab = host;
+    activeTab = host;
 }
 
 void ConferenceLogger::setIconFactoryAccessingHost(IconFactoryAccessingHost *host) {
-	IcoHost = host;
+    IcoHost = host;
 }
 
 QList < QVariantHash > ConferenceLogger::getGCButtonParam() {
-	QList< QVariantHash > l;
-	QVariantHash hash;
-	hash["tooltip"] = QVariant(tr("Groupchat History"));
-	hash["icon"] = QVariant(QString("loggerplugin/openlog"));
-	hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
-	hash["slot"] = QVariant(SLOT(view()));
-	l.push_back(hash);
-	return l;
+    QList< QVariantHash > l;
+    QVariantHash hash;
+    hash["tooltip"] = QVariant(tr("Groupchat History"));
+    hash["icon"] = QVariant(QString("loggerplugin/openlog"));
+    hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+    hash["slot"] = QVariant(SLOT(view()));
+    l.push_back(hash);
+    return l;
 }
 
 QString ConferenceLogger::pluginInfo() {
-	return tr("Author: ") +	 "Dealer_WeARE\n"
-		 + tr("Email: ") + "wadealer@gmail.com\n\n"
-		 + trUtf8("This plugin is designed to save groupchat logs in which the Psi+ user sits.\n"
-				  "Groupchats logs can be viewed from the plugin settings or by clicking on the appropriate button on the toolbar in the active window/tab with groupchat.\n\n"
-				  "Note: To work correctly, the the Groupchat Toolbar must be enabled.");
+    return tr("Author: ") +     "Dealer_WeARE\n"
+         + tr("Email: ") + "wadealer@gmail.com\n\n"
+         + trUtf8("This plugin is designed to save groupchat logs in which the Psi+ user sits.\n"
+                  "Groupchats logs can be viewed from the plugin settings or by clicking on the appropriate button on the toolbar in the active window/tab with groupchat.\n\n"
+                  "Note: To work correctly, the the Groupchat Toolbar must be enabled.");
 }
 
 QPixmap ConferenceLogger::icon() const
 {
-	return QPixmap(":/conferenceloggerplugin/conferencelogger.png");
+    return QPixmap(":/conferenceloggerplugin/conferencelogger.png");
 }
 
 #include "conferenceloggerplugin.moc"

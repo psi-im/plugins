@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -30,36 +30,36 @@ namespace Ui { class Options; }
 
 class Options : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	explicit Options(QWidget *parent = 0);
-	~Options();
+    explicit Options(QWidget *parent = 0);
+    ~Options();
 
-	void update();
-	void setOptionAccessingHost(OptionAccessingHost* host) { _optionHost = host; }
+    void update();
+    void setOptionAccessingHost(OptionAccessingHost* host) { _optionHost = host; }
 
-	void loadSettings();
-	void saveSettings();
+    void loadSettings();
+    void saveSettings();
 
 public slots:
-	void addKey();
-	void removeKey();
+    void addKey();
+    void removeKey();
 
-	void importKeyFromFile();
-	void importKeyFromClipboard();
+    void importKeyFromFile();
+    void importKeyFromClipboard();
 
-	void exportKeyToFile();
-	void exportKeyToClipboard();
+    void exportKeyToFile();
+    void exportKeyToClipboard();
 
-	void showInfo();
+    void showInfo();
 
-	void updateKeys();
+    void updateKeys();
 
 private:
-	Ui::Options *ui;
-	GPGProc *_gpgProc;
-	OptionAccessingHost* _optionHost;
+    Ui::Options *ui;
+    GPGProc *_gpgProc;
+    OptionAccessingHost* _optionHost;
 };
 
 #endif // OPTIONS_H

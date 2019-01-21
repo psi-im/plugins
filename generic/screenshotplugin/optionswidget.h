@@ -24,29 +24,29 @@
 
 class OptionsWidget : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	OptionsWidget(QWidget* p = nullptr);
+    OptionsWidget(QWidget* p = nullptr);
 
-	void applyOptions();
-	void restoreOptions();
+    void applyOptions();
+    void restoreOptions();
 
 private slots:
-	void addServer();
-	void delServer();
-	void editServer();
-	void addNewServer(const QString&);
-	void applyButtonActivate();
-	void requstNewShortcut();
-	void onNewShortcut(const QKeySequence&);
+    void addServer();
+    void delServer();
+    void editServer();
+    void addNewServer(const QString&);
+    void applyButtonActivate();
+    void requstNewShortcut();
+    void onNewShortcut(const QKeySequence&);
 
 private:
-	QString shortCut;
-	QString format;
-	QString fileName;
-	QStringList servers;
-	int defaultAction;
-	Ui::OptionsWidget ui_;
+    QString shortCut;
+    QString format;
+    QString fileName;
+    QStringList servers;
+    int defaultAction;
+    Ui::OptionsWidget ui_;
 };
 
 #endif // OPTIONSWIDGET_H

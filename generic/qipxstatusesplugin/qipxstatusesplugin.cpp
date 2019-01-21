@@ -35,25 +35,25 @@
 
 class QipXStatuses: public QObject, public PsiPlugin, public StanzaFilter, public ContactStateAccessor, public PluginInfoProvider
 {
-	Q_OBJECT
-	Q_PLUGIN_METADATA(IID "com.psi-plus.QipXStatuses")
-	Q_INTERFACES(PsiPlugin StanzaFilter ContactStateAccessor PluginInfoProvider)
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "com.psi-plus.QipXStatuses")
+    Q_INTERFACES(PsiPlugin StanzaFilter ContactStateAccessor PluginInfoProvider)
 
 public:
         QipXStatuses();
-	virtual QString name() const;
-	virtual QString shortName() const;
-	virtual QString version() const;
+    virtual QString name() const;
+    virtual QString shortName() const;
+    virtual QString version() const;
         virtual QWidget* options();
-	virtual bool enable();
+    virtual bool enable();
         virtual bool disable();
-	virtual void applyOptions() {}
-	virtual void restoreOptions(){}
+    virtual void applyOptions() {}
+    virtual void restoreOptions(){}
         virtual bool incomingStanza(int account, const QDomElement& xml);
-	virtual bool outgoingStanza(int account, QDomElement& xml);
+    virtual bool outgoingStanza(int account, QDomElement& xml);
         virtual void setContactStateAccessingHost(ContactStateAccessingHost* host);
-	virtual QString pluginInfo();
-	virtual QPixmap icon() const;
+    virtual QString pluginInfo();
+    virtual QPixmap icon() const;
 
 
 private:
@@ -89,7 +89,7 @@ bool QipXStatuses::enable() {
 
 bool QipXStatuses::disable() {
         enabled = false;
-	return true;
+    return true;
 }
 
 QWidget* QipXStatuses::options() {
@@ -287,12 +287,12 @@ bool QipXStatuses::incomingStanza(int account, const QDomElement& stanza) {
 
 bool QipXStatuses::outgoingStanza(int /*account*/, QDomElement& /*xml*/)
 {
-	return false;
+    return false;
 }
 
 void QipXStatuses::setContactStateAccessingHost(ContactStateAccessingHost* host)
 {
-	contactState = host;
+    contactState = host;
 }
 
 QDomElement QipXStatuses::activityToXml(QString type, QString specificType, QString text) {
@@ -342,14 +342,14 @@ QDomElement QipXStatuses::MoodToXml(QString type, QString text) {
 }
 
 QString QipXStatuses::pluginInfo() {
-	return tr("Author: ") +  "Dealer_WeARE\n"
-			+ tr("Email: ") + "wadealer@gmail.com\n\n"
-			+ trUtf8("This plugin is designed to display x-statuses of contacts using the QIP Infium jabber client.");
+    return tr("Author: ") +  "Dealer_WeARE\n"
+            + tr("Email: ") + "wadealer@gmail.com\n\n"
+            + trUtf8("This plugin is designed to display x-statuses of contacts using the QIP Infium jabber client.");
 }
 
 QPixmap QipXStatuses::icon() const
 {
-	return QPixmap(":/icons/qipxstatuses.png");
+    return QPixmap(":/icons/qipxstatuses.png");
 }
 
 #include "qipxstatusesplugin.moc"

@@ -33,46 +33,46 @@ class Notes : public QDialog
 {
         Q_OBJECT
 public:
-	Notes(StorageNotesPlugin *storageNotes, int acc, QWidget *parent = 0);
-	~Notes();
-	void incomingNotes(const QList<QDomElement>& notes);
-	void error();
-	void saved();
+    Notes(StorageNotesPlugin *storageNotes, int acc, QWidget *parent = 0);
+    ~Notes();
+    void incomingNotes(const QList<QDomElement>& notes);
+    void error();
+    void saved();
 
 private:
-	QString replaceSymbols(const QString& str);
+    QString replaceSymbols(const QString& str);
 
 signals:
-	void notesDeleted(int);
+    void notesDeleted(int);
 
-public slots:	
-	void load();
+public slots:    
+    void load();
 
 private slots:
         void save();
         void add();
         void del();
         void edit();
-	void addNote(const QDomElement& note);
-	void noteEdited(const QDomElement& note, const QModelIndex& index);
-	void selectTag();
-	void updateTags();
+    void addNote(const QDomElement& note);
+    void noteEdited(const QDomElement& note, const QModelIndex& index);
+    void selectTag();
+    void updateTags();
 
 protected:
         void closeEvent(QCloseEvent * event);
         void keyPressEvent(QKeyEvent *e);
-	bool eventFilter(QObject *obj, QEvent *e);
+    bool eventFilter(QObject *obj, QEvent *e);
 
 private:
-	Ui::Notes ui_;
-	int account_;
-	StorageNotesPlugin *storageNotes_;
-	TagModel *tagModel_;
-	NoteModel *noteModel_;
-	ProxyModel *proxyModel_;
-	QTimer* updateTagsTimer_;
-	bool newNotes;
-	bool waitForSave;
+    Ui::Notes ui_;
+    int account_;
+    StorageNotesPlugin *storageNotes_;
+    TagModel *tagModel_;
+    NoteModel *noteModel_;
+    ProxyModel *proxyModel_;
+    QTimer* updateTagsTimer_;
+    bool newNotes;
+    bool waitForSave;
 };
 
 

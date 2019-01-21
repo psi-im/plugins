@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -25,32 +25,32 @@
 
 class Model : public QStandardItemModel
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	enum Columns {
-		Type,
-		Name,
-		Email,
-		Created,
-		Expiration,
-		Length,
-		Comment,
-		Algorithm,
-		ShortId,
-		Fingerprint,
-		Count, // Trick to count items in enum
-		First = 0,
-		Last = Count - 1
-	};
+    enum Columns {
+        Type,
+        Name,
+        Email,
+        Created,
+        Expiration,
+        Length,
+        Comment,
+        Algorithm,
+        ShortId,
+        Fingerprint,
+        Count, // Trick to count items in enum
+        First = 0,
+        Last = Count - 1
+    };
 
-	Model(QObject *parent = 0);
+    Model(QObject *parent = 0);
 
 public slots:
-	void listKeys();
+    void listKeys();
 
 private:
-	void showKeys(const QString &keysRaw);
+    void showKeys(const QString &keysRaw);
 
 };
 

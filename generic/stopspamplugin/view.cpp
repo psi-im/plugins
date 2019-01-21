@@ -35,6 +35,6 @@ void Viewer::init()
 
 void Viewer::itemClicked(QModelIndex index)
 {
-	if(index.column() == 0)
-		model()->setData(index, 3); //invert
+    if(index.column() == 0)
+        model()->setData(index, 3); //invert
 }

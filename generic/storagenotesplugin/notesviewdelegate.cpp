@@ -27,74 +27,74 @@ NotesViewDelegate::~NotesViewDelegate()
 
 QSize NotesViewDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-	if(index.isValid())  {
-		QSize size = QItemDelegate::sizeHint(option, index);
-		size.setWidth(size.width()/2);
-		return size;
-	}
+    if(index.isValid())  {
+        QSize size = QItemDelegate::sizeHint(option, index);
+        size.setWidth(size.width()/2);
+        return size;
+    }
 
-	return QSize(0, 0);
+    return QSize(0, 0);
 }
 
 void NotesViewDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-	const QRect rect = option.rect;
-	const QString text = index.data(NoteModel::NoteRole).toString();
-	const QString title = index.data(NoteModel::TitleRole).toString();
-	const QString tags = index.data(NoteModel::TagRole).toString();
-	painter->save();
+    const QRect rect = option.rect;
+    const QString text = index.data(NoteModel::NoteRole).toString();
+    const QString title = index.data(NoteModel::TitleRole).toString();
+    const QString tags = index.data(NoteModel::TagRole).toString();
+    painter->save();
 
-	QPalette palette = option.palette;
-	QColor c = (option.state & QStyle::State_Selected) ?
-				palette.color(QPalette::Highlight) : palette.color(QPalette::Base);
+    QPalette palette = option.palette;
+    QColor c = (option.state & QStyle::State_Selected) ?
+                palette.color(QPalette::Highlight) : palette.color(QPalette::Base);
 
-	painter->fillRect(rect, c);
+    painter->fillRect(rect, c);
 
-	QPalette::ColorGroup cg = option.state & QStyle::State_Enabled
-			? QPalette::Normal : QPalette::Disabled;
+    QPalette::ColorGroup cg = option.state & QStyle::State_Enabled
+            ? QPalette::Normal : QPalette::Disabled;
 
 
-	if (option.state & QStyle::State_Selected) {
+    if (option.state & QStyle::State_Selected) {
                 painter->setPen(palette.color(cg, QPalette::HighlightedText));
-	}
-	else {
+    }
+    else {
                 painter->setPen(palette.color(cg, QPalette::Text));
-	}
-	QRect r(rect);
+    }
+    QRect r(rect);
 
-	const QFontMetrics fm = option.fontMetrics;
-	QFont font = option.font;
+    const QFontMetrics fm = option.fontMetrics;
+    QFont font = option.font;
 
-	if(!title.isEmpty()) {
-		r.setHeight(fm.height());
-		font.setBold(true);
-		painter->setFont(font);
-		painter->drawText(r, Qt::AlignLeft, title);
-		r.moveTo(r.bottomLeft());
-	}
+    if(!title.isEmpty()) {
+        r.setHeight(fm.height());
+        font.setBold(true);
+        painter->setFont(font);
+        painter->drawText(r, Qt::AlignLeft, title);
+        r.moveTo(r.bottomLeft());
+    }
 
-	if(!tags.isEmpty()) {		
-		r.setHeight(fm.height());
-		font.setBold(false);
-		font.setItalic(true);
-		font.setUnderline(true);
-		painter->setFont(font);
-		painter->drawText(r, Qt::AlignLeft, tags);
-		r.moveTo(r.bottomLeft());
-	}
+    if(!tags.isEmpty()) {        
+        r.setHeight(fm.height());
+        font.setBold(false);
+        font.setItalic(true);
+        font.setUnderline(true);
+        painter->setFont(font);
+        painter->drawText(r, Qt::AlignLeft, tags);
+        r.moveTo(r.bottomLeft());
+    }
 
-	if(!title.isEmpty() || !tags.isEmpty()) {
-		r.setBottom(rect.bottom());
-	}
+    if(!title.isEmpty() || !tags.isEmpty()) {
+        r.setBottom(rect.bottom());
+    }
 
-	font.setBold(false);
-	font.setItalic(false);
-	font.setUnderline(false);
-	painter->setFont(font);
-	painter->drawText(r, Qt::AlignLeft, text);
+    font.setBold(false);
+    font.setItalic(false);
+    font.setUnderline(false);
+    painter->setFont(font);
+    painter->drawText(r, Qt::AlignLeft, text);
 
-	painter->drawLine(rect.topRight(), rect.topLeft());
-	painter->drawLine(rect.bottomRight(), rect.bottomLeft());
+    painter->drawLine(rect.topRight(), rect.topLeft());
+    painter->drawLine(rect.bottomRight(), rect.bottomLeft());
 
-	painter->restore();
+    painter->restore();
 }

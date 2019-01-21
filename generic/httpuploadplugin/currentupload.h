@@ -9,14 +9,14 @@
 #define SRC_PLUGINS_GENERIC_HTTPUPLOADPLUGIN_CURRENTUPLOAD_H_
 
 struct CurrentUpload {
-	QString from;
-	QString to;
-	int account;
-	QString getUrl;
-	QString type;
-	QByteArray aesgcmAnchor;
-	QString localFilePath;
-	CurrentUpload(): account(-1) {}
+    QString from;
+    QString to;
+    int account;
+    QString getUrl;
+    QString type;
+    QByteArray aesgcmAnchor;
+    QString localFilePath;
+    CurrentUpload(): account(-1) {}
 };
 
 #endif /* SRC_PLUGINS_GENERIC_HTTPUPLOADPLUGIN_CURRENTUPLOAD_H_ */

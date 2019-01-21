@@ -5,8 +5,8 @@ isEmpty(PSISDK) {
 }
 
 unix {
-	CONFIG += link_pkgconfig
-	PKGCONFIG += libsignal-protocol-c libcrypto
+    CONFIG += link_pkgconfig
+    PKGCONFIG += libsignal-protocol-c libcrypto
 } else {
     LIBS += $$LINKAGE
     #LIBS += -lsignal-protocol-c

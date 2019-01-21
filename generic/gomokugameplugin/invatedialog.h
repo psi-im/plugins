@@ -34,51 +34,51 @@ namespace Ui {
 namespace GomokuGame {
 
 class InvateDialog : public QDialog {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	InvateDialog(int account, const QString jid, const QStringList resources, QWidget *parent = 0);
-	~InvateDialog();
+    InvateDialog(int account, const QString jid, const QStringList resources, QWidget *parent = 0);
+    ~InvateDialog();
 
 private:
-	Ui::InvateDialog *ui;
-	bool accepted;
-	int myAcc;
-	QString jid_;
+    Ui::InvateDialog *ui;
+    bool accepted;
+    int myAcc;
+    QString jid_;
 
 protected:
-	void closeEvent(QCloseEvent *event);
+    void closeEvent(QCloseEvent *event);
 
 private slots:
-	void acceptBlack();
-	void acceptWhite();
+    void acceptBlack();
+    void acceptWhite();
 
 signals:
-	void acceptGame(int my_acc, QString jid, QString element);
-	void rejectGame(int my_acc, QString jid);
+    void acceptGame(int my_acc, QString jid, QString element);
+    void rejectGame(int my_acc, QString jid);
 
 };
 
 class InvitationDialog : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	InvitationDialog(int account, QString jid, QString color, QString id, QWidget *parent = 0);
+    InvitationDialog(int account, QString jid, QString color, QString id, QWidget *parent = 0);
 
 private:
-	Ui::InvitationDialog ui_;
-	bool accepted_;
-	int account_;
-	QString id_;
+    Ui::InvitationDialog ui_;
+    bool accepted_;
+    int account_;
+    QString id_;
 
 private slots:
-	void buttonPressed();
+    void buttonPressed();
 
 signals:
-	void accepted(int, QString);
-	void rejected(int, QString);
+    void accepted(int, QString);
+    void rejected(int, QString);
 
 protected:
-	void closeEvent(QCloseEvent *e);
+    void closeEvent(QCloseEvent *e);
 };
 }
 

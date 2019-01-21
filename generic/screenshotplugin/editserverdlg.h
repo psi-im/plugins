@@ -28,25 +28,25 @@ class Server;
 
 class EditServerDlg : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	EditServerDlg(QWidget *parent = 0);
-	void setServer(Server *const s);
+    EditServerDlg(QWidget *parent = 0);
+    void setServer(Server *const s);
 
 signals:
-	void okPressed(const QString&);
+    void okPressed(const QString&);
 
 private:
-	Ui::EditServerDlg ui_;
+    Ui::EditServerDlg ui_;
 
-	void processOldSettingString(QStringList l);
-	void setSettings(const QString& settings);
+    void processOldSettingString(QStringList l);
+    void setSettings(const QString& settings);
 
 private slots:
-	void onOkPressed();
+    void onOkPressed();
 
 private:
-	QPointer<Server> server_;
+    QPointer<Server> server_;
 };
 
 #endif // EDITSERVERDLG_H

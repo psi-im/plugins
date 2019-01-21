@@ -27,11 +27,11 @@ class Figure
 {
 public:
 
-	enum GameType {
-		NoGame = 0,
-		WhitePlayer = 1,
-		BlackPlayer = 2
-	};
+    enum GameType {
+        NoGame = 0,
+        WhitePlayer = 1,
+        BlackPlayer = 2
+    };
 
         enum FigureType {
                 None = 0,
@@ -47,24 +47,24 @@ public:
                 Black_King = 10,
                 Black_Queen = 11,
                 Black_Knight = 12
-	};
+    };
 
-	Figure(GameType game = NoGame, FigureType type = Figure::None, int x = 0, int y = 0, QObject *parent = 0);
-	QPixmap getPixmap() const;
-	void setPosition(int x, int y);
-	void setType(FigureType type);
-	int positionX() const;
-	int positionY() const;
-	FigureType type() const;
-	GameType gameType() const;
-	QString typeString() const;
+    Figure(GameType game = NoGame, FigureType type = Figure::None, int x = 0, int y = 0, QObject *parent = 0);
+    QPixmap getPixmap() const;
+    void setPosition(int x, int y);
+    void setType(FigureType type);
+    int positionX() const;
+    int positionY() const;
+    FigureType type() const;
+    GameType gameType() const;
+    QString typeString() const;
 
-	bool isMoved;
+    bool isMoved;
 
 private:
-	int positionX_, positionY_;
-	FigureType type_;
-	GameType gameType_;
+    int positionX_, positionY_;
+    FigureType type_;
+    GameType gameType_;
 
 };
 

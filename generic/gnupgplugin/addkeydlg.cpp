@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -24,70 +24,70 @@
 #include "datewidget.h"
 
 AddKeyDlg::AddKeyDlg(QWidget *parent)
-	: QDialog(parent)
-	, ui(new Ui::AddKeyDlg)
+    : QDialog(parent)
+    , ui(new Ui::AddKeyDlg)
 {
-	ui->setupUi(this);
-	adjustSize();
-	// By default key expires in a year
-	ui->dateExpiration->setDate(QDate::currentDate().addYears(1));
-	fillLenght(ui->cmbType->currentText());
-	ui->lineName->setFocus();
+    ui->setupUi(this);
+    adjustSize();
+    // By default key expires in a year
+    ui->dateExpiration->setDate(QDate::currentDate().addYears(1));
+    fillLenght(ui->cmbType->currentText());
+    ui->lineName->setFocus();
 }
 
 AddKeyDlg::~AddKeyDlg()
 {
-	delete ui;
+    delete ui;
 }
 
 QString AddKeyDlg::name() const
 {
-	return ui->lineName->text().trimmed();
+    return ui->lineName->text().trimmed();
 }
 
 QString AddKeyDlg::email() const
 {
-	return ui->lineEmail->text().trimmed();
+    return ui->lineEmail->text().trimmed();
 }
 
 QString AddKeyDlg::comment() const
 {
-	return ui->lineComment->text().trimmed();
+    return ui->lineComment->text().trimmed();
 }
 
 int AddKeyDlg::type() const
 {
-	return ui->cmbType->currentIndex();
+    return ui->cmbType->currentIndex();
 }
 
 int AddKeyDlg::length() const
 {
-	return ui->cmbLength->currentText().toInt();
+    return ui->cmbLength->currentText().toInt();
 }
 
 QDate AddKeyDlg::expiration() const
 {
-	return ui->dateExpiration->date();
+    return ui->dateExpiration->date();
 }
 
 QString AddKeyDlg::pass() const
 {
-	return ui->linePass->text();
+    return ui->linePass->text();
 }
 
 void AddKeyDlg::checkPass()
 {
-	ui->btnBox->button(QDialogButtonBox::Ok)->setEnabled(ui->linePass->text() == ui->linePass2->text());
+    ui->btnBox->button(QDialogButtonBox::Ok)->setEnabled(ui->linePass->text() == ui->linePass2->text());
 }
 
 void AddKeyDlg::fillLenght(const QString &type)
 {
-	QStringList lengths;
-	lengths << "1024" << "2048" << "3072";
-	if (!type.contains("DSA")) {
-		lengths << "4096";
-	}
-	ui->cmbLength->clear();
-	ui->cmbLength->addItems(lengths);
-	ui->cmbLength->setCurrentIndex(1);
+    QStringList lengths;
+    lengths << "1024" << "2048" << "3072";
+    if (!type.contains("DSA")) {
+        lengths << "4096";
+    }
+    ui->cmbLength->clear();
+    ui->cmbLength->addItems(lengths);
+    ui->cmbLength->setCurrentIndex(1);
 }

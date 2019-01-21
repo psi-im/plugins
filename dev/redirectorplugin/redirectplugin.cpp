@@ -32,91 +32,91 @@
 
 
 bool Redirector::enable() {
-	if (psiOptions) {
-		enabled = true;
-		targetJid = psiOptions->getPluginOption("jid").toString();
-	}
-	return enabled;
+    if (psiOptions) {
+        enabled = true;
+        targetJid = psiOptions->getPluginOption("jid").toString();
+    }
+    return enabled;
 }
 
 bool Redirector::disable() {
-	enabled = false;
-	return true;
+    enabled = false;
+    return true;
 }
 
 void Redirector::applyOptions() {
-	if (!options_)
-		return;
+    if (!options_)
+        return;
 
-	targetJid = ui_.le_jid->text();
-	psiOptions->setPluginOption("jid", targetJid);
+    targetJid = ui_.le_jid->text();
+    psiOptions->setPluginOption("jid", targetJid);
 }
 
 void Redirector::restoreOptions() {
-	if (!options_)
-		return;
+    if (!options_)
+        return;
 
-	targetJid = psiOptions->getPluginOption("jid").toString();
-	ui_.le_jid->setText(targetJid);
+    targetJid = psiOptions->getPluginOption("jid").toString();
+    ui_.le_jid->setText(targetJid);
 }
 
 QWidget* Redirector::options() {
-	if (!enabled) {
-		return 0;
-	}
-	options_ = new QWidget();
-	ui_.setupUi(options_);
+    if (!enabled) {
+        return 0;
+    }
+    options_ = new QWidget();
+    ui_.setupUi(options_);
 
-	restoreOptions();
+    restoreOptions();
 
-	return options_;
+    return options_;
 }
 
 bool Redirector::incomingStanza(int account, const QDomElement& stanza) {
-	Q_UNUSED(account)
+    Q_UNUSED(account)
 
-	if (!enabled || stanza.tagName() != "message") {
-		return false;
-	}
-	int targetAccount = accInfoHost->findOnlineAccountForContact(targetJid);
-	QDomNodeList bodies = stanza.elementsByTagName("body");
-	if (targetAccount == -1 || bodies.count() == 0) {
-		return false;
-	}
+    if (!enabled || stanza.tagName() != "message") {
+        return false;
+    }
+    int targetAccount = accInfoHost->findOnlineAccountForContact(targetJid);
+    QDomNodeList bodies = stanza.elementsByTagName("body");
+    if (targetAccount == -1 || bodies.count() == 0) {
+        return false;
+    }
 
-	int contactId;
-	QString from = stanza.attribute("from");
+    int contactId;
+    QString from = stanza.attribute("from");
 
-	QDomDocument doc;
-	QDomElement e = doc.createElement("message");
-	e.setAttribute("to", ui_.le_jid->text());
-	e.setAttribute("type", "chat");
-	// TODO id?
-	contactId = contactIdMap.value(from);
-	if (!contactId) {
-		contactIdMap.insert(from, nextContactId);
-		contactId = nextContactId++;
-	}
-	QDomElement body = doc.createElement("body");
-	e.appendChild(body);
-	body.appendChild(doc.createTextNode(QString("#%1 %2").arg(contactId).arg(bodies.at(0).toElement().text().toHtmlEscaped())));
-	QDomElement forward = e.appendChild(doc.createElementNS("urn:xmpp:forward:0", "forwarded")).toElement();
-	forward.appendChild(doc.createElementNS("urn:xmpp:delay", "delay")).toElement()
-			.setAttribute("stamp", QDateTime::currentDateTimeUtc().toString("yyyy-MM-ddThh:mm:ssZ"));
+    QDomDocument doc;
+    QDomElement e = doc.createElement("message");
+    e.setAttribute("to", ui_.le_jid->text());
+    e.setAttribute("type", "chat");
+    // TODO id?
+    contactId = contactIdMap.value(from);
+    if (!contactId) {
+        contactIdMap.insert(from, nextContactId);
+        contactId = nextContactId++;
+    }
+    QDomElement body = doc.createElement("body");
+    e.appendChild(body);
+    body.appendChild(doc.createTextNode(QString("#%1 %2").arg(contactId).arg(bodies.at(0).toElement().text().toHtmlEscaped())));
+    QDomElement forward = e.appendChild(doc.createElementNS("urn:xmpp:forward:0", "forwarded")).toElement();
+    forward.appendChild(doc.createElementNS("urn:xmpp:delay", "delay")).toElement()
+            .setAttribute("stamp", QDateTime::currentDateTimeUtc().toString("yyyy-MM-ddThh:mm:ssZ"));
 
-	forward.appendChild(doc.importNode(stanza, true));
+    forward.appendChild(doc.importNode(stanza, true));
 
-	stanzaHost->sendStanza(targetAccount, e);
+    stanzaHost->sendStanza(targetAccount, e);
 
-	return true;
+    return true;
 }
 
 bool Redirector::outgoingStanza(int /*account*/, QDomElement& /*xml*/) {
-	return false;
+    return false;
 }
 
 QString Redirector::pluginInfo() {
-	return tr("Author: ") +  "rion\n"
-			+ tr("Email: ") + "rion4ik@gmail.com\n\n"
-			+ trUtf8("Redirects all incoming messages to some jid and allows one to redirect messages back.");
+    return tr("Author: ") +  "rion\n"
+            + tr("Email: ") + "rion4ik@gmail.com\n\n"
+            + trUtf8("Redirects all incoming messages to some jid and allows one to redirect messages back.");
 }

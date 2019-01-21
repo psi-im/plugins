@@ -25,11 +25,11 @@
 
 
 Loader::Loader(const QString& id, QObject *p)
-	: QObject(p)
-	, id_(id)
+    : QObject(p)
+    , id_(id)
 
 {
-	manager_ = new QNetworkAccessManager(this);
+    manager_ = new QNetworkAccessManager(this);
 }
 
 Loader::~Loader()
@@ -38,29 +38,29 @@ Loader::~Loader()
 
 void Loader::setProxy(const QString& host, int port, const QString& user, const QString& pass)
 {
-	if(host.isEmpty())
-		return;
+    if(host.isEmpty())
+        return;
 
-	QNetworkProxy proxy(QNetworkProxy::HttpCachingProxy,host,port,user,pass);
-	manager_->setProxy(proxy);
+    QNetworkProxy proxy(QNetworkProxy::HttpCachingProxy,host,port,user,pass);
+    manager_->setProxy(proxy);
 }
 
 void Loader::start(const QString& url)
-{	
-	manager_->get(QNetworkRequest(QUrl(url)));
-	connect(manager_,SIGNAL(finished(QNetworkReply*)), SLOT(onRequestFinish(QNetworkReply*)));
+{    
+    manager_->get(QNetworkRequest(QUrl(url)));
+    connect(manager_,SIGNAL(finished(QNetworkReply*)), SLOT(onRequestFinish(QNetworkReply*)));
 }
 
 void Loader::onRequestFinish(QNetworkReply *reply)
 {
-	if(reply->error() == QNetworkReply::NoError) {
-		QByteArray ba = reply->readAll();
-		emit data(id_, ba);
-	}
-	else
-		emit error(id_);
+    if(reply->error() == QNetworkReply::NoError) {
+        QByteArray ba = reply->readAll();
+        emit data(id_, ba);
+    }
+    else
+        emit error(id_);
 
-	reply->deleteLater();
-	deleteLater();
+    reply->deleteLater();
+    deleteLater();
 }
 

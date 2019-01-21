@@ -12,7 +12,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 RESOURCES = httpuploadplugin.qrc
 
 SOURCES += httpuploadplugin.cpp \
-		   uploadservice.cpp \
-		   previewfiledialog.cpp \
+           uploadservice.cpp \
+           previewfiledialog.cpp \
 
 HEADERS += previewfiledialog.h

@@ -28,16 +28,16 @@
 
 class BoardDelegate : public QItemDelegate
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	BoardDelegate(BoardModel *model, QObject *parent = 0);
-	virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    BoardDelegate(BoardModel *model, QObject *parent = 0);
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
 private:
-	static void setGridPen(QPainter *painter);
+    static void setGridPen(QPainter *painter);
 
 private:
-	BoardModel *model_;
+    BoardModel *model_;
 
 };
 

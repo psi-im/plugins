@@ -28,66 +28,66 @@
 
 class TagModel : public QAbstractItemModel
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	TagModel(QObject *parent = 0);
-	int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const { return 1; }
-	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-	QModelIndex index(int row, int column = 0, const QModelIndex& parent = QModelIndex()) const;
-	QModelIndex parent(const QModelIndex& index) const;
-	QVariant data(const QModelIndex &index, int role) const;
-	void addTag(const QString& tag);
-	void removeTag(const QString& tag);
-	void clear();
-	QModelIndex indexByTag(const QString& tag) const;
+    TagModel(QObject *parent = 0);
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const { return 1; }
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    QModelIndex index(int row, int column = 0, const QModelIndex& parent = QModelIndex()) const;
+    QModelIndex parent(const QModelIndex& index) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    void addTag(const QString& tag);
+    void removeTag(const QString& tag);
+    void clear();
+    QModelIndex indexByTag(const QString& tag) const;
 
-	static QString allTagsName();
+    static QString allTagsName();
 
 private:
-	QModelIndex createAllTagsIndex() const;
+    QModelIndex createAllTagsIndex() const;
 
-	QStringList stringList;
-	QModelIndex pIndex;
+    QStringList stringList;
+    QModelIndex pIndex;
 };
 
 
 
 class NoteModel : public QAbstractListModel
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
 
-	enum RoleType {
-		NoteRole = Qt::DisplayRole + 1,
-		TagRole = Qt::DisplayRole + 2,
-		TitleRole = Qt::DisplayRole + 3
-	};
+    enum RoleType {
+        NoteRole = Qt::DisplayRole + 1,
+        TagRole = Qt::DisplayRole + 2,
+        TitleRole = Qt::DisplayRole + 3
+    };
 
-	NoteModel(QObject *parent = 0);
-	int rowCount(const QModelIndex &parent = QModelIndex()) const;
-	QVariant data(const QModelIndex &index, int role) const;
-	void clear();
-	void addNote(const QDomElement& note);
-	void delNote(const QModelIndex &index);
-	void insertNote(const QDomElement& note, const QModelIndex &index);
-	void editNote(const QDomElement& note, const QModelIndex &index);
-	QList<QDomElement> getAllNotes() const;
-	QStringList getAllTags() const;
+    NoteModel(QObject *parent = 0);
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    void clear();
+    void addNote(const QDomElement& note);
+    void delNote(const QModelIndex &index);
+    void insertNote(const QDomElement& note, const QModelIndex &index);
+    void editNote(const QDomElement& note, const QModelIndex &index);
+    QList<QDomElement> getAllNotes() const;
+    QStringList getAllTags() const;
 
 private:
-	QList<QDomElement> notesList;
+    QList<QDomElement> notesList;
 
 };
 
 class ProxyModel : public QSortFilterProxyModel
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	ProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent) {}
-	bool filterAcceptsRow(int sourceRow, const QModelIndex &parent) const;
+    ProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent) {}
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &parent) const;
 };
 #endif // TAGSMODEL_H

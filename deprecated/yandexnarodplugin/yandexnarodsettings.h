@@ -1,8 +1,8 @@
 /*
     yandexnarodSettings
 
-	Copyright (c) 2009 by Alexander Kazarin <boiler@co.ru>
-			2011 by Evgeny Khryukin
+    Copyright (c) 2009 by Alexander Kazarin <boiler@co.ru>
+            2011 by Evgeny Khryukin
 
  ***************************************************************************
  *                                                                         *
@@ -22,30 +22,30 @@
 
 class yandexnarodSettings  : public QWidget
 {
-	Q_OBJECT;
+    Q_OBJECT;
 
 public:
-	yandexnarodSettings(QWidget *p = 0);
-	~yandexnarodSettings();
-	QString getLogin() const { return ui.editLogin->text(); }
-	QString getPasswd() const { return ui.editPasswd->text(); }
-	void btnTest_enabled(bool b) { ui.btnTest->setEnabled(b); }
-	void restoreSettings();
+    yandexnarodSettings(QWidget *p = 0);
+    ~yandexnarodSettings();
+    QString getLogin() const { return ui.editLogin->text(); }
+    QString getPasswd() const { return ui.editPasswd->text(); }
+    void btnTest_enabled(bool b) { ui.btnTest->setEnabled(b); }
+    void restoreSettings();
 
 public slots:
-	void setStatus(const QString& str);
-	void saveSettings();
+    void setStatus(const QString& str);
+    void saveSettings();
 
 private slots:
-	void on_btnClearCookies_clicked();
+    void on_btnClearCookies_clicked();
 
 private:
-	Ui::yandexnarodSettingsClass ui;
+    Ui::yandexnarodSettingsClass ui;
 
 
 signals:
-	void testclick();
-	void startManager();
+    void testclick();
+    void startManager();
 
 };
 #endif

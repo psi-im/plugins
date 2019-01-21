@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -40,44 +40,44 @@
 #include "optionaccessinghost.h"
 
 Options::Options(QWidget *parent)
-	: QWidget(parent)
-	, ui(new Ui::Options)
+    : QWidget(parent)
+    , ui(new Ui::Options)
 {
-	ui->setupUi(this);
+    ui->setupUi(this);
 
-	Model *model = new Model(this);
-	ui->keys->setModel(model);
-	updateKeys();
+    Model *model = new Model(this);
+    ui->keys->setModel(model);
+    updateKeys();
 
 
-	// Import key
-	QAction *action;
-	QMenu *menu = new QMenu(this);
+    // Import key
+    QAction *action;
+    QMenu *menu = new QMenu(this);
 
-	action = menu->addAction(trUtf8("from file"));
-	connect(action, SIGNAL(triggered()), SLOT(importKeyFromFile()));
+    action = menu->addAction(trUtf8("from file"));
+    connect(action, SIGNAL(triggered()), SLOT(importKeyFromFile()));
 
-	action = menu->addAction(trUtf8("from clipboard"));
-	connect(action, SIGNAL(triggered()), SLOT(importKeyFromClipboard()));
+    action = menu->addAction(trUtf8("from clipboard"));
+    connect(action, SIGNAL(triggered()), SLOT(importKeyFromClipboard()));
 
-	ui->btnImport->setMenu(menu);
+    ui->btnImport->setMenu(menu);
 
-	// Export key
+    // Export key
 
-	menu = new QMenu(this);
-	action = menu->addAction(trUtf8("to file"));
-	connect(action, SIGNAL(triggered()), SLOT(exportKeyToFile()));
-	ui->btnExport->addAction(action);
+    menu = new QMenu(this);
+    action = menu->addAction(trUtf8("to file"));
+    connect(action, SIGNAL(triggered()), SLOT(exportKeyToFile()));
+    ui->btnExport->addAction(action);
 
-	action = menu->addAction(trUtf8("to clipboard"));
-	connect(action, SIGNAL(triggered()), SLOT(exportKeyToClipboard()));
+    action = menu->addAction(trUtf8("to clipboard"));
+    connect(action, SIGNAL(triggered()), SLOT(exportKeyToClipboard()));
 
-	ui->btnExport->setMenu(menu);
+    ui->btnExport->setMenu(menu);
 }
 
 Options::~Options()
 {
-	delete ui;
+    delete ui;
 }
 
 void Options::update()
@@ -86,337 +86,337 @@ void Options::update()
 
 void Options::loadSettings()
 {
-	ui->chkAutoImport->setChecked(_optionHost->getPluginOption("auto-import", true).toBool());
-	ui->chkHideKeyMessage->setChecked(_optionHost->getPluginOption("hide-key-message", true).toBool());
+    ui->chkAutoImport->setChecked(_optionHost->getPluginOption("auto-import", true).toBool());
+    ui->chkHideKeyMessage->setChecked(_optionHost->getPluginOption("hide-key-message", true).toBool());
 }
 
 void Options::saveSettings()
 {
-	_optionHost->setPluginOption("auto-import", ui->chkAutoImport->isChecked());
-	_optionHost->setPluginOption("hide-key-message", ui->chkHideKeyMessage->isChecked());
+    _optionHost->setPluginOption("auto-import", ui->chkAutoImport->isChecked());
+    _optionHost->setPluginOption("hide-key-message", ui->chkHideKeyMessage->isChecked());
 }
 
 void Options::addKey()
 {
-	AddKeyDlg dlg(this);
-	if (dlg.exec() == QDialog::Rejected) {
-		return;
-	}
+    AddKeyDlg dlg(this);
+    if (dlg.exec() == QDialog::Rejected) {
+        return;
+    }
 
-	QString key;
-	QString type, stype, length, name, comment, email, expiration, pass;
-	switch (dlg.type()) {
-	case 0: type = stype = "RSA"; break;
-	case 1: type = "DSA"; stype = "ELG-E"; break;
-	case 2: type = "DSA"; break;
-	case 3: type = "RSA"; break;
-	}
+    QString key;
+    QString type, stype, length, name, comment, email, expiration, pass;
+    switch (dlg.type()) {
+    case 0: type = stype = "RSA"; break;
+    case 1: type = "DSA"; stype = "ELG-E"; break;
+    case 2: type = "DSA"; break;
+    case 3: type = "RSA"; break;
+    }
 
-	length = QString::number(dlg.length());
-	name = dlg.name();
-	comment = dlg.comment();
-	email = dlg.email();
-	expiration = dlg.expiration().isValid() ? dlg.expiration().toString(Qt::ISODate) : "0";
-	pass = dlg.pass();
+    length = QString::number(dlg.length());
+    name = dlg.name();
+    comment = dlg.comment();
+    email = dlg.email();
+    expiration = dlg.expiration().isValid() ? dlg.expiration().toString(Qt::ISODate) : "0";
+    pass = dlg.pass();
 
-	key += QString("Key-Type: %1\n").arg(type);
-	key += QString("Key-Length: %2\n").arg(length);
-	if (!stype.isEmpty()) {
-		key += QString("Subkey-Type: %1\n").arg(stype);
-		key += QString("Subkey-Length: %2\n").arg(length);
-	}
+    key += QString("Key-Type: %1\n").arg(type);
+    key += QString("Key-Length: %2\n").arg(length);
+    if (!stype.isEmpty()) {
+        key += QString("Subkey-Type: %1\n").arg(stype);
+        key += QString("Subkey-Length: %2\n").arg(length);
+    }
 
-	if (!name.isEmpty()) {
-		key += QString("Name-Real: %1\n").arg(name);
-	}
+    if (!name.isEmpty()) {
+        key += QString("Name-Real: %1\n").arg(name);
+    }
 
-	if (!comment.isEmpty()) {
-		key += QString("Name-Comment: %1\n").arg(comment);
-	}
+    if (!comment.isEmpty()) {
+        key += QString("Name-Comment: %1\n").arg(comment);
+    }
 
-	if (!email.isEmpty()) {
-		key += QString("Name-Email: %1\n").arg(email);
-	}
+    if (!email.isEmpty()) {
+        key += QString("Name-Email: %1\n").arg(email);
+    }
 
-	key += QString("Expire-Date: %1\n").arg(expiration);
+    key += QString("Expire-Date: %1\n").arg(expiration);
 
-	if (!pass.isEmpty()) {
-		key += QString("Passphrase: %1\n").arg(pass);
-	}
+    if (!pass.isEmpty()) {
+        key += QString("Passphrase: %1\n").arg(pass);
+    }
 
-	key += "%commit\n";
+    key += "%commit\n";
 
-	QProgressDialog waitingDlg("", trUtf8("Cancel"), 0, 0, this);
+    QProgressDialog waitingDlg("", trUtf8("Cancel"), 0, 0, this);
 
-	QLabel progressTextLabel(trUtf8(
+    QLabel progressTextLabel(trUtf8(
 "<b>Please wait!</b><br/>"
 "We need to generate a lot of random bytes. It is a good idea to perform "
 "some other action (type on the keyboard, move the mouse, utilize the "
 "disks) during the prime generation; this gives the random number "
 "generator a better chance to gain enough entropy."), &waitingDlg);
-	progressTextLabel.setAlignment(Qt::AlignHCenter);
-	progressTextLabel.setWordWrap(true);
+    progressTextLabel.setAlignment(Qt::AlignHCenter);
+    progressTextLabel.setWordWrap(true);
 
-	waitingDlg.setLabel(&progressTextLabel);
+    waitingDlg.setLabel(&progressTextLabel);
 
-	QProgressBar progressBar(&waitingDlg);
-	progressBar.setAlignment(Qt::AlignHCenter);
-	progressBar.setMinimum(0);
-	progressBar.setMaximum(0);
+    QProgressBar progressBar(&waitingDlg);
+    progressBar.setAlignment(Qt::AlignHCenter);
+    progressBar.setMinimum(0);
+    progressBar.setMaximum(0);
 
-	waitingDlg.setBar(&progressBar);
+    waitingDlg.setBar(&progressBar);
 
-	waitingDlg.setWindowModality(Qt::WindowModal);
-	waitingDlg.setWindowTitle(trUtf8("Key pair generating"));
-	waitingDlg.show();
+    waitingDlg.setWindowModality(Qt::WindowModal);
+    waitingDlg.setWindowTitle(trUtf8("Key pair generating"));
+    waitingDlg.show();
 
-	GpgProcess gpg;
-	QStringList arguments;
-	arguments << "--batch"
-			  << "--gen-key";
+    GpgProcess gpg;
+    QStringList arguments;
+    arguments << "--batch"
+              << "--gen-key";
 
-	gpg.start(arguments);
-	gpg.waitForStarted();
-	gpg.write(key.toUtf8());
-	gpg.closeWriteChannel();
-	while (gpg.state() == QProcess::Running) {
-		gpg.waitForFinished(1);
-		if (waitingDlg.wasCanceled()) {
-			gpg.terminate();
-			break;
-		}
-		qApp->processEvents();
-	}
+    gpg.start(arguments);
+    gpg.waitForStarted();
+    gpg.write(key.toUtf8());
+    gpg.closeWriteChannel();
+    while (gpg.state() == QProcess::Running) {
+        gpg.waitForFinished(1);
+        if (waitingDlg.wasCanceled()) {
+            gpg.terminate();
+            break;
+        }
+        qApp->processEvents();
+    }
 
-	updateKeys();
+    updateKeys();
 }
 
 void Options::removeKey()
 {
-	QItemSelectionModel *selModel = ui->keys->selectionModel();
+    QItemSelectionModel *selModel = ui->keys->selectionModel();
 
-	if (!selModel->hasSelection()) {
-		return;
-	}
+    if (!selModel->hasSelection()) {
+        return;
+    }
 
-	QModelIndexList indexes = selModel->selectedIndexes();
-	QModelIndexList pkeys; // Key IDs
-	foreach (QModelIndex index, indexes) {
-		// Every selection contains all columns. Need to work only with first
-		if (index.column() > 0) {
-			continue;
-		}
+    QModelIndexList indexes = selModel->selectedIndexes();
+    QModelIndexList pkeys; // Key IDs
+    foreach (QModelIndex index, indexes) {
+        // Every selection contains all columns. Need to work only with first
+        if (index.column() > 0) {
+            continue;
+        }
 
-		// Choose only primary keys
-		QModelIndex pIndex = index;
-		if (index.parent().isValid()) {
-			pIndex = index.parent();
-		}
+        // Choose only primary keys
+        QModelIndex pIndex = index;
+        if (index.parent().isValid()) {
+            pIndex = index.parent();
+        }
 
-		if (pkeys.indexOf(pIndex) < 0) {
-			pkeys << pIndex;
-		}
-	}
+        if (pkeys.indexOf(pIndex) < 0) {
+            pkeys << pIndex;
+        }
+    }
 
-	if (!pkeys.isEmpty()) {
-		if (QMessageBox::question(this, tr("Delete"), tr("Do you want to delete the selected keys?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
-			return;
-		}
-	}
+    if (!pkeys.isEmpty()) {
+        if (QMessageBox::question(this, tr("Delete"), tr("Do you want to delete the selected keys?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
+            return;
+        }
+    }
 
-	// Remove primary keys
-	foreach (QModelIndex key, pkeys) {
-		GpgProcess gpg;
-		QStringList arguments;
-		arguments << "--yes"
-				  << "--batch"
-				  << "--delete-secret-and-public-key"
-				  << "0x" + key.sibling(key.row(), Model::Fingerprint).data().toString();
+    // Remove primary keys
+    foreach (QModelIndex key, pkeys) {
+        GpgProcess gpg;
+        QStringList arguments;
+        arguments << "--yes"
+                  << "--batch"
+                  << "--delete-secret-and-public-key"
+                  << "0x" + key.sibling(key.row(), Model::Fingerprint).data().toString();
 
-		gpg.start(arguments);
-		gpg.waitForFinished();
-	}
+        gpg.start(arguments);
+        gpg.waitForFinished();
+    }
 
-	updateKeys();
+    updateKeys();
 }
 
 void Options::importKeyFromFile()
 {
-	QFileDialog dlg(this);
-	dlg.setFileMode(QFileDialog::ExistingFiles);
-	QStringList nameFilters;
-	nameFilters << trUtf8("ASCII (*.asc)")
-				<< trUtf8("All files (*)");
-	dlg.setNameFilters(nameFilters);
-	if (dlg.exec() == QDialog::Rejected) {
-		return;
-	}
+    QFileDialog dlg(this);
+    dlg.setFileMode(QFileDialog::ExistingFiles);
+    QStringList nameFilters;
+    nameFilters << trUtf8("ASCII (*.asc)")
+                << trUtf8("All files (*)");
+    dlg.setNameFilters(nameFilters);
+    if (dlg.exec() == QDialog::Rejected) {
+        return;
+    }
 
-	QStringList allFiles = dlg.selectedFiles();
-	foreach (QString filename, allFiles) {
-		GpgProcess gpg;
-		QStringList arguments;
-		arguments << "--batch"
-				  << "--import"
-				  << filename;
-		gpg.start(arguments);
-		gpg.waitForFinished();
-	}
+    QStringList allFiles = dlg.selectedFiles();
+    foreach (QString filename, allFiles) {
+        GpgProcess gpg;
+        QStringList arguments;
+        arguments << "--batch"
+                  << "--import"
+                  << filename;
+        gpg.start(arguments);
+        gpg.waitForFinished();
+    }
 
-	updateKeys();
+    updateKeys();
 }
 
 void Options::exportKeyToFile()
 {
-	QItemSelectionModel *selModel = ui->keys->selectionModel();
+    QItemSelectionModel *selModel = ui->keys->selectionModel();
 
-	if (!selModel->hasSelection()) {
-		return;
-	}
+    if (!selModel->hasSelection()) {
+        return;
+    }
 
-	QModelIndexList indexes = selModel->selectedIndexes();
-	QModelIndexList pkeys; // Key IDs
-	foreach (QModelIndex index, indexes) {
-		// Every selection contains all columns. Need to work only with first
-		if (index.column() > 0) {
-			continue;
-		}
+    QModelIndexList indexes = selModel->selectedIndexes();
+    QModelIndexList pkeys; // Key IDs
+    foreach (QModelIndex index, indexes) {
+        // Every selection contains all columns. Need to work only with first
+        if (index.column() > 0) {
+            continue;
+        }
 
-		// Choose only primary keys
-		QModelIndex pIndex = index;
-		if (index.parent().isValid()) {
-			pIndex = index.parent();
-		}
+        // Choose only primary keys
+        QModelIndex pIndex = index;
+        if (index.parent().isValid()) {
+            pIndex = index.parent();
+        }
 
-		if (pkeys.indexOf(pIndex) < 0) {
-			pkeys << pIndex;
-		}
-	}
+        if (pkeys.indexOf(pIndex) < 0) {
+            pkeys << pIndex;
+        }
+    }
 
-	// Remove primary keys
-	foreach (QModelIndex key, pkeys) {
-		QString filename = key.sibling(key.row(), 1).data().toString() + " " + key.sibling(key.row(), 2).data().toString() + ".asc";
-		QFileDialog dlg(this);
-		dlg.setAcceptMode(QFileDialog::AcceptSave);
-		dlg.setFileMode(QFileDialog::AnyFile);
-		QStringList nameFilters;
-		nameFilters << trUtf8("ASCII (*.asc)");
-		dlg.setNameFilters(nameFilters);
-		dlg.selectFile(filename);
-		if (dlg.exec() == QDialog::Rejected) {
-			break;
-		}
+    // Remove primary keys
+    foreach (QModelIndex key, pkeys) {
+        QString filename = key.sibling(key.row(), 1).data().toString() + " " + key.sibling(key.row(), 2).data().toString() + ".asc";
+        QFileDialog dlg(this);
+        dlg.setAcceptMode(QFileDialog::AcceptSave);
+        dlg.setFileMode(QFileDialog::AnyFile);
+        QStringList nameFilters;
+        nameFilters << trUtf8("ASCII (*.asc)");
+        dlg.setNameFilters(nameFilters);
+        dlg.selectFile(filename);
+        if (dlg.exec() == QDialog::Rejected) {
+            break;
+        }
 
-		filename = dlg.selectedFiles().first();
-		if (filename.right(4) != ".asc") {
-			filename += ".asc";
-		}
+        filename = dlg.selectedFiles().first();
+        if (filename.right(4) != ".asc") {
+            filename += ".asc";
+        }
 
-		GpgProcess gpg;
-		QStringList arguments;
-		QString fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
-		arguments << "--output"
-				  << filename
-				  << "--armor"
-				  << "--export"
-				  << fingerprint;
+        GpgProcess gpg;
+        QStringList arguments;
+        QString fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
+        arguments << "--output"
+                  << filename
+                  << "--armor"
+                  << "--export"
+                  << fingerprint;
 
-		gpg.start(arguments);
-		gpg.waitForFinished();
-	}
+        gpg.start(arguments);
+        gpg.waitForFinished();
+    }
 }
 
 void Options::importKeyFromClipboard()
 {
-	QClipboard *clipboard = QApplication::clipboard();
-	QString key = clipboard->text().trimmed();
+    QClipboard *clipboard = QApplication::clipboard();
+    QString key = clipboard->text().trimmed();
 
-	if (!key.startsWith("-----BEGIN PGP PUBLIC KEY BLOCK-----") ||
-		!key.endsWith("-----END PGP PUBLIC KEY BLOCK-----")) {
-		return;
-	}
+    if (!key.startsWith("-----BEGIN PGP PUBLIC KEY BLOCK-----") ||
+        !key.endsWith("-----END PGP PUBLIC KEY BLOCK-----")) {
+        return;
+    }
 
-	GpgProcess gpg;
-	QStringList arguments;
-	arguments << "--batch"
-			  << "--import";
-	gpg.start(arguments);
-	gpg.waitForStarted();
-	gpg.write(key.toUtf8());
-	gpg.closeWriteChannel();
-	gpg.waitForFinished();
+    GpgProcess gpg;
+    QStringList arguments;
+    arguments << "--batch"
+              << "--import";
+    gpg.start(arguments);
+    gpg.waitForStarted();
+    gpg.write(key.toUtf8());
+    gpg.closeWriteChannel();
+    gpg.waitForFinished();
 
-	updateKeys();
+    updateKeys();
 }
 
 void Options::exportKeyToClipboard()
 {
-	QItemSelectionModel *selModel = ui->keys->selectionModel();
+    QItemSelectionModel *selModel = ui->keys->selectionModel();
 
-	if (!selModel->hasSelection()) {
-		return;
-	}
+    if (!selModel->hasSelection()) {
+        return;
+    }
 
-	QModelIndexList indexes = selModel->selectedIndexes();
-	QModelIndexList pkeys; // Key IDs
-	foreach (QModelIndex index, indexes) {
-		// Every selection contains all columns. Need to work only with first
-		if (index.column() > 0) {
-			continue;
-		}
+    QModelIndexList indexes = selModel->selectedIndexes();
+    QModelIndexList pkeys; // Key IDs
+    foreach (QModelIndex index, indexes) {
+        // Every selection contains all columns. Need to work only with first
+        if (index.column() > 0) {
+            continue;
+        }
 
-		// Choose only primary keys
-		QModelIndex pIndex = index;
-		if (index.parent().isValid()) {
-			pIndex = index.parent();
-		}
+        // Choose only primary keys
+        QModelIndex pIndex = index;
+        if (index.parent().isValid()) {
+            pIndex = index.parent();
+        }
 
-		if (pkeys.indexOf(pIndex) < 0) {
-			pkeys << pIndex;
-		}
-	}
+        if (pkeys.indexOf(pIndex) < 0) {
+            pkeys << pIndex;
+        }
+    }
 
-	// Remove primary keys
-	QString strKey = "";
-	foreach (QModelIndex key, pkeys) {
-		GpgProcess gpg;
-		QStringList arguments;
-		QString fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
-		arguments << "--armor"
-				  << "--export"
-				  << fingerprint;
+    // Remove primary keys
+    QString strKey = "";
+    foreach (QModelIndex key, pkeys) {
+        GpgProcess gpg;
+        QStringList arguments;
+        QString fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
+        arguments << "--armor"
+                  << "--export"
+                  << fingerprint;
 
-		gpg.start(arguments);
-		gpg.waitForFinished();
+        gpg.start(arguments);
+        gpg.waitForFinished();
 
-		strKey += QString::fromUtf8(gpg.readAllStandardOutput());
-	}
+        strKey += QString::fromUtf8(gpg.readAllStandardOutput());
+    }
 
-	QClipboard *clipboard = QApplication::clipboard();
-	clipboard->setText(strKey.toUtf8().trimmed());
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(strKey.toUtf8().trimmed());
 }
 
 void Options::showInfo()
 {
-	GpgProcess gpg;
-	QString info;
-	QMessageBox::Icon icon;
-	if (gpg.info(info)) {
-		icon = QMessageBox::Information;
-	}
-	else {
-		icon = QMessageBox::Critical;
-	}
-	QMessageBox box(icon, trUtf8("GnuPG info"), info, QMessageBox::Ok, this);
-	box.exec();
+    GpgProcess gpg;
+    QString info;
+    QMessageBox::Icon icon;
+    if (gpg.info(info)) {
+        icon = QMessageBox::Information;
+    }
+    else {
+        icon = QMessageBox::Critical;
+    }
+    QMessageBox box(icon, trUtf8("GnuPG info"), info, QMessageBox::Ok, this);
+    box.exec();
 }
 
 void Options::updateKeys()
 {
-	qobject_cast<Model*>(ui->keys->model())->listKeys();
+    qobject_cast<Model*>(ui->keys->model())->listKeys();
 
-	int columns = ui->keys->model()->columnCount();
-	for (int i = 0; i < columns; i++) {
-		ui->keys->resizeColumnToContents(i);
-	}
+    int columns = ui->keys->model()->columnCount();
+    for (int i = 0; i < columns; i++) {
+        ui->keys->resizeColumnToContents(i);
+    }
 }

@@ -33,12 +33,12 @@ using namespace Chess;
 
 class ChessWindow : public QMainWindow
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
         ChessWindow(Figure::GameType type, bool enableSound_, QWidget *parent = 0);
-	void moveRequest(int oldX, int oldY, int newX, int newY, const QString& figure = "");
-	void loadRequest(const QString& settings);
+    void moveRequest(int oldX, int oldY, int newX, int newY, const QString& figure = "");
+    void loadRequest(const QString& settings);
         void youWin();
         void youLose();
         void youDraw();
@@ -48,7 +48,7 @@ protected:
 
 private slots:
         void figureKilled(Figure* figure);
-	void needNewFigure(QModelIndex index, const QString& player);
+    void needNewFigure(QModelIndex index, const QString& player);
         void newFigure(QString figure);
         void load();
         void save();
@@ -65,22 +65,22 @@ signals:
         void toggleEnableSound(bool);
 
 private:
-	void createMenu();
+    void createMenu();
 
-	BoardModel *model_;
-	QModelIndex tmpIndex_;
-	bool enabledSound;
-	int movesCount;
-	QAction *loseAction;
-	Ui::ChessWindow ui_;
+    BoardModel *model_;
+    QModelIndex tmpIndex_;
+    bool enabledSound;
+    int movesCount;
+    QAction *loseAction;
+    Ui::ChessWindow ui_;
 
 };
 
 class SelectFigure : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	SelectFigure(const QString& player, QWidget *parent = 0);
+    SelectFigure(const QString& player, QWidget *parent = 0);
 
 private slots:
         void figureSelected();
@@ -89,7 +89,7 @@ private:
         QPushButton *tb_queen, *tb_castle, *tb_knight, *tb_bishop;
 
 signals:
-	void newFigure(QString figure);
+    void newFigure(QString figure);
 
 };
 

@@ -1,7 +1,7 @@
 /*
     uploadmanger.h
 
-	Copyright (c) 2011 by Evgeny Khryukin
+    Copyright (c) 2011 by Evgeny Khryukin
 
  ***************************************************************************
  *                                                                         *
@@ -25,33 +25,33 @@ class HttpDevice;
 
 class UploadManager : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	UploadManager(QObject* p = 0);
-	~UploadManager();
-	void go(const QString& file);
-	void setCookies(const QList<QNetworkCookie>& cookies);
-	bool success() const { return success_; };
+    UploadManager(QObject* p = 0);
+    ~UploadManager();
+    void go(const QString& file);
+    void setCookies(const QList<QNetworkCookie>& cookies);
+    bool success() const { return success_; };
 
 signals:
-	void transferProgress(qint64, qint64);
-	void uploaded();
-	void statusText(const QString&);
-	void uploadFileURL(const QString&);
+    void transferProgress(qint64, qint64);
+    void uploaded();
+    void statusText(const QString&);
+    void uploadFileURL(const QString&);
 
 private slots:
-	void getStorageFinished();
-	void uploadFinished();
-	void verifyingFinished();
+    void getStorageFinished();
+    void uploadFinished();
+    void verifyingFinished();
 
 private:
-	void doUpload(const QUrl& url);
+    void doUpload(const QUrl& url);
 
 private:
-	QNetworkAccessManager* manager_;
-	QString fileName_;
-	bool success_;
-	HttpDevice *hd_;
+    QNetworkAccessManager* manager_;
+    QString fileName_;
+    bool success_;
+    HttpDevice *hd_;
 };
 
 #endif // UPLOADMANAGER_H

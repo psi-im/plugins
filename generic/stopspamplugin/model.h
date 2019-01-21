@@ -28,11 +28,11 @@
 
 class Model : public QAbstractTableModel
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
         Model(QStringList Jids_, QVariantList selected_, QObject *parent = 0);
-	~Model() {}
+    ~Model() {}
         virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
         virtual QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
         virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
@@ -43,10 +43,10 @@ public:
         void reset();
         void apply();
         void addRow();
-	void deleteRow(int row);
-	int indexByJid(const QString& jid) const;
-	QVariantList enableFor() const;
-	QStringList getJids() const;
+    void deleteRow(int row);
+    int indexByJid(const QString& jid) const;
+    QVariantList enableFor() const;
+    QStringList getJids() const;
 
 
 private:
