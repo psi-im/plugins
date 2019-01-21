@@ -471,7 +471,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
 
 		if (workInGroupChat && jid == "juick@conference.jabber.ru") {
 			QString msg = stanza.firstChild().nextSibling().firstChild().nodeValue();
-			msg.replace(QRegExp("#(\\d+)"),"http://juick.com/\\1");
+			msg.replace(QRegExp("#(\\d+)"),"https://juick.com/\\1");
 			stanza.firstChild().nextSibling().firstChild().setNodeValue(msg);
 		}
 

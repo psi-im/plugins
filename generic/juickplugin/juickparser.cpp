@@ -22,7 +22,7 @@
 #include <QObject>
 #include "juickparser.h"
 
-static const QString juickLink("http://juick.com/%1");
+static const QString juickLink("https://juick.com/%1");
 
 class JuickParser::Private
 {
@@ -30,22 +30,22 @@ public:
 	Private()
 	      : tagRx		("^\\s*(?!\\*\\S+\\*)(\\*\\S+)")
 	      , pmRx		("^\\nPrivate message from (@.+):(.*)$")
-	      , postRx		("\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n\\n(#\\d+)\\s(http://\\S*)\\n$")
-	      , replyRx		("\\nReply by @(.*):\\n>(.{,50})\\n\\n(.*)\\n\\n(#\\d+/\\d+)\\s(http://\\S*)\\n$")
+	      , postRx		("\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n\\n(#\\d+)\\s(https://\\S*)\\n$")
+	      , replyRx		("\\nReply by @(.*):\\n>(.{,50})\\n\\n(.*)\\n\\n(#\\d+/\\d+)\\s(https://\\S*)\\n$")
 //	      , regx		("(\\s+)(#\\d+(?:\\S+)|#\\d+/\\d+(?:\\S+)|@\\S+|_[^\\n]+_|\\*[^\\n]+\\*|/[^\\n]+/|http://\\S+|ftp://\\S+|https://\\S+){1}(\\s+)")
-	      , rpostRx		("\\nReply posted.\\n(#.*)\\s(http://\\S*)\\n$")
-	      , threadRx	("^\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(http://juick.com/\\S+)\\n(.*)")
-	      , userRx		("^\\nBlog: http://.*")
-	      , yourMesRecRx	("\\n@(\\S*)( recommended your post )(#\\d+)\\.\\s+(http://juick.com/\\S+).*")
-	      , singleMsgRx	("^\\n@(\\S+):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+) (\\(.*;{0,1}\\s*(?:\\d+ repl(?:ies|y)){0,1}\\) ){0,1}(http://juick.com/\\S+)\\n$")
+	      , rpostRx		("\\nReply posted.\\n(#.*)\\s(https://\\S*)\\n$")
+	      , threadRx	("^\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(https://juick.com/\\S+)\\n(.*)")
+	      , userRx		("^\\nBlog: https://.*")
+	      , yourMesRecRx	("\\n@(\\S*)( recommended your post )(#\\d+)\\.\\s+(https://juick.com/\\S+).*")
+	      , singleMsgRx	("^\\n@(\\S+):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+) (\\(.*;{0,1}\\s*(?:\\d+ repl(?:ies|y)){0,1}\\) ){0,1}(https://juick.com/\\S+)\\n$")
 	      , lastMsgRx	("^\\n(Last (?:popular ){0,1}messages:)(.*)")
-	      , juboRx		("^\\n([^\\n]*)\\n@(\\S*):( [^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(http://juick.com/\\S+)\\n$")
-	      , msgPostRx	("\\nNew message posted.\\n(#.*)\\s(http://\\S*)\\n$")
+	      , juboRx		("^\\n([^\\n]*)\\n@(\\S*):( [^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(https://juick.com/\\S+)\\n$")
+	      , msgPostRx	("\\nNew message posted.\\n(#.*)\\s(https://\\S*)\\n$")
 //	      , delMsgRx	("^\\nMessage #\\d+ deleted.\\n$")
 //	      , delReplyRx	("^\\nReply #\\d+/\\d+ deleted.\\n$")
 //	      , idRx		("(#\\d+)(/\\d+){0,1}(\\S+){0,1}")
 //	      , nickRx		("(@[\\w\\-\\.@\\|]*)(\\b.*)")
-	      , recomendRx	("^\\nRecommended by @(\\S+):\\s+@(\\S+):( \\*[^\\n]+){0,1}\\n+(.*)\\s+(#\\d+) (\\(\\d+ repl(?:ies|y)\\) ){0,1}(http://\\S+)\\s+$")
+	      , recomendRx	("^\\nRecommended by @(\\S+):\\s+@(\\S+):( \\*[^\\n]+){0,1}\\n+(.*)\\s+(#\\d+) (\\(\\d+ repl(?:ies|y)\\) ){0,1}(https://\\S+)\\s+$")
 	      , topTag		("Top 20 tags:")
 	{
 		pmRx.setMinimal(true);
@@ -69,7 +69,7 @@ JuickParser::JuickParser(QDomElement *elem)
 	if(!d)
 		d = new Private();
 
-	juickElement_ = findElement("juick", "http://juick.com/message");
+	juickElement_ = findElement("juick", "https://juick.com/message");
 	userElement_  = juickElement_.firstChildElement("user");
 
 	QString msg = "\n" + originMessage() + "\n";
