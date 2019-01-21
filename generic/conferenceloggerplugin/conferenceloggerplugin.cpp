@@ -171,7 +171,7 @@ QWidget* ConferenceLogger::options() {
 	filesLayout->addStretch();
 	viewButton = new QPushButton(IcoHost->getIcon("psi/search"), tr("View Log"));
 	connect(viewButton, SIGNAL(released()), SLOT(viewFromOpt()));
-	QLabel *wikiLink = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/plugins#conference_logger_plugin\">Wiki (Online)</a>"));
+	QLabel *wikiLink = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#conference_logger_plugin\">Wiki (Online)</a>"));
 	wikiLink->setOpenExternalLinks(true);
 	filesLayout->addWidget(viewButton);
 	layout->addWidget(label);

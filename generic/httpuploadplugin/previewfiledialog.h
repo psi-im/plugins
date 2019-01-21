@@ -3,7 +3,7 @@
 
 #include <QFileDialog>
 #include <QLabel>
-// based on http://www.qtcentre.org/threads/33593-How-can-i-have-a-QFileDialog-with-a-preview-of-the-picture
+// based on https://www.qtcentre.org/threads/33593-How-can-i-have-a-QFileDialog-with-a-preview-of-the-picture
 class PreviewFileDialog: public QFileDialog {
 Q_OBJECT
 public:

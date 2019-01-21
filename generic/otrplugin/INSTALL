@@ -1,11 +1,8 @@
-Off-the-Record messaging plugin for Psi
-
-The plugin currently only runs with Psi+ (aka Psi-dev). If you don't have Psi+
-installed on your computer, you can get it from http://code.google.com/p/psi-dev/
+Off-the-Record Messaging Plugin for Psi IM and Psi+
 
 To compile the plugin you need to have installed the following libraries:
-    - Qt4 or Qt5 (http://qt.digia.com/)
-    - libotr2 (http://www.cypherpunks.ca/otr/)
+    - Qt 5.x (https://www.qt.io/)
+    - libotr (https://otr.cypherpunks.ca/)
     - TidyLib (http://tidy.sourceforge.net/)
 
 Perform the following steps:

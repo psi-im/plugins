@@ -38,7 +38,7 @@ v0.2.8
 
 2010-09-11
 v0.2.7
-  * обновлена ссылка на wiki ( http://psi-plus.com/wiki/plugins#cleaner_plugin )
+  * обновлена ссылка на wiki ( https://psi-plus.com/wiki/plugins#cleaner_plugin )
 
 
 2010-05-17

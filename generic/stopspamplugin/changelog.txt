@@ -55,7 +55,7 @@ v0.4.4
 
 2010-09-11
 v0.4.3
-  * обновлена ссылка на wiki ( http://psi-plus.com/wiki/plugins#stop_spam_plugin )
+  * обновлена ссылка на wiki ( https://psi-plus.com/wiki/plugins#stop_spam_plugin )
 
 
 2010-09-04

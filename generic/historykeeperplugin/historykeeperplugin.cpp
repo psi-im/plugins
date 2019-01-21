@@ -185,7 +185,7 @@ QWidget* HistoryKeeperPlugin::options()
 	contactsWidget->setMaximumWidth(300);
 	contactsWidget->setText(text);
 
-	QLabel *wikiLink = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/plugins#history_keeper_plugin\">Wiki (Online)</a>"));
+	QLabel *wikiLink = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#history_keeper_plugin\">Wiki (Online)</a>"));
 	wikiLink->setOpenExternalLinks(true);
 
 	layout->addWidget(new QLabel(tr("Remove history for contacts:")));

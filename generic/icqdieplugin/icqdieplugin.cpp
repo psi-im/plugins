@@ -263,7 +263,7 @@ QWidget* IcqDie::options()
 
 	QWidget *options = new QWidget;
 	ui.setupUi(options);
-	ui.wiki->setText(tr("<a href=\"http://psi-plus.com/wiki/plugins#icq_must_die_plugin\">Wiki (Online)</a>"));
+	ui.wiki->setText(tr("<a href=\"https://psi-plus.com/wiki/plugins#icq_must_die_plugin\">Wiki (Online)</a>"));
 	ui.wiki->setOpenExternalLinks(true);
 
 	restoreOptions();

@@ -85,7 +85,7 @@ QWidget* CleanerPlugin::options()
 	h->addWidget(goButton);
 	h->addStretch();
 	hbox->addLayout(h);
-	QLabel *wikiLink = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/plugins#cleaner_plugin\">Wiki (Online)</a>"));
+	QLabel *wikiLink = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#cleaner_plugin\">Wiki (Online)</a>"));
 	wikiLink->setOpenExternalLinks(true);
 	hbox->addStretch();
 	hbox->addWidget(wikiLink);

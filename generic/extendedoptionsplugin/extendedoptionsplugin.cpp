@@ -635,7 +635,7 @@ QWidget* ExtendedOptions::options()
 	cssTab->addTab(popupCss, tr("Popup"));
 	cssTab->addTab(tooltipCss, tr("Tooltip"));
 
-	QLabel *cssLabel = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/skins_css\">CSS for Psi+</a>"));
+	QLabel *cssLabel = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/skins_css\">CSS for Psi+</a>"));
 	cssLabel->setOpenExternalLinks(true);
 
 	tab7Layout->addWidget(cssTab);
@@ -706,7 +706,7 @@ QWidget* ExtendedOptions::options()
 	tab8Layout->addStretch();
 
 
-	QLabel *wikiLink = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/plugins#extended_options_plugin\">Wiki (Online)</a>"));
+	QLabel *wikiLink = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#extended_options_plugin\">Wiki (Online)</a>"));
 	wikiLink->setOpenExternalLinks(true);
 
 	mainLayout->addWidget(tabs);

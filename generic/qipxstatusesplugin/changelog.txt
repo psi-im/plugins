@@ -4,7 +4,7 @@ v0.0.8 - taurus
 
 2010-09-11
 v0.0.7
-  * обновлена ссылка на wiki ( http://psi-plus.com/wiki/plugins#qip_x-statuses_plugin )
+  * обновлена ссылка на wiki ( https://psi-plus.com/wiki/plugins#qip_x-statuses_plugin )
 
 
 2010-05-17

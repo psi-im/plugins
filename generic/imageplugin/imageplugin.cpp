@@ -151,7 +151,7 @@ QWidget* ImagePlugin::options()
     }
     QWidget *optionsWid = new QWidget();
     QVBoxLayout *vbox= new QVBoxLayout(optionsWid);
-    QLabel *wikiLink = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/plugins#image_plugin\">Wiki (Online)</a>"),optionsWid);
+    QLabel *wikiLink = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#image_plugin\">Wiki (Online)</a>"),optionsWid);
     wikiLink->setOpenExternalLinks(true);
     vbox->addWidget(wikiLink);
     vbox->addStretch();
@@ -279,7 +279,7 @@ void ImagePlugin::actionActivated()
     QString msgHtml = QString("<message type=\"%1\" to=\"%2\" id=\"%3\" >"
                               "<body>%4</body>"
                               "<html xmlns=\"http://jabber.org/protocol/xhtml-im\">"
-                              "<body xmlns=\"http://www.w3.org/1999/xhtml\">"
+                              "<body xmlns=\"https://www.w3.org/1999/xhtml\">"
                               "<br/><img src=\"data:image/%5;base64,%6\" alt=\"img\"/> "
                               "</body></html></message>")
             .arg(mType)

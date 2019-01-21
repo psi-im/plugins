@@ -134,7 +134,7 @@ QWidget* SkinsPlugin::options() {
     ui_.pb_remove->setEnabled(false);
     ui_.pb_save->setEnabled(false);
 
-    ui_.lbl_wiki->setText(tr("<a href=\"http://psi-plus.com/wiki/plugins#skins_plugin\">Wiki (Online)</a>"));
+    ui_.lbl_wiki->setText(tr("<a href=\"https://psi-plus.com/wiki/plugins#skins_plugin\">Wiki (Online)</a>"));
     ui_.lbl_wiki->setOpenExternalLinks(true);
 
     connect(ui_.pb_update, SIGNAL(released()), this, SLOT(updateSkins()));

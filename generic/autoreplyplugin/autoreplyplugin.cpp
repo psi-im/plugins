@@ -551,7 +551,7 @@ QWidget* AutoReply::options() {
 	frame->setMinimumWidth(8);
 	hLayout->addWidget(frame);
 	hLayout->addLayout(flags);
-	QLabel *wikiLink = new QLabel(tr("<a href=\"http://psi-plus.com/wiki/plugins#autoreply_plugin\">Wiki (Online)</a>"));
+	QLabel *wikiLink = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#autoreply_plugin\">Wiki (Online)</a>"));
 	wikiLink->setOpenExternalLinks(true);
 	QVBoxLayout *tab1Layout = new QVBoxLayout(optionsWid);
 	tab1Layout->addLayout(Layout);

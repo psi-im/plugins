@@ -39,7 +39,7 @@
 static const char* propAcc = "em_account";
 static const char* propJid  = "em_jid";
 static const QString emIdName = "psi_em_id";
-static const QString htmlimNS = "http://www.w3.org/1999/xhtml";
+static const QString htmlimNS = "https://www.w3.org/1999/xhtml";
 static const QString xhtmlProtoNS = "http://jabber.org/protocol/xhtml-im";
 
 

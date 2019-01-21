@@ -330,7 +330,7 @@ void Screenshot::aboutQt()
 
 void Screenshot::doHomePage()
 {
-	QDesktopServices::openUrl(QUrl("http://psi-plus.com/wiki/plugins#screenshot_plugin"));
+	QDesktopServices::openUrl(QUrl("https://psi-plus.com/wiki/plugins#screenshot_plugin"));
 }
 
 void Screenshot::updateWidgets(bool vis)

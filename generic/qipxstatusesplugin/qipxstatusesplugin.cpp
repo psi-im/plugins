@@ -99,7 +99,7 @@ QWidget* QipXStatuses::options() {
     QWidget *options = new QWidget;
     QVBoxLayout *layout = new QVBoxLayout(options);
     QLabel *wiki = new QLabel;
-    wiki->setText(tr("<a href=\"http://psi-plus.com/wiki/plugins#qip_x-statuses_plugin\">Wiki (Online)</a>"));
+    wiki->setText(tr("<a href=\"https://psi-plus.com/wiki/plugins#qip_x-statuses_plugin\">Wiki (Online)</a>"));
     wiki->setOpenExternalLinks(true);
     layout->addWidget(wiki);
     layout->addStretch();
