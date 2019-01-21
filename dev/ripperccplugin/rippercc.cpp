@@ -50,14 +50,15 @@
 
 RipperCC::RipperCC()
 	: _enabled(false)
-	, _accountHost(0)
-	, _optionHost(0)
-	, _stanzaSending(0)
-	, _accountInfo(0)
-	, _appInfo(0)
-	, _nam(0)
+	, _accountHost(nullptr)
+	, _optionHost(nullptr)
+	, _stanzaSending(nullptr)
+	, _accountInfo(nullptr)
+	, _appInfo(nullptr)
+	, _contactInfo(nullptr)
+	, _nam(nullptr)
 	, _timer(new QTimer(this))
-	, _optionsForm(0)
+	, _optionsForm(nullptr)
 {
 	_timer->setInterval(TIMER_INTERVAL);
 	_timer->setSingleShot(true);

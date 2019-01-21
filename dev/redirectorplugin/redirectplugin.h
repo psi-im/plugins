@@ -51,12 +51,7 @@ public PluginInfoProvider, public ContactInfoAccessor
 				 PluginInfoProvider ContactInfoAccessor)
 
 public:
-	inline Redirector() : enabled(false)
-	  , psiOptions(0)
-	  , stanzaHost(0)
-	  , accInfoHost(0)
-	  , appInfoHost(0)
-	  , contactInfo(0) {}
+	Redirector() = default;
 	QString name() const { return "Redirect Plugin"; }
 	QString shortName() const { return "redirect"; }
 	QString version() const { return "0.0.2"; }
@@ -82,15 +77,15 @@ private slots:
 private:
 	QString targetJid;
 	QHash<QString, int> contactIdMap;
-	int nextContactId;
-	QWidget *options_;
+	int nextContactId = 0;
+	QWidget *options_ = nullptr;
 
-	bool enabled;
-	OptionAccessingHost* psiOptions;
-	StanzaSendingHost* stanzaHost;
-	AccountInfoAccessingHost *accInfoHost;
-	ApplicationInfoAccessingHost *appInfoHost;
-	ContactInfoAccessingHost* contactInfo;
+	bool enabled = false;
+	OptionAccessingHost *psiOptions = nullptr;
+	StanzaSendingHost *stanzaHost = nullptr;
+	AccountInfoAccessingHost *accInfoHost = nullptr;
+	ApplicationInfoAccessingHost *appInfoHost = nullptr;
+	ContactInfoAccessingHost *contactInfo = nullptr;
 
 	Ui::Options ui_;
 };

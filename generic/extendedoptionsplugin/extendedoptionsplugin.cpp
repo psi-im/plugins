@@ -60,7 +60,7 @@ class ExtendedOptions : public QObject, public PsiPlugin, public OptionAccessor,
 	Q_INTERFACES(PsiPlugin OptionAccessor ApplicationInfoAccessor PluginInfoProvider)
 
 public:
-	ExtendedOptions();
+	ExtendedOptions() = default;
 	virtual QString name() const;
 	virtual QString shortName() const;
 	virtual QString version() const;
@@ -83,140 +83,134 @@ private:
 	void setWhatThis();
 
 private:
-	OptionAccessingHost *psiOptions;
-	ApplicationInfoAccessingHost* appInfo;
-	bool enabled;
 	QString readFile();
 	void saveFile(const QString& text);
 	QString profileDir();
+
+	OptionAccessingHost *psiOptions = nullptr;
+	ApplicationInfoAccessingHost *appInfo = nullptr;
+	bool enabled = false;
 	QPointer<QWidget> options_;
 
-	//Chats-----
-	// QCheckBox *htmlRender;
-	QCheckBox *confirmClearing;
-	QCheckBox *messageIcons;
-	//QCheckBox *altnSwitch;
-	QCheckBox *showAvatar;
-	QSpinBox *avatarSize;
-	QCheckBox *sayMode;
-	QCheckBox *disableSend;
-	QCheckBox *auto_capitalize;
-	QCheckBox *auto_scroll_to_bottom;
-	QLineEdit *chat_caption;
-	QComboBox *default_jid_mode;
-	QTextEdit *default_jid_mode_ignorelist;
-	QCheckBox *show_status_changes;
-	QCheckBox *chat_status_with_priority;
-	QCheckBox *scaledIcons;
+	// Chats-----
+	//QCheckBox *htmlRender = nullptr;
+	QCheckBox *confirmClearing = nullptr;
+	QCheckBox *messageIcons = nullptr;
+	//QCheckBox *altnSwitch = nullptr;
+	QCheckBox *showAvatar = nullptr;
+	QSpinBox *avatarSize = nullptr;
+	QCheckBox *sayMode = nullptr;
+	QCheckBox *disableSend = nullptr;
+	QCheckBox *auto_capitalize = nullptr;
+	QCheckBox *auto_scroll_to_bottom = nullptr;
+	QLineEdit *chat_caption = nullptr;
+	QComboBox *default_jid_mode = nullptr;
+	QTextEdit *default_jid_mode_ignorelist = nullptr;
+	QCheckBox *show_status_changes = nullptr;
+	QCheckBox *chat_status_with_priority = nullptr;
+	QCheckBox *scaledIcons = nullptr;
 
 
-	//MUC-----
-	QCheckBox *showJoins;
-	QCheckBox *showRole;
-	QCheckBox *showStatus;
-	QCheckBox *leftMucRoster;
-	QCheckBox *showGroups;
-	QCheckBox *showAffIcons;
-	QCheckBox *skipAutojoin;
-	QTextEdit *bookmarksListSkip;
-	QCheckBox *mucClientIcons;
-	//QCheckBox *rosterNickColors;
-	QCheckBox *mucHtml;
-	QCheckBox *hideAutoJoin;
-	QCheckBox *show_initial_joins;
-	QCheckBox *status_with_priority;
-	QCheckBox *show_status_icons;
-	QCheckBox *use_slim_group_headings;
-	QComboBox *userlist_contact_sort_style;
-	QCheckBox *avatars_at_left;
-	QCheckBox *avatars_show;
-	QSpinBox *userlist_avatars_size;
-	QSpinBox *userlist_avatars_radius;
-	QLineEdit *muc_leave_status_message;
-	QCheckBox *accept_defaults;
-	QCheckBox *auto_configure;
-	QCheckBox *allowMucEvents;
-	QCheckBox *storeMucPrivates;
+	// MUC-----
+	QCheckBox *showJoins = nullptr;
+	QCheckBox *showRole = nullptr;
+	QCheckBox *showStatus = nullptr;
+	QCheckBox *leftMucRoster = nullptr;
+	QCheckBox *showGroups = nullptr;
+	QCheckBox *showAffIcons = nullptr;
+	QCheckBox *skipAutojoin = nullptr;
+	QTextEdit *bookmarksListSkip = nullptr;
+	QCheckBox *mucClientIcons = nullptr;
+	//QCheckBox *rosterNickColors = nullptr;
+	QCheckBox *mucHtml = nullptr;
+	QCheckBox *hideAutoJoin = nullptr;
+	QCheckBox *show_initial_joins = nullptr;
+	QCheckBox *status_with_priority = nullptr;
+	QCheckBox *show_status_icons = nullptr;
+	QCheckBox *use_slim_group_headings = nullptr;
+	QComboBox *userlist_contact_sort_style = nullptr;
+	QCheckBox *avatars_at_left = nullptr;
+	QCheckBox *avatars_show = nullptr;
+	QSpinBox *userlist_avatars_size = nullptr;
+	QSpinBox *userlist_avatars_radius = nullptr;
+	QLineEdit *muc_leave_status_message = nullptr;
+	QCheckBox *accept_defaults = nullptr;
+	QCheckBox *auto_configure = nullptr;
+	QCheckBox *allowMucEvents = nullptr;
+	QCheckBox *storeMucPrivates = nullptr;
 
-	//Roster
-	QCheckBox *resolveNicks;
-	QCheckBox *lockRoster;
-	QCheckBox *leftRoster;
-	QCheckBox *singleLineStatus;
-	QCheckBox *avatarTip;
-	QCheckBox *statusTip;
-	QCheckBox *geoTip;
-	QCheckBox *pgpTip;
-	QCheckBox *clientTip;
-	QComboBox *sortContacts;
-	// QComboBox *sortGroups;
-	// QComboBox *sortAccs;
-	QCheckBox *leftAvatars;
-	QCheckBox *defaultAvatar;
-	QCheckBox *showStatusIcons;
-	QCheckBox *statusIconsOverAvatars;
-	QCheckBox *auto_delete_unlisted;
+	// Roster
+	QCheckBox *resolveNicks = nullptr;
+	QCheckBox *lockRoster = nullptr;
+	QCheckBox *leftRoster = nullptr;
+	QCheckBox *singleLineStatus = nullptr;
+	QCheckBox *avatarTip = nullptr;
+	QCheckBox *statusTip = nullptr;
+	QCheckBox *geoTip = nullptr;
+	QCheckBox *pgpTip = nullptr;
+	QCheckBox *clientTip = nullptr;
+	QComboBox *sortContacts = nullptr;
+	// QComboBox *sortGroups = nullptr;
+	// QComboBox *sortAccs = nullptr;
+	QCheckBox *leftAvatars = nullptr;
+	QCheckBox *defaultAvatar = nullptr;
+	QCheckBox *showStatusIcons = nullptr;
+	QCheckBox *statusIconsOverAvatars = nullptr;
+	QCheckBox *auto_delete_unlisted = nullptr;
 
-	//Menu------
-	QCheckBox *admin;
-	QCheckBox *activeChats;
-	QCheckBox *pgpKey;
-	QCheckBox *picture;
-	QCheckBox *changeProfile;
-	QCheckBox *chat;
-	QCheckBox *invis;
-	QCheckBox *xa;
-	QCheckBox *enableMessages;
+	// Menu------
+	QCheckBox *admin = nullptr;
+	QCheckBox *activeChats = nullptr;
+	QCheckBox *pgpKey = nullptr;
+	QCheckBox *picture = nullptr;
+	QCheckBox *changeProfile = nullptr;
+	QCheckBox *chat = nullptr;
+	QCheckBox *invis = nullptr;
+	QCheckBox *xa = nullptr;
+	QCheckBox *enableMessages = nullptr;
 
 
-	//Look-----
-	QToolButton *popupBorder;
-	QToolButton *linkColor;
-	QToolButton *mailtoColor;
-	QToolButton *moderColor;
-	QToolButton *visitorColor;
-	QToolButton *parcColor;
-	QToolButton *noroleColor;
-	QToolButton *tipText;
-	QToolButton *tipBase;
-	QToolButton *composingBut;
-	QToolButton *unreadBut;
-	QGroupBox *groupTip;
-	QGroupBox *groupMucRoster;
+	// Look-----
+	QToolButton *popupBorder = nullptr;
+	QToolButton *linkColor = nullptr;
+	QToolButton *mailtoColor = nullptr;
+	QToolButton *moderColor = nullptr;
+	QToolButton *visitorColor = nullptr;
+	QToolButton *parcColor = nullptr;
+	QToolButton *noroleColor = nullptr;
+	QToolButton *tipText = nullptr;
+	QToolButton *tipBase = nullptr;
+	QToolButton *composingBut = nullptr;
+	QToolButton *unreadBut = nullptr;
+	QGroupBox *groupTip = nullptr;
+	QGroupBox *groupMucRoster = nullptr;
 
-	//CSS----------------
-	QTextEdit *chatCss;
-	QTextEdit *rosterCss;
-	QTextEdit *popupCss;
-	QTextEdit *tooltipCss;
+	// CSS----------------
+	QTextEdit *chatCss = nullptr;
+	QTextEdit *rosterCss = nullptr;
+	QTextEdit *popupCss = nullptr;
+	QTextEdit *tooltipCss = nullptr;
 
-	//Tabs----------------
-	QCheckBox *disableScroll;
-	QCheckBox *bottomTabs;
-	QCheckBox *closeButton;
-	QComboBox *middleButton;
-	QCheckBox *showTabIcons;
-	QCheckBox *hideWhenClose;
-	QCheckBox *canCloseTab;
-	QComboBox *mouseDoubleclick;
-	QCheckBox *multiRow;
+	// Tabs----------------
+	QCheckBox *disableScroll = nullptr;
+	QCheckBox *bottomTabs = nullptr;
+	QCheckBox *closeButton = nullptr;
+	QComboBox *middleButton = nullptr;
+	QCheckBox *showTabIcons = nullptr;
+	QCheckBox *hideWhenClose = nullptr;
+	QCheckBox *canCloseTab = nullptr;
+	QComboBox *mouseDoubleclick = nullptr;
+	QCheckBox *multiRow = nullptr;
 
-	//Misc
-	QCheckBox *flash_windows;
-	QCheckBox *account_single;
-	QCheckBox *xml_console_enable_at_login;
-	QCheckBox *lastActivity;
-	QCheckBox *sndMucNotify;
-	QCheckBox *popupsSuppressDnd;
-	QCheckBox *popupsSuppressAway;
+	// Misc
+	QCheckBox *flash_windows = nullptr;
+	QCheckBox *account_single = nullptr;
+	QCheckBox *xml_console_enable_at_login = nullptr;
+	QCheckBox *lastActivity = nullptr;
+	QCheckBox *sndMucNotify = nullptr;
+	QCheckBox *popupsSuppressDnd = nullptr;
+	QCheckBox *popupsSuppressAway = nullptr;
 };
-
-ExtendedOptions::ExtendedOptions()
-	: psiOptions(0)
-	, appInfo(0)
-	, enabled(false)
-{
-}
 
 QString ExtendedOptions::name() const
 {

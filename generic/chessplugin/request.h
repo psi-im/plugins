@@ -24,10 +24,10 @@
 #include "figure.h"
 
 struct Request {
-	int account;
+	int account = 0;
 	QString jid;
 	QString yourJid;
-	Figure::GameType type;
+	Figure::GameType type = Figure::GameType::NoGame;
 	QString requestId;
 	QString chessId;
 

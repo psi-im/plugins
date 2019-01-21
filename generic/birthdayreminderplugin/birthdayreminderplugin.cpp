@@ -68,8 +68,8 @@ class Reminder : public QObject, public PsiPlugin, public StanzaFilter, public A
 	Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor ApplicationInfoAccessor StanzaSender OptionAccessor
 				 PopupAccessor IconFactoryAccessor PluginInfoProvider SoundAccessor ContactInfoAccessor)
 
-	public:
-	Reminder();
+public:
+	Reminder() = default;
 	virtual QString name() const;
 	virtual QString shortName() const;
 	virtual QString version() const;
@@ -106,53 +106,31 @@ private slots:
 	void timeoutStopUpdate();
 
 private:
-	bool enabled;
-	OptionAccessingHost *psiOptions;
-	AccountInfoAccessingHost *accInfoHost;
-	ApplicationInfoAccessingHost *appInfoHost;
-	StanzaSendingHost *stanzaHost;
-	PopupAccessingHost* popup;
-	IconFactoryAccessingHost* icoHost;
-	SoundAccessingHost* sound_;
-	ContactInfoAccessingHost* contactInfo;
-	QString lastCheck;
-	int days_;
-	int interval;
-	//int timeout;
-	bool startCheck;
-	bool checkFromRoster;
-	QString lastUpdate;
-	int updateInterval;
-	QString soundFile;
-	bool updateInProgress;
-	int popupId;
+	bool enabled = false;
+	OptionAccessingHost *psiOptions = nullptr;
+	AccountInfoAccessingHost *accInfoHost = nullptr;
+	ApplicationInfoAccessingHost *appInfoHost = nullptr;
+	StanzaSendingHost *stanzaHost = nullptr;
+	PopupAccessingHost *popup = nullptr;
+	IconFactoryAccessingHost *icoHost = nullptr;
+	SoundAccessingHost *sound_ = nullptr;
+	ContactInfoAccessingHost *contactInfo = nullptr;
+
+	QString lastCheck = QStringLiteral("1901010101");
+	int days_ = 5;
+	int interval = 24;
+	//int timeout = 15;
+	bool startCheck = true;
+	bool checkFromRoster = true;
+	QString lastUpdate = QStringLiteral("19010101");
+	int updateInterval = 30;
+	QString soundFile = QStringLiteral("sound/reminder.wav");
+	bool updateInProgress = false;
+	int popupId = 0;
 
 	QPointer<QWidget> options_;
 	Ui::Options ui_;
 };
-
-
-Reminder::Reminder()
-: enabled(false)
- , psiOptions(0)
- , accInfoHost(0)
- , appInfoHost(0)
- , stanzaHost(0)
- , popup(0)
- , icoHost(0)
- , lastCheck("1901010101")
- , days_(5)
- , interval(24)
-//, timeout(15)
- , startCheck(true)
- , checkFromRoster(true)
- , lastUpdate("19010101")
- , updateInterval(30)
- , soundFile("sound/reminder.wav")
- , updateInProgress(false)
- , popupId(0)
-{
-}
 
 QString Reminder::name() const {
 	return "Birthday Reminder Plugin";
