@@ -14,7 +14,7 @@
  * appearing in the file copying.txt included in the packaging of this file.
  * Please review the following information to ensure the GNU General
  * Public License version 2.0 requirements will be met:
- * <http://www.gnu.org/licenses/>.
+ * <https://www.gnu.org/licenses/>.
  */
 
 #include <QtGui>

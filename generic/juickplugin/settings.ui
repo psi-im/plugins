@@ -624,7 +624,7 @@
      <item row="5" column="0">
       <widget class="QLabel" name="label_5">
        <property name="text">
-        <string>http://link</string>
+        <string>https://link</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>

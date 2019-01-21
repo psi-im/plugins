@@ -106,11 +106,11 @@ bool ClientSwitcherPlugin::enable()
 	os_presets << OsStruct("Nokia5130c-2/07.91") << OsStruct("SonyEricssonW580i/R8BE001");
 	client_presets.clear();
 	client_presets << ClientStruct("Bombus", "0.7.1429M-Zlib", "http://bombus-im.org/java", "0.7.1429M-Zlib");
-	client_presets << ClientStruct("Gajim", "0.12.5", "http://gajim.org", "0.12.5");
+	client_presets << ClientStruct("Gajim", "0.12.5", "https://gajim.org", "0.12.5");
 	client_presets << ClientStruct("Mcabber", "0.9.10", "http://mcabber.com/caps", "0.9.10");
 	client_presets << ClientStruct("Miranda", "0.9.16.0", "http://miranda-im.org/caps", "0.9.16.0");
 	client_presets << ClientStruct("Pidgin", "2.8.0", "http://pidgin.im", "2.8.0");
-	client_presets << ClientStruct("Psi", "0.14", "http://psi-im.org/caps", "0.14");
+	client_presets << ClientStruct("Psi", "0.14", "https://psi-im.org/caps", "0.14");
 	client_presets << ClientStruct("QIP Infium", "9034", "http://qip.ru/caps", "9034");
 	client_presets << ClientStruct("qutIM", "0.2", "http://qutim.org", "0.2");
 	client_presets << ClientStruct("Swift", "1.0", "http://swift.im", "1.0");
