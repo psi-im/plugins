@@ -1,6 +1,7 @@
 *.pro.user*
 *.sw?
 build*
+CMakeLists.txt.*
 
 # generated files
 .obj
