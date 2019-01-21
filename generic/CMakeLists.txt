@@ -35,9 +35,14 @@ set( plugins_list
     stopspamplugin
     storagenotesplugin
     translateplugin
-    videostatusplugin
     watcherplugin
 )
+
+if(NOT APPLE AND NOT HAIKU)
+    list(APPEND plugins_list
+        videostatusplugin
+    )
+endif()
 
 #if( NOT MSVC )
     list(APPEND plugins_list
