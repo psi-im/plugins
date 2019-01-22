@@ -11,3 +11,6 @@ Makefile
 .moc
 .rcc
 *.so
+
+# kde crap?
+.directory
