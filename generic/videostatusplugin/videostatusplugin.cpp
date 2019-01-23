@@ -1,6 +1,6 @@
 /*
  * videostatusplugin.cpp - plugin
- * Copyright (C) 2010  KukuRuzo, Evgeny Khryukin
+ * Copyright (C) 2010-2019  Vitaly Tonkacheyev, Evgeny Khryukin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -52,12 +52,12 @@ typedef QList<Window> WindowList;
 typedef QPair<QString, QString> StringMap;
 
 //имена сервисов. Для добавления нового плеера дописываем имя сервиса
-static const QList<StringMap> players = QList<StringMap>() << StringMap("vlc", "VLC")
-                               << StringMap("Totem", "Totem (>=2.30.2)")
-                               << StringMap("kaffeine", "Kaffeine (>=1.0)")
-                               << StringMap("mplayer", "GNOME MPlayer")
-                               << StringMap("dragonplayer", "Dragon Player")
-                               << StringMap("smplayer", "SMPlayer");
+static const QList<StringMap> players({{"vlc", "VLC"},
+                                      {"Totem", "Totem (>=2.30.2)"},
+                                      {"kaffeine", "Kaffeine (>=1.0)"},
+                                      {"mplayer", "GNOME MPlayer"},
+                                      {"dragonplayer", "Dragon Player"},
+                                      {"smplayer", "SMPlayer"}});
 struct PlayerStatus
 {
     int playStatus;
@@ -185,9 +185,9 @@ VideoStatusChanger::VideoStatusChanger()
         playerDictList.insert(item.first, false);
     }
 #endif
-    psiOptions = 0;
-    accInfo = 0;
-    accControl = 0;
+    psiOptions = nullptr;
+    accInfo = nullptr;
+    accControl = nullptr;
     isStatusSet = false;
     setOnline = true;
     restoreDelay = 20;
@@ -263,7 +263,7 @@ bool VideoStatusChanger::enable()
                               SLOT(checkMprisService(QString, QString, QString)));
 #endif
         fullST.setInterval(timeout);
-        connect(&fullST, SIGNAL(timeout()), SLOT(fullSTTimeout()));
+        connect(&fullST, &QTimer::timeout, this, &VideoStatusChanger::fullSTTimeout);
         if(fullScreen)
             fullST.start();
     }
@@ -289,7 +289,7 @@ bool VideoStatusChanger::disable()
     //убиваем таймер если он есть
     if(checkTimer) {
         checkTimer->stop();
-        disconnect(checkTimer, SIGNAL(timeout()), this, SLOT(timeOut()));
+        disconnect(checkTimer, &QTimer::timeout, this, &VideoStatusChanger::timeOut);
         delete(checkTimer);
     }
 #endif
@@ -366,7 +366,7 @@ void VideoStatusChanger::restoreOptions()
 QWidget* VideoStatusChanger::options()
 {
     if (!enabled) {
-        return 0;
+        return nullptr;
     }
     QWidget *optionsWid = new QWidget();
     ui_.setupUi(optionsWid);
@@ -447,7 +447,7 @@ void VideoStatusChanger::startCheckTimer()
     if(!checkTimer) {
         checkTimer = new QTimer();
         checkTimer->setInterval(timeout);
-        connect(checkTimer, SIGNAL(timeout()), this, SLOT(timeOut()));
+        connect(checkTimer, &QTimer::timeout, this, &VideoStatusChanger::timeOut);
         checkTimer->setInterval(timeout);
         checkTimer->start();
     }
@@ -550,8 +550,8 @@ void VideoStatusChanger::timeOut()
         QDBusMessage msg = QDBusMessage::createMethodCall(gmplayerService, "/", gmplayerService, "GetPlayState");
         QDBusPendingCall call = QDBusConnection::sessionBus().asyncCall(msg);
         QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
-        connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
-                 this, SLOT(asyncCallFinished(QDBusPendingCallWatcher*)));
+        connect(watcher, &QDBusPendingCallWatcher::finished,
+                 this, &VideoStatusChanger::asyncCallFinished);
     }
 }
 
@@ -560,7 +560,7 @@ static WindowList getWindows(Atom prop)
     WindowList res;
     Atom type = 0;
     int format = 0;
-    uchar* data = 0;
+    uchar* data = nullptr;
     ulong count, after;
     Display* display = X11Info::display();
     Window window = X11Info::appRootWindow();
@@ -623,7 +623,7 @@ void VideoStatusChanger::fullSTTimeout()
     int actual_format;
     unsigned long nitems;
     unsigned long bytes;
-    unsigned char *data = 0;
+    unsigned char *data = nullptr;
 
     if (XGetWindowProperty(display, w, state, 0, (~0L), False, AnyPropertyType,
                    &actual_type, &actual_format, &nitems, &bytes, &data) == Success) {

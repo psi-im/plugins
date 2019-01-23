@@ -27,7 +27,7 @@
 Display* X11Info::display()
 {
     if (!_display) {
-        _display = XOpenDisplay(NULL);
+        _display = XOpenDisplay(nullptr);
     }
     return _display;
 }
@@ -42,13 +42,13 @@ unsigned long X11Info::appRootWindow(int screen)
 xcb_connection_t *X11Info::xcbConnection()
 {
     if (!_xcb) {
-        _xcb = xcb_connect(NULL, &_xcbPreferredScreen);
+        _xcb = xcb_connect(nullptr, &_xcbPreferredScreen);
         Q_ASSERT(_xcb);
     }
     return _xcb;
 }
 
-xcb_connection_t* X11Info::_xcb = 0;
+xcb_connection_t* X11Info::_xcb = nullptr;
 
-Display* X11Info::_display = 0;
+Display* X11Info::_display = nullptr;
 int X11Info::_xcbPreferredScreen = 0;
