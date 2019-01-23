@@ -331,7 +331,7 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
                 }
                 else
                 {
-                    HtmlTidy htmlTidy("<body xmlns=\"https://www.w3.org/1999/xhtml\">" +
+                    HtmlTidy htmlTidy("<body xmlns=\"http://www.w3.org/1999/xhtml\">" +
                                       decrypted + "</body>");
                     decrypted = htmlTidy.output();
                     bodyText = htmlToPlain(decrypted);

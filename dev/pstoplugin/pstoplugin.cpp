@@ -159,7 +159,7 @@ bool PstoPlugin::processEvent(int account, QDomElement &e) {
         body.parentNode().appendChild(html);
 
         QDomElement html_body = doc.createElement("body");
-        html_body.setAttribute("xmlns", "https://www.w3.org/1999/xhtml");
+        html_body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
         html.appendChild(html_body);
 
         QStringList message_strings = body_text.nodeValue().split("\n");

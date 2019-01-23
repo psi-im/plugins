@@ -279,7 +279,7 @@ void ImagePlugin::actionActivated()
     QString msgHtml = QString("<message type=\"%1\" to=\"%2\" id=\"%3\" >"
                               "<body>%4</body>"
                               "<html xmlns=\"http://jabber.org/protocol/xhtml-im\">"
-                              "<body xmlns=\"https://www.w3.org/1999/xhtml\">"
+                              "<body xmlns=\"http://www.w3.org/1999/xhtml\">"
                               "<br/><img src=\"data:image/%5;base64,%6\" alt=\"img\"/> "
                               "</body></html></message>")
             .arg(mType)
