@@ -30,8 +30,8 @@ static const QString constJids_ = "jids";
 JabberDiskPlugin::JabberDiskPlugin()
     : enabled(false)
     , psiOptions(nullptr)
-        , iconHost(nullptr)
-        , jids_({"disk.jabbim.cz"})
+    , jids_({"disk.jabbim.cz"})
+    , iconHost(nullptr)
 {
 }
 
@@ -47,7 +47,7 @@ QString JabberDiskPlugin::shortName() const
 
 QString JabberDiskPlugin::version() const
 {
-        return constVersion;
+    return constVersion;
 }
 
 bool JabberDiskPlugin::enable()
@@ -87,7 +87,7 @@ void JabberDiskPlugin::restoreOptions()
 
 QWidget* JabberDiskPlugin::options()
 {
-        if (!enabled) {
+    if (!enabled) {
         return 0;
     }
     options_ = new QWidget();
