@@ -42,19 +42,6 @@ static bool isListContainsServer(const QString& server, const QStringList& serve
     return false;
 }
 
-static void updateServer(QStringList *const servers, const QString& serv)
-{
-    QStringList::iterator it = servers->begin();
-    while(++it != servers->end()) {
-        const QStringList tmpOld = (*it).split(Server::splitString());
-        const QStringList tmpNew = serv.split(Server::splitString());
-        if(tmpOld.first() == tmpNew.first()) {
-            *it = serv;
-        }
-    }
-}
-
-
 Controller::Controller(ApplicationInfoAccessingHost* appInfo)
     : QObject()
     , appInfo_(appInfo)
