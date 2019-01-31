@@ -27,7 +27,7 @@ ProxySettingsDlg::ProxySettingsDlg(QWidget *parent)
     , ui(new Ui::ProxySettingsDlg)
 {
     ui->setupUi(this);
-    ui->cb_type->addItems(QStringList() << "HTTP" << "SOCKS5");
+    ui->cb_type->addItems({"HTTP", "SOCKS5"});
     ui->cb_type->setCurrentIndex(0);
 }
 

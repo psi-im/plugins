@@ -42,10 +42,14 @@ WatchedItem::WatchedItem(const QString &jid, const QString &text, const QString 
 
 QString WatchedItem::settingsString() const
 {
-    QStringList l = QStringList() << jid_ << text_ << sFile_;
-    l << (aUse_ ? "1" : "0");
-    l << (groupChat_ ? "1" : "0");
-    return l.join(splitStr);
+    const QStringList &list = {
+        jid_,
+        text_,
+        sFile_,
+        (aUse_ ? "1" : "0"),
+        (groupChat_ ? "1" : "0")
+    };
+    return list.join(splitStr);
 }
 
 void WatchedItem::setSettings(const QString &settings)

@@ -220,7 +220,7 @@ void JDMainWin::indexContextMenu(const QModelIndex& index)
     QAction *actPublic = new QAction("public", &move);
     QAction *actAlbum = new QAction("album", &move);
     QAction *actPrivate = new QAction("private", &move);
-    move.addActions(QList<QAction*>() << actPublic << actAlbum << actPrivate);
+    move.addActions({actPublic, actAlbum, actPrivate});
 
     if(type == JDItem::File) {
         aList << actRename << actGet << actSend << actLink << actHash << actRemove << move.menuAction();

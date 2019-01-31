@@ -34,10 +34,17 @@ EditServerDlg::EditServerDlg(QWidget *parent)
 
 void EditServerDlg::onOkPressed()
 {
-    QStringList l = QStringList() << ui_.le_name->text() << ui_.le_url->text() << ui_.le_user->text() << ui_.le_pass->text();
-    l <<  ui_.le_post_data->text() << ui_.le_file_input->text() << ui_.le_regexp->text();
-    l << (ui_.cb_proxy->isChecked() ? "true" : "false");
-    const QString str = l.join(Server::splitString());
+    const QStringList &list = {
+        ui_.le_name->text(),
+        ui_.le_url->text(),
+        ui_.le_user->text(),
+        ui_.le_pass->text(),
+        ui_.le_post_data->text(),
+        ui_.le_file_input->text(),
+        ui_.le_regexp->text(),
+        (ui_.cb_proxy->isChecked() ? "true" : "false")
+    };
+    const QString &str = list.join(Server::splitString());
     if(server_) {
         server_->setFromString(str);
         server_->setText(server_->displayName());

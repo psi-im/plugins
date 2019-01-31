@@ -344,8 +344,8 @@ void CleanerMainWindow::changeProfile(const QString& profDir)
 {
     vCardDir_ = profilesCacheDir_ + QDir::separator() + profDir + QDir::separator() + "vcard";
     historyDir_ = profilesDataDir_ + QDir::separator() + profDir + QDir::separator() + "history";
-    historyModel_->setDirs(QStringList() << historyDir_);
-    vcardsModel_->setDirs(QStringList() << vCardDir_);
+    historyModel_->setDirs({historyDir_});
+    vcardsModel_->setDirs({vCardDir_});
 ;
     QStringList avatars;
     avatars.append(avatarsDir());

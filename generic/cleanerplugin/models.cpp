@@ -225,7 +225,7 @@ ClearingModel::ClearingModel(const QString& dir, QObject* parent)
             << tr("Size")
             << tr("Creation Date");
 
-    setDirs(QStringList() << dir);
+    setDirs({dir});
 }
 
 QVariant ClearingModel::data(const QModelIndex & index, int role) const

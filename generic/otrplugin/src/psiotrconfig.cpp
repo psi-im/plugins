@@ -197,11 +197,14 @@ void FingerprintWidget::updateData()
     int sortSection         = m_table->horizontalHeader()->sortIndicatorSection();
     Qt::SortOrder sortOrder = m_table->horizontalHeader()->sortIndicatorOrder();
 
-    m_tableModel->clear();
-    m_tableModel->setColumnCount(5);
-    m_tableModel->setHorizontalHeaderLabels(QStringList() << tr("Account")
-                                            << tr("User") << tr("Fingerprint")
-                                            << tr("Verified") << tr("Status"));
+    {
+        m_tableModel->clear();
+        m_tableModel->setColumnCount(5);
+        const QStringList &headerLabels = {
+            tr("Account"), tr("User"), tr("Fingerprint"), tr("Verified"), tr("Status")
+        };
+        m_tableModel->setHorizontalHeaderLabels(headerLabels);
+    }
 
     m_fingerprints = m_otr->getFingerprints();
     QListIterator<Fingerprint> fingerprintIt(m_fingerprints);
@@ -401,10 +404,14 @@ void PrivKeyWidget::updateData()
     int sortSection         = m_table->horizontalHeader()->sortIndicatorSection();
     Qt::SortOrder sortOrder = m_table->horizontalHeader()->sortIndicatorOrder();
 
-    m_tableModel->clear();
-    m_tableModel->setColumnCount(2);
-    m_tableModel->setHorizontalHeaderLabels(QStringList() << tr("Account")
-                                                          << tr("Fingerprint"));
+    {
+        m_tableModel->clear();
+        m_tableModel->setColumnCount(2);
+        const QStringList &headerLabels = {
+            tr("Account"), tr("Fingerprint")
+        };
+        m_tableModel->setHorizontalHeaderLabels(headerLabels);
+    }
 
     m_keys = m_otr->getPrivateKeys();
     QHash<QString, QString>::iterator keyIt;

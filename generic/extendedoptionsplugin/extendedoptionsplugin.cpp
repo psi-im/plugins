@@ -294,7 +294,7 @@ QWidget* ExtendedOptions::options()
     chatGridLayout->addWidget(avatarSize, 0, 1);
 
     default_jid_mode = new QComboBox;
-    default_jid_mode->addItems(QStringList() << "auto" << "barejid");
+    default_jid_mode->addItems({"auto", "barejid"});
     chatGridLayout->addWidget(new QLabel(tr("Default JID mode:")), 1, 0);
     chatGridLayout->addWidget(default_jid_mode);
 
@@ -393,7 +393,7 @@ QWidget* ExtendedOptions::options()
     avatars_at_left = new QCheckBox(tr("Place avatars at left"));
 
     userlist_contact_sort_style = new QComboBox;
-    userlist_contact_sort_style->addItems(QStringList() << "alpha" << "status");
+    userlist_contact_sort_style->addItems({"alpha", "status"});
 
     QGridLayout *mucRosterGrid = new QGridLayout;
     mucRosterGrid->addWidget(new QLabel(tr("Sort style for contacts:")), 0, 0);

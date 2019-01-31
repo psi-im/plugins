@@ -89,7 +89,7 @@ JuickPlugin::JuickPlugin()
 
 {
     regx.setMinimal(true);
-    jidList_ = QStringList() << juick << jubo;
+    jidList_ = QStringList{juick, jubo};
 }
 
 QString JuickPlugin::name() const
@@ -116,8 +116,9 @@ QWidget* JuickPlugin::options()
     ui_.setupUi(optionsWid);
 
     QSignalMapper *sm = new QSignalMapper(optionsWid);
-    QList<QToolButton*> list = QList<QToolButton*>() << ui_.tb_link
-                << ui_.tb_message << ui_.tb_name << ui_.tb_quote << ui_.tb_tag;
+    const QList<QToolButton*> list = {
+        ui_.tb_link, ui_.tb_message, ui_.tb_name, ui_.tb_quote, ui_.tb_tag
+    };
     foreach(QToolButton* b, list) {
         sm->setMapping(b, b);
         connect(b, SIGNAL(clicked()), sm, SLOT(map()));

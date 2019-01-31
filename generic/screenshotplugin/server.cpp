@@ -22,7 +22,7 @@
 
 
 Server::Server(QListWidget *parent)
-    : QListWidgetItem(parent)    
+    : QListWidgetItem(parent)
     , displayName_("server")
     , url_("")
     , userName_("")
@@ -56,10 +56,17 @@ void Server::setServer(const QString& url, const QString& user, const QString& p
 
 QString Server::settingsToString() const
 {
-    QStringList l = QStringList() << displayName_ << url_ << userName_ << password_;
-    l << servPostdata_ << servFileinput_ << servRegexp_/* << servFilefilter_*/;
-    l << (useProxy_ ? "true" : "false");
-    return l.join(splitString());
+    const QStringList &list = {
+        displayName_,
+        url_,
+        userName_,
+        password_,
+        servPostdata_,
+        servFileinput_,
+        servRegexp_,
+        (useProxy_ ? "true" : "false")
+    };
+    return list.join(splitString());
 }
 
 void Server::setFromString(const QString& settings)

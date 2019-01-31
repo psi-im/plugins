@@ -235,8 +235,8 @@ void OptionsWidget::applyOptions()
 
 void OptionsWidget::restoreOptions()
 {
-    QStringList l = QStringList() << "jpg" << "png";
-    ui_.cb_format->addItems(l);
+    const QStringList &list = { "jpg", "png" };
+    ui_.cb_format->addItems(list);
     int index = ui_.cb_format->findText(format);
     if(index != -1)
         ui_.cb_format->setCurrentIndex(index);
