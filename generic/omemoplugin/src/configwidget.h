@@ -81,7 +81,7 @@ namespace psiomemo {
   public:
     ManageDevices(int account, OMEMO *omemo, QWidget *parent);
   private:
-    int m_ourDeviceId;
+    uint32_t m_ourDeviceId;
     QPushButton *m_deleteButton;
     uint32_t selectedDeviceId(const QModelIndexList &selection) const;
   protected:
