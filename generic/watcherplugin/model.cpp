@@ -89,27 +89,32 @@ QVariant Model::data(const QModelIndex & index, int role) const
         } else if (role == Qt::TextAlignmentRole) {
             return (int)(Qt::AlignRight | Qt::AlignVCenter);
         } else if (role == Qt::DisplayRole)
-            return QVariant("");
+            return QVariant();
+        break;
     case 1:
         if (role == Qt::TextAlignmentRole) {
             return (int)(Qt::AlignRight | Qt::AlignVCenter);
         } else if (role == Qt::DisplayRole)
             return QVariant(tmpWatchedJids_.at(index.row()));
+        break;
     case 2:
         if (role == Qt::TextAlignmentRole) {
             return (int)(Qt::AlignRight | Qt::AlignVCenter);
         } else if (role == Qt::DisplayRole)
             return QVariant(tmpSounds_.at(index.row()));
+        break;
     case 3:
         if (role == Qt::TextAlignmentRole) {
             return (int)(Qt::AlignRight | Qt::AlignVCenter);
         } else if (role == Qt::DisplayRole)
             return QVariant();
+        break;
     case 4:
         if (role == Qt::TextAlignmentRole) {
             return (int)(Qt::AlignRight | Qt::AlignVCenter);
         } else if (role == Qt::DisplayRole)
             return QVariant();
+        break;
     }
     return QVariant();
 }

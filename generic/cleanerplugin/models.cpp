@@ -238,39 +238,45 @@ QVariant ClearingModel::data(const QModelIndex & index, int role) const
     filename = filename.replace("%5f", "_");
     filename = filename.replace("%2d", "-");
     filename = filename.replace("%25", "@");
-    switch(i) {
+    switch(i)
+    {
     case(0):
-                if (role == Qt::CheckStateRole) {
+        if (role == Qt::CheckStateRole) {
             return isSelected(index) ? 2:0;
-                } else if (role == Qt::TextAlignmentRole) {
-                        return (int)(Qt::AlignRight | Qt::AlignVCenter);
-                } else if (role == Qt::DisplayRole)
-                        return QVariant("");
-             case(1):
-                if (role == Qt::TextAlignmentRole) {
-                        return (int)(Qt::AlignRight | Qt::AlignVCenter);
-                } else if (role == Qt::DisplayRole) {
+        } else if (role == Qt::TextAlignmentRole) {
+            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+        } else if (role == Qt::DisplayRole)
+            return QVariant();
+        break;
+    case(1):
+        if (role == Qt::TextAlignmentRole) {
+            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+        } else if (role == Qt::DisplayRole) {
             if(filename.contains("_at_"))
                 return QVariant(filename.split("_at_").first());
             else
                 return QVariant();
-                }
-             case(2):
-                if (role == Qt::TextAlignmentRole) {
-                        return (int)(Qt::AlignRight | Qt::AlignVCenter);
-                } else if (role == Qt::DisplayRole)
-            return QVariant(filename.split("_at_").last());
-             case(3):
-        if (role == Qt::TextAlignmentRole) {
-                        return (int)(Qt::AlignRight | Qt::AlignVCenter);
-                } else if (role == Qt::DisplayRole)
-            return QVariant(fileSize(index));
-             case(4):
-        if (role == Qt::TextAlignmentRole) {
-                        return (int)(Qt::AlignRight | Qt::AlignVCenter);
-                } else if (role == Qt::DisplayRole)
-            return QVariant(fileDate(index));
         }
+        break;
+    case(2):
+        if (role == Qt::TextAlignmentRole) {
+            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+        } else if (role == Qt::DisplayRole)
+            return QVariant(filename.split("_at_").last());
+        break;
+    case(3):
+        if (role == Qt::TextAlignmentRole) {
+            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+        } else if (role == Qt::DisplayRole)
+            return QVariant(fileSize(index));
+        break;
+    case(4):
+        if (role == Qt::TextAlignmentRole) {
+            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+        } else if (role == Qt::DisplayRole)
+            return QVariant(fileDate(index));
+        break;
+    }
     return QVariant();
 }
 
@@ -358,32 +364,36 @@ QVariant ClearingAvatarModel::data(const QModelIndex & index, int role) const
     QString filename = filePass(index);
     switch(i) {
     case(0):
-                if (role == Qt::CheckStateRole) {
+        if (role == Qt::CheckStateRole) {
             return isSelected(index) ? 2:0;
-                } else if (role == Qt::TextAlignmentRole) {
-                        return (int)(Qt::AlignRight | Qt::AlignVCenter);
-                } else if (role == Qt::DisplayRole)
-                        return QVariant("");
-             case(1):
-                if (role == Qt::TextAlignmentRole) {
-                        return (int)(Qt::AlignRight | Qt::AlignVCenter);
-                } else if (role == Qt::DisplayRole) {
+        } else if (role == Qt::TextAlignmentRole) {
+            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+        } else if (role == Qt::DisplayRole)
+            return QVariant();
+        break;
+    case(1):
+        if (role == Qt::TextAlignmentRole) {
+            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+        } else if (role == Qt::DisplayRole) {
             QPixmap pix = QPixmap(filename);
             if(pix.isNull())
                 return QVariant();
             return QVariant(pix);
-                }
-             case(2):
-        if (role == Qt::TextAlignmentRole) {
-                        return (int)(Qt::AlignRight | Qt::AlignVCenter);
-                } else if (role == Qt::DisplayRole)
-            return QVariant(fileSize(index));
-             case(3):
-        if (role == Qt::TextAlignmentRole) {
-                        return (int)(Qt::AlignRight | Qt::AlignVCenter);
-                } else if (role == Qt::DisplayRole)
-            return QVariant(fileDate(index));
         }
+        break;
+    case(2):
+        if (role == Qt::TextAlignmentRole) {
+            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+        } else if (role == Qt::DisplayRole)
+            return QVariant(fileSize(index));
+        break;
+    case(3):
+        if (role == Qt::TextAlignmentRole) {
+            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+        } else if (role == Qt::DisplayRole)
+            return QVariant(fileDate(index));
+        break;
+    }
     return QVariant();
 }
 
@@ -415,26 +425,29 @@ QVariant ClearingOptionsModel::data(const QModelIndex & index, int role) const
     int i = index.column();
     switch(i) {
     case(0):
-                if (role == Qt::CheckStateRole) {
+        if (role == Qt::CheckStateRole) {
             return isSelected(index) ? 2:0;
-                } else if (role == Qt::TextAlignmentRole) {
-                        return (int)(Qt::AlignRight | Qt::AlignVCenter);
-                } else if (role == Qt::DisplayRole)
-                        return QVariant("");
-             case(1):
-                if (role == Qt::TextAlignmentRole) {
-                        return (int)(Qt::AlignLeft | Qt::AlignVCenter);
-                } else if (role == Qt::DisplayRole) {
-                        return QVariant(options.at(index.row()));
-                }
-             case(2):
-                if (role == Qt::TextAlignmentRole) {
-                        return (int)(Qt::AlignLeft | Qt::AlignVCenter);
-                } else if (role == Qt::DisplayRole) {
-                        QDomNode node = parser_->nodeByString(options.at(index.row()));
-                        return QVariant(node.toElement().text());
-                }
+        } else if (role == Qt::TextAlignmentRole) {
+            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+        } else if (role == Qt::DisplayRole)
+            return QVariant();
+        break;
+    case(1):
+        if (role == Qt::TextAlignmentRole) {
+            return (int)(Qt::AlignLeft | Qt::AlignVCenter);
+        } else if (role == Qt::DisplayRole) {
+            return QVariant(options.at(index.row()));
         }
+        break;
+    case(2):
+        if (role == Qt::TextAlignmentRole) {
+            return (int)(Qt::AlignLeft | Qt::AlignVCenter);
+        } else if (role == Qt::DisplayRole) {
+            QDomNode node = parser_->nodeByString(options.at(index.row()));
+            return QVariant(node.toElement().text());
+        }
+        break;
+    }
     return QVariant();
 }
 

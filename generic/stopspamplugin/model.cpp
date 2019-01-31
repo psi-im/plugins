@@ -21,8 +21,8 @@
 #include "model.h"
 
 Model::Model(const QStringList &Jids_, QVariantList Sounds_, QObject* parent)
-        : QAbstractTableModel(parent)
-        , Jids(Jids_)
+    : QAbstractTableModel(parent)
+    , Jids(Jids_)
 {
     headers << tr("Enable/Disable") << tr("JID (or part of JID)");
 
@@ -37,12 +37,12 @@ Model::Model(const QStringList &Jids_, QVariantList Sounds_, QObject* parent)
 QVariant Model::headerData ( int section, Qt::Orientation orientation, int role) const
 {
     if (role == Qt::DisplayRole) {
-                if (orientation == Qt::Horizontal) {
-                        return headers.at(section);
-                } else {
-                        return section+1;
-                }
-        } else
+        if (orientation == Qt::Horizontal) {
+            return headers.at(section);
+        } else {
+            return section+1;
+        }
+    } else
         return QVariant();
 }
 
@@ -78,19 +78,20 @@ QVariant Model::data(const QModelIndex & index, int role) const
     int i = index.column();
     switch(i) {
     case(0):
-                if (role == Qt::CheckStateRole)
-                        return selected.contains(tmpJids_.at(index.row())) ? 2:0;
-                else if (role == Qt::TextAlignmentRole)
-                        return (int)(Qt::AlignRight | Qt::AlignVCenter);
-                else if (role == Qt::DisplayRole)
-                        return QVariant("");
+        if (role == Qt::CheckStateRole)
+            return selected.contains(tmpJids_.at(index.row())) ? 2:0;
+        else if (role == Qt::TextAlignmentRole)
+            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+        else if (role == Qt::DisplayRole)
+            return QVariant();
+        break;
     case(1):
-                if (role == Qt::TextAlignmentRole)
-                        return (int)(Qt::AlignRight | Qt::AlignVCenter);
-                else if (role == Qt::DisplayRole)
+        if (role == Qt::TextAlignmentRole)
+            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+        else if (role == Qt::DisplayRole)
             return QVariant(tmpJids_.at(index.row()));
-
-        }
+        break;
+    }
     return QVariant();
 }
 
