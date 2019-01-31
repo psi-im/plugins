@@ -860,7 +860,7 @@ void GameSession::startGame()
             }
         }
         else
-            boardStatus_ == QString();
+            boardStatus_.clear();
     }
 }
 
