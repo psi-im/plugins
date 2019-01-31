@@ -28,8 +28,13 @@
 namespace psiomemo {
   class Bundle {
   public:
-    Bundle() : signedPreKeyId(), signedPreKeyPublic(), signedPreKeySignature(), identityKeyPublic(), preKeys() {
-    };
+    Bundle()
+        : signedPreKeyId()
+        , signedPreKeyPublic()
+        , signedPreKeySignature()
+        , identityKeyPublic()
+        , preKeys()
+    {}
     uint32_t signedPreKeyId;
     QByteArray signedPreKeyPublic;
     QByteArray signedPreKeySignature;
@@ -40,8 +45,11 @@ namespace psiomemo {
 
   class EncryptedKey {
   public:
-    EncryptedKey(uint32_t deviceId, bool isPreKey, QByteArray key)
-        : deviceId(deviceId), isPreKey(isPreKey), key(qMove(key)) {}
+    EncryptedKey(uint32_t deviceId_, bool isPreKey_, QByteArray key_)
+        : deviceId(deviceId_)
+        , isPreKey(isPreKey_)
+        , key(qMove(key_))
+    {}
     uint32_t deviceId;
     bool isPreKey;
     QByteArray key;
