@@ -270,7 +270,7 @@ QString PsiOtrPlugin::pluginInfo() {
 
 //-----------------------------------------------------------------------------
 
-bool PsiOtrPlugin::processEvent(int accountIndex, QDomElement& e)
+bool PsiOtrPlugin::processEvent(int, QDomElement&)
 {
     return false;
 }
@@ -381,7 +381,9 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
 
 //-----------------------------------------------------------------------------
 
-bool PsiOtrPlugin::processMessage(int, const QString&, const QString&,
+bool PsiOtrPlugin::processMessage(int,
+                                  const QString&,
+                                  const QString&,
                                   const QString&)
 {
     return false;
@@ -389,8 +391,10 @@ bool PsiOtrPlugin::processMessage(int, const QString&, const QString&,
 
 //-----------------------------------------------------------------------------
 
-bool PsiOtrPlugin::processOutgoingMessage(int accountIndex, const QString& contact,
-                                          QString& body, const QString& type,
+bool PsiOtrPlugin::processOutgoingMessage(int,
+                                          const QString&,
+                                          QString&,
+                                          const QString&,
                                           QString&)
 {
     return false;

@@ -157,7 +157,7 @@ namespace psiomemo {
     updateData();
   }
   
-  void ManageDevices::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
+  void ManageDevices::selectionChanged(const QItemSelection &selected, const QItemSelection &) {
     QModelIndexList selection = selected.indexes();
     if (!selection.isEmpty()) {
       m_deleteButton->setEnabled(selectedDeviceId(selection) != m_ourDeviceId);
