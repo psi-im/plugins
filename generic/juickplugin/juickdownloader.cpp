@@ -30,8 +30,6 @@
 #include <QDebug>
 
 
-const int DOWNLOAD_TIMEOUT = 60000;
-
 static void save(const QString &path, const QByteArray &img)
 {
     QFile file(path);
