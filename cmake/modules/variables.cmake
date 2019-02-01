@@ -1,13 +1,14 @@
 set(PLUGINS_ROOT_DIR "." CACHE STRING "Plugins root path. Path where include directory placed")
 
 if(NOT MAIN_PROGRAM_NAME)
-    message(WARNING "You have to set MAIN_PROGRAM_NAME or PLUGINS_PATH variable before build ${PLUGIN} plugin as a separate project. Otherwise plugin will be installed to ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/psi/plugins directory")
     set(MAIN_PROGRAM_NAME "psi" CACHE STRING "Main program name: psi or psi-plus")
 endif()
 
 if(IS_PSIPLUS)
     set(MAIN_PROGRAM_NAME "psi-plus")
 endif()
+
+get_filename_component(ABS_INCLUDES_DIR "${CMAKE_CURRENT_LIST_DIR}/../include" ABSOLUTE)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -47,3 +48,4 @@ else()
 endif()
 
 add_definitions( -DQT_PLUGIN )
+include_directories("${ABS_INCLUDES_DIR}")

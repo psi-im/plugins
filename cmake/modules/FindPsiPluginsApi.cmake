@@ -32,17 +32,10 @@ if(PsiPluginsApi_INCLUDE_DIR)
 endif()
 
 if(PLUGINS_ROOT_DIR)
-    get_filename_component(
-        ABS_PLUGINS_ROOT_DIR
-        "${PLUGINS_ROOT_DIR}"
-        ABSOLUTE
-    )
+    get_filename_component(ABS_PLUGINS_ROOT_DIR "${PLUGINS_ROOT_DIR}" ABSOLUTE)
 endif()
-get_filename_component(
-    ABS_CURRENT_DIR
-    "${CMAKE_CURRENT_LIST_DIR}/../.."
-    ABSOLUTE
-)
+get_filename_component(ABS_CURRENT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
+get_filename_component(ABS_PARENT_DIR "${ABS_CURRENT_DIR}/.." ABSOLUTE)
 
 find_path(
     PsiPluginsApi_DIR
@@ -50,7 +43,7 @@ find_path(
     "variables.cmake"
     PATHS
     ${ABS_CURRENT_DIR}
-    ${ABS_CURRENT_DIR}/../psi
+    ${ABS_PARENT_DIR}/psi
     ${ABS_PLUGINS_ROOT_DIR}/cmake/modules
     PATH_SUFFIXES
     src/plugins/cmake/modules
@@ -65,7 +58,7 @@ find_path(
     "applicationinfoaccessor.h"
     PATHS
     ${ABS_CURRENT_DIR}
-    ${ABS_CURRENT_DIR}/../psi
+    ${ABS_PARENT_DIR}/psi
     ${ABS_PLUGINS_ROOT_DIR}/include
     PATH_SUFFIXES
     src/plugins/include
