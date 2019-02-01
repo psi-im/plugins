@@ -127,7 +127,7 @@ private:
     QHash<QString, QTime> contactsOnlineTime_; // <JID, time when contact goes online>
 
     QList<ContactState>::iterator findContactStateIndex(const QString& jid);
-    bool checkContactState(QList<ContactState>::iterator it, ContactState::Event e);
+    bool checkContactState(QList<ContactState>::iterator &it, ContactState::Event e);
     bool checkContactStatus(const QString& jid);
     bool processJid(const QString& jid, ContactState::Event e);
     void playSound(const QString& soundFile);
@@ -503,7 +503,7 @@ QList<PepPlugin::ContactState>::iterator PepPlugin::findContactStateIndex(const 
     return it;
 }
 
-bool PepPlugin::checkContactState(QList<ContactState>::iterator it, ContactState::Event e)
+bool PepPlugin::checkContactState(QList<ContactState>::iterator &it, ContactState::Event e)
 {
     QTime time = QTime::currentTime();
     if((*it).events.contains(e)) {

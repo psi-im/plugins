@@ -51,7 +51,7 @@ public:
         bool my;
     };
     GameModel(GameElement::ElementType my, int row_count, int col_count, QObject *parent = 0);
-    GameModel(const QString load_str, bool local, QObject *parent = 0);
+    GameModel(const QString &load_str, const bool local, QObject *parent = 0);
     ~GameModel();
     bool isValid() const {return valid_;}
     GameStatus gameStatus() const;

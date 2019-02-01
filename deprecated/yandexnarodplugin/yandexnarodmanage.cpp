@@ -76,7 +76,7 @@ QStringList ListWidget::mimeTypes() const
     return QStringList() << "text/plain";
 }
 
-QMimeData* ListWidget::mimeData(const QList<QListWidgetItem *> items) const
+QMimeData* ListWidget::mimeData(const QList<QListWidgetItem *> &items) const
 {
     if(items.isEmpty())
         return 0;

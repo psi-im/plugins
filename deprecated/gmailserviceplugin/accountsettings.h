@@ -41,8 +41,8 @@ struct Attributes
 class AccountSettings
 {
 public:
-    AccountSettings(int acc = -1, QString j = QString());
-    ~AccountSettings() {};
+    AccountSettings(const int acc = -1, const QString &j = QString());
+    ~AccountSettings() {}
     void fromString(const QString& settings);
     QString toString() const;
 

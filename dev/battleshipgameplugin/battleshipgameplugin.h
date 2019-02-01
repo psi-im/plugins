@@ -129,17 +129,17 @@ private:
     Ui::options ui_;
 
 private:
-    void inviteDlg(int account, QString full_jid);
+    void inviteDlg(const int account, const QString &full_jid);
 
 private slots:
     void toolButtonPressed();
     void menuActivated();
     void doPsiEvent(int, QString, QString, QObject *, const char *);
-    void sendGameStanza(int account, const QString stanza);
+    void sendGameStanza(const int account, const QString &stanza);
     void testSound();
     void getSound();
-    void doPopup(QString text);
-    void playSound(QString);
+    void doPopup(const QString &text);
+    void playSound(const QString &);
 
 };
 

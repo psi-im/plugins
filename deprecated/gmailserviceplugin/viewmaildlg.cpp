@@ -24,7 +24,7 @@
 
 static const QString mailBoxUrl = "https://mail.google.com/mail/#inbox";
 
-ViewMailDlg::ViewMailDlg(QList<MailItem> l, IconFactoryAccessingHost* host, QWidget *p)
+ViewMailDlg::ViewMailDlg(const QList<MailItem> &l, IconFactoryAccessingHost* host, QWidget *p)
     : QDialog(p, Qt::Window)
     , items_(l)
     , currentItem_(-1)

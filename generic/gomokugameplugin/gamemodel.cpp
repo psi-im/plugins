@@ -49,7 +49,7 @@ GameModel::GameModel(GameElement::ElementType my, int row_count, int col_count, 
     emit statusUpdated(status_);
 }
 
-GameModel::GameModel(const QString load_str, bool local, QObject *parent) :
+GameModel::GameModel(const QString &load_str, const bool local, QObject *parent) :
     QObject(parent),
     valid_(false),
     status_(StatusNone),

@@ -22,7 +22,10 @@
 
 using namespace GomokuGame;
 
-InvateDialog::InvateDialog(int account, const QString jid, const QStringList resources, QWidget *parent) :
+InvateDialog::InvateDialog(const int account,
+                           const QString &jid,
+                           const QStringList &resources,
+                           QWidget *parent) :
     QDialog(parent),
     ui(new Ui::InvateDialog),
     accepted(false),
@@ -68,11 +71,15 @@ void InvateDialog::closeEvent(QCloseEvent *event)
 
 // ----------------------------------------
 
-InvitationDialog::InvitationDialog(int account, QString jid, QString color, QString id, QWidget *parent)
-    :  QDialog(parent),
-    accepted_(false),
-    account_(account),
-    id_(id)
+InvitationDialog::InvitationDialog(const int account,
+                                   const QString &jid,
+                                   QString color,
+                                   const QString &id,
+                                   QWidget *parent)
+    : QDialog(parent)
+    , accepted_(false)
+    , account_(account)
+    , id_(id)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setModal(false);

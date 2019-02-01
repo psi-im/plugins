@@ -125,7 +125,7 @@ private:
     bool SChat;
     bool SInvis;
     QString DisableForAcc;
-    bool FindAcc(int account, QString jid, int &i);
+    bool FindAcc(const int account, const QString &jid, int &i);
 
 private slots:
     void setEnableDisableText(int Arg);
@@ -705,7 +705,7 @@ bool AutoReply::outgoingStanza(int /*account*/, QDomElement& /*stanza*/)
     return false;
 }
 
-bool AutoReply::FindAcc(int account, QString jid, int &i) {
+bool AutoReply::FindAcc(const int account, const QString &jid, int &i) {
     for(; i > 0;) {
         Base B = Counter[--i];
         if(B.Account == account && B.Jid == jid) {

@@ -35,7 +35,7 @@ public:
 
 protected:
     virtual QStringList mimeTypes() const;
-    virtual QMimeData *mimeData(const QList<QListWidgetItem *> items) const;
+    virtual QMimeData *mimeData(const QList<QListWidgetItem *> &items) const;
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void dragEnterEvent(QDragEnterEvent *event);
     virtual void dropEvent(QDropEvent *event);

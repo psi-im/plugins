@@ -36,7 +36,10 @@ namespace GomokuGame {
 class InvateDialog : public QDialog {
     Q_OBJECT
 public:
-    InvateDialog(int account, const QString jid, const QStringList resources, QWidget *parent = 0);
+    InvateDialog(const int account,
+                 const QString &jid,
+                 const QStringList &resources,
+                 QWidget *parent = 0);
     ~InvateDialog();
 
 private:
@@ -62,7 +65,11 @@ class InvitationDialog : public QDialog
 {
     Q_OBJECT
 public:
-    InvitationDialog(int account, QString jid, QString color, QString id, QWidget *parent = 0);
+    InvitationDialog(const int account,
+                     const QString &jid,
+                     QString color,
+                     const QString &id,
+                     QWidget *parent = 0);
 
 private:
     Ui::InvitationDialog ui_;

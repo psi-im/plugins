@@ -730,7 +730,7 @@ void ClientSwitcherPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost*
 
 // ----------------------- Private ------------------------------
 
-int ClientSwitcherPlugin::getOsTemplateIndex(QString &os_name)
+int ClientSwitcherPlugin::getOsTemplateIndex(const QString &os_name)
 {
     if (os_name.isEmpty())
         return 0; // default
@@ -744,7 +744,10 @@ int ClientSwitcherPlugin::getOsTemplateIndex(QString &os_name)
     return 1; // user defined
 }
 
-int ClientSwitcherPlugin::getClientTemplateIndex(QString &cl_name, QString &cl_ver, QString &cp_node, QString &cp_ver)
+int ClientSwitcherPlugin::getClientTemplateIndex(const QString &cl_name,
+                                                 const QString &cl_ver,
+                                                 const QString &cp_node,
+                                                 const QString &cp_ver)
 {
     if (cl_name.isEmpty() && cl_ver.isEmpty() && cp_node.isEmpty() && cp_ver.isEmpty())
         return 0; // default
@@ -760,7 +763,7 @@ int ClientSwitcherPlugin::getClientTemplateIndex(QString &cl_name, QString &cl_v
     return 1; // user defined
 }
 
-int ClientSwitcherPlugin::getAccountById(QString &acc_id)
+int ClientSwitcherPlugin::getAccountById(const QString &acc_id)
 {
     if (!psiAccount || acc_id.isEmpty())
         return -1;
@@ -813,7 +816,7 @@ void ClientSwitcherPlugin::setNewCaps(int account)
 
 }
 
-bool ClientSwitcherPlugin::isSkipStanza(AccountSettings* as, int account, QString to)
+bool ClientSwitcherPlugin::isSkipStanza(AccountSettings* as, const int account, const QString &to)
 {
     if (to.isEmpty()) { // Широковещательный
         if (!as->enable_contacts)
@@ -1002,7 +1005,7 @@ void ClientSwitcherPlugin::showPopup(const QString &nick)
         psiPopup->initPopup(tr("%1 has requested your version").arg(sender_->escape(nick)), constPluginName, "psi/headline", popupId);
 }
 
-void ClientSwitcherPlugin::showLog(QString filename)
+void ClientSwitcherPlugin::showLog(const QString &filename)
 {
     QString fullname = logsDir + filename;
     Viewer *v = new Viewer(fullname, psiIcon);
@@ -1015,7 +1018,7 @@ void ClientSwitcherPlugin::showLog(QString filename)
     v->show();
 }
 
-void ClientSwitcherPlugin::saveToLog(int account, QString to_jid, QString ver_str)
+void ClientSwitcherPlugin::saveToLog(const int account, const QString &to_jid, const QString &ver_str)
 {
     QString acc_jid = psiAccount->getJid(account);
     if (acc_jid.isEmpty() || acc_jid == "-1")

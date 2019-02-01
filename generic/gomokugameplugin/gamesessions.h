@@ -101,7 +101,7 @@ private slots:
     void sendInvite(const int account, const QString &full_jid, const QString &element);
     void cancelInvite(const int account, const QString &full_jid);
     void acceptInvite(const int, const QString &);
-    void rejectInvite(const int, QString);
+    void rejectInvite(const int, const QString &);
     void setSessionStatus(const QString &);
     void closeGameWindow(bool, int, int, int, int);
     void sendMove(const int, const int);

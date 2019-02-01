@@ -23,7 +23,7 @@
 #include <QMessageBox>
 #include <QDomDocument>
 
-void Skin::setFile(QString file)
+void Skin::setFile(const QString &file)
 {
     filePass_ = file;
 }

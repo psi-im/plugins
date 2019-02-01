@@ -22,7 +22,7 @@
 
 static const QString splitString = "&split&";
 
-AccountSettings::AccountSettings(int acc, QString j)
+AccountSettings::AccountSettings(const int acc, const QString &j)
     : account(acc)
     , jid(j)
     , fullJid(j)

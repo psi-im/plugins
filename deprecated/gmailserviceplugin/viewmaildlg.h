@@ -36,8 +36,8 @@ class ViewMailDlg : public QDialog
 {
     Q_OBJECT
 public:
-    ViewMailDlg(QList<MailItem> l, IconFactoryAccessingHost* host, QWidget *p = 0);
-    ~ViewMailDlg() {};
+    ViewMailDlg(const QList<MailItem> &l, IconFactoryAccessingHost* host, QWidget *p = 0);
+    ~ViewMailDlg() {}
 
     void appendItems(QList<MailItem> l);
     QString caption() const;

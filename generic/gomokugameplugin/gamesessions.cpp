@@ -271,7 +271,7 @@ void GameSessions::acceptInvite(const int account, const QString &id)
 /**
  * Отклоняем приглашение на игру
  */
-void GameSessions::rejectInvite(const int account, QString id)
+void GameSessions::rejectInvite(const int account, const QString &id)
 {
     const int idx = findGameSessionById(account, id);
     if (idx != -1 && gameSessions.at(idx).status == StatusInviteInDialog) {

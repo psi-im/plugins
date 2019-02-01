@@ -155,7 +155,7 @@ QPixmap BattleshipGamePlugin::icon() const
 /**
  * Получение списка ресурсов и вызов формы для отправки приглашения
  */
-void BattleshipGamePlugin::inviteDlg(int account, QString full_jid)
+void BattleshipGamePlugin::inviteDlg(const int account, const QString &full_jid)
 {
     QString bareJid = full_jid.section('/', 0, 0);
     //QStringList jid_parse = full_jid.split("/");
@@ -233,7 +233,7 @@ void BattleshipGamePlugin::doPsiEvent(int account, QString from, QString text, Q
 /**
  * Отсылка станзы по запросу игры
  */
-void BattleshipGamePlugin::sendGameStanza(int account, QString stanza)
+void BattleshipGamePlugin::sendGameStanza(const int account, const QString &stanza)
 {
     if (enabled_ && psiAccInfo->getStatus(account) != "offline")
         psiSender->sendStanza(account, stanza);
@@ -272,12 +272,12 @@ void BattleshipGamePlugin::getSound() {
     le->setText(file_name);
 }
 
-void BattleshipGamePlugin::doPopup(QString text)
+void BattleshipGamePlugin::doPopup(const QString &text)
 {
     psiPopup->initPopup(text, tr(constPluginName), "battleshipgameplugin/battleship");
 }
 
-void BattleshipGamePlugin::playSound(QString sound_id)
+void BattleshipGamePlugin::playSound(const QString &sound_id)
 {
     Options *options = Options::instance();
     if (options->getOption(constDefSoundSettings).toBool() || Options::psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool())

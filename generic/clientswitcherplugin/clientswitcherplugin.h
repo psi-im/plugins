@@ -137,15 +137,16 @@ private:
     int popupId;
     //--
 
-    int getOsTemplateIndex(QString&);
-    int getClientTemplateIndex(QString&, QString&, QString&, QString&);
-    int getAccountById(QString&);
+    int getOsTemplateIndex(const QString &);
+    int getClientTemplateIndex(const QString&, const QString&,
+                               const QString&, const QString&);
+    int getAccountById(const QString&);
     AccountSettings* getAccountSetting(const QString&);
-    bool isSkipStanza(AccountSettings*, int, QString);
+    bool isSkipStanza(AccountSettings*, const int, const QString &);
     QString jidToNick(int account, const QString &jid);
     void showPopup(const QString &nick);
-    void showLog(QString filename);
-    void saveToLog(int, QString, QString);
+    void showLog(const QString &filename);
+    void saveToLog(const int, const QString &, const QString &);
 
 private slots:
     void enableAccountsList(int);

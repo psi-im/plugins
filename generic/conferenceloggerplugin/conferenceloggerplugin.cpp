@@ -66,23 +66,23 @@ class ConferenceLogger: public QObject, public PsiPlugin, public StanzaFilter, p
     virtual bool enable();
     virtual bool disable();
     virtual void applyOptions();
-    virtual void restoreOptions(){};
+    virtual void restoreOptions() {}
     virtual bool incomingStanza(int account, const QDomElement& xml);
     virtual bool outgoingStanza(int account, QDomElement& xml);
     virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
     virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
     virtual void setOptionAccessingHost(OptionAccessingHost* host);
-    virtual void optionChanged(const QString& /*option*/){};
+    virtual void optionChanged(const QString& /*option*/) {}
     virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
     virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
     virtual QList < QVariantHash > getGCButtonParam();
-    virtual QAction* getGCAction(QObject* , int , const QString& ) { return 0; };
+    virtual QAction* getGCAction(QObject* , int , const QString& ) { return 0; }
     virtual QString pluginInfo();
     virtual QPixmap icon() const;
 
 
 private:
-    void Logger(QString room, QString from, QString MyJid, QString Text, QString Stamp);
+    void Logger(QString room, const QString &from, const QString &myJid, const QString &text, QString stamp);
     void showLog(QString filename);
 
     AccountInfoAccessingHost *AccInfoHost = nullptr;
@@ -221,24 +221,24 @@ void ConferenceLogger::setApplicationInfoAccessingHost(ApplicationInfoAccessingH
     AppInfoHost = host;
 }
 
-void ConferenceLogger::Logger(QString room, QString from, QString MyJid, QString Text, QString Stamp) {
+void ConferenceLogger::Logger(QString room, const QString &from, const QString &myJid, const QString &text, QString stamp) {
     room = room.replace("@", "_at_");
     room = "_in_" + room;
-    if(Stamp == "") {
-        Stamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    if(stamp.isEmpty()) {
+        stamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
     }
     else {
-        Stamp.insert(4, "-");
-        Stamp.insert(7, "-");
-        Stamp.replace("T", " ");
+        stamp.insert(4, "-");
+        stamp.insert(7, "-");
+        stamp.replace("T", " ");
     }
-    QFile file(HistoryDir + QDir::separator() + MyJid + room + ".conferencehistory");
+    QFile file(HistoryDir + QDir::separator() + myJid + room + ".conferencehistory");
     if(file.open(QIODevice::WriteOnly | QIODevice::Append)) {
         QTextStream out(&file);
         //out.seek(file.size());
         out.setCodec("UTF-8");
         out.setGenerateByteOrderMark(false);
-        out << Stamp << "  " << from << ": " << Text << endl;
+        out << stamp << "  " << from << ": " << text << endl;
     }
 }
 

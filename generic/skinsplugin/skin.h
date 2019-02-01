@@ -29,9 +29,9 @@
 class Skin : public QListWidgetItem
 {
     public:
-         Skin(QListWidget* parent) : QListWidgetItem(parent) {};
-         ~Skin() {};
-         void setFile(QString file);
+         Skin(QListWidget* parent) : QListWidgetItem(parent) {}
+         ~Skin() {}
+         void setFile(const QString &file);
          QString filePass();
          QString name();
          QString skinFolder();
