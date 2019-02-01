@@ -63,9 +63,6 @@ static QString findRegGpgProgram()
     QStringList bins;
     bins << "gpg.exe" << "gpg2.exe";
 
-    HKEY root;
-    root = HKEY_CURRENT_USER;
-
     const char *path = "Software\\GNU\\GnuPG";
     const char *path2 = "Software\\Wow6432Node\\GNU\\GnuPG";
 
