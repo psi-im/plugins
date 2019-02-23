@@ -118,3 +118,15 @@ install(
     RUNTIME DESTINATION
     ${PLUGINS_INSTALL_PATH}
 )
+
+if(APPLE)
+    set(BUNDLED_LIBS_DIR "${CLIENT_NAME}.app/Contents/Frameworks")
+    set(LIBS_TO_INSTALL
+        ${OPENSSL_CRYPTO_LIBRARY}
+        ${SIGNAL_PROTOCOL_C_LIBRARY}
+    )
+    foreach(_LIB_REL ${LIBS_TO_INSTALL})
+        get_filename_component(_LIB_ABS "${_LIB_REL}" REALPATH)
+        install(FILES ${_LIB_ABS} DESTINATION "${BUNDLED_LIBS_DIR}")
+    endforeach()
+endif()
