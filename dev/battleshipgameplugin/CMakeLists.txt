@@ -75,7 +75,7 @@ qt5_add_resources(RSCS ${_RSCS})
 
 add_library(
     ${PLUGIN}
-    MODULE
+    SHARED
     ${_SRCS}
     ${UIS}
     ${RSCS}

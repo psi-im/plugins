@@ -96,7 +96,7 @@ set(QT_DEPLIBS
 
 add_library(
     ${PLUGIN}
-    MODULE
+    SHARED
     ${SOURCES}
     ${HEADERS}
     ${RESOURCES}
