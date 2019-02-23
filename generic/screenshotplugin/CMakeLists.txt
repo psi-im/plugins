@@ -52,7 +52,7 @@ if( APPLE )
     set( qxt_mac_HRDS
         qxt/gui/qxtwindowsystem_mac.h
     )
-    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -framework Carbon -framework CoreFoundation")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -framework Carbon -framework CoreFoundation")
 endif()
 if( WIN32 )
     add_definitions( -DQ_WS_WIN )
