@@ -94,9 +94,15 @@ set(QT_DEPLIBS
     Qt5::Sql
 )
 
+if(WIN32)
+    set(LIB_TYPE "MODULE")
+else()
+    set(LIB_TYPE "SHARED")
+endif()
+
 add_library(
     ${PLUGIN}
-    SHARED
+    ${LIB_TYPE}
     ${SOURCES}
     ${HEADERS}
     ${RESOURCES}

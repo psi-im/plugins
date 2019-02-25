@@ -109,9 +109,15 @@ set(QT_DEPLIBS
 )
 qt5_add_resources(RSCS ${_RSCS})
 
+if(WIN32)
+    set(LIB_TYPE "MODULE")
+else()
+    set(LIB_TYPE "SHARED")
+endif()
+
 add_library(
     ${PLUGIN}
-    SHARED
+    ${LIB_TYPE}
     ${_SRCS}
     ${UIS}
     ${RSCS}
