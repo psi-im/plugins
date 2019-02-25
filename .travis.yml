@@ -8,14 +8,20 @@ os:
   - osx
 
 env:
-  - TARGET=linux64
-  - TARGET=macos64
+  - TARGET=linux64 BUILD_DEV_PLUGINS=ON
+  - TARGET=linux64 BUILD_DEV_PLUGINS=OFF
+  - TARGET=macos64 BUILD_DEV_PLUGINS=ON
+  - TARGET=macos64 BUILD_DEV_PLUGINS=OFF
 
 matrix:
   exclude:
-    - env: TARGET=linux64
+    - env: TARGET=linux64 BUILD_DEV_PLUGINS=ON
       os: osx
-    - env: TARGET=macos64
+    - env: TARGET=linux64 BUILD_DEV_PLUGINS=OFF
+      os: osx
+    - env: TARGET=macos64 BUILD_DEV_PLUGINS=ON
+      os: linux
+    - env: TARGET=macos64 BUILD_DEV_PLUGINS=OFF
       os: linux
 
 install:

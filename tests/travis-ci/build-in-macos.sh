@@ -11,8 +11,10 @@ PATH="${HOMEBREW}/bin:${PATH}"
 CUR_DIR="$(dirname $(realpath -s ${0}))"
 TOOLCHAIN_FILE="${CUR_DIR}/homebrew-toolchain.cmake"
 
+[ -z "${BUILD_DEV_PLUGINS}" ] && BUILD_DEV_PLUGINS="OFF"
+
 BUILD_OPTIONS="-DCMAKE_BUILD_TYPE=Release \
-               -DBUILD_DEV_PLUGINS=OFF \
+               -DBUILD_DEV_PLUGINS=${BUILD_DEV_PLUGINS} \
                .."
 
 mkdir -p builddir

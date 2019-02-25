@@ -13,9 +13,11 @@ CFLAGS="$(dpkg-buildflags --get CFLAGS) ${CPPFLAGS}"
 CXXFLAGS="$(dpkg-buildflags --get CXXFLAGS) ${CPPFLAGS}"
 LDFLAGS="$(dpkg-buildflags --get LDFLAGS) -Wl,--as-needed"
 
+[ -z "${BUILD_DEV_PLUGINS}" ] && BUILD_DEV_PLUGINS="OFF"
+
 BUILD_OPTIONS="-DCMAKE_INSTALL_PREFIX=/usr \
                -DCMAKE_BUILD_TYPE=Release \
-               -DBUILD_DEV_PLUGINS=OFF \
+               -DBUILD_DEV_PLUGINS=${BUILD_DEV_PLUGINS} \
                .."
 
 mkdir -p builddir
