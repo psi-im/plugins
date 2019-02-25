@@ -58,7 +58,33 @@ qt5_wrap_ui(UI_SOURCES ${FORMS})
 unset(QRC_SOURCES)
 qt5_add_resources(QRC_SOURCES ${RESOURCES})
 
-add_library(${PLUGIN} SHARED ${SOURCES} ${HEADERS} ${PLAIN_HEADERS} ${QRC_SOURCES} ${RESOURCES} ${MOC_SOURCES} ${FORMS} ${UI_SOURCES})
+if(NOT WIN32)
+    add_library(
+        ${PLUGIN}
+        SHARED
+        ${SOURCES}
+        ${HEADERS}
+        ${PLAIN_HEADERS}
+        ${QRC_SOURCES}
+        ${RESOURCES}
+        ${MOC_SOURCES}
+        ${FORMS}
+        ${UI_SOURCES}
+    )
+else()
+    add_library(
+        ${PLUGIN}
+        MODULE
+        ${SOURCES}
+        ${HEADERS}
+        ${PLAIN_HEADERS}
+        ${QRC_SOURCES}
+        ${RESOURCES}
+        ${MOC_SOURCES}
+        ${FORMS}
+        ${UI_SOURCES}
+    )
+endif()
 
 target_link_libraries(${PLUGIN} ${QT_DEPLIBS})
 

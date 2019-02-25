@@ -48,12 +48,22 @@ set(QT_DEPLIBS
 )
 qt5_add_resources(RSCS ${_RSCS})
 
-add_library(
-    ${PLUGIN}
-    SHARED
-    ${_SRCS}
-    ${RSCS}
-)
+if(NOT WIN32)
+    add_library(
+        ${PLUGIN}
+        SHARED
+        ${_SRCS}
+        ${RSCS}
+    )
+else()
+    add_library(
+        ${PLUGIN}
+        MODULE
+        ${_SRCS}
+        ${RSCS}
+    )
+endif()
+
 target_link_libraries(
     ${PLUGIN}
     ${QT_DEPLIBS}

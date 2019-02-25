@@ -94,13 +94,23 @@ set(QT_DEPLIBS
     Qt5::Sql
 )
 
-add_library(
-    ${PLUGIN}
-    SHARED
-    ${SOURCES}
-    ${HEADERS}
-    ${RESOURCES}
-)
+if(NOT WIN32)
+    add_library(
+        ${PLUGIN}
+        SHARED
+        ${SOURCES}
+        ${HEADERS}
+        ${RESOURCES}
+    )
+else()
+    add_library(
+        ${PLUGIN}
+        MODULE
+        ${SOURCES}
+        ${HEADERS}
+        ${RESOURCES}
+    )
+endif()
 
 target_link_libraries(
     ${PLUGIN}
