@@ -1,0 +1,25 @@
+language: cpp
+
+dist: xenial
+sudo: required
+
+os:
+  - linux
+  - osx
+
+env:
+  - TARGET=linux64
+  - TARGET=macos64
+
+matrix:
+  exclude:
+    - env: TARGET=linux64
+      os: osx
+    - env: TARGET=macos64
+      os: linux
+
+install:
+  - ./tests/travis-ci/install-build-depends.sh
+
+script:
+  - ./tests/travis-ci/build-and-test.sh
