@@ -51,26 +51,14 @@ set(QT_DEPLIBS
 qt5_wrap_ui(UIS ${_UIS})
 qt5_add_resources(RSCS ${_RSCS})
 
-if(NOT WIN32)
-    add_library(
-        ${PLUGIN}
-        SHARED
-        ${_SRCS}
-        defines.h
-        ${UIS}
-        ${RSCS}
-    )
-else()
-    add_library(
-        ${PLUGIN}
-        MODULE
-        ${_SRCS}
-        defines.h
-        ${UIS}
-        ${RSCS}
-    )
-endif()
-
+add_library(
+    ${PLUGIN}
+    SHARED
+    ${_SRCS}
+    defines.h
+    ${UIS}
+    ${RSCS}
+)
 target_link_libraries(
     ${PLUGIN}
     ${QT_DEPLIBS}
