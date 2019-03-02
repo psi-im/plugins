@@ -374,16 +374,6 @@ PrivKeyWidget::PrivKeyWidget(AccountInfoAccessingHost* accountInfo,
     buttonLayout->addWidget(deleteButton);
 
     mainLayout->addLayout(buttonLayout);
-
-    QLabel *warningLbl = new QLabel();
-    warningLbl->setTextFormat(Qt::RichText);
-    warningLbl->setText("<b style=\"color:#ff0000\">" + tr("Any changes to private keys may lead to a crash!") + "</b>");
-    warningLbl->setToolTip(tr("Libotr according to its authors has a bug in reading private keys file procedure.\n"
-                              "And while it may work properly, additional modifications to the private keys list\n"
-                              "may lead to a crash. Deinitialization of libotr/plugin is also considered to be a\n"
-                              "change to the private keys list."));
-    mainLayout->addWidget(warningLbl);
-
     setLayout(mainLayout);
 
     m_table->setShowGrid(true);
