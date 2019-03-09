@@ -40,7 +40,7 @@
 #include "plugininfoprovider.h"
 
 
-#define constVersion "0.4.2"
+#define constVersion "0.4.3"
 
 class ExtToolButton : public QToolButton
 {
@@ -201,6 +201,7 @@ private:
     QCheckBox *canCloseTab = nullptr;
     QComboBox *mouseDoubleclick = nullptr;
     QCheckBox *multiRow = nullptr;
+    QCheckBox *currentTabAtBottom = nullptr;
 
     // Misc
     QCheckBox *flash_windows = nullptr;
@@ -244,7 +245,7 @@ bool ExtendedOptions::disable()
 QWidget* ExtendedOptions::options()
 {
     if (!enabled) {
-        return 0;
+        return nullptr;
     }
 
     options_ = new QWidget;
@@ -644,6 +645,7 @@ QWidget* ExtendedOptions::options()
     hideWhenClose = new QCheckBox(tr("Hide tab when close chat window"));
     canCloseTab = new QCheckBox(tr("Allow closing inactive tabs"));
     multiRow = new QCheckBox(tr("Enable multirow tabs"));
+    currentTabAtBottom = new QCheckBox(tr("Place current tab at the bottom row in multirow mode"));
 
     middleButton = new QComboBox;
     QHBoxLayout *mbLayout = new QHBoxLayout;
@@ -780,6 +782,7 @@ void ExtendedOptions::applyOptions()
     psiOptions->setGlobalOption("options.ui.chat.hide-when-closing",QVariant(hideWhenClose->isChecked()));
     psiOptions->setGlobalOption("options.ui.tabs.can-close-inactive-tab",QVariant(canCloseTab->isChecked()));
     psiOptions->setGlobalOption("options.ui.tabs.multi-rows",QVariant(multiRow->isChecked()));
+    psiOptions->setGlobalOption("options.ui.tabs.current-index-at-bottom", QVariant(currentTabAtBottom->isChecked()));
 
     //Roster-----
     psiOptions->setGlobalOption("options.contactlist.resolve-nicks-on-contact-add",QVariant(resolveNicks->isChecked()));
@@ -910,6 +913,7 @@ void ExtendedOptions::restoreOptions()
     hideWhenClose->setChecked(psiOptions->getGlobalOption("options.ui.chat.hide-when-closing").toBool());
     canCloseTab->setChecked(psiOptions->getGlobalOption("options.ui.tabs.can-close-inactive-tab").toBool());
     multiRow->setChecked(psiOptions->getGlobalOption("options.ui.tabs.multi-rows").toBool());
+    currentTabAtBottom->setChecked(psiOptions->getGlobalOption("options.ui.tabs.current-index-at-bottom").toBool());
 
     //Roster
     resolveNicks->setChecked(psiOptions->getGlobalOption("options.contactlist.resolve-nicks-on-contact-add").toBool());
@@ -1110,6 +1114,7 @@ void ExtendedOptions::setWhatThis()
     hideWhenClose->setWhatsThis("options.ui.chat.hide-when-closing");
     canCloseTab->setWhatsThis("options.ui.tabs.can-close-inactive-tab");
     multiRow->setWhatsThis("options.ui.tabs.multi-rows");
+    currentTabAtBottom->setWhatsThis("options.ui.tabs.current-index-at-bottom");
 
     //Roster
     resolveNicks->setWhatsThis("options.contactlist.resolve-nicks-on-contact-add");
