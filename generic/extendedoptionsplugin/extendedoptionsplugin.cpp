@@ -674,6 +674,7 @@ QWidget* ExtendedOptions::options()
     tab5Layout->addWidget(closeButton);
     tab5Layout->addWidget(showTabIcons);
     tab5Layout->addWidget(multiRow);
+    tab5Layout->addWidget(currentTabAtBottom);
     tab5Layout->addLayout(mbLayout);
     tab5Layout->addLayout(mdLayout);
     tab5Layout->addStretch();
