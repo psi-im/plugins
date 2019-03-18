@@ -641,6 +641,8 @@ void VideoStatusChanger::fullSTTimeout()
         XFree(data);
 #elif defined (Q_OS_WIN)
     bool full = isFullscreenWindow();
+#elif defined (Q_OS_HAIKU)
+    bool full = false;
 #endif
     if(full) {
         if(!isStatusSet) {

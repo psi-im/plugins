@@ -34,7 +34,7 @@ include_directories(
     ${CMAKE_CURRENT_LIST_DIR}/qxt/core
     ${CMAKE_CURRENT_LIST_DIR}/qxt/gui
 )
-if( UNIX AND NOT( APPLE OR CYGWIN ) )
+if( UNIX AND NOT( APPLE OR CYGWIN OR HAIKU ) )
     find_package( X11 REQUIRED )
     set(EXTRA_LIBS ${X11_LIBRARIES})
     add_definitions( -DX11 )
@@ -118,7 +118,7 @@ set(QT_DEPLIBS
     Qt5::Network
     Qt5::PrintSupport
 )
-if( UNIX AND NOT( APPLE OR CYGWIN ) )
+if( UNIX AND NOT( APPLE OR CYGWIN OR HAIKU ) )
     find_package( Qt5 COMPONENTS X11Extras REQUIRED )
     set(QT_DEPLIBS
         ${QT_DEPLIBS}

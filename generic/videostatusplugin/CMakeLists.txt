@@ -34,13 +34,13 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-if( NOT WIN32 )
+if( NOT WIN32 AND NOT HAIKU )
     add_definitions( -Ddbus -DHAVE_DBUS )
     find_package( X11 REQUIRED )
     set(EXTRA_LIBS ${X11_LIBRARIES})
 endif()
 
-if( NOT WIN32 )
+if( NOT WIN32 AND NOT HAIKU )
     set( x11_SRCS
         x11info.cpp
         )
@@ -64,7 +64,7 @@ set(QT_DEPLIBS
     Qt5::Widgets
     Qt5::Xml
 )
-IF( UNIX AND NOT( APPLE OR CYGWIN ) )
+if( UNIX AND NOT( APPLE OR CYGWIN OR HAIKU ) )
     find_package( Qt5 COMPONENTS DBus X11Extras REQUIRED )
     find_package( XCB REQUIRED )
     add_definitions(
@@ -76,7 +76,8 @@ IF( UNIX AND NOT( APPLE OR CYGWIN ) )
         Qt5::X11Extras
         ${XCB_LIBRARY}
     )
-ENDIF()
+endif()
+
 qt5_wrap_ui(UIS ${_UIS})
 qt5_add_resources(RSCS ${_RSCS})
 
