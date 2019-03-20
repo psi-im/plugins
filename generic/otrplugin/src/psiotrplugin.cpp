@@ -860,8 +860,8 @@ bool PsiOtrPlugin::appendSysMsg(const QString& account,
     {
         iconTag = QString("<icon name=\"%1\"> ").arg(icon);
     }
-    return m_accountHost->appendSysMsg(getAccountIndexById(account),
-                                       contact, iconTag + message);
+    return m_accountHost->appendSysHtmlMsg(getAccountIndexById(account),
+                                           contact, iconTag + message);
 }
 
 // ---------------------------------------------------------------------------
