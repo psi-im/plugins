@@ -30,13 +30,19 @@ set( plugins_list
     otrplugin
     pepchangenotifyplugin
     qipxstatusesplugin
-    screenshotplugin
     skinsplugin
     stopspamplugin
     storagenotesplugin
     translateplugin
     watcherplugin
 )
+
+if(NOT HAIKU)
+    # qxt library is buildable only in Linux, *BSD, Windows and macOS
+    list(APPEND plugins_list
+        screenshotplugin
+    )
+endif()
 
 if(NOT APPLE AND NOT HAIKU)
     list(APPEND plugins_list
