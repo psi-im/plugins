@@ -90,7 +90,7 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 }
 #endif
 
-#define constVersion "0.2.8"
+#define constVersion "0.2.9"
 
 #define constStatus "status"
 #define constStatusMessage "statusmessage"
@@ -351,8 +351,7 @@ void VideoStatusChanger::restoreOptions()
 #elif defined (Q_OS_WIN)
     ui_.groupBox->hide();
 #endif
-    QStringList list;
-    list << "away" << "xa" << "dnd";
+    QStringList list({"away", "xa", "dnd"});
     ui_.cb_status->addItems(list);
     ui_.cb_status->setCurrentIndex(ui_.cb_status->findText(status));
     ui_.le_message->setText(statusMessage);
@@ -657,10 +656,15 @@ void VideoStatusChanger::fullSTTimeout()
 bool VideoStatusChanger::isFullscreenWindow()
 {
     HWND hWnd = GetForegroundWindow();
+    HWND desktop = GetDesktopWindow();
+    HWND shellW = GetShellWindow();
+    HWND win10ui = FindWindow("EdgeUiInputWndClass", nullptr);
+    if(desktop == nullptr || hWnd == nullptr)
+        return false;
     RECT appBounds;
     RECT rc;
-    if (GetWindowRect(GetDesktopWindow(), &rc)) {
-        if(hWnd != GetDesktopWindow() && hWnd != GetShellWindow())
+    if (GetWindowRect(desktop, &rc)) {
+        if(hWnd != desktop && hWnd != shellW && hWnd != win10ui)
         {
             if (GetWindowRect(hWnd, &appBounds)) {
                 return (appBounds.bottom == rc.bottom
