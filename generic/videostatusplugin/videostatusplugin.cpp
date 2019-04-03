@@ -90,7 +90,7 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 }
 #endif
 
-#define constVersion "0.2.9"
+#define constVersion "0.3.0"
 
 #define constStatus "status"
 #define constStatusMessage "statusmessage"
@@ -658,20 +658,29 @@ bool VideoStatusChanger::isFullscreenWindow()
     HWND hWnd = GetForegroundWindow();
     HWND desktop = GetDesktopWindow();
     HWND shellW = GetShellWindow();
-    HWND win10ui = FindWindow("EdgeUiInputWndClass", nullptr);
-    if(desktop == nullptr || hWnd == nullptr)
+    if(hWnd == nullptr || desktop == nullptr) {
         return false;
+    }
+    if(hWnd == desktop || hWnd == shellW ){
+        return false;
+    }
+    //Hack to ignore all windows with WorkerW class in Win10
+    HWND workerW = nullptr;
+    do {
+        workerW = FindWindowExW(desktop, workerW, L"WorkerW", nullptr);
+        if(workerW == hWnd){
+            return false;
+        }
+    } while (workerW != nullptr);
+    //
     RECT appBounds;
     RECT rc;
-    if (GetWindowRect(desktop, &rc)) {
-        if(hWnd != desktop && hWnd != shellW && hWnd != win10ui)
-        {
-            if (GetWindowRect(hWnd, &appBounds)) {
-                return (appBounds.bottom == rc.bottom
-                    && appBounds.left == rc.left
+    if(GetWindowRect(desktop, &rc)) {
+        if (GetWindowRect(hWnd, &appBounds)) {
+            return (appBounds.left == rc.left
                     && appBounds.right == rc.right
-                    && appBounds.top == rc.top);
-            }
+                    && appBounds.top == rc.top
+                    && appBounds.bottom == rc.bottom);
         }
     }
     return false;
