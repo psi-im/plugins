@@ -148,6 +148,9 @@ private:
     int restoreDelay; //задержка восстановления статуса
     int setDelay; //задержка установки статуса
     bool fullScreen;
+#ifdef Q_OS_WIN
+    HWND lastWorkerWindow;
+#endif
 
     struct StatusString {
         QString status;
@@ -192,6 +195,9 @@ VideoStatusChanger::VideoStatusChanger()
     restoreDelay = 20;
     setDelay = 10;
     fullScreen = false;
+#ifdef Q_OS_WIN
+    lastWorkerWindow = nullptr;
+#endif
 }
 
 QString VideoStatusChanger::name() const
@@ -291,6 +297,9 @@ bool VideoStatusChanger::disable()
         disconnect(checkTimer, &QTimer::timeout, this, &VideoStatusChanger::timeOut);
         delete(checkTimer);
     }
+#endif
+#ifdef Q_OS_WIN
+    lastWorkerWindow = nullptr;
 #endif
     return true;
 }
@@ -661,7 +670,7 @@ bool VideoStatusChanger::isFullscreenWindow()
     if(hWnd == nullptr || desktop == nullptr) {
         return false;
     }
-    if(hWnd == desktop || hWnd == shellW ){
+    if(hWnd == desktop || hWnd == shellW || hWnd == lastWorkerWindow){
         return false;
     }
     //Hack to ignore all windows with WorkerW class in Win10
@@ -669,6 +678,7 @@ bool VideoStatusChanger::isFullscreenWindow()
     do {
         workerW = FindWindowExW(desktop, workerW, L"WorkerW", nullptr);
         if(workerW == hWnd){
+            lastWorkerWindow = workerW; //store last WorkerW to save CPU
             return false;
         }
     } while (workerW != nullptr);
