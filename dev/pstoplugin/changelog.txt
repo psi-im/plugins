@@ -1,3 +1,7 @@
+2019-05-06
+v0.0.4 tehnick
+  + Fix build of plugin with latest versions of gcc
+
 2013-08-13
 v0.0.3 taurus
   + Иконка плагина

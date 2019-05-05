@@ -17,7 +17,7 @@
 #include "preferenceswidget.h"
 
 
-#define VERSION "0.0.3"
+#define VERSION "0.0.4"
 #define PLUGIN_NAME "Psto Plugin"
 #define PLUGIN_NAME_SHORT "psto"
 
@@ -35,8 +35,8 @@
 #define MESSAGE_COLOR "message_color"
 
 
-// jid1 << jid2 << ...
-#define PSTO_JIDS "psto@psto.net" << "d@psto.net"
+// jid1 , jid2 , ...
+#define PSTO_JIDS "psto@psto.net" , "d@psto.net"
 
 enum PairType { PairMessage, PairPostId, PairUser, PairLink };
 typedef QPair<PairType, QString> RegExpPair;
