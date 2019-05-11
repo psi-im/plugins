@@ -70,7 +70,6 @@ class PsiOtrClosure;
 class PsiOtrPlugin : public QObject,
                      public PsiPlugin,
                      public PluginInfoProvider,
-                     public EventFilter,
                      public EventCreator,
                      public OptionAccessor,
                      public StanzaSender,
@@ -88,7 +87,6 @@ class PsiOtrPlugin : public QObject,
     Q_PLUGIN_METADATA(IID "com.psi-plus.PsiOtrPlugin")
     Q_INTERFACES(PsiPlugin
                  PluginInfoProvider
-                 EventFilter
                  EventCreator
                  OptionAccessor
                  StanzaSender
@@ -118,15 +116,6 @@ public:
 
     // PluginInfoProvider
     virtual QString pluginInfo();
-
-    // EventFilter
-    virtual bool processEvent(int accountIndex, QDomElement& e);
-    virtual bool processMessage(int accountIndex, const QString& contact,
-                                const QString& body, const QString& subject);
-    virtual bool processOutgoingMessage(int accountIndex, const QString& contact,
-                                        QString& body, const QString& type,
-                                        QString& subject);
-    virtual void logout(int accountIndex);
 
     // EventCreator
     virtual void setEventCreatingHost(EventCreatingHost *host);

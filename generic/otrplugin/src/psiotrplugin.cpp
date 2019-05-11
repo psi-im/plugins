@@ -270,13 +270,6 @@ QString PsiOtrPlugin::pluginInfo() {
 
 //-----------------------------------------------------------------------------
 
-bool PsiOtrPlugin::processEvent(int, QDomElement&)
-{
-    return false;
-}
-
-//-----------------------------------------------------------------------------
-
 bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageElement)
 {
     bool ignore = false;
@@ -381,27 +374,6 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
 
 //-----------------------------------------------------------------------------
 
-bool PsiOtrPlugin::processMessage(int,
-                                  const QString&,
-                                  const QString&,
-                                  const QString&)
-{
-    return false;
-}
-
-//-----------------------------------------------------------------------------
-
-bool PsiOtrPlugin::processOutgoingMessage(int,
-                                          const QString&,
-                                          QString&,
-                                          const QString&,
-                                          QString&)
-{
-    return false;
-}
-
-//-----------------------------------------------------------------------------
-
 bool PsiOtrPlugin::encryptMessageElement(int accountIndex, QDomElement &message)
 {
     if (!m_enabled || message.attribute("type") == "groupchat")
@@ -436,28 +408,6 @@ bool PsiOtrPlugin::encryptMessageElement(int accountIndex, QDomElement &message)
     return false;
 }
 
-// ---------------------------------------------------------------------------
-
-void PsiOtrPlugin::logout(int accountIndex)
-{
-    if (!m_enabled)
-    {
-        return;
-    }
-
-    QString account = m_accountInfo->getId(accountIndex);
-
-    if (m_onlineUsers.contains(account))
-    {
-        foreach(QString contact, m_onlineUsers.value(account).keys())
-        {
-            m_otrConnection->endSession(account, contact);
-            m_onlineUsers[account][contact]->setIsLoggedIn(false);
-            m_onlineUsers[account][contact]->updateMessageState();
-        }
-    }
-}
-
 //-----------------------------------------------------------------------------
 
 void PsiOtrPlugin::setOptionAccessingHost(OptionAccessingHost* host)
@@ -489,8 +439,28 @@ void PsiOtrPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost*
 
 //-----------------------------------------------------------------------------
 
-void PsiOtrPlugin::setPsiAccountControllingHost(PsiAccountControllingHost* host) {
+void PsiOtrPlugin::setPsiAccountControllingHost(PsiAccountControllingHost* host)
+{
     m_accountHost = host;
+    host->subscribeLogout(this, [this](int accountIndex)
+    {
+        if (!m_enabled)
+        {
+            return;
+        }
+
+        QString account = m_accountInfo->getId(accountIndex);
+
+        if (m_onlineUsers.contains(account))
+        {
+            foreach(QString contact, m_onlineUsers.value(account).keys())
+            {
+                m_otrConnection->endSession(account, contact);
+                m_onlineUsers[account][contact]->setIsLoggedIn(false);
+                m_onlineUsers[account][contact]->updateMessageState();
+            }
+        }
+    });
 }
 
 //-----------------------------------------------------------------------------

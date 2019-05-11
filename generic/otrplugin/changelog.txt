@@ -1,3 +1,7 @@
+2019-05-12
+v1.1.0 rion
+ * Switched from EventFilter::logout to other interface
+
 2018-03-24
 v1.0.4 rion
   * Added a warning about possible crash on private keys management
