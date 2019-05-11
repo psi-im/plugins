@@ -46,7 +46,7 @@ class JuickDownloader : public QObject
     Q_OBJECT
 
 public:
-    JuickDownloader(ApplicationInfoAccessingHost * host, QObject *p = 0);
+    JuickDownloader(ApplicationInfoAccessingHost * host, QObject *p = nullptr);
     ~JuickDownloader() {}
 
     void get(const JuickDownloadItem& item);

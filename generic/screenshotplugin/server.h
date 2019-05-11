@@ -25,7 +25,7 @@
 class Server : public QListWidgetItem, public QObject
 {
 public:
-    Server(QListWidget *parent = 0);
+    Server(QListWidget *parent = nullptr);
     QString displayName() const { return displayName_; };
     QString url() const { return url_; };
     QString userName() const { return userName_; };

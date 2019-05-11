@@ -203,7 +203,7 @@ QVariant OptionsParser::elementToVariant(const QDomElement& e)
         return value;
 }
 
-OptionsParser *OptionsParser::instance_ = NULL;
+OptionsParser *OptionsParser::instance_ = nullptr;
 
 
 //-----------------------

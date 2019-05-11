@@ -41,14 +41,14 @@
 
 
 ClientSwitcherPlugin::ClientSwitcherPlugin() :
-    sender_(0),
-    psiOptions(0),
-    psiPopup(0),
-    psiInfo(0),
-    psiAccount(0),
-    psiAccountCtl(0),
-    psiContactInfo(0),
-    psiIcon(0),
+    sender_(nullptr),
+    psiOptions(nullptr),
+    psiPopup(nullptr),
+    psiInfo(nullptr),
+    psiAccount(nullptr),
+    psiAccountCtl(nullptr),
+    psiContactInfo(nullptr),
+    psiIcon(nullptr),
     enabled(false),
     for_all_acc(false),
     def_os_name(""),
@@ -163,7 +163,7 @@ bool ClientSwitcherPlugin::disable()
 QWidget* ClientSwitcherPlugin::options()
 {
     if (!enabled) {
-        return 0;
+        return nullptr;
     }
     QWidget* optionsWid = new QWidget();
     ui_options.setupUi(optionsWid);
@@ -784,7 +784,7 @@ AccountSettings* ClientSwitcherPlugin::getAccountSetting(const QString &acc_id)
         if (as && as->account_id == acc_id)
             return as;
     }
-    return NULL;
+    return nullptr;
 }
 
 /**

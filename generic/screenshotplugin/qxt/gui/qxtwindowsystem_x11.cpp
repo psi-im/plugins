@@ -38,7 +38,7 @@ static WindowList qxt_getWindows(Atom prop)
     WindowList res;
     Atom type = 0;
     int format = 0;
-    uchar* data = 0;
+    uchar* data = nullptr;
     ulong count, after;
     Display* display = QX11Info::display();
     Window window = QX11Info::appRootWindow();
@@ -106,7 +106,7 @@ WId QxtWindowSystem::windowAt(const QPoint& pos)
 QString QxtWindowSystem::windowTitle(WId window)
 {
     QString name;
-    char* str = 0;
+    char* str = nullptr;
     if (XFetchName(QX11Info::display(), window, &str))
         name = QString::fromLatin1(str);
     if (str)
@@ -130,7 +130,7 @@ QRect QxtWindowSystem::windowGeometry(WId window)
     QRect rect(x, y, width, height);
     Atom type = 0;
     int format = 0;
-    uchar* data = 0;
+    uchar* data = nullptr;
     ulong count, after;
     if (XGetWindowProperty(display, window, net_frame, 0, 4, False, AnyPropertyType,
                            &type, &format, &count, &after, &data) == Success)
@@ -159,8 +159,8 @@ typedef struct {
 typedef XScreenSaverInfo* (*XScreenSaverAllocInfo)();
 typedef Status (*XScreenSaverQueryInfo)(Display* display, Drawable drawable, XScreenSaverInfo* info);
 
-static XScreenSaverAllocInfo _xScreenSaverAllocInfo = 0;
-static XScreenSaverQueryInfo _xScreenSaverQueryInfo = 0;
+static XScreenSaverAllocInfo _xScreenSaverAllocInfo = nullptr;
+static XScreenSaverQueryInfo _xScreenSaverQueryInfo = nullptr;
 
 uint QxtWindowSystem::idleTime()
 {

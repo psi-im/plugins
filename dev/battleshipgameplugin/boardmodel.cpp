@@ -24,7 +24,7 @@
 
 BoardModel::BoardModel(QObject *parent)
     : QAbstractTableModel(parent)
-    , gameModel_(NULL)
+    , gameModel_(nullptr)
 {
 }
 

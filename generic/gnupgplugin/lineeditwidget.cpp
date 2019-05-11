@@ -9,7 +9,7 @@
 LineEditWidget::LineEditWidget(QWidget *parent)
     : QLineEdit(parent)
     , _layout(new QHBoxLayout())
-    , _popup(0)
+    , _popup(nullptr)
     , _optimalLength(0)
 {
     _layout->setSpacing(0);
@@ -84,7 +84,7 @@ void LineEditWidget::setPopup(QWidget *w)
 {
     if(_popup) {
         delete _popup;
-        _popup = 0;
+        _popup = nullptr;
     }
 
     _popup = new QFrame(this);

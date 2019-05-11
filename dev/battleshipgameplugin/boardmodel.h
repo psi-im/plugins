@@ -28,7 +28,7 @@ class BoardModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    BoardModel(QObject *parent = 0);
+    BoardModel(QObject *parent = nullptr);
     ~BoardModel();
     void init(GameModel *gm);
     GameModel *gameModel() const { return gameModel_; }

@@ -23,7 +23,7 @@
 
 BoardView::BoardView(QWidget *parent)
     : QTableView(parent)
-    , bmodel_(NULL)
+    , bmodel_(nullptr)
 {
 }
 

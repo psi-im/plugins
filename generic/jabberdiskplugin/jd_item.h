@@ -27,8 +27,8 @@ class JDItem
 public:
     enum Type { None, Dir, File };
 
-    JDItem(Type t, const QString& name, const QString& size = QString(), const QString& descr = QString(), int number = -1, JDItem* parent = 0);
-    JDItem(Type t, JDItem* parent = 0);
+    JDItem(Type t, const QString& name, const QString& size = QString(), const QString& descr = QString(), int number = -1, JDItem* parent = nullptr);
+    JDItem(Type t, JDItem* parent = nullptr);
     virtual ~JDItem();    
 
     void setData(const QString& name, const QString& size = QString(), const QString& descr = QString(), int number = -1);
@@ -60,7 +60,7 @@ private:
 
 struct ProxyItem {
     ProxyItem()
-        : item(0)
+        : item(nullptr)
         , index(QModelIndex())
         , parent(QModelIndex())
     {

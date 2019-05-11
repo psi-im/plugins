@@ -47,7 +47,7 @@ void ScreenshotOptions::hideTimeout()
     int delay = ui_.sb_delay->value();
     Options::instance()->setOption(constDelay, delay);
 
-    void(ScreenshotOptions::*signal)(int) = 0;
+    void(ScreenshotOptions::*signal)(int) = nullptr;
     if(ui_.rb_capture_desktop->isChecked())
         signal =  &ScreenshotOptions::captureDesktop;
     else if(ui_.rb_capture_window->isChecked())

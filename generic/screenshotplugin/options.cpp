@@ -22,7 +22,7 @@
 #include "optionaccessinghost.h"
 
 
-Options* Options::instance_ = 0;
+Options* Options::instance_ = nullptr;
 
 Options* Options::instance()
 {
@@ -34,8 +34,8 @@ Options* Options::instance()
 }
 
 Options::Options()
-    : QObject(0)
-    , psiOptions(0)
+    : QObject(nullptr)
+    , psiOptions(nullptr)
 {
 }
 
@@ -46,7 +46,7 @@ Options::~Options()
 void Options::reset()
 {
     delete instance_;
-    instance_ = 0;
+    instance_ = nullptr;
 }
 
 QVariant Options::getOption(const QString& name, const QVariant& defValue)

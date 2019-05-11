@@ -29,7 +29,7 @@ class OptionsParser : public QObject
     Q_OBJECT
 
     public:
-        OptionsParser(QObject* parent = 0);
+        OptionsParser(QObject* parent = nullptr);
         static OptionsParser* instance();
         QVariant elementToVariant(const QDomElement& e);
         void variantToElement(const QVariant& var, QDomElement& e);

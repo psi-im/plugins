@@ -29,7 +29,7 @@ ContentDownloader::ContentDownloader()
     : enabled(false)
         , psiOptions(nullptr)
         , appInfoHost(nullptr)
-    , form_(NULL)
+    , form_(nullptr)
 {
 }
 
@@ -56,11 +56,11 @@ QString ContentDownloader::version() const
 QWidget *ContentDownloader::options()
 {
     if ( !enabled ) {
-        return 0;
+        return nullptr;
     }
 
     if ( !appInfoHost || !psiOptions ) {
-        return 0;
+        return nullptr;
     }
 
     Proxy psiProxy = appInfoHost->getProxyFor(name());

@@ -31,7 +31,7 @@ class IconDelegate : public QItemDelegate
     Q_OBJECT
 
 public:
-    IconDelegate(IconFactoryAccessingHost *iconHost, QObject * parent = 0)    : QItemDelegate(parent), iconHost_(iconHost) {};
+    IconDelegate(IconFactoryAccessingHost *iconHost, QObject * parent = nullptr)    : QItemDelegate(parent), iconHost_(iconHost) {};
     virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
     virtual void drawDisplay(QPainter * /*painter*/, const QStyleOptionViewItem & /*option*/, const QRect & /*rect*/, const QString & /*text*/) const {};
     void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
@@ -46,7 +46,7 @@ class LineEditDelegate : public QItemDelegate
     Q_OBJECT
 
 public:
-    LineEditDelegate(QObject * parent = 0)    : QItemDelegate(parent) {};
+    LineEditDelegate(QObject * parent = nullptr)    : QItemDelegate(parent) {};
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     void setEditorData(QWidget *editor, const QModelIndex &index) const;
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;

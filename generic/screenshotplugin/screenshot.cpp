@@ -56,7 +56,7 @@ class HistoryDlg : public QDialog
 {
     Q_OBJECT
 public:
-    HistoryDlg(const QStringList& list, QWidget* p = 0)
+    HistoryDlg(const QStringList& list, QWidget* p = nullptr)
         : QDialog(p, Qt::Window)
     {
         setAttribute(Qt::WA_DeleteOnClose);
@@ -214,8 +214,8 @@ Screenshot::Screenshot()
     : QMainWindow()
     , modified(false)
     , lastFolder(QDir::home().absolutePath())
-    , grabAreaWidget_(0)
-    , so_(0)
+    , grabAreaWidget_(nullptr)
+    , so_(nullptr)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     ui_.setupUi(this);
@@ -369,7 +369,7 @@ void Screenshot::setProxy(const Proxy& p)
 
 void Screenshot::openImage()
 {
-    QString fileName = QFileDialog::getOpenFileName(0,tr("Open Image"), lastFolder,tr("Images (*.png *.gif *.jpg *.jpeg *.ico)"));
+    QString fileName = QFileDialog::getOpenFileName(nullptr,tr("Open Image"), lastFolder,tr("Images (*.png *.gif *.jpg *.jpeg *.ico)"));
     if(!fileName.isEmpty()) {
         setImagePath(fileName);
         QFileInfo fi(fileName);
@@ -506,7 +506,7 @@ void Screenshot::captureArea(int delay)
     }
     else {
         delete grabAreaWidget_;
-        grabAreaWidget_ = 0;
+        grabAreaWidget_ = nullptr;
         qApp->desktop()->repaint();
         refreshWindow();
     }
@@ -525,7 +525,7 @@ void Screenshot::shootArea()
     }
 
     delete grabAreaWidget_;
-    grabAreaWidget_ = 0;
+    grabAreaWidget_ = nullptr;
 
     refreshWindow();
 }

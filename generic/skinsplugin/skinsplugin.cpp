@@ -87,8 +87,8 @@ private slots:
 
 SkinsPlugin::SkinsPlugin() {
         enabled = false;
-        appInfo = 0;
-        psiOptions = 0;
+        appInfo = nullptr;
+        psiOptions = nullptr;
     }
 
 QString SkinsPlugin::name() const {
@@ -120,7 +120,7 @@ bool SkinsPlugin::disable() {
 
 QWidget* SkinsPlugin::options() {
     if(!enabled) {
-        return 0;
+        return nullptr;
     }
 
     optionsWidget = new QWidget();
@@ -220,7 +220,7 @@ void SkinsPlugin::loadPreview()
 }
 
 void SkinsPlugin::openButtonPressed() {
-    QString fileName = QFileDialog::getOpenFileName(0,tr("Choose a skin file"), appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation), tr("*.skn"));
+    QString fileName = QFileDialog::getOpenFileName(nullptr,tr("Choose a skin file"), appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation), tr("*.skn"));
     if(fileName.isEmpty()) return;
 
     if(skins_.contains(fileName))
@@ -268,16 +268,16 @@ void SkinsPlugin::createSkin(const QString &name, const QString &author, const Q
     QFile file(":/skinsplugin/defskin.skn");
     QDomDocument doc, newDoc;
     if(!doc.setContent(&file)) {
-        QMessageBox::warning(0, tr("Create Skin"), tr("Unknown error!"));
+        QMessageBox::warning(nullptr, tr("Create Skin"), tr("Unknown error!"));
         return;
     }
     QDomElement elem = doc.documentElement();
     if(elem.tagName() != "skin") {
-        QMessageBox::warning(0, tr("Create Skin"), tr("Unknown error!"));
+        QMessageBox::warning(nullptr, tr("Create Skin"), tr("Unknown error!"));
         return;
     }
 
-    QString fileName = QFileDialog::getSaveFileName(0,tr("Save a skin file"), appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation) + QString("/%1_%2").arg(name, version), tr("*.skn"));
+    QString fileName = QFileDialog::getSaveFileName(nullptr,tr("Save a skin file"), appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation) + QString("/%1_%2").arg(name, version), tr("*.skn"));
     if(fileName.isEmpty())
         return;
     if(fileName.right(4) != ".skn")
@@ -298,7 +298,7 @@ void SkinsPlugin::createSkin(const QString &name, const QString &author, const Q
         if(!skins_.contains(fileName))
             appendSkin(fileName);
     } else {
-        QMessageBox::warning(0, tr("Create Skin"), tr("Can't save skin!"));
+        QMessageBox::warning(nullptr, tr("Create Skin"), tr("Can't save skin!"));
     }
 }
 
@@ -310,12 +310,12 @@ void SkinsPlugin::applySkin() {
     QFile file(skin->filePass());
     QDomDocument doc;
     if(!doc.setContent(&file)) {
-        QMessageBox::warning(0, tr("Apply Skin"), tr("Unknown error!"));
+        QMessageBox::warning(nullptr, tr("Apply Skin"), tr("Unknown error!"));
         return;
     }
     QDomElement elem = doc.documentElement();
     if(elem.tagName() != "skin") {
-        QMessageBox::warning(0, tr("Apply Skin"), tr("Unknown error!"));
+        QMessageBox::warning(nullptr, tr("Apply Skin"), tr("Unknown error!"));
         return;
     }
 
@@ -338,7 +338,7 @@ void SkinsPlugin::applySkin() {
             backUp.save(str, indent);
             appendSkin(fileName);
         } else {
-            QMessageBox::warning(0, tr("Apply Skin"), tr("Can't save the backup skin!"));
+            QMessageBox::warning(nullptr, tr("Apply Skin"), tr("Can't save the backup skin!"));
             return;
         }
     }
@@ -366,7 +366,7 @@ void SkinsPlugin::applySkin() {
         mes += QString("\nBackup skin saved to %2").arg(fileName);
     }
 
-    QMessageBox::information(0, tr("Apply Skin"), mes);
+    QMessageBox::information(nullptr, tr("Apply Skin"), mes);
 
     ui_.cb_hack->toggle(); //enable Apply button
 }
@@ -412,7 +412,7 @@ bool SkinsPlugin::validateOption(QString optionName)
 }
 
 void SkinsPlugin::overwrite() {
-    int ret = QMessageBox::question(0, tr("Overwrite selected skin"),
+    int ret = QMessageBox::question(nullptr, tr("Overwrite selected skin"),
                                 tr("Are You Sure?"),
                                 QMessageBox::Ok  | QMessageBox::Cancel);
     if(ret == QMessageBox::Cancel) return;
@@ -424,12 +424,12 @@ void SkinsPlugin::overwrite() {
     QFile file(skin->filePass());
     QDomDocument doc;
     if(!doc.setContent(&file)) {
-        QMessageBox::warning(0, tr("Overwrite Skin"), tr("Unknown error!"));
+        QMessageBox::warning(nullptr, tr("Overwrite Skin"), tr("Unknown error!"));
         return;
     }
     QDomElement elem = doc.documentElement();
     if(elem.tagName() != "skin") {
-        QMessageBox::warning(0, tr("Overwrite Skin"), tr("Unknown error!"));
+        QMessageBox::warning(nullptr, tr("Overwrite Skin"), tr("Unknown error!"));
         return;
     }
 
@@ -442,7 +442,7 @@ void SkinsPlugin::overwrite() {
             str.setGenerateByteOrderMark(false);
         overwriteDoc.save(str, indent);
         } else {
-            QMessageBox::warning(0, tr("Overwrite Skin"), tr("Can't save the skin!"));
+            QMessageBox::warning(nullptr, tr("Overwrite Skin"), tr("Can't save the skin!"));
             return;
         }
 }
@@ -452,7 +452,7 @@ void SkinsPlugin::removeSkin() {
     if(!skin)
         return;
 
-    int ret = QMessageBox::question(0, tr("Delete skin"),
+    int ret = QMessageBox::question(nullptr, tr("Delete skin"),
                                 tr("Are You Sure?"),
                                 QMessageBox::Ok  | QMessageBox::Cancel);
     if(ret == QMessageBox::Cancel) return;

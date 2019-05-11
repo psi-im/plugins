@@ -31,7 +31,7 @@ class TypeAheadFindBar : public QToolBar
 {
     Q_OBJECT
 public:
-    TypeAheadFindBar(IconFactoryAccessingHost *IcoHost, QTextEdit *textedit, const QString &title, QWidget *parent = 0);
+    TypeAheadFindBar(IconFactoryAccessingHost *IcoHost, QTextEdit *textedit, const QString &title, QWidget *parent = nullptr);
 
     ~TypeAheadFindBar();
     void init();

@@ -27,7 +27,7 @@
 class ContentItem
 {
 public:
-    ContentItem(const QString &name, ContentItem *parent = NULL);
+    ContentItem(const QString &name, ContentItem *parent = nullptr);
     ~ContentItem();
 
     void appendChild(ContentItem *child);

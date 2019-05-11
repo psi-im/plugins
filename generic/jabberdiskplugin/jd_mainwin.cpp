@@ -30,8 +30,8 @@
 
 JDMainWin::JDMainWin(const QString &name, const QString &jid, int acc, QWidget *p)
     : QDialog(p, Qt::Window)
-    , model_(0)
-    , commands_(0)
+    , model_(nullptr)
+    , commands_(nullptr)
     , refreshInProgres_(false)
     , yourJid_(name)
 {

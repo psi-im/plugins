@@ -36,7 +36,7 @@ class BoardPixmaps : public QObject
 {
 
 public:
-    BoardPixmaps(QObject *parent = 0);
+    BoardPixmaps(QObject *parent = nullptr);
     ~BoardPixmaps();
     void clearPix();
     QPixmap *getBoardPixmap(int, int, double, double);
@@ -55,7 +55,7 @@ class BoardDelegate : public QItemDelegate
 {
 Q_OBJECT
 public:
-    explicit BoardDelegate(BoardModel *model, QObject *parent = 0);
+    explicit BoardDelegate(BoardModel *model, QObject *parent = nullptr);
     void setSkin(int skin_num);
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 

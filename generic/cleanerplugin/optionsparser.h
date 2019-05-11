@@ -30,7 +30,7 @@ class OptionsParser : public QObject
     Q_OBJECT
 
 public:
-    OptionsParser(const QString& fileName, QObject *parent = 0);
+    OptionsParser(const QString& fileName, QObject *parent = nullptr);
     QStringList getMissingNodesString() const;
     QList<QDomNode> getMissingNodes() const;
     QDomNode nodeByString(const QString& key) const;

@@ -32,7 +32,7 @@ class Viewer : public QDialog
 {
     Q_OBJECT
 public:
-    Viewer(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *parent = 0);
+    Viewer(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *parent = nullptr);
     bool init();
 
 private:

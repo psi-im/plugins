@@ -50,7 +50,7 @@ class Options : public QWidget
     Q_OBJECT
 
 public:
-    explicit Options(const QList<Rule> &rules, QWidget *parent = 0);
+    explicit Options(const QList<Rule> &rules, QWidget *parent = nullptr);
     ~Options();
 
     void update();

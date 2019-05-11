@@ -30,7 +30,7 @@ class DefferedStanzaSender : public QObject
 {
     Q_OBJECT
 public:
-    DefferedStanzaSender(StanzaSendingHost *host, QObject* p = 0);
+    DefferedStanzaSender(StanzaSendingHost *host, QObject* p = nullptr);
 
     void sendStanza(int account, const QDomElement& xml);
     void sendStanza(int account, const QString& xml);

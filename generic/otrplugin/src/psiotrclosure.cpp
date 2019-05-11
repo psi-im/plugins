@@ -143,8 +143,8 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
     ssLayout->addSpacing(20);
     m_methodWidget[METHOD_SHARED_SECRET]->setLayout(ssLayout);
 
-    m_methodWidget[METHOD_FINGERPRINT] = NULL;
-    QLabel* authenticatedLabel = NULL;
+    m_methodWidget[METHOD_FINGERPRINT] = nullptr;
+    QLabel* authenticatedLabel = nullptr;
     if (m_isSender)
     {
         if (m_otr->isVerified(m_account, m_contact))
@@ -470,16 +470,16 @@ PsiOtrClosure::PsiOtrClosure(const QString& account, const QString& contact,
     : m_otr(otrc),
       m_account(account),
       m_contact(contact),
-      m_chatDlgMenu(0),
-      m_chatDlgAction(0),
-      m_authenticateAction(0),
-      m_sessionIdAction(0),
-      m_fingerprintAction(0),
-      m_startSessionAction(0),
-      m_endSessionAction(0),
+      m_chatDlgMenu(nullptr),
+      m_chatDlgAction(nullptr),
+      m_authenticateAction(nullptr),
+      m_sessionIdAction(nullptr),
+      m_fingerprintAction(nullptr),
+      m_startSessionAction(nullptr),
+      m_endSessionAction(nullptr),
       m_isLoggedIn(false),
-      m_parentWidget(0),
-      m_authDialog(0)
+      m_parentWidget(nullptr),
+      m_authDialog(nullptr)
 {
 }
 
@@ -559,7 +559,7 @@ void PsiOtrClosure::updateSMP(int progress)
 
 void PsiOtrClosure::finishAuth()
 {
-    m_authDialog = 0;
+    m_authDialog = nullptr;
 
     updateMessageState();
 }
@@ -690,7 +690,7 @@ QAction* PsiOtrClosure::getChatDlgMenu(QObject* parent)
     connect(m_endSessionAction, SIGNAL(triggered(bool)),
             this, SLOT(endSession(bool)));
 
-    m_chatDlgMenu->insertSeparator(NULL);
+    m_chatDlgMenu->insertSeparator(nullptr);
 
     m_authenticateAction = m_chatDlgMenu->addAction(tr("&Authenticate contact"));
     connect(m_authenticateAction, SIGNAL(triggered(bool)),

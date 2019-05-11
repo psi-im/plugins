@@ -27,10 +27,10 @@
 
 CleanerPlugin::CleanerPlugin()
     : enabled(false)
-    , appInfo(0)
-    , iconHost(0)
-    , psiOptions(0)
-    , cln(0)
+    , appInfo(nullptr)
+    , iconHost(nullptr)
+    , psiOptions(nullptr)
+    , cln(nullptr)
     , height(650)
     , width(900)
 {
@@ -75,7 +75,7 @@ bool CleanerPlugin::disable()
 QWidget* CleanerPlugin::options()
 {
     if (!enabled) {
-        return 0;
+        return nullptr;
     }
     QWidget *options = new QWidget();
     QVBoxLayout *hbox= new QVBoxLayout(options);

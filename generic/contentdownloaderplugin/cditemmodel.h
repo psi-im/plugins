@@ -27,7 +27,7 @@ class CDItemModel : public QAbstractItemModel
 {
     Q_OBJECT
 public:
-    CDItemModel(QObject *parent = NULL);
+    CDItemModel(QObject *parent = nullptr);
     ~CDItemModel();
 
     QVariant data(const QModelIndex &index, int role) const;

@@ -29,7 +29,7 @@ class JDMainWin : public QDialog
 {
     Q_OBJECT
 public:
-    JDMainWin(const QString& name,const QString& jid, int acc, QWidget* p = 0);
+    JDMainWin(const QString& name,const QString& jid, int acc, QWidget* p = nullptr);
     ~JDMainWin();
 
 private slots:

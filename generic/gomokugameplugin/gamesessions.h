@@ -43,7 +43,7 @@ class GameSessions : public QObject
 Q_OBJECT
 
 public:
-    explicit GameSessions(QObject *parent = 0);
+    explicit GameSessions(QObject *parent = nullptr);
     ~GameSessions();
     static GameSessions *instance();
     static void reset();

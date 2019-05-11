@@ -70,7 +70,7 @@ private:
     QString soundError;
 
 private:
-    Options(QObject *parent = 0);
+    Options(QObject *parent = nullptr);
 
 signals:
 

@@ -29,7 +29,7 @@
 Options::Options(const QList<Rule> &rules, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Options)
-    , _optionHost(0)
+    , _optionHost(nullptr)
     , _rules(rules)
     , _currentRule(-1)
 {

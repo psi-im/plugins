@@ -62,7 +62,7 @@ public:
     virtual QList < QVariantHash > getAccountMenuParam();
     virtual QList < QVariantHash > getContactMenuParam();
     virtual QAction* getContactAction(QObject* p, int acc, const QString& jid);
-    virtual QAction* getAccountAction(QObject* , int ) { return 0; };
+    virtual QAction* getAccountAction(QObject* , int ) { return nullptr; };
     virtual QString pluginInfo();
     virtual QPixmap icon() const;
 
@@ -88,10 +88,10 @@ private:
 
 HistoryKeeperPlugin::HistoryKeeperPlugin()
     : enabled(false)
-    , psiOptions(0)
-    , appInfo(0)
-    , icoHost(0)
-    , contactsWidget(0)
+    , psiOptions(nullptr)
+    , appInfo(nullptr)
+    , icoHost(nullptr)
+    , contactsWidget(nullptr)
 {
 }
 
@@ -171,7 +171,7 @@ QString HistoryKeeperPlugin::nameToFilename(const QString& jid)
 QWidget* HistoryKeeperPlugin::options()
 {
     if(!enabled) {
-        return 0;
+        return nullptr;
     }
     QWidget *options = new QWidget();
     QVBoxLayout *layout = new QVBoxLayout(options);

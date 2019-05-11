@@ -34,16 +34,16 @@
 GomokuGamePlugin::GomokuGamePlugin(QObject *parent) :
         QObject(parent),
         enabled_(false),
-        psiTab(NULL),
-        psiIcon(NULL),
-        psiAccInfo(NULL),
-        psiContactInfo(NULL),
-        psiSender(NULL),
-        psiEvent(NULL),
-        psiSound(NULL),
-        psiPopup(NULL)
+        psiTab(nullptr),
+        psiIcon(nullptr),
+        psiAccInfo(nullptr),
+        psiContactInfo(nullptr),
+        psiSender(nullptr),
+        psiEvent(nullptr),
+        psiSound(nullptr),
+        psiPopup(nullptr)
 {
-    Options::psiOptions = NULL;
+    Options::psiOptions = nullptr;
 }
 
 QString GomokuGamePlugin::name() const
@@ -248,7 +248,7 @@ void GomokuGamePlugin::testSound() {
 
 void GomokuGamePlugin::getSound() {
     QObject *sender_ = sender();
-    QLineEdit *le = 0;
+    QLineEdit *le = nullptr;
     if (sender_ == ui_.select_error) {
         le = ui_.le_error;
     } else if (sender_ == ui_.select_finish) {
@@ -260,7 +260,7 @@ void GomokuGamePlugin::getSound() {
     }
     if (!le)
         return;
-    QString file_name = QFileDialog::getOpenFileName(0, tr("Choose a sound file"), "", tr("Sound (*.wav)"));
+    QString file_name = QFileDialog::getOpenFileName(nullptr, tr("Choose a sound file"), "", tr("Sound (*.wav)"));
     if (file_name.isEmpty())
         return;
     le->setText(file_name);
@@ -328,7 +328,7 @@ QList<QVariantHash> GomokuGamePlugin::getButtonParam()
 
 QAction* GomokuGamePlugin::getAction(QObject* /*parent*/, int /*account*/, const QString& /*contact*/)
 {
-    return NULL;
+    return nullptr;
 }
 
 // --------------------- Activetab accessor ---------------------------
@@ -415,12 +415,12 @@ QList<QVariantHash> GomokuGamePlugin::getContactMenuParam()
 
 QAction* GomokuGamePlugin::getContactAction(QObject*, int, const QString&)
 {
-    return NULL;
+    return nullptr;
 }
 
 QAction* GomokuGamePlugin::getAccountAction(QObject*, int)
 {
-    return NULL;
+    return nullptr;
 }
 
 // --------------------- Popup accessor ---------------------------

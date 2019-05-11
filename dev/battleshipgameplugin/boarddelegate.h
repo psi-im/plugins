@@ -29,7 +29,7 @@ class BoardDelegate : public QItemDelegate
 {
     Q_OBJECT
 public:
-    BoardDelegate(BoardModel *model, QObject *parent = 0);
+    BoardDelegate(BoardModel *model, QObject *parent = nullptr);
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
 private:

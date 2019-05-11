@@ -152,7 +152,7 @@ bool JDModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int /*r
     if(!data->hasFormat(JDItem::mimeType()))
         return false;
 
-    JDItem *p = 0;
+    JDItem *p = nullptr;
     if(parent != rootIndex()) {
         foreach(const ProxyItem& i, items_) {
             if(i.index == parent) {
@@ -183,9 +183,9 @@ bool JDModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int /*r
 QMimeData* JDModel::mimeData(const QModelIndexList &indexes) const
 {
     if(indexes.isEmpty())
-        return 0;
+        return nullptr;
 
-    QMimeData *data = 0;
+    QMimeData *data = nullptr;
     QModelIndex i = indexes.first();
     foreach(const ProxyItem& item, items_) {
         if(item.index == i) {
@@ -338,7 +338,7 @@ JDItem* JDModel::findDirItem(const QString &path) const
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 QStringList JDModel::dirs(const QString &path) const

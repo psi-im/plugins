@@ -27,7 +27,7 @@ class GpgProcess : public QProcess
     Q_OBJECT
 
 public:
-    GpgProcess(QObject *parent = 0);
+    GpgProcess(QObject *parent = nullptr);
     inline void start(const QStringList &arguments, OpenMode mode = ReadWrite) { QProcess::start(_bin, arguments, mode); }
     inline void start(OpenMode mode = ReadWrite) { QProcess::start(_bin, mode); }
 

@@ -36,16 +36,16 @@
 BattleshipGamePlugin::BattleshipGamePlugin(QObject *parent) :
         QObject(parent),
         enabled_(false),
-        psiTab(NULL),
-        psiIcon(NULL),
-        psiAccInfo(NULL),
-        psiContactInfo(NULL),
-        psiSender(NULL),
-        psiEvent(NULL),
-        psiSound(NULL),
-        psiPopup(NULL)
+        psiTab(nullptr),
+        psiIcon(nullptr),
+        psiAccInfo(nullptr),
+        psiContactInfo(nullptr),
+        psiSender(nullptr),
+        psiEvent(nullptr),
+        psiSound(nullptr),
+        psiPopup(nullptr)
 {
-    Options::psiOptions = NULL;
+    Options::psiOptions = nullptr;
 }
 
 QString BattleshipGamePlugin::name() const
@@ -253,7 +253,7 @@ void BattleshipGamePlugin::testSound() {
 
 void BattleshipGamePlugin::getSound() {
     QObject *sender_ = sender();
-    QLineEdit *le = 0;
+    QLineEdit *le = nullptr;
     if (sender_ == ui_.select_error) {
         le = ui_.le_error;
     } else if (sender_ == ui_.select_finish) {
@@ -265,7 +265,7 @@ void BattleshipGamePlugin::getSound() {
     }
     if (!le)
         return;
-    QString file_name = QFileDialog::getOpenFileName(0, tr("Choose a sound file"), "", tr("Sound (*.wav)"));
+    QString file_name = QFileDialog::getOpenFileName(nullptr, tr("Choose a sound file"), "", tr("Sound (*.wav)"));
     if (file_name.isEmpty())
         return;
     le->setText(file_name);
@@ -335,7 +335,7 @@ QList<QVariantHash> BattleshipGamePlugin::getButtonParam()
 
 QAction* BattleshipGamePlugin::getAction(QObject* /*parent*/, int /*account*/, const QString& /*contact*/)
 {
-    return NULL;
+    return nullptr;
 }
 
 // --------------------- Activetab accessor ---------------------------
@@ -422,12 +422,12 @@ QList<QVariantHash> BattleshipGamePlugin::getContactMenuParam()
 
 QAction* BattleshipGamePlugin::getContactAction(QObject*, int, const QString&)
 {
-    return NULL;
+    return nullptr;
 }
 
 QAction* BattleshipGamePlugin::getAccountAction(QObject*, int)
 {
-    return NULL;
+    return nullptr;
 }
 
 // --------------------- Popup accessor ---------------------------

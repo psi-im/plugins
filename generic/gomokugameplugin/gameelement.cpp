@@ -47,11 +47,11 @@ GameElement::~GameElement()
     if (!GameElement::usesCnt) {
         if (GameElement::blackstonePixmap) {
             delete GameElement::blackstonePixmap;
-            GameElement::blackstonePixmap = NULL;
+            GameElement::blackstonePixmap = nullptr;
         }
         if (GameElement::whitestonePixmap) {
             delete GameElement::whitestonePixmap;
-            GameElement::whitestonePixmap = NULL;
+            GameElement::whitestonePixmap = nullptr;
         }
     }
 }
@@ -92,7 +92,7 @@ void GameElement::paint(QPainter *painter, const QRectF &rect) const
 
 int GameElement::usesCnt = 0;
 
-QPixmap *GameElement::blackstonePixmap = NULL;
+QPixmap *GameElement::blackstonePixmap = nullptr;
 
 QPixmap *GameElement::getBlackstonePixmap() const
 {
@@ -102,7 +102,7 @@ QPixmap *GameElement::getBlackstonePixmap() const
     return GameElement::blackstonePixmap;
 }
 
-QPixmap *GameElement::whitestonePixmap = NULL;
+QPixmap *GameElement::whitestonePixmap = nullptr;
 
 QPixmap *GameElement::getWhitestonePixmap() const
 {

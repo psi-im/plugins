@@ -87,7 +87,7 @@ void JabberDiskPlugin::restoreOptions()
 QWidget* JabberDiskPlugin::options()
 {
     if (!enabled) {
-        return 0;
+        return nullptr;
     }
     options_ = new QWidget();
     ui_.setupUi(options_);
@@ -207,7 +207,7 @@ QAction* JabberDiskPlugin::getContactAction(QObject *p, int acc, const QString &
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 QString JabberDiskPlugin::pluginInfo()

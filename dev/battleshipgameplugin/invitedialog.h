@@ -33,7 +33,7 @@ namespace Ui {
 class InviteDialog : public QDialog {
     Q_OBJECT
 public:
-    InviteDialog(const QString &jid, const QStringList &resources, QWidget *parent = 0);
+    InviteDialog(const QString &jid, const QStringList &resources, QWidget *parent = nullptr);
     ~InviteDialog();
 
 private:
@@ -57,7 +57,7 @@ class InvitationDialog : public QDialog
 {
     Q_OBJECT
 public:
-    InvitationDialog(const QString &jid, bool first, QWidget *parent = 0);
+    InvitationDialog(const QString &jid, bool first, QWidget *parent = nullptr);
 
 private:
     Ui::InvitationDialog ui_;

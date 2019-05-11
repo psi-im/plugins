@@ -30,7 +30,7 @@ using namespace GomokuGame;
 
 BoardView::BoardView(QWidget *parent) :
     QTableView(parent),
-    model_(NULL)
+    model_(nullptr)
 {
 }
 

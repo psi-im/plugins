@@ -49,7 +49,7 @@ GameSessions::~GameSessions()
     }
 }
 
-GameSessions *GameSessions::instance_ = NULL;
+GameSessions *GameSessions::instance_ = nullptr;
 
 GameSessions *GameSessions::instance()
 {
@@ -63,7 +63,7 @@ void GameSessions::reset()
 {
     if (instance_) {
         delete instance_;
-        instance_ = NULL;
+        instance_ = nullptr;
     }
 }
 
@@ -292,7 +292,7 @@ void GameSessions::startGame(const int sess_index)
     newId(true);
     GameSession *sess = &gameSessions[sess_index];
     if (sess->wnd.isNull()) {
-        PluginWindow *wnd = new PluginWindow(sess->full_jid, NULL);
+        PluginWindow *wnd = new PluginWindow(sess->full_jid, nullptr);
         connect(wnd, SIGNAL(changeGameSession(QString)), this, SLOT(setSessionStatus(QString)));
         connect(wnd, SIGNAL(closeBoard(bool, int, int, int, int)), this, SLOT(closeGameWindow(bool, int, int, int, int)));
         connect(wnd, SIGNAL(setElement(int, int)), this, SLOT(sendMove(int, int)));
@@ -745,7 +745,7 @@ bool GameSessions::regGameSession(const SessionStatus status, const int account,
     session.my_acc = account;
     session.full_jid = jid;
     session.last_iq_id = id;
-    session.wnd = NULL;
+    session.wnd = nullptr;
     session.element = element;
     gameSessions.push_back(session);
     return true;

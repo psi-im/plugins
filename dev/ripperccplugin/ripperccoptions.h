@@ -31,7 +31,7 @@ class RipperCCOptions : public QWidget
     Q_OBJECT
 
 public:
-    explicit RipperCCOptions(QWidget *parent = 0);
+    explicit RipperCCOptions(QWidget *parent = nullptr);
     ~RipperCCOptions();
 
     void update();

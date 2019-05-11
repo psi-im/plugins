@@ -90,11 +90,11 @@ public:
     virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
     virtual void setStanzaSendingHost(StanzaSendingHost *host);
     virtual QList < QVariantHash > getButtonParam();
-    virtual QAction* getAction(QObject* , int , const QString& ) { return 0; };
+    virtual QAction* getAction(QObject* , int , const QString& ) { return nullptr; };
     virtual QList < QVariantHash > getAccountMenuParam();
     virtual QList < QVariantHash > getContactMenuParam();
-    virtual QAction* getContactAction(QObject* , int , const QString& ) { return 0; };
-    virtual QAction* getAccountAction(QObject* , int ) { return 0; };
+    virtual QAction* getContactAction(QObject* , int , const QString& ) { return nullptr; };
+    virtual QAction* getAccountAction(QObject* , int ) { return nullptr; };
     virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
     virtual bool incomingStanza(int account, const QDomElement& xml);
     virtual bool outgoingStanza(int account, QDomElement& xml);
@@ -169,17 +169,17 @@ private:
 
 ChessPlugin::ChessPlugin()
     : enabled(false)
-    , psiOptions(0)
-    , accInfoHost(0)
-    , activeTab(0)
-    , icoHost(0)
-    , appInfo(0)
-    , stanzaSender(0)
-    , psiEvent(0)
-    , contactInfo(0)
-    , popup(0)
-    , sound_(0)
-    , board(0)
+    , psiOptions(nullptr)
+    , accInfoHost(nullptr)
+    , activeTab(nullptr)
+    , icoHost(nullptr)
+    , appInfo(nullptr)
+    , stanzaSender(nullptr)
+    , psiEvent(nullptr)
+    , contactInfo(nullptr)
+    , popup(nullptr)
+    , sound_(nullptr)
+    , board(nullptr)
     , game_(false)
     , theEnd_(false)
     , waitFor(false)
@@ -237,7 +237,7 @@ bool ChessPlugin::enable() {
 bool ChessPlugin::disable() {
     if(board) {
         delete (board);
-        board = 0;
+        board = nullptr;
         game_ = false;
     }
 
@@ -249,7 +249,7 @@ bool ChessPlugin::disable() {
 
 QWidget* ChessPlugin::options() {
     if(!enabled)
-        return 0;
+        return nullptr;
 
     QWidget *options = new QWidget;
     ui_.setupUi(options);
@@ -507,7 +507,7 @@ void ChessPlugin::boardClosed() {
 // Окончание игры
 void ChessPlugin::stopGame() {
     delete (board);
-    board = 0;
+    board = nullptr;
     game_ = false;
     theEnd_ = false;
 }
@@ -761,7 +761,7 @@ void ChessPlugin::doInviteDialog(const QString& jid) {
     Request rec = requests.takeAt(index);
 
     if(game_) {
-        QMessageBox::information(0, tr("Chess Plugin"), tr("You are already playing!"));
+        QMessageBox::information(nullptr, tr("Chess Plugin"), tr("You are already playing!"));
         stanzaSender->sendStanza(rec.account,
                                  QString("<iq type=\"error\" to=\"%1\" id=\"%2\"></iq>")
                                  .arg(rec.jid)
@@ -805,7 +805,7 @@ void ChessPlugin::testSound() {
 }
 
 void ChessPlugin::getSound() {
-    QLineEdit *le = 0;
+    QLineEdit *le = nullptr;
     if(ui_.select_error->isDown())
         le = ui_.le_error;
     if(ui_.select_finish->isDown())
@@ -817,7 +817,7 @@ void ChessPlugin::getSound() {
 
     if(!le) return;
 
-    QString fileName = QFileDialog::getOpenFileName(0,tr("Choose a sound file"),"", tr("Sound (*.wav)"));
+    QString fileName = QFileDialog::getOpenFileName(nullptr,tr("Choose a sound file"),"", tr("Sound (*.wav)"));
     if(fileName.isEmpty())
         return;
     le->setText(fileName);

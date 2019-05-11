@@ -97,7 +97,7 @@ public:
     QList < QVariantHash > getAccountMenuParam();
     QList < QVariantHash > getContactMenuParam();
     virtual QAction* getContactAction(QObject* , int , const QString& );
-    virtual QAction* getAccountAction(QObject* , int ) { return 0; }
+    virtual QAction* getAccountAction(QObject* , int ) { return nullptr; }
     virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
     virtual QString pluginInfo();
     virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
@@ -156,18 +156,18 @@ private slots:
 };
 
 Watcher::Watcher()
-    : psiOptions(0)
-    , popup(0)
-    , icoHost(0)
-    , appInfoHost(0)
-    , activeTab(0)
-    , contactInfo(0)
-    , accInfo(0)
-    , sound_(0)
+    : psiOptions(nullptr)
+    , popup(nullptr)
+    , icoHost(nullptr)
+    , appInfoHost(nullptr)
+    , activeTab(nullptr)
+    , contactInfo(nullptr)
+    , accInfo(nullptr)
+    , sound_(nullptr)
     , enabled(false)
     , soundFile("sound/watcher.wav")
 //, Interval(2)
-    , model_(0)
+    , model_(nullptr)
     , isSndEnable(false)
     , disableSnd(true)
     , disablePopupDnd(true)
@@ -244,7 +244,7 @@ bool Watcher::enable() {
 
 bool Watcher::disable() {
     delete model_;
-    model_ = 0;
+    model_ = nullptr;
 
     qDeleteAll(items_);
     foreach (QAction* action, actions_) {
@@ -261,7 +261,7 @@ bool Watcher::disable() {
 
 QWidget* Watcher::options() {
     if (!enabled) {
-        return 0;
+        return nullptr;
     }
     optionsWid = new QWidget();
     connect(optionsWid, SIGNAL(destroyed()), this, SLOT(onOptionsClose()));
@@ -546,7 +546,7 @@ QAction* Watcher::createAction(QObject *parent, const QString &contact)
 QAction* Watcher::getAction(QObject *parent, int /*account*/, const QString &contact)
 {
     if (!enabled) {
-        return 0;
+        return nullptr;
     }
 
     if (!actions_.contains(contact)) {
@@ -589,7 +589,7 @@ void Watcher::playSound(const QString& f) {
 
 void Watcher::getSound(QModelIndex index) {
     if(ui_.tb_open->isDown()) {
-        QString fileName = QFileDialog::getOpenFileName(0,tr("Choose a sound file"),
+        QString fileName = QFileDialog::getOpenFileName(nullptr,tr("Choose a sound file"),
                                                         psiOptions->getPluginOption(constLastFile, QVariant("")).toString(),
                                                         tr("Sound (*.wav)"));
         if(fileName.isEmpty()) return;
@@ -597,7 +597,7 @@ void Watcher::getSound(QModelIndex index) {
         psiOptions->setPluginOption(constLastFile, QVariant(fi.absolutePath()));
         ui_.le_sound->setText(fileName);
     } else {
-        QString fileName = QFileDialog::getOpenFileName(0,tr("Choose a sound file"),
+        QString fileName = QFileDialog::getOpenFileName(nullptr,tr("Choose a sound file"),
                                                         psiOptions->getPluginOption(constLastFile, QVariant("")).toString(),
                                                         tr("Sound (*.wav)"));
         if(fileName.isEmpty()) return;
@@ -651,7 +651,7 @@ QList < QVariantHash > Watcher::getContactMenuParam() {
 
 QAction* Watcher::getContactAction(QObject *p, int /*account*/, const QString &jid) {
     if (!enabled || !showInContext_) {
-        return 0;
+        return nullptr;
     }
 
     return createAction(p, jid);

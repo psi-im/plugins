@@ -22,7 +22,7 @@
 
 PluginWindow::PluginWindow(const QString &jid, QWidget *parent)
     : QMainWindow(parent)
-    , gm_(NULL)
+    , gm_(nullptr)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     ui.setupUi(this);

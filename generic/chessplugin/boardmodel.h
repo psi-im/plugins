@@ -32,7 +32,7 @@ class BoardModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
-        BoardModel(Figure::GameType type, QObject *parent = 0);
+        BoardModel(Figure::GameType type, QObject *parent = nullptr);
         ~BoardModel() {};
         virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
         virtual QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;

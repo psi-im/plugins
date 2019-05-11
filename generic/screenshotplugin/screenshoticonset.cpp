@@ -21,7 +21,7 @@
 
 #include "iconfactoryaccessinghost.h"
 
-ScreenshotIconset* ScreenshotIconset::instance_ = 0;
+ScreenshotIconset* ScreenshotIconset::instance_ = nullptr;
 
 ScreenshotIconset* ScreenshotIconset::instance()
 {
@@ -33,8 +33,8 @@ ScreenshotIconset* ScreenshotIconset::instance()
 }
 
 ScreenshotIconset::ScreenshotIconset()
-    : QObject(0)
-    , icoHost(0)
+    : QObject(nullptr)
+    , icoHost(nullptr)
 {
 }
 
@@ -45,7 +45,7 @@ ScreenshotIconset::~ScreenshotIconset()
 void ScreenshotIconset::reset()
 {
     delete instance_;
-    instance_ = 0;
+    instance_ = nullptr;
 }
 
 QIcon ScreenshotIconset::getIcon(const QString& name)

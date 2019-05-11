@@ -32,7 +32,7 @@ class ClearingViewer : public QTableView
     Q_OBJECT
 
 public:
-        ClearingViewer(QWidget *parent = 0) : QTableView(parent) {};
+        ClearingViewer(QWidget *parent = nullptr) : QTableView(parent) {};
     // virtual ~ClearingViewer() {};
         void init(IconFactoryAccessingHost *iconHost);
 

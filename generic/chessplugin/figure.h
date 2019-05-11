@@ -48,7 +48,7 @@ public:
                 Black_Knight = 12
     };
 
-    Figure(GameType game = NoGame, FigureType type = Figure::None, int x = 0, int y = 0, QObject *parent = 0);
+    Figure(GameType game = NoGame, FigureType type = Figure::None, int x = 0, int y = 0, QObject *parent = nullptr);
     QPixmap getPixmap() const;
     void setPosition(int x, int y);
     void setType(FigureType type);

@@ -73,7 +73,7 @@ RipperCC::~RipperCC()
 QWidget *RipperCC::options()
 {
     if (!_enabled) {
-        return 0;
+        return nullptr;
     }
 
     _optionsForm = new RipperCCOptions();
@@ -110,7 +110,7 @@ bool RipperCC::disable()
     _timer->stop();
     _enabled = false;
     _nam->deleteLater();
-    _nam = 0;
+    _nam = nullptr;
     return true;
 }
 

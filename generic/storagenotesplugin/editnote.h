@@ -28,7 +28,7 @@ class EditNote : public QDialog
 {
         Q_OBJECT
 public:
-    EditNote( QWidget *parent = 0, const QString& tags = "", const QString& title = "", const QString& text = "", const QModelIndex& index = QModelIndex());
+    EditNote( QWidget *parent = nullptr, const QString& tags = "", const QString& title = "", const QString& text = "", const QModelIndex& index = QModelIndex());
         ~EditNote();
 
 private:

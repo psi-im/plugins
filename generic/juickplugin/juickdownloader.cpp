@@ -37,7 +37,7 @@ static void save(const QString &path, const QByteArray &img)
         file.write(img);
     }
     else
-        QMessageBox::warning(0, QObject::tr("Warning"), QObject::tr("Cannot write to file %1:\n%2.")
+        QMessageBox::warning(nullptr, QObject::tr("Warning"), QObject::tr("Cannot write to file %1:\n%2.")
                      .arg(file.fileName())
                      .arg(file.errorString()));
 }

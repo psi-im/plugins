@@ -32,7 +32,7 @@ namespace psiotr
 {
 
 Fingerprint::Fingerprint()
-    : fingerprint(NULL)
+    : fingerprint(nullptr)
 {
 
 }

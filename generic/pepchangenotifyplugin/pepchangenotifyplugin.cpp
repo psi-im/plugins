@@ -141,13 +141,13 @@ private slots:
 
 PepPlugin::PepPlugin()
     : enabled(false)
-    , psiOptions(0)
-    , accInfoHost(0)
-    , popup(0)
-    , appInfo(0)
-    , contactInfo(0)
-    , iconHost(0)
-    , sound_(0)
+    , psiOptions(nullptr)
+    , accInfoHost(nullptr)
+    , popup(nullptr)
+    , appInfo(nullptr)
+    , contactInfo(nullptr)
+    , iconHost(nullptr)
+    , sound_(nullptr)
     , soundFile("sound/pepnotify.wav")
     //, interval(5)
     , delay(60)
@@ -209,7 +209,7 @@ bool PepPlugin::disable()
 QWidget* PepPlugin::options()
 {
     if(!enabled)
-        return 0;
+        return nullptr;
 
     options_ = new QWidget();
     ui_.setupUi(options_);
@@ -456,7 +456,7 @@ void PepPlugin::playSound(const QString& f)
 
 void PepPlugin::getSound()
 {
-    QString fileName = QFileDialog::getOpenFileName(0,tr("Choose a sound file"),"", tr("Sound (*.wav)"));
+    QString fileName = QFileDialog::getOpenFileName(nullptr,tr("Choose a sound file"),"", tr("Sound (*.wav)"));
     if(fileName.isEmpty())
         return;
     ui_.le_sound->setText(fileName);

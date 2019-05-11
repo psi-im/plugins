@@ -28,7 +28,7 @@ class BoardView : public QTableView
     Q_OBJECT
 
 public:
-        BoardView(QWidget *parent = 0);
+        BoardView(QWidget *parent = nullptr);
 
 protected:
         virtual void mousePressEvent(QMouseEvent *e);

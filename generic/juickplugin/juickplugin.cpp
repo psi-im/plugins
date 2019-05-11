@@ -209,7 +209,7 @@ bool JuickPlugin::disable()
 
     downloader_->disconnect();
     downloader_->deleteLater();
-    downloader_ = 0;
+    downloader_ = nullptr;
 
     return true;
 }
@@ -220,7 +220,7 @@ void JuickPlugin::createAvatarsDir()
     dir.mkpath("juick/photos");
     if (!dir.exists("juick/photos"))
     {
-        QMessageBox::warning(0, tr("Warning"),tr("can't create folder %1 \ncaching avatars will be not available")
+        QMessageBox::warning(nullptr, tr("Warning"),tr("can't create folder %1 \ncaching avatars will be not available")
                      .arg(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)+"/avatars/juick"));
     }
 }

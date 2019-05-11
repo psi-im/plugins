@@ -30,7 +30,7 @@ class AddKeyDlg : public QDialog
     Q_OBJECT
 
 public:
-    explicit AddKeyDlg(QWidget *parent = 0);
+    explicit AddKeyDlg(QWidget *parent = nullptr);
     ~AddKeyDlg();
 
     QString name() const;

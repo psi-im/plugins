@@ -45,7 +45,7 @@ class Previewer : public QDialog
 {
     Q_OBJECT
     public:
-        Previewer(Skin *skin, QWidget *parent = 0);
+        Previewer(Skin *skin, QWidget *parent = nullptr);
         bool loadSkinInformation();
 
     private:        
@@ -61,7 +61,7 @@ class GetSkinName : public QDialog
 {
     Q_OBJECT
     public:
-        GetSkinName(QString name, QString author, QString version, QWidget *parent = 0);
+        GetSkinName(QString name, QString author, QString version, QWidget *parent = nullptr);
 
     private slots:
         void okPressed();

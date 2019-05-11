@@ -37,7 +37,7 @@ class Form : public QWidget
 {
     Q_OBJECT
 public:
-    Form(QWidget *parent = 0);
+    Form(QWidget *parent = nullptr);
     ~Form();
 
     void setDataDir(const QString &path);

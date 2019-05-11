@@ -198,7 +198,7 @@ QString Reminder::bdaysDir() const {
 
 QWidget* Reminder::options() {
     if(!enabled)
-        return 0;
+        return nullptr;
 
     options_ = new QWidget();
     ui_.setupUi(options_);
@@ -494,7 +494,7 @@ void Reminder::playSound(const QString& f) {
 }
 
 void Reminder::getSound() {
-    QString fileName = QFileDialog::getOpenFileName(0,tr("Choose a sound file"),"", tr("Sound (*.wav)"));
+    QString fileName = QFileDialog::getOpenFileName(nullptr,tr("Choose a sound file"),"", tr("Sound (*.wav)"));
     if(fileName.isEmpty())
         return;
     ui_.le_sound->setText(fileName);

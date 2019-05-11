@@ -37,7 +37,7 @@ class BoardModel : public QAbstractTableModel
 {
 Q_OBJECT
 public:
-    explicit BoardModel(QObject *parent = 0);
+    explicit BoardModel(QObject *parent = nullptr);
     ~BoardModel();
     void init(GameModel *gameModel);
     virtual Qt::ItemFlags flags(const QModelIndex & index) const;

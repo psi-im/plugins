@@ -108,7 +108,7 @@ bool CDItemModel::setData(const QModelIndex &index, const QVariant &value, int r
 Qt::ItemFlags CDItemModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid()) {
-        return 0;
+        return nullptr;
     }
 
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
@@ -183,7 +183,7 @@ void CDItemModel::addRecord(QString group, QString name, QString url, QString ht
     QStringList subGroups = group.split("/");
     
     while(!subGroups.isEmpty()) {
-        ContentItem *newParent = NULL;
+        ContentItem *newParent = nullptr;
         for(int i = parent->childCount() - 1; i >= 0; i--) {
             if(parent->child(i)->name() == subGroups.first()) {
                 newParent = parent->child(i);
@@ -191,7 +191,7 @@ void CDItemModel::addRecord(QString group, QString name, QString url, QString ht
             }
         }
         
-        if(newParent == NULL) {
+        if(newParent == nullptr) {
             newParent = new ContentItem(subGroups.first(), parent);
             parent->appendChild(newParent);
         }

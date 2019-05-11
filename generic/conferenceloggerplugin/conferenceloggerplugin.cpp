@@ -75,7 +75,7 @@ class ConferenceLogger: public QObject, public PsiPlugin, public StanzaFilter, p
     virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
     virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
     virtual QList < QVariantHash > getGCButtonParam();
-    virtual QAction* getGCAction(QObject* , int , const QString& ) { return 0; }
+    virtual QAction* getGCAction(QObject* , int , const QString& ) { return nullptr; }
     virtual QString pluginInfo();
     virtual QPixmap icon() const;
 
@@ -144,7 +144,7 @@ bool ConferenceLogger::disable() {
 
 QWidget* ConferenceLogger::options() {
     if(!enabled) {
-        return 0;
+        return nullptr;
     }
     QWidget *options = new QWidget();
     QVBoxLayout *layout = new QVBoxLayout(options);
@@ -242,7 +242,7 @@ void ConferenceLogger::Logger(QString room, const QString &from, const QString &
 }
 
 void ConferenceLogger::applyOptions() {
-    if (FilesBox == 0)    return;
+    if (FilesBox == nullptr)    return;
 
     QVariant vlastItem(FilesBox->currentText());
     lastItem = vlastItem.toString();

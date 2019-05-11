@@ -52,7 +52,7 @@ namespace QJsonWrapper
      * @param ok Set to true if the conversion was successful, otherwise false.
      * @return After a successful conversion the parsed data either as QVariantMap or QVariantList.
      */
-    QVariant parseJson( const QByteArray& jsonData, bool* ok = 0 );
+    QVariant parseJson( const QByteArray& jsonData, bool* ok = nullptr );
 
     /**
      * Convert a QVariant to a JSON representation.
@@ -67,7 +67,7 @@ namespace QJsonWrapper
      * @param ok Set to true if the conversion was successful, otherwise false.
      * @return After a successful serialisation the data of the QVariant represented as JSON.
      */
-    QByteArray toJson( const QVariant &variant, bool* ok = 0 );
+    QByteArray toJson( const QVariant &variant, bool* ok = nullptr );
 }
 
 #endif // QJSONWRAPPER_JSON_H

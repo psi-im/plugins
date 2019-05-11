@@ -29,7 +29,7 @@ class EditServerDlg : public QDialog
 {
     Q_OBJECT
 public:
-    EditServerDlg(QWidget *parent = 0);
+    EditServerDlg(QWidget *parent = nullptr);
     void setServer(Server *const s);
 
 signals:

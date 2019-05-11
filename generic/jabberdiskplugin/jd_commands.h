@@ -31,7 +31,7 @@ class JDCommands : public QObject
 {
     Q_OBJECT
 public:
-    JDCommands(int account = -1, const QString& jid = QString(), QObject* p = 0);
+    JDCommands(int account = -1, const QString& jid = QString(), QObject* p = nullptr);
     virtual ~JDCommands();
 
     enum Command {

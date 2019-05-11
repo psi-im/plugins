@@ -52,7 +52,7 @@ public:
     AuthenticationDialog(OtrMessaging* otrc,
                          const QString& account, const QString& contact,
                          const QString& question, bool sender,
-                         QWidget* parent = 0);
+                         QWidget* parent = nullptr);
     ~AuthenticationDialog();
 
     void reset();

@@ -29,7 +29,7 @@ class GameShip : public QObject
     Q_OBJECT
 public:
     enum ShipType { ShipDirUnknown, ShipHorizontal, ShipVertical };
-    GameShip(int len, const QString &digest = QString(), QObject *parent = 0);
+    GameShip(int len, const QString &digest = QString(), QObject *parent = nullptr);
     int length() const { return length_; }
     int position() const { return firstPos_; }
     ShipType direction() const { return direction_; }
@@ -67,7 +67,7 @@ public:
         QString    seed;
         GameCell(CellStatus s) : status(s), ship(-1) {}
     };
-    GameBoard(QObject *parent = 0);
+    GameBoard(QObject *parent = nullptr);
     void init(CellStatus s, bool genseed);
     void makeShipRandomPosition();
     void calculateCellsHash();
@@ -108,7 +108,7 @@ public:
         StatusMyTurn, StatusWaitingTurnAccept, StatusWaitingOpponent,
         StatusWin, StatusLose, StatusDraw
     };
-    GameModel(QObject *parent = 0);
+    GameModel(QObject *parent = nullptr);
     void init();
     GameStatus status() const { return status_; }
     void setStatus(GameStatus s);

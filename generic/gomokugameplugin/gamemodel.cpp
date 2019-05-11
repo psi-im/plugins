@@ -215,7 +215,7 @@ const GameElement *GameModel::getElement(int x, int y) const
 {
     const int idx =  getElementIndex(x, y);
     if (idx == -1)
-        return NULL;
+        return nullptr;
     return elementsList.at(idx);
 
 }
@@ -510,7 +510,7 @@ bool GameModel::checkForDraw()
 QString GameModel::toString() const
 {
     QString res_str = "gomokugameplugin.save.1;\n";
-    GameElement *lastEl = NULL;
+    GameElement *lastEl = nullptr;
     if (!elementsList.isEmpty())
         lastEl = elementsList.last();
     foreach (GameElement *el, elementsList) {

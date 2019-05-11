@@ -71,9 +71,9 @@ public:
     virtual void applyOptions() {}
     virtual void restoreOptions() {}
     virtual QList < QVariantHash > getButtonParam();
-    virtual QAction* getAction(QObject* , int , const QString& ) { return 0; }
+    virtual QAction* getAction(QObject* , int , const QString& ) { return nullptr; }
     virtual QList < QVariantHash > getGCButtonParam();
-    virtual QAction* getGCAction(QObject* , int , const QString& ) { return 0; }
+    virtual QAction* getGCAction(QObject* , int , const QString& ) { return nullptr; }
     virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
     virtual void setStanzaSendingHost(StanzaSendingHost *host);
     virtual void setActiveTabAccessingHost(ActiveTabAccessingHost* host);
@@ -99,12 +99,12 @@ private:
 };
 
 ImagePlugin::ImagePlugin()
-    : iconHost(0)
-    , stanzaSender(0)
-    , activeTab(0)
-    , accInfo(0)
-    , psiController(0)
-    , psiOptions(0)
+    : iconHost(nullptr)
+    , stanzaSender(nullptr)
+    , activeTab(nullptr)
+    , accInfo(nullptr)
+    , psiController(nullptr)
+    , psiOptions(nullptr)
     , enabled(false)
 {
 }
@@ -146,7 +146,7 @@ bool ImagePlugin::disable()
 QWidget* ImagePlugin::options()
 {
     if (!enabled) {
-        return 0;
+        return nullptr;
     }
     QWidget *optionsWid = new QWidget();
     QVBoxLayout *vbox= new QVBoxLayout(optionsWid);
@@ -244,7 +244,7 @@ void ImagePlugin::actionActivated()
     }
     else {
         const QString lastPath = psiOptions->getPluginOption(CONST_LAST_FOLDER, QDir::homePath()).toString();
-        fileName = QFileDialog::getOpenFileName(0, tr("Open Image"), lastPath, tr("Images (*.png *.gif *.jpg *.jpeg *.ico)"));
+        fileName = QFileDialog::getOpenFileName(nullptr, tr("Open Image"), lastPath, tr("Images (*.png *.gif *.jpg *.jpeg *.ico)"));
         if (fileName.isEmpty())
             return;
 
@@ -270,7 +270,7 @@ void ImagePlugin::actionActivated()
     QString imageBase64(image.toBase64());
     int length = image.length();
     if(length > 61440) {
-        QMessageBox::information(0, tr("The image size is too large."),
+        QMessageBox::information(nullptr, tr("The image size is too large."),
                                  tr("Image size must be less than 60 kb"));
     }
     QString mType = QLatin1String(sender()->parent()->metaObject()->className()) == "PsiChatDlg"? "chat" : "groupchat";

@@ -35,7 +35,7 @@ class ProxySettingsDlg : public QDialog
 {
     Q_OBJECT
 public:
-    ProxySettingsDlg(QWidget *parent = 0);
+    ProxySettingsDlg(QWidget *parent = nullptr);
     ~ProxySettingsDlg();
 
     void setProxySettings(const Proxy& p);

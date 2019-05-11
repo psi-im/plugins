@@ -74,7 +74,7 @@ public:
     virtual QList < QVariantHash > getAccountMenuParam();
     virtual QList < QVariantHash > getContactMenuParam();
     virtual QAction* getContactAction(QObject* , int , const QString& );
-    virtual QAction* getAccountAction(QObject* , int ) { return 0; };
+    virtual QAction* getAccountAction(QObject* , int ) { return nullptr; };
     virtual QString pluginInfo();
     virtual QPixmap icon() const;
 

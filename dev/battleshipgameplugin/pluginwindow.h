@@ -28,7 +28,7 @@ class PluginWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    PluginWindow(const QString &jid, QWidget *parent = 0);
+    PluginWindow(const QString &jid, QWidget *parent = nullptr);
     void initBoard();
     void setError();
     QStringList dataExchange(const QStringList &data);

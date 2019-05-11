@@ -27,8 +27,8 @@ const QString splitStr = "&split&";
 class WatchedItem : public QListWidgetItem
 {
 public:
-    WatchedItem(QListWidget *parent = 0);
-    WatchedItem(const QString& jid, const QString& text = QString(), const QString& sFile = QString(), bool aUse = false, QListWidget *parent = 0);
+    WatchedItem(QListWidget *parent = nullptr);
+    WatchedItem(const QString& jid, const QString& text = QString(), const QString& sFile = QString(), bool aUse = false, QListWidget *parent = nullptr);
     QString settingsString() const;
     void setSettings(const QString& settings);
     void setJid(const QString& jid) { jid_ = jid; };

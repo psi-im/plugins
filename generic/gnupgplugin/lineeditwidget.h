@@ -14,7 +14,7 @@ class LineEditWidget : public QLineEdit
     Q_PROPERTY(int optimalLength READ optimalLenth WRITE setOptimalLength)
     Q_PROPERTY(QString rxValidator READ rxValidator WRITE setRxValidator)
 public:
-    explicit LineEditWidget(QWidget *parent = 0);
+    explicit LineEditWidget(QWidget *parent = nullptr);
     ~LineEditWidget();
 
     // reimplemented

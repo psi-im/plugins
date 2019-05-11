@@ -66,7 +66,7 @@ private:
 
 QipXStatuses::QipXStatuses() {
     enabled = false;
-    contactState = 0;
+    contactState = nullptr;
     }
 
 QString QipXStatuses::name() const {
@@ -93,7 +93,7 @@ bool QipXStatuses::disable() {
 
 QWidget* QipXStatuses::options() {
     if(!enabled)
-        return 0;
+        return nullptr;
 
     QWidget *options = new QWidget;
     QVBoxLayout *layout = new QVBoxLayout(options);

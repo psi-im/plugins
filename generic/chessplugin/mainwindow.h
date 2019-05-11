@@ -35,7 +35,7 @@ class ChessWindow : public QMainWindow
     Q_OBJECT
 
 public:
-        ChessWindow(Figure::GameType type, bool enableSound_, QWidget *parent = 0);
+        ChessWindow(Figure::GameType type, bool enableSound_, QWidget *parent = nullptr);
     void moveRequest(int oldX, int oldY, int newX, int newY, const QString& figure = "");
     void loadRequest(const QString& settings);
         void youWin();
@@ -79,7 +79,7 @@ class SelectFigure : public QWidget
 {
     Q_OBJECT
 public:
-    SelectFigure(const QString& player, QWidget *parent = 0);
+    SelectFigure(const QString& player, QWidget *parent = nullptr);
 
 private slots:
         void figureSelected();

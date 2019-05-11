@@ -27,7 +27,7 @@ class Viewer : public QTableView
     Q_OBJECT
 
 public:
-    Viewer(QWidget *parent = 0) : QTableView(parent) {}
+    Viewer(QWidget *parent = nullptr) : QTableView(parent) {}
         void init();
 
 private slots:

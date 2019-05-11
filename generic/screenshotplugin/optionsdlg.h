@@ -26,7 +26,7 @@ class OptionsDlg : public QDialog
 {
     Q_OBJECT
 public:
-    OptionsDlg(QWidget* p = 0);
+    OptionsDlg(QWidget* p = nullptr);
 
 public slots:
     void accept();

@@ -31,7 +31,7 @@ class InviteDialog : public QDialog
 {
     Q_OBJECT
 public:
-    InviteDialog(const Request& r, const QStringList& resources, QWidget *parent = 0);
+    InviteDialog(const Request& r, const QStringList& resources, QWidget *parent = nullptr);
 
 private:
     Ui::InviteDialog ui_;
@@ -49,7 +49,7 @@ class InvitationDialog : public QDialog
 {
     Q_OBJECT
 public:
-    InvitationDialog(const QString& jid, QString color, QWidget *parent = 0);
+    InvitationDialog(const QString& jid, QString color, QWidget *parent = nullptr);
 
 private:
     Ui::InvitationDialog ui_;

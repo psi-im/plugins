@@ -105,16 +105,16 @@ QString htmlToPlain(const QString& html)
 
 PsiOtrPlugin::PsiOtrPlugin()
     : m_enabled(false),
-      m_otrConnection(NULL),
+      m_otrConnection(nullptr),
       m_onlineUsers(),
-      m_optionHost(NULL),
-      m_senderHost(NULL),
-      m_applicationInfo(NULL),
-      m_accountHost(NULL),
-      m_accountInfo(NULL),
-      m_contactInfo(NULL),
-      m_iconHost(NULL),
-      m_psiEvent(NULL),
+      m_optionHost(nullptr),
+      m_senderHost(nullptr),
+      m_applicationInfo(nullptr),
+      m_accountHost(nullptr),
+      m_accountInfo(nullptr),
+      m_contactInfo(nullptr),
+      m_iconHost(nullptr),
+      m_psiEvent(nullptr),
       m_messageBoxList()
 {
 }
@@ -152,7 +152,7 @@ QWidget* PsiOtrPlugin::options()
 {
     if (!m_enabled)
     {
-        return 0;
+        return nullptr;
     }
     else
     {
@@ -616,7 +616,7 @@ QAction* PsiOtrPlugin::getAction(QObject* parent, int accountIndex,
 {
     if (!m_enabled)
     {
-        return 0;
+        return nullptr;
     }
 
     QString contact = getCorrectJid(accountIndex, contactJid);
@@ -686,7 +686,7 @@ void PsiOtrPlugin::notifyUser(const QString& account, const QString& contact,
     }
 
     QMessageBox *messageBox = new QMessageBox(messageBoxIcon, tr("Psi OTR"), message,
-                                              QMessageBox::Ok, NULL,
+                                              QMessageBox::Ok, nullptr,
                                               Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     m_messageBoxList.enqueue(messageBox);
 

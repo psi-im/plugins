@@ -33,7 +33,7 @@ BoardModel::BoardModel(QObject *parent) :
     selectY(-1),
     columnCount_(0),
     rowCount_(0),
-    gameModel(NULL)
+    gameModel(nullptr)
 {
 }
 

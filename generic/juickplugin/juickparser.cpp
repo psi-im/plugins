@@ -206,7 +206,7 @@ JuickParser::JuickParser(QDomElement *elem)
 void JuickParser::reset()
 {
     delete d;
-    d = 0;
+    d = nullptr;
 }
 
 bool JuickParser::hasJuckNamespace() const
@@ -291,4 +291,4 @@ QDomElement JuickParser::findElement(const QString &tagName, const QString &xmln
     return QDomElement();
 }
 
-JuickParser::Private* JuickParser::d = 0;
+JuickParser::Private* JuickParser::d = nullptr;

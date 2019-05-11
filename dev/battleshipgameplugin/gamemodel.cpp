@@ -610,7 +610,7 @@ GameShip *GameBoard::findShip(int length, const QString &digest)
     foreach (GameShip *ship, ships_)
         if (ship->length() == length && ship->digest() == digest)
             return ship;
-    return NULL;
+    return nullptr;
 }
 
 bool GameBoard::isShipPositionLegal(int shipNum)

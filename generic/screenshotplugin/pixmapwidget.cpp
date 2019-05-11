@@ -148,7 +148,7 @@ SelectionRect::CornerType SelectionRect::cornerUnderMouse(const QPoint& pos) con
 //--------------------------------------------
 PixmapWidget::PixmapWidget(QWidget *parent)
     : QWidget(parent)
-    , bar_(0)
+    , bar_(nullptr)
     , type_(ToolBar::ButtonNoButton)
     , p1(QPoint(-1, -1))
     , p2(QPoint(-1, -1))
@@ -578,7 +578,7 @@ void PixmapWidget::selectColor()
 
 void PixmapWidget::selectFont()
 {
-    bool *ok = 0;
+    bool *ok = nullptr;
     font_ = QFontDialog::getFont(ok, font_, this);
     settingsChanged(constFont, QVariant(font_.toString()));
 }

@@ -32,7 +32,7 @@ class Notes : public QDialog
 {
         Q_OBJECT
 public:
-    Notes(StorageNotesPlugin *storageNotes, int acc, QWidget *parent = 0);
+    Notes(StorageNotesPlugin *storageNotes, int acc, QWidget *parent = nullptr);
     ~Notes();
     void incomingNotes(const QList<QDomElement>& notes);
     void error();

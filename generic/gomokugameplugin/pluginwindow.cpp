@@ -39,7 +39,7 @@ const QString fileFilter = "Gomoku save files (*.gmk)";
 
 HintElementWidget::HintElementWidget(QWidget *parent) :
     QFrame(parent),
-    hintElement(NULL)
+    hintElement(nullptr)
 {
 }
 
@@ -72,8 +72,8 @@ void HintElementWidget::paintEvent(QPaintEvent *event)
 PluginWindow::PluginWindow(const QString &full_jid, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::PluginWindow),
-    bmodel(NULL),
-    delegate(NULL),
+    bmodel(nullptr),
+    delegate(nullptr),
     gameActive(false)
 {
     ui->setupUi(this);
@@ -95,7 +95,7 @@ void PluginWindow::init(const QString &element)
         elemType = GameElement::TypeBlack;
     }
     // Инициируем модель доски
-    if (bmodel == NULL) {
+    if (bmodel == nullptr) {
         bmodel = new BoardModel(this);
         connect(bmodel, SIGNAL(changeGameStatus(GameModel::GameStatus)), this, SLOT(changeGameStatus(GameModel::GameStatus)));
         connect(bmodel, SIGNAL(setupElement(int, int)), this, SLOT(setupElement(int, int)));
@@ -107,7 +107,7 @@ void PluginWindow::init(const QString &element)
     bmodel->init(new GameModel(elemType, 15, 15)); // GameModel убивается при уничтожении BoardModel
     ui->board->setModel(bmodel);
     // Создаем делегат
-    if (delegate == NULL) {
+    if (delegate == nullptr) {
         delegate = new BoardDelegate(bmodel, ui->board); // Прописан родитель
     }
     // Инициируем BoardView

@@ -34,7 +34,7 @@ class BoardView : public QTableView
 {
 Q_OBJECT
 public:
-    explicit BoardView(QWidget *parent = 0);
+    explicit BoardView(QWidget *parent = nullptr);
     void setModel(QAbstractItemModel * model);
 
 private:

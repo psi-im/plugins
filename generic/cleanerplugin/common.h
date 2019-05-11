@@ -31,7 +31,7 @@ class vCardView : public QDialog
     Q_OBJECT
 
 public:
-    vCardView(const QString& filename, QWidget *parent = 0);
+    vCardView(const QString& filename, QWidget *parent = nullptr);
 
 };
 
@@ -42,7 +42,7 @@ class HistoryView : public QDialog
     Q_OBJECT
 
 public:
-    HistoryView(const QString& file, QWidget *parent = 0);
+    HistoryView(const QString& file, QWidget *parent = nullptr);
 
 };
 
@@ -54,7 +54,7 @@ class ClearingTab : public QWidget, public Ui::ClearingTab
     Q_OBJECT
 
 public:
-    ClearingTab(QWidget * parent = 0) : QWidget(parent) { setupUi(this); };
+    ClearingTab(QWidget * parent = nullptr) : QWidget(parent) { setupUi(this); };
 };
 
 
@@ -64,7 +64,7 @@ class AvatarView : public QDialog
     Q_OBJECT
 
 public:
-        AvatarView(const QPixmap &pix, QWidget *parent = 0);
+        AvatarView(const QPixmap &pix, QWidget *parent = nullptr);
     void setIcon(const QIcon&);
 
 private:

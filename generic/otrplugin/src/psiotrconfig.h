@@ -61,7 +61,7 @@ Q_OBJECT
 public:
     ConfigDialog(OtrMessaging* otr, OptionAccessingHost* optionHost,
                  AccountInfoAccessingHost* accountInfo,
-                 QWidget* parent = 0);
+                 QWidget* parent = nullptr);
 
 private:
     OtrMessaging*             m_otr;
@@ -81,7 +81,7 @@ Q_OBJECT
 public:
     ConfigOtrWidget(OptionAccessingHost* optionHost,
                     OtrMessaging* otr,
-                    QWidget* parent = 0);
+                    QWidget* parent = nullptr);
 
 private:
     OptionAccessingHost* m_optionHost;
@@ -105,7 +105,7 @@ class FingerprintWidget : public QWidget
 Q_OBJECT
 
 public:
-    FingerprintWidget(OtrMessaging* otr, QWidget* parent = 0);
+    FingerprintWidget(OtrMessaging* otr, QWidget* parent = nullptr);
 
 protected:
     void updateData();

@@ -124,10 +124,10 @@ IcqDie::IcqDie()
             "Sincerely yours, Debian Sid.");
 
 
-    ActiveTabHost = 0;
-    AccInfoHost = 0;
-    psiOptions = 0;
-    StanzaHost = 0;
+    ActiveTabHost = nullptr;
+    AccInfoHost = nullptr;
+    psiOptions = nullptr;
+    StanzaHost = nullptr;
 }
 
 QString IcqDie::name() const { return "Icq Must Die Plugin"; }
@@ -259,7 +259,7 @@ void IcqDie::restoreOptions()
 QWidget* IcqDie::options()
 {
     if (!enabled)
-        return 0;
+        return nullptr;
 
     QWidget *options = new QWidget;
     ui.setupUi(options);

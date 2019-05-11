@@ -14,7 +14,7 @@ ScrollKeeper::ScrollKeeper(QWidget* chatView) :
         chatView_(chatView),
         scrollPos_(0),
         scrollToEnd_(false),
-        ted_(0)
+        ted_(nullptr)
 {
     Q_UNUSED(chatView_)
 

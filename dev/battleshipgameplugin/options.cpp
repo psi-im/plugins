@@ -61,22 +61,22 @@ Options::Options(QObject *parent) :
     }
 }
 
-OptionAccessingHost *Options::psiOptions = NULL;
+OptionAccessingHost *Options::psiOptions = nullptr;
 
-Options *Options::instance_ = NULL;
+Options *Options::instance_ = nullptr;
 
 Options *Options::instance()
 {
-    if (instance_ == NULL)
+    if (instance_ == nullptr)
         Options::instance_ = new Options();
     return Options::instance_;
 }
 
 void Options::reset()
 {
-    if (instance_ != NULL) {
+    if (instance_ != nullptr) {
         delete Options::instance_;
-        Options::instance_ = NULL;
+        Options::instance_ = nullptr;
     }
 }
 

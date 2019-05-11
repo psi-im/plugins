@@ -41,7 +41,7 @@ using namespace GomokuGame;
 class HintElementWidget : public QFrame {
     Q_OBJECT
 public:
-    HintElementWidget(QWidget *parent = 0);
+    HintElementWidget(QWidget *parent = nullptr);
     ~HintElementWidget();
     void setElementType(GameElement::ElementType type);
 

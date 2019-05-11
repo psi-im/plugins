@@ -30,7 +30,7 @@ class JuickJidList : public QDialog
 {
     Q_OBJECT
 public:
-    JuickJidList(const QStringList& jids, QWidget *p = 0);
+    JuickJidList(const QStringList& jids, QWidget *p = nullptr);
     ~JuickJidList();
 
 signals:

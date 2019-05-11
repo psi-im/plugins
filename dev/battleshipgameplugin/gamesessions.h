@@ -54,7 +54,7 @@ public:
     void sendErrorIq(int account, const QString &jid, const QString &id);
 
 private:
-    GameSessionList(QObject *parent = 0);
+    GameSessionList(QObject *parent = nullptr);
     ~GameSessionList();
     QString generateKey(int account, const QString &jid, const QString &gameId);
     static QString getErrorMessage(const QDomElement &xml);

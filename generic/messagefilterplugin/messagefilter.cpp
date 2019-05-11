@@ -37,11 +37,11 @@
 
 MessageFilter::MessageFilter()
     : _enabled(false)
-    , _optionsForm(0)
-    , _accountHost(0)
-    , _optionHost(0)
-    , _stanzaSending(0)
-    , _accountInfo(0)
+    , _optionsForm(nullptr)
+    , _accountHost(nullptr)
+    , _optionHost(nullptr)
+    , _stanzaSending(nullptr)
+    , _accountInfo(nullptr)
     , _rules(QList<Rule>())
 {
 }
@@ -54,7 +54,7 @@ MessageFilter::~MessageFilter()
 QWidget *MessageFilter::options()
 {
     if (!_enabled) {
-        return 0;
+        return nullptr;
     }
 
     loadRules();

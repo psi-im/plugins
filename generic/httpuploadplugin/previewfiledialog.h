@@ -7,7 +7,7 @@
 class PreviewFileDialog: public QFileDialog {
 Q_OBJECT
 public:
-    explicit PreviewFileDialog(QWidget* parent = 0, const QString & caption = QString(), const QString & directory =
+    explicit PreviewFileDialog(QWidget* parent = nullptr, const QString & caption = QString(), const QString & directory =
             QString(), const QString & filter = QString(), int previewWidth = 150);
 
 private slots:

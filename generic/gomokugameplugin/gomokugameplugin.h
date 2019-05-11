@@ -68,7 +68,7 @@ public MenuAccessor, public PopupAccessor
              EventCreator SoundAccessor MenuAccessor PopupAccessor)
 
 public:
-    explicit GomokuGamePlugin(QObject *parent = 0);
+    explicit GomokuGamePlugin(QObject *parent = nullptr);
     // Psiplugin
     virtual QString name() const;
     virtual QString shortName() const;

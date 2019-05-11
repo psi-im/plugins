@@ -16,7 +16,7 @@ class DateWidget : public LineEditWidget
                WRITE setDate)
 
 public:
-    explicit DateWidget(QWidget *parent = 0);
+    explicit DateWidget(QWidget *parent = nullptr);
 
     // get/set date
     void setDate(const QDate &date);

@@ -36,7 +36,7 @@ public:
         RoleParentPath = Qt::UserRole + 6
     };
 
-    JDModel(const QString& diskName, QObject *parent = 0);
+    JDModel(const QString& diskName, QObject *parent = nullptr);
     ~JDModel();
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;

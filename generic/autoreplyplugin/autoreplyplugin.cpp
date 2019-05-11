@@ -132,7 +132,7 @@ private slots:
 
 AutoReply::AutoReply() {
     ActiveTabIsEnable = true;
-    NotInRosterWidget = 0;
+    NotInRosterWidget = nullptr;
     NotInRoster = true;
     EnableDisable = 1;
     Counter.clear();
@@ -272,7 +272,7 @@ bool AutoReply::disable() {
 }
 
 void AutoReply::applyOptions() {
-    if (messageWidget == 0 || disableforWidget == 0 || spinWidget == 0 || activetabWidget == 0 || resetWidget == 0 || enabledisableWidget ==0) {
+    if (messageWidget == nullptr || disableforWidget == nullptr || spinWidget == nullptr || activetabWidget == nullptr || resetWidget == nullptr || enabledisableWidget ==nullptr) {
         return;
     }
     QVariant vMessage(messageWidget->toPlainText());
@@ -326,7 +326,7 @@ void AutoReply::applyOptions() {
 }
 
 void AutoReply::restoreOptions() {
-    if (messageWidget == 0 || disableforWidget == 0 || spinWidget == 0 || activetabWidget == 0 || resetWidget ==0 || enabledisableWidget == 0) {
+    if (messageWidget == nullptr || disableforWidget == nullptr || spinWidget == nullptr || activetabWidget == nullptr || resetWidget ==nullptr || enabledisableWidget == nullptr) {
         return;
     }
     QVariant vMessage(Message);
@@ -457,7 +457,7 @@ void AutoReply::restoreOptions() {
 
 QWidget* AutoReply::options() {
     if (!enabled) {
-        return 0;
+        return nullptr;
     }
     QWidget *optionsWid = new QWidget();
     messageWidget = new QTextEdit();

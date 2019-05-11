@@ -84,11 +84,11 @@ public:
     virtual void setPopupAccessingHost(PopupAccessingHost* host);
     virtual void setStanzaSendingHost(StanzaSendingHost *host);
     virtual QList < QVariantHash > getButtonParam();
-    virtual QAction* getAction(QObject* , int , const QString& ) { return 0; };
+    virtual QAction* getAction(QObject* , int , const QString& ) { return nullptr; };
     virtual QList < QVariantHash > getAccountMenuParam();
     virtual QList < QVariantHash > getContactMenuParam();
-    virtual QAction* getContactAction(QObject* , int , const QString& ) { return 0; };
-    virtual QAction* getAccountAction(QObject* , int ) { return 0; };
+    virtual QAction* getContactAction(QObject* , int , const QString& ) { return nullptr; };
+    virtual QAction* getAccountAction(QObject* , int ) { return nullptr; };
     virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
     virtual void setSoundAccessingHost(SoundAccessingHost* host);
     virtual QString pluginInfo();
@@ -142,19 +142,19 @@ private slots:
 
 AttentionPlugin::AttentionPlugin()
     : enabled(false)
-    , psiOptions(0)
-    , accInfoHost(0)
-    , activeTab(0)
-    , icoHost(0)
-    , popup(0)
-    , stanzaSender(0)
-    , appInfo(0)
-    , sound_(0)
+    , psiOptions(nullptr)
+    , accInfoHost(nullptr)
+    , activeTab(nullptr)
+    , icoHost(nullptr)
+    , popup(nullptr)
+    , stanzaSender(nullptr)
+    , appInfo(nullptr)
+    , sound_(nullptr)
     , soundFile("sound/attention.wav")
     , timeout_(30)
     , infPopup(false)
     , disableDnd(false)
-    , nudgeTimer_(0)
+    , nudgeTimer_(nullptr)
     , popupId(0)
 {
 }
@@ -209,14 +209,14 @@ bool AttentionPlugin::disable() {
     enabled = false;
     nudgeTimer_->stop();
     delete nudgeTimer_;
-    nudgeTimer_ = 0;
+    nudgeTimer_ = nullptr;
     popup->unregisterOption(POPUP_OPTION);
     return true;
 }
 
 QWidget* AttentionPlugin::options() {
     if(!enabled) {
-        return 0;
+        return nullptr;
     }
     options_ = new QWidget();
     ui_.setupUi(options_);
@@ -419,7 +419,7 @@ void AttentionPlugin::playSound(const QString& f) {
 }
 
 void AttentionPlugin::getSound() {
-    QString fileName = QFileDialog::getOpenFileName(0,tr("Choose a sound file"),"", tr("Sound (*.wav)"));
+    QString fileName = QFileDialog::getOpenFileName(nullptr,tr("Choose a sound file"),"", tr("Sound (*.wav)"));
     if(fileName.isEmpty())
         return;
     ui_.le_sound->setText(fileName);

@@ -26,7 +26,7 @@ class JDView : public QTreeView
 {
     Q_OBJECT
 public:
-    JDView(QWidget *p = 0);
+    JDView(QWidget *p = nullptr);
     ~JDView();
 
 signals:

@@ -26,12 +26,12 @@
 #include <QIcon>
 
 StorageNotesPlugin::StorageNotesPlugin()
-    : stanzaSender(0)
-    , iconHost(0)
-    , accInfo(0)
-    , popup(0)
+    : stanzaSender(nullptr)
+    , iconHost(nullptr)
+    , accInfo(nullptr)
+    , popup(nullptr)
     , enabled(false)
-    , controller_(0)
+    , controller_(nullptr)
 {
 }
 
@@ -67,7 +67,7 @@ bool StorageNotesPlugin::enable()
 bool StorageNotesPlugin::disable()
 {
     delete controller_;
-    controller_ = 0;
+    controller_ = nullptr;
     enabled = false;
 
     return true;
@@ -76,7 +76,7 @@ bool StorageNotesPlugin::disable()
 QWidget* StorageNotesPlugin::options()
 {
         if (!enabled) {
-        return 0;
+        return nullptr;
     }
         QWidget *optionsWid = new QWidget();
         QVBoxLayout *vbox= new QVBoxLayout(optionsWid);

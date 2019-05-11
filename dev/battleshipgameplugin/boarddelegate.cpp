@@ -86,7 +86,7 @@ void BoardDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
         {
             // Numbers
             QString text = QString::number(point.y() - 1);
-            painter->drawText(r, Qt::AlignCenter, text, 0);
+            painter->drawText(r, Qt::AlignCenter, text, nullptr);
             QRectF r2 = r.adjusted(0.5, 0.5, -0.5, -0.5);
             setGridPen(painter);
             if (point.x() == 1)
@@ -105,7 +105,7 @@ void BoardDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
                 text = letters.mid(point.x() - 2, 1);
             else
                 text = letters.mid(point.x() - 15, 1);
-            painter->drawText(r, Qt::AlignCenter, text, 0);
+            painter->drawText(r, Qt::AlignCenter, text, nullptr);
             QRectF r2 = r.adjusted(0.5, 0.5, -0.5, -0.5);
             setGridPen(painter);
             if (point.y() == 1)

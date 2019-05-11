@@ -90,7 +90,7 @@ public:
     virtual QList < QVariantHash > getAccountMenuParam();
     virtual QList < QVariantHash > getContactMenuParam();
     virtual QAction* getContactAction(QObject* , int , const QString& );
-    virtual QAction* getAccountAction(QObject* , int ) { return 0; }
+    virtual QAction* getAccountAction(QObject* , int ) { return nullptr; }
     virtual QList < QVariantHash > getButtonParam();
     virtual QAction* getAction(QObject* parent, int account, const QString& contact);
     virtual void setContactInfoAccessingHost(ContactInfoAccessingHost* host);
@@ -149,13 +149,13 @@ private:
 
 ExtendedMenuPlugin::ExtendedMenuPlugin()
     : enabled(false)
-    , psiOptions(0)
-    , accInfo(0)
-    , icoHost(0)
-    , accountHost(0)
-    , popup(0)
-    , contactInfo(0)
-    , stanzaSender(0)
+    , psiOptions(nullptr)
+    , accInfo(nullptr)
+    , icoHost(nullptr)
+    , accountHost(nullptr)
+    , popup(nullptr)
+    , contactInfo(nullptr)
+    , stanzaSender(nullptr)
     , enableMenu(true)
     , enableAction(false)
     , popupId(0)
@@ -238,7 +238,7 @@ QWidget* ExtendedMenuPlugin::options()
         return w;
     }
 
-    return 0;
+    return nullptr;
 }
 
 void ExtendedMenuPlugin::applyOptions()
@@ -486,7 +486,7 @@ void ExtendedMenuPlugin::showPopup(const QString &text, const QString &title)
 
 void ExtendedMenuPlugin::showDialog(const QString &text, const QString &title)
 {
-    QMessageBox mb(QMessageBox::Information, title, text, QMessageBox::Ok, NULL,
+    QMessageBox mb(QMessageBox::Information, title, text, QMessageBox::Ok, nullptr,
                    Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     mb.exec();
 }
@@ -499,7 +499,7 @@ QList < QVariantHash > ExtendedMenuPlugin::getButtonParam()
 QAction* ExtendedMenuPlugin::getAction(QObject *parent, int account, const QString &contact)
 {
     if(!enableAction) {
-        return 0;
+        return nullptr;
     }
     QAction* act = new QAction(icoHost->getIcon("menu/extendedmenu"), tr("Extended Actions"), parent);
     act->setProperty("account", account);
@@ -521,14 +521,14 @@ QList < QVariantHash > ExtendedMenuPlugin::getContactMenuParam()
 QAction* ExtendedMenuPlugin::getContactAction(QObject* obj, int account, const QString& jid)
 {
     if(!enableMenu) {
-        return 0;
+        return nullptr;
     }
     QMenu *parent = qobject_cast<QMenu*>(obj);
     if(parent) {
         QMenu *menu = parent->addMenu(icoHost->getIcon("menu/extendedmenu"), tr("Extended Actions"));
         fillMenu(menu, account, jid);
     }
-    return 0;
+    return nullptr;
 }
 
 inline void setupAction(QAction* act, int account, const QString& jid, ActionType type)

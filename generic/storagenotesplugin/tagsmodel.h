@@ -30,7 +30,7 @@ class TagModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    TagModel(QObject *parent = 0);
+    TagModel(QObject *parent = nullptr);
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const { return 1; }
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
@@ -65,7 +65,7 @@ public:
         TitleRole = Qt::DisplayRole + 3
     };
 
-    NoteModel(QObject *parent = 0);
+    NoteModel(QObject *parent = nullptr);
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;
     void clear();
@@ -86,7 +86,7 @@ class ProxyModel : public QSortFilterProxyModel
     Q_OBJECT
 
 public:
-    ProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent) {}
+    ProxyModel(QObject *parent = nullptr) : QSortFilterProxyModel(parent) {}
     bool filterAcceptsRow(int sourceRow, const QModelIndex &parent) const;
 };
 #endif // TAGSMODEL_H

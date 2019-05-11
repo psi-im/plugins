@@ -43,7 +43,7 @@ public:
         Last = Count - 1
     };
 
-    Model(QObject *parent = 0);
+    Model(QObject *parent = nullptr);
 
 public slots:
     void listKeys();

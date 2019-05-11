@@ -144,7 +144,7 @@ void ChessWindow::moveRequest(int oldX, int oldY, int newX, int newY, const QStr
 }
 
 void ChessWindow::addMove(int oldX, int oldY, int newX, int newY) {
-    Figure *f = 0;
+    Figure *f = nullptr;
     if(model_->gameType_ == Figure::WhitePlayer) { //for compatibility with tkabber
         oldY = 7-oldY;
         newY = 7-newY;
@@ -213,7 +213,7 @@ void ChessWindow::createMenu() {
 }
 
 void ChessWindow::load() {
-    QString fileName = QFileDialog::getOpenFileName(0,tr("Load game"), "", tr("*.chs"));
+    QString fileName = QFileDialog::getOpenFileName(nullptr,tr("Load game"), "", tr("*.chs"));
     if(fileName.isEmpty()) return;
 
     QFile file(fileName);
@@ -245,7 +245,7 @@ void ChessWindow::loadRequest(const QString& settings) {
 }
 
 void ChessWindow::save() {
-    QString fileName = QFileDialog::getSaveFileName(0,tr("Save game"), "", tr("*.chs"));
+    QString fileName = QFileDialog::getSaveFileName(nullptr,tr("Save game"), "", tr("*.chs"));
     if(fileName.isEmpty())
         return;
     if(fileName.right(4) != ".chs")

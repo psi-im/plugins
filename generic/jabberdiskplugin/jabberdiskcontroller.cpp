@@ -24,7 +24,7 @@
 #include "jd_mainwin.h"
 
 struct Session {
-    Session(int a, const QString& j, JDMainWin* w = 0)
+    Session(int a, const QString& j, JDMainWin* w = nullptr)
         : account(a)
         , jid(j)
         , window(w)
@@ -42,10 +42,10 @@ struct Session {
 };
 
 JabberDiskController::JabberDiskController()
-    : QObject(0)
-    , stanzaSender(0)
+    : QObject(nullptr)
+    , stanzaSender(nullptr)
 //    , iconHost(0)
-    , accInfo(0)
+    , accInfo(nullptr)
 {
 }
 
@@ -66,7 +66,7 @@ JabberDiskController* JabberDiskController::instance()
 void JabberDiskController::reset()
 {
     delete instance_;
-    instance_ = 0;
+    instance_ = nullptr;
 }
 
 void JabberDiskController::viewerDestroyed()
@@ -137,4 +137,4 @@ bool JabberDiskController::incomingStanza(int account, const QDomElement& xml)
 }
 
 
-JabberDiskController* JabberDiskController::instance_ = 0;
+JabberDiskController* JabberDiskController::instance_ = nullptr;

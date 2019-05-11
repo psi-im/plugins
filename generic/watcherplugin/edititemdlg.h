@@ -31,7 +31,7 @@ class EditItemDlg : public QDialog
 {
     Q_OBJECT
 public:
-    EditItemDlg(IconFactoryAccessingHost* icoHost, OptionAccessingHost *psiOptions_, QWidget *p = 0);
+    EditItemDlg(IconFactoryAccessingHost* icoHost, OptionAccessingHost *psiOptions_, QWidget *p = nullptr);
     void init(const QString &settings);
 
 signals:

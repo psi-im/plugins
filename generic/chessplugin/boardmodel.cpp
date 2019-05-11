@@ -204,7 +204,7 @@ bool BoardModel::moveRequested(QModelIndex oldIndex, QModelIndex newIndex)
         int move_ = canMove(figure, x, y);
         if(!move_)
             return false;
-        Figure *newFigure = 0;
+        Figure *newFigure = nullptr;
         if(move_ == 2) {  //kill figure
             newFigure = findFigure(newIndex);
             if(newFigure) {
@@ -297,7 +297,7 @@ bool BoardModel::isYourFigure(const QModelIndex &index) const
 
 Figure *BoardModel::findFigure(QModelIndex index) const
 {
-    Figure *figure_ = 0;
+    Figure *figure_ = nullptr;
     int x = index.column();
     int y = index.row();
     foreach(Figure *figure, whiteFigures_) {
@@ -920,7 +920,7 @@ bool BoardModel::doTestMove(Figure *figure, QModelIndex newIndex, int move)
     int tmpX;
     int tmpY;
     bool ch;
-    Figure *newFigure = 0;
+    Figure *newFigure = nullptr;
     switch(move) {
         case 1:
         figure->setPosition(x, y);

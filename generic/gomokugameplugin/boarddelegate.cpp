@@ -60,7 +60,7 @@ QPixmap *BoardPixmaps::getBoardPixmap(int x, int y, double w, double h)
         clearPix();
     }
     QPixmap *scPixmap = scaledPixmap.value(0, NULL);
-    if (scPixmap == NULL) {
+    if (scPixmap == nullptr) {
         // Масштабирование картинки под целое количество единиц ширины и высоты
         scPixmap = new QPixmap();
         w_cnt = boardPixmap->width() / w;
@@ -72,7 +72,7 @@ QPixmap *BoardPixmaps::getBoardPixmap(int x, int y, double w, double h)
     }
     int curr_key = (x % w_cnt) * 100 + (y % h_cnt) + 1;
     QPixmap *scPixmap2 = scaledPixmap.value(curr_key, NULL);
-    if (scPixmap2 == NULL) {
+    if (scPixmap2 == nullptr) {
         // Вырезаем необходимый кусок картинки
         scPixmap2 = new QPixmap();
         int xpixpos = (x % w_cnt) * w;
@@ -89,7 +89,7 @@ BoardDelegate::BoardDelegate(BoardModel *model, QObject *parent) :
     QItemDelegate(parent),
     model_(model),
     skin(0),
-    pixmaps(NULL)
+    pixmaps(nullptr)
 {
 }
 
@@ -98,12 +98,12 @@ void BoardDelegate::setSkin(int skin_num)
     if (skin != skin_num) {
         skin = skin_num;
         if (skin == 0) {
-            if (pixmaps != NULL) {
+            if (pixmaps != nullptr) {
                 delete pixmaps;
-                pixmaps = NULL;
+                pixmaps = nullptr;
             }
         } else {
-            if (pixmaps == NULL) {
+            if (pixmaps == nullptr) {
                 pixmaps    = new BoardPixmaps(this);
             }
         }
@@ -199,11 +199,11 @@ void BoardDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
         if ((row == 1 || row == model_->columnCount() - 2) && col >= 2 && col <= model_->columnCount() - 3) {
             // Буквы
             QString text = horHeaderString.at(col - 2);
-            painter->drawText(rect, Qt::AlignCenter,text, 0);
+            painter->drawText(rect, Qt::AlignCenter,text, nullptr);
         } else if ((col == 1 || model_->rowCount() - 2) && row >= 2 && row <= model_->rowCount() - 3) {
             // Цифры
             QString text = QString::number(row - 1);
-            painter->drawText(rect, Qt::AlignCenter,text, 0);
+            painter->drawText(rect, Qt::AlignCenter,text, nullptr);
         }
     }
     painter->restore();

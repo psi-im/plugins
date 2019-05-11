@@ -70,7 +70,7 @@ public MenuAccessor, public PopupAccessor
              EventCreator SoundAccessor MenuAccessor PopupAccessor)
 
 public:
-    explicit BattleshipGamePlugin(QObject *parent = 0);
+    explicit BattleshipGamePlugin(QObject *parent = nullptr);
     // Psiplugin
     virtual QString name() const;
     virtual QString shortName() const;

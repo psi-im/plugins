@@ -124,13 +124,13 @@ private:
 TranslatePlugin::TranslatePlugin()
     : enabled_(false)
     , notTranslate(false)
-    , table(0)
-    , shortCutWidget(0)
-    , psiOptions(0)
-    , psiShortcuts(0)
-    , activeTab(0)
+    , table(nullptr)
+    , shortCutWidget(nullptr)
+    , psiOptions(nullptr)
+    , psiShortcuts(nullptr)
+    , activeTab(nullptr)
     , shortCut("Alt+Ctrl+t")
-    , check_button(0)
+    , check_button(nullptr)
 {
     map.insert("~",QString::fromUtf8("Ё")); map.insert(QString::fromUtf8("Ё"),"~");
     map.insert("`",QString::fromUtf8("ё")); map.insert(QString::fromUtf8("ё"),"`");
@@ -228,7 +228,7 @@ QString TranslatePlugin::version() const
 QWidget* TranslatePlugin::options()
 {
     if (!enabled_) {
-        return 0;
+        return nullptr;
     }
     options_ = new QWidget();
     table = new QTableWidget(options_);

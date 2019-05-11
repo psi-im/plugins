@@ -25,7 +25,7 @@
 
 
 CleanerMainWindow::CleanerMainWindow(CleanerPlugin *cleaner)
-        : QMainWindow(0)
+        : QMainWindow(nullptr)
         , cleaner_(cleaner)
 {
     setAttribute(Qt::WA_DeleteOnClose);

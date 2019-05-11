@@ -39,7 +39,7 @@ GameSessionList::~GameSessionList()
         delete vals.takeFirst();
 }
 
-GameSessionList *GameSessionList::instance_ = NULL;
+GameSessionList *GameSessionList::instance_ = nullptr;
 
 GameSessionList *GameSessionList::instance()
 {
@@ -53,14 +53,14 @@ void GameSessionList::reset()
     if (instance_)
     {
         delete instance_;
-        instance_ = NULL;
+        instance_ = nullptr;
     }
 }
 
 GameSession *GameSessionList::createSession(int account, const QString &jid, bool first, const QString &gameId)
 {
     if (findGame(account, jid, gameId))
-        return NULL;
+        return nullptr;
     GameSession *gs = new GameSession(this, account, jid, first, gameId);
     list_[generateKey(account, jid, gameId)] = gs;
     connect(gs, SIGNAL(sendStanza(int,QString)), this, SIGNAL(sendStanza(int,QString)));
@@ -89,7 +89,7 @@ GameSession *GameSessionList::findGameByStanzaId(int account, const QString &jid
     foreach (GameSession *gs, l)
         if (gs->account_ == account && gs->jid_ == jid && gs->stanzaId_ == stanzaId)
             return gs;
-    return NULL;
+    return nullptr;
 }
 
 bool GameSessionList::processIncomingIqStanza(int account, const QDomElement &xml, const QString &accStatus, bool fromPrivate)
@@ -106,7 +106,7 @@ bool GameSessionList::processIncomingIqStanza(int account, const QDomElement &xm
         if (gameId.isEmpty())
             return true;
 
-        GameSession *gs = NULL;
+        GameSession *gs = nullptr;
         const QString tagName = childEl.tagName();
         if (tagName == "create")
         {
@@ -128,7 +128,7 @@ bool GameSessionList::processIncomingIqStanza(int account, const QDomElement &xm
                     gs = createSession(account, from, first, gameId);
             }
         }
-        else if ((gs = findGame(account, from, gameId)) != NULL)
+        else if ((gs = findGame(account, from, gameId)) != nullptr)
         {
             if (tagName == "board")
             {
@@ -219,7 +219,7 @@ bool GameSessionList::processIncomingIqStanza(int account, const QDomElement &xm
                     msg.append(QString(" (%1)").arg(errMsg));
                 doPopup(msg);
                 gs->endSession();
-                gs = NULL;
+                gs = nullptr;
             }
             else
                 gs->status_ = GameSession::StatusError;
@@ -294,7 +294,7 @@ QString XML::iqErrorString(const QString &jid, const QString &id)
 // -------------- GameSession -------------------
 
 GameSession::GameSession(GameSessionList *gsl, int account, const QString &jid, bool first, const QString &gameId)
-    : QObject(NULL)
+    : QObject(nullptr)
     , gsl_(gsl)
     , stage_(StageNone)
     , status_(StatusNone)
@@ -303,8 +303,8 @@ GameSession::GameSession(GameSessionList *gsl, int account, const QString &jid, 
     , first_(first)
     , gameId_(gameId)
     , modifTime_(QDateTime::currentDateTime())
-    , inviteDlg_(NULL)
-    , boardWid_(NULL)
+    , inviteDlg_(nullptr)
+    , boardWid_(nullptr)
     , myBoardChecked_(false)
     , opBoardChecked_(false)
     , resign_(false)
@@ -459,7 +459,7 @@ void GameSession::rejectInvitation()
 
 void GameSession::invite(const QStringList &resList)
 {
-    QWidget *parent = NULL;
+    QWidget *parent = nullptr;
     if (!boardWid_.isNull())
         parent = boardWid_.data();
     InviteDialog *dlg = new InviteDialog(jid_.section('/', 0, 0), resList, parent);

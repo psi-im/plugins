@@ -185,13 +185,13 @@ private:
 
 StopSpam::StopSpam()
     : enabled(false)
-    , psiOptions(0)
-    , stanzaHost(0)
-    , accInfoHost(0)
-    , appInfoHost(0)
-    , icoHost(0)
-    , popup(0)
-    , contactInfo(0)
+    , psiOptions(nullptr)
+    , stanzaHost(nullptr)
+    , accInfoHost(nullptr)
+    , appInfoHost(nullptr)
+    , icoHost(nullptr)
+    , popup(nullptr)
+    , contactInfo(nullptr)
     , Question("2+3=?")
     , Answer("5")
     , Unblocked("")
@@ -214,9 +214,9 @@ StopSpam::StopSpam()
     , Participant(true)
     , Visitor(true)
     , BlockAllMes("The private messages are blocked! Send your message to groupchat, please.")
-    , viewer(0)
-    , model_(0)
-    , options_(0)
+    , viewer(nullptr)
+    , model_(nullptr)
+    , options_(nullptr)
     , popupId(0)
 {
 }
@@ -289,11 +289,11 @@ bool StopSpam::enable() {
 
 bool StopSpam::disable() {
     delete viewer;
-    viewer = 0;
+    viewer = nullptr;
     delete model_;
-    model_ = 0;
+    model_ = nullptr;
     delete stanzaHost;
-    stanzaHost = 0;
+    stanzaHost = nullptr;
 
     popup->unregisterOption(POPUP_OPTION);
     enabled = false;
@@ -399,7 +399,7 @@ QPixmap StopSpam::icon() const
 
 QWidget* StopSpam::options() {
         if (!enabled) {
-                return 0;
+                return nullptr;
         }
     options_ = new QWidget();
     ui_.setupUi(options_);

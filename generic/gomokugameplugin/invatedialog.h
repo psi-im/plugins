@@ -38,7 +38,7 @@ public:
     InvateDialog(const int account,
                  const QString &jid,
                  const QStringList &resources,
-                 QWidget *parent = 0);
+                 QWidget *parent = nullptr);
     ~InvateDialog();
 
 private:
@@ -68,7 +68,7 @@ public:
                      const QString &jid,
                      QString color,
                      const QString &id,
-                     QWidget *parent = 0);
+                     QWidget *parent = nullptr);
 
 private:
     Ui::InvitationDialog ui_;

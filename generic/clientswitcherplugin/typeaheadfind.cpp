@@ -144,7 +144,7 @@ void TypeAheadFindBar::init() {
 
 TypeAheadFindBar::~TypeAheadFindBar() {
     delete d;
-    d = 0;
+    d = nullptr;
 }
 
 void TypeAheadFindBar::textChanged(const QString &str) {

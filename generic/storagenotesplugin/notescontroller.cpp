@@ -21,7 +21,7 @@
 #include "notes.h"
 
 NotesController::NotesController(StorageNotesPlugin* plugin)
-    : QObject(0)
+    : QObject(nullptr)
     , plugin_(plugin)
 {
 }
@@ -30,7 +30,7 @@ NotesController::~NotesController()
 {
     foreach(Notes* n, notesList_.values()) {
         delete n;
-        n = 0;
+        n = nullptr;
     }
     notesList_.clear();
 }
@@ -46,7 +46,7 @@ void NotesController::incomingNotes(int account, const QList<QDomElement>& notes
 
 void NotesController::start(int account)
 {
-    QPointer<Notes> note = 0;
+    QPointer<Notes> note = nullptr;
 
     if(notesList_.contains(account)) {
         note = notesList_.value(account);

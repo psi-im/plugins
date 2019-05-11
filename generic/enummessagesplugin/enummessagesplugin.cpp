@@ -45,14 +45,14 @@ static const QString xhtmlProtoNS = "http://jabber.org/protocol/xhtml-im";
 
 EnumMessagesPlugin::EnumMessagesPlugin()
     : enabled(false)
-    , _psiOptions(0)
-    , _activeTab(0)
-    , _applicationInfo(0)
-    , _accContrller(0)
+    , _psiOptions(nullptr)
+    , _activeTab(nullptr)
+    , _applicationInfo(nullptr)
+    , _accContrller(nullptr)
     , _inColor(QColor(Qt::red))
     , _outColor(QColor(Qt::green))
     , _defaultAction(true)
-    , _options(0)
+    , _options(nullptr)
 
 {
 }
@@ -75,7 +75,7 @@ QString EnumMessagesPlugin::version() const
 QWidget* EnumMessagesPlugin::options()
 {
     if(!enabled) {
-        return 0;
+        return nullptr;
     }
     _options = new QWidget();
     _ui.setupUi(_options);

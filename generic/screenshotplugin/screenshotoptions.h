@@ -26,7 +26,7 @@ class ScreenshotOptions : public QDialog
 {
     Q_OBJECT
 public:
-    ScreenshotOptions(int delay, QWidget *parent = 0);
+    ScreenshotOptions(int delay, QWidget *parent = nullptr);
 
 signals:
     void captureDesktop(int);

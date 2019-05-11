@@ -80,7 +80,7 @@ OtrInternal::OtrInternal(psiotr::OtrCallback* callback,
     m_uiOps.still_secure        = (*OtrInternal::cb_still_secure);
 
 #if (OTRL_VERSION_MAJOR > 3 || (OTRL_VERSION_MAJOR == 3 && OTRL_VERSION_MINOR >= 2))
-    m_uiOps.max_message_size    = NULL;
+    m_uiOps.max_message_size    = nullptr;
     m_uiOps.account_name        = (*OtrInternal::cb_account_name);
     m_uiOps.account_name_free   = (*OtrInternal::cb_account_name_free);
 #endif
@@ -102,7 +102,7 @@ OtrInternal::OtrInternal(psiotr::OtrCallback* callback,
     otrl_privkey_read(m_userstate, QFile::encodeName(m_keysFile).constData());
     otrl_privkey_read_fingerprints(m_userstate,
                                    QFile::encodeName(m_fingerprintFile).constData(),
-                                   NULL, NULL);
+                                   nullptr, nullptr);
 #if (OTRL_VERSION_MAJOR >= 4)
     otrl_instag_read(m_userstate, QFile::encodeName(m_instagsFile).constData());
 #endif
@@ -120,7 +120,7 @@ OtrInternal::~OtrInternal()
 QString OtrInternal::encryptMessage(const QString& account, const QString& contact,
                                     const QString& message)
 {
-    char* encMessage = NULL;
+    char* encMessage = nullptr;
     gcry_error_t err;
 
     err = otrl_message_sending(m_userstate, &m_uiOps, this,
@@ -130,12 +130,12 @@ QString OtrInternal::encryptMessage(const QString& account, const QString& conta
                                OTRL_INSTAG_BEST,
 #endif
                                message.toUtf8().constData(),
-                               NULL, &encMessage,
+                               nullptr, &encMessage,
 #if (OTRL_VERSION_MAJOR >= 4)
                                OTRL_FRAGMENT_SEND_SKIP,
-                               NULL,
+                               nullptr,
 #endif
-                               NULL, NULL);
+                               nullptr, nullptr);
     if (err)
     {
         QString err_message = QObject::tr("Encrypting message to %1 "
@@ -172,9 +172,9 @@ psiotr::OtrMessageType OtrInternal::decryptMessage(const QString& account,
     const char* userName    = userArray.constData();
 
     int ignoreMessage = 0;
-    char* newMessage  = NULL;
-    OtrlTLV* tlvs     = NULL;
-    OtrlTLV* tlv      = NULL;
+    char* newMessage  = nullptr;
+    OtrlTLV* tlvs     = nullptr;
+    OtrlTLV* tlv      = nullptr;
 
     ignoreMessage = otrl_message_receiving(m_userstate, &m_uiOps, this,
                                            accountName,
@@ -182,11 +182,11 @@ psiotr::OtrMessageType OtrInternal::decryptMessage(const QString& account,
                                            userName,
                                            cryptedMessage.toUtf8().constData(),
                                            &newMessage,
-                                           &tlvs, NULL,
+                                           &tlvs, nullptr,
 #if (OTRL_VERSION_MAJOR >= 4)
-                                           NULL,
+                                           nullptr,
 #endif
-                                           NULL);
+                                           nullptr);
     tlv = otrl_tlv_find(tlvs, OTRL_TLV_DISCONNECTED);
     if (tlv) {
         m_callback->stateChange(accountName, userName,
@@ -324,7 +324,7 @@ QList<psiotr::Fingerprint> OtrInternal::getFingerprints()
     ConnContext* context;
     ::Fingerprint* fingerprint;
 
-    for (context = m_userstate->context_root; context != NULL;
+    for (context = m_userstate->context_root; context != nullptr;
          context = context->next)
     {
         fingerprint = context->fingerprint_root.next;
@@ -354,12 +354,12 @@ void OtrInternal::verifyFingerprint(const psiotr::Fingerprint& fingerprint,
 #if (OTRL_VERSION_MAJOR >= 4)
                                              OTRL_INSTAG_BEST,
 #endif
-                                             false, NULL, NULL, NULL);
+                                             false, nullptr, nullptr, nullptr);
     if (context)
     {
         ::Fingerprint* fp = otrl_context_find_fingerprint(context,
                                                           fingerprint.fingerprint,
-                                                          0, NULL);
+                                                          0, nullptr);
         if (fp)
         {
             otrl_context_set_trust(fp, verified? "verified" : "");
@@ -386,12 +386,12 @@ void OtrInternal::deleteFingerprint(const psiotr::Fingerprint& fingerprint)
 #if (OTRL_VERSION_MAJOR >= 4)
                                              OTRL_INSTAG_BEST,
 #endif
-                                             false, NULL, NULL, NULL);
+                                             false, nullptr, nullptr, nullptr);
     if (context)
     {
         ::Fingerprint* fp = otrl_context_find_fingerprint(context,
                                                           fingerprint.fingerprint,
-                                                          0, NULL);
+                                                          0, nullptr);
         if (fp)
         {
             if (context->active_fingerprint == fp)
@@ -411,7 +411,7 @@ QHash<QString, QString> OtrInternal::getPrivateKeys()
     QHash<QString, QString> privKeyList;
     OtrlPrivKey* privKey;
 
-    for (privKey = m_userstate->privkey_root; privKey != NULL;
+    for (privKey = m_userstate->privkey_root; privKey != nullptr;
          privKey = privKey->next)
     {
         char fingerprintBuf[OTRL_PRIVKEY_FPRINT_HUMAN_LEN];
@@ -474,7 +474,7 @@ void OtrInternal::endSession(const QString& account, const QString& contact)
 #if (OTRL_VERSION_MAJOR >= 4)
                                              OTRL_INSTAG_BEST,
 #endif
-                                             false, NULL, NULL, NULL);
+                                             false, nullptr, nullptr, nullptr);
     if (context && (context->msgstate != OTRL_MSGSTATE_PLAINTEXT))
     {
         m_callback->stateChange(account, contact, psiotr::OTR_STATECHANGE_CLOSE);
@@ -499,7 +499,7 @@ void OtrInternal::expireSession(const QString& account, const QString& contact)
 #if (OTRL_VERSION_MAJOR >= 4)
                                              OTRL_INSTAG_BEST,
 #endif
-                                             false, NULL, NULL, NULL);
+                                             false, nullptr, nullptr, nullptr);
     if (context && (context->msgstate == OTRL_MSGSTATE_ENCRYPTED))
     {
         otrl_context_force_finished(context);
@@ -520,7 +520,7 @@ void OtrInternal::startSMP(const QString& account, const QString& contact,
 #if (OTRL_VERSION_MAJOR >= 4)
                                              OTRL_INSTAG_BEST,
 #endif
-                                             false, NULL, NULL, NULL);
+                                             false, nullptr, nullptr, nullptr);
     if (context)
     {
         QByteArray  secretArray   = secret.toUtf8();
@@ -553,7 +553,7 @@ void OtrInternal::continueSMP(const QString& account, const QString& contact,
 #if (OTRL_VERSION_MAJOR >= 4)
                                              OTRL_INSTAG_BEST,
 #endif
-                                             false, NULL, NULL, NULL);
+                                             false, nullptr, nullptr, nullptr);
     if (context)
     {
         QByteArray  secretArray   = secret.toUtf8();
@@ -575,7 +575,7 @@ void OtrInternal::abortSMP(const QString& account, const QString& contact)
 #if (OTRL_VERSION_MAJOR >= 4)
                                              OTRL_INSTAG_BEST,
 #endif
-                                             false, NULL, NULL, NULL);
+                                             false, nullptr, nullptr, nullptr);
     if (context)
     {
         abortSMP(context);
@@ -599,7 +599,7 @@ psiotr::OtrMessageState OtrInternal::getMessageState(const QString& account,
 #if (OTRL_VERSION_MAJOR >= 4)
                                              OTRL_INSTAG_BEST,
 #endif
-                                             false, NULL, NULL, NULL);
+                                             false, nullptr, nullptr, nullptr);
     if (context)
     {
         if (context->msgstate == OTRL_MSGSTATE_PLAINTEXT)
@@ -653,7 +653,7 @@ QString OtrInternal::getSessionId(const QString& account,
 #if (OTRL_VERSION_MAJOR >= 4)
                                 OTRL_INSTAG_BEST,
 #endif
-                                false, NULL, NULL, NULL);
+                                false, nullptr, nullptr, nullptr);
     if (context && (context->sessionid_len > 0))
     {
         QString firstHalf;
@@ -701,7 +701,7 @@ psiotr::Fingerprint OtrInternal::getActiveFingerprint(const QString& account,
 #if (OTRL_VERSION_MAJOR >= 4)
                                 OTRL_INSTAG_BEST,
 #endif
-                                false, NULL, NULL, NULL);
+                                false, nullptr, nullptr, nullptr);
 
     if (context && context->active_fingerprint)
     {
@@ -726,7 +726,7 @@ bool OtrInternal::isVerified(const QString& account,
 #if (OTRL_VERSION_MAJOR >= 4)
                                 OTRL_INSTAG_BEST,
 #endif
-                                false, NULL, NULL, NULL);
+                                false, nullptr, nullptr, nullptr);
 
     return isVerified(context);
 }
@@ -756,7 +756,7 @@ bool OtrInternal::smpSucceeded(const QString& account,
 #if (OTRL_VERSION_MAJOR >= 4)
                                 OTRL_INSTAG_BEST,
 #endif
-                                false, NULL, NULL, NULL);
+                                false, nullptr, nullptr, nullptr);
 
     if (context)
     {

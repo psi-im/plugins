@@ -35,14 +35,14 @@
 
 GnuPG::GnuPG()
     : _enabled(false)
-    , _optionsForm(0)
-    , _accountHost(0)
-    , _optionHost(0)
-    , _iconFactory(0)
-    , _menu(0)
-    , _stanzaSending(0)
-    , _activeTab(0)
-    , _accountInfo(0)
+    , _optionsForm(nullptr)
+    , _accountHost(nullptr)
+    , _optionHost(nullptr)
+    , _iconFactory(nullptr)
+    , _menu(nullptr)
+    , _stanzaSending(nullptr)
+    , _activeTab(nullptr)
+    , _accountInfo(nullptr)
 {
 }
 
@@ -54,7 +54,7 @@ GnuPG::~GnuPG()
 QWidget *GnuPG::options()
 {
     if (!_enabled) {
-        return 0;
+        return nullptr;
     }
 
     _optionsForm = new Options();

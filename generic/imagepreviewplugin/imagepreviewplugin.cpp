@@ -134,8 +134,8 @@ private:
 };
 
 ImagePreviewPlugin::ImagePreviewPlugin() :
-        psiOptions(0), enabled(false), manager(new QNetworkAccessManager(this)), previewSize(0), sizeLimit(0), allowUpscale(
-                false), appInfoHost(0) {
+        psiOptions(nullptr), enabled(false), manager(new QNetworkAccessManager(this)), previewSize(0), sizeLimit(0), allowUpscale(
+                false), appInfoHost(nullptr) {
     connect(manager, SIGNAL(finished(QNetworkReply *)), SLOT(imageReply(QNetworkReply *)));
 }
 
@@ -166,7 +166,7 @@ bool ImagePreviewPlugin::disable() {
 
 QWidget* ImagePreviewPlugin::options() {
     if (!enabled) {
-        return 0;
+        return nullptr;
     }
     QWidget *optionsWid = new QWidget();
     QVBoxLayout *vbox = new QVBoxLayout(optionsWid);
