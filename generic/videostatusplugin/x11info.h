@@ -19,8 +19,8 @@
 #ifndef X11INFO_H
 #define X11INFO_H
 
-typedef struct _XDisplay Display;
-typedef struct xcb_connection_t xcb_connection_t;
+using Display = struct _XDisplay;
+using xcb_connection_t = struct xcb_connection_t;
 
 class X11Info
 {

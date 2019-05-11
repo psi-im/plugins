@@ -47,7 +47,7 @@ static const QString GMP_PREFIX = "com.gnome";
 static const int StatusPlaying = 0;
 static const int gmpStatusPlaying = 3;
 
-typedef QList<Window> WindowList;
+using WindowList = QList<Window>;
 typedef QPair<QString, QString> StringMap;
 
 //имена сервисов. Для добавления нового плеера дописываем имя сервиса

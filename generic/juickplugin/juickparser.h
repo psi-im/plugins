@@ -38,7 +38,7 @@ struct JuickMessage {
     QString infoText;
 };
 
-typedef QList<JuickMessage> JuickMessages;
+using JuickMessages = QList<JuickMessage>;
 
 class JuickParser
 {

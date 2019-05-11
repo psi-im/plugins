@@ -156,8 +156,8 @@ typedef struct {
     unsigned long   eventMask; /* currently selected events for this client */
 } XScreenSaverInfo;
 
-typedef XScreenSaverInfo* (*XScreenSaverAllocInfo)();
-typedef Status (*XScreenSaverQueryInfo)(Display* display, Drawable drawable, XScreenSaverInfo* info);
+using XScreenSaverAllocInfo = XScreenSaverInfo *(*)();
+using XScreenSaverQueryInfo = int (*)(Display *, Drawable, XScreenSaverInfo *);
 
 static XScreenSaverAllocInfo _xScreenSaverAllocInfo = nullptr;
 static XScreenSaverQueryInfo _xScreenSaverQueryInfo = nullptr;

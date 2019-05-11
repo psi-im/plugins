@@ -34,7 +34,7 @@
 #include <QWidget>
 #include "qxtglobal.h"
 
-typedef QList<WId> WindowList;
+using WindowList = QList<WId>;
 
 class /*QXT_GUI_EXPORT*/ QxtWindowSystem
 {

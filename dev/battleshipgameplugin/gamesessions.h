@@ -84,9 +84,9 @@ public:
         StatusWaitInviteConfirmation, StatusWaitBoardVerification,
         StatusWaitShotConfirmation, StatusWaitOpponent
     };
-    typedef QPointer<QTimer> Timer;
-    typedef QPointer<QDialog> InviteDlg;
-    typedef QPointer<PluginWindow> BoardWidget;
+    using Timer = QPointer<QTimer>;
+    using InviteDlg = QPointer<QDialog>;
+    using BoardWidget = QPointer<PluginWindow>;
     void executeNextAction();
     void invite(const QStringList &resList);
     void initOpponentBoard(const QDomElement &xml);

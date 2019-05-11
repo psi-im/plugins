@@ -135,7 +135,7 @@ private:
         ActionType type;
     };
 
-    typedef QList<Request> Requests;
+    using Requests = QList<Request>;
     QHash<int, Requests> requestList_;
 
     void showMessage(int account, const QString& contact, const QString& text, const QString& title);
