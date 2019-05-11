@@ -159,12 +159,12 @@ AutoReply::AutoReply() {
     sxaWidget = nullptr;
     schatWidget = nullptr;
     sinvisWidget = nullptr;
-    SOnline = 0;
-    SAway = 1;
-    SDnd = 1;
-    SXa = 1;
-    SChat = 0;
-    SInvis = 0;
+    SOnline = false;
+    SAway = true;
+    SDnd = true;
+    SXa = true;
+    SChat = false;
+    SInvis = false;
 }
 
 QString AutoReply::name() const {

@@ -348,7 +348,7 @@ void Reminder::updateVCard() {
         }
 
         int accs = -1;
-        while(1) {
+        while(true) {
             QStringList Jids = accInfoHost->getRoster(++accs);
             if(!Jids.isEmpty()) {
                 if(Jids.first() == "-1") {
@@ -378,7 +378,7 @@ QString Reminder::checkBirthdays() {
     QSet<QString> Roster_;
     if(checkFromRoster) {
         int accs = -1;
-        while(1) {
+        while(true) {
             QStringList Jids = accInfoHost->getRoster(++accs);
             if(!Jids.isEmpty()) {
                 if(Jids.first() == "-1") {
