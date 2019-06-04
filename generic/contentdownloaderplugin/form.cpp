@@ -38,7 +38,7 @@
 #include "applicationinfoaccessinghost.h"
 #include "ui_form.h"
 
-#define LIST_URL "https://raw.githubusercontent.com/psi-plus/contentdownloader/master/content.list"
+#define LIST_URL "https://raw.githubusercontent.com/psi-im/contentdownloader/master/content.list"
 
 Form::Form(QWidget *parent)
     : QWidget(parent)
