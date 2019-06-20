@@ -14,7 +14,6 @@ extendedoptionsplugin \
 gnupgplugin \
 gomokugameplugin \
 historykeeperplugin \
-httpuploadplugin \
 icqdieplugin \
 imageplugin \
 imagepreviewplugin \
