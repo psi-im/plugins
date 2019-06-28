@@ -636,7 +636,7 @@ bool ChessPlugin::incomingStanza(int account, const QDomElement& xml)
         const QString xmlType = xml.attribute("type");
         if(xmlType == "set") {
             QDomElement createElem = xml.firstChildElement("create");
-            if(!createElem.isNull() && createElem.attribute("xmlns") == "games:board"
+            if(!createElem.isNull() && createElem.namespaceURI() == "games:board"
                && createElem.attribute("type") == "chess") {
                 const QString xmlId = stanzaSender->escape(xml.attribute("id"));
                 const QString xmlFrom = stanzaSender->escape(xml.attribute("from"));
@@ -664,7 +664,7 @@ bool ChessPlugin::incomingStanza(int account, const QDomElement& xml)
                 return true;
             }
             QDomElement turn = xml.firstChildElement("turn");
-            if(!turn.isNull() && turn.attribute("xmlns") == "games:board" && turn.attribute("type") == "chess" && game_) {
+            if(!turn.isNull() && turn.namespaceURI() == "games:board" && turn.attribute("type") == "chess" && game_) {
                 const QString xmlId = stanzaSender->escape(xml.attribute("id"));
                 const QString xmlFrom = stanzaSender->escape(xml.attribute("from"));
                 if(xmlFrom.toLower() != currentGame_.jid.toLower()) {
@@ -701,7 +701,7 @@ bool ChessPlugin::incomingStanza(int account, const QDomElement& xml)
                 return true;
             }
             QDomElement closeElem = xml.firstChildElement("close");
-            if(!closeElem.isNull() && closeElem.attribute("xmlns") == "games:board" && closeElem.attribute("type") == "chess" && game_) {
+            if(!closeElem.isNull() && closeElem.namespaceURI() == "games:board" && closeElem.attribute("type") == "chess" && game_) {
                 const QString xmlFrom = stanzaSender->escape(xml.attribute("from"));
                 if(xmlFrom.toLower() != currentGame_.jid.toLower()) {
                     return true;  // Игнорируем станзы от "левых" джидов
@@ -710,7 +710,7 @@ bool ChessPlugin::incomingStanza(int account, const QDomElement& xml)
                 return true;
             }
             QDomElement loadElem = xml.firstChildElement("load");
-            if(!loadElem.isNull() && loadElem.attribute("xmlns") == "games:board" && loadElem.attribute("type") == "chess" && game_) {
+            if(!loadElem.isNull() && loadElem.namespaceURI() == "games:board" && loadElem.attribute("type") == "chess" && game_) {
                 const QString xmlFrom = stanzaSender->escape(xml.attribute("from"));
                 if(xmlFrom.toLower() != currentGame_.jid.toLower()) {
                     return true;  // Игнорируем станзы от "левых" джидов

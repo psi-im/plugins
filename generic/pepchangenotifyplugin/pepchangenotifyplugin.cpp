@@ -255,7 +255,7 @@ bool PepPlugin::incomingStanza(int account, const QDomElement& stanza)
                 return false;
 
             QDomElement event = stanza.firstChildElement("event");
-            if(!event.isNull() && event.attribute("xmlns").contains("http://jabber.org/protocol/pubsub")) {
+            if(!event.isNull() && event.namespaceURI().contains("http://jabber.org/protocol/pubsub")) {
                 QDomElement items = event.firstChildElement("items");
                 if(items.isNull())
                     return false;
@@ -266,7 +266,7 @@ bool PepPlugin::incomingStanza(int account, const QDomElement& stanza)
                 if(showTune) {
                     QDomElement tune = item.firstChildElement("tune");
                     if(!tune.isNull()
-                     && tune.attribute("xmlns") == "http://jabber.org/protocol/tune") {
+                     && tune.namespaceURI() == "http://jabber.org/protocol/tune") {
                         if(!processJid(jid, ContactState::EventTune)) {
                             return false;
                         }
@@ -294,7 +294,7 @@ bool PepPlugin::incomingStanza(int account, const QDomElement& stanza)
                 if(showMood) {
                     QDomElement mood = item.firstChildElement("mood");
                     if(!mood.isNull()
-                     && mood.attribute("xmlns") == "http://jabber.org/protocol/mood") {
+                     && mood.namespaceURI() == "http://jabber.org/protocol/mood") {
                         if(!processJid(jid, ContactState::EventMood)) {
                             return false;
                         }
@@ -318,7 +318,7 @@ bool PepPlugin::incomingStanza(int account, const QDomElement& stanza)
                 if(showActivity) {
                     QDomElement act = item.firstChildElement("activity");
                     if(!act.isNull()
-                     && act.attribute("xmlns") == "http://jabber.org/protocol/activity") {
+                     && act.namespaceURI() == "http://jabber.org/protocol/activity") {
                         if(!processJid(jid, ContactState::EventActivity)) {
                             return false;
                         }

@@ -369,13 +369,13 @@ bool CaptchaFormsPlugin::isValidChallenge(const QDomElement& stanza, QHash<QStri
         return false;
 
     QDomElement captcha = stanza.firstChildElement("captcha");
-    if(captcha.attribute("xmlns") != "urn:xmpp:captcha")
+    if(captcha.namespaceURI() != "urn:xmpp:captcha")
         return false;
 
     bool find = false;
     QDomElement formElem = captcha.firstChildElement("x");
     while (!formElem.isNull() ) {
-        if(formElem.attribute("xmlns") == "jabber:x:data") {
+        if(formElem.namespaceURI() == "jabber:x:data") {
             find = true;
             break;
         }

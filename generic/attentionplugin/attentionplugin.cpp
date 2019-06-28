@@ -291,7 +291,7 @@ bool AttentionPlugin::incomingStanza(int account, const QDomElement& stanza) {
         else if(stanza.tagName() == "iq" && stanza.attribute("type") == "get")
         {
             QDomElement query = stanza.firstChildElement("query");
-            if(!query.isNull() && query.attribute("xmlns") == "http://jabber.org/protocol/disco#info")
+            if(!query.isNull() && query.namespaceURI() == "http://jabber.org/protocol/disco#info")
             {
                 if(query.attribute("node") == "http://psi-dev.googlecode.com/caps#at-pl") {
                     QString reply = QString("<iq type=\"result\" to=\"%1\" id=\"%2\">"

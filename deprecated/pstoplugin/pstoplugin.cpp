@@ -154,12 +154,10 @@ bool PstoPlugin::processEvent(int account, QDomElement &e) {
         QDomElement body = e.childNodes().at(5).firstChildElement(); // the same
         QDomText body_text = body.firstChild().toText();
 
-        QDomElement html = doc.createElement("html");
-        html.setAttribute("xmlns", "http://jabber.org/protocol/xhtml-im");
+        QDomElement html = doc.createElementNS("http://jabber.org/protocol/xhtml-im", "html");
         body.parentNode().appendChild(html);
 
-        QDomElement html_body = doc.createElement("body");
-        html_body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+        QDomElement html_body = doc.createElement("http://www.w3.org/1999/xhtml", "body");
         html.appendChild(html_body);
 
         QStringList message_strings = body_text.nodeValue().split("\n");

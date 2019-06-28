@@ -327,8 +327,7 @@ bool EnumMessagesPlugin::appendingChatMessage(int account, const QString &contac
 //    qDebug() << s;
 
     if(html.isNull()) {
-        html = doc.createElement("body");
-        html.setAttribute("xmlns", htmlimNS);
+        html = doc.createElementNS(htmlimNS, "body");
         doc.appendChild(html);
     }
     else {
@@ -401,16 +400,14 @@ void EnumMessagesPlugin::addMessageNum(QDomDocument *doc, QDomElement *stanza, q
     QDomElement body;
     QDomElement element = stanza->firstChildElement("html");
     if(element.isNull()) {
-        element = doc->createElement("html");
-        element.setAttribute("xmlns", xhtmlProtoNS);
+        element = doc->createElementNS(xhtmlProtoNS, "html");
     }
     else {
         body = element.firstChildElement("body");
 
     }
     if(body.isNull()) {
-        body = doc->createElement("body");
-        body.setAttribute("xmlns", htmlimNS);
+        body = doc->createElementNS(htmlimNS, "body");
         appendBody = true;
     }
 

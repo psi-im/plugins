@@ -87,13 +87,13 @@ namespace psiomemo {
     bool isCarbon = false;
     QDomElement message = xml;
 
-    if (message.firstChild().toElement().attribute("xmlns") == "urn:xmpp:carbons:2") {
+    if (message.firstChild().toElement().namespaceURI() == "urn:xmpp:carbons:2") {
       message = message.firstChild().firstChildElement("forwarded").firstChildElement("message");
       isCarbon = true;
     }
 
     QDomElement encrypted = message.firstChildElement("encrypted");
-    if (encrypted.isNull() || encrypted.attribute("xmlns") != OMEMO_XMLNS) {
+    if (encrypted.isNull() || encrypted.namespaceURI() != OMEMO_XMLNS) {
       return false;
     }
 
@@ -316,7 +316,7 @@ namespace psiomemo {
 
     if (xml.nodeName() == "message" && xml.attribute("type") == "headline") {
       QDomElement event = xml.firstChildElement("event");
-      if (event.isNull() || event.attribute("xmlns") != "http://jabber.org/protocol/pubsub#event") {
+      if (event.isNull() || event.namespaceURI() != "http://jabber.org/protocol/pubsub#event") {
         return false;
       }
 

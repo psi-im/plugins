@@ -545,10 +545,8 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement& stanza)
             msg.replace("&lt;","<");
 
             //Создаем xhtml-im элемент
-            QDomElement element =  doc.createElement("html");
-            element.setAttribute("xmlns","http://jabber.org/protocol/xhtml-im");
-            QDomElement body = doc.createElement("body");
-            body.setAttribute("xmlns","http://www.w3.org/1999/xhtml");
+            QDomElement element =  doc.createElementNS("http://jabber.org/protocol/xhtml-im", "html");
+            QDomElement body = doc.createElementNS("http://www.w3.org/1999/xhtml", "body");
 
             //HELP
             if (msg.indexOf("\nNICK mynickname - Set a nickname\n\n") != -1) {

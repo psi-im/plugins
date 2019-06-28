@@ -114,7 +114,7 @@ namespace psiomemo {
       QDomNodeList nodes = xml.childNodes();
       for (int i = 0; i < nodes.length(); i++) {
         QDomNode node = nodes.item(i);
-        if (node.nodeName() == "x" && node.toElement().attribute("xmlns") == "http://jabber.org/protocol/muc#user") {
+        if (node.nodeName() == "x" && node.toElement().namespaceURI() == "http://jabber.org/protocol/muc#user") {
           QString bareJid = xml.attribute("from").split("/").first();
           QTimer::singleShot(0, [=]() { updateAction(account, bareJid); });
           break;

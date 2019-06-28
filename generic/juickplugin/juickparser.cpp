@@ -283,7 +283,7 @@ QDomElement JuickParser::findElement(const QString &tagName, const QString &xmln
     while(!e.isNull()) {
         if(e.isElement()) {
             QDomElement el = e.toElement();
-            if(el.tagName() == tagName && el.attribute("xmlns") == xmlns)
+            if(el.tagName() == tagName && el.namespaceURI() == xmlns)
                 return el;
         }
         e = e.nextSibling();

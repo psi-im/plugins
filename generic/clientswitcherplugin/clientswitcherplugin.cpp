@@ -388,7 +388,7 @@ bool ClientSwitcherPlugin::incomingStanza(int account, const QDomElement& stanza
                 return false;
             QDomNode s_child = stanza.firstChild();
             while (!s_child.isNull()) {
-                const QString xmlns = s_child.toElement().attribute("xmlns");
+                const QString xmlns = s_child.toElement().namespaceURI();
                 if (s_child.toElement().tagName() == "query") {
                     if (xmlns == "http://jabber.org/protocol/disco#info") {
                         QString node = s_child.toElement().attribute("node");
@@ -630,8 +630,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
                         err.setAttribute("type", "cancel");
                         err.setAttribute("code", "501");
                         stanza.appendChild(err);
-                        QDomElement not_imp = xmldoc.createElement("feature-not-implemented");
-                        not_imp.setAttribute("xmlns", "urn:ietf:params:xml:ns:xmpp-stanzas");
+                        QDomElement not_imp = xmldoc.createElementNS( "urn:ietf:params:xml:ns:xmpp-stanzas", "feature-not-implemented");
                         err.appendChild(not_imp);
                         send_ver_list.push_back("feature-not-implemented");
                     }
@@ -656,8 +655,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
                         err.setAttribute("type", "cancel");
                         err.setAttribute("code", "501");
                         stanza.appendChild(err);
-                        QDomElement not_imp = xmldoc.createElement("feature-not-implemented");
-                        not_imp.setAttribute("xmlns", "urn:ietf:params:xml:ns:xmpp-stanzas");
+                        QDomElement not_imp = xmldoc.createElementNS("urn:ietf:params:xml:ns:xmpp-stanzas", "feature-not-implemented");
                         err.appendChild(not_imp);
                     }
                 }

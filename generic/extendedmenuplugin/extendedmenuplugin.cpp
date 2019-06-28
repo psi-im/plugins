@@ -376,7 +376,7 @@ bool ExtendedMenuPlugin::incomingStanza(int account, const QDomElement &xml)
                             const QString title = tr("%1 Last Activity").arg(name);
                             QDomElement query = xml.firstChildElement("query");
                             if(!query.isNull()
-                               && query.attribute("xmlns") == "jabber:iq:last"
+                               && query.namespaceURI() == "jabber:iq:last"
                                && query.hasAttribute("seconds"))
                             {
                                 ulong secs = query.attribute("seconds").toInt();

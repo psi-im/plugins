@@ -278,7 +278,7 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
         !messageElement.isNull() &&
         messageElement.attribute("type") != "error" &&
         messageElement.attribute("type") != "groupchat" &&
-        messageElement.firstChild().toElement().attribute("xmlns") != "urn:xmpp:carbons:2")
+        messageElement.firstChild().toElement().namespaceURI() != "urn:xmpp:carbons:2")
     {
         QString contact = getCorrectJid(accountIndex,
                                         messageElement.attribute("from"));
@@ -332,9 +332,7 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
                     // replace html body
                     if (htmlElement.isNull())
                     {
-                        htmlElement = messageElement.ownerDocument().createElement("html");
-                        htmlElement.setAttribute("xmlns",
-                                                 "http://jabber.org/protocol/xhtml-im");
+                        htmlElement = messageElement.ownerDocument().createElementNS("http://jabber.org/protocol/xhtml-im", "html");
                         messageElement.appendChild(htmlElement);
                     }
                     else

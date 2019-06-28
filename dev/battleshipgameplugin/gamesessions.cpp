@@ -99,7 +99,7 @@ bool GameSessionList::processIncomingIqStanza(int account, const QDomElement &xm
     if (iqType == "set")
     {
         QDomElement childEl = xml.firstChildElement();
-        if (childEl.isNull() || childEl.attribute("xmlns") != "games:board" || childEl.attribute("type") != "battleship")
+        if (childEl.isNull() || childEl.namespaceURI() != "games:board" || childEl.attribute("type") != "battleship")
             return false;
 
         const QString gameId = childEl.attribute("id");
@@ -718,7 +718,7 @@ bool GameSession::handleTurnResult(const QDomElement &xml)
     QDomElement el = xml.firstChildElement("turn");
     if (!el.isNull())
     {
-        if (el.attribute("xmlns") != "games:board"
+        if (el.namespaceURI() != "games:board"
                 || el.attribute("type") != "battleship" || el.attribute("id") != gameId_)
             return false;
 

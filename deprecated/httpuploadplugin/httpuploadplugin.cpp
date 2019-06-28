@@ -532,7 +532,7 @@ void HttpUploadPlugin::processOneService(const QDomElement& query, const QString
 }
 
 void HttpUploadPlugin::processUploadSlot(const QDomElement& xml) {
-    if (xml.firstChildElement("request").attribute("xmlns") == "urn:xmpp:http:upload") {
+    if (xml.firstChildElement("request").namespaceURI() == "urn:xmpp:http:upload") {
         QDomElement error = xml.firstChildElement("error");
         if (!error.isNull()) {
             QString errorText = error.firstChildElement("text").text();
@@ -544,7 +544,7 @@ void HttpUploadPlugin::processUploadSlot(const QDomElement& xml) {
         }
     }
     QDomElement slot = xml.firstChildElement("slot");
-    if (slot.attribute("xmlns") == "urn:xmpp:http:upload") {
+    if (slot.namespaceURI() == "urn:xmpp:http:upload") {
         slotTimeout.stop();
         QString put = slot.firstChildElement("put").text();
         QString get = slot.firstChildElement("get").text();
@@ -577,10 +577,10 @@ bool HttpUploadPlugin::incomingStanza(int account, const QDomElement& xml) {
     if (xml.nodeName() == "iq" && xml.attribute("type") == "result") {
         QDomElement query = xml.firstChildElement("query");
         if (!query.isNull()) {
-            if (query.attribute("xmlns") == "http://jabber.org/protocol/disco#items") {
+            if (query.namespaceURI() == "http://jabber.org/protocol/disco#items") {
                 processServices(query, account);
             }
-            if (query.attribute("xmlns") == "http://jabber.org/protocol/disco#info") {
+            if (query.namespaceURI() == "http://jabber.org/protocol/disco#info") {
                 processOneService(query, xml.attribute("from"), account);
             }
         } else {

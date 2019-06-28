@@ -75,7 +75,7 @@ bool GameSessions::processIncomingIqStanza(int account, const QDomElement &xml, 
     const QString iq_type = xml.attribute("type");
     if(iq_type == "set") {
         QDomElement childElem = xml.firstChildElement("create");
-        if(!childElem.isNull() && childElem.attribute("xmlns") == "games:board"
+        if(!childElem.isNull() && childElem.namespaceURI() == "games:board"
         && childElem.attribute("type") == constProtoType) {
             const QString from = xml.attribute("from");
             const QString id = xml.attribute("id");
@@ -98,7 +98,7 @@ bool GameSessions::processIncomingIqStanza(int account, const QDomElement &xml, 
         if (activeCount() == 0) // Нет ни одной активной игровой сессии (наиболее вероятный исход большую часть времени)
             return false;   // Остальные проверки бессмысленны
         childElem = xml.firstChildElement("turn");
-        if (!childElem.isNull() && childElem.attribute("xmlns") == "games:board"
+        if (!childElem.isNull() && childElem.namespaceURI() == "games:board"
             && childElem.attribute("type") == constProtoType) {
             const QString from = xml.attribute("from");
             const QString id = xml.attribute("id");
@@ -122,7 +122,7 @@ bool GameSessions::processIncomingIqStanza(int account, const QDomElement &xml, 
             return false;
         }
         childElem = xml.firstChildElement("close");
-        if (!childElem.isNull() && childElem.attribute("xmlns") == "games:board"
+        if (!childElem.isNull() && childElem.namespaceURI() == "games:board"
             && childElem.attribute("type") == constProtoType) {
             const QString from = xml.attribute("from");
             const QString id = xml.attribute("id");
@@ -134,7 +134,7 @@ bool GameSessions::processIncomingIqStanza(int account, const QDomElement &xml, 
             return closeRemoteGameBoard(account, from, id);
         }
         childElem = xml.firstChildElement("load");
-        if (!childElem.isNull() && childElem.attribute("xmlns") == "games:board"
+        if (!childElem.isNull() && childElem.namespaceURI() == "games:board"
             && childElem.attribute("type") == constProtoType) {
             const QString from = xml.attribute("from");
             const QString id = xml.attribute("id");

@@ -272,8 +272,7 @@ void RipperCC::updateNameGroup(int account, const QString &jid, const QString &n
     iqElement.setAttribute(QLatin1String("type"), QLatin1String("set"));
     iqElement.setAttribute(QLatin1String("id"), _stanzaSending->uniqueId(account));
 
-    QDomElement queryElement = doc.createElement(QLatin1String("query"));
-    queryElement.setAttribute(QLatin1String("xmlns"), QLatin1String("jabber:iq:roster"));
+    QDomElement queryElement = doc.createElementNS(QLatin1String("jabber:iq:roster"), QLatin1String("query"));
 
     QDomElement itemElement = doc.createElement(QLatin1String("item"));
     itemElement.setAttribute(QLatin1String("name"), name);

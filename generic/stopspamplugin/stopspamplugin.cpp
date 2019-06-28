@@ -458,7 +458,7 @@ bool StopSpam::incomingStanza(int account, const QDomElement& stanza) {
             QDomElement query = stanza.firstChildElement("query");
             if(!Unblocked.isEmpty()
                 && !query.isNull()
-                && query.attribute("xmlns") == "jabber:iq:roster") {
+                && query.namespaceURI() == "jabber:iq:roster") {
                 QStringList Roster = accInfoHost->getRoster(account);
                 QStringList UnblockedList = Unblocked.split("\n");
                 while(!Roster.isEmpty()) {
@@ -582,7 +582,7 @@ bool StopSpam::incomingStanza(int account, const QDomElement& stanza) {
                 return false;
 
             QDomElement captcha = stanza.firstChildElement("captcha");
-            if(!captcha.isNull() && captcha.attribute("xmlns") == "urn:xmpp:captcha")
+            if(!captcha.isNull() && captcha.namespaceURI() == "urn:xmpp:captcha")
                 return false; // CAPTCHA
 
             QDomElement Body = stanza.firstChildElement("body");
@@ -678,7 +678,7 @@ bool StopSpam::findMucNS(const QDomElement &stanza) {
     QDomNodeList nodeList = stanza.elementsByTagName("x");
     for(int i = 0; i < nodeList.size(); i++) {
         QDomElement item = nodeList.at(i).toElement();
-        if(!item.isNull() && item.attribute("xmlns").contains("http://jabber.org/protocol/muc")) {
+        if(!item.isNull() && item.namespaceURI().contains("http://jabber.org/protocol/muc")) {
             find = true;
             break;
         }

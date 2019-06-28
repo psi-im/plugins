@@ -115,7 +115,7 @@ bool QipXStatuses::incomingStanza(int account, const QDomElement& stanza) {
           QDomElement xElem;
           for(int i = xElemList.size(); i > 0;) {
              xElem = xElemList.at(--i).toElement();
-             if(xElem.attribute("xmlns") == "http://qip.ru/x-status") {
+             if(xElem.namespaceURI() == "http://qip.ru/x-status") {
                  xStat = true;
                  QString mood = "";
                  QString act = "";
@@ -272,7 +272,7 @@ bool QipXStatuses::incomingStanza(int account, const QDomElement& stanza) {
           if(!xStat) {
               QDomElement cElem = stanza.firstChildElement("c");
               if(!cElem.isNull() &&
-                 cElem.attribute("xmlns") == "http://jabber.org/protocol/caps" &&
+                 cElem.namespaceURI() == "http://jabber.org/protocol/caps" &&
                  cElem.attribute("node") == "http://qip.ru/caps") {
                   contactState->setMood(account, from, emptyElem);
                   contactState->setActivity(account, from, emptyElem);
@@ -296,8 +296,7 @@ void QipXStatuses::setContactStateAccessingHost(ContactStateAccessingHost* host)
 
 QDomElement QipXStatuses::activityToXml(QString type, QString specificType, QString text) {
         QDomDocument doc;
-        QDomElement activity = doc.createElement("activity");
-        activity.setAttribute("xmlns", "http://jabber.org/protocol/activity");
+        QDomElement activity = doc.createElementNS("http://jabber.org/protocol/activity", "activity");
 
         if (!type.isEmpty()) {
                 QDomElement el = doc.createElement(type);
@@ -322,8 +321,7 @@ QDomElement QipXStatuses::activityToXml(QString type, QString specificType, QStr
 
 QDomElement QipXStatuses::MoodToXml(QString type, QString text) {
         QDomDocument doc;
-        QDomElement mood = doc.createElement("mood");
-        mood.setAttribute("xmlns", "http://jabber.org/protocol/mood");
+        QDomElement mood = doc.createElementNS("http://jabber.org/protocol/mood", "mood");
 
         if (!type.isEmpty()) {
                 QDomElement el = doc.createElement(type);

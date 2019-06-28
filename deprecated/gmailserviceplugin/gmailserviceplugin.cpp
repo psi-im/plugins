@@ -302,7 +302,7 @@ bool GmailNotifyPlugin::incomingStanza(int account, const QDomElement& stanza)
         }
         else if(stanza.tagName() == "message") {
             QDomElement x = stanza.firstChildElement("x");
-            if(!x.isNull() && x.attribute("xmlns") == "google:nosave") {
+            if(!x.isNull() && x.namespaceURI() == "google:nosave") {
                 QString jid = stanza.attribute("from").split("/").first();
                 bool val = (x.attribute("value") == "enabled");
                 AccountSettings *as = findAccountSettings(accInfo->getJid(account));
@@ -347,7 +347,7 @@ bool GmailNotifyPlugin::checkFeatures(int account, const QDomElement &stanza, co
     bool myReqyest = false;
     if (stanza.attribute("type") == "result"
          && query.tagName() == "query"
-         && query.attribute("xmlns") == "http://jabber.org/protocol/disco#info")
+         && query.namespaceURI() == "http://jabber.org/protocol/disco#info")
     {
         if(id_.contains(stanza.attribute("id"))) {
             id_.removeAll(stanza.attribute("id"));
@@ -422,7 +422,7 @@ bool GmailNotifyPlugin::checkEmail(int account, const QDomElement &stanza, const
 {
     if (stanza.attribute("type") == "set"
         && query.tagName() == "new-mail"
-        && query.attribute("xmlns") == "google:mail:notify")
+        && query.namespaceURI() == "google:mail:notify")
     {
         //Server reports new mail
         //send success result
@@ -443,7 +443,7 @@ bool GmailNotifyPlugin::checkEmail(int account, const QDomElement &stanza, const
     }
     else if(stanza.attribute("type") == "result"
         && query.tagName() == "mailbox"
-        && query.attribute("xmlns") == "google:mail:notify")
+        && query.namespaceURI() == "google:mail:notify")
     {
         //Email Query Response
         const QString jid = stanza.attribute("to").split("/").at(0);
@@ -477,7 +477,7 @@ bool GmailNotifyPlugin::checkSettings(int account, const QDomElement &stanza, co
     if ( (stanza.attribute("type") == "result"
          || stanza.attribute("type") == "set")
         && query.tagName() == "usersetting"
-        && query.attribute("xmlns") == "google:setting")
+        && query.namespaceURI() == "google:setting")
     {
         foundSettings = true;
         //id_.removeAll(stanza.attribute("id"));
@@ -523,7 +523,7 @@ bool GmailNotifyPlugin::checkSharedStatus(int account, const QDomElement &stanza
 {
     bool found = false;
     if (query.tagName() == "query"
-        && query.attribute("xmlns") == "google:shared-status") {
+        && query.namespaceURI() == "google:shared-status") {
         found = true;
         const QString jid = stanza.attribute("to").split("/").at(0);
         const QString server = stanza.attribute("from").toLower();
@@ -591,7 +591,7 @@ bool GmailNotifyPlugin::checkNoSave(int account, const QDomElement &stanza, cons
 {
     bool found = false;
     if(query.tagName() == "query"
-       && query.attribute("xmlns") == "google:nosave")
+       && query.namespaceURI() == "google:nosave")
     {
         found = true;
         const QString jid = stanza.attribute("to").split("/").at(0);
@@ -643,7 +643,7 @@ bool GmailNotifyPlugin::checkAttributes(int account, const QDomElement &stanza, 
 {
     bool found = false;
     if(query.tagName() == "query"
-       && query.attribute("xmlns") == "jabber:iq:roster"
+       && query.namespaceURI() == "jabber:iq:roster"
        && query.attribute("ext") == "2")
     {
         const QString jid = stanza.attribute("to").split("/").at(0);
