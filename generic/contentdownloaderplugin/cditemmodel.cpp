@@ -76,8 +76,8 @@ bool CDItemModel::setData(const QModelIndex &index, const QVariant &value, int r
 
         // set the same for the descends 
         int i = 0;
-        while(index.model()->index(i, 0).isValid()) {
-            setData(index.model()->index(i++, 0), value, role);
+        while(index.model()->index(i, 0, index).isValid()) {
+            setData(index.model()->index(i++, 0, index), value, role);
         }
         
         if(index.parent().isValid()) {
@@ -212,9 +212,9 @@ QList<ContentItem*> CDItemModel::getToInstall() const
     QList<ContentItem*> listItems;
     QModelIndex index = this->index(0, 0);
     while(index.isValid()) {
-        if(index.model()->index(0, 0).isValid()) {
+        if(index.model()->index(0, 0, index).isValid()) {
             // Descent
-            index = index.model()->index(0, 0);
+            index = index.model()->index(0, 0, index);
         } else {
             while(index.isValid()) {
                 ContentItem *item = static_cast<ContentItem*>(index.internalPointer());
@@ -254,9 +254,9 @@ void CDItemModel::update()
 {
     QModelIndex index = this->index(0, 0);
     while(index.isValid()) {
-        if(index.model()->index(0, 0).isValid()) {
+        if(index.model()->index(0, 0, index).isValid()) {
             // Descent
-            index = index.model()->index(0, 0);
+            index = index.model()->index(0, 0, index);
         } else {
             bool allInstalled = true;
             while(true) {
