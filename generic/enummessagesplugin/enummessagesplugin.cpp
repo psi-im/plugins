@@ -460,6 +460,6 @@ QString EnumMessagesPlugin::pluginInfo()
 {
     return tr("Authors: ") + "Dealer_WeARE\n\n" +
         tr("The plugin is designed to enumerate messages, adding the messages numbers in chat logs "
-    "and notification of missed messages. \n"
-    "Supports per contact on / off message enumeration via the buttons on the chats toolbar.");
+           "and notification of missed messages. \n"
+           "Supports per contact on / off message enumeration via the buttons on the chats toolbar.");
 }

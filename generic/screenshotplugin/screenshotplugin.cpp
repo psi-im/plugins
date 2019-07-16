@@ -227,7 +227,7 @@ void ScreenshotPlugin::restoreOptions()
 QString ScreenshotPlugin::pluginInfo()
 {
     return tr("Authors: ") +  "C.H., Dealer_WeARE\n\n"
-            + trUtf8("This plugin allows you to make screenshots and save them to your hard drive or upload them to an FTP or HTTP server.\n"
+            + tr("This plugin allows you to make screenshots and save them to your hard drive or upload them to an FTP or HTTP server.\n"
              "The plugin has the following settings:\n"
              "* Shortcut -- hotkey to make the screenshot (by default, Ctrl+Alt+P)\n"
              "* Format -- the file format in which the screenshot will be stored (default: .jpg)\n"

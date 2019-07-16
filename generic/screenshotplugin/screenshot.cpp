@@ -31,6 +31,7 @@
 #include <QCloseEvent>
 #include <QDesktopServices>
 #include <QClipboard>
+#include <QScreen>
 
 
 #include "screenshot.h"
@@ -521,7 +522,7 @@ void Screenshot::shootArea()
     if(rect.isValid()) {
         qApp->desktop()->repaint();
         qApp->beep();
-        originalPixmap = QPixmap::grabWindow(QApplication::desktop()->winId(), rect.x(), rect.y(), rect.width(), rect.height());
+        originalPixmap = qApp->primaryScreen()->grabWindow(QApplication::desktop()->winId(), rect.x(), rect.y(), rect.width(), rect.height());
     }
 
     delete grabAreaWidget_;
@@ -538,7 +539,7 @@ void Screenshot::captureWindow(int delay)
 void Screenshot::shootWindow()
 {
     qApp->beep();
-    originalPixmap = QPixmap::grabWindow(QxtWindowSystem::activeWindow());
+    originalPixmap = qApp->primaryScreen()->grabWindow(QxtWindowSystem::activeWindow());
 
     refreshWindow();
 }
@@ -551,7 +552,7 @@ void Screenshot::captureDesktop(int delay)
 void Screenshot::shootScreen()
 {
     qApp->beep();
-    originalPixmap = QPixmap::grabWindow(QApplication::desktop()->winId());
+    originalPixmap = qApp->primaryScreen()->grabWindow(QApplication::desktop()->winId());
 
     refreshWindow();
 }
@@ -591,8 +592,8 @@ void Screenshot::copyUrl()
 
 void Screenshot::dataTransferProgress(qint64 done, qint64 total)
 {
-    ui_.progressBar->setMaximum(total);
-    ui_.progressBar->setValue(done);
+    ui_.progressBar->setMaximum(int(total));
+    ui_.progressBar->setValue(int(done));
 }
 
 void Screenshot::uploadScreenshot()
@@ -653,7 +654,7 @@ void Screenshot::uploadFtp()
 
     manager = new QNetworkAccessManager(this);
     if(s->useProxy() && !proxy_.host.isEmpty()) {
-        QNetworkProxy p = QNetworkProxy(QNetworkProxy::HttpCachingProxy, proxy_.host, proxy_.port, proxy_.user, proxy_.pass);
+        QNetworkProxy p = QNetworkProxy(QNetworkProxy::HttpCachingProxy, proxy_.host, quint16(proxy_.port), proxy_.user, proxy_.pass);
         if(proxy_.type == "socks")
             p.setType(QNetworkProxy::Socks5Proxy);
         manager->setProxy(p);
@@ -722,7 +723,7 @@ void Screenshot::uploadHttp()
     manager = new QNetworkAccessManager(this);
 
     if(s->useProxy() && !proxy_.host.isEmpty()) {
-        QNetworkProxy p = QNetworkProxy(QNetworkProxy::HttpCachingProxy, proxy_.host, proxy_.port, proxy_.user, proxy_.pass);
+        QNetworkProxy p = QNetworkProxy(QNetworkProxy::HttpCachingProxy, proxy_.host, quint16(proxy_.port), proxy_.user, proxy_.pass);
         if(proxy_.type == "socks")
             p.setType(QNetworkProxy::Socks5Proxy);
         manager->setProxy(p);
@@ -749,7 +750,7 @@ void Screenshot::uploadHttp()
 
 void Screenshot::ftpReplyFinished()
 {
-    QNetworkReply *reply = (QNetworkReply*)sender();
+    QNetworkReply *reply = static_cast<QNetworkReply*>(sender());
     ui_.urlFrame->setVisible(true);
     if(reply->error() == QNetworkReply::NoError) {
         const QString url = reply->url().toString(QUrl::RemoveUserInfo | QUrl::StripTrailingSlash);

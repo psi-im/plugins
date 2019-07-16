@@ -195,7 +195,7 @@ void ImagePreviewPlugin::setOptionAccessingHost(OptionAccessingHost *host) {
 }
 
 QString ImagePreviewPlugin::pluginInfo() {
-    return tr("Author: ") + "rkfg\n\n" + trUtf8("This plugin shows images URLs' previews in chats for non-webkit Psi version.\n");
+    return tr("Author: ") + "rkfg\n\n" + tr("This plugin shows images URLs' previews in chats for non-webkit Psi version.\n");
 }
 
 QPixmap ImagePreviewPlugin::icon() const {

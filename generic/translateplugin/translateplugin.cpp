@@ -591,7 +591,7 @@ void TranslatePlugin::actionDestroyed(QObject *obj)
 QString TranslatePlugin::pluginInfo()
 {
     return tr("Author: ") +     "VampiRUS\n\n"
-           + trUtf8("This plugin allows you to convert selected text into another language.\n");
+           + tr("This plugin allows you to convert selected text into another language.\n");
 }
 
 QPixmap TranslatePlugin::icon() const

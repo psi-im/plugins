@@ -114,11 +114,11 @@ IcqDie::IcqDie()
     MessageCount = 0;
 
     enabled = false;
-    MessageRecv = trUtf8("I can tell you as a Linux, but do not be mad at me. "
+    MessageRecv = tr("I can tell you as a Linux, but do not be mad at me. "
             "Certainly this human will receive this message. But it's much better to chat to him by Jabber. "
             "You are risking, one never knows when ICQ can die, granny already outlived its. His JID: %1.\n\n"
             "Sincerely yours, Debian Sid.");
-    MessageNoRecv = trUtf8("I can tell you as a Linux, but do not be mad at me. "
+    MessageNoRecv = tr("I can tell you as a Linux, but do not be mad at me. "
             "This human do not use ICQ anymore, so if you are still use that network he will not receive your message and you have to chat to him by Jabber. His JID: %1.\n\n"
             "If you don't know what Jabber is - use Google. It knows everything and ready to help everyone who ask it.\n"
             "Sincerely yours, Debian Sid.");
@@ -409,7 +409,7 @@ void IcqDie::setAccountInfoAccessingHost(AccountInfoAccessingHost* host)
 QString IcqDie::pluginInfo()
 {
     return tr("Author: ") +  "ivan1986\n\n"
-            + trUtf8("This plugin is designed to help you transfer as many contacts as possible from ICQ to Jabber.\n"
+            + tr("This plugin is designed to help you transfer as many contacts as possible from ICQ to Jabber.\n"
              "The plugin has a number of simple settings that can help you:\n"
              "* set a special message text\n"
              "* exclude specific ICQ numbers\n"

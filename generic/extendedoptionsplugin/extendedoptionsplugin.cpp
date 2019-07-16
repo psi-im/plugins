@@ -1187,10 +1187,10 @@ QString ExtendedOptions::pluginInfo()
 {
     return tr("Author: ") +     "Dealer_WeARE\n"
          + tr("Email: ") + "wadealer@gmail.com\n\n"
-         + trUtf8("This plugin is designed to allow easy configuration of some advanced options in Psi+.\n"
-                  "This plugin gives you access to advanced application options, which do not have a graphical user interface.\n\n"
-                  "Importantly: a large part of the options are important system settings. These require extra attention and proper"
-                  "understanding of the results when changing the option.");
+         + tr("This plugin is designed to allow easy configuration of some advanced options in Psi+.\n"
+              "This plugin gives you access to advanced application options, which do not have a graphical user interface.\n\n"
+              "Importantly: a large part of the options are important system settings. These require extra attention and proper"
+              "understanding of the results when changing the option.");
 }
 
 QPixmap ExtendedOptions::icon() const

@@ -114,18 +114,17 @@ QWidget* JuickPlugin::options()
     optionsWid = new QWidget();
     ui_.setupUi(optionsWid);
 
-    QSignalMapper *sm = new QSignalMapper(optionsWid);
     const QList<QToolButton*> list = {
         ui_.tb_link, ui_.tb_message, ui_.tb_name, ui_.tb_quote, ui_.tb_tag
     };
     foreach(QToolButton* b, list) {
-        sm->setMapping(b, b);
-        connect(b, SIGNAL(clicked()), sm, SLOT(map()));
+        connect(b, &QToolButton::clicked, this, [this, b](){
+            chooseColor(b);
+        });
     }
 
     restoreOptions();
 
-    connect(sm, SIGNAL(mapped(QWidget*)), SLOT(chooseColor(QWidget*)));
     connect(ui_.pb_clearCache, SIGNAL(released()), SLOT(clearCache()));
     connect(ui_.pb_editJids, SIGNAL(released()), SLOT(requestJidList()));
 
@@ -1132,10 +1131,10 @@ void JuickPlugin::updateWidgets(const QList<QByteArray>& urls)
 QString JuickPlugin::pluginInfo()
 {
     return tr("Authors: ") + "VampiRUS, Dealer_WeARE\n\n"
-    + trUtf8("This plugin is designed to work efficiently and comfortably with the Juick microblogging service.\n"
-             "Currently, the plugin is able to: \n"
-             "* Coloring @nick, *tag and #message_id in messages from the juick@juick.com bot\n"
-             "* Detect >quotes in messages\n"
-             "* Enable clickable @nick, *tag, #message_id and other control elements to insert them into the typing area\n\n"
-             "Note: To work correctly, the option options.html.chat.render    must be set to true. ");
+    + tr("This plugin is designed to work efficiently and comfortably with the Juick microblogging service.\n"
+         "Currently, the plugin is able to: \n"
+         "* Coloring @nick, *tag and #message_id in messages from the juick@juick.com bot\n"
+         "* Detect >quotes in messages\n"
+         "* Enable clickable @nick, *tag, #message_id and other control elements to insert them into the typing area\n\n"
+         "Note: To work correctly, the option options.html.chat.render    must be set to true. ");
 }

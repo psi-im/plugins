@@ -678,8 +678,8 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 
 QString ClientSwitcherPlugin::pluginInfo() {
     return tr("Authors: ") +  "Liuch\n\n"
-         + trUtf8("The plugin is intended for substitution of the client version, his name and operating system type.\n"
-                  "You can specify the version of the client and OS or to select them from the preset list.\n");
+         + tr("The plugin is intended for substitution of the client version, his name and operating system type.\n"
+              "You can specify the version of the client and OS or to select them from the preset list.\n");
 }
 
 void ClientSwitcherPlugin::setPopupAccessingHost(PopupAccessingHost* host)

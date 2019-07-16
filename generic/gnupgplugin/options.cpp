@@ -53,10 +53,10 @@ Options::Options(QWidget *parent)
     QAction *action;
     QMenu *menu = new QMenu(this);
 
-    action = menu->addAction(trUtf8("from file"));
+    action = menu->addAction(tr("from file"));
     connect(action, SIGNAL(triggered()), SLOT(importKeyFromFile()));
 
-    action = menu->addAction(trUtf8("from clipboard"));
+    action = menu->addAction(tr("from clipboard"));
     connect(action, SIGNAL(triggered()), SLOT(importKeyFromClipboard()));
 
     ui->btnImport->setMenu(menu);
@@ -64,11 +64,11 @@ Options::Options(QWidget *parent)
     // Export key
 
     menu = new QMenu(this);
-    action = menu->addAction(trUtf8("to file"));
+    action = menu->addAction(tr("to file"));
     connect(action, SIGNAL(triggered()), SLOT(exportKeyToFile()));
     ui->btnExport->addAction(action);
 
-    action = menu->addAction(trUtf8("to clipboard"));
+    action = menu->addAction(tr("to clipboard"));
     connect(action, SIGNAL(triggered()), SLOT(exportKeyToClipboard()));
 
     ui->btnExport->setMenu(menu);
@@ -145,9 +145,9 @@ void Options::addKey()
 
     key += "%commit\n";
 
-    QProgressDialog waitingDlg("", trUtf8("Cancel"), 0, 0, this);
+    QProgressDialog waitingDlg("", tr("Cancel"), 0, 0, this);
 
-    QLabel progressTextLabel(trUtf8(
+    QLabel progressTextLabel(tr(
 "<b>Please wait!</b><br/>"
 "We need to generate a lot of random bytes. It is a good idea to perform "
 "some other action (type on the keyboard, move the mouse, utilize the "
@@ -166,7 +166,7 @@ void Options::addKey()
     waitingDlg.setBar(&progressBar);
 
     waitingDlg.setWindowModality(Qt::WindowModal);
-    waitingDlg.setWindowTitle(trUtf8("Key pair generating"));
+    waitingDlg.setWindowTitle(tr("Key pair generating"));
     waitingDlg.show();
 
     GpgProcess gpg;
@@ -244,8 +244,8 @@ void Options::importKeyFromFile()
     QFileDialog dlg(this);
     dlg.setFileMode(QFileDialog::ExistingFiles);
     QStringList nameFilters;
-    nameFilters << trUtf8("ASCII (*.asc)")
-                << trUtf8("All files (*)");
+    nameFilters << tr("ASCII (*.asc)")
+                << tr("All files (*)");
     dlg.setNameFilters(nameFilters);
     if (dlg.exec() == QDialog::Rejected) {
         return;
@@ -299,7 +299,7 @@ void Options::exportKeyToFile()
         dlg.setAcceptMode(QFileDialog::AcceptSave);
         dlg.setFileMode(QFileDialog::AnyFile);
         QStringList nameFilters;
-        nameFilters << trUtf8("ASCII (*.asc)");
+        nameFilters << tr("ASCII (*.asc)");
         dlg.setNameFilters(nameFilters);
         dlg.selectFile(filename);
         if (dlg.exec() == QDialog::Rejected) {
@@ -406,7 +406,7 @@ void Options::showInfo()
     else {
         icon = QMessageBox::Critical;
     }
-    QMessageBox box(icon, trUtf8("GnuPG info"), info, QMessageBox::Ok, this);
+    QMessageBox box(icon, tr("GnuPG info"), info, QMessageBox::Ok, this);
     box.exec();
 }
 

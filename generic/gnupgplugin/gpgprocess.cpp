@@ -150,7 +150,7 @@ bool GpgProcess::info(QString &message)
 
     if (!_bin.isEmpty()) {
         if (error() == FailedToStart) {
-            message = trUtf8("Can't start ") + _bin;
+            message = tr("Can't start ") + _bin;
         }
         else {
             message = QString("%1 %2\n%3").arg(QDir::toNativeSeparators(_bin)).arg(arguments.join(" ")).arg(QString::fromLocal8Bit(readAll()));
@@ -158,7 +158,7 @@ bool GpgProcess::info(QString &message)
         }
     }
     else {
-        message = trUtf8("GnuPG program not found");
+        message = tr("GnuPG program not found");
     }
 
     return res;

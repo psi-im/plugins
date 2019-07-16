@@ -35,7 +35,11 @@ QSize LineEditWidget::sizeHint() const
     int width = 0;
 
     if(_optimalLength) {
+#if QT_VERSION < QT_VERSION_CHECK(5, 11, 0)
         width += fontMetrics().width("0") * _optimalLength;
+#else
+        width += fontMetrics().horizontalAdvance("0") * _optimalLength;
+#endif
     }
     else {
         width += size.width();

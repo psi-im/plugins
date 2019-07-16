@@ -852,10 +852,10 @@ void ChessPlugin::toggleEnableSound(bool enable) {
 QString ChessPlugin::pluginInfo() {
     return tr("Author: ") +     "Dealer_WeARE\n"
          + tr("Email: ") + "wadealer@gmail.com\n\n"
-         + trUtf8("This plugin allows you to play chess with your friends.\n"
-                  "The plugin is compatible with a similar plugin for Tkabber.\n"
-                  "For sending commands, normal messages are used, so this plugin will always work wherever you are able to log in."
-                  "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat window.");
+         + tr("This plugin allows you to play chess with your friends.\n"
+              "The plugin is compatible with a similar plugin for Tkabber.\n"
+              "For sending commands, normal messages are used, so this plugin will always work wherever you are able to log in."
+              "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat window.");
 }
 
 QPixmap ChessPlugin::icon() const

@@ -470,7 +470,7 @@ void SkinsPlugin::removeSkin() {
 QString SkinsPlugin::pluginInfo() {
     return tr("Author: ") +  "Dealer_WeARE\n"
             + tr("Email: ") + "wadealer@gmail.com\n\n"
-            + trUtf8("This plugin is designed to create, store and apply skins to Psi+.\n"
+            + tr("This plugin is designed to create, store and apply skins to Psi+.\n"
              "Skin - a set of custom settings.\n"
              "To download a new skin, create a folder named skins in the PsiData directory and put the new skin in it. You can also just open a skin file.\n"
              "Each skin must be in a separate directory. You can also add a screenshot to the skin file.\n"

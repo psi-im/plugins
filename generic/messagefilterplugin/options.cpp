@@ -117,7 +117,11 @@ void Options::removeRule()
 void Options::upRule()
 {
     int rule = ui->lwRules->currentRow();
+#if QT_VERSION < QT_VERSION_CHECK(5, 13, 0)
     _rules.swap(rule, rule - 1);
+#else
+    _rules.swapItemsAt(rule, rule -1);
+#endif
 
     QListWidgetItem *item = ui->lwRules->takeItem(rule);
     ui->lwRules->insertItem(rule - 1, item);
@@ -128,7 +132,11 @@ void Options::upRule()
 void Options::downRule()
 {
     int rule = ui->lwRules->currentRow();
+#if QT_VERSION < QT_VERSION_CHECK(5, 13, 0)
     _rules.swap(rule, rule + 1);
+#else
+    _rules.swapItemsAt(rule, rule + 1);
+#endif
 
     QListWidgetItem *item = ui->lwRules->takeItem(rule);
     ui->lwRules->insertItem(rule + 1, item);
@@ -187,8 +195,11 @@ void Options::upCondition()
 
     saveCondition(rule, condition - 1);
     saveCondition(rule, condition);
-
+#if QT_VERSION < QT_VERSION_CHECK(5, 13, 0)
     _rules[rule].conditions.swap(condition, condition - 1);
+#else
+    _rules[rule].conditions.swapItemsAt(condition, condition - 1);
+#endif
 
     fillCondition(condition - 1);
     fillCondition(condition);
@@ -204,8 +215,11 @@ void Options::downCondition()
 
     saveCondition(rule, condition);
     saveCondition(rule, condition + 1);
-
+#if QT_VERSION < QT_VERSION_CHECK(5, 13, 0)
     _rules[rule].conditions.swap(condition, condition + 1);
+#else
+    _rules[rule].conditions.swapItemsAt(condition, condition + 1);
+#endif
 
     fillCondition(condition);
     fillCondition(condition + 1);

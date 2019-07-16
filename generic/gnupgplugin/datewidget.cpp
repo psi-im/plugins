@@ -94,7 +94,7 @@ void DateWidget::calendarSetDate()
 
 void DateWidget::disableExpiration()
 {
-    setText(trUtf8("never"));
+    setText(tr("never"));
 }
 
 void DateWidget::keyPressEvent(QKeyEvent *event)

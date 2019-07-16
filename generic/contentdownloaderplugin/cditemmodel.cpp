@@ -50,7 +50,7 @@ QVariant CDItemModel::data(const QModelIndex &index, int role) const
         return item->name();
     }
 
-    ContentItem *item = (ContentItem*)index.internalPointer();
+    ContentItem *item = static_cast<ContentItem*>(index.internalPointer());
     if(role == Qt::CheckStateRole) {
         if(item->isInstalled()) {
             return 1;
@@ -71,18 +71,18 @@ bool CDItemModel::setData(const QModelIndex &index, const QVariant &value, int r
     }
     
     if(role == Qt::CheckStateRole) {
-        ContentItem *item = (ContentItem*)index.internalPointer();
+        ContentItem *item = static_cast<ContentItem*>(index.internalPointer());
         item->setToInstall(value.toBool());
 
         // set the same for the descends 
         int i = 0;
-        while(index.child(i, 0).isValid()) {
-            setData(index.child(i++, 0), value, role);
+        while(QAbstractItemModel::index(i, 0, index).isValid()) {
+            setData(QAbstractItemModel::index(i++, 0, index), value, role);
         }
         
         if(index.parent().isValid()) {
             if(value.toBool() == false) {
-                ((ContentItem*)(index.parent().internalPointer()))->setToInstall(false);
+                static_cast<ContentItem*>(index.internalPointer())->setToInstall(false);
             } else {
                 int i = 0;
                 bool b = true;
@@ -93,7 +93,7 @@ bool CDItemModel::setData(const QModelIndex &index, const QVariant &value, int r
                     }
                 }
                 
-                ((ContentItem*)(index.parent().internalPointer()))->setToInstall(b);
+                static_cast<ContentItem*>(index.internalPointer())->setToInstall(b);
             }
         }
 
@@ -212,12 +212,12 @@ QList<ContentItem*> CDItemModel::getToInstall() const
     QList<ContentItem*> listItems;
     QModelIndex index = this->index(0, 0);
     while(index.isValid()) {
-        if(index.child(0, 0).isValid()) {
+        if(QAbstractItemModel::index(0,0,index).isValid()) {
             // Descent
-            index = index.child(0, 0);
+            index = QAbstractItemModel::index(0, 0, index);
         } else {
             while(index.isValid()) {
-                ContentItem *item = (ContentItem*)index.internalPointer();
+                ContentItem *item = static_cast<ContentItem*>(index.internalPointer());
 
                 if(item->toInstall()) {
                     listItems << item;
@@ -254,13 +254,13 @@ void CDItemModel::update()
 {
     QModelIndex index = this->index(0, 0);
     while(index.isValid()) {
-        if(index.child(0, 0).isValid()) {
+        if(QAbstractItemModel::index(0, 0, index).isValid()) {
             // Descent
-            index = index.child(0, 0);
+            index = QAbstractItemModel::index(0, 0, index);
         } else {
             bool allInstalled = true;
             while(true) {
-                ContentItem *item = (ContentItem*)index.internalPointer();
+                ContentItem *item = static_cast<ContentItem*>(index.internalPointer());
                 QString filename = item->url().section("/", -1);
                 QString fullFileNameH = QDir::toNativeSeparators(QString("%1/%2/%3").
                                                                  arg(dataDir_).

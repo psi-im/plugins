@@ -507,10 +507,10 @@ void Reminder::checkSound() {
 QString Reminder::pluginInfo() {
     return tr("Author: ") +     "Dealer_WeARE\n"
          + tr("Email: ") + "wadealer@gmail.com\n\n"
-         + trUtf8("This plugin is designed to show reminders of upcoming birthdays.\n"
-                  "The first time you install this plugin, you need to log on to all of your accounts, go to the plugin settings and click \"Update Birthdays\"."
-                  "The plugin will then collect the information about the birthdays of all the users in your roster, but when the 'Use vCards cache' option is"
-                  "selected, the users' vCards that are cached on your hard disk will be used. ");
+         + tr("This plugin is designed to show reminders of upcoming birthdays.\n"
+              "The first time you install this plugin, you need to log on to all of your accounts, go to the plugin settings and click \"Update Birthdays\"."
+              "The plugin will then collect the information about the birthdays of all the users in your roster, but when the 'Use vCards cache' option is"
+              "selected, the users' vCards that are cached on your hard disk will be used. ");
 }
 
 QPixmap Reminder::icon() const

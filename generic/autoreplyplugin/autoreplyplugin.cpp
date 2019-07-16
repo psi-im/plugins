@@ -747,17 +747,17 @@ void AutoReply::setEnableDisableText(int Arg) {
 QString AutoReply::pluginInfo() {
     return tr("Author: ") +     "Dealer_WeARE\n"
          + tr("Email: ") + "wadealer@gmail.com\n\n"
-         + trUtf8("This plugin acts as an auto-answering machine. It has a number of simple configuration options, which you can use to:\n"
-                  "* set a text message for auto-answer\n"
-                  "* exclude specified jids, including conferences, from the objects for auto-answer (if a jid conference is set, the exception will include all private messages)\n"
-                  "* disable the auto-responder for some of your accounts\n"
-                  "* set the number of sent auto messages\n"
-                  "* set the time interval after which the number of auto messages counter will be reset\n"
-                  "* disable the auto-responder for the active tab\n"
-                  "* disable the auto-responder for contacts that are not in your roster\n"
-                  "The list of exceptions for jids has two operating modes:\n"
-                  "* auto-responder is switched off for the list of exceptions, for the others is switched on (Disable mode)\n"
-                  "* auto-responder is switched on for the list of exceptions, for the others is switched off (Enable mode) ");
+         + tr("This plugin acts as an auto-answering machine. It has a number of simple configuration options, which you can use to:\n"
+              "* set a text message for auto-answer\n"
+              "* exclude specified jids, including conferences, from the objects for auto-answer (if a jid conference is set, the exception will include all private messages)\n"
+              "* disable the auto-responder for some of your accounts\n"
+              "* set the number of sent auto messages\n"
+              "* set the time interval after which the number of auto messages counter will be reset\n"
+              "* disable the auto-responder for the active tab\n"
+              "* disable the auto-responder for contacts that are not in your roster\n"
+              "The list of exceptions for jids has two operating modes:\n"
+              "* auto-responder is switched off for the list of exceptions, for the others is switched on (Disable mode)\n"
+              "* auto-responder is switched on for the list of exceptions, for the others is switched off (Enable mode) ");
 }
 
 QPixmap AutoReply::icon() const

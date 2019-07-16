@@ -400,7 +400,7 @@ QWidget* VideoStatusChanger::options()
 QString VideoStatusChanger::pluginInfo()
 {
     return tr("Authors: ") +  "Dealer_WeARE, KukuRuzo\n\n"
-            + trUtf8("This plugin is designed to set the custom status when you watching the video in selected video players. \n"
+            + tr("This plugin is designed to set the custom status when you watching the video in selected video players. \n"
                  "Note: This plugin is designed to work in Linux family operating systems and in Windows OS. \n\n"
                  "In Linux plugin uses DBUS to work with video players and X11 functions to detect fullscreen applications. \n"
                  "In Windows plugin uses WinAPI functions to detect fullscreen applications. \n\n"

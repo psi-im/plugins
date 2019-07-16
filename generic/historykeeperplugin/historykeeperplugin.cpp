@@ -283,7 +283,7 @@ QString HistoryKeeperPlugin::pluginInfo()
 {
     return tr("Author: ") +  "Dealer_WeARE\n"
             + tr("Email: ") + "wadealer@gmail.com\n\n"
-            + trUtf8("This plugin is designed to remove the history of selected contacts when the Psi+ is closed.\n"
+            + tr("This plugin is designed to remove the history of selected contacts when the Psi+ is closed.\n"
                  "You can select or deselect a contact for history removal from the context menu of a contact or via the plugin options.");
 }
 

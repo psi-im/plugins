@@ -166,15 +166,20 @@ int BaseFileModel::fileSize(const QModelIndex & index) const
 
     QFile file(filePass(index));
 
-    return file.size();
+    return int(file.size());
 }
 
 QString BaseFileModel::fileDate(const QModelIndex & index) const
 {
+    QString result;
     if(!index.isValid())
-        return QString();
-
-    return QFileInfo(filePass(index)).created().toString("yyyy-MM-dd");
+        return result;
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
+    result = QFileInfo(filePass(index)).created().toString("yyyy-MM-dd");
+#else
+    result = QFileInfo(filePass(index)).birthTime().toString("yyyy-MM-dd");
+#endif
+    return result;
 }
 
 void BaseFileModel::deleteSelected()
@@ -243,13 +248,13 @@ QVariant ClearingModel::data(const QModelIndex & index, int role) const
         if (role == Qt::CheckStateRole) {
             return isSelected(index) ? 2:0;
         } else if (role == Qt::TextAlignmentRole) {
-            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+            return int(Qt::AlignRight | Qt::AlignVCenter);
         } else if (role == Qt::DisplayRole)
             return QVariant();
         break;
     case(1):
         if (role == Qt::TextAlignmentRole) {
-            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+            return int(Qt::AlignRight | Qt::AlignVCenter);
         } else if (role == Qt::DisplayRole) {
             if(filename.contains("_at_"))
                 return QVariant(filename.split("_at_").first());
@@ -259,19 +264,19 @@ QVariant ClearingModel::data(const QModelIndex & index, int role) const
         break;
     case(2):
         if (role == Qt::TextAlignmentRole) {
-            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+            return int(Qt::AlignRight | Qt::AlignVCenter);
         } else if (role == Qt::DisplayRole)
             return QVariant(filename.split("_at_").last());
         break;
     case(3):
         if (role == Qt::TextAlignmentRole) {
-            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+            return int(Qt::AlignRight | Qt::AlignVCenter);
         } else if (role == Qt::DisplayRole)
             return QVariant(fileSize(index));
         break;
     case(4):
         if (role == Qt::TextAlignmentRole) {
-            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+            return int(Qt::AlignRight | Qt::AlignVCenter);
         } else if (role == Qt::DisplayRole)
             return QVariant(fileDate(index));
         break;
@@ -366,13 +371,13 @@ QVariant ClearingAvatarModel::data(const QModelIndex & index, int role) const
         if (role == Qt::CheckStateRole) {
             return isSelected(index) ? 2:0;
         } else if (role == Qt::TextAlignmentRole) {
-            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+            return int(Qt::AlignRight | Qt::AlignVCenter);
         } else if (role == Qt::DisplayRole)
             return QVariant();
         break;
     case(1):
         if (role == Qt::TextAlignmentRole) {
-            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+            return int(Qt::AlignRight | Qt::AlignVCenter);
         } else if (role == Qt::DisplayRole) {
             QPixmap pix = QPixmap(filename);
             if(pix.isNull())
@@ -382,13 +387,13 @@ QVariant ClearingAvatarModel::data(const QModelIndex & index, int role) const
         break;
     case(2):
         if (role == Qt::TextAlignmentRole) {
-            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+            return int(Qt::AlignRight | Qt::AlignVCenter);
         } else if (role == Qt::DisplayRole)
             return QVariant(fileSize(index));
         break;
     case(3):
         if (role == Qt::TextAlignmentRole) {
-            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+            return int(Qt::AlignRight | Qt::AlignVCenter);
         } else if (role == Qt::DisplayRole)
             return QVariant(fileDate(index));
         break;
@@ -427,20 +432,20 @@ QVariant ClearingOptionsModel::data(const QModelIndex & index, int role) const
         if (role == Qt::CheckStateRole) {
             return isSelected(index) ? 2:0;
         } else if (role == Qt::TextAlignmentRole) {
-            return (int)(Qt::AlignRight | Qt::AlignVCenter);
+            return int(Qt::AlignRight | Qt::AlignVCenter);
         } else if (role == Qt::DisplayRole)
             return QVariant();
         break;
     case(1):
         if (role == Qt::TextAlignmentRole) {
-            return (int)(Qt::AlignLeft | Qt::AlignVCenter);
+            return int(Qt::AlignLeft | Qt::AlignVCenter);
         } else if (role == Qt::DisplayRole) {
             return QVariant(options.at(index.row()));
         }
         break;
     case(2):
         if (role == Qt::TextAlignmentRole) {
-            return (int)(Qt::AlignLeft | Qt::AlignVCenter);
+            return int(Qt::AlignLeft | Qt::AlignVCenter);
         } else if (role == Qt::DisplayRole) {
             QDomNode node = parser_->nodeByString(options.at(index.row()));
             return QVariant(node.toElement().text());
