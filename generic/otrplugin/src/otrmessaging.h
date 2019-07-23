@@ -189,6 +189,16 @@ public:
     OtrMessaging(OtrCallback* callback, OtrPolicy policy);
 
     /**
+     * Copy constructor
+     */
+    OtrMessaging(const OtrMessaging&) = delete;
+
+    /**
+     * operator=
+     */
+    OtrMessaging& operator=(const OtrMessaging&) = delete;
+
+    /**
      * Deconstructor
      */
     ~OtrMessaging();
