@@ -149,7 +149,7 @@ private:
     int setDelay; //задержка установки статуса
     bool fullScreen;
 #ifdef Q_OS_WIN
-    HWND lastWorkerWindow;
+    HWND lastWorkerWindow = nullptr;
 #endif
 
     struct StatusString {
@@ -195,9 +195,6 @@ VideoStatusChanger::VideoStatusChanger()
     restoreDelay = 20;
     setDelay = 10;
     fullScreen = false;
-#ifdef Q_OS_WIN
-    lastWorkerWindow = nullptr;
-#endif
 }
 
 QString VideoStatusChanger::name() const
