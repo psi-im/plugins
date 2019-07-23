@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/icons">
-        <file>gmailnotify.png</file>
-        <file>nohistory.png</file>
-    </qresource>
-</RCC>
