@@ -1,3 +1,7 @@
+2019-07-23
+v.0.4.4
+  + удалена опция options.ui.chat.hide-when-closing
+
 2019-03-09
 v.0.4.3
   + добавлена опция options.ui.tabs.current-index-at-bottom

@@ -39,7 +39,7 @@
 #include "plugininfoprovider.h"
 
 
-#define constVersion "0.4.3"
+#define constVersion "0.4.4"
 
 class ExtToolButton : public QToolButton
 {
@@ -196,7 +196,6 @@ private:
     QCheckBox *closeButton = nullptr;
     QComboBox *middleButton = nullptr;
     QCheckBox *showTabIcons = nullptr;
-    QCheckBox *hideWhenClose = nullptr;
     QCheckBox *canCloseTab = nullptr;
     QComboBox *mouseDoubleclick = nullptr;
     QCheckBox *multiRow = nullptr;
@@ -641,7 +640,6 @@ QWidget* ExtendedOptions::options()
     bottomTabs = new QCheckBox(tr("Put tabs at bottom of chat window"));
     closeButton = new QCheckBox(tr("Show Close Button on tabs"));
     showTabIcons = new QCheckBox(tr("Show status icons on tabs"));
-    hideWhenClose = new QCheckBox(tr("Hide tab when close chat window"));
     canCloseTab = new QCheckBox(tr("Allow closing inactive tabs"));
     multiRow = new QCheckBox(tr("Enable multirow tabs"));
     currentTabAtBottom = new QCheckBox(tr("Place current tab at the bottom row in multirow mode"));
@@ -666,7 +664,6 @@ QWidget* ExtendedOptions::options()
     mdLayout->addStretch();
     mdLayout->addWidget(mouseDoubleclick);
 
-    tab5Layout->addWidget(hideWhenClose);
     tab5Layout->addWidget(disableScroll);
     tab5Layout->addWidget(bottomTabs);
     tab5Layout->addWidget(canCloseTab);
@@ -779,7 +776,6 @@ void ExtendedOptions::applyOptions()
     psiOptions->setGlobalOption("options.ui.tabs.mouse-middle-button",QVariant(middleButton->currentText()));
     psiOptions->setGlobalOption("options.ui.tabs.mouse-doubleclick-action",QVariant(mouseDoubleclick->currentText()));
     psiOptions->setGlobalOption("options.ui.tabs.show-tab-icons",QVariant(showTabIcons->isChecked()));
-    psiOptions->setGlobalOption("options.ui.chat.hide-when-closing",QVariant(hideWhenClose->isChecked()));
     psiOptions->setGlobalOption("options.ui.tabs.can-close-inactive-tab",QVariant(canCloseTab->isChecked()));
     psiOptions->setGlobalOption("options.ui.tabs.multi-rows",QVariant(multiRow->isChecked()));
     psiOptions->setGlobalOption("options.ui.tabs.current-index-at-bottom", QVariant(currentTabAtBottom->isChecked()));
@@ -910,7 +906,6 @@ void ExtendedOptions::restoreOptions()
         index = 0;
     mouseDoubleclick->setCurrentIndex(index);
     showTabIcons->setChecked(psiOptions->getGlobalOption("options.ui.tabs.show-tab-icons").toBool());
-    hideWhenClose->setChecked(psiOptions->getGlobalOption("options.ui.chat.hide-when-closing").toBool());
     canCloseTab->setChecked(psiOptions->getGlobalOption("options.ui.tabs.can-close-inactive-tab").toBool());
     multiRow->setChecked(psiOptions->getGlobalOption("options.ui.tabs.multi-rows").toBool());
     currentTabAtBottom->setChecked(psiOptions->getGlobalOption("options.ui.tabs.current-index-at-bottom").toBool());
@@ -1111,7 +1106,6 @@ void ExtendedOptions::setWhatThis()
     middleButton->setWhatsThis("options.ui.tabs.mouse-middle-button");
     mouseDoubleclick->setWhatsThis("options.ui.tabs.mouse-doubleclick-action");
     showTabIcons->setWhatsThis("options.ui.tabs.show-tab-icons");
-    hideWhenClose->setWhatsThis("options.ui.chat.hide-when-closing");
     canCloseTab->setWhatsThis("options.ui.tabs.can-close-inactive-tab");
     multiRow->setWhatsThis("options.ui.tabs.multi-rows");
     currentTabAtBottom->setWhatsThis("options.ui.tabs.current-index-at-bottom");
