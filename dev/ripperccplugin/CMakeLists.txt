@@ -5,7 +5,7 @@ unset(_RSCS)
 unset(PLUGIN)
 
 set(PLUGIN ripperccplugin)
-project(${PLUGIN})
+project(${PLUGIN} LANGUAGES CXX)
 cmake_minimum_required( VERSION 3.1.0 )
 
 set(PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." CACHE STRING "Plugins root path. Path where include directory placed")
