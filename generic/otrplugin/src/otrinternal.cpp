@@ -3,9 +3,9 @@
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
- *               2011-2012  Florian Fieber
- *                    2013  Georg Rudoy
- *               2013-2014  Boris Pek (tehnick-8@mail.ru)
+ * Copyright (C) 2011-2012  Florian Fieber
+ * Copyright (C) 2013  Georg Rudoy
+ * Copyright (C) 2013-2014  Boris Pek (tehnick-8@mail.ru)
  *
  * This program was originally written as part of a diplom thesis
  * advised by Prof. Dr. Ruediger Weis (PST Labor)
@@ -28,20 +28,20 @@
 
 #include "otrinternal.h"
 
-#include <assert.h>
-#include <Qt>
-#include <QCoreApplication>
-#include <QMessageBox>
 #include <QAbstractButton>
-#include <QtConcurrentRun>
-#include <QFutureWatcher>
-#include <QString>
 #include <QByteArray>
-#include <QRegExp>
-#include <QList>
-#include <QHash>
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
+#include <QFutureWatcher>
+#include <QHash>
+#include <QList>
+#include <QMessageBox>
+#include <QRegExp>
+#include <QString>
+#include <Qt>
+#include <QtConcurrentRun>
+#include <assert.h>
 
 //-----------------------------------------------------------------------------
 
@@ -157,7 +157,6 @@ QString OtrInternal::encryptMessage(const QString& account, const QString& conta
     }
     return message;
 }
-
 
 //-----------------------------------------------------------------------------
 

@@ -1,4 +1,5 @@
-/* Copyright 2014, Uwe L. Korn <uwelk@xhochy.com>
+/*
+ * Copyright (C) 2014  Uwe L. Korn <uwelk@xhochy.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -17,6 +18,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ *
  */
 
 #include "qjsonwrapper.h"
@@ -32,9 +34,7 @@
     #include <qjson/serializer.h>
 #endif
 
-namespace QJsonWrapper
-{
-
+namespace QJsonWrapper {
 QVariantMap
 qobject2qvariant( const QObject* object )
 {
@@ -59,7 +59,6 @@ qobject2qvariant( const QObject* object )
     return QJson::QObjectHelper::qobject2qvariant( object );
 #endif
 }
-
 
 void
 qvariant2qobject( const QVariantMap& variant, QObject* object )
@@ -86,7 +85,6 @@ qvariant2qobject( const QVariantMap& variant, QObject* object )
 #endif
 }
 
-
 QVariant
 parseJson( const QByteArray& jsonData, bool* ok )
 {
@@ -103,7 +101,6 @@ parseJson( const QByteArray& jsonData, bool* ok )
     return p.parse( jsonData, ok );
 #endif
 }
-
 
 QByteArray
 toJson( const QVariant &variant, bool* ok )
@@ -136,4 +133,4 @@ toJson( const QVariant &variant, bool* ok )
 #endif
 }
 
-}
+} // namespace QJsonWrapper

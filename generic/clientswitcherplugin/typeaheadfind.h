@@ -20,15 +20,13 @@
 #ifndef TYPEAHEADFIND_H
 #define TYPEAHEADFIND_H
 
-#include <QToolBar>
-#include <QTextEdit>
-
 #include "iconfactoryaccessinghost.h"
 
-namespace ClientSwitcher {
+#include <QTextEdit>
+#include <QToolBar>
 
-class TypeAheadFindBar : public QToolBar
-{
+namespace ClientSwitcher {
+class TypeAheadFindBar : public QToolBar {
     Q_OBJECT
 public:
     TypeAheadFindBar(IconFactoryAccessingHost *IcoHost, QTextEdit *textedit, const QString &title, QWidget *parent = nullptr);
@@ -54,5 +52,6 @@ private:
     IconFactoryAccessingHost *icoHost_;
 };
 
-}
-#endif
+} // namespace ClientSwitcher
+
+#endif // TYPEAHEADFIND_H

@@ -17,26 +17,28 @@
  *
  */
 
+#include "psiplugin.h"
+
+#include "applicationinfoaccessinghost.h"
+#include "applicationinfoaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "optionsparser.h"
+#include "plugininfoprovider.h"
+#include "skin.h"
+#include "ui_skinsplugin.h"
+
 #include <QFileDialog>
 #include <QMessageBox>
 
-#include "psiplugin.h"
-#include "applicationinfoaccessor.h"
-#include "applicationinfoaccessinghost.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
-#include "plugininfoprovider.h"
-
-#include "ui_skinsplugin.h"
-#include "skin.h"
-#include "optionsparser.h"
-
-
 #define cVer "0.3.3"
 
-
-class SkinsPlugin: public QObject, public PsiPlugin, public ApplicationInfoAccessor, public OptionAccessor, public PluginInfoProvider
-{
+class SkinsPlugin:
+        public ApplicationInfoAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiPlugin,
+        public QObject {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.SkinsPlugin")
     Q_INTERFACES(PsiPlugin OptionAccessor ApplicationInfoAccessor PluginInfoProvider)
@@ -69,7 +71,6 @@ private:
         bool validateOption(QString option);
         void appendSkin(QString fileName);
     QPointer<QWidget> optionsWidget;
-
 
 private slots:
         void updateSkins();
@@ -468,7 +469,7 @@ void SkinsPlugin::removeSkin() {
 }
 
 QString SkinsPlugin::pluginInfo() {
-    return tr("Author: ") +  "Dealer_WeARE\n"
+    return tr("Author: ") +  "Evgeny Khryukin\n"
             + tr("Email: ") + "wadealer@gmail.com\n\n"
             + tr("This plugin is designed to create, store and apply skins to Psi+.\n"
              "Skin - a set of custom settings.\n"

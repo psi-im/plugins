@@ -25,8 +25,7 @@
 #include <QObject>
 #include <QStringList>
 
-class OptionsParser : public QObject
-{
+class OptionsParser : public QObject {
     Q_OBJECT
 
 public:
@@ -34,7 +33,6 @@ public:
     QStringList getMissingNodesString() const;
     QList<QDomNode> getMissingNodes() const;
     QDomNode nodeByString(const QString& key) const;
-
 
 private:
     QString fileName_;

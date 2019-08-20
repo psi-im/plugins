@@ -21,8 +21,7 @@
 
 #include "ui_optionswidget.h"
 
-class OptionsWidget : public QWidget
-{
+class OptionsWidget : public QWidget {
     Q_OBJECT
 public:
     OptionsWidget(QWidget* p = nullptr);

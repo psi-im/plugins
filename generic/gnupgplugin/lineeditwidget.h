@@ -8,8 +8,7 @@
 class QFrame;
 class QHBoxLayout;
 
-class LineEditWidget : public QLineEdit
-{
+class LineEditWidget : public QLineEdit {
     Q_OBJECT
     Q_PROPERTY(int optimalLength READ optimalLenth WRITE setOptimalLength)
     Q_PROPERTY(QString rxValidator READ rxValidator WRITE setRxValidator)

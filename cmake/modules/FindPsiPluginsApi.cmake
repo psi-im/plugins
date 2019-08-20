@@ -1,5 +1,5 @@
 #=============================================================================
-# Copyright 2018 Psi+ Project
+# Copyright (C) 2018  Psi+ Project
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without

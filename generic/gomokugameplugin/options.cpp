@@ -22,11 +22,12 @@
  *
  */
 
-#include <QVariant>
-
 #include "options.h"
+
 #include "common.h"
 #include "optionaccessinghost.h"
+
+#include <QVariant>
 
 Options::Options(QObject *parent) :
     QObject(parent),

@@ -1,6 +1,6 @@
 /*
  * OMEMO Plugin for Psi
- * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2018  Vyacheslav Karpukhin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,12 +20,13 @@
 #ifndef PSI_CONFIGWIDGET_H
 #define PSI_CONFIGWIDGET_H
 
-#include <QtGui>
-#include <QWidget>
-#include <QTableView>
+#include "omemo.h"
+
 #include <QLabel>
 #include <QPushButton>
-#include "omemo.h"
+#include <QTableView>
+#include <QWidget>
+#include <QtGui>
 
 namespace psiomemo {
   class ConfigWidgetTab: public QWidget {
@@ -101,6 +102,6 @@ namespace psiomemo {
   private slots:
     void currentAccountChanged(int index);
   };
-}
+} // namespace psiomemo
 
-#endif //PSI_CONFIGWIDGET_H
+#endif // PSI_CONFIGWIDGET_H

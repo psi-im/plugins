@@ -1,6 +1,6 @@
 /*
- * JuickParser - plugin
- * Copyright (C) 2012 Evgeny Khryukin
+ * juickparser.cpp - plugin
+ * Copyright (C) 2012  Evgeny Khryukin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,14 +17,14 @@
  *
  */
 
+#include "juickparser.h"
+
 #include <QDateTime>
 #include <QObject>
-#include "juickparser.h"
 
 static const QString juickLink("https://juick.com/%1");
 
-class JuickParser::Private
-{
+class JuickParser::Private {
 public:
     Private()
           : tagRx        ("^\\s*(?!\\*\\S+\\*)(\\*\\S+)")
@@ -59,8 +59,6 @@ public:
     QRegExp singleMsgRx,lastMsgRx,juboRx,msgPostRx,/*delMsgRx,delReplyRx,idRx,nickRx,*/recomendRx;
     const QString topTag;
 };
-
-
 
 JuickParser::JuickParser(QDomElement *elem)
     : elem_(elem)

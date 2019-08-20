@@ -25,8 +25,7 @@
 
 class IconFactoryAccessingHost;
 
-class Viewer : public QTableView
-{
+class Viewer : public QTableView {
     Q_OBJECT
 
 public:

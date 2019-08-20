@@ -1,5 +1,5 @@
 /*
- * gamesessionlist.cpp - Battleship Game plugin
+ * gamesessionlist.cpp - plugin
  * Copyright (C) 2014  Aleksey Andreev
  *
  * This program is free software; you can redistribute it and/or
@@ -17,11 +17,12 @@
  *
  */
 
-#include <QTextDocument>
-
 #include "gamesessions.h"
-#include "options.h"
+
 #include "invitedialog.h"
+#include "options.h"
+
+#include <QTextDocument>
 
 #define TIMEOUT_INTERVAL_SECS 60*60*1 // One hour
 

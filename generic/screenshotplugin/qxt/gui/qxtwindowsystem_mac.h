@@ -95,7 +95,6 @@ extern "C" {
   // Properties
   extern CGError CGSGetWindowProperty(const CGSConnection cid, CGSWindow wid, CGSValue key, CGSValue *outValue);
 
-
 #ifdef __cplusplus
 }
 #endif
@@ -103,8 +102,7 @@ extern "C" {
 /* QCFString from Qt */
 #include <QString>
 template <typename T>
-class QCFType
-{
+class QCFType {
 public:
     inline QCFType(const T &t = 0) : type(t) {}
     inline QCFType(const QCFType &helper) : type(helper.type) { if (type) CFRetain(type); }
@@ -130,8 +128,7 @@ protected:
     T type;
 };
 
-class QCFString : public QCFType<CFStringRef>
-{
+class QCFString : public QCFType<CFStringRef> {
 public:
     inline QCFString(const QString &str) : QCFType<CFStringRef>(0), string(str) {}
     inline QCFString(const CFStringRef cfstr = 0) : QCFType<CFStringRef>(cfstr) {}
@@ -145,4 +142,3 @@ private:
 };
 
 #endif // QXTWINDOWSYSTEM_MAC_H
-

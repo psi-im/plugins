@@ -1,4 +1,3 @@
-#include "qxtwindowsystem.h"
 /****************************************************************************
 ** Copyright (c) 2006 - 2011, the LibQxt project.
 ** See the Qxt AUTHORS file for a list of authors and copyright holders.
@@ -29,11 +28,13 @@
 ** <http://libqxt.org>  <foundation@libqxt.org>
 *****************************************************************************/
 
+#include "qxtwindowsystem.h"
+
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0500
 #endif
-#include <qt_windows.h>
 #include <qglobal.h> // QT_WA
+#include <qt_windows.h>
 
 static WindowList qxt_Windows;
 

@@ -26,7 +26,9 @@
 
 class OptionAccessingHost;
 
-namespace Ui { class Options; }
+namespace Ui {
+    class Options;
+}
 
 enum ConditionType { From, To, FromFull, ToFull, Message };
 enum Comparison { Equal, NotEqual, Contains, NotContains };
@@ -45,8 +47,7 @@ struct Rule
     QList<Condition> conditions;
 };
 
-class Options : public QWidget
-{
+class Options : public QWidget {
     Q_OBJECT
 
 public:

@@ -25,16 +25,14 @@
 #ifndef BOARDMODEL_H
 #define BOARDMODEL_H
 
-#include <QAbstractTableModel>
-#include <QStringList>
-
 #include "gameelement.h"
 #include "gamemodel.h"
 
-namespace GomokuGame {
+#include <QAbstractTableModel>
+#include <QStringList>
 
-class BoardModel : public QAbstractTableModel
-{
+namespace GomokuGame {
+class BoardModel : public QAbstractTableModel {
 Q_OBJECT
 public:
     explicit BoardModel(QObject *parent = nullptr);
@@ -85,6 +83,6 @@ signals:
     void playSound(const QString);
 
 };
-}
+} // namespace GomokuGame
 
 #endif // BOARDMODEL_H

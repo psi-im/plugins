@@ -20,16 +20,15 @@
 #ifndef NOTES_H
 #define NOTES_H
 
-#include "ui_notes.h"
 #include "tagsmodel.h"
+#include "ui_notes.h"
 
 #include <QKeyEvent>
 
-class StorageNotesPlugin;
 class QTimer;
+class StorageNotesPlugin;
 
-class Notes : public QDialog
-{
+class Notes : public QDialog {
         Q_OBJECT
 public:
     Notes(StorageNotesPlugin *storageNotes, int acc, QWidget *parent = nullptr);
@@ -73,6 +72,5 @@ private:
     bool newNotes;
     bool waitForSave;
 };
-
 
 #endif // NOTES_H

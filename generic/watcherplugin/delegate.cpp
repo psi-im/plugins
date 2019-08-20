@@ -18,6 +18,7 @@
  */
 
 #include "delegate.h"
+
 #include "iconfactoryaccessinghost.h"
 
 #include <QLineEdit>
@@ -46,7 +47,6 @@ void IconDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & opti
     QPalette::ColorGroup cg = option.state & QStyle::State_Enabled
     ? QPalette::Normal : QPalette::Disabled;
 
-
     if (option.state & QStyle::State_Selected) {
         painter->setPen(palette.color(cg, QPalette::HighlightedText));
     }
@@ -68,7 +68,6 @@ void IconDelegate::paint ( QPainter * painter, const QStyleOptionViewItem & opti
 
     painter->restore();
 }
-
 
 //-----------------------------------
 //--------LineEditDelegate-----------

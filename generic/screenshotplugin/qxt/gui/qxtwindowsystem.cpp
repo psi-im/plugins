@@ -1,4 +1,3 @@
-#include "qxtwindowsystem.h"
 /****************************************************************************
 ** Copyright (c) 2006 - 2011, the LibQxt project.
 ** See the Qxt AUTHORS file for a list of authors and copyright holders.
@@ -28,6 +27,8 @@
 **
 ** <http://libqxt.org>  <foundation@libqxt.org>
 *****************************************************************************/
+
+#include "qxtwindowsystem.h"
 
 #include <QStringList>
 

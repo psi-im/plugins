@@ -1,6 +1,6 @@
 /*
  * OMEMO Plugin for Psi
- * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2018  Vyacheslav Karpukhin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,18 +17,18 @@
  *
  */
 
-#include <QtGui>
-#include <QtXml>
-#include <QtSql>
-#include <QAction>
+#include "omemoplugin.h"
 
 #include "accountinfoaccessinghost.h"
 #include "applicationinfoaccessinghost.h"
-#include "stanzasendinghost.h"
-#include "eventcreatinghost.h"
-
-#include "omemoplugin.h"
 #include "configwidget.h"
+#include "eventcreatinghost.h"
+#include "stanzasendinghost.h"
+
+#include <QAction>
+#include <QtGui>
+#include <QtSql>
+#include <QtXml>
 
 namespace psiomemo {
   QString OMEMOPlugin::name() const {
@@ -358,4 +358,4 @@ namespace psiomemo {
 
       return false;
     }
-}
+} // namespace psiomemo

@@ -24,8 +24,7 @@
 
 class QNetworkAccessManager;
 
-class Loader : public QObject
-{
+class Loader : public QObject {
     Q_OBJECT
 public:
     Loader(const QString& id, QObject *p);

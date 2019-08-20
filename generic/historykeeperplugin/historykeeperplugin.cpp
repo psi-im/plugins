@@ -1,6 +1,6 @@
 /*
  * historykeeperplugin.cpp - plugin
- * Copyright (C) 2010-2011 Evgeny Khryukin
+ * Copyright (C) 2010-2011  Evgeny Khryukin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,30 +17,33 @@
  *
  */
 
-#include <QTextEdit>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QIcon>
-#include <QAction>
-
-#include "psiplugin.h"
-#include "applicationinfoaccessor.h"
 #include "applicationinfoaccessinghost.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
-#include "menuaccessor.h"
-#include "plugininfoprovider.h"
+#include "applicationinfoaccessor.h"
 #include "iconfactoryaccessinghost.h"
 #include "iconfactoryaccessor.h"
+#include "menuaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "psiplugin.h"
+
+#include <QAction>
+#include <QIcon>
+#include <QLabel>
+#include <QTextEdit>
+#include <QVBoxLayout>
 
 #define cVer "0.0.7"
 #define constClearHistoryFor "clear-history-for"
 
-
-
-class HistoryKeeperPlugin: public QObject, public PsiPlugin, public ApplicationInfoAccessor, public OptionAccessor,
-            public MenuAccessor, public PluginInfoProvider, public IconFactoryAccessor
-{
+class HistoryKeeperPlugin:
+        public ApplicationInfoAccessor,
+        public IconFactoryAccessor,
+        public MenuAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiPlugin,
+        public QObject {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.HistoryKeeperPlugin")
     Q_INTERFACES(PsiPlugin OptionAccessor ApplicationInfoAccessor MenuAccessor PluginInfoProvider IconFactoryAccessor)
@@ -65,7 +68,6 @@ public:
     virtual QAction* getAccountAction(QObject* , int ) { return nullptr; };
     virtual QString pluginInfo();
     virtual QPixmap icon() const;
-
 
 private:
         void removeHistory();
@@ -281,7 +283,7 @@ QAction* HistoryKeeperPlugin::getContactAction(QObject *p, int /*acc*/, const QS
 
 QString HistoryKeeperPlugin::pluginInfo()
 {
-    return tr("Author: ") +  "Dealer_WeARE\n"
+    return tr("Author: ") +  "Evgeny Khryukin\n"
             + tr("Email: ") + "wadealer@gmail.com\n\n"
             + tr("This plugin is designed to remove the history of selected contacts when the Psi+ is closed.\n"
                  "You can select or deselect a contact for history removal from the context menu of a contact or via the plugin options.");

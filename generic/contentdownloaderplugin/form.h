@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef FORM_H
 #define FORM_H
 
@@ -24,17 +23,18 @@
 #include <QModelIndex>
 #include <QNetworkProxy>
 
-class QNetworkAccessManager;
 class ContentItem;
 class OptionAccessingHost;
-class QNetworkReply;
 class QAuthenticator;
 class QDialog;
+class QNetworkAccessManager;
+class QNetworkReply;
 
-namespace Ui { class Form; }
+namespace Ui {
+    class Form;
+}
 
-class Form : public QWidget 
-{
+class Form : public QWidget {
     Q_OBJECT
 public:
     Form(QWidget *parent = nullptr);

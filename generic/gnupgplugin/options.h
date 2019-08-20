@@ -25,10 +25,11 @@
 class GPGProc;
 class OptionAccessingHost;
 
-namespace Ui { class Options; }
+namespace Ui {
+    class Options;
+}
 
-class Options : public QWidget
-{
+class Options : public QWidget {
     Q_OBJECT
 
 public:

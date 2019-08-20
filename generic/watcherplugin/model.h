@@ -24,8 +24,7 @@
 #include <QStringList>
 #include <QSet>
 
-class Model : public QAbstractTableModel
-{
+class Model : public QAbstractTableModel {
     Q_OBJECT
 
 public:
@@ -61,6 +60,5 @@ private:
     QMap<QString, QString> statuses;
     QList<bool> tmpEnabledJids_;
 };
-
 
 #endif // MODEL_H

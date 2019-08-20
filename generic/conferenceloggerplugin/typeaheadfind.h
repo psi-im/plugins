@@ -20,14 +20,13 @@
 #ifndef TYPEAHEADFIND_H
 #define TYPEAHEADFIND_H
 
-#include <QToolBar>
-#include <QTextEdit>
-
 #include "iconfactoryaccessinghost.h"
-namespace ConfLogger {
 
-class TypeAheadFindBar : public QToolBar
-{
+#include <QTextEdit>
+#include <QToolBar>
+
+namespace ConfLogger {
+class TypeAheadFindBar : public QToolBar {
     Q_OBJECT
 public:
     TypeAheadFindBar(IconFactoryAccessingHost *IcoHost, QTextEdit *textedit, const QString &title, QWidget *parent = nullptr);
@@ -50,5 +49,6 @@ private:
     IconFactoryAccessingHost *icoHost_;
 };
 
-}
-#endif
+} // namespace ConfLogger
+
+#endif // TYPEAHEADFIND_H

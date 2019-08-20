@@ -1,9 +1,9 @@
 2019-05-12
-v1.1.0 rion
+v1.1.0 Sergey Ilinykh
  * Switched from EventFilter::logout to other interface
 
 2018-03-24
-v1.0.4 rion
+v1.0.4 Sergey Ilinykh
   * Added a warning about possible crash on private keys management
   * A little changed a key generation procedure just to use functions where it
   explicitly said what threads are allowed.
@@ -15,35 +15,35 @@ v1.0.3 ValdikSS
   * Ignore incoming carbon-copied OTR messages
 
 2014-03-26
-v1.0.2 tehnick
+v1.0.2 Boris Pek
   * Fix a queue of events for modal dialogs.
   * Fix possible memory leak after disabling of the plugin.
 
 2014-03-15
-v1.0.1 tehnick
+v1.0.1 Boris Pek
   * Use a queue of events for some modal dialogs. They will not be shown
     immediately; user should trigger them manually.
 
 2014-03-07
-v1.0.0 tehnick
+v1.0.0 Boris Pek
   * Minimize the number of modal dialogs: use other ways for notifying user
     (system messages in chat).
   * Small code improvements. [Thanks to Michael Kurz]
 
 2014-01-09
-v0.9.9 tehnick
+v0.9.9 Boris Pek
   * Minimize the number of modal dialogs: use other ways for notifying user
     (system messages in chat).
   * Do not block program windows during generating of private key.
 
 2014-01-06
-v0.9.8 tehnick
+v0.9.8 Boris Pek
   * Fix OTRv3 support: added limited support of instance tags. Previous
     temporary solution is not needed anymore. (Affects only build with
     libotr 4.x.)
 
 2013-10-14
-v0.9.7 tehnick
+v0.9.7 Boris Pek
   * Fix problem of initialization of private conversation when both sides use
     libotr 4.x. Protocol OTRv2 is forced. This is temporary solution.
   * Fix tiny memory leak when libotr 4.x is used.
@@ -56,7 +56,7 @@ v0.9.6 taurus
   * Fix build with Qt 5.x.
 
 2013-06-30
-v0.9.5 tehnick
+v0.9.5 Boris Pek
   * Add support of libotr >= 4.0.0.
 
 2012-04-04

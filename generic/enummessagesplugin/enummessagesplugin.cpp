@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Evgeny Khryukin
+ * Copyright (C) 2016  Evgeny Khryukin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,32 +16,28 @@
  *
  */
 
-#include <QDomElement>
-#include <QWidget>
-#include <QVariant>
-#include <QFile>
-#include <QDataStream>
-#include <QColorDialog>
-#include <QAction>
-//#include <QTextStream>
-
 #include "enummessagesplugin.h"
 
-#include "optionaccessinghost.h"
 #include "activetabaccessinghost.h"
 #include "applicationinfoaccessinghost.h"
+#include "defines.h"
+#include "optionaccessinghost.h"
 #include "psiaccountcontrollinghost.h"
 
-#include "defines.h"
-
+#include <QAction>
+#include <QColorDialog>
+#include <QDataStream>
+#include <QDomElement>
+#include <QFile>
+//#include <QTextStream>
+#include <QVariant>
+#include <QWidget>
 
 static const char* propAcc = "em_account";
 static const char* propJid  = "em_jid";
 static const QString emIdName = "psi_em_id";
 static const QString htmlimNS = "http://www.w3.org/1999/xhtml";
 static const QString xhtmlProtoNS = "http://jabber.org/protocol/xhtml-im";
-
-
 
 EnumMessagesPlugin::EnumMessagesPlugin()
     : enabled(false)
@@ -211,7 +207,6 @@ bool EnumMessagesPlugin::incomingStanza(int account, const QDomElement& stanza)
             }
             _accContrller->appendSysMsg(account, jid, tr("Missed messages: %1").arg(missed));
         }
-
 
         jids.insert(jid, num);
         _enumsIncomming.insert(account, jids);
@@ -458,7 +453,7 @@ bool EnumMessagesPlugin::isEnabledFor(int account, const QString &jid) const
 
 QString EnumMessagesPlugin::pluginInfo()
 {
-    return tr("Authors: ") + "Dealer_WeARE\n\n" +
+    return tr("Authors: ") + "Evgeny Khryukin\n\n" +
         tr("The plugin is designed to enumerate messages, adding the messages numbers in chat logs "
            "and notification of missed messages. \n"
            "Supports per contact on / off message enumeration via the buttons on the chats toolbar.");

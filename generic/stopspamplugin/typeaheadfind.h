@@ -20,15 +20,13 @@
 #ifndef TYPEAHEADFIND_H
 #define TYPEAHEADFIND_H
 
-#include <QToolBar>
-#include <QTextEdit>
-
 #include "iconfactoryaccessinghost.h"
 
-namespace Stopspam {
+#include <QTextEdit>
+#include <QToolBar>
 
-class TypeAheadFindBar : public QToolBar
-{
+namespace Stopspam {
+class TypeAheadFindBar : public QToolBar {
     Q_OBJECT
 public:
     TypeAheadFindBar(IconFactoryAccessingHost *IcoHost, QTextEdit *textedit, const QString &title, QWidget *parent = nullptr);
@@ -54,5 +52,6 @@ private:
     IconFactoryAccessingHost *icoHost_;
 };
 
-}
-#endif
+} // namespace Stopspam
+
+#endif // TYPEAHEADFIND_H

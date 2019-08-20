@@ -22,12 +22,13 @@
  *
  */
 
-#include <QTextDocument>
-
 #include "gamesessions.h"
-#include "invatedialog.h"
+
 #include "common.h"
+#include "invitedialog.h"
 #include "options.h"
+
+#include <QTextDocument>
 
 GameSessions::GameSessions(QObject *parent) :
     QObject(parent),
@@ -162,7 +163,7 @@ bool GameSessions::processIncomingIqStanza(int account, const QDomElement &xml, 
  */
 void GameSessions::invite(int account, const QString &jid, const QStringList &res_list, QWidget *parent)
 {
-    InvateDialog *dialog = new InvateDialog(account, jid, res_list, parent);
+    InviteDialog *dialog = new InviteDialog(account, jid, res_list, parent);
     connect(dialog, SIGNAL(acceptGame(int, QString, QString)), this, SLOT(sendInvite(int, QString, QString)));
     connect(dialog, SIGNAL(rejectGame(int,QString)), this, SLOT(cancelInvite(int, QString)));
     dialog->show();

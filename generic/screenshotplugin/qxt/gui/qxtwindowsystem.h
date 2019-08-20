@@ -1,4 +1,3 @@
-#ifndef QXTWINDOWSYSTEM_H
 /****************************************************************************
 ** Copyright (c) 2006 - 2011, the LibQxt project.
 ** See the Qxt AUTHORS file for a list of authors and copyright holders.
@@ -29,15 +28,16 @@
 ** <http://libqxt.org>  <foundation@libqxt.org>
 *****************************************************************************/
 
+#ifndef QXTWINDOWSYSTEM_H
 #define QXTWINDOWSYSTEM_H
 
-#include <QWidget>
 #include "qxtglobal.h"
+
+#include <QWidget>
 
 using WindowList = QList<WId>;
 
-class /*QXT_GUI_EXPORT*/ QxtWindowSystem
-{
+class /*QXT_GUI_EXPORT*/ QxtWindowSystem {
 public:
     static WindowList windows();
     static WId activeWindow();

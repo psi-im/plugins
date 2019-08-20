@@ -1,34 +1,36 @@
 /*
-    yandexnarodManage
-
-    Copyright (c) 2009 by Alexander Kazarin <boiler@co.ru>
-            2011 by Evgeny Khryukin
-
- ***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************
-*/
+ * yandexnarodmanage.h - plugin
+ * Copyright (C) 2009  Alexander Kazarin <boiler@co.ru>
+ * Copyright (C) 2011  Evgeny Khryukin
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
 
 #ifndef YANDEXNARODMANAGE_H
 #define YANDEXNARODMANAGE_H
 
-#include <QListWidget>
-#include <QDialog>
-
 #include "yandexnarodnetman.h"
+
+#include <QDialog>
+#include <QListWidget>
 
 namespace Ui {
     class yandexnarodManageClass;
 }
 
-
-class ListWidget : public QListWidget
-{
+class ListWidget : public QListWidget {
     Q_OBJECT
 public:
     ListWidget(QWidget* p = 0);
@@ -45,10 +47,7 @@ signals:
     void uploadFile(const QString&);
 };
 
-
-
-class yandexnarodManage : public QDialog
-{
+class yandexnarodManage : public QDialog {
     Q_OBJECT
 
 public:
@@ -80,5 +79,5 @@ private:
     QList<QIcon> fileicons;
     QHash<QString, int> fileiconstyles;
 };
-#endif
 
+#endif // YANDEXNARODMANAGE_H

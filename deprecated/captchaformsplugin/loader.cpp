@@ -22,7 +22,6 @@
 #include <QNetworkAccessManager>
 #include <QNetworkProxy>
 
-
 Loader::Loader(const QString& id, QObject *p)
     : QObject(p)
     , id_(id)

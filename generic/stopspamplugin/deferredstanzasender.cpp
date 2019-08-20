@@ -17,7 +17,6 @@
  *
  */
 
-
 #include "deferredstanzasender.h"
 
 #define DELAY 500

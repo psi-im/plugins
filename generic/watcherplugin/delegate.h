@@ -25,9 +25,7 @@
 
 class IconFactoryAccessingHost;
 
-
-class IconDelegate : public QItemDelegate
-{
+class IconDelegate : public QItemDelegate {
     Q_OBJECT
 
 public:
@@ -41,8 +39,7 @@ private:
 
 };
 
-class LineEditDelegate : public QItemDelegate
-{
+class LineEditDelegate : public QItemDelegate {
     Q_OBJECT
 
 public:

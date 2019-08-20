@@ -36,5 +36,4 @@ struct Request {
     }
 };
 
-
 #endif // REQUEST_H

@@ -6,6 +6,7 @@
  */
 
 #include "ScrollKeeper.h"
+
 #include <QScrollBar>
 
 //#define SCROLL_DEBUG
@@ -40,4 +41,3 @@ ScrollKeeper::~ScrollKeeper() {
         ted_->verticalScrollBar()->setValue(scrollToEnd_ ? ted_->verticalScrollBar()->maximum() : scrollPos_);
     }
 }
-

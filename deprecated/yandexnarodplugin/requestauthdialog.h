@@ -1,29 +1,33 @@
 /*
-    requestAuthDialog
-
-    Copyright (c) 2008 by Alexander Kazarin <boiler@co.ru>
-
- ***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************
-*/
+ * requestauthdialog.h - plugin
+ * Copyright (C) 2008  Alexander Kazarin <boiler@co.ru>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
 
 #ifndef REQUESTAUTHDIALOG_H
 #define REQUESTAUTHDIALOG_H
 
 #include "ui_requestauthdialog.h"
+
 #include <QNetworkCookie>
 
 class QNetworkAccessManager;
 class QNetworkReply;
 
-class requestAuthDialog : public QDialog
-{
+class requestAuthDialog : public QDialog {
     Q_OBJECT;
 
 public:
@@ -40,10 +44,10 @@ public:
 private slots:
     void reply(QNetworkReply* r);
 
-
 private:
     Ui::requestAuthDialogClass ui;
     QNetworkAccessManager *manager_;
 
 };
-#endif
+
+#endif // REQUESTAUTHDIALOG_H

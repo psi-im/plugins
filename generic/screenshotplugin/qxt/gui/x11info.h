@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013  Sergey Ilinykh (rion)
+ * Copyright (C) 2013  Sergey Ilinykh
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,8 +22,7 @@
 typedef struct _XDisplay Display;
 typedef struct xcb_connection_t xcb_connection_t;
 
-class X11Info
-{
+class X11Info {
     static Display *_display;
     static xcb_connection_t *_xcb;
     static int _xcbPreferredScreen;

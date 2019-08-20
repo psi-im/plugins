@@ -3,7 +3,7 @@
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
- *                    2011  Florian Fieber
+ * Copyright (C) 2011  Florian Fieber
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,11 +22,10 @@
 
 #include "htmltidy.h"
 
+#include <QDebug>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QTextStream>
-#include <QDebug>
-
 
 //-----------------------------------------------------------------------------
 

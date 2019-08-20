@@ -22,12 +22,11 @@
 
 #include <QToolBar>
 
-class QToolBar;
 class Button;
 class QSpinBox;
+class QToolBar;
 
-class ToolBar : public QToolBar
-{
+class ToolBar : public QToolBar {
     Q_OBJECT
 public:
     enum ButtonType {
@@ -66,6 +65,5 @@ private:
     QSpinBox *sb;
 
 };
-
 
 #endif // TOOLBAR_H

@@ -25,13 +25,12 @@
 #ifndef BOARDVIEW_H
 #define BOARDVIEW_H
 
+#include "boardmodel.h"
+
 #include <QTableView>
 
-#include "boardmodel.h"
 namespace GomokuGame {
-
-class BoardView : public QTableView
-{
+class BoardView : public QTableView {
 Q_OBJECT
 public:
     explicit BoardView(QWidget *parent = nullptr);
@@ -48,6 +47,6 @@ signals:
 private slots:
 
 };
-}
+} // namespace GomokuGame
 
 #endif // BOARDVIEW_H

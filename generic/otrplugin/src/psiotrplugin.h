@@ -3,7 +3,7 @@
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
- *                    2011  Florian Fieber
+ * Copyright (C) 2011  Florian Fieber
  *
  * This program was originally written as part of a diplom thesis
  * advised by Prof. Dr. Ruediger Weis (PST Labor)
@@ -24,65 +24,60 @@
  *
  */
 
-#ifndef PSIOTRPLUGIN_H_
-#define PSIOTRPLUGIN_H_
+#ifndef PSIOTRPLUGIN_H
+#define PSIOTRPLUGIN_H
 
-#include <QObject>
-#include <QMessageBox>
-#include <QQueue>
-
-#include "otrmessaging.h"
-#include "psiplugin.h"
-#include "plugininfoprovider.h"
-#include "eventfilter.h"
-#include "optionaccessinghost.h"
-#include "optionaccessor.h"
-#include "stanzasender.h"
-#include "stanzasendinghost.h"
-#include "applicationinfoaccessor.h"
-#include "psiaccountcontroller.h"
-#include "stanzafilter.h"
-#include "toolbariconaccessor.h"
 #include "accountinfoaccessor.h"
+#include "applicationinfoaccessor.h"
 #include "contactinfoaccessor.h"
-#include "iconfactoryaccessor.h"
+#include "encryptionsupport.h"
 #include "eventcreatinghost.h"
 #include "eventcreator.h"
-#include "encryptionsupport.h"
+#include "eventfilter.h"
+#include "iconfactoryaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "otrmessaging.h"
+#include "plugininfoprovider.h"
+#include "psiaccountcontroller.h"
+#include "psiplugin.h"
+#include "stanzafilter.h"
+#include "stanzasender.h"
+#include "stanzasendinghost.h"
+#include "toolbariconaccessor.h"
 
-class ApplicationInfoAccessingHost;
-class PsiAccountControllingHost;
+#include <QMessageBox>
+#include <QObject>
+#include <QQueue>
+
 class AccountInfoAccessingHost;
+class ApplicationInfoAccessingHost;
 class ContactInfoAccessingHost;
 class IconFactoryAccessingHost;
-
+class PsiAccountControllingHost;
+class QAction;
 class QDomElement;
 class QString;
-class QAction;
 
-namespace psiotr
-{
-
+namespace psiotr {
 class PsiOtrClosure;
-
 //-----------------------------------------------------------------------------
-
-class PsiOtrPlugin : public QObject,
-                     public PsiPlugin,
-                     public PluginInfoProvider,
-                     public EventCreator,
-                     public OptionAccessor,
-                     public StanzaSender,
-                     public ApplicationInfoAccessor,
-                     public PsiAccountController,
-                     public StanzaFilter,
-                     public ToolbarIconAccessor,
-                     public AccountInfoAccessor,
-                     public ContactInfoAccessor,
-                     public IconFactoryAccessor,
-                     public OtrCallback,
-                     public EncryptionSupport
-{
+class PsiOtrPlugin:
+        public AccountInfoAccessor,
+        public ApplicationInfoAccessor,
+        public ContactInfoAccessor,
+        public EncryptionSupport,
+        public EventCreator,
+        public IconFactoryAccessor,
+        public OptionAccessor,
+        public OtrCallback,
+        public PluginInfoProvider,
+        public PsiAccountController,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter,
+        public StanzaSender,
+        public ToolbarIconAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.PsiOtrPlugin")
     Q_INTERFACES(PsiPlugin
@@ -231,4 +226,4 @@ private:
 
 } // namespace psiotr
 
-#endif
+#endif // PSIOTRPLUGIN_H

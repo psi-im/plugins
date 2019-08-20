@@ -3,8 +3,8 @@
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
- *                    2011  Florian Fieber
- *               2013-2014  Boris Pek (tehnick-8@mail.ru)
+ * Copyright (C) 2011  Florian Fieber
+ * Copyright (C) 2013-2014  Boris Pek (tehnick-8@mail.ru)
  *
  * This program was originally written as part of a diplom thesis
  * advised by Prof. Dr. Ruediger Weis (PST Labor)
@@ -25,19 +25,19 @@
  *
  */
 
-#ifndef OTRINTERNAL_H_
-#define OTRINTERNAL_H_
+#ifndef OTRINTERNAL_H
+#define OTRINTERNAL_H
 
 #include "otrmessaging.h"
 
-#include <QList>
 #include <QHash>
+#include <QList>
 
 extern "C"
 {
-#include <libotr/proto.h>
 #include <libotr/message.h>
 #include <libotr/privkey.h>
+#include <libotr/proto.h>
 #ifndef OTRL_PRIVKEY_FPRINT_HUMAN_LEN
 #define OTRL_PRIVKEY_FPRINT_HUMAN_LEN 45
 #endif
@@ -54,8 +54,7 @@ class QString;
 /**
  * Handles all libotr calls and callbacks.
  */
-class OtrInternal
-{
+class OtrInternal {
 public:
 
     OtrInternal(psiotr::OtrCallback* callback, psiotr::OtrPolicy& policy);
@@ -80,13 +79,11 @@ public:
 
     void deleteKey(const QString& account);
 
-
     void startSession(const QString& account, const QString& contact);
 
     void endSession(const QString& account, const QString& contact);
 
     void expireSession(const QString& account, const QString& contact);
-
 
     void startSMP(const QString& account, const QString& contact,
                   const QString& question, const QString& secret);
@@ -96,7 +93,6 @@ public:
 
     void abortSMP(const QString& account, const QString& contact);
     void abortSMP(ConnContext* context);
-
 
     psiotr::OtrMessageState getMessageState(const QString& account,
                                             const QString& contact);
@@ -153,7 +149,6 @@ public:
     const char* account_name(const char* account,
                              const char* protocol);
     void account_name_free(const char* account_name);
-
 
     /*** static otr callback wrapper-functions ***/
     static OtrlPolicy cb_policy(void* opdata, ConnContext* context);
@@ -240,4 +235,4 @@ private:
 
 // ---------------------------------------------------------------------------
 
-#endif
+#endif OTRINTERNAL_H

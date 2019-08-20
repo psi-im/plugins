@@ -1,5 +1,5 @@
 /*
- * contentdownloader.h - plugin interface
+ * contentdownloader.h - plugin
  * Copyright (C) 2010  Ivan Romanov <drizt@land.ru>
  *
  * This program is free software; you can redistribute it and/or
@@ -16,22 +16,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef CONTENTDOWLOADER_H
 #define CONTENTDOWLOADER_H
 
-#include <QWidget>
-#include "psiplugin.h"
-#include "applicationinfoaccessor.h"
 #include "applicationinfoaccessinghost.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
-#include "plugininfoprovider.h"
+#include "applicationinfoaccessor.h"
 #include "cditemmodel.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "psiplugin.h"
+
+#include <QWidget>
 
 class Form;
 
-class ContentDownloader : public QObject, public PsiPlugin, public OptionAccessor, public ApplicationInfoAccessor , public PluginInfoProvider {
+class ContentDownloader:
+        public ApplicationInfoAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiPlugin,
+        public QObject {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.ContentDownloader")
     Q_INTERFACES(PsiPlugin OptionAccessor ApplicationInfoAccessor PluginInfoProvider)

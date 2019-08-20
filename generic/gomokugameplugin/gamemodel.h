@@ -25,12 +25,11 @@
 #ifndef GAMEMODEL_H
 #define GAMEMODEL_H
 
-#include <QObject>
-
 #include "gameelement.h"
 
-class GameModel : public QObject
-{
+#include <QObject>
+
+class GameModel : public QObject {
 Q_OBJECT
 public:
     enum GameStatus {

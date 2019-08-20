@@ -3,7 +3,7 @@
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
- *                    2011  Florian Fieber
+ * Copyright (C) 2011  Florian Fieber
  *
  * This program was originally written as part of a diplom thesis
  * advised by Prof. Dr. Ruediger Weis (PST Labor)
@@ -25,27 +25,23 @@
  */
 
 #include "psiotrplugin.h"
+
+#include "accountinfoaccessinghost.h"
+#include "applicationinfoaccessinghost.h"
+#include "contactinfoaccessinghost.h"
+#include "htmltidy.h"
+#include "iconfactoryaccessinghost.h"
+#include "psiaccountcontrollinghost.h"
 #include "psiotrclosure.h"
 #include "psiotrconfig.h"
-#include "htmltidy.h"
-#include "applicationinfoaccessinghost.h"
-#include "psiaccountcontrollinghost.h"
-#include "accountinfoaccessinghost.h"
-#include "contactinfoaccessinghost.h"
-#include "iconfactoryaccessinghost.h"
 
-#include <QtGui>
-#include <QDomElement>
 #include <QAction>
+#include <QDomElement>
+#include <QtGui>
 
-namespace psiotr
-{
-
+namespace psiotr {
 // ---------------------------------------------------------------------------
-
-namespace
-{
-
+namespace {
 // ---------------------------------------------------------------------------
 
 /**

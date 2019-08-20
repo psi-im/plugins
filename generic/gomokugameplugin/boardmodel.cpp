@@ -23,6 +23,7 @@
  */
 
 #include "boardmodel.h"
+
 #include "common.h"
 
 using namespace GomokuGame;

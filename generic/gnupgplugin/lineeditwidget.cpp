@@ -1,10 +1,10 @@
-#include <QBoxLayout>
+#include "lineeditwidget.h"
+
 #include <QApplication>
+#include <QBoxLayout>
 #include <QDesktopWidget>
 #include <QEvent>
 #include <QRegExpValidator>
-
-#include "lineeditwidget.h"
 
 LineEditWidget::LineEditWidget(QWidget *parent)
     : QLineEdit(parent)
@@ -25,7 +25,6 @@ LineEditWidget::~LineEditWidget()
 {
     _toolbuttons.clear();
 }
-
 
 QSize LineEditWidget::sizeHint() const
 {

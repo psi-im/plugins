@@ -20,12 +20,11 @@
 #ifndef BOARDMODEL_H
 #define BOARDMODEL_H
 
-#include <QAbstractTableModel>
-
 #include "gamemodel.h"
 
-class BoardModel : public QAbstractTableModel
-{
+#include <QAbstractTableModel>
+
+class BoardModel : public QAbstractTableModel {
     Q_OBJECT
 public:
     BoardModel(QObject *parent = nullptr);

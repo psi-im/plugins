@@ -1,6 +1,6 @@
 /*
  * OMEMO Plugin for Psi
- * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2018  Vyacheslav Karpukhin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,8 +18,9 @@
  */
 
 #include "configwidget.h"
-#include <QVBoxLayout>
+
 #include <QHeaderView>
+#include <QVBoxLayout>
 
 namespace psiomemo {
   ConfigWidget::ConfigWidget(OMEMO *omemo, AccountInfoAccessingHost *accountInfo) : QWidget(), m_accountInfo(accountInfo) {
@@ -189,4 +190,4 @@ namespace psiomemo {
       updateData();
     }
   }
-}
+} // namespace psiomemo

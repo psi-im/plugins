@@ -17,35 +17,35 @@
  *
  */
 
-#include <QTextEdit>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QStyle>
-#include <QDialogButtonBox>
-#include <QInputDialog>
+#include "pixmapwidget.h"
+
+#include "defines.h"
+#include "options.h"
+#include "screenshoticonset.h"
+
 #include <QApplication>
 #include <QClipboard>
-#include <QPainter>
-#include <QMouseEvent>
-#include <QMenu>
-#include <QPrintDialog>
 #include <QColorDialog>
+#include <QDialogButtonBox>
 #include <QFontDialog>
+#include <QHBoxLayout>
 #include <QIcon>
-
-#include "pixmapwidget.h"
-#include "options.h"
-#include "defines.h"
-#include "screenshoticonset.h"
+#include <QInputDialog>
+#include <QMenu>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QPrintDialog>
+#include <QPushButton>
+#include <QStyle>
+#include <QTextEdit>
+#include <QVBoxLayout>
 
 #define ACCURACY 5
 
 //------------------------------
 //---GetTextDlg-----------------
 //------------------------------
-class GetTextDlg : public QDialog
-{
+class GetTextDlg : public QDialog {
     Q_OBJECT
 public:
     GetTextDlg(QWidget *parent)
@@ -92,9 +92,6 @@ private:
     QTextEdit *te;
 };
 
-
-
-
 //------------------------------
 //---SelectionRect--------------
 //------------------------------
@@ -140,8 +137,6 @@ SelectionRect::CornerType SelectionRect::cornerUnderMouse(const QPoint& pos) con
 
     return NoCorner;
 }
-
-
 
 //--------------------------------------------
 //---------------PixmapWidget-----------------
@@ -316,7 +311,6 @@ static QImage blurred(const QImage& image, const QRect& rect, int radius, bool a
 
     return result;
 }
-
 
 void PixmapWidget::blur()
 {

@@ -1,28 +1,31 @@
 /*
-    proxy.h
+ * options.h - plugin
+ * Copyright (C) 2011  Evgeny Khryukin
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
 
-    Copyright (c) 2011 by Evgeny Khryukin
+#ifndef OPTIONS_H
+#define OPTIONS_H
 
- ***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************
-*/
-
-#ifndef PROXY_H
-#define PROXY_H
-
-#include <QNetworkProxy>
-#include <QNetworkCookie>
 #include "QVariant"
 
-class ApplicationInfoAccessingHost;
-class OptionAccessingHost;
+#include <QNetworkCookie>
+#include <QNetworkProxy>
 
+#define VERSION "0.1.4"
 #define CONST_COOKIES "cookies"
 #define CONST_LOGIN "login"
 #define CONST_PASS_OLD "pass"
@@ -31,16 +34,17 @@ class OptionAccessingHost;
 #define CONST_LAST_FOLDER "lastfolder"
 #define CONST_WIDTH "width"
 #define CONST_HEIGHT "height"
-#define POPUP_OPTION_NAME ".popupinterval"
-#define VERSION "0.1.4"
 
+#define POPUP_OPTION_NAME ".popupinterval"
 
 #define O_M(x) Options::message(x)
 
 enum MessageType { MAuthStart, MAuthOk, MAuthError, MCancel, MChooseFile, MUploading, MError, MRemoveCookie };
 
-class Options : public QObject
-{
+class ApplicationInfoAccessingHost;
+class OptionAccessingHost;
+
+class Options : public QObject {
     Q_OBJECT
 public:
     static Options * instance();
@@ -68,4 +72,4 @@ private:
     OptionAccessingHost* options;
 };
 
-#endif // PROXY_H
+#endif // OPTIONS_H

@@ -1,6 +1,6 @@
 /*
  * OMEMO Plugin for Psi
- * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2018  Vyacheslav Karpukhin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,44 +17,45 @@
  *
  */
 
-#ifndef PSIOMEMO_OMEMOPLUGIN_H
-#define PSIOMEMO_OMEMOPLUGIN_H
+#ifndef OMEMOPLUGIN_H
+#define OMEMOPLUGIN_H
+
+#include "accountinfoaccessor.h"
+#include "applicationinfoaccessor.h"
+#include "commandexecutor.h"
+#include "contactinfoaccessor.h"
+#include "crypto.h"
+#include "encryptionsupport.h"
+#include "eventcreator.h"
+#include "gctoolbariconaccessor.h"
+#include "omemo.h"
+#include "plugininfoprovider.h"
+#include "psiaccountcontroller.h"
+#include "psiplugin.h"
+#include "stanzafilter.h"
+#include "stanzasender.h"
+#include "storage.h"
+#include "toolbariconaccessor.h"
 
 #include <QObject>
 #include <QtNetwork/QtNetwork>
 
-#include "psiplugin.h"
-#include "stanzafilter.h"
-#include "stanzasender.h"
-#include "eventcreator.h"
-#include "accountinfoaccessor.h"
-#include "applicationinfoaccessor.h"
-#include "psiaccountcontroller.h"
-#include "plugininfoprovider.h"
-#include "toolbariconaccessor.h"
-#include "gctoolbariconaccessor.h"
-#include "encryptionsupport.h"
-#include "commandexecutor.h"
-#include "contactinfoaccessor.h"
-#include "storage.h"
-#include "crypto.h"
-#include "omemo.h"
-
 namespace psiomemo {
-  class OMEMOPlugin : public QObject,
-                      public PsiPlugin,
-                      public StanzaFilter,
-                      public StanzaSender,
-                      public EventCreator,
-                      public AccountInfoAccessor,
-                      public ApplicationInfoAccessor,
-                      public PsiAccountController,
-                      public PluginInfoProvider,
-                      public ToolbarIconAccessor,
-                      public GCToolbarIconAccessor,
-                      public EncryptionSupport,
-                      public CommandExecutor,
-                      public ContactInfoAccessor {
+class OMEMOPlugin:
+        public AccountInfoAccessor,
+        public ApplicationInfoAccessor,
+        public CommandExecutor,
+        public ContactInfoAccessor,
+        public EncryptionSupport,
+        public EventCreator,
+        public GCToolbarIconAccessor,
+        public PluginInfoProvider,
+        public PsiAccountController,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter,
+        public StanzaSender,
+        public ToolbarIconAccessor {
   Q_OBJECT
   Q_PLUGIN_METADATA(IID
                         "com.psi.OmemoPlugin")
@@ -123,5 +124,6 @@ namespace psiomemo {
     void onFileDownloadFinished();
     void onActionDestroyed(QObject *action);
   };
-}
-#endif //PSIOMEMO_OMEMOPLUGIN_H
+} // namespace psiomemo
+
+#endif // OMEMOPLUGIN_H

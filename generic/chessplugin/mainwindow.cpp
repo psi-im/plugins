@@ -77,7 +77,6 @@ void SelectFigure::figureSelected()
     close();
 }
 
-
 //-------------------------
 //----ChessWindow----------
 //-------------------------

@@ -20,32 +20,32 @@
 #ifndef JUICKPLUGIN_H
 #define JUICKPLUGIN_H
 
+#include "activetabaccessor.h"
+#include "applicationinfoaccessor.h"
+#include "chattabaccessor.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
 #include "psiplugin.h"
 #include "stanzafilter.h"
-#include "optionaccessor.h"
-#include "activetabaccessor.h"
-#include "plugininfoprovider.h"
-#include "chattabaccessor.h"
-#include "applicationinfoaccessor.h"
-#include "webkitaccessor.h"
 #include "ui_settings.h"
+#include "webkitaccessor.h"
 
-class OptionAccessingHost;
 class ActiveTabAccessingHost;
 class ApplicationInfoAccessingHost;
 class JuickDownloader;
+class OptionAccessingHost;
 class QDomDocument;
 
-class JuickPlugin : public QObject,
-        public PsiPlugin,
-        public OptionAccessor,
+class JuickPlugin:
         public ActiveTabAccessor,
-        public StanzaFilter,
         public ApplicationInfoAccessor,
-        public PluginInfoProvider,
         public ChatTabAccessor,
-        public WebkitAccessor
-{
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter,
+        public WebkitAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.JuickPlugin")
     Q_INTERFACES(PsiPlugin OptionAccessor ActiveTabAccessor StanzaFilter

@@ -1,32 +1,32 @@
 /*
-* invitedialog.cpp - plugin
-* Copyright (C) 2010  Evgeny Khryukin, liuch
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*
-*/
+ * invitedialog.cpp - plugin
+ * Copyright (C) 2010  Evgeny Khryukin, Aleksey Andreev
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
 
-#include "invatedialog.h"
+#include "invitedialog.h"
 
 using namespace GomokuGame;
 
-InvateDialog::InvateDialog(const int account,
+InviteDialog::InviteDialog(const int account,
                            const QString &jid,
                            const QStringList &resources,
                            QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::InvateDialog),
+    ui(new Ui::InviteDialog),
     accepted(false),
     myAcc(account),
     jid_(jid)
@@ -38,12 +38,12 @@ InvateDialog::InvateDialog(const int account,
     adjustSize();
 }
 
-InvateDialog::~InvateDialog()
+InviteDialog::~InviteDialog()
 {
     delete ui;
 }
 
-void InvateDialog::acceptBlack()
+void InviteDialog::acceptBlack()
 {
     emit acceptGame(myAcc, jid_ + "/" + ui->cbResource->currentText(), "black");
     accepted = true;
@@ -51,7 +51,7 @@ void InvateDialog::acceptBlack()
     close();
 }
 
-void InvateDialog::acceptWhite()
+void InviteDialog::acceptWhite()
 {
     emit acceptGame(myAcc, jid_ + "/" + ui->cbResource->currentText(), "white");
     accepted = true;
@@ -59,7 +59,7 @@ void InvateDialog::acceptWhite()
     close();
 }
 
-void InvateDialog::closeEvent(QCloseEvent *event)
+void InviteDialog::closeEvent(QCloseEvent *event)
 {
     if (!accepted) {
         reject();

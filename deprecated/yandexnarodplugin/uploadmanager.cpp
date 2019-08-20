@@ -1,37 +1,41 @@
 /*
-    uploadmanger.cpp
-
-    Copyright (c) 2011 by Evgeny Khryukin
-
- ***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************
-*/
-#include <QFile>
-#include <QFileInfo>
-#include <QRegExp>
-#include <QBuffer>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
+ * uploadmanager.cpp - plugin
+ * Copyright (C) 2011  Evgeny Khryukin
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
 
 #include "uploadmanager.h"
+
+#include "authmanager.h"
 #include "common.h"
 #include "options.h"
-#include "authmanager.h"
+
+#include <QBuffer>
+#include <QFile>
+#include <QFileInfo>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QRegExp>
 
 static const QString boundary = "AaB03x";
-
 
 //---------------------------------
 //-------HttpDevice----------------
 //---------------------------------
-class HttpDevice : public QIODevice
-{
+class HttpDevice : public QIODevice {
 public:
     HttpDevice(const QString& fileName, QObject *p = 0)
         : QIODevice(p)
@@ -134,7 +138,6 @@ protected:
                 break;
             }
 
-
             data += bytesToReadInThisRequest;
             len -= bytesToReadInThisRequest;
             totalRead += bytesToReadInThisRequest;
@@ -175,9 +178,6 @@ private:
     int lastIndex;
     QString fileName_;
 };
-
-
-
 
 //-----------------------------------------
 //-------UploadManager---------------------

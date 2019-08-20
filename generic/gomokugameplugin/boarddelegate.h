@@ -25,15 +25,13 @@
 #ifndef BOARDDELEGATE_H
 #define BOARDDELEGATE_H
 
+#include "boardmodel.h"
+
 #include <QItemDelegate>
 #include <QPainter>
 
-#include "boardmodel.h"
-
 namespace GomokuGame {
-
-class BoardPixmaps : public QObject
-{
+class BoardPixmaps : public QObject {
 
 public:
     BoardPixmaps(QObject *parent = nullptr);
@@ -51,8 +49,7 @@ private:
 
 };
 
-class BoardDelegate : public QItemDelegate
-{
+class BoardDelegate : public QItemDelegate {
 Q_OBJECT
 public:
     explicit BoardDelegate(BoardModel *model, QObject *parent = nullptr);
@@ -64,6 +61,6 @@ private:
     int skin;
     BoardPixmaps *pixmaps;
 };
-}
+} // namespace GomokuGame
 
 #endif // BOARDDELEGATE_H

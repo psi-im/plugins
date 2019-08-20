@@ -3,7 +3,7 @@
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
- *                    2011  Florian Fieber
+ * Copyright (C) 2011  Florian Fieber
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,37 +21,33 @@
  */
 
 #include "psiotrconfig.h"
-#include "optionaccessinghost.h"
+
 #include "accountinfoaccessinghost.h"
+#include "optionaccessinghost.h"
 
-
-#include <QWidget>
-#include <QVariant>
-#include <QGroupBox>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QTableView>
-#include <QHeaderView>
-#include <QStandardItem>
-#include <QModelIndex>
-#include <QMessageBox>
-#include <QButtonGroup>
-#include <QPushButton>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QRadioButton>
-#include <QMenu>
-#include <QClipboard>
 #include <QApplication>
+#include <QButtonGroup>
+#include <QCheckBox>
+#include <QClipboard>
+#include <QComboBox>
+#include <QGroupBox>
+#include <QHeaderView>
+#include <QLabel>
+#include <QMenu>
+#include <QMessageBox>
+#include <QModelIndex>
 #include <QPoint>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QStandardItem>
+#include <QTableView>
+#include <QVBoxLayout>
+#include <QVariant>
+#include <QWidget>
 
 //-----------------------------------------------------------------------------
-
-namespace psiotr
-{
-
+namespace psiotr {
 //-----------------------------------------------------------------------------
-
 ConfigDialog::ConfigDialog(OtrMessaging* otr, OptionAccessingHost* optionHost,
                            AccountInfoAccessingHost* accountInfo,
                            QWidget* parent)
@@ -100,7 +96,6 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
 
     m_endWhenOffline = new QCheckBox(tr("End session when contact goes offline"), this);
 
-
     m_policy->addButton(polDisable, OTR_POLICY_OFF);
     m_policy->addButton(polEnable,  OTR_POLICY_ENABLED);
     m_policy->addButton(polAuto,    OTR_POLICY_AUTO);
@@ -117,7 +112,6 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost* optionHost,
     layout->addStretch();
 
     setLayout(layout);
-
 
     int policyOption = m_optionHost->getPluginOption(OPTION_POLICY,
                                                      DEFAULT_POLICY).toInt();

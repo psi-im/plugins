@@ -1,5 +1,5 @@
 /*
- * battleshipgameplugin.cpp - Battleship Game plugin
+ * battleshipgameplugin.cpp - plugin
  * Copyright (C) 2014  Aleksey Andreev
  *
  * This program is free software; you can redistribute it and/or
@@ -23,15 +23,15 @@
  */
 
 #include "battleshipgameplugin.h"
+
 #include "gamesessions.h"
 #include "options.h"
 
 #include <QFileDialog>
 
-#define constVersion            "0.0.1"
-#define constShortPluginName    "battleshipgameplugin"
-#define constPluginName         "Battleship Game Plugin"
-
+#define constVersion "0.0.1"
+#define constShortPluginName "battleshipgameplugin"
+#define constPluginName "Battleship Game Plugin"
 
 BattleshipGamePlugin::BattleshipGamePlugin(QObject *parent) :
         QObject(parent),
@@ -296,7 +296,7 @@ void BattleshipGamePlugin::playSound(const QString &sound_id)
 
 QString BattleshipGamePlugin::pluginInfo()
 {
-    return tr("Author: ") +  "Liuch\n"
+    return tr("Author: ") +  "Aleksey Andreev\n"
         + tr("Email: ") + "liuch@mail.ru\n\n"
         + tr("This plugin allows you to play battleship with your friends.\n"
              "For sending commands, normal messages are used, so this plugin will always work wherever you are able to log in."

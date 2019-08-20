@@ -27,9 +27,7 @@
 
 #include <QtCore>
 
-class AccountSettings
-{
-
+class AccountSettings {
 public:
     enum {RespAllow = 0, RespNotImpl = 1, RespIgnore = 2}; // как номер индекса в combobox
     enum {LogNever = 0, LogIfReplace = 1, LogAlways = 2};

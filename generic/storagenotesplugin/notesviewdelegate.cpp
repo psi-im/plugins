@@ -18,6 +18,7 @@
  */
 
 #include "notesviewdelegate.h"
+
 #include "tagsmodel.h"
 
 NotesViewDelegate::~NotesViewDelegate()
@@ -51,7 +52,6 @@ void NotesViewDelegate::paint ( QPainter * painter, const QStyleOptionViewItem &
 
     QPalette::ColorGroup cg = option.state & QStyle::State_Enabled
             ? QPalette::Normal : QPalette::Disabled;
-
 
     if (option.state & QStyle::State_Selected) {
                 painter->setPen(palette.color(cg, QPalette::HighlightedText));

@@ -1,5 +1,5 @@
 /*
- * battleshipgameplugin.h - Battleship Game plugin
+ * battleshipgameplugin.h - plugin
  * Copyright (C) 2014  Aleksey Andreev
  *
  * This program is free software; you can redistribute it and/or
@@ -25,44 +25,52 @@
 #ifndef BATTLESHIPGAMEPLUGIN_H
 #define BATTLESHIPGAMEPLUGIN_H
 
-#include <QtGui>
-#include <QtCore>
-#include <QObject>
-#include <QDomElement>
-
-
-#include "psiplugin.h"
-#include "plugininfoprovider.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
-#include "iconfactoryaccessor.h"
-#include "iconfactoryaccessinghost.h"
-#include "toolbariconaccessor.h"
-#include "activetabaccessor.h"
-#include "activetabaccessinghost.h"
-#include "accountinfoaccessor.h"
 #include "accountinfoaccessinghost.h"
-#include "contactinfoaccessor.h"
+#include "accountinfoaccessor.h"
+#include "activetabaccessinghost.h"
+#include "activetabaccessor.h"
 #include "contactinfoaccessinghost.h"
+#include "contactinfoaccessor.h"
+#include "eventcreatinghost.h"
+#include "eventcreator.h"
+#include "iconfactoryaccessinghost.h"
+#include "iconfactoryaccessor.h"
+#include "menuaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "popupaccessinghost.h"
+#include "popupaccessor.h"
+#include "psiplugin.h"
+#include "soundaccessinghost.h"
+#include "soundaccessor.h"
+#include "stanzafilter.h"
 #include "stanzasender.h"
 #include "stanzasendinghost.h"
-#include "stanzafilter.h"
-#include "eventcreator.h"
-#include "eventcreatinghost.h"
-#include "soundaccessor.h"
-#include "soundaccessinghost.h"
-#include "menuaccessor.h"
-#include "popupaccessor.h"
-#include "popupaccessinghost.h"
-
+#include "toolbariconaccessor.h"
 #include "ui_options.h"
 
+#include <QDomElement>
+#include <QObject>
+#include <QtCore>
+#include <QtGui>
 
-class BattleshipGamePlugin : public QObject, public PsiPlugin, public PluginInfoProvider, public OptionAccessor,
-public IconFactoryAccessor, public ToolbarIconAccessor, public ActiveTabAccessor, public AccountInfoAccessor,
-public ContactInfoAccessor, public StanzaSender, public StanzaFilter, public EventCreator, public SoundAccessor,
-public MenuAccessor, public PopupAccessor
-{
+class BattleshipGamePlugin:
+        public AccountInfoAccessor,
+        public ActiveTabAccessor,
+        public ContactInfoAccessor,
+        public EventCreator,
+        public IconFactoryAccessor,
+        public MenuAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PopupAccessor,
+        public PsiPlugin,
+        public QObject,
+        public SoundAccessor,
+        public StanzaFilter,
+        public StanzaSender,
+        public ToolbarIconAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.BattleshipGame")
     Q_INTERFACES(PsiPlugin PluginInfoProvider OptionAccessor IconFactoryAccessor ToolbarIconAccessor

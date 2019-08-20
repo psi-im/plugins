@@ -18,13 +18,13 @@
  */
 
 #include "view.h"
+
+#include "delegate.h"
+#include "iconfactoryaccessinghost.h"
 #include "model.h"
 
 #include <QHeaderView>
 #include <QMenu>
-
-#include "iconfactoryaccessinghost.h"
-#include "delegate.h"
 
 void Viewer::init(IconFactoryAccessingHost *iconHost)
 {

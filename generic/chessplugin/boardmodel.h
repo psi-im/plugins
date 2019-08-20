@@ -20,15 +20,13 @@
 #ifndef BOARDMODEL_H
 #define BOARDMODEL_H
 
+#include "figure.h"
+
 #include <QAbstractTableModel>
 #include <QStringList>
 
-#include "figure.h"
-
 namespace Chess {
-
-class BoardModel : public QAbstractTableModel
-{
+class BoardModel : public QAbstractTableModel {
     Q_OBJECT
 
 public:
@@ -87,5 +85,6 @@ private:
     Move lastMove;
 
 };
-}
+} // namespace Chess
+
 #endif // BOARDMODEL_H

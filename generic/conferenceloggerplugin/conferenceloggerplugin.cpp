@@ -17,30 +17,29 @@
  *
  */
 
+#include "accountinfoaccessinghost.h"
+#include "accountinfoaccessor.h"
+#include "activetabaccessinghost.h"
+#include "activetabaccessor.h"
+#include "applicationinfoaccessinghost.h"
+#include "applicationinfoaccessor.h"
+#include "gctoolbariconaccessor.h"
+#include "iconfactoryaccessinghost.h"
+#include "iconfactoryaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "psiplugin.h"
+#include "stanzafilter.h"
+#include "viewer.h"
+
 #include <QByteArray>
 #include <QComboBox>
-#include <QVBoxLayout>
+#include <QDomElement>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
-#include <QDomElement>
-
-#include "psiplugin.h"
-#include "stanzafilter.h"
-#include "accountinfoaccessor.h"
-#include "accountinfoaccessinghost.h"
-#include "applicationinfoaccessor.h"
-#include "applicationinfoaccessinghost.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
-#include "activetabaccessinghost.h"
-#include "activetabaccessor.h"
-#include "iconfactoryaccessor.h"
-#include "iconfactoryaccessinghost.h"
-#include "gctoolbariconaccessor.h"
-#include "plugininfoprovider.h"
-
-#include "viewer.h"
+#include <QVBoxLayout>
 
 #define cVer "0.2.3"
 #define constHeight "Height"
@@ -48,9 +47,17 @@
 #define constlastItem "lastItem"
 #define constShortCut "shortcut"
 
-class ConferenceLogger: public QObject, public PsiPlugin, public StanzaFilter, public AccountInfoAccessor, public ApplicationInfoAccessor, public OptionAccessor,
-                        public ActiveTabAccessor, public GCToolbarIconAccessor, public IconFactoryAccessor, public PluginInfoProvider
-{
+class ConferenceLogger:
+        public AccountInfoAccessor,
+        public ActiveTabAccessor,
+        public ApplicationInfoAccessor,
+        public GCToolbarIconAccessor,
+        public IconFactoryAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.ConferenceLogger")
     Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor ApplicationInfoAccessor OptionAccessor
@@ -78,7 +85,6 @@ class ConferenceLogger: public QObject, public PsiPlugin, public StanzaFilter, p
     virtual QAction* getGCAction(QObject* , int , const QString& ) { return nullptr; }
     virtual QString pluginInfo();
     virtual QPixmap icon() const;
-
 
 private:
     void Logger(QString room, const QString &from, const QString &myJid, const QString &text, QString stamp);
@@ -319,7 +325,7 @@ QList < QVariantHash > ConferenceLogger::getGCButtonParam() {
 }
 
 QString ConferenceLogger::pluginInfo() {
-    return tr("Author: ") +     "Dealer_WeARE\n"
+    return tr("Author: ") +     "Evgeny Khryukin\n"
          + tr("Email: ") + "wadealer@gmail.com\n\n"
          + tr("This plugin is designed to save groupchat logs in which the Psi+ user sits.\n"
               "Groupchats logs can be viewed from the plugin settings or by clicking on the appropriate button on the toolbar in the active window/tab with groupchat.\n\n"

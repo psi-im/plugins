@@ -17,26 +17,24 @@
  *
  */
 
-#include <QDomElement>
-
-#include "captchadialog.h"
-#include "loader.h"
-#include "ui_options.h"
-
-#include "psiplugin.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
-#include "plugininfoprovider.h"
-#include "eventcreatinghost.h"
-#include "eventcreator.h"
-#include "stanzafilter.h"
-#include "stanzasender.h"
-#include "stanzasendinghost.h"
 #include "accountinfoaccessinghost.h"
 #include "accountinfoaccessor.h"
 #include "applicationinfoaccessinghost.h"
 #include "applicationinfoaccessor.h"
+#include "captchadialog.h"
+#include "eventcreatinghost.h"
+#include "eventcreator.h"
+#include "loader.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "psiplugin.h"
+#include "stanzafilter.h"
+#include "stanzasender.h"
+#include "stanzasendinghost.h"
+#include "ui_options.h"
 
+#include <QDomElement>
 
 #define constVersion "0.1.1"
 #define constProxyHost "host"
@@ -48,9 +46,16 @@
 
 static const QStringList methods = QStringList() << "qa" << "ocr" << "picture_q" << "picture_recog";
 
-class CaptchaFormsPlugin : public QObject, public PsiPlugin, public OptionAccessor, public PluginInfoProvider, public EventCreator,
-                           public StanzaFilter, public StanzaSender, public AccountInfoAccessor, public ApplicationInfoAccessor
-{
+class CaptchaFormsPlugin:
+        public AccountInfoAccessor,
+        public ApplicationInfoAccessor,
+        public EventCreator,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter,
+        public StanzaSender {
     Q_OBJECT
 #ifdef HAVE_QT5
     Q_PLUGIN_METADATA(IID "com.psi-plus.CaptchaFormsPlugin")
@@ -89,7 +94,6 @@ private:
     QList< QHash<QString, QString> > challenges_;
     QHash< QString, QPointer<CaptchaDialog> > dialogs_;
     Ui::Options ui_;
-
 
     bool isValidChallenge(const QDomElement& xml, QHash<QString, QString>& dataFields) const;
     int findChalleng(const QString& field, const QString& value);
@@ -247,7 +251,6 @@ void CaptchaFormsPlugin::eventActivated(const QString& from)
     connect(cd, SIGNAL(ok(QString, QString)), this, SLOT(submitChallenge(QString, QString)));
     connect(cd, SIGNAL(cancel(QString)), this, SLOT(cancelChallenge(QString)));
     dialogs_[id] = cd;
-
 
     if(dataFields.contains("data")) {
         QByteArray ba;
@@ -450,7 +453,7 @@ bool CaptchaFormsPlugin::isValidChallenge(const QDomElement& stanza, QHash<QStri
 
 QString CaptchaFormsPlugin::pluginInfo()
 {
-    return tr("Author: ") +     "Dealer_WeARE\n"
+    return tr("Author: ") +     "Evgeny Khryukin\n"
          + tr("Email: ") + "wadealer@gmail.com\n\n"
          + trUtf8("This plugin is designed to pass of captcha directly from the Psi+.");
 }

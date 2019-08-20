@@ -20,18 +20,17 @@
 #ifndef SCREENSHOT_H
 #define SCREENSHOT_H
 
-#include "ui_screenshot.h"
-#include "toolbar.h"
 #include "applicationinfoaccessinghost.h"
+#include "toolbar.h"
+#include "ui_screenshot.h"
 
-class Server;
 class GrabAreaWidget;
-class ScreenshotOptions;
 class QNetworkAccessManager;
 class QNetworkReply;
+class ScreenshotOptions;
+class Server;
 
-class Screenshot : public QMainWindow
-{
+class Screenshot : public QMainWindow {
     Q_OBJECT
 
 public:
@@ -110,5 +109,4 @@ private:
     Ui::Screenshot ui_;
 };
 
-
-#endif
+#endif // SCREENSHOT_H

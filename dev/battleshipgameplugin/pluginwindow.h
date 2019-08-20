@@ -1,5 +1,5 @@
 /*
- * pluginwindow.h - Battleship Game plugin
+ * pluginwindow.h - plugin
  * Copyright (C) 2014  Aleksey Andreev
  *
  * This program is free software; you can redistribute it and/or
@@ -20,11 +20,10 @@
 #ifndef PLUGINWINDOW_H
 #define PLUGINWINDOW_H
 
-#include "ui_pluginwindow.h"
 #include "gamemodel.h"
+#include "ui_pluginwindow.h"
 
-class PluginWindow : public QMainWindow
-{
+class PluginWindow : public QMainWindow {
     Q_OBJECT
 
 public:

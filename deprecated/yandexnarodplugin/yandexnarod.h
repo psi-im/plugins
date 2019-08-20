@@ -1,47 +1,55 @@
 /*
-    yandexnarodPlugin
+ * yandexnarod.h - plugin
+ * Copyright (C) 2008-2009  Alexander Kazarin <boiler@co.ru>
+ * Copyright (C) 2011  Evgeny Khryukin
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
 
-    Copyright (c) 2008-2009 by Alexander Kazarin <boiler@co.ru>
-              2011 Evgeny Khryukin
+#ifndef YANDEXNAROD_H
+#define YANDEXNAROD_H
 
- ***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************
-*/
-
-#ifndef YANDEXNARODPLUGIN_H
-#define YANDEXNARODPLUGIN_H
-
-class QAction;
-
-#include "psiplugin.h"
-#include "optionaccessinghost.h"
-#include "optionaccessor.h"
-#include "menuaccessor.h"
-#include "iconfactoryaccessinghost.h"
-#include "iconfactoryaccessor.h"
-#include "stanzasender.h"
-#include "stanzasendinghost.h"
-#include "plugininfoprovider.h"
 #include "applicationinfoaccessinghost.h"
 #include "applicationinfoaccessor.h"
+#include "iconfactoryaccessinghost.h"
+#include "iconfactoryaccessor.h"
+#include "menuaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
 #include "popupaccessinghost.h"
 #include "popupaccessor.h"
+#include "psiplugin.h"
+#include "stanzasender.h"
+#include "stanzasendinghost.h"
 
-class yandexnarodSettings;
+class QAction;
 class uploadDialog;
 class yandexnarodManage;
+class yandexnarodSettings;
 
-
-class yandexnarodPlugin : public QObject, public PsiPlugin, public OptionAccessor, public MenuAccessor
-        , public IconFactoryAccessor , public StanzaSender, public PluginInfoProvider
-        , public ApplicationInfoAccessor, public PopupAccessor
-{
+class yandexnarodPlugin:
+        public ApplicationInfoAccessor,
+        public IconFactoryAccessor,
+        public MenuAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PopupAccessor,
+        public PsiPlugin,
+        public QObject,
+        public StanzaSender {
     Q_OBJECT
     Q_INTERFACES(PsiPlugin OptionAccessor MenuAccessor IconFactoryAccessor StanzaSender
              PluginInfoProvider ApplicationInfoAccessor PopupAccessor)
@@ -95,4 +103,4 @@ private:
     QFileInfo fi;
 };
 
-#endif
+#endif // YANDEXNAROD_H

@@ -1,17 +1,16 @@
+#include "datewidget.h"
+
+#include <QApplication>
+#include <QCalendarWidget>
+#include <QDebug>
+#include <QDesktopWidget>
+#include <QHBoxLayout>
+#include <QIcon>
 #include <QKeyEvent>
 #include <QLineEdit>
-#include <QCalendarWidget>
-#include <QIcon>
-#include <QHBoxLayout>
+#include <QLocale>
 #include <QRegExp>
 #include <QRegExpValidator>
-#include <QApplication>
-#include <QDesktopWidget>
-#include <QLocale>
-#include <QDebug>
-#include <QKeyEvent>
-
-#include "datewidget.h"
 
 DateWidget::DateWidget(QWidget *parent)
     : LineEditWidget(parent)

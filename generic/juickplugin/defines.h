@@ -1,6 +1,6 @@
 /*
  * defines.h - plugin
- * Copyright (C) 2012 Evgeny Khryukin
+ * Copyright (C) 2012  Evgeny Khryukin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,6 +20,8 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
+#define constVersion "0.11.7"
+#define constPluginName "Juick Plugin"
 #define constuserColor "usercolor"
 #define consttagColor "tagcolor"
 #define constmsgColor "idcolor"
@@ -45,9 +47,5 @@
 #define constShowAvatars "showavatars"
 #define constWorkInGroupchat "workingroupchat"
 #define constVersionOpt "version"
-
-
-#define constVersion "0.11.7"
-#define constPluginName "Juick Plugin"
 
 #endif // DEFINES_H

@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "cditemmodel.h"
 
 #include <QDebug>
 #include <QDir>
-#include "cditemmodel.h"
 
 CDItemModel::CDItemModel(QObject *parent)
     : QAbstractItemModel(parent)
@@ -103,7 +103,6 @@ bool CDItemModel::setData(const QModelIndex &index, const QVariant &value, int r
     }
     return false;
 }
-
 
 Qt::ItemFlags CDItemModel::flags(const QModelIndex &index) const
 {

@@ -17,44 +17,42 @@
  *
  */
 
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QDomElement>
-
-#include "psiplugin.h"
-#include "accountinfoaccessor.h"
 #include "accountinfoaccessinghost.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
+#include "accountinfoaccessor.h"
 #include "activetabaccessinghost.h"
 #include "activetabaccessor.h"
-#include "stanzasender.h"
-#include "stanzasendinghost.h"
-#include "iconfactoryaccessor.h"
-#include "iconfactoryaccessinghost.h"
-#include "toolbariconaccessor.h"
-#include "menuaccessor.h"
-#include "applicationinfoaccessor.h"
 #include "applicationinfoaccessinghost.h"
-#include "stanzafilter.h"
-#include "plugininfoprovider.h"
-#include "eventcreatinghost.h"
-#include "eventcreator.h"
+#include "applicationinfoaccessor.h"
 #include "contactinfoaccessinghost.h"
 #include "contactinfoaccessor.h"
+#include "eventcreatinghost.h"
+#include "eventcreator.h"
+#include "figure.h"
+#include "iconfactoryaccessinghost.h"
+#include "iconfactoryaccessor.h"
+#include "invitedialog.h"
+#include "mainwindow.h"
+#include "menuaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
 #include "popupaccessinghost.h"
 #include "popupaccessor.h"
+#include "psiplugin.h"
+#include "request.h"
 #include "soundaccessinghost.h"
 #include "soundaccessor.h"
-
-#include "mainwindow.h"
-#include "figure.h"
+#include "stanzafilter.h"
+#include "stanzasender.h"
+#include "stanzasendinghost.h"
+#include "toolbariconaccessor.h"
 #include "ui_options.h"
-#include "invitedialog.h"
-#include "request.h"
+
+#include <QDomElement>
+#include <QFileDialog>
+#include <QMessageBox>
 
 #define cVer "0.2.8"
-
 #define soundStartConst "soundstart"
 #define soundFinishConst "soundfinish"
 #define soundMoveConst "soundmove"
@@ -64,10 +62,23 @@
 
 using namespace Chess;
 
-class ChessPlugin: public QObject, public PsiPlugin, public OptionAccessor, public ActiveTabAccessor, public MenuAccessor, public ApplicationInfoAccessor,
-                   public ToolbarIconAccessor, public IconFactoryAccessor, public StanzaSender, public AccountInfoAccessor, public StanzaFilter,
-                   public PluginInfoProvider, public EventCreator, public ContactInfoAccessor, public PopupAccessor, public SoundAccessor
-{
+class ChessPlugin:
+        public AccountInfoAccessor,
+        public ActiveTabAccessor,
+        public ApplicationInfoAccessor,
+        public ContactInfoAccessor,
+        public EventCreator,
+        public IconFactoryAccessor,
+        public MenuAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PopupAccessor,
+        public PsiPlugin,
+        public QObject,
+        public SoundAccessor,
+        public StanzaFilter,
+        public StanzaSender,
+        public ToolbarIconAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.ChessPlugin")
     Q_INTERFACES(PsiPlugin AccountInfoAccessor OptionAccessor ActiveTabAccessor MenuAccessor StanzaFilter ContactInfoAccessor SoundAccessor
@@ -850,7 +861,7 @@ void ChessPlugin::toggleEnableSound(bool enable) {
 }
 
 QString ChessPlugin::pluginInfo() {
-    return tr("Author: ") +     "Dealer_WeARE\n"
+    return tr("Author: ") +     "Evgeny Khryukin\n"
          + tr("Email: ") + "wadealer@gmail.com\n\n"
          + tr("This plugin allows you to play chess with your friends.\n"
               "The plugin is compatible with a similar plugin for Tkabber.\n"

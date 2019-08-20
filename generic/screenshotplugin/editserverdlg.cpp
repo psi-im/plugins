@@ -18,8 +18,8 @@
  */
 
 #include "editserverdlg.h"
-#include "server.h"
 
+#include "server.h"
 
 EditServerDlg::EditServerDlg(QWidget *parent)
     : QDialog(parent)

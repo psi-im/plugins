@@ -19,7 +19,6 @@
 
 #include "editnote.h"
 
-
 EditNote::EditNote( QWidget *parent, const QString& tags, const QString& title, const QString& text, const QModelIndex& index)
     : QDialog(parent)
         , index_(index)

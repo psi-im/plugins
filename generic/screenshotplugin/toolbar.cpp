@@ -17,15 +17,15 @@
  *
  */
 
-#include <QLabel>
-#include <QSpinBox>
-#include <QAction>
-
 #include "toolbar.h"
+
 #include "screenshoticonset.h"
 
-class Button : public QAction
-{
+#include <QAction>
+#include <QLabel>
+#include <QSpinBox>
+
+class Button : public QAction {
     Q_OBJECT
 public:
     Button(const QString &tip, const QIcon &ico, ToolBar::ButtonType type, bool checkable, QWidget *parent)
@@ -45,7 +45,6 @@ public:
 private:
     ToolBar::ButtonType type_;
 };
-
 
 //----------------ToolBar--------------------------------
 

@@ -21,10 +21,9 @@
 #define BOARDDELEGATE_H
 
 #include <QItemDelegate>
-namespace Chess {
 
-class BoardDelegate : public QItemDelegate
-{
+namespace Chess {
+class BoardDelegate : public QItemDelegate {
     Q_OBJECT
 
 public:
@@ -32,5 +31,6 @@ public:
     virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 
 };
-}
+} // namespace Chess
+
 #endif // BOARDDELEGATE_H

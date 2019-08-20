@@ -19,7 +19,6 @@
 
 #include "server.h"
 
-
 Server::Server(QListWidget *parent)
     : QListWidgetItem(parent)
     , displayName_("server")

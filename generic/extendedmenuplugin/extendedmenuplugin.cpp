@@ -17,36 +17,34 @@
  *
  */
 
-#include <QMenu>
-#include <QClipboard>
-#include <QApplication>
-#include <QDomElement>
-#include <QMessageBox>
-
-#include "psiplugin.h"
-#include "accountinfoaccessor.h"
 #include "accountinfoaccessinghost.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
-#include "iconfactoryaccessor.h"
-#include "iconfactoryaccessinghost.h"
-#include "popupaccessor.h"
-#include "popupaccessinghost.h"
-#include "menuaccessor.h"
-#include "plugininfoprovider.h"
+#include "accountinfoaccessor.h"
 #include "contactinfoaccessinghost.h"
 #include "contactinfoaccessor.h"
+#include "iconfactoryaccessinghost.h"
+#include "iconfactoryaccessor.h"
+#include "menuaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "popupaccessinghost.h"
+#include "popupaccessor.h"
+#include "psiaccountcontroller.h"
+#include "psiaccountcontrollinghost.h"
+#include "psiplugin.h"
 #include "stanzafilter.h"
 #include "stanzasender.h"
 #include "stanzasendinghost.h"
 #include "toolbariconaccessor.h"
-#include "psiaccountcontroller.h"
-#include "psiaccountcontrollinghost.h"
-
 #include "ui_options.h"
 
-#define cVer "0.1.3"
+#include <QApplication>
+#include <QClipboard>
+#include <QDomElement>
+#include <QMenu>
+#include <QMessageBox>
 
+#define cVer "0.1.3"
 #define constInterval "intrvl"
 #define constAction "action"
 #define constMenu "menu"
@@ -59,11 +57,20 @@ static const QString timeString = "<iq from='%1' to='%2' type='get' id='%3'><tim
 
 enum ActionType { NoAction = 0, CopyJid, CopyNick, CopyStatusMessage, RequestPing, RequestLastSeen, RequestTime };
 
-class ExtendedMenuPlugin: public QObject, public PsiPlugin, public OptionAccessor,    public AccountInfoAccessor,
-                          public IconFactoryAccessor, public PopupAccessor, public MenuAccessor, public PluginInfoProvider,
-                          public ContactInfoAccessor, public StanzaSender, public StanzaFilter, public ToolbarIconAccessor,
-                          public PsiAccountController
-{
+class ExtendedMenuPlugin:
+        public AccountInfoAccessor,
+        public ContactInfoAccessor,
+        public IconFactoryAccessor,
+        public MenuAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PopupAccessor,
+        public PsiAccountController,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter,
+        public StanzaSender,
+        public ToolbarIconAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.ExtendedMenuPlugin")
     Q_INTERFACES(PsiPlugin    AccountInfoAccessor OptionAccessor IconFactoryAccessor PopupAccessor  MenuAccessor
@@ -145,7 +152,6 @@ private:
     void addRequest(int account, const Request& r);
     void doCommand(int account, const QString &jid, const QString& command, ActionType type_);
 };
-
 
 ExtendedMenuPlugin::ExtendedMenuPlugin()
     : enabled(false)
@@ -610,7 +616,6 @@ void ExtendedMenuPlugin::menuActivated()
         return;
     }
 
-
     if(contactInfo->isPrivate(account, jid)) {
         doCommand(account, jid, command, type);
     }
@@ -651,7 +656,7 @@ void ExtendedMenuPlugin::addRequest(int account, const Request &r)
 
 QString ExtendedMenuPlugin::pluginInfo()
 {
-    return tr("Author: ") +     "Dealer_WeARE\n"
+    return tr("Author: ") +     "Evgeny Khryukin\n"
          + tr("Email: ") + "wadealer@gmail.com\n\n"
          + tr("This plugin adds several additional commands into contacts context menu.");
 }

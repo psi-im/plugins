@@ -1,8 +1,9 @@
 #ifndef QXTWINDOWSYSTEM_MAC_CPP
 #define QXTWINDOWSYSTEM_MAC_CPP
 
-#include "qxtwindowsystem.h"
 #include "qxtwindowsystem_mac.h"
+
+#include "qxtwindowsystem.h"
 
 // WId to return when error
 #define WINDOW_NOT_FOUND (WId)(0)
@@ -43,7 +44,6 @@ WindowList qxt_getWindowsForPSN(ProcessSerialNumber *psn)
 
     return wlist;
 }
-
 
 WindowList QxtWindowSystem::windows()
 {
@@ -122,7 +122,6 @@ uint QxtWindowSystem::idleTime()
     return (uint)idle;
 }
 
-
 // these are copied from X11 implementation
 WId QxtWindowSystem::findWindow(const QString& /*title*/)
 {
@@ -156,4 +155,3 @@ WId QxtWindowSystem::windowAt(const QPoint& /*pos*/)
 }
 
 #endif // QXTWINDOWSYSTEM_MAC_CPP
-

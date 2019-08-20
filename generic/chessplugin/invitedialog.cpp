@@ -54,8 +54,6 @@ void InviteDialog::buttonPressed()
     close();
 }
 
-
-
 static QString unescape(const QString& escaped)
 {
     QString plain = escaped;
@@ -65,8 +63,6 @@ static QString unescape(const QString& escaped)
     plain.replace("&amp;", "&");
     return plain;
 }
-
-
 
 InvitationDialog::InvitationDialog(const QString& jid, QString color,  QWidget *parent)
         :  QDialog(parent)

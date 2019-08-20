@@ -1,5 +1,5 @@
 /*
- * options.h - Battleship Game plugin
+ * options.h - plugin
  * Copyright (C) 2014  Aleksey Andreev
  *
  * This program is free software; you can redistribute it and/or
@@ -25,10 +25,10 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
+#include "optionaccessor.h"
+
 #include <QObject>
 #include <QVariant>
-
-#include "optionaccessor.h"
 
 #define constDndDisable         "dnddsbl"
 #define constConfDisable        "confdsbl"
@@ -44,8 +44,7 @@
 #define constSoundMove          "soundmove"
 #define constSoundError         "sounderror"
 
-class Options : public QObject
-{
+class Options : public QObject {
 Q_OBJECT
 public:
     static OptionAccessingHost *psiOptions;

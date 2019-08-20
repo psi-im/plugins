@@ -24,8 +24,7 @@
 #include <QStringList>
 #include <QRect>
 
-class GameShip : public QObject
-{
+class GameShip : public QObject {
     Q_OBJECT
 public:
     enum ShipType { ShipDirUnknown, ShipHorizontal, ShipVertical };
@@ -50,8 +49,7 @@ private:
 
 };
 
-class GameBoard : public QObject
-{
+class GameBoard : public QObject {
     Q_OBJECT
 public:
     enum CellStatus
@@ -98,8 +96,7 @@ signals:
 
 };
 
-class GameModel : public QObject
-{
+class GameModel : public QObject {
     Q_OBJECT
 public:
     enum GameStatus

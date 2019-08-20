@@ -1,6 +1,6 @@
 /*
  * OMEMO Plugin for Psi
- * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2018  Vyacheslav Karpukhin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,8 +17,8 @@
  *
  */
 
-#ifndef PSIOMEMO_STORAGE_H
-#define PSIOMEMO_STORAGE_H
+#ifndef STORAGE_H
+#define STORAGE_H
 
 #include <QtSql>
 
@@ -94,6 +94,6 @@ namespace psiomemo {
   };
 
   QByteArray toQByteArray(signal_buffer *buffer);
-}
+} // namespace psiomemo
 
-#endif //PSIOMEMO_STORAGE_H
+#endif // STORAGE_H

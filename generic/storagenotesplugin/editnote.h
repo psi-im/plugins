@@ -21,11 +21,11 @@
 #define EDITNOTE_H
 
 #include "ui_editnote.h"
+
 #include <QDomElement>
 #include <QModelIndex>
 
-class EditNote : public QDialog
-{
+class EditNote : public QDialog {
         Q_OBJECT
 public:
     EditNote( QWidget *parent = nullptr, const QString& tags = "", const QString& title = "", const QString& text = "", const QModelIndex& index = QModelIndex());
@@ -42,6 +42,5 @@ signals:
 private slots:
         void ok();
 };
-
 
 #endif // EDITNOTE_H

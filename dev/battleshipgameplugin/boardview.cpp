@@ -17,9 +17,9 @@
  *
  */
 
-#include <QHeaderView>
-
 #include "boardview.h"
+
+#include <QHeaderView>
 
 BoardView::BoardView(QWidget *parent)
     : QTableView(parent)

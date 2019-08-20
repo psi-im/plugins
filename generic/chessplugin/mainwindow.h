@@ -20,18 +20,17 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "boarddelegate.h"
+#include "boardmodel.h"
+#include "boardview.h"
+#include "ui_mainwindow.h"
+
 #include <QLabel>
 #include <QPushButton>
 
-#include "ui_mainwindow.h"
-#include "boardview.h"
-#include "boarddelegate.h"
-#include "boardmodel.h"
-
 using namespace Chess;
 
-class ChessWindow : public QMainWindow
-{
+class ChessWindow : public QMainWindow {
     Q_OBJECT
 
 public:
@@ -75,8 +74,7 @@ private:
 
 };
 
-class SelectFigure : public QWidget
-{
+class SelectFigure : public QWidget {
     Q_OBJECT
 public:
     SelectFigure(const QString& player, QWidget *parent = nullptr);

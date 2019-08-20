@@ -18,15 +18,15 @@
  */
 
 #include "jd_mainwin.h"
+
 #include "model.h"
 
+//#include <QDebug>
+#include <QInputDialog>
+#include <QMenu>
+#include <QMessageBox>
 #include <QTextStream>
 #include <QTimer>
-#include <QMenu>
-#include <QInputDialog>
-#include <QMessageBox>
-
-//#include <QDebug>
 
 JDMainWin::JDMainWin(const QString &name, const QString &jid, int acc, QWidget *p)
     : QDialog(p, Qt::Window)

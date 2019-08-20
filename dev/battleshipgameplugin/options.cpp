@@ -1,5 +1,5 @@
 /*
- * options.cpp - Battleship Game plugin
+ * options.cpp - plugin
  * Copyright (C) 2014  Aleksey Andreev
  *
  * This program is free software; you can redistribute it and/or
@@ -22,11 +22,12 @@
  *
  */
 
-#include <QVariant>
-
 #include "options.h"
+
 //#include "common.h"
 #include "optionaccessinghost.h"
+
+#include <QVariant>
 
 Options::Options(QObject *parent) :
     QObject(parent),

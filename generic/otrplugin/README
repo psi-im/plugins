@@ -2,7 +2,7 @@ Off-The-Record-Messaging plugin for Psi+
 
 This is a Off-The-Record-Messaging plugin for the Psi+ instant messenger.
 Psi+ (aka Psi-dev) is a collection of patches for Psi. It is available from
-http://psi-dev.googlecode.com/
+https://github.com/psi-plus/
 
 See the file INSTALL for instructions how to build this plugin.
 
@@ -10,17 +10,14 @@ Please note that the plugin may be instable and security is not guaranteed.
 
 See http://www.cypherpunks.ca/otr/ for more information about OTR.
 
-
 TODO
 * Configure OTR policy per contact
 * Documentation
-
 
 KNOWN ISSUES
 * Currently only works for top priority resources
 * System messages are only displayed for existing chat windows, might be
   displayed in wrong order (needs to be fixed in Psi+)
-
 
 THANKS
 
@@ -28,31 +25,31 @@ Thanks to Prof. Dr. Ruediger Weis for supporting this work. Thanks to
 all people who sent patches. Especially to specThor <specthor@web.de>
 for UTF8 patches, Hannes Mehnert <hannes@mehnert.org> for chatdialog.
 Rolf Wuerdemann <rowue@digitalis.org> for configure patch and several
-bugfixes. Thanks to wadealer from Psi+ for adapting and including the
+bugfixes. Thanks to Evgeny Khryukin from Psi+ for adapting and including the
 patches into Psi+. Thanks to Boris Pek for porting to libotr >= 4.0.0.
-
 
 LICENSE
 
 The Off-the-Record Messaging plugin for Psi+ is covered by the following
 (GPL) license:
 
-    Off-the-Record Messaging plugin for Psi+
-    Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
-                  2011-2012  Florian Fieber
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of version 2 of the GNU General Public License as
-    published by the Free Software Foundation.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+ * Off-the-Record Messaging plugin for Psi+
+ * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
+ * Copyright (C) 2011-2012  Florian Fieber
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
 
 CONTACT
 
@@ -61,4 +58,3 @@ Timo Engel <timo-e@freenet.de>
 
 Psi+ developers can be contacted via XMPP conference:
 psi-dev@conference.jabber.ru
-

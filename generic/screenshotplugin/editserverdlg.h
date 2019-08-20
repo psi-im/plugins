@@ -20,13 +20,13 @@
 #ifndef EDITSERVERDLG_H
 #define EDITSERVERDLG_H
 
-#include <QPointer>
 #include "ui_editserverdlg.h"
+
+#include <QPointer>
 
 class Server;
 
-class EditServerDlg : public QDialog
-{
+class EditServerDlg : public QDialog {
     Q_OBJECT
 public:
     EditServerDlg(QWidget *parent = nullptr);

@@ -3,7 +3,7 @@
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
- *                    2011  Florian Fieber
+ * Copyright (C) 2011  Florian Fieber
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,21 +20,20 @@
  *
  */
 
-#ifndef HTMLTIDY_H_
-#define HTMLTIDY_H_
+#ifndef HTMLTIDY_H
+#define HTMLTIDY_H
 
-#include <QString>
 #include <QByteArray>
-
+#include <QString>
 #include <string>
 
 #ifdef LEGACY_TIDY
 # ifdef Q_OS_WIN
-#  include <tidy/tidy.h>
 #  include <tidy/buffio.h>
+#  include <tidy/tidy.h>
 # else
-#  include <tidy.h>
 #  include <buffio.h>
+#  include <tidy.h>
 # endif
 #else
 # include <tidy.h>
@@ -44,8 +43,7 @@
 class QDomDocument;
 class QDomElement;
 
-class HtmlTidy
-{
+class HtmlTidy {
 public:
     HtmlTidy(const QString& html);
     ~HtmlTidy();
@@ -56,11 +54,9 @@ public:
     static void TIDY_CALL callPutByte(void* sinkData, byte bt);
 #endif
 
-
 protected:
     void putByte(byte bt);
     QString writeOutput();
-
 
 private:
     TidyDoc     m_tidyDoc;
@@ -69,4 +65,4 @@ private:
     QString     m_input;
 };
 
-#endif
+#endif // HTMLTIDY_H

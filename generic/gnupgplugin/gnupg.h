@@ -20,33 +20,33 @@
 #ifndef GNUPG_H
 #define GNUPG_H
 
-#include "psiplugin.h"
+#include "accountinfoaccessor.h"
+#include "activetabaccessor.h"
 #include "applicationinfoaccessinghost.h"
+#include "iconfactoryaccessor.h"
+#include "optionaccessor.h"
 #include "plugininfoprovider.h"
+#include "psiaccountcontroller.h"
+#include "psiplugin.h"
 #include "stanzafilter.h"
 #include "stanzasender.h"
-#include "psiaccountcontroller.h"
-#include "optionaccessor.h"
 #include "toolbariconaccessor.h"
-#include "iconfactoryaccessor.h"
-#include "activetabaccessor.h"
-#include "accountinfoaccessor.h"
 
 class Options;
 class QMenu;
 
-class GnuPG : public QObject
-            , public PsiPlugin
-            , public PluginInfoProvider
-            , public StanzaFilter
-            , public PsiAccountController
-            , public OptionAccessor
-            , public ToolbarIconAccessor
-            , public IconFactoryAccessor
-            , public StanzaSender
-            , public ActiveTabAccessor
-            , public AccountInfoAccessor
-{
+class GnuPG:
+        public AccountInfoAccessor,
+        public ActiveTabAccessor,
+        public IconFactoryAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiAccountController,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter,
+        public StanzaSender,
+        public ToolbarIconAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.GnuPG")
     Q_INTERFACES(PsiPlugin

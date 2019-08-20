@@ -22,40 +22,48 @@
  *
  */
 
-#ifndef PLUGIN_MAIN_H
-#define PLUGIN_MAIN_H
+#ifndef CLIENTSWITCHERPLUGIN_H
+#define CLIENTSWITCHERPLUGIN_H
 
-#include <QtGui>
-#include <QtCore>
-#include <QDomElement>
-
-#include "ui_options.h"
-
-#include "psiplugin.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
-#include "stanzasender.h"
-#include "stanzasendinghost.h"
-#include "stanzafilter.h"
-#include "plugininfoprovider.h"
-#include "applicationinfoaccessor.h"
-#include "applicationinfoaccessinghost.h"
-#include "popupaccessor.h"
-#include "popupaccessinghost.h"
-#include "accountinfoaccessor.h"
 #include "accountinfoaccessinghost.h"
+#include "accountinfoaccessor.h"
+#include "accountsettings.h"
+#include "applicationinfoaccessinghost.h"
+#include "applicationinfoaccessor.h"
+#include "contactinfoaccessinghost.h"
+#include "contactinfoaccessor.h"
+#include "iconfactoryaccessinghost.h"
+#include "iconfactoryaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "popupaccessinghost.h"
+#include "popupaccessor.h"
 #include "psiaccountcontroller.h"
 #include "psiaccountcontrollinghost.h"
-#include "contactinfoaccessor.h"
-#include "contactinfoaccessinghost.h"
-#include "iconfactoryaccessor.h"
-#include "iconfactoryaccessinghost.h"
+#include "psiplugin.h"
+#include "stanzafilter.h"
+#include "stanzasender.h"
+#include "stanzasendinghost.h"
+#include "ui_options.h"
 
-#include "accountsettings.h"
+#include <QDomElement>
+#include <QtCore>
+#include <QtGui>
 
-class ClientSwitcherPlugin: public QObject, public PsiPlugin, public OptionAccessor, public StanzaSender, public StanzaFilter, public PluginInfoProvider, public PopupAccessor, public ApplicationInfoAccessor, public AccountInfoAccessor, public PsiAccountController, public ContactInfoAccessor, public IconFactoryAccessor
-
-{
+class ClientSwitcherPlugin:
+        public AccountInfoAccessor,
+        public ApplicationInfoAccessor,
+        public ContactInfoAccessor,
+        public IconFactoryAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PopupAccessor,
+        public PsiAccountController,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter,
+        public StanzaSender {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.ClientSwitcherPlugin")
     Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter PluginInfoProvider PopupAccessor ApplicationInfoAccessor AccountInfoAccessor PsiAccountController ContactInfoAccessor IconFactoryAccessor)
@@ -159,4 +167,4 @@ private slots:
 
 };
 
-#endif
+#endif // CLIENTSWITCHERPLUGIN_H

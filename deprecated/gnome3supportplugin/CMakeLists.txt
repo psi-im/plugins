@@ -10,7 +10,6 @@ ELSE( NOT WIN32 )
     set( PLUGINS_PATH "psi-plus/plugins" CACHE STRING "Install suffix for plugins" )
 ENDIF( NOT WIN32 )
 
-
 add_definitions( -Wall -Ddbus -DQT_PLUGIN -DHAVE_QT5 )
 include_directories(
     ${CMAKE_SOURCE_DIR}

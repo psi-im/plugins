@@ -22,8 +22,7 @@
 
 #include "jd_item.h"
 
-class JDModel : public QAbstractItemModel
-{
+class JDModel : public QAbstractItemModel {
     Q_OBJECT
 
 public:
@@ -79,4 +78,4 @@ private:
     const QModelIndex rootIndex_;
 };
 
-#endif
+#endif // MODEL_H

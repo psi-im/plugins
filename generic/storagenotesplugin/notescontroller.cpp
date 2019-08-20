@@ -17,8 +17,8 @@
  *
  */
 
-#include "notescontroller.h"
 #include "notes.h"
+#include "notescontroller.h"
 
 NotesController::NotesController(StorageNotesPlugin* plugin)
     : QObject(nullptr)

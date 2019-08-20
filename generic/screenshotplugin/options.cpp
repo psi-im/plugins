@@ -17,10 +17,9 @@
  *
  */
 
-
 #include "options.h"
-#include "optionaccessinghost.h"
 
+#include "optionaccessinghost.h"
 
 Options* Options::instance_ = nullptr;
 

@@ -20,13 +20,12 @@
 #ifndef JD_MAINWIN_H
 #define JD_MAINWIN_H
 
-class JDModel;
-
 #include "jd_commands.h"
 #include "ui_jd_mainwin.h"
 
-class JDMainWin : public QDialog
-{
+class JDModel;
+
+class JDMainWin : public QDialog {
     Q_OBJECT
 public:
     JDMainWin(const QString& name,const QString& jid, int acc, QWidget* p = nullptr);

@@ -21,14 +21,13 @@
 #define JD_COMMANDS_H
 
 #include <QObject>
-class QEventLoop;
-class QTimer;
-class QDomElement;
 
 class JabberDiskController;
+class QDomElement;
+class QEventLoop;
+class QTimer;
 
-class JDCommands : public QObject
-{
+class JDCommands : public QObject {
     Q_OBJECT
 public:
     JDCommands(int account = -1, const QString& jid = QString(), QObject* p = nullptr);

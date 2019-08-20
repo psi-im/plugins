@@ -25,8 +25,7 @@
 #include <QVariantList>
 #include <QSet>
 
-class Model : public QAbstractTableModel
-{
+class Model : public QAbstractTableModel {
     Q_OBJECT
 
 public:
@@ -47,11 +46,9 @@ public:
     QVariantList enableFor() const;
     QStringList getJids() const;
 
-
 private:
         QStringList headers, Jids, tmpJids_;
         QSet<QString> selected;
 };
-
 
 #endif // MODEL_H

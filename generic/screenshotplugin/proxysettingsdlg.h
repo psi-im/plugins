@@ -17,22 +17,19 @@
  *
  */
 
-
 #ifndef PROXYSETTINGS_H
 #define PROXYSETTINGS_H
-
-#include <QDialog>
 
 //for psi+ plugin only
 #include "applicationinfoaccessinghost.h"
 
-namespace Ui
-{
+#include <QDialog>
+
+namespace Ui {
     class ProxySettingsDlg;
 }
 
-class ProxySettingsDlg : public QDialog
-{
+class ProxySettingsDlg : public QDialog {
     Q_OBJECT
 public:
     ProxySettingsDlg(QWidget *parent = nullptr);

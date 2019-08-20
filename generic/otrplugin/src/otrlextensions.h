@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef __OTRLEXT_H__
-#define __OTRLEXT_H__
+#ifndef OTRLEXTENSIONS_H
+#define OTRLEXTENSIONS_H
 
 #include <stdio.h>
 #include <libotr/userstate.h>
@@ -32,4 +32,4 @@ gcry_error_t otrl_privkey_write(OtrlUserState us, const char* filename);
  * The FILE* must be open for reading and writing. */
 gcry_error_t otrl_privkey_write_FILEp(OtrlUserState us, FILE* privf);
 
-#endif
+#endif OTRLEXTENSIONS_H

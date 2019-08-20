@@ -17,10 +17,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <QFileInfo>
 #include "gpgprocess.h"
+
 #include <QCoreApplication>
 #include <QDir>
+#include <QFileInfo>
 #ifdef Q_OS_WIN
 #include <windows.h>
 #endif

@@ -1,14 +1,14 @@
 #ifndef DATEWIDGET_H
 #define DATEWIDGET_H
 
-#include <QDate>
 #include "lineeditwidget.h"
 
-class QToolButton;
-class QCalendarWidget;
+#include <QDate>
 
-class DateWidget : public LineEditWidget
-{
+class QCalendarWidget;
+class QToolButton;
+
+class DateWidget : public LineEditWidget {
     Q_OBJECT
 
     Q_PROPERTY(QDate date
@@ -35,4 +35,4 @@ private:
     QCalendarWidget *_calendar;
 };
 
-#endif // DATEWIDGETs_H
+#endif // DATEWIDGET_H

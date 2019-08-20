@@ -1,13 +1,13 @@
 #ifndef PREFERENCESWIDGET_H
 #define PREFERENCESWIDGET_H
 
-#include <QWidget>
-#include <QColorDialog>
-#include "ui_preferences.h"
 #include "optionaccessor.h"
+#include "ui_preferences.h"
 
-class PreferencesWidget : public QWidget
-{
+#include <QColorDialog>
+#include <QWidget>
+
+class PreferencesWidget : public QWidget {
     Q_OBJECT
 
 public:

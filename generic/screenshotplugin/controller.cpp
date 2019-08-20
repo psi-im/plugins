@@ -19,18 +19,17 @@
 
 #include "controller.h"
 
-#include "screenshot.h"
-#include "server.h"
-#include "options.h"
-#include "screenshoticonset.h"
-#include "defines.h"
 #include "applicationinfoaccessinghost.h"
+#include "defines.h"
+#include "options.h"
+#include "screenshot.h"
+#include "screenshoticonset.h"
+#include "server.h"
 
 static const QString pixacadem = "Pix.Academ.info&split&http://pix.academ.info/&split&&split&&split&action=upload_image&split&image&split&<div id='link'><a id=\"original\" href=\"(http[^\"]+)\"&split&true";
 static const QString smages = "Smages.com&split&http://smages.com/&split&&split&&split&&split&fileup&split&<div class=\"codex\"><a href=\"(http://smages.com/[^\"]+)\" target=\"_blank\">URL:</a></div>&split&true";
 
 static const QStringList staticHostsList = QStringList() /*<< imageShack*/ << pixacadem << smages;
-
 
 static bool isListContainsServer(const QString& server, const QStringList& servers)
 {
@@ -85,7 +84,6 @@ Controller::~Controller()
     Options::reset();
     ScreenshotIconset::reset();
 }
-
 
 void Controller::onShortCutActivated()
 {

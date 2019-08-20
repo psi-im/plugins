@@ -18,10 +18,11 @@
  */
 
 #include "model.h"
+
 #include <QApplication>
-#include <QStyle>
-#include <QMimeData>
 //#include <QDebug>
+#include <QMimeData>
+#include <QStyle>
 
 JDModel::JDModel(const QString &diskName, QObject *parent)
     : QAbstractItemModel(parent)

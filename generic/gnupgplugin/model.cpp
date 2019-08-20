@@ -18,7 +18,9 @@
  */
 
 #include "model.h"
+
 #include "gpgprocess.h"
+
 #include <QDateTime>
 
 inline QString epochToHuman(const QString &seconds)
@@ -159,7 +161,6 @@ void Model::listKeys()
     process.start(arguments);
     process.waitForFinished();
     keysRaw += QString::fromUtf8(process.readAll());
-
 
     showKeys(keysRaw);
 }

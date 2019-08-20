@@ -1,6 +1,5 @@
 /*
  * addkeydlg.cpp - generating key pair dialog
- *
  * Copyright (C) 2013  Ivan Romanov <drizt@land.ru>
  *
  * This program is free software; you can redistribute it and/or
@@ -17,10 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <QPushButton>
 #include "addkeydlg.h"
-#include "ui_addkeydlg.h"
+
 #include "datewidget.h"
+#include "ui_addkeydlg.h"
+
+#include <QPushButton>
 
 AddKeyDlg::AddKeyDlg(QWidget *parent)
     : QDialog(parent)

@@ -19,19 +19,16 @@
  *
  */
 
+#include "otrlextensions.h"
+
 /* system headers */
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <sys/stat.h>
 
-/* libgcrypt headers */
-#include <gcrypt.h>
-
-/* libotr headers */
-#include <libotr/privkey.h>
-
-#include "otrlextensions.h"
+#include <gcrypt.h> // libgcrypt headers
+#include <libotr/privkey.h> // libotr headers
 
 static gcry_error_t sexp_write(FILE* privf, gcry_sexp_t sexp)
 {

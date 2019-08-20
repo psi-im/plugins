@@ -20,30 +20,35 @@
 #ifndef REDIRECTPLUGIN_H
 #define REDIRECTPLUGIN_H
 
-#include <QPixmap>
-#include "psiplugin.h"
-#include "optionaccessor.h"
-#include "stanzafilter.h"
-#include "stanzasender.h"
 #include "accountinfoaccessor.h"
 #include "applicationinfoaccessor.h"
-#include "plugininfoprovider.h"
 #include "contactinfoaccessor.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "psiplugin.h"
+#include "stanzafilter.h"
+#include "stanzasender.h"
+#include "ui_options.h"
 
-class QDomElement;
+#include <QPixmap>
 
-class OptionAccessingHost;
-class StanzaSendingHost;
 class AccountInfoAccessingHost;
 class ApplicationInfoAccessingHost;
 class ContactInfoAccessingHost;
+class OptionAccessingHost;
+class QDomElement;
+class StanzaSendingHost;
 
-#include "ui_options.h"
-
-class Redirector: public QObject, public PsiPlugin, public OptionAccessor, public StanzaSender,  public StanzaFilter,
-public AccountInfoAccessor, public ApplicationInfoAccessor,
-public PluginInfoProvider, public ContactInfoAccessor
-{
+class Redirector:
+        public AccountInfoAccessor,
+        public ApplicationInfoAccessor,
+        public ContactInfoAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter,
+        public StanzaSender {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.Redirector")
     Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter AccountInfoAccessor ApplicationInfoAccessor
@@ -89,4 +94,4 @@ private:
     Ui::Options ui_;
 };
 
-#endif
+#endif // REDIRECTPLUGIN_H

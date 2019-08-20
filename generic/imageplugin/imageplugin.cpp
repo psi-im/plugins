@@ -17,31 +17,32 @@
  *
  */
 
-#include "psiplugin.h"
-#include "activetabaccessinghost.h"
-#include "activetabaccessor.h"
-#include "toolbariconaccessor.h"
-#include "iconfactoryaccessor.h"
-#include "iconfactoryaccessinghost.h"
-#include "gctoolbariconaccessor.h"
-#include "stanzasender.h"
-#include "stanzasendinghost.h"
 #include "accountinfoaccessinghost.h"
 #include "accountinfoaccessor.h"
+#include "activetabaccessinghost.h"
+#include "activetabaccessor.h"
+#include "gctoolbariconaccessor.h"
+#include "iconfactoryaccessinghost.h"
+#include "iconfactoryaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
 #include "plugininfoprovider.h"
 #include "psiaccountcontroller.h"
 #include "psiaccountcontrollinghost.h"
-#include "optionaccessinghost.h"
-#include "optionaccessor.h"
+#include "psiplugin.h"
+#include "stanzasender.h"
+#include "stanzasendinghost.h"
+#include "toolbariconaccessor.h"
+
+#include <QApplication>
 #include <QByteArray>
+#include <QClipboard>
 #include <QFile>
 #include <QFileDialog>
 #include <QLabel>
+#include <QMenu>
 #include <QMessageBox>
 #include <QVBoxLayout>
-#include <QMenu>
-#include <QApplication>
-#include <QClipboard>
 
 #define constVersion "0.1.2"
 
@@ -49,11 +50,18 @@
 
 const int MAX_SIZE = 400;
 
-class ImagePlugin : public QObject, public PsiPlugin, public ToolbarIconAccessor
-        , public GCToolbarIconAccessor, public StanzaSender, public IconFactoryAccessor
-        , public ActiveTabAccessor, public PluginInfoProvider, public AccountInfoAccessor
-        , public PsiAccountController, public OptionAccessor
-{
+class ImagePlugin:
+        public AccountInfoAccessor,
+        public ActiveTabAccessor,
+        public GCToolbarIconAccessor,
+        public IconFactoryAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiAccountController,
+        public PsiPlugin,
+        public QObject,
+        public StanzaSender,
+        public ToolbarIconAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.ImagePlugin")
     Q_INTERFACES(PsiPlugin ToolbarIconAccessor GCToolbarIconAccessor
@@ -296,13 +304,11 @@ void ImagePlugin::actionActivated()
         psiController->appendSysMsg(account, jidToSend, tr("Image %1 is sent").arg(imageName));
     }
 
-
-
 }
 
 QString ImagePlugin::pluginInfo()
 {
-    return tr("Authors: ") +  "VampiRUS, Dealer_WeARE\n\n"
+    return tr("Authors: ") +  "VampiRUS, Evgeny Khryukin\n\n"
             + tr("This plugin is designed to send images to roster contacts.\n"
                  "Your contact's client must be support XEP-0071: XHTML-IM and support the data:URI scheme.\n"
                  "Note: To work correctly, the option options.ui.chat.central-toolbar  must be set to true.");

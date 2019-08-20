@@ -1,5 +1,5 @@
 /*
- * JuickParser - plugin
+ * juickparser.h - plugin
  * Copyright (C) 2012 Kravtsov Nikolai, Evgeny Khryukin
  *
  * This program is free software; you can redistribute it and/or
@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-
 
 #ifndef JUICKPARSER_H
 #define JUICKPARSER_H
@@ -40,8 +39,7 @@ struct JuickMessage {
 
 using JuickMessages = QList<JuickMessage>;
 
-class JuickParser
-{
+class JuickParser {
 public:    
     JuickParser(QDomElement* elem);
     virtual ~JuickParser() {}

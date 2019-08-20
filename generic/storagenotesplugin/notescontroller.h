@@ -23,12 +23,11 @@
 #include <QHash>
 #include <QPointer>
 
+class Notes;
 class QDomElement;
 class StorageNotesPlugin;
-class Notes;
 
-class NotesController : public QObject
-{
+class NotesController : public QObject {
     Q_OBJECT
 public:
     NotesController(StorageNotesPlugin* plugin);

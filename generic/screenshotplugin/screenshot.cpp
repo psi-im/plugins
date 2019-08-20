@@ -17,44 +17,41 @@
  *
  */
 
-#include <QDesktopWidget>
-#include <QBuffer>
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QNetworkReply>
-#include <QNetworkProxy>
-#include <QDateTime>
-#include <QTimer>
-#include <QPrintDialog>
-#include <QPrinter>
-#include <QPainter>
-#include <QCloseEvent>
-#include <QDesktopServices>
-#include <QClipboard>
-#include <QScreen>
-
-
 #include "screenshot.h"
-#include "server.h"
-#include "screenshotoptions.h"
+
+#include "defines.h"
 #include "options.h"
-#include "screenshoticonset.h"
 #include "optionsdlg.h"
 #include "proxysettingsdlg.h"
-#include "defines.h"
-
 #include "qxtwindowsystem.h"
+#include "screenshoticonset.h"
+#include "screenshotoptions.h"
+#include "server.h"
+
+#include <QBuffer>
+#include <QClipboard>
+#include <QCloseEvent>
+#include <QDateTime>
+#include <QDesktopServices>
+#include <QDesktopWidget>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QNetworkProxy>
+#include <QNetworkReply>
+#include <QPainter>
+#include <QPrintDialog>
+#include <QPrinter>
+#include <QScreen>
+#include <QTimer>
 
 #define PROTOCOL_FTP "ftp"
 #define PROTOCOL_HTTP "http"
 #define MAX_HISTORY_SIZE 10
 
-
 //----------------------------------------------
 //-----------HistoryDlg-------------------------
 //----------------------------------------------
-class HistoryDlg : public QDialog
-{
+class HistoryDlg : public QDialog {
     Q_OBJECT
 public:
     HistoryDlg(const QStringList& list, QWidget* p = nullptr)
@@ -116,12 +113,10 @@ private:
     QListWidget* lw;
 };
 
-
 //----------------------------------------------
 //-----------GrabAreaWidget-------------------------
 //----------------------------------------------
-class GrabAreaWidget : public QDialog
-{
+class GrabAreaWidget : public QDialog {
     Q_OBJECT
 public:
     GrabAreaWidget()
@@ -206,7 +201,6 @@ protected:
 private:
     QPoint startPoint, endPoint;
 };
-
 
 //----------------------------------------------
 //-----------Screenshot-------------------------

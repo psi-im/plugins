@@ -20,16 +20,15 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
-#include <QDialog>
-#include <QCloseEvent>
-#include <QDateTime>
-#include <QTextEdit>
-
 #include "iconfactoryaccessinghost.h"
 #include "typeaheadfind.h"
 
-class Viewer : public QDialog
-{
+#include <QCloseEvent>
+#include <QDateTime>
+#include <QDialog>
+#include <QTextEdit>
+
+class Viewer : public QDialog {
     Q_OBJECT
 public:
     Viewer(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *parent = nullptr);

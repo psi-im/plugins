@@ -1,4 +1,5 @@
-/* Copyright 2014, Uwe L. Korn <uwelk@xhochy.com>
+/*
+ * Copyright (C) 2014  Uwe L. Korn <uwelk@xhochy.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -17,16 +18,16 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ *
  */
 
 #pragma once
-#ifndef QJSONWRAPPER_JSON_H
-#define QJSONWRAPPER_JSON_H
+#ifndef QJSONWRAPPER_H
+#define QJSONWRAPPER_H
 
 #include <QVariant>
 
-namespace QJsonWrapper
-{
+namespace QJsonWrapper {
     /**
      * Convert a QObject instance to a QVariantMap by adding its properties
      * as key-value pairs.
@@ -68,6 +69,6 @@ namespace QJsonWrapper
      * @return After a successful serialisation the data of the QVariant represented as JSON.
      */
     QByteArray toJson( const QVariant &variant, bool* ok = nullptr );
-}
+} // namespace QJsonWrapper
 
-#endif // QJSONWRAPPER_JSON_H
+#endif // QJSONWRAPPER_H

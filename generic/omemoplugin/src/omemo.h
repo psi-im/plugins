@@ -1,6 +1,6 @@
 /*
  * OMEMO Plugin for Psi
- * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2018  Vyacheslav Karpukhin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,16 +17,17 @@
  *
  */
 
-#ifndef PSIOMEMO_OMEMO_H
-#define PSIOMEMO_OMEMO_H
+#ifndef OMEMO_H
+#define OMEMO_H
 
-#include <memory>
-#include <QtXml>
-#include "psiaccountcontrollinghost.h"
-#include "stanzasendinghost.h"
 #include "accountinfoaccessinghost.h"
 #include "contactinfoaccessinghost.h"
+#include "psiaccountcontrollinghost.h"
 #include "signal.h"
+#include "stanzasendinghost.h"
+
+#include <QtXml>
+#include <memory>
 
 namespace psiomemo {
   class OMEMO: public QObject {
@@ -90,6 +91,6 @@ namespace psiomemo {
   signals:
     void deviceListUpdated(int account);
   };
-}
+} // namespace psiomemo
 
-#endif //PSIOMEMO_OMEMO_H
+#endif // OMEMO_H

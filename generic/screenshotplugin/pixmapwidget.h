@@ -20,18 +20,17 @@
 #ifndef PIXMAPWIDGET_H
 #define PIXMAPWIDGET_H
 
+#include "toolbar.h"
+
 #include <QPen>
 #include <QPointer>
 #include <QVariant>
-
-#include "toolbar.h"
 
 #define constPenWidth "penwidth"
 #define constColor "color"
 #define constFont "font"
 
-class SelectionRect : public QRect
-{
+class SelectionRect : public QRect {
 public:
     SelectionRect();
     SelectionRect(int left, int top, int w, int h);
@@ -40,9 +39,7 @@ public:
     CornerType cornerUnderMouse(const QPoint& pos) const;
 };
 
-
-class PixmapWidget : public QWidget
-{
+class PixmapWidget : public QWidget {
     Q_OBJECT
 public:
     PixmapWidget(QWidget *parent);

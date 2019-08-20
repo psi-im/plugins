@@ -16,29 +16,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-#include "psiplugin.h"
-#include "plugininfoprovider.h"
-#include "optionaccessinghost.h"
-#include "optionaccessor.h"
+
 #include "accountinfoaccessinghost.h"
 #include "accountinfoaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
 #include "psiaccountcontroller.h"
 #include "psiaccountcontrollinghost.h"
-
+#include "psiplugin.h"
 #include "ui_options.h"
 
 #ifdef Q_OS_WIN
 #include "windows.h"
 #elif defined (HAVE_DBUS)
+#include "x11info.h"
 #include <QCheckBox>
-#include <QDBusMessage>
 #include <QDBusConnection>
+#include <QDBusConnectionInterface>
+#include <QDBusInterface>
+#include <QDBusMessage>
 #include <QDBusMetaType>
 #include <QDBusReply>
-#include <QDBusInterface>
-#include <QDBusConnectionInterface>
-#include "x11info.h"
 #include <X11/Xlib.h>
+
+#define constVersion "0.3.0"
+#define constStatus "status"
+#define constStatusMessage "statusmessage"
+#define constSetOnline "setonline"
+#define constRestoreDelay "restoredelay"
+#define constSetDelay "setdelay"
+#define constFullScreen "fullscreen"
 
 static const QString MPRIS_PREFIX = "org.mpris";
 static const QString MPRIS2_PREFIX = "org.mpris.MediaPlayer2";
@@ -90,20 +98,15 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 }
 #endif
 
-#define constVersion "0.3.0"
-
-#define constStatus "status"
-#define constStatusMessage "statusmessage"
-#define constSetOnline "setonline"
-#define constRestoreDelay "restoredelay"
-#define constSetDelay "setdelay"
-#define constFullScreen "fullscreen"
-
 static const int timeout = 10000;
 
-class VideoStatusChanger : public QObject, public PsiPlugin, public PluginInfoProvider, public OptionAccessor
-            , public PsiAccountController, public AccountInfoAccessor
-{
+class VideoStatusChanger:
+        public AccountInfoAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiAccountController,
+        public PsiPlugin,
+        public QObject {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.VideoStatusChanger")
     Q_INTERFACES(PsiPlugin PluginInfoProvider OptionAccessor PsiAccountController AccountInfoAccessor)
@@ -396,7 +399,7 @@ QWidget* VideoStatusChanger::options()
 
 QString VideoStatusChanger::pluginInfo()
 {
-    return tr("Authors: ") +  "Dealer_WeARE, KukuRuzo\n\n"
+    return tr("Authors: ") +  "Evgeny Khryukin, Vitaly Tonkacheyev\n\n"
             + tr("This plugin is designed to set the custom status when you watching the video in selected video players. \n"
                  "Note: This plugin is designed to work in Linux family operating systems and in Windows OS. \n\n"
                  "In Linux plugin uses DBUS to work with video players and X11 functions to detect fullscreen applications. \n"
@@ -443,7 +446,6 @@ void VideoStatusChanger::checkMprisService(const QString &name, const QString &o
         }
     }
 }
-
 
 void VideoStatusChanger::startCheckTimer()
 {
@@ -707,7 +709,6 @@ void VideoStatusChanger::delayTimeout()
 {
     setPsiGlobalStatus(!isStatusSet);
 }
-
 
 void VideoStatusChanger::setPsiGlobalStatus(const bool set) {
     if (!enabled) return;

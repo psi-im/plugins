@@ -24,8 +24,7 @@
 #include <QVariant>
 #include <QByteArray>
 
-class OptionsParser : public QObject
-{
+class OptionsParser : public QObject {
     Q_OBJECT
 
     public:
@@ -40,11 +39,10 @@ class OptionsParser : public QObject
 };
 
 //stolen from iris
-class Base64
-        {
-                public:
-                        static QString encode(const QByteArray&);
-                        static QByteArray decode(const QString &s);
-        };
+class Base64 {
+        public:
+            static QString encode(const QByteArray&);
+            static QByteArray decode(const QString &s);
+};
 
 #endif // OPTIONSPARSER_H

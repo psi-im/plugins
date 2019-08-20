@@ -3,7 +3,7 @@
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
- *               2011-2012  Florian Fieber
+ * Copyright (C) 2011-2012  Florian Fieber
  *
  * This program was originally written as part of a diplom thesis
  * advised by Prof. Dr. Ruediger Weis (PST Labor)
@@ -24,29 +24,25 @@
  *
  */
 
-#ifndef PSIOTRCLOSURE_H_
-#define PSIOTRCLOSURE_H_
+#ifndef PSIOTRCLOSURE_H
+#define PSIOTRCLOSURE_H
 
 #include "otrmessaging.h"
 
-#include <QObject>
 #include <QDialog>
 #include <QMessageBox>
+#include <QObject>
 
 class QAction;
-class QMenu;
 class QComboBox;
 class QLineEdit;
+class QMenu;
 class QProgressBar;
 class QPushButton;
 
-namespace psiotr
-{
-
+namespace psiotr {
 //-----------------------------------------------------------------------------
-
-class AuthenticationDialog : public QDialog
-{
+class AuthenticationDialog : public QDialog {
     Q_OBJECT
 public:
     AuthenticationDialog(OtrMessaging* otrc,
@@ -93,8 +89,7 @@ private slots:
 
 //-----------------------------------------------------------------------------
 
-class PsiOtrClosure : public QObject
-{
+class PsiOtrClosure : public QObject {
     Q_OBJECT
 
 public:
@@ -139,4 +134,4 @@ public slots:
 
 } // namespace psiotr
 
-#endif
+#endif // PSIOTRCLOSURE_H

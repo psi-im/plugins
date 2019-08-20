@@ -18,9 +18,10 @@
  */
 
 #include "skin.h"
+
 #include <QDir>
-#include <QMessageBox>
 #include <QDomDocument>
+#include <QMessageBox>
 
 void Skin::setFile(const QString &file)
 {
@@ -64,8 +65,6 @@ QString Skin::name()
     return name;
 }
 
-
-
 //---------------------------------
 //---Previewer---------------------
 //---------------------------------
@@ -104,9 +103,6 @@ bool Previewer::loadSkinInformation()
 
     return true;
 }
-
-
-
 
 //-----------------------------
 //------GetSkinName------------

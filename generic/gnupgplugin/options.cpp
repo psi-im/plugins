@@ -1,5 +1,5 @@
 /*
- * options.cpp - plugin widget
+ * options.cpp - plugin
  *
  * Copyright (C) 2013  Ivan Romanov <drizt@land.ru>
  *
@@ -17,26 +17,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <QInputDialog>
-#include <QStandardItemModel>
-#include <QStandardItem>
-#include <QItemSelectionModel>
-#include <QProgressDialog>
-#include <QApplication>
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QLabel>
-#include <QProgressBar>
-#include <QAction>
-#include <QMenu>
-#include <QClipboard>
-#include <QApplication>
 #include "options.h"
-#include "ui_options.h"
-#include "model.h"
-#include "gpgprocess.h"
+
 #include "addkeydlg.h"
+#include "gpgprocess.h"
+#include "model.h"
 #include "optionaccessinghost.h"
+#include "ui_options.h"
+
+#include <QAction>
+#include <QApplication>
+#include <QClipboard>
+#include <QFileDialog>
+#include <QInputDialog>
+#include <QItemSelectionModel>
+#include <QLabel>
+#include <QMenu>
+#include <QMessageBox>
+#include <QProgressBar>
+#include <QProgressDialog>
+#include <QStandardItem>
+#include <QStandardItemModel>
 
 Options::Options(QWidget *parent)
     : QWidget(parent)
@@ -47,7 +48,6 @@ Options::Options(QWidget *parent)
     Model *model = new Model(this);
     ui->keys->setModel(model);
     updateKeys();
-
 
     // Import key
     QAction *action;

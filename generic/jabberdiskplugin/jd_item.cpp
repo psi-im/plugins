@@ -17,11 +17,12 @@
  *
  */
 
-#include <QMimeData>
-#include <QIODevice>
-#include <QDataStream>
 #include "jd_item.h"
+
+#include <QDataStream>
 //#include <QDebug>
+#include <QIODevice>
+#include <QMimeData>
 
 JDItem::JDItem(Type t, const QString& name, const QString& size, const QString& descr, int number, JDItem* parent)
     : parent_(parent)
@@ -135,7 +136,6 @@ void JDItem::fromDataStream(QDataStream *const in)
     *in >> name_ >> size_ >> descr_ >> number_ >> t;
     type_ = (Type)t;
 }
-
 
 //-----------------------------------
 //------ItemsList--------------------

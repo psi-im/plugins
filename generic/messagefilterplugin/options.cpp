@@ -1,5 +1,5 @@
 /*
- * options.cpp - plugin widget
+ * options.cpp - plugin
  *
  * Copyright (C) 2013  Ivan Romanov <drizt@land.ru>
  *
@@ -19,12 +19,12 @@
 
 #include "options.h"
 
-#include "ui_options.h"
 #include "optionaccessinghost.h"
+#include "ui_options.h"
 
 #include <QComboBox>
-#include <QLineEdit>
 #include <QDebug>
+#include <QLineEdit>
 
 Options::Options(const QList<Rule> &rules, QWidget *parent)
     : QWidget(parent)

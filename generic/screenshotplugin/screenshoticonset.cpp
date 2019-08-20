@@ -1,5 +1,5 @@
 /*
- * iconset.cpp - plugin
+ * screenshoticonset.cpp - plugin
  * Copyright (C) 2011  Evgeny Khryukin
  *
  * This program is free software; you can redistribute it and/or
@@ -60,7 +60,6 @@ QIcon ScreenshotIconset::getIcon(const QString& name)
 
     return ico;
 }
-
 
 //for Psi plugin only
 void ScreenshotIconset::setIconHost(IconFactoryAccessingHost *_icoHost)

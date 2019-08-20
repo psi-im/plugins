@@ -22,10 +22,10 @@
  *
  */
 
-#include <QStringList>
-#include <QCryptographicHash>
-
 #include "gamemodel.h"
+
+#include <QCryptographicHash>
+#include <QStringList>
 
 GameModel::GameModel(GameElement::ElementType my, int row_count, int col_count, QObject *parent) :
     QObject(parent),

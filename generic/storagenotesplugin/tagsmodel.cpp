@@ -17,9 +17,9 @@
  *
  */
 
-#include <QtGlobal>
-
 #include "tagsmodel.h"
+
+#include <QtGlobal>
 
 static const QString allTags = QObject::tr("All Tags");
 
@@ -72,7 +72,6 @@ QModelIndex TagModel::parent(const QModelIndex& index) const
         return createAllTagsIndex();
     return QModelIndex();
 }
-
 
 QVariant TagModel::data(const QModelIndex &index, int role) const
 {
@@ -140,9 +139,6 @@ QString TagModel::allTagsName()
 {
     return allTags;
 }
-
-
-
 
 ////--------NoteModel---------------------
 NoteModel::NoteModel(QObject *parent) : QAbstractListModel(parent)
@@ -250,8 +246,6 @@ QStringList NoteModel::getAllTags() const
     }
     return tagsList;
 }
-
-
 
 /////-------------ProxyModel---------------
 

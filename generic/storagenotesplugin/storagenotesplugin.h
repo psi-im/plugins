@@ -20,31 +20,38 @@
 #ifndef STORAGENOTESPLUGIN_H
 #define STORAGENOTESPLUGIN_H
 
+#include "accountinfoaccessinghost.h"
+#include "accountinfoaccessor.h"
+#include "iconfactoryaccessinghost.h"
+#include "iconfactoryaccessor.h"
+#include "menuaccessor.h"
+#include "plugininfoprovider.h"
+#include "popupaccessinghost.h"
+#include "popupaccessor.h"
+#include "psiplugin.h"
+#include "stanzafilter.h"
+#include "stanzasender.h"
+#include "stanzasendinghost.h"
+
+#define constVersion "0.1.9"
+
+#define NOTES_ID "strnotes_1"
+
+class Notes;
+class NotesController;
 class QAction;
 class QDomElement;
 
-#include "psiplugin.h"
-#include "iconfactoryaccessor.h"
-#include "iconfactoryaccessinghost.h"
-#include "stanzasender.h"
-#include "stanzasendinghost.h"
-#include "accountinfoaccessinghost.h"
-#include "accountinfoaccessor.h"
-#include "stanzafilter.h"
-#include "popupaccessor.h"
-#include "popupaccessinghost.h"
-#include "menuaccessor.h"
-#include "plugininfoprovider.h"
-
-class NotesController;
-class Notes;
-
-#define constVersion "0.1.9"
-#define NOTES_ID "strnotes_1"
-
-class StorageNotesPlugin : public QObject, public PsiPlugin, public StanzaSender, public IconFactoryAccessor, public PluginInfoProvider,
-        public AccountInfoAccessor, public StanzaFilter, public PopupAccessor, public MenuAccessor
-{
+class StorageNotesPlugin:
+        public AccountInfoAccessor,
+        public IconFactoryAccessor,
+        public MenuAccessor,
+        public PluginInfoProvider,
+        public PopupAccessor,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter,
+        public StanzaSender {
         Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.StorageNotesPlugin")
     Q_INTERFACES(PsiPlugin StanzaSender IconFactoryAccessor AccountInfoAccessor StanzaFilter PopupAccessor MenuAccessor PluginInfoProvider)

@@ -17,17 +17,16 @@
  *
  */
 
-
 #ifndef DEFERREDSTANZASENDER_H
 #define DEFERREDSTANZASENDER_H
 
-#include <QPair>
-#include <QTimer>
-#include <QDomElement>
 #include "stanzasendinghost.h"
 
-class DefferedStanzaSender : public QObject
-{
+#include <QDomElement>
+#include <QPair>
+#include <QTimer>
+
+class DefferedStanzaSender : public QObject {
     Q_OBJECT
 public:
     DefferedStanzaSender(StanzaSendingHost *host, QObject* p = nullptr);

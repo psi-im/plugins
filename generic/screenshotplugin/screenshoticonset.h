@@ -1,5 +1,5 @@
 /*
- * iconset.h - plugin
+ * screenshoticonset.h - plugin
  * Copyright (C) 2011  Evgeny Khryukin
  *
  * This program is free software; you can redistribute it and/or
@@ -25,8 +25,7 @@
 //for Psi plugin only
 class IconFactoryAccessingHost;
 
-class ScreenshotIconset : public QObject
-{
+class ScreenshotIconset : public QObject {
     Q_OBJECT
 public:
     static ScreenshotIconset* instance();

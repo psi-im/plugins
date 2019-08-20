@@ -1,4 +1,5 @@
 #include "previewfiledialog.h"
+
 #include <QGridLayout>
 
 PreviewFileDialog::PreviewFileDialog(QWidget* parent, const QString & caption, const QString & directory,

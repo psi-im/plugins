@@ -22,10 +22,11 @@
  *
  */
 
-#include <QStyleOptionViewItem>
-
 #include "boarddelegate.h"
+
 #include "common.h"
+
+#include <QStyleOptionViewItem>
 
 using namespace GomokuGame;
 

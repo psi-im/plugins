@@ -17,41 +17,39 @@
  *
  */
 
-#include <QFileDialog>
-#include <QDomElement>
-#include <QHash>
-#include <QAction>
-
-#include "view.h"
-#include "model.h"
-#include "ui_options.h"
-#include "watcheditem.h"
-#include "edititemdlg.h"
-
-#include "psiplugin.h"
-#include "stanzafilter.h"
-#include "popupaccessor.h"
-#include "popupaccessinghost.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
-#include "iconfactoryaccessor.h"
-#include "iconfactoryaccessinghost.h"
-#include "menuaccessor.h"
-#include "applicationinfoaccessor.h"
-#include "applicationinfoaccessinghost.h"
-#include "plugininfoprovider.h"
-#include "activetabaccessinghost.h"
-#include "activetabaccessor.h"
-#include "contactinfoaccessinghost.h"
-#include "contactinfoaccessor.h"
 #include "accountinfoaccessinghost.h"
 #include "accountinfoaccessor.h"
+#include "activetabaccessinghost.h"
+#include "activetabaccessor.h"
+#include "applicationinfoaccessinghost.h"
+#include "applicationinfoaccessor.h"
+#include "contactinfoaccessinghost.h"
+#include "contactinfoaccessor.h"
+#include "edititemdlg.h"
+#include "iconfactoryaccessinghost.h"
+#include "iconfactoryaccessor.h"
+#include "menuaccessor.h"
+#include "model.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "popupaccessinghost.h"
+#include "popupaccessor.h"
+#include "psiplugin.h"
 #include "soundaccessinghost.h"
 #include "soundaccessor.h"
+#include "stanzafilter.h"
 #include "toolbariconaccessor.h"
+#include "ui_options.h"
+#include "view.h"
+#include "watcheditem.h"
+
+#include <QAction>
+#include <QDomElement>
+#include <QFileDialog>
+#include <QHash>
 
 #define constVersion "0.4.6"
-
 #define constSoundFile "sndfl"
 #define constInterval "intrvl"
 #define constCount "count"
@@ -65,12 +63,21 @@
 
 #define POPUP_OPTION_NAME "Watcher Plugin"
 
-
-class Watcher : public QObject, public PsiPlugin, public PopupAccessor, public MenuAccessor, public PluginInfoProvider,
-                public OptionAccessor, public StanzaFilter, public IconFactoryAccessor, public ApplicationInfoAccessor,
-                public ActiveTabAccessor, public ContactInfoAccessor, public AccountInfoAccessor, public SoundAccessor,
-                public ToolbarIconAccessor
-{
+class Watcher:
+        public AccountInfoAccessor,
+        public ActiveTabAccessor,
+        public ApplicationInfoAccessor,
+        public ContactInfoAccessor,
+        public IconFactoryAccessor,
+        public MenuAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PopupAccessor,
+        public PsiPlugin,
+        public QObject,
+        public SoundAccessor,
+        public StanzaFilter,
+        public ToolbarIconAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.Watcher")
     Q_INTERFACES(PsiPlugin PopupAccessor OptionAccessor StanzaFilter IconFactoryAccessor AccountInfoAccessor
@@ -483,7 +490,6 @@ bool Watcher::checkWatchedItem(const QString &from, const QString &body, Watched
     return false;
 }
 
-
 void Watcher::timeOut() {
     psiOptions->setGlobalOption("options.ui.notifications.sounds.enable", QVariant(isSndEnable));
 }
@@ -714,7 +720,7 @@ void Watcher::editCurrentItem(const QString& settings) {
 }
 
 QString Watcher::pluginInfo() {
-    return tr("Author: ") +     "Dealer_WeARE\n"
+    return tr("Author: ") +     "Evgeny Khryukin\n"
     + tr("Email: ") + "wadealer@gmail.com\n\n"
     + tr("This plugin is designed to monitor the status of specific roster contacts, as well as for substitution of standard sounds of incoming messages.\n"
          "On the first tab set up a list of contacts for the status of which is monitored. When the status of such contacts changes a popup window will be shown"

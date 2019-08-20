@@ -1,6 +1,6 @@
 /*
  * juickdownloader.h - plugin
- * Copyright (C) 2012 Evgeny Khryukin
+ * Copyright (C) 2012  Evgeny Khryukin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,9 +23,9 @@
 #include <QVariant>
 #include <QQueue>
 
+class ApplicationInfoAccessingHost;
 class QNetworkAccessManager;
 class QNetworkReply;
-class ApplicationInfoAccessingHost;
 class QTimer;
 
 struct JuickDownloadItem
@@ -41,8 +41,7 @@ struct JuickDownloadItem
 
 Q_DECLARE_METATYPE(JuickDownloadItem)
 
-class JuickDownloader : public QObject
-{
+class JuickDownloader : public QObject {
     Q_OBJECT
 
 public:
@@ -73,4 +72,4 @@ private:
     QTimer *waitTimer_;
 }; 
 
-#endif
+#endif // JUICKDOWNLOADER_H

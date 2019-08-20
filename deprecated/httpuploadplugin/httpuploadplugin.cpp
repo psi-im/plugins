@@ -17,51 +17,54 @@
  *
  */
 
-#include "psiplugin.h"
-#include "activetabaccessinghost.h"
-#include "activetabaccessor.h"
-#include "toolbariconaccessor.h"
-#include "iconfactoryaccessor.h"
-#include "iconfactoryaccessinghost.h"
-#include "gctoolbariconaccessor.h"
-#include "stanzasender.h"
-#include "stanzasendinghost.h"
 #include "accountinfoaccessinghost.h"
 #include "accountinfoaccessor.h"
-#include "plugininfoprovider.h"
-#include "psiaccountcontroller.h"
-#include "psiaccountcontrollinghost.h"
+#include "activetabaccessinghost.h"
+#include "activetabaccessor.h"
+#include "applicationinfoaccessinghost.h"
+#include "applicationinfoaccessor.h"
+#include "chattabaccessor.h"
+#include "commandexecutor.h"
+#include "currentupload.h"
+#include "gctoolbariconaccessor.h"
+#include "iconfactoryaccessinghost.h"
+#include "iconfactoryaccessor.h"
 #include "optionaccessinghost.h"
 #include "optionaccessor.h"
-#include "applicationinfoaccessor.h"
-#include "applicationinfoaccessinghost.h"
-#include "pluginaccessor.h"
 #include "pluginaccessinghost.h"
-#include "commandexecutor.h"
+#include "pluginaccessor.h"
+#include "plugininfoprovider.h"
+#include "previewfiledialog.h"
+#include "psiaccountcontroller.h"
+#include "psiaccountcontrollinghost.h"
+#include "psiplugin.h"
+#include "stanzafilter.h"
+#include "stanzasender.h"
+#include "stanzasendinghost.h"
+#include "toolbariconaccessor.h"
+#include "uploadservice.h"
+
+#include <QApplication>
 #include <QByteArray>
+#include <QCheckBox>
+#include <QDomElement>
 #include <QFile>
 #include <QFileDialog>
 #include <QLabel>
-#include <QMessageBox>
-#include <QVBoxLayout>
 #include <QMenu>
-#include <QApplication>
-#include <QTextDocument>
+#include <QMessageBox>
 #include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
 #include <QNetworkProxy>
-#include "chattabaccessor.h"
-#include "stanzafilter.h"
-#include <QDomElement>
-#include "uploadservice.h"
-#include "currentupload.h"
-#include <QCheckBox>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QSpinBox>
-#include "previewfiledialog.h"
+#include <QTextDocument>
+#include <QVBoxLayout>
 
 //#define DEBUG_UPLOAD
+
 #define constVersion "0.1.0"
+
 #define CONST_LAST_FOLDER "httpupload-lastfolder"
 #define SLOT_TIMEOUT 10000
 #define OPTION_RESIZE "httpupload-do-resize"
@@ -73,21 +76,22 @@ QString escape(const QString &plain) {
     return plain.toHtmlEscaped();
 }
 
-class HttpUploadPlugin: public QObject,
-        public PsiPlugin,
-        public ToolbarIconAccessor,
-        public GCToolbarIconAccessor,
-        public StanzaSender,
-        public IconFactoryAccessor,
-        public ActiveTabAccessor,
-        public PluginInfoProvider,
+class HttpUploadPlugin:
         public AccountInfoAccessor,
-        public PsiAccountController,
-        public OptionAccessor,
-        public ChatTabAccessor,
-        public StanzaFilter,
+        public ActiveTabAccessor,
         public ApplicationInfoAccessor,
-        public PluginAccessor {
+        public ChatTabAccessor,
+        public GCToolbarIconAccessor,
+        public IconFactoryAccessor,
+        public OptionAccessor,
+        public PluginAccessor,
+        public PluginInfoProvider,
+        public PsiAccountController,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter,
+        public StanzaSender,
+        public ToolbarIconAccessor {
 Q_OBJECT
 Q_PLUGIN_METADATA(IID "com.psi-plus.HttpUploadPlugin")
 Q_INTERFACES(PsiPlugin ToolbarIconAccessor GCToolbarIconAccessor

@@ -1,6 +1,6 @@
 /*
  * OMEMO Plugin for Psi
- * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2018  Vyacheslav Karpukhin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,9 @@
  */
 
 #include "signal.h"
+
 #include "crypto.h"
+
 #include <QMessageBox>
 
 extern "C" {
@@ -392,4 +394,4 @@ namespace psiomemo {
   bool Bundle::isValid() {
     return !signedPreKeyPublic.isNull() && !signedPreKeySignature.isNull() && !identityKeyPublic.isNull() && !preKeys.isEmpty();
   }
-}
+} // namespace psiomemo

@@ -11,7 +11,7 @@ HEADERS += gomokugameplugin.h \
     boardmodel.h \
     boarddelegate.h \
     gameelement.h \
-    invatedialog.h \
+    invitedialog.h \
     gamesessions.h \
     common.h \
     options.h \
@@ -22,12 +22,12 @@ SOURCES += gomokugameplugin.cpp \
     boardmodel.cpp \
     boarddelegate.cpp \
     gameelement.cpp \
-    invatedialog.cpp \
+    invitedialog.cpp \
     gamesessions.cpp \
     options.cpp \
     gamemodel.cpp
 FORMS += pluginwindow.ui \
-    invatedialog.ui \
+    invitedialog.ui \
     invitationdialog.ui \
     options.ui
 RESOURCES += gomokugameplugin.qrc

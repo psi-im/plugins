@@ -11,7 +11,6 @@ HEADERS += \
     defines.h \
     enummessagesplugin.h
 
-
 RESOURCES += resources.qrc
 
 OTHER_FILES += \

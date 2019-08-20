@@ -17,11 +17,12 @@
  *
  */
 
-#include <QDomElement>
-#include <QAction>
-
 #include "jabberdiskcontroller.h"
+
 #include "jd_mainwin.h"
+
+#include <QAction>
+#include <QDomElement>
 
 struct Session {
     Session(int a, const QString& j, JDMainWin* w = nullptr)
@@ -135,6 +136,5 @@ bool JabberDiskController::incomingStanza(int account, const QDomElement& xml)
     }
     return false;
 }
-
 
 JabberDiskController* JabberDiskController::instance_ = nullptr;

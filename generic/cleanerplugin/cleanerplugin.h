@@ -20,21 +20,24 @@
 #ifndef CLEANERPLUGIN_H
 #define CLEANERPLUGIN_H
 
-
-#include "psiplugin.h"
-#include "applicationinfoaccessor.h"
 #include "applicationinfoaccessinghost.h"
-#include "iconfactoryaccessor.h"
+#include "applicationinfoaccessor.h"
 #include "iconfactoryaccessinghost.h"
-#include "optionaccessor.h"
+#include "iconfactoryaccessor.h"
 #include "optionaccessinghost.h"
+#include "optionaccessor.h"
 #include "plugininfoprovider.h"
+#include "psiplugin.h"
 
 class CleanerMainWindow;
 
-class CleanerPlugin : public QObject, public PsiPlugin, public ApplicationInfoAccessor,
-                      public IconFactoryAccessor, public OptionAccessor, public PluginInfoProvider
-{
+class CleanerPlugin:
+        public ApplicationInfoAccessor,
+        public IconFactoryAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiPlugin,
+        public QObject {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.CleanerPlugin")
     Q_INTERFACES(PsiPlugin ApplicationInfoAccessor IconFactoryAccessor OptionAccessor PluginInfoProvider)

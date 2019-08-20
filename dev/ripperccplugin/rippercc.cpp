@@ -1,6 +1,5 @@
 /*
- * rippercc.cpp
- *
+ * rippercc.cpp - plugin
  * Copyright (C) 2016
  *
  * This program is free software; you can redistribute it and/or
@@ -15,24 +14,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 #include "rippercc.h"
 
 #include "qjsonwrapper.h"
 
-#include <psiaccountcontrollinghost.h>
-#include <optionaccessinghost.h>
-#include <iconfactoryaccessinghost.h>
-#include <activetabaccessinghost.h>
-#include <accountinfoaccessinghost.h>
-#include <stanzasendinghost.h>
-
-#include <QDomElement>
 #include <QDomDocument>
+#include <QDomElement>
 #include <QDomText>
 #include <QNetworkProxy>
 #include <QNetworkReply>
+#include <accountinfoaccessinghost.h>
+#include <activetabaccessinghost.h>
+#include <iconfactoryaccessinghost.h>
+#include <optionaccessinghost.h>
+#include <psiaccountcontrollinghost.h>
+#include <stanzasendinghost.h>
 
 #define TIMER_INTERVAL (30 * 60 * 1000) /* 30 minutes */
 #define RIPPER_DB_URL "https://ripper.cc/api/v1/plugin/jabber?format=json"
@@ -46,7 +45,6 @@
     "<a href=\"https://ripper.cc%1\">https://ripper.cc%1</a>"
 
 #define NONASCII_MESSAGE "<b>WARNING!</b> NON ASCII | Jabber с русскими буквами!"
-
 
 RipperCC::RipperCC()
     : _enabled(false)
@@ -64,7 +62,6 @@ RipperCC::RipperCC()
     _timer->setSingleShot(true);
     connect(_timer, SIGNAL(timeout()), SLOT(updateRipperDb()));
 }
-
 
 RipperCC::~RipperCC()
 {

@@ -15,7 +15,6 @@ PstoPlugin::PstoPlugin()
 {
 }
 
-
 QString PstoPlugin::name() const {
     return PLUGIN_NAME;
 }
@@ -223,8 +222,6 @@ void PstoPlugin::setOptionAccessingHost(OptionAccessingHost * host) {
     new_message_color = message_color;
 }
 
-
-
 QString PstoPlugin::generateXMPPUrl(const QString & jid, const QString & message) {
     QString message_percent(message.toLatin1().toPercentEncoding());
     return QString("xmpp:%1?message;type=chat;body=%2").arg(jid, message_percent);
@@ -288,7 +285,6 @@ QDomElement PstoPlugin::generateLink(const QString & value,
 
     return link;
 }
-
 
 RegExpPartitions * PstoPlugin::splitRegexpSimple(const QString & source1,
                                                  const QString & regexp_str,

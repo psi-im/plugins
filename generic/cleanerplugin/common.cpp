@@ -18,17 +18,16 @@
  */
 
 #include "common.h"
+
 #include <QDir>
-#include <QTextList>
-#include <QTextEdit>
-#include <QLineEdit>
-#include <QLabel>
-#include <QPushButton>
-#include <QTextStream>
-#include <QFileDialog>
 #include <QDomElement>
-
-
+#include <QFileDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QTextList>
+#include <QTextStream>
 
 //---------------------------------------------
 //--------------HistoryView--------------------
@@ -65,8 +64,6 @@ HistoryView::HistoryView(const QString& filename, QWidget *parent)
     else
         close();
 }
-
-
 
 //---------------------------------------------
 //----------------vCardView--------------------
@@ -108,7 +105,6 @@ vCardView::vCardView(const QString& filename, QWidget *parent)
         birth->setText(VCard.firstChildElement("BDAY").text());
         email->setText(VCard.firstChildElement("EMAIL").firstChildElement("USERID").text());
 
-
         QPushButton *Close = new QPushButton(tr("Close"));
         QHBoxLayout *butLayout = new QHBoxLayout();
 
@@ -124,8 +120,6 @@ vCardView::vCardView(const QString& filename, QWidget *parent)
     else
         close();
 }
-
-
 
 //---------------------------------------------
 //----------------AvatarView-------------------

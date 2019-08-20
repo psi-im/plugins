@@ -17,21 +17,21 @@
  *
  */
 
+#include "optionswidget.h"
+
+#include "defines.h"
+#include "editserverdlg.h"
+#include "options.h"
+#include "server.h"
+
 #include <QCloseEvent>
 #include <QKeyEvent>
-
-#include "optionswidget.h"
-#include "editserverdlg.h"
-#include "server.h"
-#include "options.h"
-#include "defines.h"
 
 namespace screenshotplugin {
 //--------------------------------------------------------
 //---GrepShortcutKeyDialog from libpsi with some changes--
 //--------------------------------------------------------
-class GrepShortcutKeyDialog : public QDialog
-{
+class GrepShortcutKeyDialog : public QDialog {
     Q_OBJECT
 public:
     GrepShortcutKeyDialog(QWidget* p = nullptr)
@@ -132,8 +132,7 @@ private:
     bool gotKey;
     QLineEdit* le;
 };
-}
-
+} // namespace screenshotplugin
 
 //---------------------------------------------------
 //-------------------OptionsWidget-------------------
@@ -158,7 +157,6 @@ OptionsWidget::OptionsWidget(QWidget* p)
     connect(ui_.lw_servers, SIGNAL(currentRowChanged(int)), this, SLOT(applyButtonActivate()));
     connect(ui_.pb_modify, SIGNAL(clicked()), this, SLOT(requstNewShortcut()));
 }
-
 
 void OptionsWidget::addServer()
 {

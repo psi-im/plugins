@@ -20,12 +20,11 @@
 #ifndef BOARDVIEW_H
 #define BOARDVIEW_H
 
-#include <QTableView>
-
 #include "boardmodel.h"
 
-class BoardView : public QTableView
-{
+#include <QTableView>
+
+class BoardView : public QTableView {
     Q_OBJECT
 public:
     BoardView(QWidget *parent = nullptr);

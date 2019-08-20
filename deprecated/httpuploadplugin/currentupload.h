@@ -5,8 +5,8 @@
  *      Author: rkfg
  */
 
-#ifndef SRC_PLUGINS_GENERIC_HTTPUPLOADPLUGIN_CURRENTUPLOAD_H_
-#define SRC_PLUGINS_GENERIC_HTTPUPLOADPLUGIN_CURRENTUPLOAD_H_
+#ifndef CURRENTUPLOAD_H
+#define CURRENTUPLOAD_H
 
 struct CurrentUpload {
     QString from;
@@ -19,4 +19,4 @@ struct CurrentUpload {
     CurrentUpload(): account(-1) {}
 };
 
-#endif /* SRC_PLUGINS_GENERIC_HTTPUPLOADPLUGIN_CURRENTUPLOAD_H_ */
+#endif // CURRENTUPLOAD_H

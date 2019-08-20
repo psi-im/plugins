@@ -154,8 +154,7 @@ QXT_CORE_EXPORT const char* qxtVersion();
 #define QXT_P(PUB) PUB& p = qxt_p()
 
 template <typename PUB>
-class QxtPrivate
-{
+class QxtPrivate {
 public:
     virtual ~QxtPrivate()
     {}
@@ -187,8 +186,7 @@ private:
 };
 
 template <typename PUB, typename PVT>
-class QxtPrivateInterface
-{
+class QxtPrivateInterface {
     friend class QxtPrivate<PUB>;
 public:
     QxtPrivateInterface()
@@ -226,4 +224,4 @@ private:
     QxtPrivate<PUB>* pvt = nullptr;
 };
 
-#endif // QXT_GLOBAL
+#endif // QXT_GLOBAL_H

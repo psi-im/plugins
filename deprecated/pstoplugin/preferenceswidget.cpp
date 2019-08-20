@@ -69,7 +69,6 @@ void PreferencesWidget::messageColorClicked() {
     showChangeButtonColorDialog(preferences_ui.messageColorButton);
 }
 
-
 void PreferencesWidget::showChangeButtonColorDialog(QAbstractButton * button) {
     now_changing_button = button;
     color_dialog.show();

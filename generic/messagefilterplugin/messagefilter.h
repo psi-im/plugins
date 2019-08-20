@@ -1,5 +1,5 @@
 /*
- * messagefilter.h - plugin main class
+ * messagefilter.h - plugin
  *
  * Copyright (C) 2015  Ivan Romanov <drizt@land.ru>
  *
@@ -22,30 +22,30 @@
 
 #include "options.h"
 
-#include <psiplugin.h>
+#include <accountinfoaccessor.h>
+#include <activetabaccessor.h>
 #include <applicationinfoaccessinghost.h>
+#include <iconfactoryaccessor.h>
+#include <optionaccessor.h>
 #include <plugininfoprovider.h>
+#include <psiaccountcontroller.h>
+#include <psiplugin.h>
 #include <stanzafilter.h>
 #include <stanzasender.h>
-#include <psiaccountcontroller.h>
-#include <optionaccessor.h>
 #include <toolbariconaccessor.h>
-#include <iconfactoryaccessor.h>
-#include <activetabaccessor.h>
-#include <accountinfoaccessor.h>
 
 class Options;
 class QMenu;
 
-class MessageFilter : public QObject
-                    , public PsiPlugin
-                    , public PluginInfoProvider
-                    , public StanzaFilter
-                    , public PsiAccountController
-                    , public OptionAccessor
-                    , public StanzaSender
-                    , public AccountInfoAccessor
-{
+class MessageFilte:
+        public AccountInfoAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiAccountController,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter,
+        public StanzaSender {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.MessageFilter")
     Q_INTERFACES(PsiPlugin

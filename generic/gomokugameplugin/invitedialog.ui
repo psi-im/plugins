@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>InvateDialog</class>
- <widget class="QDialog" name="InvateDialog">
+ <class>InviteDialog</class>
+ <widget class="QDialog" name="InviteDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -119,7 +119,7 @@
   <connection>
    <sender>btnBlack</sender>
    <signal>clicked()</signal>
-   <receiver>InvateDialog</receiver>
+   <receiver>InviteDialog</receiver>
    <slot>acceptBlack()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -135,7 +135,7 @@
   <connection>
    <sender>btnWhite</sender>
    <signal>clicked()</signal>
-   <receiver>InvateDialog</receiver>
+   <receiver>InviteDialog</receiver>
    <slot>acceptWhite()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -151,7 +151,7 @@
   <connection>
    <sender>btnCancel</sender>
    <signal>clicked()</signal>
-   <receiver>InvateDialog</receiver>
+   <receiver>InviteDialog</receiver>
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">

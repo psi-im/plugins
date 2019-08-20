@@ -19,15 +19,14 @@
 
 #include "typeaheadfind.h"
 
-#include <QLineEdit>
 #include <QCheckBox>
 #include <QLabel>
+#include <QLineEdit>
 #include <QPushButton>
 
 using namespace ClientSwitcher;
 
-class TypeAheadFindBar::Private
-{
+class TypeAheadFindBar::Private {
 public:
     void doFind(bool backward = false)    {
         QTextDocument::FindFlags options;

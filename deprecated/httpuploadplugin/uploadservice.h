@@ -5,8 +5,8 @@
  *      Author: rkfg
  */
 
-#ifndef SRC_PLUGINS_GENERIC_HTTPUPLOADPLUGIN_UPLOADSERVICE_H_
-#define SRC_PLUGINS_GENERIC_HTTPUPLOADPLUGIN_UPLOADSERVICE_H_
+#ifndef UPLOADSERVICE_H
+#define UPLOADSERVICE_H
 
 #include <QString>
 
@@ -27,4 +27,4 @@ private:
     int sizeLimit_;
 };
 
-#endif /* SRC_PLUGINS_GENERIC_HTTPUPLOADPLUGIN_UPLOADSERVICE_H_ */
+#endif // UPLOADSERVICE_H

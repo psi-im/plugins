@@ -25,8 +25,7 @@
 #include <QDomElement>
 #include <QStringList>
 
-class TagModel : public QAbstractItemModel
-{
+class TagModel : public QAbstractItemModel {
     Q_OBJECT
 
 public:
@@ -51,10 +50,7 @@ private:
     QModelIndex pIndex;
 };
 
-
-
-class NoteModel : public QAbstractListModel
-{
+class NoteModel : public QAbstractListModel {
     Q_OBJECT
 
 public:
@@ -81,12 +77,12 @@ private:
 
 };
 
-class ProxyModel : public QSortFilterProxyModel
-{
+class ProxyModel : public QSortFilterProxyModel {
     Q_OBJECT
 
 public:
     ProxyModel(QObject *parent = nullptr) : QSortFilterProxyModel(parent) {}
     bool filterAcceptsRow(int sourceRow, const QModelIndex &parent) const;
 };
+
 #endif // TAGSMODEL_H

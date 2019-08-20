@@ -18,12 +18,12 @@
  */
 
 #include "notes.h"
+
 #include "editnote.h"
 #include "notesviewdelegate.h"
 #include "storagenotesplugin.h"
 
 #include <QMessageBox>
-
 
 Notes::Notes(StorageNotesPlugin *storageNotes, int acc, QWidget *parent)
     : QDialog(parent, Qt::Window)

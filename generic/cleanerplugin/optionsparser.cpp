@@ -18,6 +18,7 @@
  */
 
 #include "optionsparser.h"
+
 #include <QFile>
 
 OptionsParser::OptionsParser(const QString& fileName, QObject *parent)

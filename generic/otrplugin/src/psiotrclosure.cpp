@@ -3,8 +3,8 @@
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
- *               2011-2012  Florian Fieber
- *                    2014  Boris Pek (tehnick-8@mail.ru)
+ * Copyright (C) 2011-2012  Florian Fieber
+ * Copyright (C) 2014  Boris Pek (tehnick-8@mail.ru)
  *
  * This program was originally written as part of a diplom thesis
  * advised by Prof. Dr. Ruediger Weis (PST Labor)
@@ -27,23 +27,21 @@
 
 #include "psiotrclosure.h"
 
-#include <QObject>
-#include <QDialog>
-#include <QWidget>
-#include <QVBoxLayout>
-#include <QMessageBox>
-#include <QMenu>
 #include <QAction>
-#include <QLabel>
 #include <QComboBox>
+#include <QDialog>
+#include <QFont>
+#include <QLabel>
 #include <QLineEdit>
+#include <QMenu>
+#include <QMessageBox>
+#include <QObject>
 #include <QProgressBar>
 #include <QPushButton>
-#include <QFont>
+#include <QVBoxLayout>
+#include <QWidget>
 
-namespace psiotr
-{
-
+namespace psiotr {
 AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
                                            const QString& account,
                                            const QString& contact,
@@ -209,7 +207,6 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging* otrc,
     mainLayout->addSpacing(20);
     mainLayout->addLayout(buttonLayout);
     setLayout(mainLayout);
-
 
     connect(m_methodBox, SIGNAL(currentIndexChanged(int)),
             this, SLOT(changeMethod(int)));
@@ -753,4 +750,4 @@ bool PsiOtrClosure::encrypted() const
 
 //-----------------------------------------------------------------------------
 
-} // namespace
+} // namespace psiotr

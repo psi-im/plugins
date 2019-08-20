@@ -1,6 +1,6 @@
 /*
  * invitedialog.h - plugin
- * Copyright (C) 2010-2011  Evgeny Khryukin
+ * Copyright (C) 2010  Evgeny Khryukin, Aleksey Andreev
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,49 +20,70 @@
 #ifndef INVITEDIALOG_H
 #define INVITEDIALOG_H
 
-#include "request.h"
 #include "ui_invitationdialog.h"
 #include "ui_invitedialog.h"
 
 #include <QCloseEvent>
+#include <QDialog>
 
-namespace Chess {
+namespace Ui {
+    class InviteDialog;
+}
+
+namespace GomokuGame {
 class InviteDialog : public QDialog {
     Q_OBJECT
 public:
-    InviteDialog(const Request& r, const QStringList& resources, QWidget *parent = nullptr);
+    InviteDialog(const int account,
+                 const QString &jid,
+                 const QStringList &resources,
+                 QWidget *parent = nullptr);
+    ~InviteDialog();
 
 private:
-    Ui::InviteDialog ui_;
-    QStringList resources_;
-    Request r;
+    Ui::InviteDialog *ui;
+    bool accepted;
+    int myAcc;
+    QString jid_;
+
+protected:
+    void closeEvent(QCloseEvent *event);
 
 private slots:
-    void buttonPressed();
+    void acceptBlack();
+    void acceptWhite();
 
 signals:
-    void play(const Request& r, const QString&, const QString&);
+    void acceptGame(int my_acc, QString jid, QString element);
+    void rejectGame(int my_acc, QString jid);
+
 };
 
 class InvitationDialog : public QDialog {
     Q_OBJECT
 public:
-    InvitationDialog(const QString& jid, QString color, QWidget *parent = nullptr);
+    InvitationDialog(const int account,
+                     const QString &jid,
+                     QString color,
+                     const QString &id,
+                     QWidget *parent = nullptr);
 
 private:
     Ui::InvitationDialog ui_;
-    bool accepted;
+    bool accepted_;
+    int account_;
+    QString id_;
 
 private slots:
     void buttonPressed();
 
 signals:
-    void accept();
-    void reject();
+    void accepted(int, QString);
+    void rejected(int, QString);
 
 protected:
     void closeEvent(QCloseEvent *e);
 };
-} // namespace Chess
+} // namespace GomokuGame
 
 #endif // INVITEDIALOG_H

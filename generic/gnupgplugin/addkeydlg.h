@@ -23,10 +23,11 @@
 #include <QDialog>
 #include <QDate>
 
-namespace Ui { class AddKeyDlg; }
+namespace Ui {
+    class AddKeyDlg;
+}
 
-class AddKeyDlg : public QDialog
-{
+class AddKeyDlg : public QDialog {
     Q_OBJECT
 
 public:

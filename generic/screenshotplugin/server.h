@@ -22,8 +22,9 @@
 
 #include <QListWidgetItem>
 
-class Server : public QListWidgetItem, public QObject
-{
+class Server:
+        public QListWidgetItem,
+        public QObject {
 public:
     Server(QListWidget *parent = nullptr);
     QString displayName() const { return displayName_; };

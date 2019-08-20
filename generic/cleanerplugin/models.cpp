@@ -18,12 +18,12 @@
  */
 
 #include "models.h"
+
 #include "optionsparser.h"
 
 #include <QDateTime>
 #include <QDir>
 #include <QPixmap>
-
 
 //----------------------------------------
 //--BaseModel-----------------------------
@@ -118,7 +118,6 @@ int BaseModel::columnCount(const QModelIndex & /*parent*/) const
     return headers.size();
 }
 
-
 //---------------------------------------
 //------BaseFileModel--------------------
 //---------------------------------------
@@ -127,7 +126,6 @@ void BaseFileModel::reset()
     files_.clear();
     BaseModel::reset();
 }
-
 
 int BaseFileModel::rowCount(const QModelIndex &/* parent*/) const
 {
@@ -216,7 +214,6 @@ void BaseFileModel::setDirs(const QStringList& dirs)
     emit layoutChanged();
 }
 
-
 //----------------------------------------
 //--ClearingModel-------------------------
 //----------------------------------------
@@ -302,7 +299,6 @@ QVariant ClearingVcardModel::data(const QModelIndex & index, int role) const
     return ClearingModel::data(index, role);
 }
 
-
 //----------------------------------------
 //--ClearingHistoryModel------------------
 //----------------------------------------
@@ -342,8 +338,6 @@ QVariant ClearingHistoryModel::data(const QModelIndex & index, int role) const
 
     return ClearingModel::data(index, role);
 }
-
-
 
 //----------------------------------------
 //--ClearingAvatarModel-------------------
@@ -482,9 +476,6 @@ void ClearingOptionsModel::setFile(const QString& fileName)
 
     emit layoutChanged();
 }
-
-
-
 
 //----------------------------------------
 //--ClearingProxyModel--------------------

@@ -22,12 +22,13 @@
  *
  */
 
-//#include <QtCore>
+#include "clientswitcherplugin.h"
+
+#include "viewer.h"
+
 //#include <QDomDocument>
 #include <QMetaObject>
-
-#include "clientswitcherplugin.h"
-#include "viewer.h"
+//#include <QtCore>
 
 #define cVer                    "0.0.18"
 #define constPluginShortName    "clientswitcher"
@@ -38,7 +39,6 @@
 #define constShowLogWidth       "showlogwidth"
 #define constLastLogItem        "lastlogview"
 #define constPopupDuration      "popupduration"
-
 
 ClientSwitcherPlugin::ClientSwitcherPlugin() :
     sender_(nullptr),
@@ -677,7 +677,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
 }
 
 QString ClientSwitcherPlugin::pluginInfo() {
-    return tr("Authors: ") +  "Liuch\n\n"
+    return tr("Authors: ") +  "Aleksey Andreev\n\n"
          + tr("The plugin is intended for substitution of the client version, his name and operating system type.\n"
               "You can specify the version of the client and OS or to select them from the preset list.\n");
 }

@@ -17,8 +17,8 @@
  *
  */
 
-
 #include "proxysettingsdlg.h"
+
 #include "ui_proxysettingsdlg.h"
 
 ProxySettingsDlg::ProxySettingsDlg(QWidget *parent)

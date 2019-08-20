@@ -18,8 +18,10 @@
  */
 
 #include "screenshotoptions.h"
-#include "options.h"
+
 #include "defines.h"
+#include "options.h"
+
 #include <QTimer>
 
 ScreenshotOptions::ScreenshotOptions(int delay, QWidget *parent)

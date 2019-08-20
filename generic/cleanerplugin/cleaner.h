@@ -20,14 +20,13 @@
 #ifndef CLEANER_H
 #define CLEANER_H
 
-#include <QMainWindow>
 #include "cleanerplugin.h"
-#include "ui_cleaner.h"
 #include "models.h"
+#include "ui_cleaner.h"
 
+#include <QMainWindow>
 
-class CleanerMainWindow : public QMainWindow
-{
+class CleanerMainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
@@ -82,6 +81,5 @@ private:
     ClearingProxyModel *proxyHistoryModel_, *proxyVcardsModel_;
     QSortFilterProxyModel *proxyAvatarModel_, *proxyOptionsModel_;
 };
-
 
 #endif // CLEANER_H

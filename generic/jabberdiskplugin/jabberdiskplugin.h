@@ -20,32 +20,38 @@
 #ifndef JABBERDISKPLUGIN_H
 #define JABBERDISKPLUGIN_H
 
-class QAction;
-class QDomElement;
-
-#include "psiplugin.h"
-#include "iconfactoryaccessor.h"
-#include "iconfactoryaccessinghost.h"
-#include "stanzasender.h"
-#include "stanzasendinghost.h"
 #include "accountinfoaccessinghost.h"
 #include "accountinfoaccessor.h"
-#include "stanzafilter.h"
-//#include "popupaccessor.h"
-//#include "popupaccessinghost.h"
+#include "iconfactoryaccessinghost.h"
+#include "iconfactoryaccessor.h"
 #include "menuaccessor.h"
-#include "plugininfoprovider.h"
 #include "optionaccessinghost.h"
 #include "optionaccessor.h"
-
+//#include "popupaccessinghost.h"
+//#include "popupaccessor.h"
+#include "plugininfoprovider.h"
+#include "psiplugin.h"
+#include "stanzafilter.h"
+#include "stanzasender.h"
+#include "stanzasendinghost.h"
 #include "ui_options.h"
 
 #define constVersion "0.0.4"
 
-class JabberDiskPlugin : public QObject, public PsiPlugin, public StanzaSender, public IconFactoryAccessor,
-    public PluginInfoProvider, public StanzaFilter, public MenuAccessor, public AccountInfoAccessor, public OptionAccessor
-    /*, public PopupAccessor,*/
-{
+class QAction;
+class QDomElement;
+
+class JabberDiskPlugin:
+        public AccountInfoAccessor,
+        public IconFactoryAccessor,
+        public MenuAccessor,
+        public OptionAccessor,
+        /* public PopupAccessor,*/
+        public PluginInfoProvider,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter,
+        public StanzaSender {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.JabberDiskPlugin")
     Q_INTERFACES(PsiPlugin StanzaFilter StanzaSender IconFactoryAccessor AccountInfoAccessor//  PopupAccessor
@@ -78,7 +84,6 @@ public:
     virtual QString pluginInfo();
     virtual QPixmap icon() const;
 
-
 //signals:
 
 private slots:
@@ -87,7 +92,6 @@ private slots:
 
 private:
     void hack();
-
 
 private:
     bool enabled;
@@ -100,4 +104,4 @@ private:
 //        PopupAccessingHost* popup;
 };
 
-#endif
+#endif // JABBERDISKPLUGIN_H

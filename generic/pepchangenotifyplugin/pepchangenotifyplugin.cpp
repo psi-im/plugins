@@ -17,27 +17,27 @@
  *
  */
 
-#include <QFileDialog>
-#include <QDomElement>
-#include "psiplugin.h"
-#include "stanzafilter.h"
-#include "accountinfoaccessor.h"
 #include "accountinfoaccessinghost.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
-#include "popupaccessor.h"
-#include "popupaccessinghost.h"
-#include "plugininfoprovider.h"
+#include "accountinfoaccessor.h"
 #include "applicationinfoaccessinghost.h"
 #include "applicationinfoaccessor.h"
-#include "contactinfoaccessor.h"
 #include "contactinfoaccessinghost.h"
+#include "contactinfoaccessor.h"
 #include "iconfactoryaccessinghost.h"
 #include "iconfactoryaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "popupaccessinghost.h"
+#include "popupaccessor.h"
+#include "psiplugin.h"
 #include "soundaccessinghost.h"
 #include "soundaccessor.h"
-
+#include "stanzafilter.h"
 #include "ui_options.h"
+
+#include <QDomElement>
+#include <QFileDialog>
 
 #define cVer "0.1.0"
 #define constSoundFile "sndfl"
@@ -54,10 +54,18 @@
 //delays in secconds
 const int connectDelay = 30;
 
-class PepPlugin: public QObject, public PsiPlugin, public StanzaFilter, public AccountInfoAccessor,
-            public OptionAccessor, public PopupAccessor, public PluginInfoProvider, public SoundAccessor,
-            public ApplicationInfoAccessor, public ContactInfoAccessor, public IconFactoryAccessor
-{
+class PepPlugin:
+        public AccountInfoAccessor,
+        public ApplicationInfoAccessor,
+        public ContactInfoAccessor,
+        public IconFactoryAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PopupAccessor,
+        public PsiPlugin,
+        public QObject,
+        public SoundAccessor,
+        public StanzaFilter {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.PepPlugin")
     Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor OptionAccessor PopupAccessor SoundAccessor
@@ -85,7 +93,6 @@ public:
     virtual void setSoundAccessingHost(SoundAccessingHost* host);
     virtual QString pluginInfo();
     virtual QPixmap icon() const;
-
 
 private:
     bool enabled;
@@ -555,7 +562,7 @@ QDomElement PepPlugin::getFirstChildElement(const QDomElement &elem)
 
 QString PepPlugin::pluginInfo()
 {
-    return tr("Author: ") +  "Dealer_WeARE\n"
+    return tr("Author: ") +  "Evgeny Khryukin\n"
             + tr("Email: ") + "wadealer@gmail.com\n\n"
             + tr("This plugin shows popup notifications when users from your roster changes their mood, tune or activity.");
 }

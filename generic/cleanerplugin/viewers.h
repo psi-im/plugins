@@ -20,15 +20,13 @@
 #ifndef VIEWERS_H
 #define VIEWERS_H
 
-#include <QTableView>
-#include <QKeyEvent>
 #include <QItemDelegate>
-
+#include <QKeyEvent>
+#include <QTableView>
 
 class IconFactoryAccessingHost;
 
-class ClearingViewer : public QTableView
-{
+class ClearingViewer : public QTableView {
     Q_OBJECT
 
 public:
@@ -48,10 +46,7 @@ private slots:
 
 };
 
-
-
-class AvatarDelegate : public QItemDelegate
-{
+class AvatarDelegate : public QItemDelegate {
     Q_OBJECT
 
 public:
@@ -60,6 +55,5 @@ public:
     virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 
 };
-
 
 #endif // VIEWERS_H

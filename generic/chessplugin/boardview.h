@@ -23,8 +23,7 @@
 #include <QTableView>
 #include <QMouseEvent>
 
-class BoardView : public QTableView
-{
+class BoardView : public QTableView {
     Q_OBJECT
 
 public:

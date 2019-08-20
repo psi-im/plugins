@@ -17,32 +17,31 @@
  *
  */
 
-#include <QFileDialog>
-#include <QDomElement>
-
-#include "psiplugin.h"
-#include "stanzafilter.h"
-#include "accountinfoaccessor.h"
 #include "accountinfoaccessinghost.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
+#include "accountinfoaccessor.h"
 #include "activetabaccessinghost.h"
 #include "activetabaccessor.h"
-#include "stanzasender.h"
-#include "stanzasendinghost.h"
-#include "iconfactoryaccessor.h"
-#include "iconfactoryaccessinghost.h"
-#include "toolbariconaccessor.h"
-#include "popupaccessor.h"
-#include "popupaccessinghost.h"
-#include "menuaccessor.h"
-#include "applicationinfoaccessor.h"
 #include "applicationinfoaccessinghost.h"
+#include "applicationinfoaccessor.h"
+#include "iconfactoryaccessinghost.h"
+#include "iconfactoryaccessor.h"
+#include "menuaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
 #include "plugininfoprovider.h"
+#include "popupaccessinghost.h"
+#include "popupaccessor.h"
+#include "psiplugin.h"
 #include "soundaccessinghost.h"
 #include "soundaccessor.h"
-
+#include "stanzafilter.h"
+#include "stanzasender.h"
+#include "stanzasendinghost.h"
+#include "toolbariconaccessor.h"
 #include "ui_options.h"
+
+#include <QDomElement>
+#include <QFileDialog>
 
 #define cVer "0.2.0"
 #define constSoundFile "sndfl"
@@ -53,11 +52,21 @@
 
 #define POPUP_OPTION "Attention Plugin"
 
-class AttentionPlugin: public QObject, public PsiPlugin, public StanzaFilter, public AccountInfoAccessor,
-                       public OptionAccessor, public ActiveTabAccessor, public ToolbarIconAccessor, public ApplicationInfoAccessor,
-                       public IconFactoryAccessor, public PopupAccessor, public StanzaSender, public MenuAccessor, public PluginInfoProvider,
-                       public SoundAccessor
-{
+class AttentionPlugin:
+        public AccountInfoAccessor,
+        public ActiveTabAccessor,
+        public ApplicationInfoAccessor,
+        public IconFactoryAccessor,
+        public MenuAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PopupAccessor,
+        public PsiPlugin,
+        public QObject,
+        public SoundAccessor,
+        public StanzaFilter,
+        public StanzaSender,
+        public ToolbarIconAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.AttentionPlugin")
     Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor OptionAccessor ActiveTabAccessor ApplicationInfoAccessor
@@ -113,7 +122,6 @@ private:
     QPointer<QWidget> options_;
     int popupId;
 
-
     struct Blocked {
         int Acc;
         QString Jid;
@@ -122,7 +130,6 @@ private:
     QVector<Blocked> blockedJids_;
 
     Ui::Options ui_;
-
 
     enum { FakeAccount = 9999 };
 
@@ -281,8 +288,6 @@ bool AttentionPlugin::incomingStanza(int account, const QDomElement& stanza) {
 
               else
               nudgeWindow_ = qApp->activeWindow();*/
-
-
 
             if(nudgeWindow_ && nudgeWindow_->isVisible())
                 nudge();
@@ -526,7 +531,7 @@ void AttentionPlugin::nudgeTimerTimeout() {
 }
 
 QString AttentionPlugin::pluginInfo() {
-    return tr("Author: ") +     "Dealer_WeARE\n"
+    return tr("Author: ") +     "Evgeny Khryukin\n"
          + tr("Email: ") + "wadealer@gmail.com\n\n"
          + tr("This plugin is designed to send and receive special messages such as Attentions.\n"
               "To work correctly, the plugin requires that the client of the other part supports XEP-0224 (for example: Pidgin, Miranda IM with Nudge plugin).");

@@ -17,8 +17,9 @@
  *
  */
 
-#include <QKeyEvent>
 #include "captchadialog.h"
+
+#include <QKeyEvent>
 
 CaptchaDialog::CaptchaDialog(const QString& id, QWidget *p)
     : QDialog(p)

@@ -17,13 +17,14 @@
  *
  */
 
-#include <QTimer>
+#include "jd_commands.h"
+
+#include "jabberdiskcontroller.h"
+
+#include <QDomElement>
 #include <QEventLoop>
 #include <QStringList>
-#include <QDomElement>
-
-#include "jd_commands.h"
-#include "jabberdiskcontroller.h"
+#include <QTimer>
 
 #define TIMER_INTERVAL 5000
 

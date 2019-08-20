@@ -1,5 +1,5 @@
 /*
- * pluginwindow.cpp - Battleship Game plugin
+ * pluginwindow.cpp - plugin
  * Copyright (C) 2014  Aleksey Andreev
  *
  * This program is free software; you can redistribute it and/or
@@ -18,6 +18,7 @@
  */
 
 #include "pluginwindow.h"
+
 #include "boarddelegate.h"
 
 PluginWindow::PluginWindow(const QString &jid, QWidget *parent)

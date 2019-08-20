@@ -17,46 +17,47 @@
  *
  */
 
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QTableWidgetItem>
-#include <QTableWidget>
-#include <QLineEdit>
-#include <QCheckBox>
-#include <QHeaderView>
-#include <QPushButton>
-#include <QTextEdit>
-#include <QLabel>
-#include <QApplication>
-#include <QMap>
-#include <QAction>
-#include "psiplugin.h"
-#include "shortcutaccessor.h"
-#include "shortcutaccessinghost.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
-#include "activetabaccessor.h"
 #include "activetabaccessinghost.h"
-#include "plugininfoprovider.h"
+#include "activetabaccessor.h"
 #include "chattabaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "psiplugin.h"
+#include "shortcutaccessinghost.h"
+#include "shortcutaccessor.h"
 
+#include <QAction>
+#include <QApplication>
+#include <QCheckBox>
+#include <QHBoxLayout>
+#include <QHeaderView>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMap>
+#include <QPushButton>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QTextEdit>
+#include <QVBoxLayout>
+
+#define constVersion "0.4.6"
 #define constOld "oldsymbol"
 #define constNew "newsymbol"
 #define constShortCut "shortcut"
 #define constNotTranslate "nottranslate"
-#define constVersion "0.4.6"
 
 static const QString mucData = "groupchat";
 static const QString chatData = "chat";
 
-class TranslatePlugin : public QObject
-                      , public PsiPlugin
-                      , public OptionAccessor
-                      , public ShortcutAccessor
-                      , public ActiveTabAccessor
-                      , public PluginInfoProvider
-                      , public ChatTabAccessor
-{
+class TranslatePlugin:
+        public ActiveTabAccessor,
+        public ChatTabAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiPlugin,
+        public QObject,
+        public ShortcutAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.TranslatePlugin")
     Q_INTERFACES(PsiPlugin OptionAccessor ShortcutAccessor ActiveTabAccessor PluginInfoProvider ChatTabAccessor)
@@ -487,7 +488,6 @@ void TranslatePlugin::restoreOptions()
         table->setItem(table->rowCount()-1,1,new QTableWidgetItem(map.value(symbol)));
     }
 }
-
 
 void TranslatePlugin::del()
 {

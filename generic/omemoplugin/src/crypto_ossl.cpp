@@ -1,6 +1,6 @@
 /*
  * OMEMO Plugin for Psi
- * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2018  Vyacheslav Karpukhin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,9 +17,10 @@
  *
  */
 
+#include "crypto.h"
+
 #include <QVector>
 
-#include "crypto.h"
 extern "C" {
 #include <openssl/hmac.h>
 #include <openssl/rand.h>
@@ -168,7 +169,6 @@ namespace psiomemo {
     int length;
     QVector<uint8_t> vector(ciphertext.length() + EVP_CIPHER_CTX_block_size(ctx));
 
-
     res = updateF(ctx, vector.data(), &length, reinterpret_cast<const unsigned char *>(ciphertext.data()), ciphertext.length());
 
     if (res == 1) {
@@ -197,7 +197,6 @@ namespace psiomemo {
 
     return qMakePair(cryptoText, outTag);
   }
-
 
   QPair<QByteArray, QByteArray> Crypto::aes_gcm(Crypto::Direction direction,
                                                 const QByteArray &iv,
@@ -264,4 +263,4 @@ namespace psiomemo {
     Q_UNUSED(user_data);
     return aes(Crypto::Encode, output, cipherMode, key, key_len, iv, iv_len, plaintext, plaintext_len);
   }
-}
+} // namespace psiomemo

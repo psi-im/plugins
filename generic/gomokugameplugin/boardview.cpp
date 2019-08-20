@@ -22,9 +22,9 @@
  *
  */
 
-#include <QHeaderView>
-
 #include "boardview.h"
+
+#include <QHeaderView>
 
 using namespace GomokuGame;
 

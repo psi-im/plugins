@@ -20,13 +20,12 @@
 #ifndef BOARDDELEGATE_H
 #define BOARDDELEGATE_H
 
+#include "boardmodel.h"
+
 #include <QItemDelegate>
 #include <QPainter>
 
-#include "boardmodel.h"
-
-class BoardDelegate : public QItemDelegate
-{
+class BoardDelegate : public QItemDelegate {
     Q_OBJECT
 public:
     BoardDelegate(BoardModel *model, QObject *parent = nullptr);

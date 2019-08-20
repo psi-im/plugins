@@ -18,6 +18,7 @@
  */
 
 #include "boardview.h"
+
 #include "boarddelegate.h"
 #include "boardmodel.h"
 

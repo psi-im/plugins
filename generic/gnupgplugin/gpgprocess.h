@@ -22,8 +22,7 @@
 
 #include <QProcess>
 
-class GpgProcess : public QProcess
-{
+class GpgProcess : public QProcess {
     Q_OBJECT
 
 public:

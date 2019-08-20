@@ -20,14 +20,11 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-
-
-#include <QDialog>
 #include "ui_clearingtab.h"
 
+#include <QDialog>
 
-class vCardView : public QDialog
-{
+class vCardView : public QDialog {
     Q_OBJECT
 
 public:
@@ -35,10 +32,7 @@ public:
 
 };
 
-
-
-class HistoryView : public QDialog
-{
+class HistoryView : public QDialog {
     Q_OBJECT
 
 public:
@@ -46,21 +40,16 @@ public:
 
 };
 
-
-
-
-class ClearingTab : public QWidget, public Ui::ClearingTab
-{
+class ClearingTab:
+        public QWidget,
+        public Ui::ClearingTab {
     Q_OBJECT
 
 public:
     ClearingTab(QWidget * parent = nullptr) : QWidget(parent) { setupUi(this); };
 };
 
-
-
-class AvatarView : public QDialog
-{
+class AvatarView : public QDialog {
     Q_OBJECT
 
 public:

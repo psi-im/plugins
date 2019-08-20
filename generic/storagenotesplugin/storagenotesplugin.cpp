@@ -18,12 +18,13 @@
  */
 
 #include "storagenotesplugin.h"
+
 #include "notescontroller.h"
 
-#include <QLabel>
-#include <QVBoxLayout>
 #include <QDomElement>
 #include <QIcon>
+#include <QLabel>
+#include <QVBoxLayout>
 
 StorageNotesPlugin::StorageNotesPlugin()
     : stanzaSender(nullptr)
@@ -169,7 +170,7 @@ QList < QVariantHash > StorageNotesPlugin::getContactMenuParam()
 }
 
 QString StorageNotesPlugin::pluginInfo() {
-    return tr("Author: ") +  "Dealer_WeARE\n"
+    return tr("Author: ") +  "Evgeny Khryukin\n"
             + tr("Email: ") + "wadealer@gmail.com\n\n"
             + tr("This plugin is an implementation of XEP-0049: Private XML Storage.\n"
                  "The plugin is fully compatible with notes saved using Miranda IM.\n"

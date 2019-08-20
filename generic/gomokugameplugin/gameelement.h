@@ -27,8 +27,7 @@
 
 #include <QPainter>
 
-class GameElement
-{
+class GameElement {
 public:
     enum ElementType {
         TypeNone,

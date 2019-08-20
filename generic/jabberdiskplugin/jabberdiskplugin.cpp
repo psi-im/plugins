@@ -17,12 +17,12 @@
  *
  */
 
-#include <QDomElement>
-#include <QAction>
-
 #include "jabberdiskplugin.h"
+
 #include "jabberdiskcontroller.h"
 
+#include <QAction>
+#include <QDomElement>
 
 static const QString constJids_ = "jids";
 
@@ -212,7 +212,7 @@ QAction* JabberDiskPlugin::getContactAction(QObject *p, int acc, const QString &
 
 QString JabberDiskPlugin::pluginInfo()
 {
-    return tr("Author: ") +  "Dealer_WeARE\n"
+    return tr("Author: ") +  "Evgeny Khryukin\n"
             + tr("Email: ") + "wadealer@gmail.com\n\n";
 }
 

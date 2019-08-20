@@ -1,6 +1,6 @@
 /*
  * juickjidlist.h - plugin
- * Copyright (C) 2010 Evgeny Khryukin
+ * Copyright (C) 2010  Evgeny Khryukin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,8 +26,7 @@ namespace Ui {
     class JuickJidDialog;
 }
 
-class JuickJidList : public QDialog
-{
+class JuickJidList : public QDialog {
     Q_OBJECT
 public:
     JuickJidList(const QStringList& jids, QWidget *p = nullptr);

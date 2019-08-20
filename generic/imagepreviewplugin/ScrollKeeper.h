@@ -5,11 +5,11 @@
  *      Author: rkfg
  */
 
-#ifndef SRC_PLUGINS_GENERIC_IMAGEPREVIEWPLUGIN_SCROLLKEEPER_H_
-#define SRC_PLUGINS_GENERIC_IMAGEPREVIEWPLUGIN_SCROLLKEEPER_H_
+#ifndef SCROLLKEEPER_H
+#define SCROLLKEEPER_H
 
-#include <QWidget>
 #include <QTextEdit>
+#include <QWidget>
 
 class QWebFrame;
 
@@ -24,4 +24,4 @@ public:
     virtual ~ScrollKeeper();
 };
 
-#endif /* SRC_PLUGINS_GENERIC_IMAGEPREVIEWPLUGIN_SCROLLKEEPER_H_ */
+#endif // SCROLLKEEPER_H

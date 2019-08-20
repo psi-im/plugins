@@ -3,8 +3,8 @@
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
- *                    2011  Florian Fieber
- *                    2014  Boris Pek (tehnick-8@mail.ru)
+ * Copyright (C) 2011  Florian Fieber
+ * Copyright (C) 2014  Boris Pek (tehnick-8@mail.ru)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,22 +21,18 @@
  *
  */
 
-#ifndef OTRMESSAGING_H_
-#define OTRMESSAGING_H_
+#ifndef OTRMESSAGING_H
+#define OTRMESSAGING_H
 
-#include <QList>
 #include <QHash>
+#include <QList>
 #include <QString>
 
 class OtrInternal;
 
 // ---------------------------------------------------------------------------
-
-namespace psiotr
-{
-
+namespace psiotr {
 // ---------------------------------------------------------------------------
-
 enum OtrPolicy
 {
     OTR_POLICY_OFF,
@@ -91,8 +87,7 @@ enum OtrNotifyType
 /**
  * Interface for callbacks from libotr to application
  */
-class OtrCallback
-{
+class OtrCallback {
 public:
     virtual QString dataDir() = 0;
 
@@ -176,8 +171,7 @@ struct Fingerprint
  * This class is the interface to the Off the Record Messaging library.
  * See the libotr documentation for more information.
  */
-class OtrMessaging
-{
+class OtrMessaging {
 public:
 
     /**
@@ -369,4 +363,4 @@ private:
 
 } // namespace psiotr
 
-#endif
+#endif // OTRMESSAGING_H

@@ -22,9 +22,7 @@
 
 #include "ui_captchadialog.h"
 
-
-class CaptchaDialog : public QDialog
-{
+class CaptchaDialog : public QDialog {
     Q_OBJECT
 public:
     CaptchaDialog(const QString& id, QWidget *p = 0);

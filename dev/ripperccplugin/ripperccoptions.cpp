@@ -1,6 +1,5 @@
 /*
- * ripperccoptions.cpp
- *
+ * ripperccoptions.cpp - plugin
  * Copyright (C) 2016
  *
  * This program is free software; you can redistribute it and/or
@@ -15,12 +14,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 #include "ripperccoptions.h"
-#include "ui_ripperccoptions.h"
 
 #include "optionaccessinghost.h"
+#include "ui_ripperccoptions.h"
 
 RipperCCOptions::RipperCCOptions(QWidget *parent) :
     QWidget(parent),

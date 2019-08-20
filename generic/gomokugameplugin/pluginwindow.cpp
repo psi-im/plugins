@@ -22,16 +22,17 @@
  *
  */
 
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QFile>
-#include <QTextStream>
-
 #include "pluginwindow.h"
-#include "ui_pluginwindow.h"
+
 #include "common.h"
-#include "options.h"
 #include "gamemodel.h"
+#include "options.h"
+#include "ui_pluginwindow.h"
+
+#include <QFile>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QTextStream>
 
 const QString fileFilter = "Gomoku save files (*.gmk)";
 

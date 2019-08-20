@@ -1,5 +1,5 @@
 /*
- * gnupg.cpp - plugin main class
+ * gnupg.cpp - plugin
  *
  * Copyright (C) 2013  Ivan Romanov <drizt@land.ru>
  *
@@ -17,21 +17,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <QDomElement>
-#include <QMessageBox>
-#include <QFile>
-#include <QCursor>
-#include <QMenu>
-#include "options.h"
 #include "gnupg.h"
+
+#include "accountinfoaccessinghost.h"
+#include "activetabaccessinghost.h"
 #include "gpgprocess.h"
-#include "psiaccountcontrollinghost.h"
-#include "optionaccessinghost.h"
 #include "iconfactoryaccessinghost.h"
 #include "model.h"
-#include "activetabaccessinghost.h"
-#include "accountinfoaccessinghost.h"
+#include "optionaccessinghost.h"
+#include "options.h"
+#include "psiaccountcontrollinghost.h"
 #include "stanzasendinghost.h"
+
+#include <QCursor>
+#include <QDomElement>
+#include <QFile>
+#include <QMenu>
+#include <QMessageBox>
 
 GnuPG::GnuPG()
     : _enabled(false)
@@ -45,7 +47,6 @@ GnuPG::GnuPG()
     , _accountInfo(nullptr)
 {
 }
-
 
 GnuPG::~GnuPG()
 {

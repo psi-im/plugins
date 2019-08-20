@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Evgeny Khryukin
+ * Copyright (C) 2016  Evgeny Khryukin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,29 +19,36 @@
 #ifndef ENUMMESSAGESPLUGIN_H
 #define ENUMMESSAGESPLUGIN_H
 
+#include "activetabaccessor.h"
+#include "applicationinfoaccessor.h"
+#include "chattabaccessor.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "psiaccountcontroller.h"
 #include "psiplugin.h"
 #include "stanzafilter.h"
-#include "optionaccessor.h"
-#include "activetabaccessor.h"
-#include "plugininfoprovider.h"
-#include "chattabaccessor.h"
-#include "applicationinfoaccessor.h"
-#include "psiaccountcontroller.h"
 #include "toolbariconaccessor.h"
 #include "ui_options.h"
 
 #include <QColor>
 #include <QPointer>
 
-class OptionAccessingHost;
 class ActiveTabAccessingHost;
 class ApplicationInfoAccessingHost;
+class OptionAccessingHost;
 class QDomDocument;
 
-class EnumMessagesPlugin : public QObject, public PsiPlugin, public OptionAccessor, public ActiveTabAccessor,
-            public StanzaFilter, public ApplicationInfoAccessor, public PluginInfoProvider,
-            public ChatTabAccessor, public PsiAccountController, public ToolbarIconAccessor
-{
+class EnumMessagesPlugin:
+        public ActiveTabAccessor,
+        public ApplicationInfoAccessor,
+        public ChatTabAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiAccountController,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter,
+        public ToolbarIconAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.EnumMessagesPlugin")
     Q_INTERFACES(PsiPlugin OptionAccessor ActiveTabAccessor StanzaFilter

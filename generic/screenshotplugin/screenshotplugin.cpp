@@ -17,30 +17,34 @@
  *
  */
 
-class QAction;
-
-#include "psiplugin.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
-#include "shortcutaccessor.h"
-#include "shortcutaccessinghost.h"
-#include "plugininfoprovider.h"
+#include "applicationinfoaccessinghost.h"
+#include "applicationinfoaccessor.h"
+#include "controller.h"
+#include "defines.h"
 #include "iconfactoryaccessinghost.h"
 #include "iconfactoryaccessor.h"
 #include "menuaccessor.h"
-#include "applicationinfoaccessinghost.h"
-#include "applicationinfoaccessor.h"
-
-#include "defines.h"
-#include "optionswidget.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
 #include "options.h"
+#include "optionswidget.h"
+#include "plugininfoprovider.h"
+#include "psiplugin.h"
 #include "screenshoticonset.h"
-#include "controller.h"
+#include "shortcutaccessinghost.h"
+#include "shortcutaccessor.h"
 
+class QAction;
 
-class ScreenshotPlugin : public QObject, public PsiPlugin, public OptionAccessor, public ShortcutAccessor, public PluginInfoProvider,
-        public IconFactoryAccessor, public MenuAccessor, public ApplicationInfoAccessor
-{
+class ScreenshotPlugin:
+        public ApplicationInfoAccessor,
+        public IconFactoryAccessor,
+        public MenuAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiPlugin,
+        public QObject,
+        public ShortcutAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.ScreenshotPlugin")
     Q_INTERFACES(PsiPlugin OptionAccessor ShortcutAccessor PluginInfoProvider IconFactoryAccessor MenuAccessor ApplicationInfoAccessor)
@@ -70,7 +74,6 @@ public:
 
     virtual QString pluginInfo();
     virtual QPixmap icon() const;
-
 
 private slots:
     void openImage();
@@ -226,7 +229,7 @@ void ScreenshotPlugin::restoreOptions()
 
 QString ScreenshotPlugin::pluginInfo()
 {
-    return tr("Authors: ") +  "C.H., Dealer_WeARE\n\n"
+    return tr("Authors: ") +  "C.H., Evgeny Khryukin\n\n"
             + tr("This plugin allows you to make screenshots and save them to your hard drive or upload them to an FTP or HTTP server.\n"
              "The plugin has the following settings:\n"
              "* Shortcut -- hotkey to make the screenshot (by default, Ctrl+Alt+P)\n"

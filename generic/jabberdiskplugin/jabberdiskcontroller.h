@@ -17,23 +17,22 @@
  *
  */
 
-
 #ifndef JABBERDISKCONTROLLER_H
 #define JABBERDISKCONTROLLER_H
 
-//class QIcon;
-class JDMainWin;
-struct Session;
-class QDomElement;
+#include "accountinfoaccessinghost.h"
+//#include "iconfactoryaccessinghost.h"
+#include "stanzasendinghost.h"
 
 #include <QObject>
 
-//#include "iconfactoryaccessinghost.h"
-#include "stanzasendinghost.h"
-#include "accountinfoaccessinghost.h"
+struct Session;
 
-class JabberDiskController : public QObject
-{
+class JDMainWin;
+class QDomElement;
+//class QIcon;
+
+class JabberDiskController : public QObject {
     Q_OBJECT
 public:
     static JabberDiskController* instance();

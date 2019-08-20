@@ -17,18 +17,17 @@
  *
  */
 
-#include <QDomElement>
-#include <QDateTime>
-#include <QTextDocument>
-
 #include "redirectplugin.h"
 
-#include "optionaccessinghost.h"
-#include "stanzasendinghost.h"
 #include "accountinfoaccessinghost.h"
 #include "applicationinfoaccessinghost.h"
 #include "contactinfoaccessinghost.h"
+#include "optionaccessinghost.h"
+#include "stanzasendinghost.h"
 
+#include <QDateTime>
+#include <QDomElement>
+#include <QTextDocument>
 
 bool Redirector::enable() {
     if (psiOptions) {
@@ -115,7 +114,7 @@ bool Redirector::outgoingStanza(int /*account*/, QDomElement& /*xml*/) {
 }
 
 QString Redirector::pluginInfo() {
-    return tr("Author: ") +  "rion\n"
+    return tr("Author: ") +  "Sergey Ilinykh\n"
             + tr("Email: ") + "rion4ik@gmail.com\n\n"
             + trUtf8("Redirects all incoming messages to some jid and allows one to redirect messages back.");
 }

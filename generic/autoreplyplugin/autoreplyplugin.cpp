@@ -17,27 +17,27 @@
  *
  */
 
-#include <QSpinBox>
-#include <QCheckBox>
-#include <QTextEdit>
-#include <QDomElement>
-#include <QComboBox>
-#include <QLabel>
-#include <QGroupBox>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-
-#include "psiplugin.h"
-#include "optionaccessor.h"
+#include "accountinfoaccessinghost.h"
+#include "accountinfoaccessor.h"
+#include "activetabaccessinghost.h"
+#include "activetabaccessor.h"
 #include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "psiplugin.h"
 #include "stanzafilter.h"
 #include "stanzasender.h"
 #include "stanzasendinghost.h"
-#include "activetabaccessor.h"
-#include "activetabaccessinghost.h"
-#include "accountinfoaccessor.h"
-#include "accountinfoaccessinghost.h"
-#include "plugininfoprovider.h"
+
+#include <QCheckBox>
+#include <QComboBox>
+#include <QDomElement>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QSpinBox>
+#include <QTextEdit>
+#include <QVBoxLayout>
 
 #define cVer "0.3.2"
 #define constMessage "mssg"
@@ -56,9 +56,15 @@
 #define constSXa "xa"
 #define constNotInRoster "ntnrstr"
 
-class AutoReply: public QObject, public PsiPlugin, public OptionAccessor, public StanzaSender,    public StanzaFilter,
-                 public ActiveTabAccessor, public AccountInfoAccessor, public PluginInfoProvider
-{
+class AutoReply:
+        public AccountInfoAccessor,
+        public ActiveTabAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter,
+        public StanzaSender {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.AutoReplyPlugin")
     Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter ActiveTabAccessor AccountInfoAccessor PluginInfoProvider)
@@ -745,7 +751,7 @@ void AutoReply::setEnableDisableText(int Arg) {
 }
 
 QString AutoReply::pluginInfo() {
-    return tr("Author: ") +     "Dealer_WeARE\n"
+    return tr("Author: ") +     "Evgeny Khryukin\n"
          + tr("Email: ") + "wadealer@gmail.com\n\n"
          + tr("This plugin acts as an auto-answering machine. It has a number of simple configuration options, which you can use to:\n"
               "* set a text message for auto-answer\n"

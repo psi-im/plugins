@@ -22,8 +22,7 @@
 
 #include <QModelIndex>
 
-class JDItem
-{
+class JDItem {
 public:
     enum Type { None, Dir, File };
 
@@ -81,8 +80,7 @@ struct ProxyItem {
     }
 };
 
-class ItemsList : public QList<ProxyItem>
-{
+class ItemsList : public QList<ProxyItem> {
 public:
     ItemsList();
     ~ItemsList();

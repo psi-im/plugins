@@ -22,8 +22,7 @@
 
 #include <QTreeView>
 
-class JDView : public QTreeView
-{
+class JDView : public QTreeView {
     Q_OBJECT
 public:
     JDView(QWidget *p = nullptr);

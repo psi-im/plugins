@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef CONTENTITEM_H
 #define CONTENTITEM_H
 
@@ -24,8 +23,7 @@
 #include <QVariant>
 #include <QString>
 
-class ContentItem
-{
+class ContentItem {
 public:
     ContentItem(const QString &name, ContentItem *parent = nullptr);
     ~ContentItem();
@@ -67,4 +65,4 @@ private:
     bool isInstalled_;
 };
 
-#endif
+#endif // CONTENTITEM_H

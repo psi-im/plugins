@@ -20,13 +20,12 @@
 #ifndef SKIN_H
 #define SKIN_H
 
+#include "ui_getskinname.h"
+#include "ui_previewer.h"
+
 #include <QListWidgetItem>
 
-#include "ui_previewer.h"
-#include "ui_getskinname.h"
-
-class Skin : public QListWidgetItem
-{
+class Skin : public QListWidgetItem {
     public:
          Skin(QListWidget* parent) : QListWidgetItem(parent) {}
          ~Skin() {}
@@ -41,8 +40,7 @@ class Skin : public QListWidgetItem
 
 };
 
-class Previewer : public QDialog
-{
+class Previewer : public QDialog {
     Q_OBJECT
     public:
         Previewer(Skin *skin, QWidget *parent = nullptr);
@@ -57,8 +55,7 @@ class Previewer : public QDialog
 
 };
 
-class GetSkinName : public QDialog
-{
+class GetSkinName : public QDialog {
     Q_OBJECT
     public:
         GetSkinName(QString name, QString author, QString version, QWidget *parent = nullptr);

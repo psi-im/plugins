@@ -17,6 +17,7 @@
  *
  */
 #include "jd_view.h"
+
 #include <QMouseEvent>
 
 JDView::JDView(QWidget* p)

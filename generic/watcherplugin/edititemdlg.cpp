@@ -18,8 +18,10 @@
  */
 
 #include "edititemdlg.h"
+
 #include "iconfactoryaccessinghost.h"
 #include "optionaccessinghost.h"
+
 #include <QFileDialog>
 
 static const QString splitStr = "&split&";

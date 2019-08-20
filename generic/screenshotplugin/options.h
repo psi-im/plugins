@@ -25,8 +25,7 @@
 //for Psi plugin only
 class OptionAccessingHost;
 
-class Options : public QObject
-{
+class Options : public QObject {
     Q_OBJECT
 public:
     static Options* instance();

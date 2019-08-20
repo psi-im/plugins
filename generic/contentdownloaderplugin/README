@@ -9,5 +9,3 @@ Install
 4. Run qmake-qt4 (or qmake).
 5. Run make (or gmake).
 6. Copy binary library to /usr/lib(64)/psi/plugins or run make install to install in ~/.psi
-
-

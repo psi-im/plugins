@@ -22,13 +22,12 @@
 
 #include "ui_edititemdlg.h"
 
-class OptionAccessingHost;
-class IconFactoryAccessingHost;
-
 #define constLastFile "lastfile"
 
-class EditItemDlg : public QDialog
-{
+class IconFactoryAccessingHost;
+class OptionAccessingHost;
+
+class EditItemDlg : public QDialog {
     Q_OBJECT
 public:
     EditItemDlg(IconFactoryAccessingHost* icoHost, OptionAccessingHost *psiOptions_, QWidget *p = nullptr);

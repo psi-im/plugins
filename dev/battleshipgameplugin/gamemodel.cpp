@@ -17,9 +17,9 @@
  *
  */
 
-#include <QCryptographicHash>
-
 #include "gamemodel.h"
+
+#include <QCryptographicHash>
 
 GameModel::GameModel(QObject *parent)
     : QObject(parent)

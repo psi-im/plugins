@@ -17,23 +17,27 @@
  *
  */
 
-#include <QtCore>
-#include <QWidget>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QDomElement>
-#include <QIcon>
-
+#include "contactstateaccessinghost.h"
+#include "contactstateaccessor.h"
+#include "plugininfoprovider.h"
 #include "psiplugin.h"
 #include "stanzafilter.h"
-#include "contactstateaccessor.h"
-#include "contactstateaccessinghost.h"
-#include "plugininfoprovider.h"
+
+#include <QDomElement>
+#include <QIcon>
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <QtCore>
 
 #define cVer "0.0.8"
 
-class QipXStatuses: public QObject, public PsiPlugin, public StanzaFilter, public ContactStateAccessor, public PluginInfoProvider
-{
+class QipXStatuses:
+        public ContactStateAccessor,
+        public PluginInfoProvider,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.QipXStatuses")
     Q_INTERFACES(PsiPlugin StanzaFilter ContactStateAccessor PluginInfoProvider)
@@ -54,7 +58,6 @@ public:
     virtual QString pluginInfo();
     virtual QPixmap icon() const;
 
-
 private:
         bool enabled;
         ContactStateAccessingHost *contactState;
@@ -62,7 +65,6 @@ private:
         QDomElement activityToXml(QString type, QString specificType, QString text);
         QDomElement MoodToXml(QString type, QString text);
     };
-
 
 QipXStatuses::QipXStatuses() {
     enabled = false;
@@ -339,7 +341,7 @@ QDomElement QipXStatuses::MoodToXml(QString type, QString text) {
 }
 
 QString QipXStatuses::pluginInfo() {
-    return tr("Author: ") +  "Dealer_WeARE\n"
+    return tr("Author: ") +  "Evgeny Khryukin\n"
             + tr("Email: ") + "wadealer@gmail.com\n\n"
             + tr("This plugin is designed to display x-statuses of contacts using the QIP Infium jabber client.");
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013  Sergey Ilinykh (rion)
+ * Copyright (C) 2013  Sergey Ilinykh
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,10 +18,9 @@
 
 #include "x11info.h"
 
+# include <QtGlobal>
 # include <X11/Xlib.h>
 # include <xcb/xcb.h>
-# include <QtGlobal>
-
 
 Display* X11Info::display()
 {

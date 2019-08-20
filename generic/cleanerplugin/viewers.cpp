@@ -19,14 +19,12 @@
 
 #include "viewers.h"
 
+#include "iconfactoryaccessinghost.h"
+
 #include <QHeaderView>
 #include <QMenu>
 #include <QPainter>
 #include <QStyleOptionViewItem>
-
-#include "iconfactoryaccessinghost.h"
-
-
 
 //------------------------------------------
 //-----------ClearingViewer-----------------
@@ -92,9 +90,6 @@ void ClearingViewer::itemClicked(const QModelIndex& index)
         model()->setData(currentIndex(), 3); //invert
     }
 }
-
-
-
 
 //------------------------------------------
 //-----------AvatarDelegate-----------------

@@ -1,6 +1,6 @@
 /*
  * OMEMO Plugin for Psi
- * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2018  Vyacheslav Karpukhin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,8 +17,9 @@
  *
  */
 
-#include <QtSql>
 #include "storage.h"
+
+#include <QtSql>
 
 extern "C" {
 #include "key_helper.h"
@@ -540,4 +541,4 @@ namespace psiomemo {
     return QByteArray(reinterpret_cast<const char *>(signal_buffer_data(buffer)),
                       static_cast<int>(signal_buffer_len(buffer)));
   }
-}
+} // namespace psiomemo

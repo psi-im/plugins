@@ -25,12 +25,12 @@
 #ifndef PLUGINWINDOW_H
 #define PLUGINWINDOW_H
 
-#include <QMainWindow>
-#include <QCloseEvent>
-
-#include "gameelement.h"
-#include "boardmodel.h"
 #include "boarddelegate.h"
+#include "boardmodel.h"
+#include "gameelement.h"
+
+#include <QCloseEvent>
+#include <QMainWindow>
 
 namespace Ui {
     class PluginWindow;

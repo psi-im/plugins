@@ -1,5 +1,5 @@
 /*
- * imageplugin.cpp - plugin
+ * imagepreviewplugin.cpp - plugin
  * Copyright (C) 2016 rkfg
  *
  * This program is free software; you can redistribute it and/or
@@ -17,32 +17,33 @@
  *
  */
 
-#include "psiplugin.h"
-#include "plugininfoprovider.h"
+#include "ScrollKeeper.h"
+#include "applicationinfoaccessinghost.h"
+#include "applicationinfoaccessor.h"
+#include "chattabaccessor.h"
 #include "optionaccessinghost.h"
 #include "optionaccessor.h"
-#include "chattabaccessor.h"
-#include "applicationinfoaccessor.h"
-#include "applicationinfoaccessinghost.h"
-#include "ScrollKeeper.h"
-#include <QDomElement>
-#include <QByteArray>
-#include <QLabel>
-#include <QMessageBox>
-#include <QVBoxLayout>
-#include <QMenu>
+#include "plugininfoprovider.h"
+#include "psiplugin.h"
+
 #include <QApplication>
+#include <QByteArray>
+#include <QCheckBox>
+#include <QComboBox>
 #include <QDebug>
-#include <QTextEdit>
+#include <QDomElement>
+#include <QImageReader>
+#include <QLabel>
+#include <QMenu>
+#include <QMessageBox>
 #include <QNetworkAccessManager>
+#include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QNetworkProxy>
-#include <QImageReader>
-#include <QTextDocumentFragment>
 #include <QSpinBox>
-#include <QComboBox>
-#include <QCheckBox>
+#include <QTextDocumentFragment>
+#include <QTextEdit>
+#include <QVBoxLayout>
 #include <stdexcept>
 
 #undef AUTOREDIRECTS
@@ -51,10 +52,12 @@
 #endif
 
 //#define IMGPREVIEW_DEBUG
+
 #define constVersion "0.1.2"
 #define sizeLimitName "imgpreview-size-limit"
 #define previewSizeName "imgpreview-preview-size"
 #define allowUpscaleName "imgpreview-allow-upscale"
+
 #define MAX_REDIRECTS 2
 
 class Origin: public QObject {
@@ -73,12 +76,13 @@ public:
 #endif
 };
 
-class ImagePreviewPlugin: public QObject,
-        public PsiPlugin,
-        public PluginInfoProvider,
-        public OptionAccessor,
+class ImagePreviewPlugin:
+        public ApplicationInfoAccessor,
         public ChatTabAccessor,
-        public ApplicationInfoAccessor {
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiPlugin,
+        public QObject {
 Q_OBJECT
 Q_PLUGIN_METADATA(IID "com.psi-plus.ImagePreviewPlugin")
 Q_INTERFACES(PsiPlugin PluginInfoProvider OptionAccessor ChatTabAccessor ApplicationInfoAccessor)

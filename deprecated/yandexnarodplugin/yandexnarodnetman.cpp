@@ -1,30 +1,32 @@
 /*
-    yandexnarodNetMan
-
-    Copyright (c) 2008-2009 by Alexander Kazarin <boiler@co.ru>
-            2011 by Evgeny Khryukin
-
- ***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************
-*/
-
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QtGui>
-
-
+ * yandexnarodnetman.cpp - plugin
+ * Copyright (C) 2008-2009  Alexander Kazarin <boiler@co.ru>
+ * Copyright (C) 2011  Evgeny Khryukin
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
 
 #include "yandexnarodnetman.h"
-#include "authmanager.h"
-#include "options.h"
-#include "common.h"
 
+#include "authmanager.h"
+#include "common.h"
+#include "options.h"
+
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QtGui>
 
 // function needed for tests only
 //static void saveData(const QString& text)
@@ -37,12 +39,10 @@
 //    }
 //}
 
-
 //-------------------------------------------
 //------GetPassDlg---------------------------
 //-------------------------------------------
-class GetPassDlg : public QDialog
-{
+class GetPassDlg : public QDialog {
     Q_OBJECT
 public:
     GetPassDlg(QWidget *p = 0)
@@ -95,10 +95,6 @@ private:
 private:
     QLineEdit *lePass, *leConfirmPass;
 };
-
-
-
-
 
 //-----------------------------------------
 //-------yandexnarodNetMan-----------------

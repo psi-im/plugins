@@ -16,27 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-#include <QDebug>
-#include <QUrl>
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QNetworkProxyFactory>
-#include <QAuthenticator>
-#include <QNetworkDiskCache>
-#include <QFile>
-#include <QRegExp>
-#include <QUrl>
-#include <QDomDocument>
-#include <QFileSystemModel>
-#include <QNetworkProxyFactory>
-
 #include "form.h"
+
+#include "applicationinfoaccessinghost.h"
 #include "cditemmodel.h"
 #include "contentitem.h"
-#include "applicationinfoaccessinghost.h"
 #include "ui_form.h"
+
+#include <QAuthenticator>
+#include <QDebug>
+#include <QDomDocument>
+#include <QFile>
+#include <QFileSystemModel>
+#include <QNetworkAccessManager>
+#include <QNetworkDiskCache>
+#include <QNetworkProxyFactory>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QRegExp>
+#include <QUrl>
 
 #define LIST_URL "https://raw.githubusercontent.com/psi-im/contentdownloader/master/content.list"
 

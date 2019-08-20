@@ -3,7 +3,7 @@
  *
  * Off-the-Record Messaging plugin for Psi+
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
- *                    2011  Florian Fieber
+ * Copyright (C) 2011  Florian Fieber
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,30 +20,26 @@
  *
  */
 
-#ifndef PSIOTRCONFIG_H_
-#define PSIOTRCONFIG_H_
+#ifndef PSIOTRCONFIG_H
+#define PSIOTRCONFIG_H
 
 #include "otrmessaging.h"
 
-#include <QWidget>
 #include <QVariant>
+#include <QWidget>
 
-class OptionAccessingHost;
 class AccountInfoAccessingHost;
+class OptionAccessingHost;
 class QButtonGroup;
-class QComboBox;
 class QCheckBox;
+class QComboBox;
+class QPoint;
 class QStandardItemModel;
 class QTableView;
-class QPoint;
 
 // ---------------------------------------------------------------------------
-
-namespace psiotr
-{
-
+namespace psiotr {
 // ---------------------------------------------------------------------------
-
 const QString  OPTION_POLICY            = "otr-policy";
 const QVariant DEFAULT_POLICY           = QVariant(OTR_POLICY_ENABLED);
 const QString  OPTION_END_WHEN_OFFLINE  = "end-session-when-offline";
@@ -54,8 +50,7 @@ const QVariant DEFAULT_END_WHEN_OFFLINE = QVariant(false);
 /**
  * This dialog appears in the 'Plugins' section of the Psi configuration.
  */
-class ConfigDialog : public QWidget
-{
+class ConfigDialog : public QWidget {
 Q_OBJECT
 
 public:
@@ -74,8 +69,7 @@ private:
 /**
  * Configure OTR policy.
  */
-class ConfigOtrWidget : public QWidget
-{
+class ConfigOtrWidget : public QWidget {
 Q_OBJECT
 
 public:
@@ -100,8 +94,7 @@ private slots:
 /**
  * Show fingerprint of your contacts.
  */
-class FingerprintWidget : public QWidget
-{
+class FingerprintWidget : public QWidget {
 Q_OBJECT
 
 public:
@@ -128,8 +121,7 @@ private slots:
 /**
  * Display a table with account and fingerprint of private key.
  */
-class PrivKeyWidget : public QWidget
-{
+class PrivKeyWidget : public QWidget {
 Q_OBJECT
 
 public:
@@ -158,4 +150,4 @@ private slots:
 
 } // namespace psiotr
 
-#endif
+#endif // PSIOTRCONFIG_H

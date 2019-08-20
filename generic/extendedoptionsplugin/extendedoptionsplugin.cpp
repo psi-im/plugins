@@ -17,32 +17,30 @@
  *
  */
 
-#include <QSpinBox>
+#include "applicationinfoaccessinghost.h"
+#include "applicationinfoaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "psiplugin.h"
+
+#include <QButtonGroup>
 #include <QCheckBox>
-#include <QLineEdit>
+#include <QColorDialog>
 #include <QComboBox>
-#include <QTextList>
-#include <QToolButton>
-#include <QScrollArea>
-#include <QVBoxLayout>
-#include <QTextEdit>
 #include <QGroupBox>
 #include <QLabel>
-#include <QButtonGroup>
-#include <QColorDialog>
-
-#include "psiplugin.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
-#include "applicationinfoaccessor.h"
-#include "applicationinfoaccessinghost.h"
-#include "plugininfoprovider.h"
-
+#include <QLineEdit>
+#include <QScrollArea>
+#include <QSpinBox>
+#include <QTextEdit>
+#include <QTextList>
+#include <QToolButton>
+#include <QVBoxLayout>
 
 #define constVersion "0.4.4"
 
-class ExtToolButton : public QToolButton
-{
+class ExtToolButton : public QToolButton {
     Q_OBJECT
 public:
     ExtToolButton() : QToolButton()
@@ -52,8 +50,12 @@ public:
 
 };
 
-class ExtendedOptions : public QObject, public PsiPlugin, public OptionAccessor, public ApplicationInfoAccessor, public PluginInfoProvider
-{
+class ExtendedOptions:
+        public ApplicationInfoAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiPlugin,
+        public QObject {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.ExtendedOptions")
     Q_INTERFACES(PsiPlugin OptionAccessor ApplicationInfoAccessor PluginInfoProvider)
@@ -108,7 +110,6 @@ private:
     QCheckBox *show_status_changes = nullptr;
     QCheckBox *chat_status_with_priority = nullptr;
     QCheckBox *scaledIcons = nullptr;
-
 
     // MUC-----
     QCheckBox *showJoins = nullptr;
@@ -167,7 +168,6 @@ private:
     QCheckBox *invis = nullptr;
     QCheckBox *xa = nullptr;
     QCheckBox *enableMessages = nullptr;
-
 
     // Look-----
     QToolButton *popupBorder = nullptr;
@@ -274,7 +274,6 @@ QWidget* ExtendedOptions::options()
     tabs->addTab(tab7, tr("CSS"));
     tabs->addTab(tab8, tr("Misc"));
 
-
     //Chats-----
     //    htmlRender = new QCheckBox(tr("Enable HTML rendering in chat window"));
     confirmClearing = new QCheckBox(tr("Ask for confirmation before clearing chat window"));
@@ -297,7 +296,6 @@ QWidget* ExtendedOptions::options()
     chatGridLayout->addWidget(new QLabel(tr("Default JID mode:")), 1, 0);
     chatGridLayout->addWidget(default_jid_mode);
 
-
     auto_capitalize = new QCheckBox(tr("Automatically capitalize the first letter in a sentence"));
     auto_scroll_to_bottom = new QCheckBox(tr("Automatically scroll down the log when a message was sent"));
     show_status_changes = new QCheckBox(tr("Show status changes"));
@@ -306,7 +304,6 @@ QWidget* ExtendedOptions::options()
     default_jid_mode_ignorelist->setMaximumWidth(300);
 
     chat_caption = new QLineEdit;
-
 
     tab1Layout->addWidget(new QLabel(tr("Chat window caption:")));
     tab1Layout->addWidget(chat_caption);
@@ -327,9 +324,6 @@ QWidget* ExtendedOptions::options()
     tab1Layout->addWidget(chat_status_with_priority);
     tab1Layout->addStretch();
 
-
-
-
     //MUC-----
     QTabWidget *mucTabWidget = new QTabWidget;
     QWidget *mucGeneralWidget = new QWidget;
@@ -338,7 +332,6 @@ QWidget* ExtendedOptions::options()
     QVBoxLayout *mucRosterLayout = new QVBoxLayout(mucRosterWidget);
     mucTabWidget->addTab(mucGeneralWidget, tr("General"));
     mucTabWidget->addTab(mucRosterWidget, tr("Roster"));
-
 
     showJoins = new QCheckBox(tr("Show joins"));
     show_initial_joins = new QCheckBox(tr("Show initial joins"));
@@ -380,7 +373,6 @@ QWidget* ExtendedOptions::options()
     mucGeneralLayout->addWidget(muc_leave_status_message);
     mucGeneralLayout->addStretch();
 
-
     leftMucRoster = new QCheckBox(tr("Place groupchat roster at left"));
     showGroups = new QCheckBox(tr("Show groups"));
     use_slim_group_headings = new QCheckBox(tr("Use slim group heading"));
@@ -406,7 +398,6 @@ QWidget* ExtendedOptions::options()
     mucRosterGrid->addWidget(new QLabel(tr("Avatars radius:")), 2, 0);
     mucRosterGrid->addWidget(userlist_avatars_radius, 2, 2);
 
-
     mucRosterLayout->addWidget(leftMucRoster);
     mucRosterLayout->addWidget(showGroups);
     mucRosterLayout->addWidget(use_slim_group_headings);
@@ -420,9 +411,6 @@ QWidget* ExtendedOptions::options()
     mucRosterLayout->addStretch();
 
     tab2Layout->addWidget(mucTabWidget);
-
-
-
 
     //Roster
     resolveNicks = new QCheckBox(tr("Resolve nicks on contact add"));
@@ -474,7 +462,6 @@ QWidget* ExtendedOptions::options()
     tab3Layout->addWidget(groupBox);
     tab3Layout->addStretch();
 
-
     //Menu------
     admin = new QCheckBox(tr("Show \"Admin\" option in account menu"));
     activeChats = new QCheckBox(tr("Show \"Active Chats\" option in contact menu"));
@@ -496,7 +483,6 @@ QWidget* ExtendedOptions::options()
     tab4Layout->addWidget(invis);
     tab4Layout->addWidget(xa);
     tab4Layout->addStretch();
-
 
     //Look----
     popupBorder = new ExtToolButton;
@@ -634,7 +620,6 @@ QWidget* ExtendedOptions::options()
     tab7Layout->addWidget(cssTab);
     tab7Layout->addWidget(cssLabel);
 
-
     //Tabs--------------------
     disableScroll = new QCheckBox(tr("Disable wheel scroll"));
     bottomTabs = new QCheckBox(tr("Put tabs at bottom of chat window"));
@@ -675,7 +660,6 @@ QWidget* ExtendedOptions::options()
     tab5Layout->addLayout(mdLayout);
     tab5Layout->addStretch();
 
-
     //Misc--------------------------------
     flash_windows = new QCheckBox(tr("Enable windows flashing"));
     account_single = new QCheckBox(tr("Enable \"Single Account\" mode"));
@@ -697,7 +681,6 @@ QWidget* ExtendedOptions::options()
     tab8Layout->addWidget(lastActivity);
     tab8Layout->addWidget(ngb);
     tab8Layout->addStretch();
-
 
     QLabel *wikiLink = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#extended_options_plugin\">Wiki (Online)</a>"));
     wikiLink->setOpenExternalLinks(true);
@@ -738,7 +721,6 @@ void ExtendedOptions::applyOptions()
                                          .join(",")));
     psiOptions->setGlobalOption("options.ui.chat.show-status-changes",QVariant(show_status_changes->isChecked()));
     psiOptions->setGlobalOption("options.ui.chat.status-with-priority",QVariant(chat_status_with_priority->isChecked()));
-
 
     //MUC-----
     psiOptions->setGlobalOption("options.ui.muc.allow-highlight-events", QVariant(allowMucEvents->isChecked()));
@@ -799,7 +781,6 @@ void ExtendedOptions::applyOptions()
     psiOptions->setGlobalOption("options.ui.contactlist.status-icon-over-avatar",QVariant(statusIconsOverAvatars->isChecked()));
     psiOptions->setGlobalOption("options.ui.contactlist.auto-delete-unlisted",QVariant(auto_delete_unlisted->isChecked()));
 
-
     //Menu------
     psiOptions->setGlobalOption("options.ui.menu.account.admin",QVariant(admin->isChecked()));
     psiOptions->setGlobalOption("options.ui.menu.contact.active-chats",QVariant(activeChats->isChecked()));
@@ -831,7 +812,6 @@ void ExtendedOptions::applyOptions()
     psiOptions->setGlobalOption("options.ui.contactlist.css", QVariant(rosterCss->toPlainText()));
     psiOptions->setGlobalOption("options.ui.notifications.passive-popups.css", QVariant(popupCss->toPlainText()));
     psiOptions->setGlobalOption("options.ui.contactlist.tooltip.css", QVariant(tooltipCss->toPlainText()));
-
 
     //Misc--------------------
     psiOptions->setGlobalOption("options.ui.flash-windows", QVariant(flash_windows->isChecked()));
@@ -991,7 +971,6 @@ void ExtendedOptions::restoreOptions()
     popupsSuppressDnd->setChecked(psiOptions->getGlobalOption("options.ui.notifications.passive-popups.suppress-while-dnd").toBool());
     popupsSuppressAway->setChecked(psiOptions->getGlobalOption("options.ui.notifications.passive-popups.suppress-while-away").toBool());
 }
-
 
 void ExtendedOptions::setOptionAccessingHost(OptionAccessingHost *host)
 {
@@ -1179,7 +1158,7 @@ QString ExtendedOptions::profileDir()
 
 QString ExtendedOptions::pluginInfo()
 {
-    return tr("Author: ") +     "Dealer_WeARE\n"
+    return tr("Author: ") +     "Evgeny Khryukin\n"
          + tr("Email: ") + "wadealer@gmail.com\n\n"
          + tr("This plugin is designed to allow easy configuration of some advanced options in Psi+.\n"
               "This plugin gives you access to advanced application options, which do not have a graphical user interface.\n\n"

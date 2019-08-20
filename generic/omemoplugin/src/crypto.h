@@ -1,6 +1,6 @@
 /*
  * OMEMO Plugin for Psi
- * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2018  Vyacheslav Karpukhin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,8 +17,8 @@
  *
  */
 
-#ifndef PSIOMEMO_CRYPTO_H
-#define PSIOMEMO_CRYPTO_H
+#ifndef CRYPTO_H
+#define CRYPTO_H
 
 #include <QByteArray>
 #include <QPair>
@@ -79,6 +79,6 @@ namespace psiomemo {
                   const uint8_t *plaintext, size_t plaintext_len,
                   void *user_data);
   QByteArray toQByteArray(const uint8_t *key, size_t key_len);
-}
+} // namespace psiomemo
 
-#endif //PSIOMEMO_CRYPTO_H
+#endif // CRYPTO_H

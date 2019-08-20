@@ -1,6 +1,6 @@
 /*
  * OMEMO Plugin for Psi
- * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2018  Vyacheslav Karpukhin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,12 +17,13 @@
  *
  */
 
-#ifndef PSIOMEMO_SIGNAL_H
-#define PSIOMEMO_SIGNAL_H
+#ifndef SIGNAL_H
+#define SIGNAL_H
+
+#include "storage.h"
 
 #include <QObject>
 #include <utility>
-#include "storage.h"
 
 namespace psiomemo {
   class Bundle {
@@ -104,5 +105,6 @@ namespace psiomemo {
     QString getFingerprint(const QByteArray &publicKeyBytes) const;
     QByteArray getIdentityPublicKey() const;
   };
-}
-#endif //PSIOMEMO_SIGNAL_H
+} // namespace psiomemo
+
+#endif // SIGNAL_H

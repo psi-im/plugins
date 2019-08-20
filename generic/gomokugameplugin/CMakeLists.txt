@@ -36,7 +36,7 @@ set( _HDRS
     boardmodel.h
     boarddelegate.h
     gameelement.h
-    invatedialog.h
+    invitedialog.h
     gamesessions.h
     common.h
     options.h
@@ -49,14 +49,14 @@ set( _SRCS
     boardmodel.cpp
     boarddelegate.cpp
     gameelement.cpp
-    invatedialog.cpp
+    invitedialog.cpp
     gamesessions.cpp
     options.cpp
     gamemodel.cpp
 )
 set( _UIS
     pluginwindow.ui
-    invatedialog.ui
+    invitedialog.ui
     invitationdialog.ui
     options.ui
 )

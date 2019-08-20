@@ -1,6 +1,6 @@
 /*
  * gnome3supportplugin.cpp - plugin
- * Copyright (C) 2011  KukuRuzo
+ * Copyright (C) 2011  Vitaly Tonkacheyev
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,30 +16,35 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-#include "psiplugin.h"
-#include "plugininfoprovider.h"
-#include "optionaccessinghost.h"
-#include "optionaccessor.h"
+
 #include "accountinfoaccessinghost.h"
 #include "accountinfoaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
 #include "psiaccountcontroller.h"
 #include "psiaccountcontrollinghost.h"
+#include "psiplugin.h"
 
-#include <QIcon>
 #include <QDBusConnection>
 #include <QDBusConnectionInterface>
+#include <QIcon>
 
 #define gnome3Service "org.gnome.SessionManager"
 #define gnome3Interface "org.gnome.SessionManager.Presence"
 #define gnome3Path "/org/gnome/SessionManager/Presence"
 
-static const QStringList statuses = QStringList() << "online" << "invisible" << "dnd" << "away";
-
 #define constVersion "0.0.3"
 
-class Gnome3StatusWatcher : public QObject, public PsiPlugin, public PluginInfoProvider, public OptionAccessor,
-        public PsiAccountController, public AccountInfoAccessor
-{
+static const QStringList statuses = QStringList() << "online" << "invisible" << "dnd" << "away";
+
+class Gnome3StatusWatcher:
+        public AccountInfoAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiAccountController,
+        public PsiPlugin,
+        public QObject {
     Q_OBJECT
 #ifdef HAVE_QT5
     Q_PLUGIN_METADATA(IID "com.psi-plus.Gnome3StatusWatcher")
@@ -144,7 +149,7 @@ QWidget* Gnome3StatusWatcher::options()
 }
 
 QString Gnome3StatusWatcher::pluginInfo() {
-    return tr("Authors: ") +  "KukuRuzo\n\n"
+    return tr("Authors: ") +  "Vitaly Tonkacheyev\n\n"
             + trUtf8("This plugin is designed to add support of GNOME 3 presence status changes");
 }
 
@@ -188,4 +193,5 @@ void Gnome3StatusWatcher::setPsiGlobalStatus(const QString &status_)
         ++account;
     }
 }
+
 #include "gnome3supportplugin.moc"

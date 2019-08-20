@@ -18,11 +18,12 @@
  */
 
 #include "cleaner.h"
+
 #include "common.h"
+
 #include <QDomDocument>
 #include <QInputDialog>
 #include <QMessageBox>
-
 
 CleanerMainWindow::CleanerMainWindow(CleanerPlugin *cleaner)
         : QMainWindow(nullptr)
@@ -132,7 +133,6 @@ void CleanerMainWindow::setContent()
     proxyOptionsModel_->setSourceModel(optionsModel_);
     ui_.tab_options->tv_table->setModel(proxyOptionsModel_);
     ui_.tab_options->tv_table->init(cleaner_->iconHost);
-
 
     connect(ui_.tab_history->tv_table, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(viewHistory(QModelIndex)));
     connect(ui_.tab_vcard->tv_table, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(viewVcard(QModelIndex)));

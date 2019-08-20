@@ -23,8 +23,7 @@
 #include <QItemDelegate>
 #include <QPainter>
 
-class NotesViewDelegate : public QItemDelegate
-{
+class NotesViewDelegate : public QItemDelegate {
     Q_OBJECT
 
 public:

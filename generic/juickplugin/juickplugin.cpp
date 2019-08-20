@@ -17,23 +17,21 @@
  *
  */
 
-#include <QDomElement>
-#include <QMessageBox>
-#include <QColorDialog>
-#include <QTextEdit>
+#include "juickplugin.h"
 
-#include "optionaccessinghost.h"
 #include "activetabaccessinghost.h"
 #include "applicationinfoaccessinghost.h"
-#include "webkitaccessinghost.h"
-
-#include "juickplugin.h"
+#include "defines.h"
 #include "juickdownloader.h"
 #include "juickjidlist.h"
 #include "juickparser.h"
-#include "defines.h"
+#include "optionaccessinghost.h"
+#include "webkitaccessinghost.h"
 
-
+#include <QColorDialog>
+#include <QDomElement>
+#include <QMessageBox>
+#include <QTextEdit>
 
 static const QString showAllmsgString(QObject::tr("Show all messages"));
 static const QString replyMsgString(QObject::tr("Reply"));
@@ -51,8 +49,6 @@ static const QString chatAction = "xmpp:%1%3?message;type=chat;body=%2";
 
 static const int avatarsUpdateInterval = 10;
 
-
-
 //static void debugElement(const QDomElement& e)
 //{
 //    QString out;
@@ -60,8 +56,6 @@ static const int avatarsUpdateInterval = 10;
 //    e.save(str, 3);
 //    qDebug() << out;
 //}
-
-
 
 static void nl2br(QDomElement *body,QDomDocument* e, const QString& msg)
 {
@@ -71,9 +65,6 @@ static void nl2br(QDomElement *body,QDomDocument* e, const QString& msg)
     }
     body->removeChild(body->lastChild());
 }
-
-
-
 
 //-----------------------------
 //------JuickPlugin------------
@@ -1130,7 +1121,7 @@ void JuickPlugin::updateWidgets(const QList<QByteArray>& urls)
 
 QString JuickPlugin::pluginInfo()
 {
-    return tr("Authors: ") + "VampiRUS, Dealer_WeARE\n\n"
+    return tr("Authors: ") + "VampiRUS, Evgeny Khryukin\n\n"
     + tr("This plugin is designed to work efficiently and comfortably with the Juick microblogging service.\n"
          "Currently, the plugin is able to: \n"
          "* Coloring @nick, *tag and #message_id in messages from the juick@juick.com bot\n"

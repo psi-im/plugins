@@ -1,5 +1,5 @@
 /*
- * gamesessionlist.cpp - Battleship game plugin
+ * gamesessions.h - Battleship game plugin
  * Copyright (C) 2014  Aleksey Andreev
  *
  * This program is free software; you can redistribute it and/or
@@ -17,17 +17,17 @@
  *
  */
 
-#ifndef GAMESESSIONLIST_H
-#define GAMESESSIONLIST_H
-
-#include <QObject>
-#include <QDomElement>
-#include <QHash>
-#include <QPointer>
-#include <QDateTime>
-#include <QTimer>
+#ifndef GAMESESSIONS_H
+#define GAMESESSIONS_H
 
 #include "pluginwindow.h"
+
+#include <QDateTime>
+#include <QDomElement>
+#include <QHash>
+#include <QObject>
+#include <QPointer>
+#include <QTimer>
 
 class GameSession;
 
@@ -36,8 +36,7 @@ namespace XML {
     QString iqErrorString(const QString &jid, const QString &id);
 }
 
-class GameSessionList : public QObject
-{
+class GameSessionList : public QObject {
 Q_OBJECT
 
 public:
@@ -72,8 +71,7 @@ signals:
 
 };
 
-class GameSession : public QObject
-{
+class GameSession : public QObject {
 Q_OBJECT
 
 public:
@@ -152,4 +150,4 @@ signals:
 
 };
 
-#endif // GAMESESSIONLIST_H
+#endif // GAMESESSIONS_H

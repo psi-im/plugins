@@ -25,9 +25,9 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
-#include <QObject>
-
 #include "optionaccessor.h"
+
+#include <QObject>
 
 #define constDndDisable         "dnddsbl"
 #define constConfDisable        "confdsbl"
@@ -43,8 +43,7 @@
 #define constSoundMove          "soundmove"
 #define constSoundError         "sounderror"
 
-class Options : public QObject
-{
+class Options : public QObject {
 Q_OBJECT
 public:
     static OptionAccessingHost *psiOptions;

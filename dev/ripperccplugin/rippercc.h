@@ -1,6 +1,5 @@
 /*
- * rippercc.cpp
- *
+ * rippercc.cpp - plugin
  * Copyright (C) 2016
  *
  * This program is free software; you can redistribute it and/or
@@ -15,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 #ifndef RIPPERCC_H
@@ -22,35 +22,33 @@
 
 #include "ripperccoptions.h"
 
-#include <psiplugin.h>
-#include <applicationinfoaccessinghost.h>
-#include <plugininfoprovider.h>
-#include <stanzafilter.h>
-#include <stanzasender.h>
-#include <psiaccountcontroller.h>
-#include <optionaccessor.h>
+#include <QList>
+#include <QNetworkAccessManager>
+#include <QStringList>
+#include <QTimer>
 #include <accountinfoaccessor.h>
-#include <applicationinfoaccessor.h>
 #include <applicationinfoaccessinghost.h>
+#include <applicationinfoaccessor.h>
 #include <contactinfoaccessinghost.h>
 #include <contactinfoaccessor.h>
+#include <optionaccessor.h>
+#include <plugininfoprovider.h>
+#include <psiaccountcontroller.h>
+#include <psiplugin.h>
+#include <stanzafilter.h>
+#include <stanzasender.h>
 
-#include <QStringList>
-#include <QNetworkAccessManager>
-#include <QTimer>
-#include <QList>
-
-class RipperCC : public QObject
-               , public PsiPlugin
-               , public PluginInfoProvider
-               , public StanzaFilter
-               , public PsiAccountController
-               , public OptionAccessor
-               , public StanzaSender
-               , public AccountInfoAccessor
-               , public ApplicationInfoAccessor
-               , public ContactInfoAccessor
-{
+class RipperCC:
+        public AccountInfoAccessor,
+        public ApplicationInfoAccessor,
+        public ContactInfoAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiAccountController,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter,
+        public StanzaSender {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.RipperCC")
     Q_INTERFACES(PsiPlugin

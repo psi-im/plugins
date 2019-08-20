@@ -18,16 +18,16 @@
  */
 
 #include "optionsparser.h"
-#include <QStringList>
-#include <QSize>
+
 #include <QKeySequence>
 #include <QRect>
+#include <QSize>
+#include <QStringList>
 
 OptionsParser::OptionsParser(QObject *parent)
         :QObject(parent)
 {
 }
-
 
 OptionsParser* OptionsParser::instance()
 {
@@ -204,7 +204,6 @@ QVariant OptionsParser::elementToVariant(const QDomElement& e)
 }
 
 OptionsParser *OptionsParser::instance_ = nullptr;
-
 
 //-----------------------
 //---------Base64--------

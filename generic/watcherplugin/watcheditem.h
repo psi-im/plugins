@@ -24,8 +24,7 @@
 
 const QString splitStr = "&split&";
 
-class WatchedItem : public QListWidgetItem
-{
+class WatchedItem : public QListWidgetItem {
 public:
     WatchedItem(QListWidget *parent = nullptr);
     WatchedItem(const QString& jid, const QString& text = QString(), const QString& sFile = QString(), bool aUse = false, QListWidget *parent = nullptr);

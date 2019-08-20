@@ -25,11 +25,11 @@
 #ifndef GAMESESSIONS_H
 #define GAMESESSIONS_H
 
+#include "pluginwindow.h"
+
+#include <QDomElement>
 #include <QObject>
 #include <QPointer>
-#include <QDomElement>
-
-#include "pluginwindow.h"
 
 #define constProtoId    "gomoku_01"
 
@@ -38,8 +38,7 @@ namespace XML {
     QString iqErrorString(const QString &jid, const QString &id);
 }
 
-class GameSessions : public QObject
-{
+class GameSessions : public QObject {
 Q_OBJECT
 
 public:

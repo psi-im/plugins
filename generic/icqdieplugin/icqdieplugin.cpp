@@ -17,23 +17,23 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-#include <QtGui>
-#include <QtCore>
-#include <QMap>
-#include <QDomElement>
-
-#include "psiplugin.h"
-#include "optionaccessor.h"
+#include "accountinfoaccessinghost.h"
+#include "accountinfoaccessor.h"
+#include "activetabaccessinghost.h"
+#include "activetabaccessor.h"
 #include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "psiplugin.h"
 #include "stanzafilter.h"
 #include "stanzasender.h"
 #include "stanzasendinghost.h"
-#include "activetabaccessor.h"
-#include "activetabaccessinghost.h"
-#include "accountinfoaccessor.h"
-#include "accountinfoaccessinghost.h"
-#include "plugininfoprovider.h"
 #include "ui_icqdieoptions.h"
+
+#include <QDomElement>
+#include <QMap>
+#include <QtCore>
+#include <QtGui>
 
 #define cVer "0.1.6"
 #define constMessageRecv "msgr"
@@ -44,9 +44,15 @@
 #define constMessageCount "msgcnt"
 #define constTransports "transp"
 
-class IcqDie: public QObject, public PsiPlugin, public OptionAccessor, public StanzaSender,  public StanzaFilter, public ActiveTabAccessor,
-        public AccountInfoAccessor, public PluginInfoProvider
-{
+class IcqDie:
+        public AccountInfoAccessor,
+        public ActiveTabAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter,
+        public StanzaSender {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.IcqDie")
         Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter ActiveTabAccessor
@@ -96,7 +102,6 @@ private:
 
 };
 
-
 IcqDie::IcqDie()
 {
     ActiveTabIsEnable = true;
@@ -122,7 +127,6 @@ IcqDie::IcqDie()
             "This human do not use ICQ anymore, so if you are still use that network he will not receive your message and you have to chat to him by Jabber. His JID: %1.\n\n"
             "If you don't know what Jabber is - use Google. It knows everything and ready to help everyone who ask it.\n"
             "Sincerely yours, Debian Sid.");
-
 
     ActiveTabHost = nullptr;
     AccInfoHost = nullptr;
@@ -408,7 +412,7 @@ void IcqDie::setAccountInfoAccessingHost(AccountInfoAccessingHost* host)
 
 QString IcqDie::pluginInfo()
 {
-    return tr("Author: ") +  "ivan1986\n\n"
+    return tr("Author: ") +  "Ivan Borzenkov\n\n"
             + tr("This plugin is designed to help you transfer as many contacts as possible from ICQ to Jabber.\n"
              "The plugin has a number of simple settings that can help you:\n"
              "* set a special message text\n"

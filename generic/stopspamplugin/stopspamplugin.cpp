@@ -17,32 +17,31 @@
  *
  */
 
-#include <QDomElement>
-
-#include "psiplugin.h"
-#include "optionaccessor.h"
+#include "accountinfoaccessinghost.h"
+#include "accountinfoaccessor.h"
+#include "applicationinfoaccessinghost.h"
+#include "applicationinfoaccessor.h"
+#include "contactinfoaccessinghost.h"
+#include "contactinfoaccessor.h"
+#include "deferredstanzasender.h"
+#include "eventfilter.h"
+#include "iconfactoryaccessinghost.h"
+#include "iconfactoryaccessor.h"
+#include "model.h"
 #include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "popupaccessinghost.h"
+#include "popupaccessor.h"
+#include "psiplugin.h"
 #include "stanzafilter.h"
 #include "stanzasender.h"
 #include "stanzasendinghost.h"
-#include "accountinfoaccessor.h"
-#include "accountinfoaccessinghost.h"
-#include "applicationinfoaccessor.h"
-#include "applicationinfoaccessinghost.h"
-#include "popupaccessor.h"
-#include "popupaccessinghost.h"
-#include "iconfactoryaccessor.h"
-#include "iconfactoryaccessinghost.h"
-#include "plugininfoprovider.h"
-#include "eventfilter.h"
-#include "contactinfoaccessinghost.h"
-#include "contactinfoaccessor.h"
-
+#include "ui_options.h"
 #include "view.h"
 #include "viewer.h"
-#include "model.h"
-#include "ui_options.h"
-#include "deferredstanzasender.h"
+
+#include <QDomElement>
 
 #define cVer "0.5.7"
 #define constQuestion "qstn"
@@ -60,7 +59,6 @@
 #define constResetTime "resettm"
 #define constLogHistory "lghstr"
 #define constDefaultAct "dfltact"
-
 #define constUseMuc "usemuc"
 #define constAdmin "affadmin"
 #define constModer "rolemoder"
@@ -76,11 +74,19 @@
 
 #define POPUP_OPTION "Stop Spam Plugin"
 
-
-class StopSpam: public QObject, public PsiPlugin, public OptionAccessor, public StanzaSender,  public StanzaFilter,
-public AccountInfoAccessor, public ApplicationInfoAccessor, public PopupAccessor, public IconFactoryAccessor,
-public PluginInfoProvider, public EventFilter, public ContactInfoAccessor
-{
+class StopSpam:
+        public AccountInfoAccessor,
+        public ApplicationInfoAccessor,
+        public ContactInfoAccessor,
+        public EventFilter,
+        public IconFactoryAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PopupAccessor,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter,
+        public StanzaSender {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.StopSpam")
     Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter AccountInfoAccessor ApplicationInfoAccessor
@@ -132,7 +138,6 @@ private:
     bool findMuc(const QString& mucJid, const QString& nick, int &i);
     void logHistory(const QDomElement& stanza);
     bool processMuc(int account, const QDomElement& stanza);
-
 
     bool enabled;
     OptionAccessingHost* psiOptions;
@@ -475,7 +480,6 @@ bool StopSpam::incomingStanza(int account, const QDomElement& stanza) {
                 psiOptions->setPluginOption(constUnblocked, QVariant(Unblocked));
             }
         }
-
 
         QString from = stanza.attribute("from");
         QString to = stanza.attribute("to");
@@ -1007,7 +1011,7 @@ void StopSpam::onOptionsClose() {
 }
 
 QString StopSpam::pluginInfo() {
-    return tr("Author: ") +  "Dealer_WeARE\n"
+    return tr("Author: ") +  "Evgeny Khryukin\n"
             + tr("Email: ") + "wadealer@gmail.com\n\n"
             + tr("This plugin is designed to block spam messages and other unwanted information from Psi+ users."
                  "The functionality of the plugin is based on the principle of \"question - answer\".\n"

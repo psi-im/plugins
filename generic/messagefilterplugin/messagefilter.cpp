@@ -1,5 +1,5 @@
 /*
- * messagefilter.cpp - plugin main class
+ * messagefilter.cpp - plugin
  *
  * Copyright (C) 2015  Ivan Romanov <drizt@land.ru>
  *
@@ -21,19 +21,18 @@
 
 #include "options.h"
 
-#include <psiaccountcontrollinghost.h>
-#include <optionaccessinghost.h>
-#include <iconfactoryaccessinghost.h>
-#include <activetabaccessinghost.h>
-#include <accountinfoaccessinghost.h>
-#include <stanzasendinghost.h>
-
-#include <QRegExp>
-#include <QDomElement>
-#include <QMessageBox>
-#include <QFile>
 #include <QCursor>
+#include <QDomElement>
+#include <QFile>
 #include <QMenu>
+#include <QMessageBox>
+#include <QRegExp>
+#include <accountinfoaccessinghost.h>
+#include <activetabaccessinghost.h>
+#include <iconfactoryaccessinghost.h>
+#include <optionaccessinghost.h>
+#include <psiaccountcontrollinghost.h>
+#include <stanzasendinghost.h>
 
 MessageFilter::MessageFilter()
     : _enabled(false)
@@ -45,7 +44,6 @@ MessageFilter::MessageFilter()
     , _rules(QList<Rule>())
 {
 }
-
 
 MessageFilter::~MessageFilter()
 {

@@ -1,8 +1,9 @@
-#ifndef PREVIEW_FILE_DIALOG_H
-#define PREVIEW_FILE_DIALOG_H
+#ifndef PREVIEWFILEDIALOG_H
+#define PREVIEWFILEDIALOG_H
 
 #include <QFileDialog>
 #include <QLabel>
+
 // based on https://www.qtcentre.org/threads/33593-How-can-i-have-a-QFileDialog-with-a-preview-of-the-picture
 class PreviewFileDialog: public QFileDialog {
 Q_OBJECT
@@ -18,4 +19,4 @@ protected:
 
 };
 
-#endif // PREVIEW_FILE_DIALOG_H
+#endif // PREVIEWFILEDIALOG_H

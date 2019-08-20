@@ -1,26 +1,21 @@
 #ifndef PSTOPLUGIN_H
 #define PSTOPLUGIN_H
 
-#include <QtCore>
-#include <QtGui>
-
-
-#include <QDomElement>
-
-
-#include "psiplugin.h"
 #include "eventfilter.h"
-#include "stanzafilter.h"
-#include "optionaccessor.h"
 #include "optionaccessinghost.h"
+#include "optionaccessor.h"
 #include "plugininfoprovider.h"
 #include "preferenceswidget.h"
+#include "psiplugin.h"
+#include "stanzafilter.h"
 
+#include <QDomElement>
+#include <QtCore>
+#include <QtGui>
 
 #define VERSION "0.0.4"
 #define PLUGIN_NAME "Psto Plugin"
 #define PLUGIN_NAME_SHORT "psto"
-
 
 #define DEFAULT_USERNAME_COLOR QColor(0, 85, 255)
 #define DEFAULT_POST_ID_COLOR QColor(87, 165, 87)
@@ -34,7 +29,6 @@
 #define QUOTE_COLOR "quote_color"
 #define MESSAGE_COLOR "message_color"
 
-
 // jid1 , jid2 , ...
 #define PSTO_JIDS "psto@psto.net" , "d@psto.net"
 
@@ -42,13 +36,13 @@ enum PairType { PairMessage, PairPostId, PairUser, PairLink };
 typedef QPair<PairType, QString> RegExpPair;
 typedef QList<RegExpPair> RegExpPartitions;
 
-class PstoPlugin : public QObject
-                 , public PsiPlugin
-                 , public EventFilter
-                 , public OptionAccessor
-                 , public StanzaFilter
-                 , public PluginInfoProvider
-{
+class PstoPlugin:
+        public EventFilter,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PsiPlugin,
+        public QObject,
+        public StanzaFilter {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.PstoPlugin")
     Q_INTERFACES(PsiPlugin EventFilter StanzaFilter OptionAccessor PluginInfoProvider)
@@ -128,7 +122,6 @@ private:
     void processMessageString(const int pos_number, const QString & string,
                               const QString & psto_jid, QDomElement & html_body);
 
-
 private slots:
     void usernameColorChanged(QColor);
     void postColorChanged(QColor);
@@ -139,6 +132,5 @@ private slots:
     void onOptionsClose();
 
 };
-
 
 #endif // PSTOPLUGIN_H

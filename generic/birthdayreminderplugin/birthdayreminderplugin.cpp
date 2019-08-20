@@ -17,30 +17,29 @@
  *
  */
 
-#include <QFileDialog>
-#include <QDomElement>
-
-#include "psiplugin.h"
-#include "stanzafilter.h"
-#include "accountinfoaccessor.h"
 #include "accountinfoaccessinghost.h"
-#include "applicationinfoaccessor.h"
+#include "accountinfoaccessor.h"
 #include "applicationinfoaccessinghost.h"
-#include "stanzasender.h"
-#include "stanzasendinghost.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
-#include "popupaccessor.h"
-#include "popupaccessinghost.h"
+#include "applicationinfoaccessor.h"
+#include "contactinfoaccessinghost.h"
+#include "contactinfoaccessor.h"
 #include "iconfactoryaccessinghost.h"
 #include "iconfactoryaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
 #include "plugininfoprovider.h"
+#include "popupaccessinghost.h"
+#include "popupaccessor.h"
+#include "psiplugin.h"
 #include "soundaccessinghost.h"
 #include "soundaccessor.h"
-#include "contactinfoaccessor.h"
-#include "contactinfoaccessinghost.h"
-
+#include "stanzafilter.h"
+#include "stanzasender.h"
+#include "stanzasendinghost.h"
 #include "ui_options.h"
+
+#include <QDomElement>
+#include <QFileDialog>
 
 #define cVer "0.4.1"
 #define constLastCheck "lstchck"
@@ -58,10 +57,19 @@
 static const QString id = "bdreminder_1";
 static const QString dirName = "Birthdays";
 
-class Reminder : public QObject, public PsiPlugin, public StanzaFilter, public AccountInfoAccessor, public ApplicationInfoAccessor,
-                 public StanzaSender, public OptionAccessor, public PopupAccessor, public IconFactoryAccessor,
-                 public PluginInfoProvider, public SoundAccessor, public ContactInfoAccessor
-{
+class Reminder:
+        public AccountInfoAccessor,
+        public ApplicationInfoAccessor,
+        public ContactInfoAccessor,
+        public IconFactoryAccessor,
+        public OptionAccessor,
+        public PluginInfoProvider,
+        public PopupAccessor,
+        public PsiPlugin,
+        public QObject,
+        public SoundAccessor,
+        public StanzaFilter,
+        public StanzaSender {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.Reminder")
     Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor ApplicationInfoAccessor StanzaSender OptionAccessor
@@ -205,7 +213,6 @@ QWidget* Reminder::options() {
 
     ui_.tb_get->setIcon(icoHost->getIcon("psi/browse"));
     ui_.tb_check->setIcon(icoHost->getIcon("psi/play"));
-
 
     connect(ui_.pb_update, SIGNAL(clicked()), SLOT(updateVCard()));
     connect(ui_.pb_check, SIGNAL(clicked()), SLOT(check()));
@@ -469,7 +476,6 @@ bool Reminder::check() {
     text = text.replace("\n", "<br>");
     popup->initPopup(text, tr("Birthday Reminder"), "reminder/birthdayicon", popupId);
 
-
     return true;
 }
 
@@ -505,7 +511,7 @@ void Reminder::checkSound() {
 }
 
 QString Reminder::pluginInfo() {
-    return tr("Author: ") +     "Dealer_WeARE\n"
+    return tr("Author: ") +     "Evgeny Khryukin\n"
          + tr("Email: ") + "wadealer@gmail.com\n\n"
          + tr("This plugin is designed to show reminders of upcoming birthdays.\n"
               "The first time you install this plugin, you need to log on to all of your accounts, go to the plugin settings and click \"Update Birthdays\"."

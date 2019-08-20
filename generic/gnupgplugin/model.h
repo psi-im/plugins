@@ -22,8 +22,7 @@
 
 #include <QStandardItemModel>
 
-class Model : public QStandardItemModel
-{
+class Model : public QStandardItemModel {
     Q_OBJECT
 
 public:

@@ -22,8 +22,7 @@
 
 #include <QPixmap>
 
-class Figure
-{
+class Figure {
 public:
 
     enum GameType {

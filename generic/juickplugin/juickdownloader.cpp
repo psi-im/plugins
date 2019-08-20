@@ -1,6 +1,6 @@
 /*
  * juickdownloader.cpp - plugin
- * Copyright (C) 2012 Evgeny Khryukin
+ * Copyright (C) 2012  Evgeny Khryukin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,16 +18,16 @@
  */
 
 #include "juickdownloader.h"
+
 #include "applicationinfoaccessinghost.h"
 #include "defines.h"
 
+#include <QDebug>
+#include <QFile>
+#include <QMessageBox>
 #include <QNetworkProxy>
 #include <QNetworkReply>
-#include <QMessageBox>
-#include <QFile>
 #include <QTimer>
-#include <QDebug>
-
 
 static void save(const QString &path, const QByteArray &img)
 {
@@ -41,8 +41,6 @@ static void save(const QString &path, const QByteArray &img)
                      .arg(file.fileName())
                      .arg(file.errorString()));
 }
-
-
 
 JuickDownloader::JuickDownloader(ApplicationInfoAccessingHost *host, QObject *p)
     : QObject(p)
@@ -72,7 +70,6 @@ void JuickDownloader::get(const JuickDownloadItem &item)
         peekNext();
     }
 }
-
 
 void JuickDownloader::setProxyHostPort(const QString& host, int port, const QString& username, const QString& pass, const QString& type)
 {
@@ -132,7 +129,6 @@ void JuickDownloader::timeOut()
     emit finished(urls_);
     urls_.clear();
 }
-
 
 void JuickDownloader::dataReady(const QByteArray &ba, const JuickDownloadItem& it)
 {

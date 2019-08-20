@@ -20,12 +20,11 @@
 #include "viewer.h"
 
 #include <QFile>
-#include <QTextStream>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QMessageBox>
 #include <QFileInfo>
-
+#include <QHBoxLayout>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QTextStream>
 
 Viewer::Viewer(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *parent)
         : QDialog(parent)

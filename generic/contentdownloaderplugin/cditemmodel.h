@@ -16,15 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef CDITEMMODEL_H
 #define CDITEMMODEL_H
 
-#include <QAbstractTableModel>
 #include "contentitem.h"
 
-class CDItemModel : public QAbstractItemModel
-{
+#include <QAbstractTableModel>
+
+class CDItemModel : public QAbstractItemModel {
     Q_OBJECT
 public:
     CDItemModel(QObject *parent = nullptr);

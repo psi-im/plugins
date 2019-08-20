@@ -1,5 +1,5 @@
 /*
- * contentdownloader.cpp - plugin interface
+ * contentdownloader.cpp - plugin
  * Copyright (C) 2010  Ivan Romanov <drizt@land.ru>
  *
  * This program is free software; you can redistribute it and/or
@@ -16,14 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-#include <QDebug>
-#include <QNetworkInterface>
-#include <QNetworkProxy>
-#include <QList>
 #include "contentdownloader.h"
+
 #include "form.h"
 
+#include <QDebug>
+#include <QList>
+#include <QNetworkInterface>
+#include <QNetworkProxy>
 
 ContentDownloader::ContentDownloader()
     : enabled(false)
