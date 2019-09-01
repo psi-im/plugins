@@ -44,7 +44,7 @@ else()
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
         set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
     endif()
-    add_definitions( -DQ_OS_WIN )
+    #add_definitions( -DQ_OS_WIN )
 endif()
 
 add_definitions( -DQT_PLUGIN )

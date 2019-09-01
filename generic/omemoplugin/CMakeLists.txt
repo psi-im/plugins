@@ -19,11 +19,11 @@ if(WIN32)
     endif()
 endif()
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-
-set(PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." CACHE STRING "Plugins root path. Path where include directory placed")
+get_filename_component(ABS_PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
+set(PLUGINS_ROOT_DIR "${ABS_PLUGINS_ROOT_DIR}" CACHE STRING "Plugins root path. Path where include directory placed")
 set( CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
+    ${CMAKE_CURRENT_LIST_DIR}/cmake
     ${PLUGINS_ROOT_DIR}/cmake/modules
 )
 find_package(PsiPluginsApi REQUIRED)

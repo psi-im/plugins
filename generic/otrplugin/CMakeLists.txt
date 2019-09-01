@@ -15,9 +15,11 @@ if(POLICY CMP0074)
 endif()
 set( CMAKE_AUTOMOC TRUE )
 
-set(PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." CACHE STRING "Plugins root path. Path where include directory placed")
+get_filename_component(ABS_PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
+set(PLUGINS_ROOT_DIR "${ABS_PLUGINS_ROOT_DIR}" CACHE STRING "Plugins root path. Path where include directory placed")
 set( CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
+    ${CMAKE_CURRENT_LIST_DIR}/cmake
     ${PLUGINS_ROOT_DIR}/cmake/modules
 )
 find_package(PsiPluginsApi REQUIRED)
@@ -32,7 +34,7 @@ if(NOT PLUGINS_INSTALL_PATH)
     set(PLUGINS_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}")
 endif()
 
-IF( WIN32 )
+if( WIN32 )
     if(NOT LIBGCRYPT_ROOT)
         set( LIBGCRYPT_ROOT "C:\\build\\psisdk\\libgcrypt\\i386" CACHE STRING "Path to libgcrypt library" )
     endif()
@@ -45,9 +47,7 @@ IF( WIN32 )
     if(NOT LIBGCRYPT_ROOT)
         set( LIBTIDY_ROOT "C:\\build\\psisdk\\libtidy\\i386" CACHE STRING "Path to libtidy library" )
     endif()
-ENDIF()
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+endif()
 
 find_package( LibGcrypt REQUIRED )
 find_package( LibOtr REQUIRED )
@@ -61,11 +61,11 @@ add_definitions(
 )
 
 #dirty hack for windows
-IF( WIN32 )
+if( WIN32 )
     set(TIDY_INCLUDES
         ${LIBTIDY_INCLUDE_DIR}/..
     )
-ENDIF()
+endif()
 #
 include_directories(
         ${CMAKE_SOURCE_DIR}

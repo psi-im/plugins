@@ -15,9 +15,11 @@ if(POLICY CMP0074)
 endif()
 set( CMAKE_AUTOMOC TRUE )
 
-set(PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." CACHE STRING "Plugins root path. Path where include directory placed")
+get_filename_component(ABS_PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
+set(PLUGINS_ROOT_DIR "${ABS_PLUGINS_ROOT_DIR}" CACHE STRING "Plugins root path. Path where include directory placed")
 set( CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
+    ${CMAKE_CURRENT_LIST_DIR}/cmake
     ${PLUGINS_ROOT_DIR}/cmake/modules
 )
 find_package(PsiPluginsApi REQUIRED)
@@ -31,8 +33,6 @@ include_directories(
 if(NOT PLUGINS_INSTALL_PATH)
     set(PLUGINS_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}")
 endif()
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 if( NOT WIN32 AND NOT HAIKU )
     add_definitions( -Ddbus -DHAVE_DBUS )

@@ -1,16 +1,12 @@
 cmake_minimum_required(VERSION 3.1.0)
 
-#set( deprecated_list
-#    captchaformsplugin
-#    gmailserviceplugin
-#)
-
 set( plugins_list
     attentionplugin
     autoreplyplugin
     birthdayreminderplugin
     chessplugin
     cleanerplugin
+    clientswitcherplugin
     conferenceloggerplugin
     contentdownloaderplugin
     enummessagesplugin
@@ -43,17 +39,11 @@ if(NOT HAIKU)
     )
 endif()
 
-if(NOT APPLE AND NOT HAIKU)
+if(NOT APPLE AND (NOT HAIKU))
     list(APPEND plugins_list
         videostatusplugin
     )
 endif()
-
-#if( NOT MSVC )
-    list(APPEND plugins_list
-        clientswitcherplugin
-    )
-#endif()
 
 if( "${BUILD_PLUGINS}" STREQUAL "ALL" )
     set ( plugins ${plugins_list} )
@@ -64,8 +54,8 @@ endif()
 foreach(plugin ${plugins_list})
     foreach(subdir ${plugins})
         if( ${plugin} STREQUAL ${subdir} )
-            message("Parse subdirectory: ./${plugin}")
-            add_subdirectory("./${plugin}")
+            message(STATUS "Add subdirectory: ${plugin}")
+            add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/${plugin}")
         endif()
     endforeach()
 endforeach()

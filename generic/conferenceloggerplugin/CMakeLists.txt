@@ -12,7 +12,8 @@ if(POLICY CMP0071)
 endif()
 set( CMAKE_AUTOMOC ON )
 
-set(PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." CACHE STRING "Plugins root path. Path where include directory placed")
+get_filename_component(ABS_PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
+set(PLUGINS_ROOT_DIR "${ABS_PLUGINS_ROOT_DIR}" CACHE STRING "Plugins root path. Path where include directory placed")
 set( CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
     ${PLUGINS_ROOT_DIR}/cmake/modules
