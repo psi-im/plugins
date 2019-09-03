@@ -51,6 +51,7 @@ else()
     set ( plugins "${BUILD_PLUGINS}" )
 endif()
 
+message(STATUS "Plugins from generic subdirectory")
 foreach(plugin ${plugins_list})
     foreach(subdir ${plugins})
         if( ${plugin} STREQUAL ${subdir} )
