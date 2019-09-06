@@ -17,6 +17,8 @@ set( CMAKE_MODULE_PATH
 find_package(PsiPluginsApi QUIET)
 if(PsiPluginsApi_DIR)
     include(${PsiPluginsApi_DIR}/variables.cmake)
+    message(STATUS "PsiPluginsApi_DIR: ${PsiPluginsApi_DIR}")
+    message(STATUS "PsiPluginsApi_INCLUDE_DIR: ${PsiPluginsApi_INCLUDE_DIR}")
 endif()
 
 if(PROJECT_NAME AND MAIN_PROGRAM_NAME)
