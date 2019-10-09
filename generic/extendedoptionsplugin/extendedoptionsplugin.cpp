@@ -39,7 +39,7 @@
 #include "plugininfoprovider.h"
 
 
-#define constVersion "0.4.4"
+#define constVersion "0.4.5"
 
 class ExtToolButton : public QToolButton
 {
@@ -137,6 +137,7 @@ private:
     QCheckBox *auto_configure = nullptr;
     QCheckBox *allowMucEvents = nullptr;
     QCheckBox *storeMucPrivates = nullptr;
+    QCheckBox *hideWhenClose = nullptr;
 
     // Roster
     QCheckBox *resolveNicks = nullptr;
@@ -350,6 +351,7 @@ QWidget* ExtendedOptions::options()
     mucHtml = new QCheckBox(tr("Enable HTML rendering in groupchat chat window"));
     allowMucEvents = new QCheckBox(tr("Allow groupchat highlight events"));
     storeMucPrivates = new QCheckBox(tr("Store MUC private messages in history"));
+    hideWhenClose = new QCheckBox(tr("Hide groupchat when closing window"));
 
     muc_leave_status_message = new QLineEdit;
     accept_defaults = new QCheckBox(tr("Automatically accept the default room configuration"));
@@ -378,6 +380,7 @@ QWidget* ExtendedOptions::options()
     mucGeneralLayout->addWidget(bookmarksListSkip);
     mucGeneralLayout->addWidget(new QLabel(tr("Groupchat leave status message:")));
     mucGeneralLayout->addWidget(muc_leave_status_message);
+    mucGeneralLayout->addWidget(hideWhenClose);
     mucGeneralLayout->addStretch();
 
 
@@ -754,6 +757,7 @@ void ExtendedOptions::applyOptions()
     psiOptions->setGlobalOption("options.html.muc.render",QVariant(mucHtml->isChecked()));
     psiOptions->setGlobalOption("options.ui.muc.hide-on-autojoin",QVariant(hideAutoJoin->isChecked()));
     saveFile(bookmarksListSkip->toPlainText());
+    psiOptions->setGlobalOption("options.ui.muc.hide-when-closing",QVariant(hideWhenClose->isChecked()));
 
     psiOptions->setGlobalOption("options.ui.muc.show-initial-joins",QVariant(show_initial_joins->isChecked()));
     psiOptions->setGlobalOption("options.ui.muc.status-with-priority",QVariant(status_with_priority->isChecked()));
@@ -881,6 +885,7 @@ void ExtendedOptions::restoreOptions()
     //    rosterNickColors->setChecked(psiOptions->getGlobalOption("options.ui.muc.userlist.nick-coloring").toBool());
     mucHtml->setChecked(psiOptions->getGlobalOption("options.html.muc.render").toBool());
     hideAutoJoin->setChecked(psiOptions->getGlobalOption("options.ui.muc.hide-on-autojoin").toBool());
+    hideWhenClose->setChecked(psiOptions->getGlobalOption("options.ui.muc.hide-when-closing").toBool());
 
     show_initial_joins->setChecked(psiOptions->getGlobalOption("options.ui.muc.show-initial-joins").toBool());
     status_with_priority->setChecked(psiOptions->getGlobalOption("options.ui.muc.status-with-priority").toBool());
@@ -1084,6 +1089,7 @@ void ExtendedOptions::setWhatThis()
     mucClientIcons->setWhatsThis("options.ui.muc.userlist.show-client-icons");
     mucHtml->setWhatsThis("options.html.muc.render");
     hideAutoJoin->setWhatsThis("options.ui.muc.hide-on-autojoin");
+    hideWhenClose->setWhatsThis("options.ui.muc.hide-when-closing");
 
     show_initial_joins->setWhatsThis("options.ui.muc.show-initial-joins");
     status_with_priority->setWhatsThis("options.ui.muc.status-with-priority");
