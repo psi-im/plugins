@@ -53,11 +53,11 @@ QVariant CDItemModel::data(const QModelIndex &index, int role) const
     ContentItem *item = static_cast<ContentItem*>(index.internalPointer());
     if(role == Qt::CheckStateRole) {
         if(item->isInstalled()) {
-            return 1;
+            return Qt::PartiallyChecked;
         } else if(item->toInstall()) {
-            return 2;
+            return Qt::Checked;
         } else    {
-            return 0;
+            return Qt::Unchecked;
         }
     }
     
@@ -82,7 +82,7 @@ bool CDItemModel::setData(const QModelIndex &index, const QVariant &value, int r
         
         if(index.parent().isValid()) {
             if(value.toBool() == false) {
-                static_cast<ContentItem*>(index.internalPointer())->setToInstall(false);
+                static_cast<ContentItem*>(index.parent().internalPointer())->setToInstall(false);
             } else {
                 int i = 0;
                 bool b = true;
@@ -93,7 +93,7 @@ bool CDItemModel::setData(const QModelIndex &index, const QVariant &value, int r
                     }
                 }
                 
-                static_cast<ContentItem*>(index.internalPointer())->setToInstall(b);
+                static_cast<ContentItem*>(index.parent().internalPointer())->setToInstall(b);
             }
         }
 

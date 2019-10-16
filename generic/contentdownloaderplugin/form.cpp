@@ -52,8 +52,9 @@ Form::Form(QWidget *parent)
     CDItemModel *model = new CDItemModel(this);
     ui->treeView->setModel(model);
 
-    connect(ui->treeView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), SLOT(modelSelectionChanged(const QModelIndex&, const QModelIndex&)));
-    connect(model, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), SLOT(modelSelectedItem()));
+    connect(ui->treeView->selectionModel(), &QItemSelectionModel::currentChanged,
+            this, &Form::modelSelectionChanged);
+    connect(model, &CDItemModel::dataChanged, this, [this](){modelSelectedItem();});
     ui->widgetContent->hide();
 }
 
@@ -66,7 +67,7 @@ Form::~Form()
 void Form::setDataDir(const QString &path)
 {
     dataDir_ = path;
-    CDItemModel *model = qobject_cast<CDItemModel*>(ui->treeView->model());
+    CDItemModel *model = static_cast<CDItemModel*>(ui->treeView->model());
     model->setDataDir(path);
 }
 
@@ -89,7 +90,7 @@ void Form::setCacheDir(const QString &path)
 
 void Form::setResourcesDir(const QString &path)
 {
-    CDItemModel *model = qobject_cast<CDItemModel*>(ui->treeView->model());
+    CDItemModel *model = static_cast<CDItemModel*>(ui->treeView->model());
     model->setResourcesDir(path);
 }
 
@@ -121,14 +122,14 @@ void Form::on_btnLoadList_clicked()
     QNetworkReply *reply = nam_->get(request);
 
     // State of progress 
-    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), SLOT(downloadContentListProgress(qint64, qint64)));
+    connect(reply, &QNetworkReply::downloadProgress, this, &Form::downloadContentProgress);
 
     // Content list have beign downloaded
-    connect(reply, SIGNAL(finished()), SLOT(downloadContentListFinished()));
+    connect(reply, &QNetworkReply::finished, this, &Form::downloadContentListFinished);
   
     ui->progressBar->show();
     ui->progressBar->setFormat(url.section(QDir::separator(), -1) + " %v Kb (%p%)");
-    ui->progressBar->setMaximum(reply->size());
+    ui->progressBar->setMaximum(int(reply->size()));
 }
 
 void Form::changeEvent(QEvent *e)
@@ -145,7 +146,7 @@ void Form::changeEvent(QEvent *e)
 
 void Form::parseContentList(const QString &text)
 {
-    CDItemModel *model = qobject_cast<CDItemModel*>(ui->treeView->model());
+    CDItemModel *model = static_cast<CDItemModel*>(ui->treeView->model());
     int position = 0;
 
     QStringList list;
@@ -188,13 +189,13 @@ void Form::parseContentList(const QString &text)
 
 void Form::downloadContentListProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
-    ui->progressBar->setMaximum(bytesTotal / 1024);
-    ui->progressBar->setValue(bytesReceived / 1024);
+    ui->progressBar->setMaximum(int(bytesTotal / 1024));
+    ui->progressBar->setValue(int(bytesReceived / 1024));
 }
 
 void Form::downloadContentListFinished()
 {
-    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    QNetworkReply *reply = static_cast<QNetworkReply*>(sender());
     ui->progressBar->hide();
  
     // Occurs erros
@@ -212,20 +213,20 @@ void Form::downloadContentListFinished()
     parseContentList(reply->readAll());
     reply->close();
     ui->btnInstall->setEnabled(false);
-    CDItemModel *model = qobject_cast<CDItemModel*>(ui->treeView->model());
+    CDItemModel *model = static_cast<CDItemModel*>(ui->treeView->model());
     model->update();
     ui->treeView->reset();
 }
 
 void Form::downloadContentProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
-    ui->progressBar->setMaximum(bytesTotal / 1024);
-    ui->progressBar->setValue(bytesReceived / 1024);
+    ui->progressBar->setMaximum(int(bytesTotal / 1024));
+    ui->progressBar->setValue(int(bytesReceived / 1024));
 }
 
 void Form::downloadContentFinished()
 {
-    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    QNetworkReply *reply = static_cast<QNetworkReply*>(sender());
     
     // Occurs erros
     if(reply->error() != QNetworkReply::NoError) {
@@ -242,7 +243,7 @@ void Form::downloadContentFinished()
     ContentItem *item = toDownload_.first();
     QString filename = item->url().section("/", -1);
     toDownload_.removeFirst();
-    if(filename.endsWith(".jisp")) {
+    if(filename.endsWith(".jisp", Qt::CaseInsensitive)) {
         QDir dir(QDir::toNativeSeparators(QString("%1/%2").
                                           arg(dataDir_).
                                           arg(item->group())));
@@ -262,7 +263,7 @@ void Form::downloadContentFinished()
         }
         
         fd.close();
-        CDItemModel *model = qobject_cast<CDItemModel*>(ui->treeView->model());
+        CDItemModel *model = static_cast<CDItemModel*>(ui->treeView->model());
         model->update();
     }
     
@@ -272,7 +273,7 @@ void Form::downloadContentFinished()
 
 void Form::downloadHtmlFinished()
 {
-    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    QNetworkReply *reply = static_cast<QNetworkReply*>(sender());
     
     // Occurs erros
     if(reply->error() != QNetworkReply::NoError) {
@@ -296,11 +297,11 @@ void Form::downloadHtmlFinished()
             }
             delete model;
             dir.mkpath(".");
-      
+
             QDomNodeList imgs = doc.elementsByTagName("img");
             QDomNode node;
             QVector<QStringList> text;
-    
+
             for(int i = 0; i < imgs.size(); i++) {
                 QDomElement el = imgs.at(i).toElement();
                 QString urlStr(el.attribute("src"));
@@ -315,21 +316,22 @@ void Form::downloadHtmlFinished()
                 if(!url.isValid()) {
                     continue;
                 }
-                
+
                 QString filename = url.toString().section("/", -1);
                 el.setAttribute("src", imgsdir + QDir::separator() + filename);
                 QNetworkRequest request(url);
                 request.setRawHeader("User-Agent", "Content Downloader Plugin (Psi+)");
                 request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::PreferCache);
                 QNetworkReply *reply = nam_->get(request);
-                connect(reply, SIGNAL(finished()), SLOT(downloadImgFinished()));
+                connect(reply, &QNetworkReply::finished, this, &Form::downloadImgFinished);
             }
             html = doc.toString();
         } else {
             // Error occurs in parse of yandex.xml
-            qDebug() << "Content Downloader Plugin:" << " line: " << errorLine << ", column: " << errorColumn;
+            qDebug() << "Content Downloader Plugin:" << " line: "
+                     << errorLine << ", column: " << errorColumn << "msg: " << errorMsg;
         }
-        
+
         ui->textEdit->setHtml(html);
     }
     
@@ -338,7 +340,7 @@ void Form::downloadHtmlFinished()
 
 void Form::downloadImgFinished()
 {
-    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    QNetworkReply *reply = static_cast<QNetworkReply*>(sender());
     
     // Occurs erros
     if(reply->error() != QNetworkReply::NoError) {
@@ -375,21 +377,21 @@ void Form::startDownload()
     QNetworkReply *reply = nam_->get(request);
 
     // State of progress 
-    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), SLOT(downloadContentProgress(qint64, qint64)));
+    connect(reply, &QNetworkReply::downloadProgress, this, &Form::downloadContentProgress);
 
     // Content list have beign downloaded
-    connect(reply, SIGNAL(finished()), SLOT(downloadContentFinished()));
+    connect(reply, &QNetworkReply::finished, this, &Form::downloadContentFinished);
   
     ui->progressBar->show();
     ui->progressBar->setFormat(toDownload_.first()->url().section("/", -1) + " %v Kb (%p%)");
-    ui->progressBar->setMaximum(reply->size());
+    ui->progressBar->setMaximum(int(reply->size()));
 }
 
 void Form::modelSelectionChanged(const QModelIndex &current, const QModelIndex &previous)
 {
     Q_UNUSED(previous);
 
-    ContentItem *item = (ContentItem*)current.internalPointer();
+    ContentItem *item = static_cast<ContentItem*>(current.internalPointer());
     ui->textEdit->setHtml("");
     QUrl url(item->html());
 
@@ -400,13 +402,13 @@ void Form::modelSelectionChanged(const QModelIndex &current, const QModelIndex &
         replyLastHtml_ = nam_->get(request);
 
         // Content list have beign downloaded
-        connect(replyLastHtml_, SIGNAL(finished()), SLOT(downloadHtmlFinished()));
+        connect(replyLastHtml_, &QNetworkReply::finished, this, &Form::downloadHtmlFinished);
    }
 }
 
 void Form::modelSelectedItem()
 {
-    CDItemModel *model = qobject_cast<CDItemModel*>(ui->treeView->model());
+    CDItemModel *model = static_cast<CDItemModel*>(ui->treeView->model());
     toDownload_ = model->getToInstall();
 
     if(toDownload_.isEmpty()) {

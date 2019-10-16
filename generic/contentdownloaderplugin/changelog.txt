@@ -1,3 +1,9 @@
+2019-10-16  VitoZz
+v0.2.6
+  * исправлена работа с ресурсами
+  * изменен файл интерфейса
+  * рефакторинг кода
+
 2014-05-02  zet
 v0.2.5
   * https://raw.githubusercontent.com/psi-plus/contentdownloader/master/content.list

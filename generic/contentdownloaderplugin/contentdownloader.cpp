@@ -50,7 +50,7 @@ QString ContentDownloader::shortName() const
 
 QString ContentDownloader::version() const
 {
-    return "0.2.5";
+    return "0.2.6";
 }
 
 QWidget *ContentDownloader::options()
@@ -71,7 +71,7 @@ QWidget *ContentDownloader::options()
         type = QNetworkProxy::HttpProxy;
     }
 
-    QNetworkProxy proxy(type, psiProxy.host, psiProxy.port, psiProxy.user, psiProxy.pass);
+    QNetworkProxy proxy(type, psiProxy.host, quint16(psiProxy.port), psiProxy.user, psiProxy.pass);
 
     form_ = new Form();
     form_->setDataDir(appInfoHost->appHomeDir(ApplicationInfoAccessingHost::DataLocation));
@@ -79,7 +79,7 @@ QWidget *ContentDownloader::options()
     form_->setResourcesDir(appInfoHost->appResourcesDir());
     form_->setPsiOption(psiOptions);
     form_->setProxy(proxy);
-    return qobject_cast<QWidget*>(form_);
+    return static_cast<QWidget*>(form_);
 }
 
 bool ContentDownloader::enable()
