@@ -1,7 +1,8 @@
 language: cpp
 
-dist: xenial
 sudo: required
+dist: xenial
+osx_image: xcode10.3
 
 os:
   - linux
