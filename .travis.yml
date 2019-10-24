@@ -1,31 +1,41 @@
 language: cpp
 
 sudo: required
-dist: xenial
-osx_image: xcode10.3
-
-os:
-  - linux
-  - osx
 
 if: tag IS blank
 
-env:
-  - TARGET=linux64 BUILD_DEV_PLUGINS=ON
-  - TARGET=linux64 BUILD_DEV_PLUGINS=OFF
-  - TARGET=macos64 BUILD_DEV_PLUGINS=ON
-  - TARGET=macos64 BUILD_DEV_PLUGINS=OFF
-
-matrix:
-  exclude:
-    - env: TARGET=linux64 BUILD_DEV_PLUGINS=ON
-      os: osx
-    - env: TARGET=linux64 BUILD_DEV_PLUGINS=OFF
-      os: osx
+jobs:
+  include:
+    - env: TARGET=linux64 BUILD_DEV_PLUGINS=ON DIST=xenial
+      os: linux
+      dist: xenial
+    - env: TARGET=linux64 BUILD_DEV_PLUGINS=ON DIST=bionic
+      os: linux
+      dist: bionic
+    - env: TARGET=linux64 BUILD_DEV_PLUGINS=OFF DIST=xenial
+      os: linux
+      dist: xenial
+    - env: TARGET=linux64 BUILD_DEV_PLUGINS=OFF DIST=bionic
+      os: linux
+      dist: bionic
     - env: TARGET=macos64 BUILD_DEV_PLUGINS=ON
-      os: linux
+      os: osx
+      osx_image: xcode9.4
+    - env: TARGET=macos64 BUILD_DEV_PLUGINS=ON
+      os: osx
+      osx_image: xcode10.3
+    - env: TARGET=macos64 BUILD_DEV_PLUGINS=ON
+      os: osx
+      osx_image: xcode11.2
     - env: TARGET=macos64 BUILD_DEV_PLUGINS=OFF
-      os: linux
+      os: osx
+      osx_image: xcode9.4
+    - env: TARGET=macos64 BUILD_DEV_PLUGINS=OFF
+      os: osx
+      osx_image: xcode10.3
+    - env: TARGET=macos64 BUILD_DEV_PLUGINS=OFF
+      os: osx
+      osx_image: xcode11.2
 
 install:
   - ./tests/travis-ci/install-build-depends.sh
