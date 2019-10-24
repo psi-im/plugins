@@ -18,7 +18,6 @@ then
     ./tests/travis-ci/build-in-ubuntu.sh
 elif [ "${TARGET}" = "macos64" ]
 then
-    export HOMEBREW="/usr/local"
     ./tests/travis-ci/build-in-macos.sh
 fi
 
