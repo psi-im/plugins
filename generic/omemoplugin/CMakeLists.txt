@@ -85,6 +85,9 @@ set(SOURCES
     src/configwidget.cpp
 )
 
+get_plugin_version("src/omemoplugin.cpp" PV)
+message(STATUS "${PROJECT_NAME} version - ${PV}")
+
 qt5_add_resources(RESOURCES omemoplugin.qrc)
 
 set(QT_DEPLIBS

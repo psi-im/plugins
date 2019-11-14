@@ -1,5 +1,6 @@
 cmake_minimum_required( VERSION 3.1.0 )
-if(NOT PROJECT_NAME)
+get_directory_property(hasParent PARENT_DIRECTORY)
+if(NOT PROJECT_NAME OR (NOT hasParent))
     project(psi-plugins)
 endif()
 set_directory_properties(PROPERTIES
@@ -14,9 +15,12 @@ set( CMAKE_MODULE_PATH
 )
 
 #Find Psi Plugins API
+if(NOT PLUGINS_ROOT_DIR)
+    set(PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE STRING "Plugins root directory" FORCE)
+endif()
 find_package(PsiPluginsApi QUIET)
 if(PsiPluginsApi_DIR)
-    include(${PsiPluginsApi_DIR}/variables.cmake)
+    include("${PsiPluginsApi_DIR}/variables.cmake")
     message(STATUS "PsiPluginsApi_DIR: ${PsiPluginsApi_DIR}")
     message(STATUS "PsiPluginsApi_INCLUDE_DIR: ${PsiPluginsApi_INCLUDE_DIR}")
 endif()

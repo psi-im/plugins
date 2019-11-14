@@ -48,6 +48,9 @@ set(RESOURCES
     resources.qrc
     )
 
+get_plugin_version("rippercc.h" PV)
+message(STATUS "${PROJECT_NAME} version - ${PV}")
+
 find_package(Qt5 COMPONENTS Core Gui Widgets Xml Network REQUIRED)
 set(QT_DEPLIBS Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Xml Qt5::Network)
 

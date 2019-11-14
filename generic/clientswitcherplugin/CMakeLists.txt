@@ -49,6 +49,9 @@ set( _RSCS
     resources.qrc
 )
 
+get_plugin_version("${PLUGIN}.cpp" PV)
+message(STATUS "${PROJECT_NAME} version - ${PV}")
+
 find_package( Qt5 COMPONENTS Widgets Xml REQUIRED )
 set(QT_DEPLIBS
     Qt5::Widgets

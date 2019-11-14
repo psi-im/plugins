@@ -34,12 +34,19 @@ set( _SRCS
     messagefilter.cpp
     options.cpp
 )
+set( _HDRS
+    messagefilter.h
+    options.h
+    )
 set( _UIS
     options.ui
 )
 set( _RSCS
     resources.qrc
 )
+
+get_plugin_version("messagefilter.h" PV)
+message(STATUS "${PROJECT_NAME} version - ${PV}")
 
 find_package( Qt5 COMPONENTS Widgets Xml REQUIRED )
 set(QT_DEPLIBS

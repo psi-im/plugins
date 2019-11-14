@@ -101,6 +101,9 @@ set( _RSCS
     ${PLUGIN}.qrc
 )
 
+get_plugin_version("src/psiotrplugin.cpp" PV)
+message(STATUS "${PROJECT_NAME} version - ${PV}")
+
 find_package( Qt5 COMPONENTS Widgets Xml Concurrent REQUIRED )
 set(QT_DEPLIBS
     Qt5::Widgets
