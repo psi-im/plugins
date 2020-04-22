@@ -34,9 +34,11 @@
 #include <QList>
 
 extern "C" {
-#include <libotr/message.h>
+// clang-format off
 #include <libotr/privkey.h>
 #include <libotr/proto.h>
+#include <libotr/message.h>
+// clang-format on
 #ifndef OTRL_PRIVKEY_FPRINT_HUMAN_LEN
 #define OTRL_PRIVKEY_FPRINT_HUMAN_LEN 45
 #endif
