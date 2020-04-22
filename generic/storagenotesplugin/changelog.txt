@@ -25,7 +25,7 @@ v0.1.6
 
 2010-09-11
 v0.1.4
-  * обновлена ссылка на wiki ( https://psi-plus.com/wiki/plugins#storage_notes_plugin )
+  * обновлена ссылка на wiki ( https://psi-plus.com/wiki/en:plugins#storage_notes_plugin )
 
 
 2010-08-19

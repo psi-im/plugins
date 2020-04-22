@@ -104,7 +104,7 @@ void Form::on_btnLoadList_clicked()
     ui->btnInstall->setEnabled(false);
     QString         url(LIST_URL);
     QNetworkRequest request(url);
-    request.setRawHeader("User-Agent", "Content Downloader Plugin (Psi+)");
+    request.setRawHeader("User-Agent", "Content Downloader Plugin (Psi)");
     QNetworkReply *reply = nam_->get(request);
 
     // State of progress
@@ -301,7 +301,7 @@ void Form::downloadHtmlFinished()
                 QString filename = url.toString().section("/", -1);
                 el.setAttribute("src", imgsdir + QDir::separator() + filename);
                 QNetworkRequest request(url);
-                request.setRawHeader("User-Agent", "Content Downloader Plugin (Psi+)");
+                request.setRawHeader("User-Agent", "Content Downloader Plugin (Psi)");
                 request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::PreferCache);
                 QNetworkReply *reply = nam_->get(request);
                 connect(reply, &QNetworkReply::finished, this, &Form::downloadImgFinished);
@@ -352,7 +352,7 @@ void Form::startDownload()
     ui->btnInstall->setEnabled(false);
     QNetworkRequest request;
     request.setUrl(QUrl(toDownload_.first()->url()));
-    request.setRawHeader("User-Agent", "Content Downloader Plugin (Psi+)");
+    request.setRawHeader("User-Agent", "Content Downloader Plugin (Psi)");
     QNetworkReply *reply = nam_->get(request);
 
     // State of progress
@@ -376,7 +376,7 @@ void Form::modelSelectionChanged(const QModelIndex &current, const QModelIndex &
 
     if (url.isValid()) {
         QNetworkRequest request(url);
-        request.setRawHeader("User-Agent", "Content Downloader Plugin (Psi+)");
+        request.setRawHeader("User-Agent", "Content Downloader Plugin (Psi)");
         request.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::PreferCache);
         replyLastHtml_ = nam_->get(request);
 

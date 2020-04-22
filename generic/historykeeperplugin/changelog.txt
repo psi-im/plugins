@@ -10,7 +10,7 @@ v0.0.6
 
 2010-09-11
 v0.0.5
-  * обновлена ссылка на wiki ( https://psi-plus.com/wiki/plugins#history_keeper_plugin )
+  * обновлена ссылка на wiki ( https://psi-plus.com/wiki/en:plugins#history_keeper_plugin )
 
 
 2010-05-17

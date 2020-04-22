@@ -1,10 +1,10 @@
-Content Downloader Plugin for Psi+
+Content Downloader Plugin for Psi
 
 The plugin allows you to download and install some content. In the current state only images smileys.
 
 Install
 1. Download source.
-2. Copy contentdownloader folder to src/plugins/generic folder in Psi+ root.
+2. Copy contentdownloader folder to src/plugins/generic folder in Psi root.
 3. cd /src/plugins/generic/contentdownloader
 4. Run qmake-qt4 (or qmake).
 5. Run make (or gmake).

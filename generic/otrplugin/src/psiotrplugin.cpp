@@ -1,7 +1,7 @@
 /*
  * psiotrplugin.cpp
  *
- * Off-the-Record Messaging plugin for Psi+
+ * Off-the-Record Messaging plugin for Psi
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
  *                    2011  Florian Fieber
  *
@@ -207,7 +207,7 @@ QString PsiOtrPlugin::pluginInfo()
                    "<dt>%10</dt><dd>%11</dd>"
                    "</dl>"
                    "%12")
-        .arg(tr("Off-the-Record Messaging plugin for Psi+"))
+        .arg(tr("Off-the-Record Messaging plugin for Psi"))
         .arg(tr("Authors: %1").arg("Timo Engel, Florian Fieber"))
         .arg(tr("Off-the-Record (OTR) Messaging allows you to have private "
                 "conversations over instant messaging by providing:"))

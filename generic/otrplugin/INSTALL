@@ -1,4 +1,4 @@
-Off-the-Record Messaging Plugin for Psi IM and Psi+
+Off-the-Record Messaging Plugin for Psi IM
 
 To compile the plugin you need to have installed the following libraries:
     - Qt 5.x (https://www.qt.io/)

@@ -1,7 +1,7 @@
 /*
  * otrinternal.h - Manages the OTR connection
  *
- * Off-the-Record Messaging plugin for Psi+
+ * Off-the-Record Messaging plugin for Psi
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
  *                    2011  Florian Fieber
  *               2013-2014  Boris Pek (tehnick-8@mail.ru)

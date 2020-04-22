@@ -130,7 +130,7 @@ QWidget *SkinsPlugin::options()
     ui_.pb_remove->setEnabled(false);
     ui_.pb_save->setEnabled(false);
 
-    ui_.lbl_wiki->setText(tr("<a href=\"https://psi-plus.com/wiki/plugins#skins_plugin\">Wiki (Online)</a>"));
+    ui_.lbl_wiki->setText(tr("<a href=\"https://psi-plus.com/wiki/en:plugins#skins_plugin\">Wiki (Online)</a>"));
     ui_.lbl_wiki->setOpenExternalLinks(true);
 
     connect(ui_.pb_update, SIGNAL(released()), this, SLOT(updateSkins()));
@@ -482,7 +482,7 @@ void SkinsPlugin::removeSkin()
 QString SkinsPlugin::pluginInfo()
 {
     return tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
-        + tr("This plugin is designed to create, store and apply skins to Psi+.\n"
+        + tr("This plugin is designed to create, store and apply skins to Psi.\n"
              "Skin - a set of custom settings.\n"
              "To download a new skin, create a folder named skins in the PsiData directory and put the new skin in it. "
              "You can also just open a skin file.\n"

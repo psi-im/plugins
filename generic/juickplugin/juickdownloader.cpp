@@ -95,7 +95,7 @@ void JuickDownloader::peekNext()
         JuickDownloadItem it = items_.dequeue();
         QNetworkRequest   request;
         request.setUrl(QUrl(it.url));
-        request.setRawHeader("User-Agent", "Juick Plugin (Psi+)");
+        request.setRawHeader("User-Agent", "Juick Plugin (Psi)");
         QNetworkReply *reply = manager_->get(request);
         QVariant       v;
         v.setValue(it);

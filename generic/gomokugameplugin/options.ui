@@ -246,10 +246,10 @@
    <item>
     <widget class="QLabel" name="label_6">
      <property name="toolTip">
-      <string notr="true">https://psi-plus.com/wiki/plugins#gomoku_game_plugin</string>
+      <string notr="true">https://psi-plus.com/wiki/en:plugins#gomoku_game_plugin</string>
      </property>
      <property name="text">
-      <string>&lt;a href=&quot;https://psi-plus.com/wiki/plugins#gomoku_game_plugin&quot;&gt;Wiki (online)&lt;/a&gt;</string>
+      <string>&lt;a href=&quot;https://psi-plus.com/wiki/en:plugins#gomoku_game_plugin&quot;&gt;Wiki (online)&lt;/a&gt;</string>
      </property>
      <property name="openExternalLinks">
       <bool>true</bool>

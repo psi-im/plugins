@@ -223,7 +223,7 @@
    <item>
     <widget class="QLabel" name="lb_wiki">
      <property name="text">
-      <string>&lt;a href=&quot;https://psi-plus.com/wiki/plugins#screenshot_plugin&quot;&gt;Wiki (Online)&lt;/a&gt;</string>
+      <string>&lt;a href=&quot;https://psi-plus.com/wiki/en:plugins#screenshot_plugin&quot;&gt;Wiki (Online)&lt;/a&gt;</string>
      </property>
      <property name="openExternalLinks">
       <bool>true</bool>

@@ -169,7 +169,7 @@ QWidget *HistoryKeeperPlugin::options()
     contactsWidget->setText(text);
 
     QLabel *wikiLink
-        = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#history_keeper_plugin\">Wiki (Online)</a>"));
+        = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/en:plugins#history_keeper_plugin\">Wiki (Online)</a>"));
     wikiLink->setOpenExternalLinks(true);
 
     layout->addWidget(new QLabel(tr("Remove history for contacts:")));
@@ -251,7 +251,7 @@ QAction *HistoryKeeperPlugin::getContactAction(QObject *p, int /*acc*/, const QS
 QString HistoryKeeperPlugin::pluginInfo()
 {
     return tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
-        + tr("This plugin is designed to remove the history of selected contacts when the Psi+ is closed.\n"
+        + tr("This plugin is designed to remove the history of selected contacts when the Psi is closed.\n"
              "You can select or deselect a contact for history removal from the context menu of a contact or via the "
              "plugin options.");
 }

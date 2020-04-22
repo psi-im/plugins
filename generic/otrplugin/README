@@ -1,8 +1,7 @@
-Off-The-Record-Messaging plugin for Psi+
+Off-The-Record-Messaging plugin for Psi
 
-This is a Off-The-Record-Messaging plugin for the Psi+ instant messenger.
-Psi+ (aka Psi-dev) is a collection of patches for Psi. It is available from
-http://psi-dev.googlecode.com/
+This is a Off-The-Record-Messaging plugin for the Psi instant messenger.
+https://psi-im.org/
 
 See the file INSTALL for instructions how to build this plugin.
 
@@ -19,7 +18,7 @@ TODO
 KNOWN ISSUES
 * Currently only works for top priority resources
 * System messages are only displayed for existing chat windows, might be
-  displayed in wrong order (needs to be fixed in Psi+)
+  displayed in wrong order (needs to be fixed)
 
 
 THANKS
@@ -28,16 +27,16 @@ Thanks to Prof. Dr. Ruediger Weis for supporting this work. Thanks to
 all people who sent patches. Especially to specThor <specthor@web.de>
 for UTF8 patches, Hannes Mehnert <hannes@mehnert.org> for chatdialog.
 Rolf Wuerdemann <rowue@digitalis.org> for configure patch and several
-bugfixes. Thanks to wadealer from Psi+ for adapting and including the
-patches into Psi+. Thanks to Boris Pek for porting to libotr >= 4.0.0.
+bugfixes. Thanks to wadealer for adapting and including the patches.
+Thanks to Boris Pek for porting to libotr >= 4.0.0.
 
 
 LICENSE
 
-The Off-the-Record Messaging plugin for Psi+ is covered by the following
+The Off-the-Record Messaging plugin for Psi is covered by the following
 (GPL) license:
 
-    Off-the-Record Messaging plugin for Psi+
+    Off-the-Record Messaging plugin for Psi
     Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
                   2011-2012  Florian Fieber
 
@@ -59,6 +58,6 @@ CONTACT
 http://public.beuth-hochschule.de/~s30935/
 Timo Engel <timo-e@freenet.de>
 
-Psi+ developers can be contacted via XMPP conference:
-psi-dev@conference.jabber.ru
+Psi developers can be contacted via XMPP conference:
+xmpp:psi-dev@conference.jabber.ru?join
 
