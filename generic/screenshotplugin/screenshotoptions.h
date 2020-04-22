@@ -22,8 +22,7 @@
 
 #include "ui_screenshotoptions.h"
 
-class ScreenshotOptions : public QDialog
-{
+class ScreenshotOptions : public QDialog {
     Q_OBJECT
 public:
     ScreenshotOptions(int delay, QWidget *parent = nullptr);

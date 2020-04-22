@@ -22,25 +22,20 @@
 
 #include "htmltidy.h"
 
+#include <QDebug>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QTextStream>
-#include <QDebug>
-
 
 //-----------------------------------------------------------------------------
 
-HtmlTidy::HtmlTidy(const QString& html)
-    : m_tidyDoc(tidyCreate()),
-      m_errorOutput(),
-      m_output(),
-      m_input(html)
+HtmlTidy::HtmlTidy(const QString &html) : m_tidyDoc(tidyCreate()), m_errorOutput(), m_output(), m_input(html)
 {
-    tidyOptSetBool (m_tidyDoc, TidyXmlOut,       yes);
+    tidyOptSetBool(m_tidyDoc, TidyXmlOut, yes);
     tidyOptSetValue(m_tidyDoc, TidyCharEncoding, "utf8");
-    tidyOptSetInt  (m_tidyDoc, TidyNewline,      TidyLF);
-    tidyOptSetBool (m_tidyDoc, TidyQuoteNbsp,    no);
-    tidyOptSetBool (m_tidyDoc, TidyForceOutput,  yes);
+    tidyOptSetInt(m_tidyDoc, TidyNewline, TidyLF);
+    tidyOptSetBool(m_tidyDoc, TidyQuoteNbsp, no);
+    tidyOptSetBool(m_tidyDoc, TidyForceOutput, yes);
 
     tidySetErrorBuffer(m_tidyDoc, &m_errorOutput);
 
@@ -78,26 +73,25 @@ QString HtmlTidy::writeOutput()
 QString HtmlTidy::output()
 {
     QDomDocument document;
-    QDomElement body = output(document);
-    QString s;
-    QTextStream ts(&s) ;
+    QDomElement  body = output(document);
+    QString      s;
+    QTextStream  ts(&s);
     body.save(ts, 0);
     return s;
 }
 
 //-----------------------------------------------------------------------------
 
-QDomElement HtmlTidy::output(QDomDocument& document)
+QDomElement HtmlTidy::output(QDomDocument &document)
 {
-    int errorLine = 0;
-    int errorColumn = 0;
+    int     errorLine   = 0;
+    int     errorColumn = 0;
     QString errorText;
 
     QString html = writeOutput();
-    if (!document.setContent(html, true, &errorText,
-                            &errorLine, &errorColumn))
-    {
-        qWarning() << "---- parsing error:\n" << html << "\n----\n"
+    if (!document.setContent(html, true, &errorText, &errorLine, &errorColumn)) {
+        qWarning() << "---- parsing error:\n"
+                   << html << "\n----\n"
                    << errorText << " line:" << errorLine << " column:" << errorColumn;
 
         QDomElement domBody = document.createElement("body");
@@ -110,23 +104,17 @@ QDomElement HtmlTidy::output(QDomDocument& document)
 
 //-----------------------------------------------------------------------------
 
-void HtmlTidy::putByte(void* sinkData, byte bt)
-{
-    static_cast<HtmlTidy*>(sinkData)->putByte(bt);
-}
+void HtmlTidy::putByte(void *sinkData, byte bt) { static_cast<HtmlTidy *>(sinkData)->putByte(bt); }
 
 //-----------------------------------------------------------------------------
 #ifdef Q_OS_WIN
-void TIDY_CALL HtmlTidy::callPutByte(void* sinkData, byte bt)
+void TIDY_CALL HtmlTidy::callPutByte(void *sinkData, byte bt)
 {
-    static_cast<HtmlTidy*>(sinkData)->putByte(sinkData, bt);
+    static_cast<HtmlTidy *>(sinkData)->putByte(sinkData, bt);
 }
 
 //-----------------------------------------------------------------------------
 #endif
-void HtmlTidy::putByte(byte bt)
-{
-    m_output.append(bt);
-}
+void HtmlTidy::putByte(byte bt) { m_output.append(bt); }
 
 //-----------------------------------------------------------------------------

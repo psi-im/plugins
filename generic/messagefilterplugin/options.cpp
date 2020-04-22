@@ -19,19 +19,15 @@
 
 #include "options.h"
 
-#include "ui_options.h"
 #include "optionaccessinghost.h"
+#include "ui_options.h"
 
 #include <QComboBox>
-#include <QLineEdit>
 #include <QDebug>
+#include <QLineEdit>
 
-Options::Options(const QList<Rule> &rules, QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::Options)
-    , _optionHost(nullptr)
-    , _rules(rules)
-    , _currentRule(-1)
+Options::Options(const QList<Rule> &rules, QWidget *parent) :
+    QWidget(parent), ui(new Ui::Options), _optionHost(nullptr), _rules(rules), _currentRule(-1)
 {
     ui->setupUi(this);
 
@@ -55,21 +51,16 @@ Options::Options(const QList<Rule> &rules, QWidget *parent)
     }
 }
 
-Options::~Options()
-{
-    delete ui;
-}
+Options::~Options() { delete ui; }
 
-void Options::update()
-{
-}
+void Options::update() { }
 
 void Options::saveSettings()
 {
     if (_currentRule >= 0) {
-        _rules[_currentRule].name = ui->lneRuleName->text();
+        _rules[_currentRule].name        = ui->lneRuleName->text();
         _rules[_currentRule].showMessage = ui->chkShowMessage->isChecked();
-        
+
         for (int i = 0; i < ui->twConditions->rowCount(); ++i)
             saveCondition(_currentRule, i);
     }
@@ -77,13 +68,13 @@ void Options::saveSettings()
     _optionHost->setPluginOption("rules.size", _rules.size());
     for (int i = 0; i < _rules.size(); ++i) {
         QString optionName = QString("rules.l%1.").arg(i);
-        Rule rule = _rules.at(i);
+        Rule    rule       = _rules.at(i);
         _optionHost->setPluginOption(optionName + "name", rule.name);
         _optionHost->setPluginOption(optionName + "show-message", rule.showMessage);
         _optionHost->setPluginOption(optionName + "conditions.size", rule.conditions.size());
         for (int j = 0; j < rule.conditions.size(); ++j) {
-            Condition condition = rule.conditions.at(j);
-            QString optionName1 = QString("%1conditions.l%2.").arg(optionName).arg(j);
+            Condition condition   = rule.conditions.at(j);
+            QString   optionName1 = QString("%1conditions.l%2.").arg(optionName).arg(j);
             _optionHost->setPluginOption(optionName1 + "type", static_cast<int>(condition.type));
             _optionHost->setPluginOption(optionName1 + "comparison", static_cast<int>(condition.comparison));
             _optionHost->setPluginOption(optionName1 + "text", condition.text);
@@ -96,9 +87,9 @@ void Options::addRule()
     ui->lwRules->addItem("New rule");
 
     Rule rule;
-    rule.name = "New rule";
+    rule.name        = "New rule";
     rule.showMessage = false;
-    
+
     _rules << rule;
     ui->lwRules->setCurrentRow(ui->lwRules->count() - 1);
     addCondition();
@@ -120,7 +111,7 @@ void Options::upRule()
 #if QT_VERSION < QT_VERSION_CHECK(5, 13, 0)
     _rules.swap(rule, rule - 1);
 #else
-    _rules.swapItemsAt(rule, rule -1);
+    _rules.swapItemsAt(rule, rule - 1);
 #endif
 
     QListWidgetItem *item = ui->lwRules->takeItem(rule);
@@ -150,15 +141,14 @@ void Options::updateRuleButtons()
         ui->btRemoveRule->setEnabled(false);
         ui->btUpRule->setEnabled(false);
         ui->btDownRule->setEnabled(false);
-    }
-    else {
+    } else {
         ui->btRemoveRule->setEnabled(true);
         if (ui->lwRules->currentRow() > 0)
             ui->btUpRule->setEnabled(true);
         else
             ui->btUpRule->setEnabled(false);
-        
-        if (ui->lwRules->currentRow() <  ui->lwRules->count() - 1)
+
+        if (ui->lwRules->currentRow() < ui->lwRules->count() - 1)
             ui->btDownRule->setEnabled(true);
         else
             ui->btDownRule->setEnabled(false);
@@ -168,9 +158,9 @@ void Options::updateRuleButtons()
 void Options::addCondition()
 {
     Condition condition;
-    condition.type = From;
+    condition.type       = From;
     condition.comparison = Equal;
-    condition.text = "";
+    condition.text       = "";
 
     _rules[ui->lwRules->currentRow()].conditions << condition;
     setRulePane(ui->lwRules->currentRow());
@@ -178,9 +168,9 @@ void Options::addCondition()
 
 void Options::removeCondition()
 {
-    int rule = ui->lwRules->currentRow();
+    int rule      = ui->lwRules->currentRow();
     int condition = ui->twConditions->currentRow();
-    
+
     _rules[rule].conditions.removeAt(condition);
     ui->twConditions->removeRow(condition);
 
@@ -189,8 +179,8 @@ void Options::removeCondition()
 
 void Options::upCondition()
 {
-    int rule = ui->lwRules->currentRow();
-    int condition = ui->twConditions->currentRow();
+    int rule            = ui->lwRules->currentRow();
+    int condition       = ui->twConditions->currentRow();
     int conditionColumn = ui->twConditions->currentColumn();
 
     saveCondition(rule, condition - 1);
@@ -209,8 +199,8 @@ void Options::upCondition()
 
 void Options::downCondition()
 {
-    int rule = ui->lwRules->currentRow();
-    int condition = ui->twConditions->currentRow();
+    int rule            = ui->lwRules->currentRow();
+    int condition       = ui->twConditions->currentRow();
     int conditionColumn = ui->twConditions->currentColumn();
 
     saveCondition(rule, condition);
@@ -233,15 +223,14 @@ void Options::updateConditionButtons()
         ui->btRemoveCondition->setEnabled(false);
         ui->btUpCondition->setEnabled(false);
         ui->btDownCondition->setEnabled(false);
-    }
-    else {
+    } else {
         ui->btRemoveCondition->setEnabled(true);
         if (ui->twConditions->currentRow() > 0)
             ui->btUpCondition->setEnabled(true);
         else
             ui->btUpCondition->setEnabled(false);
-        
-        if (ui->twConditions->currentRow() <  ui->twConditions->rowCount() - 1)
+
+        if (ui->twConditions->currentRow() < ui->twConditions->rowCount() - 1)
             ui->btDownCondition->setEnabled(true);
         else
             ui->btDownCondition->setEnabled(false);
@@ -257,9 +246,9 @@ void Options::updateRuleName(const QString &name)
 void Options::setRulePane(int row)
 {
     if (_currentRule >= 0) {
-        _rules[_currentRule].name = ui->lneRuleName->text();
+        _rules[_currentRule].name        = ui->lneRuleName->text();
         _rules[_currentRule].showMessage = ui->chkShowMessage->isChecked();
-        
+
         for (int i = 0; i < ui->twConditions->rowCount(); ++i)
             saveCondition(_currentRule, i);
     }
@@ -299,7 +288,7 @@ void Options::setRulePane(int row)
             lineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
             ui->twConditions->setCellWidget(i, 2, lineEdit);
             connect(lineEdit, SIGNAL(textEdited(QString)), SLOT(hack()));
-            
+
             fillCondition(i);
         }
 
@@ -308,8 +297,7 @@ void Options::setRulePane(int row)
 #else
         ui->twConditions->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
 #endif
-    }
-    else {
+    } else {
         ui->wRulePane->setEnabled(false);
         ui->lneRuleName->setText("");
         ui->chkShowMessage->setChecked(false);
@@ -334,14 +322,18 @@ void Options::clearConditionsTable()
 void Options::fillCondition(int row)
 {
     int rule = ui->lwRules->currentRow();
-    qobject_cast<QComboBox*>(ui->twConditions->cellWidget(row, 0))->setCurrentIndex(_rules.at(rule).conditions.at(row).type);
-    qobject_cast<QComboBox*>(ui->twConditions->cellWidget(row, 1))->setCurrentIndex(_rules.at(rule).conditions.at(row).comparison);
-    qobject_cast<QLineEdit*>(ui->twConditions->cellWidget(row, 2))->setText(_rules.at(rule).conditions.at(row).text);
+    qobject_cast<QComboBox *>(ui->twConditions->cellWidget(row, 0))
+        ->setCurrentIndex(_rules.at(rule).conditions.at(row).type);
+    qobject_cast<QComboBox *>(ui->twConditions->cellWidget(row, 1))
+        ->setCurrentIndex(_rules.at(rule).conditions.at(row).comparison);
+    qobject_cast<QLineEdit *>(ui->twConditions->cellWidget(row, 2))->setText(_rules.at(rule).conditions.at(row).text);
 }
 
 void Options::saveCondition(int rule, int row)
 {
-    _rules[rule].conditions[row].type = static_cast<ConditionType>(qobject_cast<QComboBox*>(ui->twConditions->cellWidget(row, 0))->currentIndex());
-    _rules[rule].conditions[row].comparison = static_cast<Comparison>(qobject_cast<QComboBox*>(ui->twConditions->cellWidget(row, 1))->currentIndex());
-    _rules[rule].conditions[row].text = qobject_cast<QLineEdit*>(ui->twConditions->cellWidget(row, 2))->text();
+    _rules[rule].conditions[row].type
+        = static_cast<ConditionType>(qobject_cast<QComboBox *>(ui->twConditions->cellWidget(row, 0))->currentIndex());
+    _rules[rule].conditions[row].comparison
+        = static_cast<Comparison>(qobject_cast<QComboBox *>(ui->twConditions->cellWidget(row, 1))->currentIndex());
+    _rules[rule].conditions[row].text = qobject_cast<QLineEdit *>(ui->twConditions->cellWidget(row, 2))->text();
 }

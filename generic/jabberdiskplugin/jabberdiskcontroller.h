@@ -17,11 +17,10 @@
  *
  */
 
-
 #ifndef JABBERDISKCONTROLLER_H
 #define JABBERDISKCONTROLLER_H
 
-//class QIcon;
+// class QIcon;
 class JDMainWin;
 struct Session;
 class QDomElement;
@@ -29,26 +28,25 @@ class QDomElement;
 #include <QObject>
 
 //#include "iconfactoryaccessinghost.h"
-#include "stanzasendinghost.h"
 #include "accountinfoaccessinghost.h"
+#include "stanzasendinghost.h"
 
-class JabberDiskController : public QObject
-{
+class JabberDiskController : public QObject {
     Q_OBJECT
 public:
-    static JabberDiskController* instance();
-    static void reset();
+    static JabberDiskController *instance();
+    static void                  reset();
     virtual ~JabberDiskController();
 
-    //void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
+    // void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
     void setStanzaSendingHost(StanzaSendingHost *host);
-    void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
-    bool incomingStanza(int account, const QDomElement& xml);
+    void setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
+    bool incomingStanza(int account, const QDomElement &xml);
 
-    void sendStanza(int account, const QString& to, const QString& message, QString* id);
+    void sendStanza(int account, const QString &to, const QString &message, QString *id);
 
 signals:
-    void stanza(int account, const QDomElement& xml);
+    void stanza(int account, const QDomElement &xml);
 
 public slots:
     void initSession();
@@ -58,14 +56,13 @@ private slots:
 
 private:
     JabberDiskController();
-    static JabberDiskController* instance_;
+    static JabberDiskController *instance_;
 
 private:
-    StanzaSendingHost* stanzaSender;
-    //IconFactoryAccessingHost* iconHost;
-    AccountInfoAccessingHost* accInfo;
-    QList<Session> sessions_;
-
+    StanzaSendingHost *stanzaSender;
+    // IconFactoryAccessingHost* iconHost;
+    AccountInfoAccessingHost *accInfo;
+    QList<Session>            sessions_;
 };
 
 #endif // JABBERDISKCONTROLLER_H

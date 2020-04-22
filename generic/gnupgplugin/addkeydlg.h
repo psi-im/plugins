@@ -20,13 +20,14 @@
 #ifndef ADDKEYDLG_H
 #define ADDKEYDLG_H
 
-#include <QDialog>
 #include <QDate>
+#include <QDialog>
 
-namespace Ui { class AddKeyDlg; }
+namespace Ui {
+class AddKeyDlg;
+}
 
-class AddKeyDlg : public QDialog
-{
+class AddKeyDlg : public QDialog {
     Q_OBJECT
 
 public:
@@ -36,9 +37,9 @@ public:
     QString name() const;
     QString email() const;
     QString comment() const;
-    int type() const;
-    int length() const;
-    QDate expiration() const;
+    int     type() const;
+    int     length() const;
+    QDate   expiration() const;
     QString pass() const;
 
 private slots:

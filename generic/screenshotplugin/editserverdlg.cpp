@@ -20,9 +20,7 @@
 #include "editserverdlg.h"
 #include "server.h"
 
-
-EditServerDlg::EditServerDlg(QWidget *parent)
-    : QDialog(parent)
+EditServerDlg::EditServerDlg(QWidget *parent) : QDialog(parent)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setModal(false);
@@ -33,18 +31,12 @@ EditServerDlg::EditServerDlg(QWidget *parent)
 
 void EditServerDlg::onOkPressed()
 {
-    const QStringList &list = {
-        ui_.le_name->text(),
-        ui_.le_url->text(),
-        ui_.le_user->text(),
-        ui_.le_pass->text(),
-        ui_.le_post_data->text(),
-        ui_.le_file_input->text(),
-        ui_.le_regexp->text(),
-        (ui_.cb_proxy->isChecked() ? "true" : "false")
-    };
-    const QString &str = list.join(Server::splitString());
-    if(server_) {
+    const QStringList &list = { ui_.le_name->text(),      ui_.le_url->text(),
+                                ui_.le_user->text(),      ui_.le_pass->text(),
+                                ui_.le_post_data->text(), ui_.le_file_input->text(),
+                                ui_.le_regexp->text(),    (ui_.cb_proxy->isChecked() ? "true" : "false") };
+    const QString &    str  = list.join(Server::splitString());
+    if (server_) {
         server_->setFromString(str);
         server_->setText(server_->displayName());
     }
@@ -52,30 +44,30 @@ void EditServerDlg::onOkPressed()
     close();
 }
 
-void EditServerDlg::setSettings(const QString& settings)
+void EditServerDlg::setSettings(const QString &settings)
 {
-        QStringList l = settings.split(Server::splitString());
-        if(l.size() == 11) {
-            processOldSettingString(l);
-            return;
-        }
+    QStringList l = settings.split(Server::splitString());
+    if (l.size() == 11) {
+        processOldSettingString(l);
+        return;
+    }
 
-        if(!l.isEmpty())
-            ui_.le_name->setText(l.takeFirst());
-        if(!l.isEmpty())
-            ui_.le_url->setText(l.takeFirst());
-        if(!l.isEmpty())
-            ui_.le_user->setText(l.takeFirst());
-        if(!l.isEmpty())
-            ui_.le_pass->setText(l.takeFirst());
-        if(!l.isEmpty())
-            ui_.le_post_data->setText(l.takeFirst());
-        if(!l.isEmpty())
-            ui_.le_file_input->setText(l.takeFirst());
-        if(!l.isEmpty())
-            ui_.le_regexp->setText(l.takeFirst());
-        if(!l.isEmpty())
-            ui_.cb_proxy->setChecked(l.takeFirst() == "true");
+    if (!l.isEmpty())
+        ui_.le_name->setText(l.takeFirst());
+    if (!l.isEmpty())
+        ui_.le_url->setText(l.takeFirst());
+    if (!l.isEmpty())
+        ui_.le_user->setText(l.takeFirst());
+    if (!l.isEmpty())
+        ui_.le_pass->setText(l.takeFirst());
+    if (!l.isEmpty())
+        ui_.le_post_data->setText(l.takeFirst());
+    if (!l.isEmpty())
+        ui_.le_file_input->setText(l.takeFirst());
+    if (!l.isEmpty())
+        ui_.le_regexp->setText(l.takeFirst());
+    if (!l.isEmpty())
+        ui_.cb_proxy->setChecked(l.takeFirst() == "true");
 }
 
 void EditServerDlg::processOldSettingString(QStringList l)
@@ -85,7 +77,7 @@ void EditServerDlg::processOldSettingString(QStringList l)
     ui_.le_user->setText(l.takeFirst());
     ui_.le_pass->setText(l.takeFirst());
 
-    //remove old useless proxy settings
+    // remove old useless proxy settings
     l.takeFirst();
     l.takeFirst();
     l.takeFirst();

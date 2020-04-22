@@ -17,28 +17,25 @@
  *
  */
 
-
 #ifndef PROXYSETTINGS_H
 #define PROXYSETTINGS_H
 
 #include <QDialog>
 
-//for psi+ plugin only
+// for psi+ plugin only
 #include "applicationinfoaccessinghost.h"
 
-namespace Ui
-{
-    class ProxySettingsDlg;
+namespace Ui {
+class ProxySettingsDlg;
 }
 
-class ProxySettingsDlg : public QDialog
-{
+class ProxySettingsDlg : public QDialog {
     Q_OBJECT
 public:
     ProxySettingsDlg(QWidget *parent = nullptr);
     ~ProxySettingsDlg();
 
-    void setProxySettings(const Proxy& p);
+    void  setProxySettings(const Proxy &p);
     Proxy getSettings() const { return proxy_; };
 
 public slots:
@@ -46,7 +43,7 @@ public slots:
 
 private:
     Ui::ProxySettingsDlg *ui;
-    Proxy proxy_;
+    Proxy                 proxy_;
 };
 
 #endif // PROXYSETTINGS_H

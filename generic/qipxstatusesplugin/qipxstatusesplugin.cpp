@@ -17,87 +17,86 @@
  *
  */
 
-#include <QtCore>
-#include <QWidget>
-#include <QVBoxLayout>
-#include <QLabel>
 #include <QDomElement>
 #include <QIcon>
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <QtCore>
 
+#include "contactstateaccessinghost.h"
+#include "contactstateaccessor.h"
+#include "plugininfoprovider.h"
 #include "psiplugin.h"
 #include "stanzafilter.h"
-#include "contactstateaccessor.h"
-#include "contactstateaccessinghost.h"
-#include "plugininfoprovider.h"
 
 #define cVer "0.0.8"
 
-class QipXStatuses: public QObject, public PsiPlugin, public StanzaFilter, public ContactStateAccessor, public PluginInfoProvider
-{
+class QipXStatuses : public QObject,
+                     public PsiPlugin,
+                     public StanzaFilter,
+                     public ContactStateAccessor,
+                     public PluginInfoProvider {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.QipXStatuses")
     Q_INTERFACES(PsiPlugin StanzaFilter ContactStateAccessor PluginInfoProvider)
 
 public:
-        QipXStatuses();
-    virtual QString name() const;
-    virtual QString shortName() const;
-    virtual QString version() const;
-        virtual QWidget* options();
-    virtual bool enable();
-        virtual bool disable();
-    virtual void applyOptions() {}
-    virtual void restoreOptions(){}
-        virtual bool incomingStanza(int account, const QDomElement& xml);
-    virtual bool outgoingStanza(int account, QDomElement& xml);
-        virtual void setContactStateAccessingHost(ContactStateAccessingHost* host);
-    virtual QString pluginInfo();
-    virtual QPixmap icon() const;
-
+    QipXStatuses();
+    virtual QString  name() const;
+    virtual QString  shortName() const;
+    virtual QString  version() const;
+    virtual QWidget *options();
+    virtual bool     enable();
+    virtual bool     disable();
+    virtual void     applyOptions() { }
+    virtual void     restoreOptions() { }
+    virtual bool     incomingStanza(int account, const QDomElement &xml);
+    virtual bool     outgoingStanza(int account, QDomElement &xml);
+    virtual void     setContactStateAccessingHost(ContactStateAccessingHost *host);
+    virtual QString  pluginInfo();
+    virtual QPixmap  icon() const;
 
 private:
-        bool enabled;
-        ContactStateAccessingHost *contactState;
+    bool                       enabled;
+    ContactStateAccessingHost *contactState;
 
-        QDomElement activityToXml(QString type, QString specificType, QString text);
-        QDomElement MoodToXml(QString type, QString text);
-    };
+    QDomElement activityToXml(QString type, QString specificType, QString text);
+    QDomElement MoodToXml(QString type, QString text);
+};
 
-
-QipXStatuses::QipXStatuses() {
-    enabled = false;
+QipXStatuses::QipXStatuses()
+{
+    enabled      = false;
     contactState = nullptr;
-    }
-
-QString QipXStatuses::name() const {
-        return "Qip X-Statuses Plugin";
-    }
-
-QString QipXStatuses::shortName() const {
-        return "qipxstatuses";
 }
 
-QString QipXStatuses::version() const {
-        return cVer;
-}
+QString QipXStatuses::name() const { return "Qip X-Statuses Plugin"; }
 
-bool QipXStatuses::enable() {
+QString QipXStatuses::shortName() const { return "qipxstatuses"; }
+
+QString QipXStatuses::version() const { return cVer; }
+
+bool QipXStatuses::enable()
+{
     enabled = true;
     return enabled;
 }
 
-bool QipXStatuses::disable() {
-        enabled = false;
+bool QipXStatuses::disable()
+{
+    enabled = false;
     return true;
 }
 
-QWidget* QipXStatuses::options() {
-    if(!enabled)
+QWidget *QipXStatuses::options()
+{
+    if (!enabled)
         return nullptr;
 
-    QWidget *options = new QWidget;
-    QVBoxLayout *layout = new QVBoxLayout(options);
-    QLabel *wiki = new QLabel;
+    QWidget *    options = new QWidget;
+    QVBoxLayout *layout  = new QVBoxLayout(options);
+    QLabel *     wiki    = new QLabel;
     wiki->setText(tr("<a href=\"https://psi-plus.com/wiki/plugins#qip_x-statuses_plugin\">Wiki (Online)</a>"));
     wiki->setOpenExternalLinks(true);
     layout->addWidget(wiki);
@@ -105,248 +104,241 @@ QWidget* QipXStatuses::options() {
     return options;
 }
 
-bool QipXStatuses::incomingStanza(int account, const QDomElement& stanza) {
-   if (enabled) {
-       if(stanza.tagName() == "presence") {
-          bool xStat = false;
-          QDomElement emptyElem;
-          QString from = stanza.attribute("from").split("/").first();
-          QDomNodeList xElemList = stanza.elementsByTagName ("x");
-          QDomElement xElem;
-          for(int i = xElemList.size(); i > 0;) {
-             xElem = xElemList.at(--i).toElement();
-             if(xElem.namespaceURI() == "http://qip.ru/x-status") {
-                 xStat = true;
-                 QString mood = "";
-                 QString act = "";
-                 QString specAct = "";
-                 QString title = "";
-                 title = xElem.firstChildElement("title").text();
-                 int id = xElem.attribute("id").toInt();
-                 switch(id) {
-                     case 1:
+bool QipXStatuses::incomingStanza(int account, const QDomElement &stanza)
+{
+    if (enabled) {
+        if (stanza.tagName() == "presence") {
+            bool         xStat = false;
+            QDomElement  emptyElem;
+            QString      from      = stanza.attribute("from").split("/").first();
+            QDomNodeList xElemList = stanza.elementsByTagName("x");
+            QDomElement  xElem;
+            for (int i = xElemList.size(); i > 0;) {
+                xElem = xElemList.at(--i).toElement();
+                if (xElem.namespaceURI() == "http://qip.ru/x-status") {
+                    xStat           = true;
+                    QString mood    = "";
+                    QString act     = "";
+                    QString specAct = "";
+                    QString title   = "";
+                    title           = xElem.firstChildElement("title").text();
+                    int id          = xElem.attribute("id").toInt();
+                    switch (id) {
+                    case 1:
                         mood = "angry";
                         break;
-                     case 2:
-                        act = "grooming";
+                    case 2:
+                        act     = "grooming";
                         specAct = "taking_a_bath";
                         break;
-                     case 3:
+                    case 3:
                         mood = "tired";
                         break;
-                     case 4:
-                        act = "relaxing";
+                    case 4:
+                        act     = "relaxing";
                         specAct = "partying";
                         break;
-                     case 5:
-                        act = "drinking";
+                    case 5:
+                        act     = "drinking";
                         specAct = "having_a_beer";
                         break;
-                     case 6:
-                        act = "inactive";
+                    case 6:
+                        act     = "inactive";
                         specAct = "thinking";
                         break;
-                     case 7:
+                    case 7:
                         act = "eating";
                         break;
-                     case 8:
-                        act = "relaxing";
+                    case 8:
+                        act     = "relaxing";
                         specAct = "watching_tv";
                         break;
-                     case 9:
-                        act = "relaxing";
+                    case 9:
+                        act     = "relaxing";
                         specAct = "socializing";
                         break;
-                     case 10:
-                        act = "drinking";
+                    case 10:
+                        act     = "drinking";
                         specAct = "having_coffee";
                         break;
-                     case 12:
+                    case 12:
                         act = "having_appointment";
                         break;
-                     case 13:
-                        act = "relaxing";
+                    case 13:
+                        act     = "relaxing";
                         specAct = "watching_a_movie";
                         break;
-                     case 14:
+                    case 14:
                         mood = "happy";
                         break;
-                     case 15:
-                        act = "talking";
+                    case 15:
+                        act     = "talking";
                         specAct = "on_the_phone";
                         break;
-                     case 16:
-                        act = "relaxing";
+                    case 16:
+                        act     = "relaxing";
                         specAct = "gaming";
                         break;
-                     case 17:
-                        act = "working";
+                    case 17:
+                        act     = "working";
                         specAct = "studying";
                         break;
-                     case 18:
-                        act = "relaxing";
+                    case 18:
+                        act     = "relaxing";
                         specAct = "shopping";
                         break;
-                     case 19:
+                    case 19:
                         mood = "sick";
                         break;
-                     case 20:
-                        act = "inactive";
+                    case 20:
+                        act     = "inactive";
                         specAct = "sleeping";
                         break;
-                     case 21:
-                        act = "exercising";
+                    case 21:
+                        act     = "exercising";
                         specAct = "swimming";
                         break;
-                     case 22:
-                        act = "relaxing";
+                    case 22:
+                        act     = "relaxing";
                         specAct = "reading";
                         break;
-                     case 23:
+                    case 23:
                         act = "working";
                         break;
-                     case 24:
-                        act = "working";
+                    case 24:
+                        act     = "working";
                         specAct = "coding";
                         break;
-                     case 25:
-                        act = "relaxing";
+                    case 25:
+                        act     = "relaxing";
                         specAct = "going_out";
                         break;
-                     case 26:
-                        act = "talking";
+                    case 26:
+                        act     = "talking";
                         specAct = "on_video_phone";
                         break;
-                     case 27:
-                        act = "talking";
+                    case 27:
+                        act     = "talking";
                         specAct = "on_the_phone";
                         break;
-                     case 28:
-                        act = "inactive";
+                    case 28:
+                        act     = "inactive";
                         specAct = "sleeping";
                         break;
-                     case 29:
+                    case 29:
                         act = "grooming";
                         break;
-                     case 30:
+                    case 30:
                         mood = "undefined";
                         break;
-                     case 31:
+                    case 31:
                         act = "doing_chores";
                         break;
-                     case 32:
+                    case 32:
                         mood = "in_love";
                         break;
-                     case 33:
+                    case 33:
                         mood = "curious";
                         break;
-                     case 34:
+                    case 34:
                         mood = "in_love";
                         break;
-                     case 35:
-                        act = "working";
+                    case 35:
+                        act     = "working";
                         specAct = "writing";
                         break;
-                 }
+                    }
 
-                 if(id != 11) {
-                     if(!mood.isEmpty())
-                         contactState->setMood(account, from, MoodToXml(mood, title));
-                     else
-                         contactState->setMood(account, from, emptyElem);
-                     if(!act.isEmpty())
-                         contactState->setActivity(account, from, activityToXml(act, specAct, title));
-                     else
-                         contactState->setActivity(account, from, emptyElem);
+                    if (id != 11) {
+                        if (!mood.isEmpty())
+                            contactState->setMood(account, from, MoodToXml(mood, title));
+                        else
+                            contactState->setMood(account, from, emptyElem);
+                        if (!act.isEmpty())
+                            contactState->setActivity(account, from, activityToXml(act, specAct, title));
+                        else
+                            contactState->setActivity(account, from, emptyElem);
 
-                     contactState->setTune(account, from, "");
-                 } else {
-                     contactState->setTune(account, from, title);
-                     contactState->setActivity(account, from, emptyElem);
-                     contactState->setMood(account, from, emptyElem);
-                 }
+                        contactState->setTune(account, from, "");
+                    } else {
+                        contactState->setTune(account, from, title);
+                        contactState->setActivity(account, from, emptyElem);
+                        contactState->setMood(account, from, emptyElem);
+                    }
 
-             break;
-             }
-          }
-          if(!xStat) {
-              QDomElement cElem = stanza.firstChildElement("c");
-              if(!cElem.isNull() &&
-                 cElem.namespaceURI() == "http://jabber.org/protocol/caps" &&
-                 cElem.attribute("node") == "http://qip.ru/caps") {
-                  contactState->setMood(account, from, emptyElem);
-                  contactState->setActivity(account, from, emptyElem);
-                  contactState->setTune(account, from, "");
-              }
-          }
-      }
-     }
-     return false;
- }
-
-bool QipXStatuses::outgoingStanza(int /*account*/, QDomElement& /*xml*/)
-{
+                    break;
+                }
+            }
+            if (!xStat) {
+                QDomElement cElem = stanza.firstChildElement("c");
+                if (!cElem.isNull() && cElem.namespaceURI() == "http://jabber.org/protocol/caps"
+                    && cElem.attribute("node") == "http://qip.ru/caps") {
+                    contactState->setMood(account, from, emptyElem);
+                    contactState->setActivity(account, from, emptyElem);
+                    contactState->setTune(account, from, "");
+                }
+            }
+        }
+    }
     return false;
 }
 
-void QipXStatuses::setContactStateAccessingHost(ContactStateAccessingHost* host)
+bool QipXStatuses::outgoingStanza(int /*account*/, QDomElement & /*xml*/) { return false; }
+
+void QipXStatuses::setContactStateAccessingHost(ContactStateAccessingHost *host) { contactState = host; }
+
+QDomElement QipXStatuses::activityToXml(QString type, QString specificType, QString text)
 {
-    contactState = host;
-}
+    QDomDocument doc;
+    QDomElement  activity = doc.createElementNS("http://jabber.org/protocol/activity", "activity");
 
-QDomElement QipXStatuses::activityToXml(QString type, QString specificType, QString text) {
-        QDomDocument doc;
-        QDomElement activity = doc.createElementNS("http://jabber.org/protocol/activity", "activity");
+    if (!type.isEmpty()) {
+        QDomElement el = doc.createElement(type);
 
-        if (!type.isEmpty()) {
-                QDomElement el = doc.createElement(type);
-
-                if (!specificType.isEmpty()) {
-                        QDomElement elChild = doc.createElement(specificType);
-                        el.appendChild(elChild);
-                }
-
-                activity.appendChild(el);
+        if (!specificType.isEmpty()) {
+            QDomElement elChild = doc.createElement(specificType);
+            el.appendChild(elChild);
         }
 
-        if (!text.isEmpty()) {
-                QDomElement el = doc.createElement("text");
-                QDomText t = doc.createTextNode(text);
-                el.appendChild(t);
-                activity.appendChild(el);
-        }
+        activity.appendChild(el);
+    }
 
-        return activity;
+    if (!text.isEmpty()) {
+        QDomElement el = doc.createElement("text");
+        QDomText    t  = doc.createTextNode(text);
+        el.appendChild(t);
+        activity.appendChild(el);
+    }
+
+    return activity;
 }
 
-QDomElement QipXStatuses::MoodToXml(QString type, QString text) {
-        QDomDocument doc;
-        QDomElement mood = doc.createElementNS("http://jabber.org/protocol/mood", "mood");
-
-        if (!type.isEmpty()) {
-                QDomElement el = doc.createElement(type);
-                mood.appendChild(el);
-        }
-
-        if (!text.isEmpty()) {
-                QDomElement el = doc.createElement("text");
-                QDomText t = doc.createTextNode(text);
-                el.appendChild(t);
-                mood.appendChild(el);
-        }
-
-        return mood;
-}
-
-QString QipXStatuses::pluginInfo() {
-    return tr("Author: ") +  "Dealer_WeARE\n"
-            + tr("Email: ") + "wadealer@gmail.com\n\n"
-            + tr("This plugin is designed to display x-statuses of contacts using the QIP Infium jabber client.");
-}
-
-QPixmap QipXStatuses::icon() const
+QDomElement QipXStatuses::MoodToXml(QString type, QString text)
 {
-    return QPixmap(":/icons/qipxstatuses.png");
+    QDomDocument doc;
+    QDomElement  mood = doc.createElementNS("http://jabber.org/protocol/mood", "mood");
+
+    if (!type.isEmpty()) {
+        QDomElement el = doc.createElement(type);
+        mood.appendChild(el);
+    }
+
+    if (!text.isEmpty()) {
+        QDomElement el = doc.createElement("text");
+        QDomText    t  = doc.createTextNode(text);
+        el.appendChild(t);
+        mood.appendChild(el);
+    }
+
+    return mood;
 }
+
+QString QipXStatuses::pluginInfo()
+{
+    return tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
+        + tr("This plugin is designed to display x-statuses of contacts using the QIP Infium jabber client.");
+}
+
+QPixmap QipXStatuses::icon() const { return QPixmap(":/icons/qipxstatuses.png"); }
 
 #include "qipxstatusesplugin.moc"

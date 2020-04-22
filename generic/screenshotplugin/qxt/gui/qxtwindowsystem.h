@@ -31,21 +31,20 @@
 
 #define QXTWINDOWSYSTEM_H
 
-#include <QWidget>
 #include "qxtglobal.h"
+#include <QWidget>
 
 using WindowList = QList<WId>;
 
-class /*QXT_GUI_EXPORT*/ QxtWindowSystem
-{
+class /*QXT_GUI_EXPORT*/ QxtWindowSystem {
 public:
-    static WindowList windows();
-    static WId activeWindow();
-    static WId findWindow(const QString& title);
-    static WId windowAt(const QPoint& pos);
-    static QString windowTitle(WId window);
+    static WindowList  windows();
+    static WId         activeWindow();
+    static WId         findWindow(const QString &title);
+    static WId         windowAt(const QPoint &pos);
+    static QString     windowTitle(WId window);
     static QStringList windowTitles();
-    static QRect windowGeometry(WId window);
+    static QRect       windowGeometry(WId window);
 
     static uint idleTime();
 };

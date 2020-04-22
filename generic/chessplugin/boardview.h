@@ -20,23 +20,21 @@
 #ifndef BOARDVIEW_H
 #define BOARDVIEW_H
 
-#include <QTableView>
 #include <QMouseEvent>
+#include <QTableView>
 
-class BoardView : public QTableView
-{
+class BoardView : public QTableView {
     Q_OBJECT
 
 public:
-        BoardView(QWidget *parent = nullptr);
+    BoardView(QWidget *parent = nullptr);
 
 protected:
-        virtual void mousePressEvent(QMouseEvent *e);
-        virtual void mouseReleaseEvent(QMouseEvent *e);
-        virtual void mouseMoveEvent(QMouseEvent *e);
-        virtual void keyPressEvent(QKeyEvent *e);
+    virtual void mousePressEvent(QMouseEvent *e);
+    virtual void mouseReleaseEvent(QMouseEvent *e);
+    virtual void mouseMoveEvent(QMouseEvent *e);
+    virtual void keyPressEvent(QKeyEvent *e);
     virtual bool event(QEvent *e);
-
 };
 
 #endif // BOARDVIEW_H

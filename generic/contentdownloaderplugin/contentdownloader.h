@@ -16,22 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef CONTENTDOWLOADER_H
 #define CONTENTDOWLOADER_H
 
-#include <QWidget>
-#include "psiplugin.h"
-#include "applicationinfoaccessor.h"
 #include "applicationinfoaccessinghost.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
-#include "plugininfoprovider.h"
+#include "applicationinfoaccessor.h"
 #include "cditemmodel.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "psiplugin.h"
+#include <QWidget>
 
 class Form;
 
-class ContentDownloader : public QObject, public PsiPlugin, public OptionAccessor, public ApplicationInfoAccessor , public PluginInfoProvider {
+class ContentDownloader : public QObject,
+                          public PsiPlugin,
+                          public OptionAccessor,
+                          public ApplicationInfoAccessor,
+                          public PluginInfoProvider {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.ContentDownloader")
     Q_INTERFACES(PsiPlugin OptionAccessor ApplicationInfoAccessor PluginInfoProvider)
@@ -40,19 +43,19 @@ public:
     ~ContentDownloader();
 
     // from PsiPlugin
-    QString name() const;
-    QString shortName() const;
-    QString version() const;
+    QString  name() const;
+    QString  shortName() const;
+    QString  version() const;
     QWidget *options();
-    bool enable();
-    bool disable();
-    void applyOptions();
-    void restoreOptions();
-    QPixmap icon() const;
+    bool     enable();
+    bool     disable();
+    void     applyOptions();
+    void     restoreOptions();
+    QPixmap  icon() const;
 
     // from OptionAccessor
-    void setOptionAccessingHost(OptionAccessingHost* host);
-    void optionChanged(const QString& option);
+    void setOptionAccessingHost(OptionAccessingHost *host);
+    void optionChanged(const QString &option);
 
     // from ApplicationInfoAccessor
     void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
@@ -61,11 +64,11 @@ public:
     QString pluginInfo();
 
 private:
-    bool enabled;
-    OptionAccessingHost *psiOptions;
+    bool                          enabled;
+    OptionAccessingHost *         psiOptions;
     ApplicationInfoAccessingHost *appInfoHost;
-    QString texto;
-    Form *form_;
+    QString                       texto;
+    Form *                        form_;
 };
 
 #endif // CONTENTDOWLOADER_H

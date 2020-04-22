@@ -22,17 +22,15 @@
 
 #include <QTableView>
 
-class Viewer : public QTableView
-{
+class Viewer : public QTableView {
     Q_OBJECT
 
 public:
-    Viewer(QWidget *parent = nullptr) : QTableView(parent) {}
-        void init();
+    Viewer(QWidget *parent = nullptr) : QTableView(parent) { }
+    void init();
 
 private slots:
-        void itemClicked(QModelIndex index);
-
+    void itemClicked(QModelIndex index);
 };
 
 #endif // VIEW_H

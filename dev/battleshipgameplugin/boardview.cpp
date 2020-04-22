@@ -21,11 +21,7 @@
 
 #include "boardview.h"
 
-BoardView::BoardView(QWidget *parent)
-    : QTableView(parent)
-    , bmodel_(nullptr)
-{
-}
+BoardView::BoardView(QWidget *parent) : QTableView(parent), bmodel_(nullptr) { }
 
 void BoardView::setModel(BoardModel *model)
 {
@@ -33,16 +29,12 @@ void BoardView::setModel(BoardModel *model)
     bmodel_ = model;
 }
 
-void BoardView::resizeEvent(QResizeEvent */*event*/)
-{
-    setCellsSize();
-}
+void BoardView::resizeEvent(QResizeEvent * /*event*/) { setCellsSize(); }
 
-void BoardView::mouseReleaseEvent(QMouseEvent */*event*/)
+void BoardView::mouseReleaseEvent(QMouseEvent * /*event*/)
 {
     QModelIndex index = currentIndex();
-    if (index.isValid())
-    {
+    if (index.isValid()) {
         int pos = bmodel_->model2oppboard(QPoint(index.column(), index.row()));
         if (pos != -1)
             bmodel_->gameModel()->localTurn(pos);
@@ -53,15 +45,16 @@ void BoardView::setCellsSize()
 {
     if (!bmodel_)
         return;
-    int rowCnt = model()->rowCount() - 2;
-    int colCnt = model()->columnCount() - 3;
-    int boardWidth = width() - verticalHeader()->width() - (lineWidth() + midLineWidth()) * 2;
+    int rowCnt      = model()->rowCount() - 2;
+    int colCnt      = model()->columnCount() - 3;
+    int boardWidth  = width() - verticalHeader()->width() - (lineWidth() + midLineWidth()) * 2;
     int boardHeight = height() - horizontalHeader()->height() - (lineWidth() + midLineWidth()) * 2;
-    boardWidth -= 4; boardHeight -= 4; // Запас для гарантии отсутствия прокрутки
-    int cellWidth = boardWidth / colCnt - 1;
+    boardWidth -= 4;
+    boardHeight -= 4; // Запас для гарантии отсутствия прокрутки
+    int cellWidth  = boardWidth / colCnt - 1;
     int cellHeight = boardHeight / rowCnt - 1;
-    int cellSize = qMin(cellWidth, cellHeight);
-    int hMargin = boardHeight - cellSize * rowCnt;
+    int cellSize   = qMin(cellWidth, cellHeight);
+    int hMargin    = boardHeight - cellSize * rowCnt;
     if (hMargin < 0)
         hMargin = 0;
     hMargin /= 2;

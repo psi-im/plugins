@@ -15,8 +15,8 @@
 
 #include "common.h"
 
-#include <QNetworkAccessManager>
 #include "options.h"
+#include <QNetworkAccessManager>
 
 QNetworkRequest newRequest()
 {
@@ -27,10 +27,10 @@ QNetworkRequest newRequest()
     return nr;
 }
 
-QNetworkAccessManager* newManager(QObject* parent)
+QNetworkAccessManager *newManager(QObject *parent)
 {
-    QNetworkAccessManager* netman = new QNetworkAccessManager(parent);
-    if(Options::instance()->useProxy()) {
+    QNetworkAccessManager *netman = new QNetworkAccessManager(parent);
+    if (Options::instance()->useProxy()) {
         netman->setProxy(Options::instance()->getProxy());
     }
 

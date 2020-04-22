@@ -8,19 +8,20 @@
 #ifndef SRC_PLUGINS_GENERIC_IMAGEPREVIEWPLUGIN_SCROLLKEEPER_H_
 #define SRC_PLUGINS_GENERIC_IMAGEPREVIEWPLUGIN_SCROLLKEEPER_H_
 
-#include <QWidget>
 #include <QTextEdit>
+#include <QWidget>
 
 class QWebFrame;
 
 class ScrollKeeper {
 private:
-    QWidget* chatView_;
-    int scrollPos_;
-    bool scrollToEnd_;
-    QTextEdit* ted_;
+    QWidget *  chatView_;
+    int        scrollPos_;
+    bool       scrollToEnd_;
+    QTextEdit *ted_;
+
 public:
-    ScrollKeeper(QWidget* chatView);
+    ScrollKeeper(QWidget *chatView);
     virtual ~ScrollKeeper();
 };
 

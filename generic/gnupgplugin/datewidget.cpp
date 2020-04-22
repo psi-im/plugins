@@ -1,23 +1,20 @@
+#include <QApplication>
+#include <QCalendarWidget>
+#include <QDebug>
+#include <QDesktopWidget>
+#include <QHBoxLayout>
+#include <QIcon>
 #include <QKeyEvent>
 #include <QLineEdit>
-#include <QCalendarWidget>
-#include <QIcon>
-#include <QHBoxLayout>
+#include <QLocale>
 #include <QRegExp>
 #include <QRegExpValidator>
-#include <QApplication>
-#include <QDesktopWidget>
-#include <QLocale>
-#include <QDebug>
-#include <QKeyEvent>
 
 #include "datewidget.h"
 
-DateWidget::DateWidget(QWidget *parent)
-    : LineEditWidget(parent)
-    , _tbCalendar(new QToolButton(this))
-    , _tbClean(new QToolButton(this))
-    , _calendar(new QCalendarWidget(this))
+DateWidget::DateWidget(QWidget *parent) :
+    LineEditWidget(parent), _tbCalendar(new QToolButton(this)), _tbClean(new QToolButton(this)),
+    _calendar(new QCalendarWidget(this))
 {
     setReadOnly(true);
 
@@ -47,7 +44,7 @@ DateWidget::DateWidget(QWidget *parent)
 
     setPopup(_calendar);
 
-    connect(_calendar, SIGNAL(clicked(const QDate&)), SLOT(closeCalendar(const QDate&)));
+    connect(_calendar, SIGNAL(clicked(const QDate &)), SLOT(closeCalendar(const QDate &)));
     connect(_tbCalendar, SIGNAL(clicked()), SLOT(showPopup()));
     connect(_tbCalendar, SIGNAL(clicked()), SLOT(calendarSetDate()));
 
@@ -69,15 +66,9 @@ inline QString dateFormat()
     return format;
 }
 
-void DateWidget::setDate(const QDate &date)
-{
-    setText(date.toString(dateFormat()));
-}
+void DateWidget::setDate(const QDate &date) { setText(date.toString(dateFormat())); }
 
-QDate DateWidget::date() const
-{
-    return QDate::fromString(text(), dateFormat());
-}
+QDate DateWidget::date() const { return QDate::fromString(text(), dateFormat()); }
 
 void DateWidget::closeCalendar(const QDate &date)
 {
@@ -87,25 +78,20 @@ void DateWidget::closeCalendar(const QDate &date)
 
 void DateWidget::calendarSetDate()
 {
-    if(date().isValid()) {
+    if (date().isValid()) {
         _calendar->setSelectedDate(date());
     }
 }
 
-void DateWidget::disableExpiration()
-{
-    setText(tr("never"));
-}
+void DateWidget::disableExpiration() { setText(tr("never")); }
 
 void DateWidget::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Backspace || event->key() == Qt::Key_Delete) {
         disableExpiration();
-    }
-    else if (event->key() == Qt::Key_Space) {
+    } else if (event->key() == Qt::Key_Space) {
         showPopup();
-    }
-    else {
+    } else {
         LineEditWidget::keyPressEvent(event);
     }
 }

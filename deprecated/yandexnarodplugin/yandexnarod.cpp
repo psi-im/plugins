@@ -16,48 +16,31 @@
 
 #include <QFileDialog>
 
+#include "authmanager.h"
+#include "options.h"
+#include "uploaddialog.h"
 #include "yandexnarod.h"
 #include "yandexnarodmanage.h"
-#include "authmanager.h"
 #include "yandexnarodsettings.h"
-#include "uploaddialog.h"
-#include "options.h"
 
-
-yandexnarodPlugin::yandexnarodPlugin()
-    : psiOptions(0)
-    , psiIcons(0)
-    , stanzaSender(0)
-    , appInfo(0)
-    , popup(0)
-    , enabled(false)
-    , currentAccount(-1)
-    , popupId(0)
+yandexnarodPlugin::yandexnarodPlugin() :
+    psiOptions(0), psiIcons(0), stanzaSender(0), appInfo(0), popup(0), enabled(false), currentAccount(-1), popupId(0)
 {
 }
 
-QString yandexnarodPlugin::name() const
-{
-    return "Yandex Narod Plugin";
-}
-QString yandexnarodPlugin::shortName() const
-{
-    return "yandexnarod";
-}
+QString yandexnarodPlugin::name() const { return "Yandex Narod Plugin"; }
+QString yandexnarodPlugin::shortName() const { return "yandexnarod"; }
 
-QString yandexnarodPlugin::version() const
-{
-    return VERSION;
-}
+QString yandexnarodPlugin::version() const { return VERSION; }
 
-QWidget* yandexnarodPlugin::options()
+QWidget *yandexnarodPlugin::options()
 {
-    if(!enabled) {
+    if (!enabled) {
         return 0;
     }
 
     settingswidget = new yandexnarodSettings();
-    connect(settingswidget, SIGNAL(testclick()), this,  SLOT(on_btnTest_clicked()));
+    connect(settingswidget, SIGNAL(testclick()), this, SLOT(on_btnTest_clicked()));
     connect(settingswidget, SIGNAL(startManager()), this, SLOT(manage_clicked()));
 
     return settingswidget;
@@ -69,15 +52,15 @@ bool yandexnarodPlugin::enable()
     QFile file(":/icons/yandexnarodplugin.png");
     file.open(QIODevice::ReadOnly);
     QByteArray image = file.readAll();
-    psiIcons->addIcon("yandexnarod/logo",image);
+    psiIcons->addIcon("yandexnarod/logo", image);
     file.close();
 
     Options::instance()->setApplicationInfoAccessingHost(appInfo);
     Options::instance()->setOptionAccessingHost(psiOptions);
 
-    //remove old password option
+    // remove old password option
     QString oldPass = Options::instance()->getOption(CONST_PASS_OLD).toString();
-    if(!oldPass.isEmpty()) {
+    if (!oldPass.isEmpty()) {
         Options::instance()->setOption(CONST_PASS_OLD, QVariant(""));
         Options::instance()->setOption(CONST_PASS, Options::encodePassword(oldPass));
     }
@@ -90,10 +73,10 @@ bool yandexnarodPlugin::enable()
 bool yandexnarodPlugin::disable()
 {
     enabled = false;
-    if(manageDialog)
+    if (manageDialog)
         delete manageDialog;
 
-    if(uploadwidget) {
+    if (uploadwidget) {
         uploadwidget->disconnect();
         delete uploadwidget;
     }
@@ -104,64 +87,49 @@ bool yandexnarodPlugin::disable()
     return true;
 }
 
-void yandexnarodPlugin::setOptionAccessingHost(OptionAccessingHost* host)
-{
-    psiOptions = host;
-}
+void yandexnarodPlugin::setOptionAccessingHost(OptionAccessingHost *host) { psiOptions = host; }
 
-void yandexnarodPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost *host)
-{
-    psiIcons = host;
-}
+void yandexnarodPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost *host) { psiIcons = host; }
 
-void yandexnarodPlugin::setStanzaSendingHost(StanzaSendingHost *host)
-{
-    stanzaSender = host;
-}
+void yandexnarodPlugin::setStanzaSendingHost(StanzaSendingHost *host) { stanzaSender = host; }
 
-void yandexnarodPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host)
-{
-    appInfo = host;
-}
+void yandexnarodPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) { appInfo = host; }
 
-void yandexnarodPlugin::setPopupAccessingHost(PopupAccessingHost *host)
-{
-    popup = host;
-}
+void yandexnarodPlugin::setPopupAccessingHost(PopupAccessingHost *host) { popup = host; }
 
 void yandexnarodPlugin::applyOptions()
 {
-    if(settingswidget)
+    if (settingswidget)
         settingswidget->saveSettings();
 }
 
 void yandexnarodPlugin::restoreOptions()
 {
-    if(settingswidget)
+    if (settingswidget)
         settingswidget->restoreSettings();
 }
 
-QList < QVariantHash > yandexnarodPlugin::getAccountMenuParam()
+QList<QVariantHash> yandexnarodPlugin::getAccountMenuParam()
 {
-    QList < QVariantHash > list;
-    QVariantHash hash;
-    hash["icon"] = QVariant(QString("yandexnarod/logo"));
-    hash["name"] = QVariant(tr("Open Yandex Narod Manager"));
+    QList<QVariantHash> list;
+    QVariantHash        hash;
+    hash["icon"]    = QVariant(QString("yandexnarod/logo"));
+    hash["name"]    = QVariant(tr("Open Yandex Narod Manager"));
     hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
-    hash["slot"] = QVariant(SLOT(manage_clicked()));
+    hash["slot"]    = QVariant(SLOT(manage_clicked()));
 
     list.append(hash);
     return list;
 }
 
-QList < QVariantHash > yandexnarodPlugin::getContactMenuParam()
+QList<QVariantHash> yandexnarodPlugin::getContactMenuParam()
 {
-    QList < QVariantHash > list;
-    QVariantHash hash;
-    hash["icon"] = QVariant(QString("yandexnarod/logo"));
-    hash["name"] = QVariant(tr("Send file via Yandex Narod"));
+    QList<QVariantHash> list;
+    QVariantHash        hash;
+    hash["icon"]    = QVariant(QString("yandexnarod/logo"));
+    hash["name"]    = QVariant(tr("Send file via Yandex Narod"));
     hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
-    hash["slot"] = QVariant(SLOT(actionStart()));
+    hash["slot"]    = QVariant(SLOT(actionStart()));
 
     list.append(hash);
     return list;
@@ -169,11 +137,10 @@ QList < QVariantHash > yandexnarodPlugin::getContactMenuParam()
 
 void yandexnarodPlugin::manage_clicked()
 {
-    if(!manageDialog) {
+    if (!manageDialog) {
         manageDialog = new yandexnarodManage();
         manageDialog->show();
-    }
-    else {
+    } else {
         manageDialog->raise();
         manageDialog->activateWindow();
     }
@@ -181,25 +148,25 @@ void yandexnarodPlugin::manage_clicked()
 
 void yandexnarodPlugin::on_btnTest_clicked()
 {
-    if(!settingswidget)
+    if (!settingswidget)
         return;
 
     AuthManager am;
     settingswidget->setStatus(O_M(MAuthStart));
-    bool auth = am.go(settingswidget->getLogin(), settingswidget->getPasswd());
-    QString rez = auth ? O_M(MAuthOk) : O_M(MAuthError);
+    bool    auth = am.go(settingswidget->getLogin(), settingswidget->getPasswd());
+    QString rez  = auth ? O_M(MAuthOk) : O_M(MAuthError);
     settingswidget->setStatus(rez);
-    if(auth) {
+    if (auth) {
         Options::instance()->saveCookies(am.cookies());
     }
 }
 
 void yandexnarodPlugin::actionStart()
 {
-    currentJid = sender()->property("jid").toString();
-    currentAccount = sender()->property("account").toInt();
+    currentJid       = sender()->property("jid").toString();
+    currentAccount   = sender()->property("account").toInt();
     QString filepath = QFileDialog::getOpenFileName(uploadwidget, O_M(MChooseFile),
-                            psiOptions->getPluginOption(CONST_LAST_FOLDER).toString());
+                                                    psiOptions->getPluginOption(CONST_LAST_FOLDER).toString());
 
     if (!filepath.isEmpty()) {
         fi = QFileInfo(filepath);
@@ -213,7 +180,7 @@ void yandexnarodPlugin::actionStart()
     }
 }
 
-void yandexnarodPlugin::onFileURL(const QString& url)
+void yandexnarodPlugin::onFileURL(const QString &url)
 {
     QString sendmsg = psiOptions->getPluginOption(CONST_TEMPLATE).toString();
     sendmsg.replace("%N", fi.fileName());
@@ -221,7 +188,7 @@ void yandexnarodPlugin::onFileURL(const QString& url)
     sendmsg.replace("%S", QString::number(fi.size()));
     uploadwidget->close();
 
-    if(currentAccount != -1 && !currentJid.isEmpty()) {
+    if (currentAccount != -1 && !currentJid.isEmpty()) {
         stanzaSender->sendMessage(currentAccount, currentJid, stanzaSender->escape(sendmsg), "", "chat");
         showPopup(currentAccount, currentJid, tr("File sent to %1").arg(currentJid));
     }
@@ -230,9 +197,9 @@ void yandexnarodPlugin::onFileURL(const QString& url)
     currentAccount = -1;
 }
 
-void yandexnarodPlugin::showPopup(int/* account*/, const QString&/* jid*/, const QString& text)
+void yandexnarodPlugin::showPopup(int /* account*/, const QString & /* jid*/, const QString &text)
 {
-    if(popup->popupDuration(name())) {
+    if (popup->popupDuration(name())) {
         popup->initPopup(text, tr("Yandex Narod Plugin"), "yandexnarod/logo", popupId);
     }
 }
@@ -242,9 +209,6 @@ QString yandexnarodPlugin::pluginInfo()
     return trUtf8("Ported from QutIM Yandex.Narod plugin\nhttp://qutim.org/forum/viewtopic.php?f=62&t=711\n\n");
 }
 
-QPixmap yandexnarodPlugin::icon() const
-{
-    return QPixmap(":/icons/yandexnarodplugin.png");
-}
+QPixmap yandexnarodPlugin::icon() const { return QPixmap(":/icons/yandexnarodplugin.png"); }
 
 Q_EXPORT_PLUGIN(yandexnarodPlugin);

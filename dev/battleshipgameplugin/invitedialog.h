@@ -1,33 +1,33 @@
 /*
-* invitedialog.h - Battleship Game plugin
-* Copyright (C) 2014  Aleksey Andreev
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*
-*/
+ * invitedialog.h - Battleship Game plugin
+ * Copyright (C) 2014  Aleksey Andreev
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
 
 #ifndef INVITEDIALOG_H
 #define INVITEDIALOG_H
 
-#include <QDialog>
 #include <QCloseEvent>
+#include <QDialog>
 
-#include "ui_invitedialog.h"
 #include "ui_invitationdialog.h"
+#include "ui_invitedialog.h"
 
 namespace Ui {
-    class InvateDialog;
+class InvateDialog;
 }
 
 class InviteDialog : public QDialog {
@@ -38,8 +38,8 @@ public:
 
 private:
     Ui::InviteDialog *ui;
-    bool accepted_;
-    QString jid_;
+    bool              accepted_;
+    QString           jid_;
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -50,11 +50,9 @@ private slots:
 
 signals:
     void acceptGame(QString jid, bool first);
-
 };
 
-class InvitationDialog : public QDialog
-{
+class InvitationDialog : public QDialog {
     Q_OBJECT
 public:
     InvitationDialog(const QString &jid, bool first, QWidget *parent = nullptr);
@@ -64,7 +62,6 @@ private:
 
 private slots:
     void okPressed();
-
 };
 
 #endif // INVITEDIALOG_H

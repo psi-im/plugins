@@ -20,18 +20,18 @@
 #ifndef TYPEAHEADFIND_H
 #define TYPEAHEADFIND_H
 
-#include <QToolBar>
 #include <QTextEdit>
+#include <QToolBar>
 
 #include "iconfactoryaccessinghost.h"
 
 namespace Stopspam {
 
-class TypeAheadFindBar : public QToolBar
-{
+class TypeAheadFindBar : public QToolBar {
     Q_OBJECT
 public:
-    TypeAheadFindBar(IconFactoryAccessingHost *IcoHost, QTextEdit *textedit, const QString &title, QWidget *parent = nullptr);
+    TypeAheadFindBar(IconFactoryAccessingHost *IcoHost, QTextEdit *textedit, const QString &title,
+                     QWidget *parent = nullptr);
 
     ~TypeAheadFindBar();
     void init();
@@ -50,7 +50,7 @@ private slots:
 
 private:
     class Private;
-    Private *d;
+    Private *                 d;
     IconFactoryAccessingHost *icoHost_;
 };
 

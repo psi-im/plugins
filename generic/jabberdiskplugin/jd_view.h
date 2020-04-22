@@ -22,22 +22,21 @@
 
 #include <QTreeView>
 
-class JDView : public QTreeView
-{
+class JDView : public QTreeView {
     Q_OBJECT
 public:
     JDView(QWidget *p = nullptr);
     ~JDView();
 
 signals:
-    void contextMenu(const QModelIndex&);
-    void newIndex(const QModelIndex&);
+    void contextMenu(const QModelIndex &);
+    void newIndex(const QModelIndex &);
 
 protected:
     void currentChanged(const QModelIndex &current, const QModelIndex &previous);
     void mousePressEvent(QMouseEvent *e);
-    //void dragEnterEvent(QDragEnterEvent *event);
-    //void dropEvent(QDropEvent *event);
+    // void dragEnterEvent(QDragEnterEvent *event);
+    // void dropEvent(QDropEvent *event);
 };
 
 #endif // JD_VIEW_H

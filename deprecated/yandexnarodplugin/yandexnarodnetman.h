@@ -22,21 +22,19 @@
 class QNetworkAccessManager;
 class QNetworkReply;
 
-class yandexnarodNetMan : public QObject
-{
+class yandexnarodNetMan : public QObject {
     Q_OBJECT
 
 public:
     yandexnarodNetMan(QObject *parent);
     ~yandexnarodNetMan();
 
-    struct FileItem
-    {
+    struct FileItem {
         int prolong() const
         {
-            int d = 1;
+            int     d = 1;
             QRegExp re("(\\d+) \\S+");
-            if(re.indexIn(date) != -1) {
+            if (re.indexIn(date) != -1) {
                 d = re.cap(1).toInt();
             }
             return d;
@@ -50,16 +48,16 @@ public:
         QString size;
         QString date;
         QString passtoken;
-        bool passset = false;
-        bool deleted = false;
+        bool    passset = false;
+        bool    deleted = false;
     };
 
-    bool startAuth(const QString& login, const QString& pass);
+    bool startAuth(const QString &login, const QString &pass);
     void startGetFilelist();
-    void startDelFiles(const QList<FileItem>& fileItems);
-    void startProlongFiles(const QList<FileItem>& fileItems);
-    void startSetPass(const FileItem& item);
-    void startRemovePass(const FileItem& item);
+    void startDelFiles(const QList<FileItem> &fileItems);
+    void startProlongFiles(const QList<FileItem> &fileItems);
+    void startSetPass(const FileItem &item);
+    void startRemovePass(const FileItem &item);
 
 private:
     enum Actions { NoAction = 0, GetFiles, DeleteFiles, ProlongateFiles, SetPass, RemovePass };
@@ -67,15 +65,15 @@ private:
     void netmanDo(QList<FileItem> fileItems = QList<FileItem>());
 
 private slots:
-    void netrpFinished(QNetworkReply*);
+    void netrpFinished(QNetworkReply *);
 
 signals:
-    void statusText(const QString&);
+    void statusText(const QString &);
     void newFileItem(yandexnarodNetMan::FileItem);
     void finished();
 
 private:
-    Actions action;
+    Actions                action;
     QNetworkAccessManager *netman;
 };
 

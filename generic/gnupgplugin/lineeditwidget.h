@@ -2,14 +2,13 @@
 #define LINEEDITWIDGET_H
 
 #include <QLineEdit>
-#include <QToolButton>
 #include <QList>
+#include <QToolButton>
 
 class QFrame;
 class QHBoxLayout;
 
-class LineEditWidget : public QLineEdit
-{
+class LineEditWidget : public QLineEdit {
     Q_OBJECT
     Q_PROPERTY(int optimalLength READ optimalLenth WRITE setOptimalLength)
     Q_PROPERTY(QString rxValidator READ rxValidator WRITE setRxValidator)
@@ -19,19 +18,19 @@ public:
 
     // reimplemented
     QSize sizeHint() const;
-    void showEvent(QShowEvent *e);
-    bool eventFilter(QObject *o, QEvent *e);
+    void  showEvent(QShowEvent *e);
+    bool  eventFilter(QObject *o, QEvent *e);
 
     // Properties
-    int optimalLenth() const { return _optimalLength; }
+    int  optimalLenth() const { return _optimalLength; }
     void setOptimalLength(int optimalLength) { _optimalLength = optimalLength; }
 
     QString rxValidator() const { return _rxValidator; }
-    void setRxValidator(const QString &str);
+    void    setRxValidator(const QString &str);
 
 protected:
-    void addWidget(QWidget *w);
-    void setPopup(QWidget* w);
+    void    addWidget(QWidget *w);
+    void    setPopup(QWidget *w);
     QFrame *popup() const { return _popup; };
 
 protected slots:
@@ -39,13 +38,12 @@ protected slots:
     virtual void hidePopup();
 
 private:
-
-    QHBoxLayout *_layout;
-    QList<QWidget*> _toolbuttons;
-    QFrame *_popup;
+    QHBoxLayout *    _layout;
+    QList<QWidget *> _toolbuttons;
+    QFrame *         _popup;
 
     // Properties
-    int _optimalLength;
+    int     _optimalLength;
     QString _rxValidator;
 };
 

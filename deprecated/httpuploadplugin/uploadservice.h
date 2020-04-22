@@ -12,19 +12,15 @@
 
 class UploadService {
 public:
-    UploadService(const QString& serviceName, int sizeLimit);
+    UploadService(const QString &serviceName, int sizeLimit);
 
-    const QString& serviceName() const {
-        return serviceName_;
-    }
+    const QString &serviceName() const { return serviceName_; }
 
-    int sizeLimit() const {
-        return sizeLimit_;
-    }
+    int sizeLimit() const { return sizeLimit_; }
 
 private:
     QString serviceName_;
-    int sizeLimit_;
+    int     sizeLimit_;
 };
 
 #endif /* SRC_PLUGINS_GENERIC_HTTPUPLOADPLUGIN_UPLOADSERVICE_H_ */

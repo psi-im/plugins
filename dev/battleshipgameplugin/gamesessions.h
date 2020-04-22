@@ -20,11 +20,11 @@
 #ifndef GAMESESSIONLIST_H
 #define GAMESESSIONLIST_H
 
-#include <QObject>
+#include <QDateTime>
 #include <QDomElement>
 #include <QHash>
+#include <QObject>
 #include <QPointer>
-#include <QDateTime>
 #include <QTimer>
 
 #include "pluginwindow.h"
@@ -32,60 +32,59 @@
 class GameSession;
 
 namespace XML {
-    QString escapeString(const QString &str);
-    QString iqErrorString(const QString &jid, const QString &id);
+QString escapeString(const QString &str);
+QString iqErrorString(const QString &jid, const QString &id);
 }
 
-class GameSessionList : public QObject
-{
-Q_OBJECT
+class GameSessionList : public QObject {
+    Q_OBJECT
 
 public:
     static GameSessionList *instance();
-    static void reset();
-    GameSession *createSession(int account, const QString &jid, bool first, const QString &gameId);
-    void updateGameKey(GameSession *gs);
-    void removeGame(GameSession *gs);
-    GameSession *findGame(int account, const QString &jid, const QString &gameId);
-    GameSession *findGameByStanzaId(int account, const QString &jid, const QString &stanzaId);
-    bool processIncomingIqStanza(int account, const QDomElement &xml, const QString &accStatus, bool fromPrivate);
-    void invite(int account, const QString &jid, const QStringList &resList);
+    static void             reset();
+    GameSession *           createSession(int account, const QString &jid, bool first, const QString &gameId);
+    void                    updateGameKey(GameSession *gs);
+    void                    removeGame(GameSession *gs);
+    GameSession *           findGame(int account, const QString &jid, const QString &gameId);
+    GameSession *           findGameByStanzaId(int account, const QString &jid, const QString &stanzaId);
+    bool    processIncomingIqStanza(int account, const QDomElement &xml, const QString &accStatus, bool fromPrivate);
+    void    invite(int account, const QString &jid, const QStringList &resList);
     QString getStanzaId(bool bigOffset);
-    void sendErrorIq(int account, const QString &jid, const QString &id);
+    void    sendErrorIq(int account, const QString &jid, const QString &id);
 
 private:
     GameSessionList(QObject *parent = nullptr);
     ~GameSessionList();
-    QString generateKey(int account, const QString &jid, const QString &gameId);
+    QString        generateKey(int account, const QString &jid, const QString &gameId);
     static QString getErrorMessage(const QDomElement &xml);
 
 private:
-    static GameSessionList *instance_;
+    static GameSessionList *      instance_;
     QHash<QString, GameSession *> list_;
-    int stanzaId_;
+    int                           stanzaId_;
 
 signals:
     void sendStanza(int, QString);
     void doPopup(QString);
     void playSound(QString);
     void doInviteEvent(int, QString, QString, QObject *, const char *);
-
 };
 
-class GameSession : public QObject
-{
-Q_OBJECT
+class GameSession : public QObject {
+    Q_OBJECT
 
 public:
     enum GameStage { StageNone, StageInvitation, StageInitBoard, StageShooting, StageShowBoard, StageEnd };
-    enum GameStatus
-    {
-        StatusNone, StatusError,
-        StatusWaitInviteConfirmation, StatusWaitBoardVerification,
-        StatusWaitShotConfirmation, StatusWaitOpponent
+    enum GameStatus {
+        StatusNone,
+        StatusError,
+        StatusWaitInviteConfirmation,
+        StatusWaitBoardVerification,
+        StatusWaitShotConfirmation,
+        StatusWaitOpponent
     };
-    using Timer = QPointer<QTimer>;
-    using InviteDlg = QPointer<QDialog>;
+    using Timer       = QPointer<QTimer>;
+    using InviteDlg   = QPointer<QDialog>;
     using BoardWidget = QPointer<PluginWindow>;
     void executeNextAction();
     void invite(const QStringList &resList);
@@ -113,25 +112,25 @@ private:
 
 private:
     GameSessionList *gsl_;
-    GameStage       stage_;
-    GameStatus      status_;
-    int             account_;
-    QString         jid_;
-    bool            first_;
-    QString         gameId_;
-    QString         stanzaId_;
-    QDateTime       modifTime_;
-    Timer           timer_;
-    InviteDlg       inviteDlg_;
-    BoardWidget     boardWid_;
-    bool            myBoardChecked_;
-    bool            opBoardChecked_;
-    bool            resign_;
-    //int             lastTurnPos_;
-    //bool            lastTurnMy_;
-    QString         lastTurnResult_;
-    QString         lastTurnSeed_;
-    QString         boardStatus_;
+    GameStage        stage_;
+    GameStatus       status_;
+    int              account_;
+    QString          jid_;
+    bool             first_;
+    QString          gameId_;
+    QString          stanzaId_;
+    QDateTime        modifTime_;
+    Timer            timer_;
+    InviteDlg        inviteDlg_;
+    BoardWidget      boardWid_;
+    bool             myBoardChecked_;
+    bool             opBoardChecked_;
+    bool             resign_;
+    // int             lastTurnPos_;
+    // bool            lastTurnMy_;
+    QString lastTurnResult_;
+    QString lastTurnSeed_;
+    QString boardStatus_;
 
 private slots:
     void sendInvite(QString jid, bool first);
@@ -149,7 +148,6 @@ signals:
     void doPopup(const QString);
     void playSound(const QString);
     void doInviteEvent(int, QString, QString, QObject *, const char *);
-
 };
 
 #endif // GAMESESSIONLIST_H

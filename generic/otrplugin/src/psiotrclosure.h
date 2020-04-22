@@ -29,9 +29,9 @@
 
 #include "otrmessaging.h"
 
-#include <QObject>
 #include <QDialog>
 #include <QMessageBox>
+#include <QObject>
 
 class QAction;
 class QMenu;
@@ -40,34 +40,30 @@ class QLineEdit;
 class QProgressBar;
 class QPushButton;
 
-namespace psiotr
-{
+namespace psiotr {
 
 //-----------------------------------------------------------------------------
 
-class AuthenticationDialog : public QDialog
-{
+class AuthenticationDialog : public QDialog {
     Q_OBJECT
 public:
-    AuthenticationDialog(OtrMessaging* otrc,
-                         const QString& account, const QString& contact,
-                         const QString& question, bool sender,
-                         QWidget* parent = nullptr);
+    AuthenticationDialog(OtrMessaging *otrc, const QString &account, const QString &contact, const QString &question,
+                         bool sender, QWidget *parent = nullptr);
     ~AuthenticationDialog();
 
     void reset();
     bool finished();
     void updateSMP(int progress);
-    void notify(const QMessageBox::Icon icon, const QString& message);
+    void notify(const QMessageBox::Icon icon, const QString &message);
 
 public slots:
     void reject();
 
 private:
-    enum AuthState {AUTH_READY, AUTH_IN_PROGRESS, AUTH_FINISHED};
-    enum Method {METHOD_QUESTION, METHOD_SHARED_SECRET, METHOD_FINGERPRINT};
+    enum AuthState { AUTH_READY, AUTH_IN_PROGRESS, AUTH_FINISHED };
+    enum Method { METHOD_QUESTION, METHOD_SHARED_SECRET, METHOD_FINGERPRINT };
 
-    OtrMessaging* m_otr;
+    OtrMessaging *m_otr;
     Method        m_method;
     QString       m_account;
     QString       m_contact;
@@ -76,14 +72,14 @@ private:
     AuthState     m_state;
     Fingerprint   m_fpr;
 
-    QWidget*      m_methodWidget[3];
-    QComboBox*    m_methodBox;
-    QLineEdit*    m_questionEdit;
-    QLineEdit*    m_answerEdit;
-    QLineEdit*    m_sharedSecretEdit;
-    QProgressBar* m_progressBar;
-    QPushButton*  m_cancelButton;
-    QPushButton*  m_startButton;
+    QWidget *     m_methodWidget[3];
+    QComboBox *   m_methodBox;
+    QLineEdit *   m_questionEdit;
+    QLineEdit *   m_answerEdit;
+    QLineEdit *   m_sharedSecretEdit;
+    QProgressBar *m_progressBar;
+    QPushButton * m_cancelButton;
+    QPushButton * m_startButton;
 
 private slots:
     void changeMethod(int index);
@@ -93,37 +89,35 @@ private slots:
 
 //-----------------------------------------------------------------------------
 
-class PsiOtrClosure : public QObject
-{
+class PsiOtrClosure : public QObject {
     Q_OBJECT
 
 public:
-    PsiOtrClosure(const QString& account, const QString& contact,
-                  OtrMessaging* otrc);
+    PsiOtrClosure(const QString &account, const QString &contact, OtrMessaging *otrc);
     ~PsiOtrClosure();
-    void updateMessageState();
-    void setIsLoggedIn(bool isLoggedIn);
-    bool isLoggedIn() const;
-    void disable();
-    QAction* getChatDlgMenu(QObject* parent);
-    bool encrypted() const;
-    void receivedSMP(const QString& question);
-    void updateSMP(int progress);
+    void     updateMessageState();
+    void     setIsLoggedIn(bool isLoggedIn);
+    bool     isLoggedIn() const;
+    void     disable();
+    QAction *getChatDlgMenu(QObject *parent);
+    bool     encrypted() const;
+    void     receivedSMP(const QString &question);
+    void     updateSMP(int progress);
 
 private:
-    OtrMessaging* m_otr;
-    QString       m_account;
-    QString       m_contact;
-    QMenu*        m_chatDlgMenu;
-    QAction*      m_chatDlgAction;
-    QAction*      m_authenticateAction;
-    QAction*      m_sessionIdAction;
-    QAction*      m_fingerprintAction;
-    QAction*      m_startSessionAction;
-    QAction*      m_endSessionAction;
-    bool          m_isLoggedIn;
-    QObject*      m_parentWidget;
-    AuthenticationDialog* m_authDialog;
+    OtrMessaging *        m_otr;
+    QString               m_account;
+    QString               m_contact;
+    QMenu *               m_chatDlgMenu;
+    QAction *             m_chatDlgAction;
+    QAction *             m_authenticateAction;
+    QAction *             m_sessionIdAction;
+    QAction *             m_fingerprintAction;
+    QAction *             m_startSessionAction;
+    QAction *             m_endSessionAction;
+    bool                  m_isLoggedIn;
+    QObject *             m_parentWidget;
+    AuthenticationDialog *m_authDialog;
 
 public slots:
     void initiateSession(bool b);

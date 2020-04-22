@@ -26,8 +26,7 @@ class QToolBar;
 class Button;
 class QSpinBox;
 
-class ToolBar : public QToolBar
-{
+class ToolBar : public QToolBar {
     Q_OBJECT
 public:
     enum ButtonType {
@@ -45,12 +44,12 @@ public:
 
     ToolBar(QWidget *parent);
     ~ToolBar();
-    void init();
+    void                init();
     ToolBar::ButtonType currentButton() const;
-    void checkButton(ToolBar::ButtonType);
-    void enableButton(bool enable, ToolBar::ButtonType type);
-    void setColorForColorButton(const QColor &color);
-    void setLineWidth(int width);
+    void                checkButton(ToolBar::ButtonType);
+    void                enableButton(bool enable, ToolBar::ButtonType type);
+    void                setColorForColorButton(const QColor &color);
+    void                setLineWidth(int width);
 
 private slots:
     void buttonChecked(bool);
@@ -62,10 +61,8 @@ signals:
     void newWidth(int);
 
 private:
-    QList<Button*> buttons_;
-    QSpinBox *sb;
-
+    QList<Button *> buttons_;
+    QSpinBox *      sb;
 };
-
 
 #endif // TOOLBAR_H

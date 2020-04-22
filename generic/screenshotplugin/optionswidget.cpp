@@ -20,29 +20,26 @@
 #include <QCloseEvent>
 #include <QKeyEvent>
 
-#include "optionswidget.h"
-#include "editserverdlg.h"
-#include "server.h"
-#include "options.h"
 #include "defines.h"
+#include "editserverdlg.h"
+#include "options.h"
+#include "optionswidget.h"
+#include "server.h"
 
 namespace screenshotplugin {
 //--------------------------------------------------------
 //---GrepShortcutKeyDialog from libpsi with some changes--
 //--------------------------------------------------------
-class GrepShortcutKeyDialog : public QDialog
-{
+class GrepShortcutKeyDialog : public QDialog {
     Q_OBJECT
 public:
-    GrepShortcutKeyDialog(QWidget* p = nullptr)
-        : QDialog(p)
-        , gotKey(false)
+    GrepShortcutKeyDialog(QWidget *p = nullptr) : QDialog(p), gotKey(false)
     {
         setAttribute(Qt::WA_DeleteOnClose);
         setModal(true);
         setWindowTitle(tr("New Shortcut"));
         QHBoxLayout *l = new QHBoxLayout(this);
-        le = new QLineEdit();
+        le             = new QLineEdit();
         l->addWidget(le);
         QPushButton *cancelButton = new QPushButton(tr("Cancel"));
         l->addWidget(cancelButton);
@@ -67,7 +64,7 @@ protected:
         event->accept();
     }
 
-    void keyPressEvent(QKeyEvent* event)
+    void keyPressEvent(QKeyEvent *event)
     {
         displayPressedKeys(getKeySequence(event));
 
@@ -79,16 +76,13 @@ protected:
         close();
     }
 
-    void keyReleaseEvent(QKeyEvent* event)
-    {
-        displayPressedKeys(getKeySequence(event));
-    }
+    void keyReleaseEvent(QKeyEvent *event) { displayPressedKeys(getKeySequence(event)); }
 
 signals:
-    void newShortcutKey(const QKeySequence& key);
+    void newShortcutKey(const QKeySequence &key);
 
 private:
-    void displayPressedKeys(const QKeySequence& keys)
+    void displayPressedKeys(const QKeySequence &keys)
     {
         QString str = keys.toString(QKeySequence::NativeText);
         if (str.isEmpty())
@@ -96,10 +90,9 @@ private:
         le->setText(str);
     }
 
-    QKeySequence getKeySequence(QKeyEvent* event) const
+    QKeySequence getKeySequence(QKeyEvent *event) const
     {
-        return QKeySequence((isValid(event->key()) ? event->key() : 0)
-                    + (event->modifiers() & ~Qt::KeypadModifier));
+        return QKeySequence((isValid(event->key()) ? event->key() : 0) + (event->modifiers() & ~Qt::KeypadModifier));
     }
 
     bool isValid(int key) const
@@ -129,26 +122,24 @@ private:
         return false;
     }
 
-    bool gotKey;
-    QLineEdit* le;
+    bool       gotKey;
+    QLineEdit *le;
 };
 }
-
 
 //---------------------------------------------------
 //-------------------OptionsWidget-------------------
 //---------------------------------------------------
-OptionsWidget::OptionsWidget(QWidget* p)
-    : QWidget(p)
+OptionsWidget::OptionsWidget(QWidget *p) : QWidget(p)
 {
     ui_.setupUi(this);
     ui_.cb_hack->setVisible(false);
 
-    Options* o = Options::instance();
-    shortCut = o->getOption(constShortCut, QVariant(shortCut)).toString();
-    format = o->getOption(constFormat, QVariant(format)).toString();
-    fileName = o->getOption(constFileName, QVariant(fileName)).toString();
-    servers = o->getOption(constServerList).toStringList();
+    Options *o    = Options::instance();
+    shortCut      = o->getOption(constShortCut, QVariant(shortCut)).toString();
+    format        = o->getOption(constFormat, QVariant(format)).toString();
+    fileName      = o->getOption(constFileName, QVariant(fileName)).toString();
+    servers       = o->getOption(constServerList).toStringList();
     defaultAction = o->getOption(constDefaultAction, QVariant(Desktop)).toInt();
 
     connect(ui_.pb_add, SIGNAL(clicked()), this, SLOT(addServer()));
@@ -159,7 +150,6 @@ OptionsWidget::OptionsWidget(QWidget* p)
     connect(ui_.pb_modify, SIGNAL(clicked()), this, SLOT(requstNewShortcut()));
 }
 
-
 void OptionsWidget::addServer()
 {
     EditServerDlg *esd = new EditServerDlg(this);
@@ -169,18 +159,18 @@ void OptionsWidget::addServer()
 
 void OptionsWidget::delServer()
 {
-    Server *s = (Server*)ui_.lw_servers->currentItem();
-    if(!s)
+    Server *s = (Server *)ui_.lw_servers->currentItem();
+    if (!s)
         return;
     ui_.lw_servers->removeItemWidget(s);
-    delete(s);
+    delete (s);
     applyButtonActivate();
 }
 
 void OptionsWidget::editServer()
 {
-    Server *s = (Server*)ui_.lw_servers->currentItem();
-    if(!s)
+    Server *s = (Server *)ui_.lw_servers->currentItem();
+    if (!s)
         return;
     EditServerDlg *esd = new EditServerDlg(this);
     connect(esd, SIGNAL(okPressed(QString)), this, SLOT(applyButtonActivate()));
@@ -188,7 +178,7 @@ void OptionsWidget::editServer()
     esd->show();
 }
 
-void OptionsWidget::addNewServer(const QString& settings)
+void OptionsWidget::addNewServer(const QString &settings)
 {
     Server *s = new Server(ui_.lw_servers);
     s->setFromString(settings);
@@ -197,14 +187,11 @@ void OptionsWidget::addNewServer(const QString& settings)
     applyButtonActivate();
 }
 
-void OptionsWidget::applyButtonActivate()
-{
-    ui_.cb_hack->toggle();
-}
+void OptionsWidget::applyButtonActivate() { ui_.cb_hack->toggle(); }
 
 void OptionsWidget::applyOptions()
 {
-    Options* o = Options::instance();
+    Options *o = Options::instance();
 
     shortCut = ui_.le_shortcut->text();
     o->setOption(constShortCut, QVariant(shortCut));
@@ -216,20 +203,19 @@ void OptionsWidget::applyOptions()
     o->setOption(constFileName, QVariant(fileName));
 
     servers.clear();
-    for(int i = 0; i < ui_.lw_servers->count(); i++) {
+    for (int i = 0; i < ui_.lw_servers->count(); i++) {
         Server *s = (Server *)ui_.lw_servers->item(i);
         servers.append(s->settingsToString());
     }
     o->setOption(constServerList, QVariant(servers));
 
-    if(ui_.rb_desktop->isChecked())
+    if (ui_.rb_desktop->isChecked())
         defaultAction = Desktop;
-    else if(ui_.rb_window->isChecked())
+    else if (ui_.rb_window->isChecked())
         defaultAction = Window;
     else
         defaultAction = Area;
     o->setOption(constDefaultAction, defaultAction);
-
 }
 
 void OptionsWidget::restoreOptions()
@@ -237,13 +223,13 @@ void OptionsWidget::restoreOptions()
     const QStringList &list = { "jpg", "png" };
     ui_.cb_format->addItems(list);
     int index = ui_.cb_format->findText(format);
-    if(index != -1)
+    if (index != -1)
         ui_.cb_format->setCurrentIndex(index);
     ui_.le_filename->setText(fileName);
     ui_.le_shortcut->setText(shortCut);
-    if(ui_.lw_servers->count() > 0)
+    if (ui_.lw_servers->count() > 0)
         ui_.lw_servers->clear();
-    foreach(QString settings, servers) {
+    foreach (QString settings, servers) {
         Server *s = new Server(ui_.lw_servers);
         s->setFromString(settings);
         s->setText(s->displayName());
@@ -260,7 +246,7 @@ void OptionsWidget::requstNewShortcut()
     gs->show();
 }
 
-void OptionsWidget::onNewShortcut(const QKeySequence& ks)
+void OptionsWidget::onNewShortcut(const QKeySequence &ks)
 {
     ui_.le_shortcut->setText(ks.toString(QKeySequence::NativeText));
 }

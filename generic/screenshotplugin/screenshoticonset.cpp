@@ -21,26 +21,20 @@
 
 #include "iconfactoryaccessinghost.h"
 
-ScreenshotIconset* ScreenshotIconset::instance_ = nullptr;
+ScreenshotIconset *ScreenshotIconset::instance_ = nullptr;
 
-ScreenshotIconset* ScreenshotIconset::instance()
+ScreenshotIconset *ScreenshotIconset::instance()
 {
-    if(!instance_) {
+    if (!instance_) {
         instance_ = new ScreenshotIconset();
     }
 
     return instance_;
 }
 
-ScreenshotIconset::ScreenshotIconset()
-    : QObject(nullptr)
-    , icoHost(nullptr)
-{
-}
+ScreenshotIconset::ScreenshotIconset() : QObject(nullptr), icoHost(nullptr) { }
 
-ScreenshotIconset::~ScreenshotIconset()
-{
-}
+ScreenshotIconset::~ScreenshotIconset() { }
 
 void ScreenshotIconset::reset()
 {
@@ -48,22 +42,18 @@ void ScreenshotIconset::reset()
     instance_ = nullptr;
 }
 
-QIcon ScreenshotIconset::getIcon(const QString& name)
+QIcon ScreenshotIconset::getIcon(const QString &name)
 {
     QIcon ico;
-    if(icoHost) {
+    if (icoHost) {
         ico = icoHost->getIcon(name);
     }
 
-    if(ico.isNull())
+    if (ico.isNull())
         ico = QIcon(":/screenshotplugin/" + name);
 
     return ico;
 }
 
-
-//for Psi plugin only
-void ScreenshotIconset::setIconHost(IconFactoryAccessingHost *_icoHost)
-{
-    icoHost = _icoHost;
-}
+// for Psi plugin only
+void ScreenshotIconset::setIconHost(IconFactoryAccessingHost *_icoHost) { icoHost = _icoHost; }

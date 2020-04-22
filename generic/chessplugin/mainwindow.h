@@ -23,73 +23,69 @@
 #include <QLabel>
 #include <QPushButton>
 
-#include "ui_mainwindow.h"
-#include "boardview.h"
 #include "boarddelegate.h"
 #include "boardmodel.h"
+#include "boardview.h"
+#include "ui_mainwindow.h"
 
 using namespace Chess;
 
-class ChessWindow : public QMainWindow
-{
+class ChessWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-        ChessWindow(Figure::GameType type, bool enableSound_, QWidget *parent = nullptr);
-    void moveRequest(int oldX, int oldY, int newX, int newY, const QString& figure = "");
-    void loadRequest(const QString& settings);
-        void youWin();
-        void youLose();
-        void youDraw();
+    ChessWindow(Figure::GameType type, bool enableSound_, QWidget *parent = nullptr);
+    void moveRequest(int oldX, int oldY, int newX, int newY, const QString &figure = "");
+    void loadRequest(const QString &settings);
+    void youWin();
+    void youLose();
+    void youDraw();
 
 protected:
-        void closeEvent(QCloseEvent *e);
+    void closeEvent(QCloseEvent *e);
 
 private slots:
-        void figureKilled(Figure* figure);
-    void needNewFigure(QModelIndex index, const QString& player);
-        void newFigure(QString figure);
-        void load();
-        void save();
-        void addMove(int,int,int,int);
+    void figureKilled(Figure *figure);
+    void needNewFigure(QModelIndex index, const QString &player);
+    void newFigure(QString figure);
+    void load();
+    void save();
+    void addMove(int, int, int, int);
 
 signals:
-        void closeBoard();
-        void move(int, int, int, int, QString);
-        void moveAccepted();
-        void error();
-        void load(QString);
-        void draw();
-        void lose();
-        void toggleEnableSound(bool);
+    void closeBoard();
+    void move(int, int, int, int, QString);
+    void moveAccepted();
+    void error();
+    void load(QString);
+    void draw();
+    void lose();
+    void toggleEnableSound(bool);
 
 private:
     void createMenu();
 
-    BoardModel *model_;
-    QModelIndex tmpIndex_;
-    bool enabledSound;
-    int movesCount;
-    QAction *loseAction;
+    BoardModel *    model_;
+    QModelIndex     tmpIndex_;
+    bool            enabledSound;
+    int             movesCount;
+    QAction *       loseAction;
     Ui::ChessWindow ui_;
-
 };
 
-class SelectFigure : public QWidget
-{
+class SelectFigure : public QWidget {
     Q_OBJECT
 public:
-    SelectFigure(const QString& player, QWidget *parent = nullptr);
+    SelectFigure(const QString &player, QWidget *parent = nullptr);
 
 private slots:
-        void figureSelected();
+    void figureSelected();
 
 private:
-        QPushButton *tb_queen, *tb_castle, *tb_knight, *tb_bishop;
+    QPushButton *tb_queen, *tb_castle, *tb_knight, *tb_bishop;
 
 signals:
     void newFigure(QString figure);
-
 };
 
 #endif // MAINWINDOW_H

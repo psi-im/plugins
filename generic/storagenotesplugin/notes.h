@@ -20,59 +20,57 @@
 #ifndef NOTES_H
 #define NOTES_H
 
-#include "ui_notes.h"
 #include "tagsmodel.h"
+#include "ui_notes.h"
 
 #include <QKeyEvent>
 
 class StorageNotesPlugin;
 class QTimer;
 
-class Notes : public QDialog
-{
-        Q_OBJECT
+class Notes : public QDialog {
+    Q_OBJECT
 public:
     Notes(StorageNotesPlugin *storageNotes, int acc, QWidget *parent = nullptr);
     ~Notes();
-    void incomingNotes(const QList<QDomElement>& notes);
+    void incomingNotes(const QList<QDomElement> &notes);
     void error();
     void saved();
 
 private:
-    QString replaceSymbols(const QString& str);
+    QString replaceSymbols(const QString &str);
 
 signals:
     void notesDeleted(int);
 
-public slots:    
+public slots:
     void load();
 
 private slots:
-        void save();
-        void add();
-        void del();
-        void edit();
-    void addNote(const QDomElement& note);
-    void noteEdited(const QDomElement& note, const QModelIndex& index);
+    void save();
+    void add();
+    void del();
+    void edit();
+    void addNote(const QDomElement &note);
+    void noteEdited(const QDomElement &note, const QModelIndex &index);
     void selectTag();
     void updateTags();
 
 protected:
-        void closeEvent(QCloseEvent * event);
-        void keyPressEvent(QKeyEvent *e);
+    void closeEvent(QCloseEvent *event);
+    void keyPressEvent(QKeyEvent *e);
     bool eventFilter(QObject *obj, QEvent *e);
 
 private:
-    Ui::Notes ui_;
-    int account_;
+    Ui::Notes           ui_;
+    int                 account_;
     StorageNotesPlugin *storageNotes_;
-    TagModel *tagModel_;
-    NoteModel *noteModel_;
-    ProxyModel *proxyModel_;
-    QTimer* updateTagsTimer_;
-    bool newNotes;
-    bool waitForSave;
+    TagModel *          tagModel_;
+    NoteModel *         noteModel_;
+    ProxyModel *        proxyModel_;
+    QTimer *            updateTagsTimer_;
+    bool                newNotes;
+    bool                waitForSave;
 };
-
 
 #endif // NOTES_H

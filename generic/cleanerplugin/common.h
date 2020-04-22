@@ -20,60 +20,43 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-
-
-#include <QDialog>
 #include "ui_clearingtab.h"
+#include <QDialog>
 
-
-class vCardView : public QDialog
-{
+class vCardView : public QDialog {
     Q_OBJECT
 
 public:
-    vCardView(const QString& filename, QWidget *parent = nullptr);
-
+    vCardView(const QString &filename, QWidget *parent = nullptr);
 };
 
-
-
-class HistoryView : public QDialog
-{
+class HistoryView : public QDialog {
     Q_OBJECT
 
 public:
-    HistoryView(const QString& file, QWidget *parent = nullptr);
-
+    HistoryView(const QString &file, QWidget *parent = nullptr);
 };
 
-
-
-
-class ClearingTab : public QWidget, public Ui::ClearingTab
-{
+class ClearingTab : public QWidget, public Ui::ClearingTab {
     Q_OBJECT
 
 public:
-    ClearingTab(QWidget * parent = nullptr) : QWidget(parent) { setupUi(this); };
+    ClearingTab(QWidget *parent = nullptr) : QWidget(parent) { setupUi(this); };
 };
 
-
-
-class AvatarView : public QDialog
-{
+class AvatarView : public QDialog {
     Q_OBJECT
 
 public:
-        AvatarView(const QPixmap &pix, QWidget *parent = nullptr);
-    void setIcon(const QIcon&);
+    AvatarView(const QPixmap &pix, QWidget *parent = nullptr);
+    void setIcon(const QIcon &);
 
 private:
-        QPixmap pix_;
+    QPixmap      pix_;
     QPushButton *pbSave;
 
 private slots:
-        void save();
-
+    void save();
 };
 
 #endif // COMMON_H

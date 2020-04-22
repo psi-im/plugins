@@ -30,24 +30,16 @@ AccountSettings::AccountSettings()
     return;
 }
 
-AccountSettings::AccountSettings(const QString& set_str)
-{
-    fromString(set_str);
-}
+AccountSettings::AccountSettings(const QString &set_str) { fromString(set_str); }
 
-AccountSettings::~AccountSettings()
-{
+AccountSettings::~AccountSettings() { }
 
-}
-
-bool AccountSettings::isValid()
-{
-    return !account_id.isEmpty();
-}
+bool AccountSettings::isValid() { return !account_id.isEmpty(); }
 
 bool AccountSettings::isEmpty()
 {
-    if (!enable_contacts && !enable_conferences && response_mode == RespAllow && !lock_time_requ && show_requ_mode == LogNever && log_mode == LogNever) {
+    if (!enable_contacts && !enable_conferences && response_mode == RespAllow && !lock_time_requ
+        && show_requ_mode == LogNever && log_mode == LogNever) {
         if (os_name.isEmpty() && client_name.isEmpty() && caps_node.isEmpty() && caps_version.isEmpty()) {
             return true;
         }
@@ -55,12 +47,12 @@ bool AccountSettings::isEmpty()
     return false;
 }
 
-void AccountSettings::fromString(const QString& set_str)
+void AccountSettings::fromString(const QString &set_str)
 {
-    QStringList set_list;
-    int len = set_str.length();
+    QStringList  set_list;
+    int          len    = set_str.length();
     unsigned int sl_cnt = 0;
-    int st_pos = 0;
+    int          st_pos = 0;
     for (int i = 0; i < len; i++) {
         QChar ch = set_str.at(i);
         if (ch == '\\') {
@@ -82,7 +74,7 @@ void AccountSettings::fromString(const QString& set_str)
     for (int i = 0; i < len; i++) {
         QStringList param_list = set_list.at(i).split("=");
         if (param_list.size() >= 2) {
-            QString param_name = param_list.takeFirst();
+            QString param_name  = param_list.takeFirst();
             QString param_value = param_list.join("=");
             if (param_name == "acc_id") {
                 account_id = stripSlashes(param_value);
@@ -126,7 +118,6 @@ void AccountSettings::fromString(const QString& set_str)
             }
         }
     }
-
 }
 
 QString AccountSettings::toString()
@@ -169,26 +160,23 @@ QString AccountSettings::toString()
 
 void AccountSettings::init()
 {
-    account_id = "";
-    enable_contacts = false;
+    account_id         = "";
+    enable_contacts    = false;
     enable_conferences = false;
-    response_mode = RespAllow;
-    lock_time_requ = false;
-    show_requ_mode = LogNever;
-    os_name = "";
-    client_name = "";
-    client_version = "";
-    caps_node = "";
-    caps_version = "";
-    log_mode = LogNever;
+    response_mode      = RespAllow;
+    lock_time_requ     = false;
+    show_requ_mode     = LogNever;
+    os_name            = "";
+    client_name        = "";
+    client_version     = "";
+    caps_node          = "";
+    caps_version       = "";
+    log_mode           = LogNever;
 }
 
-QString AccountSettings::addSlashes(QString& str)
+QString AccountSettings::addSlashes(QString &str)
 {
     return str.replace("\\", "\\\\", Qt::CaseSensitive).replace(";", "\\;");
 }
 
-QString AccountSettings::stripSlashes(QString& str)
-{
-    return str.replace("\\;", ";").replace("\\\\", "\\");
-}
+QString AccountSettings::stripSlashes(QString &str) { return str.replace("\\;", ";").replace("\\\\", "\\"); }

@@ -23,26 +23,25 @@ class QNetworkAccessManager;
 class QEventLoop;
 class QTimer;
 
-class AuthManager : public QObject
-{
+class AuthManager : public QObject {
     Q_OBJECT
 public:
-    AuthManager(QObject* p = 0);
+    AuthManager(QObject *p = 0);
     ~AuthManager();
 
-    bool go(const QString& login, const QString& pass, const QString& captcha = "");
+    bool                  go(const QString &login, const QString &pass, const QString &captcha = "");
     QList<QNetworkCookie> cookies() const;
 
 private slots:
     void timeout();
-    void replyFinished(QNetworkReply* r);
+    void replyFinished(QNetworkReply *r);
 
 private:
-    bool authorized_;
-    QString narodLogin, narodPass;
+    bool                   authorized_;
+    QString                narodLogin, narodPass;
     QNetworkAccessManager *manager_;
-    QEventLoop *loop_;
-    QTimer *timer_;
+    QEventLoop *           loop_;
+    QTimer *               timer_;
 };
 
 #endif // AUTHMANAGER_H

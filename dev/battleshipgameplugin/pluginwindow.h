@@ -20,17 +20,16 @@
 #ifndef PLUGINWINDOW_H
 #define PLUGINWINDOW_H
 
-#include "ui_pluginwindow.h"
 #include "gamemodel.h"
+#include "ui_pluginwindow.h"
 
-class PluginWindow : public QMainWindow
-{
+class PluginWindow : public QMainWindow {
     Q_OBJECT
 
 public:
     PluginWindow(const QString &jid, QWidget *parent = nullptr);
-    void initBoard();
-    void setError();
+    void        initBoard();
+    void        setError();
     QStringList dataExchange(const QStringList &data);
 
 private:
@@ -38,7 +37,7 @@ private:
 
 private:
     Ui::PluginWindow ui;
-    GameModel *gm_;
+    GameModel *      gm_;
 
 private:
     void updateWidgets();
@@ -50,7 +49,6 @@ private slots:
 
 signals:
     void gameEvent(QString data);
-
 };
 
 #endif // PLUGINWINDOW_H

@@ -17,39 +17,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <QDomElement>
-#include <QMessageBox>
-#include <QFile>
-#include <QCursor>
-#include <QMenu>
-#include "options.h"
 #include "gnupg.h"
+#include "accountinfoaccessinghost.h"
+#include "activetabaccessinghost.h"
 #include "gpgprocess.h"
-#include "psiaccountcontrollinghost.h"
-#include "optionaccessinghost.h"
 #include "iconfactoryaccessinghost.h"
 #include "model.h"
-#include "activetabaccessinghost.h"
-#include "accountinfoaccessinghost.h"
+#include "optionaccessinghost.h"
+#include "options.h"
+#include "psiaccountcontrollinghost.h"
 #include "stanzasendinghost.h"
+#include <QCursor>
+#include <QDomElement>
+#include <QFile>
+#include <QMenu>
+#include <QMessageBox>
 
-GnuPG::GnuPG()
-    : _enabled(false)
-    , _optionsForm(nullptr)
-    , _accountHost(nullptr)
-    , _optionHost(nullptr)
-    , _iconFactory(nullptr)
-    , _menu(nullptr)
-    , _stanzaSending(nullptr)
-    , _activeTab(nullptr)
-    , _accountInfo(nullptr)
+GnuPG::GnuPG() :
+    _enabled(false), _optionsForm(nullptr), _accountHost(nullptr), _optionHost(nullptr), _iconFactory(nullptr),
+    _menu(nullptr), _stanzaSending(nullptr), _activeTab(nullptr), _accountInfo(nullptr)
 {
 }
 
-
-GnuPG::~GnuPG()
-{
-}
+GnuPG::~GnuPG() { }
 
 QWidget *GnuPG::options()
 {
@@ -60,19 +50,18 @@ QWidget *GnuPG::options()
     _optionsForm = new Options();
     _optionsForm->setOptionAccessingHost(_optionHost);
     _optionsForm->loadSettings();
-    return qobject_cast<QWidget*>(_optionsForm);
+    return qobject_cast<QWidget *>(_optionsForm);
 }
 
 bool GnuPG::enable()
 {
     QFile file(":/icons/key.png");
-    if ( file.open(QIODevice::ReadOnly) ) {
+    if (file.open(QIODevice::ReadOnly)) {
         QByteArray image = file.readAll();
-        _iconFactory->addIcon("gnupg/icon",image);
+        _iconFactory->addIcon("gnupg/icon", image);
         file.close();
         _enabled = true;
-    }
-    else {
+    } else {
         _enabled = false;
     }
     return _enabled;
@@ -84,29 +73,20 @@ bool GnuPG::disable()
     return true;
 }
 
-void GnuPG::applyOptions()
-{
-    _optionsForm->saveSettings();
-}
+void GnuPG::applyOptions() { _optionsForm->saveSettings(); }
 
-void GnuPG::restoreOptions()
-{
-}
+void GnuPG::restoreOptions() { }
 
-QPixmap GnuPG::icon() const
-{
-    return QPixmap(":/icons/gnupg.png");
-}
+QPixmap GnuPG::icon() const { return QPixmap(":/icons/gnupg.png"); }
 
 QString GnuPG::pluginInfo()
 {
-    return tr("Author: ") +     "Ivan Romanov\n"
-           + tr("e-mail: ") + "drizt@land.ru\n\n"
-           + tr("GnuPG Key Manager can create, remove, export and import GnuPG keys. "
-                "It can do only the base operations but I hope it will be enough for your needs.");
+    return tr("Author: ") + "Ivan Romanov\n" + tr("e-mail: ") + "drizt@land.ru\n\n"
+        + tr("GnuPG Key Manager can create, remove, export and import GnuPG keys. "
+             "It can do only the base operations but I hope it will be enough for your needs.");
 }
 
-bool GnuPG::incomingStanza(int account, const QDomElement& stanza)
+bool GnuPG::incomingStanza(int account, const QDomElement &stanza)
 {
     if (!_enabled) {
         return false;
@@ -134,7 +114,7 @@ bool GnuPG::incomingStanza(int account, const QDomElement& stanza)
 
     QString key = body.mid(start, end - start);
 
-    GpgProcess gpg;
+    GpgProcess  gpg;
     QStringList arguments;
     arguments << "--batch"
               << "--import";
@@ -147,7 +127,7 @@ bool GnuPG::incomingStanza(int account, const QDomElement& stanza)
     QString from = stanza.attribute("from");
     // Cut trash from gpg command output
     QString res = QString::fromUtf8(gpg.readAllStandardError());
-    res = _stanzaSending->escape(res.mid(0, res.indexOf('\n')));
+    res         = _stanzaSending->escape(res.mid(0, res.indexOf('\n')));
     _accountHost->appendSysMsg(account, from, res);
 
     // Don't hide message if an error occurred
@@ -157,8 +137,7 @@ bool GnuPG::incomingStanza(int account, const QDomElement& stanza)
 
     if (!_optionHost->getPluginOption("hide-key-message", true).toBool()) {
         return false;
-    }
-    else {
+    } else {
         return true;
     }
 }
@@ -169,9 +148,9 @@ QList<QVariantHash> GnuPG::getButtonParam()
 
     QVariantHash hash;
     hash["tooltip"] = QVariant(tr("Send GnuPG Public Key"));
-    hash["icon"] = QVariant(QString("gnupg/icon"));
+    hash["icon"]    = QVariant(QString("gnupg/icon"));
     hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
-    hash["slot"] = QVariant(SLOT(actionActivated()));
+    hash["slot"]    = QVariant(SLOT(actionActivated()));
     l << hash;
     return l;
 }
@@ -230,14 +209,13 @@ void GnuPG::actionActivated()
 
 void GnuPG::sendPublicKey()
 {
-    QAction *action = qobject_cast<QAction*>(sender());
-    QString fingerprint = "0x" + action->data().toString();
+    QAction *action      = qobject_cast<QAction *>(sender());
+    QString  fingerprint = "0x" + action->data().toString();
 
-    GpgProcess gpg;
+    GpgProcess  gpg;
     QStringList arguments;
     arguments << "--armor"
-              << "--export"
-              << fingerprint;
+              << "--export" << fingerprint;
 
     gpg.start(arguments);
     gpg.waitForFinished();
@@ -249,9 +227,9 @@ void GnuPG::sendPublicKey()
 
     QString key = QString::fromUtf8(gpg.readAllStandardOutput());
 
-    QString jid = _activeTab->getYourJid();
+    QString jid       = _activeTab->getYourJid();
     QString jidToSend = _activeTab->getJid();
-    int account = 0;
+    int     account   = 0;
     QString tmpJid;
     while (jid != (tmpJid = _accountInfo->getJid(account))) {
         ++account;
@@ -261,5 +239,6 @@ void GnuPG::sendPublicKey()
     }
 
     _stanzaSending->sendMessage(account, jidToSend, key, "", "chat");
-    _accountHost->appendSysMsg(account, jidToSend, _stanzaSending->escape(QString(tr("Public key %1 sent")).arg(action->text())));
+    _accountHost->appendSysMsg(account, jidToSend,
+                               _stanzaSending->escape(QString(tr("Public key %1 sent")).arg(action->text())));
 }

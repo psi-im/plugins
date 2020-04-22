@@ -22,55 +22,50 @@
 
 #include <QListWidgetItem>
 
-#include "ui_previewer.h"
 #include "ui_getskinname.h"
+#include "ui_previewer.h"
 
-class Skin : public QListWidgetItem
-{
-    public:
-         Skin(QListWidget* parent) : QListWidgetItem(parent) {}
-         ~Skin() {}
-         void setFile(const QString &file);
-         QString filePass();
-         QString name();
-         QString skinFolder();
-         QPixmap previewPixmap();
+class Skin : public QListWidgetItem {
+public:
+    Skin(QListWidget *parent) : QListWidgetItem(parent) { }
+    ~Skin() { }
+    void    setFile(const QString &file);
+    QString filePass();
+    QString name();
+    QString skinFolder();
+    QPixmap previewPixmap();
 
-    private:
-         QString filePass_;
-
+private:
+    QString filePass_;
 };
 
-class Previewer : public QDialog
-{
+class Previewer : public QDialog {
     Q_OBJECT
-    public:
-        Previewer(Skin *skin, QWidget *parent = nullptr);
-        bool loadSkinInformation();
+public:
+    Previewer(Skin *skin, QWidget *parent = nullptr);
+    bool loadSkinInformation();
 
-    private:        
-        Ui::Previewer ui_;
-        Skin *skin_;
+private:
+    Ui::Previewer ui_;
+    Skin *        skin_;
 
-    signals:
-        void applySkin();
-
+signals:
+    void applySkin();
 };
 
-class GetSkinName : public QDialog
-{
+class GetSkinName : public QDialog {
     Q_OBJECT
-    public:
-        GetSkinName(QString name, QString author, QString version, QWidget *parent = nullptr);
+public:
+    GetSkinName(QString name, QString author, QString version, QWidget *parent = nullptr);
 
-    private slots:
-        void okPressed();
+private slots:
+    void okPressed();
 
-    signals:
-        void ok(QString, QString, QString);
+signals:
+    void ok(QString, QString, QString);
 
-    private:
-        Ui::GetSkinName ui_;
-    };
+private:
+    Ui::GetSkinName ui_;
+};
 
 #endif // SKIN_H

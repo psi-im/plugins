@@ -17,30 +17,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <QInputDialog>
-#include <QStandardItemModel>
-#include <QStandardItem>
-#include <QItemSelectionModel>
-#include <QProgressDialog>
-#include <QApplication>
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QLabel>
-#include <QProgressBar>
-#include <QAction>
-#include <QMenu>
-#include <QClipboard>
-#include <QApplication>
 #include "options.h"
-#include "ui_options.h"
-#include "model.h"
-#include "gpgprocess.h"
 #include "addkeydlg.h"
+#include "gpgprocess.h"
+#include "model.h"
 #include "optionaccessinghost.h"
+#include "ui_options.h"
+#include <QAction>
+#include <QApplication>
+#include <QClipboard>
+#include <QFileDialog>
+#include <QInputDialog>
+#include <QItemSelectionModel>
+#include <QLabel>
+#include <QMenu>
+#include <QMessageBox>
+#include <QProgressBar>
+#include <QProgressDialog>
+#include <QStandardItem>
+#include <QStandardItemModel>
 
-Options::Options(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::Options)
+Options::Options(QWidget *parent) : QWidget(parent), ui(new Ui::Options)
 {
     ui->setupUi(this);
 
@@ -48,10 +45,9 @@ Options::Options(QWidget *parent)
     ui->keys->setModel(model);
     updateKeys();
 
-
     // Import key
     QAction *action;
-    QMenu *menu = new QMenu(this);
+    QMenu *  menu = new QMenu(this);
 
     action = menu->addAction(tr("from file"));
     connect(action, SIGNAL(triggered()), SLOT(importKeyFromFile()));
@@ -63,7 +59,7 @@ Options::Options(QWidget *parent)
 
     // Export key
 
-    menu = new QMenu(this);
+    menu   = new QMenu(this);
     action = menu->addAction(tr("to file"));
     connect(action, SIGNAL(triggered()), SLOT(exportKeyToFile()));
     ui->btnExport->addAction(action);
@@ -74,14 +70,9 @@ Options::Options(QWidget *parent)
     ui->btnExport->setMenu(menu);
 }
 
-Options::~Options()
-{
-    delete ui;
-}
+Options::~Options() { delete ui; }
 
-void Options::update()
-{
-}
+void Options::update() { }
 
 void Options::loadSettings()
 {
@@ -105,18 +96,27 @@ void Options::addKey()
     QString key;
     QString type, stype, length, name, comment, email, expiration, pass;
     switch (dlg.type()) {
-    case 0: type = stype = "RSA"; break;
-    case 1: type = "DSA"; stype = "ELG-E"; break;
-    case 2: type = "DSA"; break;
-    case 3: type = "RSA"; break;
+    case 0:
+        type = stype = "RSA";
+        break;
+    case 1:
+        type  = "DSA";
+        stype = "ELG-E";
+        break;
+    case 2:
+        type = "DSA";
+        break;
+    case 3:
+        type = "RSA";
+        break;
     }
 
-    length = QString::number(dlg.length());
-    name = dlg.name();
-    comment = dlg.comment();
-    email = dlg.email();
+    length     = QString::number(dlg.length());
+    name       = dlg.name();
+    comment    = dlg.comment();
+    email      = dlg.email();
     expiration = dlg.expiration().isValid() ? dlg.expiration().toString(Qt::ISODate) : "0";
-    pass = dlg.pass();
+    pass       = dlg.pass();
 
     key += QString("Key-Type: %1\n").arg(type);
     key += QString("Key-Length: %2\n").arg(length);
@@ -147,12 +147,12 @@ void Options::addKey()
 
     QProgressDialog waitingDlg("", tr("Cancel"), 0, 0, this);
 
-    QLabel progressTextLabel(tr(
-"<b>Please wait!</b><br/>"
-"We need to generate a lot of random bytes. It is a good idea to perform "
-"some other action (type on the keyboard, move the mouse, utilize the "
-"disks) during the prime generation; this gives the random number "
-"generator a better chance to gain enough entropy."), &waitingDlg);
+    QLabel progressTextLabel(tr("<b>Please wait!</b><br/>"
+                                "We need to generate a lot of random bytes. It is a good idea to perform "
+                                "some other action (type on the keyboard, move the mouse, utilize the "
+                                "disks) during the prime generation; this gives the random number "
+                                "generator a better chance to gain enough entropy."),
+                             &waitingDlg);
     progressTextLabel.setAlignment(Qt::AlignHCenter);
     progressTextLabel.setWordWrap(true);
 
@@ -169,7 +169,7 @@ void Options::addKey()
     waitingDlg.setWindowTitle(tr("Key pair generating"));
     waitingDlg.show();
 
-    GpgProcess gpg;
+    GpgProcess  gpg;
     QStringList arguments;
     arguments << "--batch"
               << "--gen-key";
@@ -218,14 +218,16 @@ void Options::removeKey()
     }
 
     if (!pkeys.isEmpty()) {
-        if (QMessageBox::question(this, tr("Delete"), tr("Do you want to delete the selected keys?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
+        if (QMessageBox::question(this, tr("Delete"), tr("Do you want to delete the selected keys?"),
+                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+            == QMessageBox::No) {
             return;
         }
     }
 
     // Remove primary keys
     foreach (QModelIndex key, pkeys) {
-        GpgProcess gpg;
+        GpgProcess  gpg;
         QStringList arguments;
         arguments << "--yes"
                   << "--batch"
@@ -244,8 +246,7 @@ void Options::importKeyFromFile()
     QFileDialog dlg(this);
     dlg.setFileMode(QFileDialog::ExistingFiles);
     QStringList nameFilters;
-    nameFilters << tr("ASCII (*.asc)")
-                << tr("All files (*)");
+    nameFilters << tr("ASCII (*.asc)") << tr("All files (*)");
     dlg.setNameFilters(nameFilters);
     if (dlg.exec() == QDialog::Rejected) {
         return;
@@ -253,11 +254,10 @@ void Options::importKeyFromFile()
 
     QStringList allFiles = dlg.selectedFiles();
     foreach (QString filename, allFiles) {
-        GpgProcess gpg;
+        GpgProcess  gpg;
         QStringList arguments;
         arguments << "--batch"
-                  << "--import"
-                  << filename;
+                  << "--import" << filename;
         gpg.start(arguments);
         gpg.waitForFinished();
     }
@@ -294,7 +294,8 @@ void Options::exportKeyToFile()
 
     // Remove primary keys
     foreach (QModelIndex key, pkeys) {
-        QString filename = key.sibling(key.row(), 1).data().toString() + " " + key.sibling(key.row(), 2).data().toString() + ".asc";
+        QString filename
+            = key.sibling(key.row(), 1).data().toString() + " " + key.sibling(key.row(), 2).data().toString() + ".asc";
         QFileDialog dlg(this);
         dlg.setAcceptMode(QFileDialog::AcceptSave);
         dlg.setFileMode(QFileDialog::AnyFile);
@@ -311,14 +312,11 @@ void Options::exportKeyToFile()
             filename += ".asc";
         }
 
-        GpgProcess gpg;
+        GpgProcess  gpg;
         QStringList arguments;
-        QString fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
-        arguments << "--output"
-                  << filename
-                  << "--armor"
-                  << "--export"
-                  << fingerprint;
+        QString     fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
+        arguments << "--output" << filename << "--armor"
+                  << "--export" << fingerprint;
 
         gpg.start(arguments);
         gpg.waitForFinished();
@@ -328,14 +326,14 @@ void Options::exportKeyToFile()
 void Options::importKeyFromClipboard()
 {
     QClipboard *clipboard = QApplication::clipboard();
-    QString key = clipboard->text().trimmed();
+    QString     key       = clipboard->text().trimmed();
 
-    if (!key.startsWith("-----BEGIN PGP PUBLIC KEY BLOCK-----") ||
-        !key.endsWith("-----END PGP PUBLIC KEY BLOCK-----")) {
+    if (!key.startsWith("-----BEGIN PGP PUBLIC KEY BLOCK-----")
+        || !key.endsWith("-----END PGP PUBLIC KEY BLOCK-----")) {
         return;
     }
 
-    GpgProcess gpg;
+    GpgProcess  gpg;
     QStringList arguments;
     arguments << "--batch"
               << "--import";
@@ -378,12 +376,11 @@ void Options::exportKeyToClipboard()
     // Remove primary keys
     QString strKey = "";
     foreach (QModelIndex key, pkeys) {
-        GpgProcess gpg;
+        GpgProcess  gpg;
         QStringList arguments;
-        QString fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
+        QString     fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
         arguments << "--armor"
-                  << "--export"
-                  << fingerprint;
+                  << "--export" << fingerprint;
 
         gpg.start(arguments);
         gpg.waitForFinished();
@@ -397,13 +394,12 @@ void Options::exportKeyToClipboard()
 
 void Options::showInfo()
 {
-    GpgProcess gpg;
-    QString info;
+    GpgProcess        gpg;
+    QString           info;
     QMessageBox::Icon icon;
     if (gpg.info(info)) {
         icon = QMessageBox::Information;
-    }
-    else {
+    } else {
         icon = QMessageBox::Critical;
     }
     QMessageBox box(icon, tr("GnuPG info"), info, QMessageBox::Ok, this);
@@ -412,7 +408,7 @@ void Options::showInfo()
 
 void Options::updateKeys()
 {
-    qobject_cast<Model*>(ui->keys->model())->listKeys();
+    qobject_cast<Model *>(ui->keys->model())->listKeys();
 
     int columns = ui->keys->model()->columnCount();
     for (int i = 0; i < columns; i++) {

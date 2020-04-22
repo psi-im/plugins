@@ -21,11 +21,10 @@
 
 #include "ui_optionswidget.h"
 
-class OptionsWidget : public QWidget
-{
+class OptionsWidget : public QWidget {
     Q_OBJECT
 public:
-    OptionsWidget(QWidget* p = nullptr);
+    OptionsWidget(QWidget *p = nullptr);
 
     void applyOptions();
     void restoreOptions();
@@ -34,17 +33,17 @@ private slots:
     void addServer();
     void delServer();
     void editServer();
-    void addNewServer(const QString&);
+    void addNewServer(const QString &);
     void applyButtonActivate();
     void requstNewShortcut();
-    void onNewShortcut(const QKeySequence&);
+    void onNewShortcut(const QKeySequence &);
 
 private:
-    QString shortCut;
-    QString format;
-    QString fileName;
-    QStringList servers;
-    int defaultAction;
+    QString           shortCut;
+    QString           format;
+    QString           fileName;
+    QStringList       servers;
+    int               defaultAction;
     Ui::OptionsWidget ui_;
 };
 

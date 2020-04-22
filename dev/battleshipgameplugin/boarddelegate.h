@@ -25,8 +25,7 @@
 
 #include "boardmodel.h"
 
-class BoardDelegate : public QItemDelegate
-{
+class BoardDelegate : public QItemDelegate {
     Q_OBJECT
 public:
     BoardDelegate(BoardModel *model, QObject *parent = nullptr);
@@ -37,7 +36,6 @@ private:
 
 private:
     BoardModel *model_;
-
 };
 
 #endif // BOARDDELEGATE_H

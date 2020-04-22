@@ -24,29 +24,29 @@
 
 const QString splitStr = "&split&";
 
-class WatchedItem : public QListWidgetItem
-{
+class WatchedItem : public QListWidgetItem {
 public:
     WatchedItem(QListWidget *parent = nullptr);
-    WatchedItem(const QString& jid, const QString& text = QString(), const QString& sFile = QString(), bool aUse = false, QListWidget *parent = nullptr);
+    WatchedItem(const QString &jid, const QString &text = QString(), const QString &sFile = QString(),
+                bool aUse = false, QListWidget *parent = nullptr);
     QString settingsString() const;
-    void setSettings(const QString& settings);
-    void setJid(const QString& jid) { jid_ = jid; };
-    void setWatchedText(const QString& text) { text_ = text; };
-    void setSFile(const QString& sFile) { sFile_ = sFile; };
-    void setUse(bool use) { aUse_ = use; };
-    void setGroupChat(bool gc) { groupChat_ = gc; };
+    void    setSettings(const QString &settings);
+    void    setJid(const QString &jid) { jid_ = jid; };
+    void    setWatchedText(const QString &text) { text_ = text; };
+    void    setSFile(const QString &sFile) { sFile_ = sFile; };
+    void    setUse(bool use) { aUse_ = use; };
+    void    setGroupChat(bool gc) { groupChat_ = gc; };
     QString jid() const { return jid_; };
     QString watchedText() const { return text_; };
     QString sFile() const { return sFile_; };
-    bool alwaysUse() const { return aUse_; };
-    bool groupChat() const { return groupChat_; };
+    bool    alwaysUse() const { return aUse_; };
+    bool    groupChat() const { return groupChat_; };
 
-    WatchedItem* copy();
+    WatchedItem *copy();
 
 private:
     QString jid_, text_, sFile_;
-    bool aUse_, groupChat_;
+    bool    aUse_, groupChat_;
 };
 
 #endif // WATCHEDITEM_H

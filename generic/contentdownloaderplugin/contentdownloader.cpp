@@ -16,56 +16,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-#include <QDebug>
-#include <QNetworkInterface>
-#include <QNetworkProxy>
-#include <QList>
 #include "contentdownloader.h"
 #include "form.h"
+#include <QDebug>
+#include <QList>
+#include <QNetworkInterface>
+#include <QNetworkProxy>
 
+ContentDownloader::ContentDownloader() : enabled(false), psiOptions(nullptr), appInfoHost(nullptr), form_(nullptr) { }
 
-ContentDownloader::ContentDownloader()
-    : enabled(false)
-        , psiOptions(nullptr)
-        , appInfoHost(nullptr)
-    , form_(nullptr)
-{
-}
-
-ContentDownloader::~ContentDownloader()
-{
-}
+ContentDownloader::~ContentDownloader() { }
 
 // PsiPlugin
-QString ContentDownloader::name() const
-{
-    return "Content Downloader Plugin";
-}
+QString ContentDownloader::name() const { return "Content Downloader Plugin"; }
 
-QString ContentDownloader::shortName() const
-{
-    return "cdownloader";
-}
+QString ContentDownloader::shortName() const { return "cdownloader"; }
 
-QString ContentDownloader::version() const
-{
-    return "0.2.6";
-}
+QString ContentDownloader::version() const { return "0.2.6"; }
 
 QWidget *ContentDownloader::options()
 {
-    if ( !enabled ) {
+    if (!enabled) {
         return nullptr;
     }
 
-    if ( !appInfoHost || !psiOptions ) {
+    if (!appInfoHost || !psiOptions) {
         return nullptr;
     }
 
-    Proxy psiProxy = appInfoHost->getProxyFor(name());
+    Proxy                    psiProxy = appInfoHost->getProxyFor(name());
     QNetworkProxy::ProxyType type;
-    if(psiProxy.type == "socks") {
+    if (psiProxy.type == "socks") {
         type = QNetworkProxy::Socks5Proxy;
     } else {
         type = QNetworkProxy::HttpProxy;
@@ -79,12 +60,12 @@ QWidget *ContentDownloader::options()
     form_->setResourcesDir(appInfoHost->appResourcesDir());
     form_->setPsiOption(psiOptions);
     form_->setProxy(proxy);
-    return static_cast<QWidget*>(form_);
+    return static_cast<QWidget *>(form_);
 }
 
 bool ContentDownloader::enable()
 {
-    if ( psiOptions ) {
+    if (psiOptions) {
         enabled = true;
     }
 
@@ -98,38 +79,20 @@ bool ContentDownloader::disable()
     return true;
 }
 
-void ContentDownloader::applyOptions()
-{
-}
+void ContentDownloader::applyOptions() { }
 
-void ContentDownloader::restoreOptions()
-{
-}
+void ContentDownloader::restoreOptions() { }
 
-QPixmap ContentDownloader::icon() const
-{
-    return QPixmap(":/icons/download.png");
-}
+QPixmap ContentDownloader::icon() const { return QPixmap(":/icons/download.png"); }
 
-void ContentDownloader::setOptionAccessingHost(OptionAccessingHost *host)
-{
-    psiOptions = host;
-}
+void ContentDownloader::setOptionAccessingHost(OptionAccessingHost *host) { psiOptions = host; }
 
-void ContentDownloader::optionChanged(const QString &option)
-{
-    Q_UNUSED(option);
-}
+void ContentDownloader::optionChanged(const QString &option) { Q_UNUSED(option); }
 
-void ContentDownloader::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host)
-{
-    appInfoHost = host;
-}
+void ContentDownloader::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) { appInfoHost = host; }
 
 QString ContentDownloader::pluginInfo()
 {
-    return tr("Author: ") +     "Ivan Romanov\n"
-           + tr("e-mail: ") + "drizt@land.ru\n\n"
-           + tr("This plugin is designed to make it easy to download and install iconsets and other resources for Psi+.");
-
+    return tr("Author: ") + "Ivan Romanov\n" + tr("e-mail: ") + "drizt@land.ru\n\n"
+        + tr("This plugin is designed to make it easy to download and install iconsets and other resources for Psi+.");
 }

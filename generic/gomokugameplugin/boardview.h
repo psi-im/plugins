@@ -30,23 +30,21 @@
 #include "boardmodel.h"
 namespace GomokuGame {
 
-class BoardView : public QTableView
-{
-Q_OBJECT
+class BoardView : public QTableView {
+    Q_OBJECT
 public:
     explicit BoardView(QWidget *parent = nullptr);
-    void setModel(QAbstractItemModel * model);
+    void setModel(QAbstractItemModel *model);
 
 private:
-    BoardModel *model_;
+    BoardModel * model_;
     virtual void resizeEvent(QResizeEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
-    void setCellsSize();
+    void         setCellsSize();
 
 signals:
 
 private slots:
-
 };
 }
 

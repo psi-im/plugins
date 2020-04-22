@@ -17,103 +17,90 @@
  *
  */
 
+#include <QAction>
+#include <QIcon>
+#include <QLabel>
 #include <QTextEdit>
 #include <QVBoxLayout>
-#include <QLabel>
-#include <QIcon>
-#include <QAction>
 
-#include "psiplugin.h"
-#include "applicationinfoaccessor.h"
 #include "applicationinfoaccessinghost.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
-#include "menuaccessor.h"
-#include "plugininfoprovider.h"
+#include "applicationinfoaccessor.h"
 #include "iconfactoryaccessinghost.h"
 #include "iconfactoryaccessor.h"
+#include "menuaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "psiplugin.h"
 
 #define cVer "0.0.7"
 #define constClearHistoryFor "clear-history-for"
 
-
-
-class HistoryKeeperPlugin: public QObject, public PsiPlugin, public ApplicationInfoAccessor, public OptionAccessor,
-            public MenuAccessor, public PluginInfoProvider, public IconFactoryAccessor
-{
+class HistoryKeeperPlugin : public QObject,
+                            public PsiPlugin,
+                            public ApplicationInfoAccessor,
+                            public OptionAccessor,
+                            public MenuAccessor,
+                            public PluginInfoProvider,
+                            public IconFactoryAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.HistoryKeeperPlugin")
     Q_INTERFACES(PsiPlugin OptionAccessor ApplicationInfoAccessor MenuAccessor PluginInfoProvider IconFactoryAccessor)
 
 public:
     HistoryKeeperPlugin();
-    virtual QString name() const;
-    virtual QString shortName() const;
-    virtual QString version() const;
-        virtual QWidget* options();
-    virtual bool enable();
-        virtual bool disable();
-        virtual void applyOptions();
-        virtual void restoreOptions();
-        virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
-        virtual void setOptionAccessingHost(OptionAccessingHost* host);
-    virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
-        virtual void optionChanged(const QString& /*option*/) {};
-    virtual QList < QVariantHash > getAccountMenuParam();
-    virtual QList < QVariantHash > getContactMenuParam();
-    virtual QAction* getContactAction(QObject* p, int acc, const QString& jid);
-    virtual QAction* getAccountAction(QObject* , int ) { return nullptr; };
-    virtual QString pluginInfo();
-    virtual QPixmap icon() const;
-
+    virtual QString             name() const;
+    virtual QString             shortName() const;
+    virtual QString             version() const;
+    virtual QWidget *           options();
+    virtual bool                enable();
+    virtual bool                disable();
+    virtual void                applyOptions();
+    virtual void                restoreOptions();
+    virtual void                setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
+    virtual void                setOptionAccessingHost(OptionAccessingHost *host);
+    virtual void                setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
+    virtual void                optionChanged(const QString & /*option*/) {};
+    virtual QList<QVariantHash> getAccountMenuParam();
+    virtual QList<QVariantHash> getContactMenuParam();
+    virtual QAction *           getContactAction(QObject *p, int acc, const QString &jid);
+    virtual QAction *           getAccountAction(QObject *, int) { return nullptr; };
+    virtual QString             pluginInfo();
+    virtual QPixmap             icon() const;
 
 private:
-        void removeHistory();
-    static QString nameToFilename(const QString& jid);
-    void addContact(const QString& jid);
-    void removeContact(const QString& jid);
+    void           removeHistory();
+    static QString nameToFilename(const QString &jid);
+    void           addContact(const QString &jid);
+    void           removeContact(const QString &jid);
 
 private slots:
     void actionActivated(bool);
 
 private:
-    bool enabled;
-    OptionAccessingHost* psiOptions;
+    bool                          enabled;
+    OptionAccessingHost *         psiOptions;
     ApplicationInfoAccessingHost *appInfo;
-    IconFactoryAccessingHost* icoHost;
-    QPointer<QTextEdit> contactsWidget;
-    QStringList contacts;
-
+    IconFactoryAccessingHost *    icoHost;
+    QPointer<QTextEdit>           contactsWidget;
+    QStringList                   contacts;
 };
 
-HistoryKeeperPlugin::HistoryKeeperPlugin()
-    : enabled(false)
-    , psiOptions(nullptr)
-    , appInfo(nullptr)
-    , icoHost(nullptr)
-    , contactsWidget(nullptr)
+HistoryKeeperPlugin::HistoryKeeperPlugin() :
+    enabled(false), psiOptions(nullptr), appInfo(nullptr), icoHost(nullptr), contactsWidget(nullptr)
 {
 }
 
-QString HistoryKeeperPlugin::name() const
-{
-        return "History Keeper Plugin";
-}
+QString HistoryKeeperPlugin::name() const { return "History Keeper Plugin"; }
 
-QString HistoryKeeperPlugin::shortName() const
-{
-        return "historykeeper";
-}
+QString HistoryKeeperPlugin::shortName() const { return "historykeeper"; }
 
-QString HistoryKeeperPlugin::version() const
-{
-        return cVer;
-}
+QString HistoryKeeperPlugin::version() const { return cVer; }
 
 bool HistoryKeeperPlugin::enable()
 {
-    if(psiOptions) {
-        enabled = true;
+    if (psiOptions) {
+        enabled  = true;
         contacts = psiOptions->getPluginOption(constClearHistoryFor, QVariant(contacts)).toStringList();
     }
     return enabled;
@@ -121,46 +108,43 @@ bool HistoryKeeperPlugin::enable()
 
 bool HistoryKeeperPlugin::disable()
 {
-        removeHistory();
-        enabled = false;
+    removeHistory();
+    enabled = false;
     return true;
 }
 
 void HistoryKeeperPlugin::removeHistory()
 {
-    if(!enabled)
+    if (!enabled)
         return;
 
     QString historyDir(appInfo->appHistoryDir());
-    foreach(QString jid, contacts) {
-        jid = nameToFilename(jid);
+    foreach (QString jid, contacts) {
+        jid              = nameToFilename(jid);
         QString fileName = historyDir + QDir::separator() + jid;
-        QFile file(fileName);
-        if(file.open(QIODevice::ReadWrite)) {
+        QFile   file(fileName);
+        if (file.open(QIODevice::ReadWrite)) {
             qDebug("Removing file %s", qPrintable(fileName));
             file.remove();
         }
     }
 }
 
-QString HistoryKeeperPlugin::nameToFilename(const QString& jid)
+QString HistoryKeeperPlugin::nameToFilename(const QString &jid)
 {
     QString jid2;
 
-    for(int n = 0; n < jid.length(); ++n) {
-        if(jid.at(n) == '@') {
+    for (int n = 0; n < jid.length(); ++n) {
+        if (jid.at(n) == '@') {
             jid2.append("_at_");
-        }
-        else if(jid.at(n) == '.') {
+        } else if (jid.at(n) == '.') {
             jid2.append('.');
-        }
-        else if(!jid.at(n).isLetterOrNumber()) {
+        } else if (!jid.at(n).isLetterOrNumber()) {
             // hex encode
             QString hex;
             hex.sprintf("%%%02X", jid.at(n).toLatin1());
             jid2.append(hex);
-        }
-        else {
+        } else {
             jid2.append(jid.at(n));
         }
     }
@@ -168,23 +152,24 @@ QString HistoryKeeperPlugin::nameToFilename(const QString& jid)
     return jid2.toLower() + ".history";
 }
 
-QWidget* HistoryKeeperPlugin::options()
+QWidget *HistoryKeeperPlugin::options()
 {
-    if(!enabled) {
+    if (!enabled) {
         return nullptr;
     }
-    QWidget *options = new QWidget();
-    QVBoxLayout *layout = new QVBoxLayout(options);
+    QWidget *    options = new QWidget();
+    QVBoxLayout *layout  = new QVBoxLayout(options);
 
     contactsWidget = new QTextEdit();
     QString text;
-    foreach(QString contact, contacts) {
+    foreach (QString contact, contacts) {
         text += contact + "\n";
     }
     contactsWidget->setMaximumWidth(300);
     contactsWidget->setText(text);
 
-    QLabel *wikiLink = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#history_keeper_plugin\">Wiki (Online)</a>"));
+    QLabel *wikiLink
+        = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#history_keeper_plugin\">Wiki (Online)</a>"));
     wikiLink->setOpenExternalLinks(true);
 
     layout->addWidget(new QLabel(tr("Remove history for contacts:")));
@@ -194,18 +179,18 @@ QWidget* HistoryKeeperPlugin::options()
     return options;
 }
 
-void HistoryKeeperPlugin::addContact(const QString& jid)
+void HistoryKeeperPlugin::addContact(const QString &jid)
 {
-    if(!contacts.contains(jid)) {
+    if (!contacts.contains(jid)) {
         contacts.append(jid);
         psiOptions->setPluginOption(constClearHistoryFor, QVariant(contacts));
         restoreOptions();
     }
 }
 
-void HistoryKeeperPlugin::removeContact(const QString& jid)
+void HistoryKeeperPlugin::removeContact(const QString &jid)
 {
-    if(contacts.contains(jid)) {
+    if (contacts.contains(jid)) {
         contacts.removeAt(contacts.indexOf(jid));
         psiOptions->setPluginOption(constClearHistoryFor, QVariant(contacts));
         restoreOptions();
@@ -215,16 +200,15 @@ void HistoryKeeperPlugin::removeContact(const QString& jid)
 void HistoryKeeperPlugin::actionActivated(bool check)
 {
     QString jid = sender()->property("jid").toString();
-    if(check)
-        addContact(jid) ;
+    if (check)
+        addContact(jid);
     else
         removeContact(jid);
-
 }
 
 void HistoryKeeperPlugin::applyOptions()
 {
-    if(!contactsWidget)
+    if (!contactsWidget)
         return;
 
     contacts = contactsWidget->toPlainText().split(QRegExp("\\s+"), QString::SkipEmptyParts);
@@ -233,44 +217,29 @@ void HistoryKeeperPlugin::applyOptions()
 
 void HistoryKeeperPlugin::restoreOptions()
 {
-    if(!contactsWidget)
+    if (!contactsWidget)
         return;
 
     QString text;
-    foreach(const QString& contact, contacts) {
+    foreach (const QString &contact, contacts) {
         text += contact + "\n";
     }
     contactsWidget->setText(text);
 }
 
-void HistoryKeeperPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host)
-{
-    appInfo = host;
-}
+void HistoryKeeperPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) { appInfo = host; }
 
-void HistoryKeeperPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost *host)
-{
-    icoHost = host;
-}
+void HistoryKeeperPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost *host) { icoHost = host; }
 
-void HistoryKeeperPlugin::setOptionAccessingHost(OptionAccessingHost* host)
-{
-    psiOptions = host;
-}
+void HistoryKeeperPlugin::setOptionAccessingHost(OptionAccessingHost *host) { psiOptions = host; }
 
-QList < QVariantHash > HistoryKeeperPlugin::getAccountMenuParam()
-{
-    return QList < QVariantHash >();
-}
+QList<QVariantHash> HistoryKeeperPlugin::getAccountMenuParam() { return QList<QVariantHash>(); }
 
-QList < QVariantHash > HistoryKeeperPlugin::getContactMenuParam()
-{
-    return QList < QVariantHash >();
-}
+QList<QVariantHash> HistoryKeeperPlugin::getContactMenuParam() { return QList<QVariantHash>(); }
 
-QAction* HistoryKeeperPlugin::getContactAction(QObject *p, int /*acc*/, const QString &jid)
+QAction *HistoryKeeperPlugin::getContactAction(QObject *p, int /*acc*/, const QString &jid)
 {
-    QAction* act = new QAction(icoHost->getIcon("psi/clearChat"), tr("Clear history on exit"), p);
+    QAction *act = new QAction(icoHost->getIcon("psi/clearChat"), tr("Clear history on exit"), p);
     act->setCheckable(true);
     act->setChecked(contacts.contains(jid));
     act->setProperty("jid", jid);
@@ -281,15 +250,12 @@ QAction* HistoryKeeperPlugin::getContactAction(QObject *p, int /*acc*/, const QS
 
 QString HistoryKeeperPlugin::pluginInfo()
 {
-    return tr("Author: ") +  "Dealer_WeARE\n"
-            + tr("Email: ") + "wadealer@gmail.com\n\n"
-            + tr("This plugin is designed to remove the history of selected contacts when the Psi+ is closed.\n"
-                 "You can select or deselect a contact for history removal from the context menu of a contact or via the plugin options.");
+    return tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
+        + tr("This plugin is designed to remove the history of selected contacts when the Psi+ is closed.\n"
+             "You can select or deselect a contact for history removal from the context menu of a contact or via the "
+             "plugin options.");
 }
 
-QPixmap HistoryKeeperPlugin::icon() const
-{
-    return QPixmap(":/icons/historykeeper.png");
-}
+QPixmap HistoryKeeperPlugin::icon() const { return QPixmap(":/icons/historykeeper.png"); }
 
 #include "historykeeperplugin.moc"

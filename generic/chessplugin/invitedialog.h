@@ -20,40 +20,38 @@
 #ifndef INVITEDIALOG_H
 #define INVITEDIALOG_H
 
-#include <QCloseEvent>
-#include "ui_invitedialog.h"
-#include "ui_invitationdialog.h"
 #include "request.h"
+#include "ui_invitationdialog.h"
+#include "ui_invitedialog.h"
+#include <QCloseEvent>
 
 namespace Chess {
 
-class InviteDialog : public QDialog
-{
+class InviteDialog : public QDialog {
     Q_OBJECT
 public:
-    InviteDialog(const Request& r, const QStringList& resources, QWidget *parent = nullptr);
+    InviteDialog(const Request &r, const QStringList &resources, QWidget *parent = nullptr);
 
 private:
     Ui::InviteDialog ui_;
-    QStringList resources_;
-    Request r;
+    QStringList      resources_;
+    Request          r;
 
 private slots:
     void buttonPressed();
 
 signals:
-    void play(const Request& r, const QString&, const QString&);
+    void play(const Request &r, const QString &, const QString &);
 };
 
-class InvitationDialog : public QDialog
-{
+class InvitationDialog : public QDialog {
     Q_OBJECT
 public:
-    InvitationDialog(const QString& jid, QString color, QWidget *parent = nullptr);
+    InvitationDialog(const QString &jid, QString color, QWidget *parent = nullptr);
 
 private:
     Ui::InvitationDialog ui_;
-    bool accepted;
+    bool                 accepted;
 
 private slots:
     void buttonPressed();

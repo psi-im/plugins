@@ -19,17 +19,17 @@
 
 #include "typeaheadfind.h"
 
-#include <QLineEdit>
 #include <QCheckBox>
 #include <QLabel>
+#include <QLineEdit>
 #include <QPushButton>
 
 using namespace ClientSwitcher;
 
-class TypeAheadFindBar::Private
-{
+class TypeAheadFindBar::Private {
 public:
-    void doFind(bool backward = false)    {
+    void doFind(bool backward = false)
+    {
         QTextDocument::FindFlags options;
         if (caseSensitive)
             options |= QTextDocument::FindCaseSensitively;
@@ -42,13 +42,14 @@ public:
         }
         if (find(text, options)) {
             le_find->setStyleSheet("");
-        }
-        else {
+        } else {
             le_find->setStyleSheet("QLineEdit { background: #ff6666; color: #ffffff }");
         }
     }
 
-    bool find(const QString &str, QTextDocument::FindFlags options, QTextCursor::MoveOperation start = QTextCursor::NoMove)    {
+    bool find(const QString &str, QTextDocument::FindFlags options,
+              QTextCursor::MoveOperation start = QTextCursor::NoMove)
+    {
         Q_UNUSED(str);
         if (start != QTextCursor::NoMove) {
             QTextCursor cursor = te->textCursor();
@@ -58,34 +59,37 @@ public:
         bool found = te->find(text, options);
         if (!found) {
             if (start == QTextCursor::NoMove)
-                return find(text, options, options & QTextDocument::FindBackward ? QTextCursor::End : QTextCursor::Start);
+                return find(text, options,
+                            options & QTextDocument::FindBackward ? QTextCursor::End : QTextCursor::Start);
             return false;
         }
         return true;
     }
 
-    QString text;
-    bool caseSensitive;
-    QTextEdit *te;
-    QLineEdit *le_find;
+    QString      text;
+    bool         caseSensitive;
+    QTextEdit *  te;
+    QLineEdit *  le_find;
     QPushButton *but_next;
     QPushButton *but_prev;
     QPushButton *first_page, *next_page, *last_page, *prev_page;
-    QCheckBox *cb_case;
+    QCheckBox *  cb_case;
 };
 
-TypeAheadFindBar::TypeAheadFindBar(IconFactoryAccessingHost *IcoHost, QTextEdit *textedit, const QString &title, QWidget *parent)
-        : QToolBar(title, parent)
-        , icoHost_(IcoHost)
+TypeAheadFindBar::TypeAheadFindBar(IconFactoryAccessingHost *IcoHost, QTextEdit *textedit, const QString &title,
+                                   QWidget *parent) :
+    QToolBar(title, parent),
+    icoHost_(IcoHost)
 {
-    d = new Private();
+    d     = new Private();
     d->te = textedit;
     init();
 }
 
-void TypeAheadFindBar::init() {
+void TypeAheadFindBar::init()
+{
     d->caseSensitive = false;
-    d->text = "";
+    d->text          = "";
     addWidget(new QLabel(tr("Search: "), this));
 
     d->le_find = new QLineEdit(this);
@@ -94,14 +98,14 @@ void TypeAheadFindBar::init() {
     addWidget(d->le_find);
 
     d->but_prev = new QPushButton(this);
-    d->but_prev->setFixedSize(25,25);
+    d->but_prev->setFixedSize(25, 25);
     d->but_prev->setIcon(icoHost_->getIcon("psi/arrowUp"));
     d->but_prev->setEnabled(false);
     connect(d->but_prev, SIGNAL(released()), SLOT(findPrevious()));
     addWidget(d->but_prev);
 
     d->but_next = new QPushButton(this);
-    d->but_next->setFixedSize(25,25);
+    d->but_next->setFixedSize(25, 25);
     d->but_next->setIcon(icoHost_->getIcon("psi/arrowDown"));
     d->but_next->setEnabled(false);
     connect(d->but_next, SIGNAL(released()), SLOT(findNext()));
@@ -116,38 +120,40 @@ void TypeAheadFindBar::init() {
     d->first_page = new QPushButton(this);
     d->first_page->setToolTip(tr("First page"));
     connect(d->first_page, SIGNAL(released()), SIGNAL(firstPage()));
-    d->first_page->setFixedSize(25,25);
+    d->first_page->setFixedSize(25, 25);
     d->first_page->setIcon(icoHost_->getIcon("psi/doubleBackArrow"));
     addWidget(d->first_page);
 
     d->prev_page = new QPushButton(this);
     d->prev_page->setToolTip(tr("Previous page"));
     connect(d->prev_page, SIGNAL(released()), SIGNAL(prevPage()));
-    d->prev_page->setFixedSize(25,25);
+    d->prev_page->setFixedSize(25, 25);
     d->prev_page->setIcon(icoHost_->getIcon("psi/arrowLeft"));
     addWidget(d->prev_page);
 
     d->next_page = new QPushButton(this);
     d->next_page->setToolTip(tr("Next page"));
     connect(d->next_page, SIGNAL(released()), SIGNAL(nextPage()));
-    d->next_page->setFixedSize(25,25);
+    d->next_page->setFixedSize(25, 25);
     d->next_page->setIcon(icoHost_->getIcon("psi/arrowRight"));
     addWidget(d->next_page);
 
     d->last_page = new QPushButton(this);
     d->last_page->setToolTip(tr("Last page"));
     connect(d->last_page, SIGNAL(released()), SIGNAL(lastPage()));
-    d->last_page->setFixedSize(25,25);
+    d->last_page->setFixedSize(25, 25);
     d->last_page->setIcon(icoHost_->getIcon("psi/doubleNextArrow"));
     addWidget(d->last_page);
 }
 
-TypeAheadFindBar::~TypeAheadFindBar() {
+TypeAheadFindBar::~TypeAheadFindBar()
+{
     delete d;
     d = nullptr;
 }
 
-void TypeAheadFindBar::textChanged(const QString &str) {
+void TypeAheadFindBar::textChanged(const QString &str)
+{
     QTextCursor cursor = d->te->textCursor();
     if (str.isEmpty()) {
         d->but_next->setEnabled(false);
@@ -155,8 +161,7 @@ void TypeAheadFindBar::textChanged(const QString &str) {
         d->le_find->setStyleSheet("");
         cursor.clearSelection();
         d->te->setTextCursor(cursor);
-    }
-    else {
+    } else {
         d->but_next->setEnabled(true);
         d->but_prev->setEnabled(true);
         cursor.setPosition(cursor.selectionStart());
@@ -166,14 +171,8 @@ void TypeAheadFindBar::textChanged(const QString &str) {
     }
 }
 
-void TypeAheadFindBar::findNext() {
-    d->doFind();
-}
+void TypeAheadFindBar::findNext() { d->doFind(); }
 
-void TypeAheadFindBar::findPrevious() {
-    d->doFind(true);
-}
+void TypeAheadFindBar::findPrevious() { d->doFind(true); }
 
-void TypeAheadFindBar::caseToggled() {
-    d->caseSensitive = d->cb_case->checkState();
-}
+void TypeAheadFindBar::caseToggled() { d->caseSensitive = d->cb_case->checkState(); }

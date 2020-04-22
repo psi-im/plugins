@@ -25,15 +25,15 @@
 #ifndef PLUGINWINDOW_H
 #define PLUGINWINDOW_H
 
-#include <QMainWindow>
 #include <QCloseEvent>
+#include <QMainWindow>
 
-#include "gameelement.h"
-#include "boardmodel.h"
 #include "boarddelegate.h"
+#include "boardmodel.h"
+#include "gameelement.h"
 
 namespace Ui {
-    class PluginWindow;
+class PluginWindow;
 }
 
 using namespace GomokuGame;
@@ -46,11 +46,10 @@ public:
     void setElementType(GameElement::ElementType type);
 
 private:
-    GameElement* hintElement;
+    GameElement *hintElement;
 
 protected:
     virtual void paintEvent(QPaintEvent *event);
-
 };
 
 class PluginWindow : public QMainWindow {
@@ -62,9 +61,9 @@ public:
 
 private:
     Ui::PluginWindow *ui;
-    BoardModel *bmodel;
-    BoardDelegate *delegate;
-    bool gameActive;
+    BoardModel *      bmodel;
+    BoardDelegate *   delegate;
+    bool              gameActive;
 
 private:
     void endGame();
@@ -73,7 +72,7 @@ private:
     void showDraw();
 
 protected:
-    virtual void closeEvent (QCloseEvent *event);
+    virtual void closeEvent(QCloseEvent *event);
 
 private slots:
     void changeGameStatus(const GameModel::GameStatus status);
@@ -110,7 +109,6 @@ signals:
     void sendNewInvite();
     void doPopup(const QString);
     void playSound(const QString);
-
 };
 
 #endif // PLUGINWINDOW_H

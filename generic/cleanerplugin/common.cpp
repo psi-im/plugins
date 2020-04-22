@@ -19,32 +19,29 @@
 
 #include "common.h"
 #include <QDir>
-#include <QTextList>
-#include <QTextEdit>
-#include <QLineEdit>
-#include <QLabel>
-#include <QPushButton>
-#include <QTextStream>
-#include <QFileDialog>
 #include <QDomElement>
-
-
+#include <QFileDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QTextList>
+#include <QTextStream>
 
 //---------------------------------------------
 //--------------HistoryView--------------------
 //---------------------------------------------
-HistoryView::HistoryView(const QString& filename, QWidget *parent)
-    :QDialog(parent, Qt::Window)
+HistoryView::HistoryView(const QString &filename, QWidget *parent) : QDialog(parent, Qt::Window)
 {
 
-        setAttribute(Qt::WA_DeleteOnClose);
+    setAttribute(Qt::WA_DeleteOnClose);
     QFile file(filename);
-    if(file.open(QIODevice::ReadOnly)) {
+    if (file.open(QIODevice::ReadOnly)) {
         setWindowTitle(filename.split(QDir::separator()).takeLast());
-        QVBoxLayout *layout = new QVBoxLayout(this);
-        QTextEdit *textWid = new QTextEdit();
-        QString text;
-        QTextStream in(&file);
+        QVBoxLayout *layout  = new QVBoxLayout(this);
+        QTextEdit *  textWid = new QTextEdit();
+        QString      text;
+        QTextStream  in(&file);
         in.setCodec("UTF-8");
         text = in.readAll();
         textWid->setText(text);
@@ -52,7 +49,7 @@ HistoryView::HistoryView(const QString& filename, QWidget *parent)
         cur.setPosition(text.length());
         textWid->setTextCursor(cur);
         layout->addWidget(textWid);
-        QPushButton *Close = new QPushButton(tr("Close"));
+        QPushButton *Close     = new QPushButton(tr("Close"));
         QHBoxLayout *butLayout = new QHBoxLayout();
         butLayout->addStretch();
         butLayout->addWidget(Close);
@@ -61,31 +58,27 @@ HistoryView::HistoryView(const QString& filename, QWidget *parent)
         connect(Close, SIGNAL(released()), this, SLOT(close()));
         resize(800, 500);
         show();
-    }
-    else
+    } else
         close();
 }
-
-
 
 //---------------------------------------------
 //----------------vCardView--------------------
 //---------------------------------------------
-vCardView::vCardView(const QString& filename, QWidget *parent)
-    :QDialog(parent, Qt::Window)
+vCardView::vCardView(const QString &filename, QWidget *parent) : QDialog(parent, Qt::Window)
 {
 
-        setAttribute(Qt::WA_DeleteOnClose);
-        QFile file(filename);
-        if(file.open(QIODevice::ReadOnly)) {
+    setAttribute(Qt::WA_DeleteOnClose);
+    QFile file(filename);
+    if (file.open(QIODevice::ReadOnly)) {
         setWindowTitle(filename.split(QDir::separator()).takeLast());
         QVBoxLayout *layout = new QVBoxLayout(this);
-        QGridLayout *main = new QGridLayout;
-        QLineEdit *name = new QLineEdit;
-        QLineEdit *nick = new QLineEdit;
-        QLineEdit *birth = new QLineEdit;
-        QLineEdit *email = new QLineEdit;
-        main->addWidget(new QLabel(tr("Full Name:")),0,0);
+        QGridLayout *main   = new QGridLayout;
+        QLineEdit *  name   = new QLineEdit;
+        QLineEdit *  nick   = new QLineEdit;
+        QLineEdit *  birth  = new QLineEdit;
+        QLineEdit *  email  = new QLineEdit;
+        main->addWidget(new QLabel(tr("Full Name:")), 0, 0);
         main->addWidget(name, 0, 1);
         main->addWidget(new QLabel(tr("Nick:")), 1, 0);
         main->addWidget(nick, 1, 1);
@@ -100,16 +93,15 @@ vCardView::vCardView(const QString& filename, QWidget *parent)
         QDomElement VCard = text.documentElement();
         nick->setText(VCard.firstChildElement("NICKNAME").text());
         QString Name = VCard.firstChildElement("FN").text();
-        if(Name.isEmpty()) {
+        if (Name.isEmpty()) {
             QDomElement n = VCard.firstChildElement("N");
-            Name = n.firstChildElement("FAMILY").text() + " " + n.firstChildElement("GIVEN").text();
+            Name          = n.firstChildElement("FAMILY").text() + " " + n.firstChildElement("GIVEN").text();
         }
         name->setText(Name);
         birth->setText(VCard.firstChildElement("BDAY").text());
         email->setText(VCard.firstChildElement("EMAIL").firstChildElement("USERID").text());
 
-
-        QPushButton *Close = new QPushButton(tr("Close"));
+        QPushButton *Close     = new QPushButton(tr("Close"));
         QHBoxLayout *butLayout = new QHBoxLayout();
 
         layout->addLayout(main);
@@ -118,29 +110,24 @@ vCardView::vCardView(const QString& filename, QWidget *parent)
         butLayout->addStretch();
         layout->addLayout(butLayout);
         connect(Close, SIGNAL(released()), this, SLOT(close()));
-        setFixedSize(400,200);
+        setFixedSize(400, 200);
         show();
-    }
-    else
+    } else
         close();
 }
-
-
 
 //---------------------------------------------
 //----------------AvatarView-------------------
 //---------------------------------------------
-AvatarView::AvatarView( const QPixmap &pix, QWidget *parent)
-        : QDialog(parent)
-        , pix_(pix)
+AvatarView::AvatarView(const QPixmap &pix, QWidget *parent) : QDialog(parent), pix_(pix)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Avatar"));
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    QLabel *pixLabel = new QLabel;
+    QVBoxLayout *layout   = new QVBoxLayout(this);
+    QLabel *     pixLabel = new QLabel;
     pixLabel->setPixmap(pix);
     pbSave = new QPushButton;
-    pbSave->setFixedSize(25,25);
+    pbSave->setFixedSize(25, 25);
     pbSave->setToolTip(tr("Save Image"));
     layout->addWidget(pbSave);
     layout->addWidget(pixLabel);
@@ -148,17 +135,14 @@ AvatarView::AvatarView( const QPixmap &pix, QWidget *parent)
     adjustSize();
 }
 
-void AvatarView::setIcon(const QIcon& ico)
-{
-    pbSave->setIcon(ico);
-}
+void AvatarView::setIcon(const QIcon &ico) { pbSave->setIcon(ico); }
 
 void AvatarView::save()
 {
     QFileDialog dialog(this);
     dialog.setModal(true);
-    QString filename = dialog.getSaveFileName(this, tr("Save Avatar"),"", tr("Images (*.png *.gif *.jpg *.jpeg)"));
-    if(filename.isEmpty())
+    QString filename = dialog.getSaveFileName(this, tr("Save Avatar"), "", tr("Images (*.png *.gif *.jpg *.jpeg)"));
+    if (filename.isEmpty())
         return;
 
     QImage image = pix_.toImage();

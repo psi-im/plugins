@@ -17,55 +17,45 @@
  *
  */
 
+#include <QAction>
 #include <QLabel>
 #include <QSpinBox>
-#include <QAction>
 
-#include "toolbar.h"
 #include "screenshoticonset.h"
+#include "toolbar.h"
 
-class Button : public QAction
-{
+class Button : public QAction {
     Q_OBJECT
 public:
-    Button(const QString &tip, const QIcon &ico, ToolBar::ButtonType type, bool checkable, QWidget *parent)
-        : QAction(parent)
-        , type_(type)
+    Button(const QString &tip, const QIcon &ico, ToolBar::ButtonType type, bool checkable, QWidget *parent) :
+        QAction(parent), type_(type)
     {
         setToolTip(tip);
         setIcon(ico);
         setCheckable(checkable);
     }
 
-    ToolBar::ButtonType type() const
-    {
-        return type_;
-    }
+    ToolBar::ButtonType type() const { return type_; }
 
 private:
     ToolBar::ButtonType type_;
 };
 
-
 //----------------ToolBar--------------------------------
 
-ToolBar::ToolBar(QWidget *parent)
-    : QToolBar(parent)
-{
-    init();
-}
+ToolBar::ToolBar(QWidget *parent) : QToolBar(parent) { init(); }
 
 ToolBar::~ToolBar()
 {
-    foreach(Button *b, buttons_) {
-        delete(b);
+    foreach (Button *b, buttons_) {
+        delete (b);
     }
     buttons_.clear();
 }
 
 void ToolBar::init()
 {
-    ScreenshotIconset* icoHost = ScreenshotIconset::instance();
+    ScreenshotIconset *icoHost = ScreenshotIconset::instance();
 
     addWidget(new QLabel(tr("Line Width:")));
     sb = new QSpinBox(this);
@@ -73,29 +63,29 @@ void ToolBar::init()
     setLineWidth(2);
     sb->setToolTip(tr("Line width"));
     addWidget(sb);
-    connect(sb,SIGNAL(valueChanged(int)), this, SIGNAL(newWidth(int)));
+    connect(sb, SIGNAL(valueChanged(int)), this, SIGNAL(newWidth(int)));
 
-    QPixmap pix(16,16);
+    QPixmap pix(16, 16);
     pix.fill(QColor(Qt::black));
     QIcon ico(pix);
-    buttons_.append(new Button(tr("Select Color"), ico, ToolBar::ButtonColor, false,this) );
-    buttons_.append(new Button(tr("Pen"), icoHost->getIcon("psi/draw"), ToolBar::ButtonPen, true,this) );
-    buttons_.append(new Button(tr("Select"), icoHost->getIcon("psi/frame"), ToolBar::ButtonSelect, true,this) );
-    buttons_.append(new Button(tr("Cut"), icoHost->getIcon("psi/crop"), ToolBar::ButtonCut, false,this) );
+    buttons_.append(new Button(tr("Select Color"), ico, ToolBar::ButtonColor, false, this));
+    buttons_.append(new Button(tr("Pen"), icoHost->getIcon("psi/draw"), ToolBar::ButtonPen, true, this));
+    buttons_.append(new Button(tr("Select"), icoHost->getIcon("psi/frame"), ToolBar::ButtonSelect, true, this));
+    buttons_.append(new Button(tr("Cut"), icoHost->getIcon("psi/crop"), ToolBar::ButtonCut, false, this));
     buttons_.last()->setShortcut(QKeySequence("Ctrl+x"));
 
-    buttons_.append(new Button(tr("Copy"), icoHost->getIcon("psi/copy"), ToolBar::ButtonCopy, false,this) );
+    buttons_.append(new Button(tr("Copy"), icoHost->getIcon("psi/copy"), ToolBar::ButtonCopy, false, this));
     buttons_.last()->setShortcut(QKeySequence("Ctrl+c"));
 
-    buttons_.append(new Button(tr("Paste"), icoHost->getIcon("psi/paste"), ToolBar::ButtonInsert, false,this) );
+    buttons_.append(new Button(tr("Paste"), icoHost->getIcon("psi/paste"), ToolBar::ButtonInsert, false, this));
     buttons_.last()->setShortcut(QKeySequence("Ctrl+v"));
 
-    buttons_.append(new Button(tr("Rotate"), icoHost->getIcon("psi/rotate"), ToolBar::ButtonRotate, false,this) );
-    buttons_.append(new Button(tr("Insert Text"), icoHost->getIcon("psi/text"), ToolBar::ButtonText, true,this) );    
-    buttons_.append(new Button(tr("Undo"), icoHost->getIcon("psi/undo"), ToolBar::ButtonUndo, false,this) );
+    buttons_.append(new Button(tr("Rotate"), icoHost->getIcon("psi/rotate"), ToolBar::ButtonRotate, false, this));
+    buttons_.append(new Button(tr("Insert Text"), icoHost->getIcon("psi/text"), ToolBar::ButtonText, true, this));
+    buttons_.append(new Button(tr("Undo"), icoHost->getIcon("psi/undo"), ToolBar::ButtonUndo, false, this));
     buttons_.last()->setShortcut(QKeySequence("Ctrl+z"));
 
-    foreach(Button *b, buttons_) {
+    foreach (Button *b, buttons_) {
         addAction(b);
         connect(b, SIGNAL(triggered(bool)), SLOT(buttonChecked(bool)));
         connect(b, SIGNAL(triggered()), SLOT(buttonClicked()));
@@ -106,8 +96,8 @@ void ToolBar::init()
 
 void ToolBar::enableButton(bool enable, ToolBar::ButtonType type)
 {
-    foreach(Button *b, buttons_) {
-        if(b->type() == type) {
+    foreach (Button *b, buttons_) {
+        if (b->type() == type) {
             b->setEnabled(enable);
             break;
         }
@@ -116,8 +106,8 @@ void ToolBar::enableButton(bool enable, ToolBar::ButtonType type)
 
 void ToolBar::checkButton(ToolBar::ButtonType type)
 {
-    foreach(Button *b, buttons_) {
-        if(b->type() == type && b->isCheckable()) {
+    foreach (Button *b, buttons_) {
+        if (b->type() == type && b->isCheckable()) {
             b->setChecked(true);
             break;
         }
@@ -127,36 +117,33 @@ void ToolBar::checkButton(ToolBar::ButtonType type)
 
 void ToolBar::buttonChecked(bool check)
 {
-    Button *s = (Button*)sender();
+    Button *s = (Button *)sender();
 
-    if(!s->isCheckable()) {
+    if (!s->isCheckable()) {
         return;
     }
 
-    if(s->type() == ButtonSelect && check) {
+    if (s->type() == ButtonSelect && check) {
         enableButton(true, ButtonCut);
-    }
-    else {
+    } else {
         enableButton(false, ButtonCut);
     }
 
-    if(check)
-    {
-        foreach(Button *b, buttons_) {
-            if(b != s)
+    if (check) {
+        foreach (Button *b, buttons_) {
+            if (b != s)
                 b->setChecked(false);
         }
         emit checkedButtonChanged(s->type());
-    }
-    else
+    } else
         emit checkedButtonChanged(ToolBar::ButtonNoButton);
 }
 
 void ToolBar::setColorForColorButton(const QColor &color)
 {
-    foreach(Button *b, buttons_) {
-        if(b->type() == ButtonColor) {
-            QPixmap pix(16,16);
+    foreach (Button *b, buttons_) {
+        if (b->type() == ButtonColor) {
+            QPixmap pix(16, 16);
             pix.fill(color);
             b->setIcon(QIcon(pix));
             break;
@@ -166,23 +153,20 @@ void ToolBar::setColorForColorButton(const QColor &color)
 
 void ToolBar::buttonClicked()
 {
-    Button *s = (Button*)sender();
-    if(s)
+    Button *s = (Button *)sender();
+    if (s)
         emit buttonClicked(s->type());
 }
 
 ToolBar::ButtonType ToolBar::currentButton() const
 {
-    foreach(Button *b, buttons_) {
-        if(b->isChecked())
+    foreach (Button *b, buttons_) {
+        if (b->isChecked())
             return b->type();
     }
     return ToolBar::ButtonNoButton;
 }
 
-void ToolBar::setLineWidth(int width)
-{
-    sb->setValue(width);
-}
+void ToolBar::setLineWidth(int width) { sb->setValue(width); }
 
 #include "toolbar.moc"

@@ -23,18 +23,14 @@
 #include "figure.h"
 
 struct Request {
-    int account = 0;
-    QString jid;
-    QString yourJid;
+    int              account = 0;
+    QString          jid;
+    QString          yourJid;
     Figure::GameType type = Figure::GameType::NoGame;
-    QString requestId;
-    QString chessId;
+    QString          requestId;
+    QString          chessId;
 
-    bool operator==(const Request& other)
-    {
-        return jid == other.jid && account == other.account;
-    }
+    bool operator==(const Request &other) { return jid == other.jid && account == other.account; }
 };
-
 
 #endif // REQUEST_H

@@ -17,32 +17,32 @@
  *
  */
 
-#include "psiplugin.h"
-#include "plugininfoprovider.h"
+#include "ScrollKeeper.h"
+#include "applicationinfoaccessinghost.h"
+#include "applicationinfoaccessor.h"
+#include "chattabaccessor.h"
 #include "optionaccessinghost.h"
 #include "optionaccessor.h"
-#include "chattabaccessor.h"
-#include "applicationinfoaccessor.h"
-#include "applicationinfoaccessinghost.h"
-#include "ScrollKeeper.h"
-#include <QDomElement>
-#include <QByteArray>
-#include <QLabel>
-#include <QMessageBox>
-#include <QVBoxLayout>
-#include <QMenu>
+#include "plugininfoprovider.h"
+#include "psiplugin.h"
 #include <QApplication>
+#include <QByteArray>
+#include <QCheckBox>
+#include <QComboBox>
 #include <QDebug>
-#include <QTextEdit>
+#include <QDomElement>
+#include <QImageReader>
+#include <QLabel>
+#include <QMenu>
+#include <QMessageBox>
 #include <QNetworkAccessManager>
+#include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QNetworkProxy>
-#include <QImageReader>
-#include <QTextDocumentFragment>
 #include <QSpinBox>
-#include <QComboBox>
-#include <QCheckBox>
+#include <QTextDocumentFragment>
+#include <QTextEdit>
+#include <QVBoxLayout>
 #include <stdexcept>
 
 #undef AUTOREDIRECTS
@@ -57,120 +57,118 @@
 #define allowUpscaleName "imgpreview-allow-upscale"
 #define MAX_REDIRECTS 2
 
-class Origin: public QObject {
+class Origin : public QObject {
     Q_OBJECT
 public:
-    Origin(QWidget* chat) :
-    QObject(chat), originalUrl_(""), chat_(chat)
+    Origin(QWidget *chat) :
+        QObject(chat), originalUrl_(""), chat_(chat)
 #ifndef AUTOREDIRECTS
-    , redirectsLeft_(0)
+        ,
+        redirectsLeft_(0)
 #endif
-    {}
-    QString originalUrl_;
-    QWidget* chat_;
+    {
+    }
+    QString  originalUrl_;
+    QWidget *chat_;
 #ifndef AUTOREDIRECTS
     int redirectsLeft_;
 #endif
 };
 
-class ImagePreviewPlugin: public QObject,
-        public PsiPlugin,
-        public PluginInfoProvider,
-        public OptionAccessor,
-        public ChatTabAccessor,
-        public ApplicationInfoAccessor {
-Q_OBJECT
-Q_PLUGIN_METADATA(IID "com.psi-plus.ImagePreviewPlugin")
-Q_INTERFACES(PsiPlugin PluginInfoProvider OptionAccessor ChatTabAccessor ApplicationInfoAccessor)
+class ImagePreviewPlugin : public QObject,
+                           public PsiPlugin,
+                           public PluginInfoProvider,
+                           public OptionAccessor,
+                           public ChatTabAccessor,
+                           public ApplicationInfoAccessor {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "com.psi-plus.ImagePreviewPlugin")
+    Q_INTERFACES(PsiPlugin PluginInfoProvider OptionAccessor ChatTabAccessor ApplicationInfoAccessor)
 public:
     ImagePreviewPlugin();
-    virtual QString name() const;
-    virtual QString shortName() const;
-    virtual QString version() const;
-    virtual QWidget* options();
-    virtual bool enable();
-    virtual bool disable();
+    virtual QString  name() const;
+    virtual QString  shortName() const;
+    virtual QString  version() const;
+    virtual QWidget *options();
+    virtual bool     enable();
+    virtual bool     disable();
 
-    virtual void applyOptions();
-    virtual void restoreOptions();
-    virtual void setOptionAccessingHost(OptionAccessingHost *host);
-    virtual void optionChanged(const QString &) {
-    }
+    virtual void    applyOptions();
+    virtual void    restoreOptions();
+    virtual void    setOptionAccessingHost(OptionAccessingHost *host);
+    virtual void    optionChanged(const QString &) { }
     virtual QString pluginInfo();
     virtual QPixmap icon() const;
-    virtual void setupChatTab(QWidget* widget, int, const QString&) {
-        connect(widget, SIGNAL(messageAppended(const QString &, QWidget*)),
-                SLOT(messageAppended(const QString &, QWidget*)));
+    virtual void    setupChatTab(QWidget *widget, int, const QString &)
+    {
+        connect(widget, SIGNAL(messageAppended(const QString &, QWidget *)),
+                SLOT(messageAppended(const QString &, QWidget *)));
     }
-    virtual void setupGCTab(QWidget* widget, int, const QString&) {
-        connect(widget, SIGNAL(messageAppended(const QString &, QWidget*)),
-                SLOT(messageAppended(const QString &, QWidget*)));
+    virtual void setupGCTab(QWidget *widget, int, const QString &)
+    {
+        connect(widget, SIGNAL(messageAppended(const QString &, QWidget *)),
+                SLOT(messageAppended(const QString &, QWidget *)));
     }
 
-    virtual bool appendingChatMessage(int, const QString&, QString&, QDomElement&, bool) {
-        return false;
-    }
-    virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
-    void updateProxy();
-    ~ImagePreviewPlugin() {
-        manager->deleteLater();
-    }
+    virtual bool appendingChatMessage(int, const QString &, QString &, QDomElement &, bool) { return false; }
+    virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
+    void         updateProxy();
+    ~ImagePreviewPlugin() { manager->deleteLater(); }
 private slots:
-    void messageAppended(const QString &, QWidget*);
-    void imageReply(QNetworkReply* reply);
+    void messageAppended(const QString &, QWidget *);
+    void imageReply(QNetworkReply *reply);
+
 private:
-    OptionAccessingHost *psiOptions;
-    bool enabled;
-    QNetworkAccessManager* manager;
-    QSet<QString> pending, failed;
-    int previewSize;
-    QPointer<QSpinBox> sb_previewSize;
-    int sizeLimit;
-    QPointer<QComboBox> cb_sizeLimit;
-    bool allowUpscale;
-    QPointer<QCheckBox> cb_allowUpscale;
-    ApplicationInfoAccessingHost* appInfoHost;
-    void queueUrl(const QString& url, Origin* origin);
+    OptionAccessingHost *         psiOptions;
+    bool                          enabled;
+    QNetworkAccessManager *       manager;
+    QSet<QString>                 pending, failed;
+    int                           previewSize;
+    QPointer<QSpinBox>            sb_previewSize;
+    int                           sizeLimit;
+    QPointer<QComboBox>           cb_sizeLimit;
+    bool                          allowUpscale;
+    QPointer<QCheckBox>           cb_allowUpscale;
+    ApplicationInfoAccessingHost *appInfoHost;
+    void                          queueUrl(const QString &url, Origin *origin);
 };
 
 ImagePreviewPlugin::ImagePreviewPlugin() :
-        psiOptions(nullptr), enabled(false), manager(new QNetworkAccessManager(this)), previewSize(0), sizeLimit(0), allowUpscale(
-                false), appInfoHost(nullptr) {
+    psiOptions(nullptr), enabled(false), manager(new QNetworkAccessManager(this)), previewSize(0), sizeLimit(0),
+    allowUpscale(false), appInfoHost(nullptr)
+{
     connect(manager, SIGNAL(finished(QNetworkReply *)), SLOT(imageReply(QNetworkReply *)));
 }
 
-QString ImagePreviewPlugin::name() const {
-    return "Image Preview Plugin";
-}
+QString ImagePreviewPlugin::name() const { return "Image Preview Plugin"; }
 
-QString ImagePreviewPlugin::shortName() const {
-    return "imgpreview";
-}
-QString ImagePreviewPlugin::version() const {
-    return constVersion;
-}
+QString ImagePreviewPlugin::shortName() const { return "imgpreview"; }
+QString ImagePreviewPlugin::version() const { return constVersion; }
 
-bool ImagePreviewPlugin::enable() {
-    enabled = true;
-    sizeLimit = psiOptions->getPluginOption(sizeLimitName, 1024 * 1024).toInt();
-    previewSize = psiOptions->getPluginOption(previewSizeName, 150).toInt();
+bool ImagePreviewPlugin::enable()
+{
+    enabled      = true;
+    sizeLimit    = psiOptions->getPluginOption(sizeLimitName, 1024 * 1024).toInt();
+    previewSize  = psiOptions->getPluginOption(previewSizeName, 150).toInt();
     allowUpscale = psiOptions->getPluginOption(allowUpscaleName, true).toBool();
     updateProxy();
     return enabled;
 }
 
-bool ImagePreviewPlugin::disable() {
+bool ImagePreviewPlugin::disable()
+{
     enabled = false;
     return true;
 }
 
-QWidget* ImagePreviewPlugin::options() {
+QWidget *ImagePreviewPlugin::options()
+{
     if (!enabled) {
         return nullptr;
     }
-    QWidget *optionsWid = new QWidget();
-    QVBoxLayout *vbox = new QVBoxLayout(optionsWid);
-    cb_sizeLimit = new QComboBox(optionsWid);
+    QWidget *    optionsWid = new QWidget();
+    QVBoxLayout *vbox       = new QVBoxLayout(optionsWid);
+    cb_sizeLimit            = new QComboBox(optionsWid);
     cb_sizeLimit->addItem(tr("512 Kb"), 512 * 1024);
     cb_sizeLimit->addItem(tr("1 Mb"), 1024 * 1024);
     cb_sizeLimit->addItem(tr("2 Mb"), 2 * 1024 * 1024);
@@ -190,19 +188,18 @@ QWidget* ImagePreviewPlugin::options() {
     return optionsWid;
 }
 
-void ImagePreviewPlugin::setOptionAccessingHost(OptionAccessingHost *host) {
-    psiOptions = host;
+void ImagePreviewPlugin::setOptionAccessingHost(OptionAccessingHost *host) { psiOptions = host; }
+
+QString ImagePreviewPlugin::pluginInfo()
+{
+    return tr("Author: ") + "rkfg\n\n"
+        + tr("This plugin shows images URLs' previews in chats for non-webkit Psi version.\n");
 }
 
-QString ImagePreviewPlugin::pluginInfo() {
-    return tr("Author: ") + "rkfg\n\n" + tr("This plugin shows images URLs' previews in chats for non-webkit Psi version.\n");
-}
+QPixmap ImagePreviewPlugin::icon() const { return QPixmap(":/imagepreviewplugin/imagepreviewplugin.png"); }
 
-QPixmap ImagePreviewPlugin::icon() const {
-    return QPixmap(":/imagepreviewplugin/imagepreviewplugin.png");
-}
-
-void ImagePreviewPlugin::queueUrl(const QString& url, Origin* origin) {
+void ImagePreviewPlugin::queueUrl(const QString &url, Origin *origin)
+{
     if (!pending.contains(url) && !failed.contains(url)) {
         pending.insert(url);
         QNetworkRequest req;
@@ -213,7 +210,8 @@ void ImagePreviewPlugin::queueUrl(const QString& url, Origin* origin) {
         req.setUrl(QUrl::fromUserInput(url));
         req.setOriginatingObject(origin);
         req.setRawHeader("User-Agent",
-                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36");
+                         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 "
+                         "Safari/537.36");
 #ifdef AUTOREDIRECTS
         req.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
         req.setMaximumRedirectsAllowed(MAX_REDIRECTS);
@@ -222,12 +220,13 @@ void ImagePreviewPlugin::queueUrl(const QString& url, Origin* origin) {
     }
 }
 
-void ImagePreviewPlugin::messageAppended(const QString &, QWidget* logWidget) {
+void ImagePreviewPlugin::messageAppended(const QString &, QWidget *logWidget)
+{
     if (!enabled) {
         return;
     }
     ScrollKeeper sk(logWidget);
-    QTextEdit* te_log = qobject_cast<QTextEdit*>(logWidget);
+    QTextEdit *  te_log = qobject_cast<QTextEdit *>(logWidget);
     if (te_log) {
         QTextCursor cur = te_log->textCursor();
         te_log->moveCursor(QTextCursor::End, QTextCursor::MoveAnchor);
@@ -244,16 +243,17 @@ void ImagePreviewPlugin::messageAppended(const QString &, QWidget* logWidget) {
     }
 }
 
-void ImagePreviewPlugin::imageReply(QNetworkReply* reply) {
-    bool ok;
-    int size = 0;
+void ImagePreviewPlugin::imageReply(QNetworkReply *reply)
+{
+    bool        ok;
+    int         size = 0;
     QStringList contentTypes;
     QStringList allowedTypes;
     allowedTypes.append("image/jpeg");
     allowedTypes.append("image/png");
     allowedTypes.append("image/gif");
-    Origin* origin = qobject_cast<Origin*>(reply->request().originatingObject());
-    QString urlStr = origin->originalUrl_;
+    Origin *origin        = qobject_cast<Origin *>(reply->request().originatingObject());
+    QString urlStr        = origin->originalUrl_;
     QString urlStrEscaped = reply->url().toString();
 #ifdef IMGPREVIEW_DEBUG
     qDebug() << "Original URL " << urlStr << " / Escaped: " << urlStrEscaped;
@@ -287,11 +287,11 @@ void ImagePreviewPlugin::imageReply(QNetworkReply* reply) {
             if (reply->error() == QNetworkReply::NoError) {
                 ok = true;
             }
-            contentTypes = reply->header(QNetworkRequest::ContentTypeHeader).toString().split(",");
+            contentTypes     = reply->header(QNetworkRequest::ContentTypeHeader).toString().split(",");
             QString lastType = contentTypes.last().trimmed();
 #ifdef IMGPREVIEW_DEBUG
-            qDebug() << "URL:" << urlStr << "RESULT:" << reply->error() << "SIZE:" << size << "Content-type:"
-                    << contentTypes << " Last type: " << lastType;
+            qDebug() << "URL:" << urlStr << "RESULT:" << reply->error() << "SIZE:" << size
+                     << "Content-type:" << contentTypes << " Last type: " << lastType;
 #endif
             if (ok && allowedTypes.contains(lastType, Qt::CaseInsensitive) && size < sizeLimit) {
                 manager->get(reply->request());
@@ -309,7 +309,7 @@ void ImagePreviewPlugin::imageReply(QNetworkReply* reply) {
     case QNetworkAccessManager::GetOperation:
         try {
             QImageReader imageReader(reply);
-            QImage image = imageReader.read();
+            QImage       image = imageReader.read();
             if (imageReader.error() != QImageReader::UnknownError) {
                 throw std::runtime_error(imageReader.errorString().toStdString());
             }
@@ -320,15 +320,15 @@ void ImagePreviewPlugin::imageReply(QNetworkReply* reply) {
             qDebug() << "Image size:" << image.size();
 #endif
             ScrollKeeper sk(origin->chat_);
-            QTextEdit* te_log = qobject_cast<QTextEdit*>(origin->chat_);
+            QTextEdit *  te_log = qobject_cast<QTextEdit *>(origin->chat_);
             if (te_log) {
                 te_log->document()->addResource(QTextDocument::ImageResource, urlStrEscaped, image);
                 QTextCursor saved = te_log->textCursor();
                 te_log->moveCursor(QTextCursor::End);
                 QRegExp rawUrlRE = QRegExp("(<a href=\"[^\"]*\">)(.*)(</a>)");
                 while (te_log->find(urlStr, QTextDocument::FindBackward)) {
-                    QTextCursor cur = te_log->textCursor();
-                    QString html = cur.selection().toHtml();
+                    QTextCursor cur  = te_log->textCursor();
+                    QString     html = cur.selection().toHtml();
                     if (html.contains(rawUrlRE)) {
                         html.replace(rawUrlRE, QString("\\1<img src='%1'/>\\3").arg(urlStrEscaped));
                         cur.insertHtml(html);
@@ -336,7 +336,7 @@ void ImagePreviewPlugin::imageReply(QNetworkReply* reply) {
                 }
                 te_log->setTextCursor(saved);
             }
-        } catch (std::exception& e) {
+        } catch (std::exception &e) {
             failed.insert(origin->originalUrl_);
             qWarning() << "ERROR: " << e.what();
         }
@@ -349,35 +349,37 @@ void ImagePreviewPlugin::imageReply(QNetworkReply* reply) {
     reply->deleteLater();
 }
 
-void ImagePreviewPlugin::applyOptions() {
+void ImagePreviewPlugin::applyOptions()
+{
     psiOptions->setPluginOption(previewSizeName, previewSize = sb_previewSize->value());
-    psiOptions->setPluginOption(sizeLimitName, sizeLimit =
-            cb_sizeLimit->itemData(cb_sizeLimit->currentIndex()).toInt());
+    psiOptions->setPluginOption(sizeLimitName,
+                                sizeLimit = cb_sizeLimit->itemData(cb_sizeLimit->currentIndex()).toInt());
     psiOptions->setPluginOption(allowUpscaleName, allowUpscale = cb_allowUpscale->checkState() == Qt::Checked);
 }
 
-void ImagePreviewPlugin::restoreOptions() {
+void ImagePreviewPlugin::restoreOptions()
+{
     sb_previewSize->setValue(previewSize);
     cb_sizeLimit->setCurrentIndex(cb_sizeLimit->findData(sizeLimit));
     cb_allowUpscale->setCheckState(allowUpscale ? Qt::Checked : Qt::Unchecked);
 }
 
-void ImagePreviewPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host) {
-    appInfoHost = host;
-}
+void ImagePreviewPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) { appInfoHost = host; }
 
-void ImagePreviewPlugin::updateProxy() {
+void ImagePreviewPlugin::updateProxy()
+{
     Proxy proxy = appInfoHost->getProxyFor(name());
 #ifdef IMGPREVIEW_DEBUG
-    qDebug() << "Proxy:" << "T:" << proxy.type << "H:" << proxy.host << "Pt:" << proxy.port << "U:" << proxy.user
-            << "Ps:" << proxy.pass;
+    qDebug() << "Proxy:"
+             << "T:" << proxy.type << "H:" << proxy.host << "Pt:" << proxy.port << "U:" << proxy.user
+             << "Ps:" << proxy.pass;
 #endif
     if (proxy.type.isEmpty()) {
         manager->setProxy(QNetworkProxy());
         return;
     }
     QNetworkProxy netProxy(proxy.type == "socks" ? QNetworkProxy::Socks5Proxy : QNetworkProxy::HttpProxy, proxy.host,
-            proxy.port, proxy.user, proxy.pass);
+                           proxy.port, proxy.user, proxy.pass);
     manager->setProxy(netProxy);
 }
 

@@ -20,30 +20,29 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
-#include <QDialog>
 #include <QCloseEvent>
 #include <QDateTime>
+#include <QDialog>
 #include <QTextEdit>
 
 #include "iconfactoryaccessinghost.h"
 #include "typeaheadfind.h"
 
-class ViewLog : public QDialog
-{
+class ViewLog : public QDialog {
     Q_OBJECT
 public:
     ViewLog(const QString &filename, IconFactoryAccessingHost *IcoHost, QWidget *parent = nullptr);
     bool init();
 
 private:
-    IconFactoryAccessingHost *icoHost_;
-    QString fileName_;
-    QDateTime lastModified_;
-    QTextEdit *textWid;
+    IconFactoryAccessingHost *  icoHost_;
+    QString                     fileName_;
+    QDateTime                   lastModified_;
+    QTextEdit *                 textWid;
     Stopspam::TypeAheadFindBar *findBar;
-    QMap<int, QString> pages_;
-    int currentPage_;
-    void setPage();
+    QMap<int, QString>          pages_;
+    int                         currentPage_;
+    void                        setPage();
 
 private slots:
     void saveLog();
@@ -58,7 +57,7 @@ protected:
     void closeEvent(QCloseEvent *e);
 
 signals:
-    void onClose(int,int);
+    void onClose(int, int);
 };
 
 #endif // VIEWER_H

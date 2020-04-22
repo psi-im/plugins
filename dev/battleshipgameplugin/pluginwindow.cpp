@@ -20,9 +20,7 @@
 #include "pluginwindow.h"
 #include "boarddelegate.h"
 
-PluginWindow::PluginWindow(const QString &jid, QWidget *parent)
-    : QMainWindow(parent)
-    , gm_(nullptr)
+PluginWindow::PluginWindow(const QString &jid, QWidget *parent) : QMainWindow(parent), gm_(nullptr)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     ui.setupUi(this);
@@ -31,8 +29,7 @@ PluginWindow::PluginWindow(const QString &jid, QWidget *parent)
 
 void PluginWindow::initBoard()
 {
-    if (!gm_)
-    {
+    if (!gm_) {
         gm_ = new GameModel(this);
         connect(gm_, SIGNAL(gameEvent(QString)), this, SIGNAL(gameEvent(QString)));
         connect(gm_, SIGNAL(statusChanged()), this, SLOT(updateStatus()));
@@ -53,46 +50,35 @@ void PluginWindow::initBoard()
     ui.tvBoard->reset();
 }
 
-void PluginWindow::setError()
-{
-    gm_->setError();
-}
+void PluginWindow::setError() { gm_->setError(); }
 
 QStringList PluginWindow::dataExchange(const QStringList &data)
 {
     const QString cmd = data.at(0);
-    int cnt = data.count();
-    if (cmd == "init-opp-board")
-    {
+    int           cnt = data.count();
+    if (cmd == "init-opp-board") {
         QStringList b = data;
         b.removeAt(0);
         if (gm_->initOpponentBoard(b))
             return QStringList("ok");
-    }
-    else if (cmd == "check-opp-board")
-    {
+    } else if (cmd == "check-opp-board") {
         QStringList b = data;
         b.removeAt(0);
         if (gm_->uncoverOpponentBoard(b))
             return QStringList("ok");
-    }
-    else if (cmd == "start")
-    {
+    } else if (cmd == "start") {
         GameModel::GameStatus st = GameModel::StatusWaitingOpponent;
         if (cnt == 2 && data.at(1) == "first")
-                st = GameModel::StatusMyTurn;
+            st = GameModel::StatusMyTurn;
         gm_->setStatus(st);
-    }
-    else if (cmd == "turn")
-    {
-        int pos     = -1;
+    } else if (cmd == "turn") {
+        int  pos    = -1;
         bool draw   = false;
         bool accept = false;
         bool resign = false;
-        for (int i = 1; i < cnt; ++i)
-        {
+        for (int i = 1; i < cnt; ++i) {
             const QString str = data.at(i);
-            const QString t = str.section(';', 0, 0);
+            const QString t   = str.section(';', 0, 0);
             if (t == "shot")
                 pos = str.section(';', 1, 1).toInt();
             else if (t == "draw")
@@ -112,32 +98,24 @@ QStringList PluginWindow::dataExchange(const QStringList &data)
             gm_->opponentResign();
         res.append(QString("status;%1").arg(stringStatus(true)));
         return res;
-    }
-    else if (cmd == "turn-result")
-    {
+    } else if (cmd == "turn-result") {
         bool err = true;
-        if (cnt == 2)
-        {
-            QString    str = data.at(1);
-            if (str.section(';', 0, 0) == "shot-result")
-            {
-                const QString res = str.section(';', 1, 1);
+        if (cnt == 2) {
+            QString str = data.at(1);
+            if (str.section(';', 0, 0) == "shot-result") {
+                const QString res  = str.section(';', 1, 1);
                 const QString seed = str.section(';', 2);
                 if (gm_->handleTurnResult(res, seed))
                     err = false;
             }
-        }
-        else if (gm_->handleResult())
+        } else if (gm_->handleResult())
             err = false;
-        if (!err)
-        {
+        if (!err) {
             QStringList res("ok");
             res.append(QString("status;%1").arg(stringStatus(true)));
             return res;
         }
-    }
-    else if (cmd == "get-uncovered-board")
-    {
+    } else if (cmd == "get-uncovered-board") {
         QStringList res = gm_->getUncoveredBoard();
         return res;
     }
@@ -146,8 +124,7 @@ QStringList PluginWindow::dataExchange(const QStringList &data)
 
 QString PluginWindow::stringStatus(bool short_) const
 {
-    switch (gm_->status())
-    {
+    switch (gm_->status()) {
     case GameModel::StatusBoardInit:
         return short_ ? QString("init") : tr("Setting ships position");
         break;
@@ -194,13 +171,8 @@ void PluginWindow::updateWidgets()
     ui.btnAccept->setEnabled((f && gm_->isOpponentDraw()));
     ui.btnResign->setEnabled(f);
     ui.actionResign->setEnabled(f);
-    ui.actionNewGame->setEnabled((st == GameModel::StatusWin
-                || st == GameModel::StatusLose
-                || st == GameModel::StatusDraw
-                || st == GameModel::StatusError));
+    ui.actionNewGame->setEnabled((st == GameModel::StatusWin || st == GameModel::StatusLose
+                                  || st == GameModel::StatusDraw || st == GameModel::StatusError));
 }
 
-void PluginWindow::newGame()
-{
-    emit gameEvent("new-game");
-}
+void PluginWindow::newGame() { emit gameEvent("new-game"); }

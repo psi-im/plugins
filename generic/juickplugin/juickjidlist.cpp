@@ -21,10 +21,8 @@
 #include "ui_juickjidlist.h"
 #include <QInputDialog>
 
-JuickJidList::JuickJidList(const QStringList &jids, QWidget *p)
-    : QDialog(p)
-    , ui_(new Ui::JuickJidDialog)
-    , jidList_(jids)
+JuickJidList::JuickJidList(const QStringList &jids, QWidget *p) :
+    QDialog(p), ui_(new Ui::JuickJidDialog), jidList_(jids)
 {
     ui_->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);
@@ -38,21 +36,15 @@ JuickJidList::JuickJidList(const QStringList &jids, QWidget *p)
     connect(ui_->listWidget, SIGNAL(clicked(QModelIndex)), SLOT(enableButtons()));
 }
 
-JuickJidList::~JuickJidList()
-{
-    delete ui_;
-}
+JuickJidList::~JuickJidList() { delete ui_; }
 
-void JuickJidList::enableButtons()
-{
-    ui_->pb_del->setEnabled(!ui_->listWidget->selectedItems().isEmpty());
-}
+void JuickJidList::enableButtons() { ui_->pb_del->setEnabled(!ui_->listWidget->selectedItems().isEmpty()); }
 
 void JuickJidList::addPressed()
 {
-    bool ok;
-    QString jid = QInputDialog::getText(this, tr("Input JID"),"",QLineEdit::Normal,"", &ok);
-    if(ok) {
+    bool    ok;
+    QString jid = QInputDialog::getText(this, tr("Input JID"), "", QLineEdit::Normal, "", &ok);
+    if (ok) {
         jidList_.append(jid);
         ui_->listWidget->addItem(jid);
     }
@@ -60,8 +52,8 @@ void JuickJidList::addPressed()
 
 void JuickJidList::delPressed()
 {
-    QList<QListWidgetItem*> list = ui_->listWidget->selectedItems();
-    foreach(QListWidgetItem *i, list) {
+    QList<QListWidgetItem *> list = ui_->listWidget->selectedItems();
+    foreach (QListWidgetItem *i, list) {
         QString jid = i->text();
         jidList_.removeAll(jid);
         ui_->listWidget->removeItemWidget(i);

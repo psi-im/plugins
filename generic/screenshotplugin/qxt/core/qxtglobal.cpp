@@ -80,10 +80,7 @@
 
     \sa QXT_VERSION_STR
  */
-const char * qxtVersion()
-{
-    return QXT_VERSION_STR;
-}
+const char *qxtVersion() { return QXT_VERSION_STR; }
 
 /*!
 \headerfile <QxtPimpl>
@@ -171,7 +168,7 @@ void MyTestPrivate::doQuux() {
 \endcode
 */
 
-/*! 
+/*!
  * \macro QXT_DECLARE_PRIVATE(PUB)
  * \relates <QxtPimpl>
  * Declares that a public class has a related private class.

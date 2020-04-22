@@ -24,21 +24,15 @@
 
 #include "gameelement.h"
 
-GameElement::GameElement(ElementType type, int x, int y)
-    : type_(type)
-    , posX(x)
-    , posY(y)
-{
-    ++GameElement::usesCnt;
-}
+GameElement::GameElement(ElementType type, int x, int y) : type_(type), posX(x), posY(y) { ++GameElement::usesCnt; }
 
 GameElement::GameElement(const GameElement *from)
 {
     if (this == from)
         return;
     type_ = from->type();
-    posX = from->x();
-    posY = from->y();
+    posX  = from->x();
+    posY  = from->y();
 }
 
 GameElement::~GameElement()
@@ -56,20 +50,11 @@ GameElement::~GameElement()
     }
 }
 
-int GameElement::x() const
-{
-    return posX;
-}
+int GameElement::x() const { return posX; }
 
-int GameElement::y() const
-{
-    return posY;
-}
+int GameElement::y() const { return posY; }
 
-GameElement::ElementType GameElement::type() const
-{
-    return type_;
-}
+GameElement::ElementType GameElement::type() const { return type_; }
 
 void GameElement::paint(QPainter *painter, const QRectF &rect) const
 {

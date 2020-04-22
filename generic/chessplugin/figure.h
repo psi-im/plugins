@@ -22,49 +22,42 @@
 
 #include <QPixmap>
 
-class Figure
-{
+class Figure {
 public:
+    enum GameType { NoGame = 0, WhitePlayer = 1, BlackPlayer = 2 };
 
-    enum GameType {
-        NoGame = 0,
-        WhitePlayer = 1,
-        BlackPlayer = 2
-    };
-
-        enum FigureType {
-                None = 0,
-                White_Pawn = 1,
-                White_Castle = 2,
-                White_Bishop = 3,
-                White_King = 4,
-                White_Queen = 5,
-                White_Knight = 6,
-                Black_Pawn = 7,
-                Black_Castle = 8,
-                Black_Bishop = 9,
-                Black_King = 10,
-                Black_Queen = 11,
-                Black_Knight = 12
+    enum FigureType {
+        None         = 0,
+        White_Pawn   = 1,
+        White_Castle = 2,
+        White_Bishop = 3,
+        White_King   = 4,
+        White_Queen  = 5,
+        White_Knight = 6,
+        Black_Pawn   = 7,
+        Black_Castle = 8,
+        Black_Bishop = 9,
+        Black_King   = 10,
+        Black_Queen  = 11,
+        Black_Knight = 12
     };
 
     Figure(GameType game = NoGame, FigureType type = Figure::None, int x = 0, int y = 0, QObject *parent = nullptr);
-    QPixmap getPixmap() const;
-    void setPosition(int x, int y);
-    void setType(FigureType type);
-    int positionX() const;
-    int positionY() const;
+    QPixmap    getPixmap() const;
+    void       setPosition(int x, int y);
+    void       setType(FigureType type);
+    int        positionX() const;
+    int        positionY() const;
     FigureType type() const;
-    GameType gameType() const;
-    QString typeString() const;
+    GameType   gameType() const;
+    QString    typeString() const;
 
     bool isMoved;
 
 private:
-    int positionX_, positionY_;
+    int        positionX_, positionY_;
     FigureType type_;
-    GameType gameType_;
-
+    GameType   gameType_;
 };
 
 #endif // FIGURE_H

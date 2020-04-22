@@ -20,28 +20,25 @@
 #include "viewer.h"
 
 #include <QFile>
-#include <QTextStream>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QMessageBox>
 #include <QFileInfo>
+#include <QHBoxLayout>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QTextStream>
 
-
-ViewLog::ViewLog(const QString &filename, IconFactoryAccessingHost *IcoHost, QWidget *parent)
-        : QDialog(parent)
-        , icoHost_(IcoHost)
-        , fileName_(filename)
+ViewLog::ViewLog(const QString &filename, IconFactoryAccessingHost *IcoHost, QWidget *parent) :
+    QDialog(parent), icoHost_(IcoHost), fileName_(filename)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(fileName_);
     QVBoxLayout *layout = new QVBoxLayout(this);
-    textWid = new QTextEdit();
+    textWid             = new QTextEdit();
     layout->addWidget(textWid);
-    findBar = new Stopspam::TypeAheadFindBar(icoHost_, textWid, tr("Find"), this);
-    QPushButton *Close = new QPushButton(icoHost_->getIcon("psi/quit"), tr("Close"));
-    QPushButton *Save = new QPushButton(icoHost_->getIcon("psi/save"), tr("Save Changes"));
-    QPushButton *Delete = new QPushButton(icoHost_->getIcon("psi/remove"), tr("Delete Log"));
-    QPushButton *Update = new QPushButton(icoHost_->getIcon("psi/reload"), tr("Update Log"));
+    findBar                = new Stopspam::TypeAheadFindBar(icoHost_, textWid, tr("Find"), this);
+    QPushButton *Close     = new QPushButton(icoHost_->getIcon("psi/quit"), tr("Close"));
+    QPushButton *Save      = new QPushButton(icoHost_->getIcon("psi/save"), tr("Save Changes"));
+    QPushButton *Delete    = new QPushButton(icoHost_->getIcon("psi/remove"), tr("Delete Log"));
+    QPushButton *Update    = new QPushButton(icoHost_->getIcon("psi/reload"), tr("Update Log"));
     QHBoxLayout *butLayout = new QHBoxLayout();
     butLayout->addWidget(Delete);
     butLayout->addStretch();
@@ -68,22 +65,24 @@ void ViewLog::closeEvent(QCloseEvent *e)
     e->accept();
 }
 
-void ViewLog::deleteLog() {
-    int ret = QMessageBox::question(this, tr("Delete log file"),
-                    tr("Are you sure?"), QMessageBox::Yes, QMessageBox::Cancel);
-    if(ret == QMessageBox::Cancel) {
+void ViewLog::deleteLog()
+{
+    int ret = QMessageBox::question(this, tr("Delete log file"), tr("Are you sure?"), QMessageBox::Yes,
+                                    QMessageBox::Cancel);
+    if (ret == QMessageBox::Cancel) {
         return;
     }
     close();
     QFile file(fileName_);
-    if(file.open(QIODevice::ReadWrite)) {
+    if (file.open(QIODevice::ReadWrite)) {
         file.remove();
     }
 }
 
-void ViewLog::saveLog() {
+void ViewLog::saveLog()
+{
     QDateTime Modified = QFileInfo(fileName_).lastModified();
-    if(lastModified_ < Modified) {
+    if (lastModified_ < Modified) {
         QMessageBox msgBox;
         msgBox.setWindowTitle(tr("Save log"));
         msgBox.setText(tr("New messages has been added to log. If you save your changes, you will lose them"));
@@ -91,56 +90,57 @@ void ViewLog::saveLog() {
         msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Cancel);
         int ret = msgBox.exec();
-        if(ret == QMessageBox::Cancel) {
+        if (ret == QMessageBox::Cancel) {
             return;
         }
     } else {
-        int ret = QMessageBox::question(this, tr("Save log"),
-                        tr("Are you sure?"), QMessageBox::Yes, QMessageBox::Cancel);
-        if(ret == QMessageBox::Cancel) {
+        int ret
+            = QMessageBox::question(this, tr("Save log"), tr("Are you sure?"), QMessageBox::Yes, QMessageBox::Cancel);
+        if (ret == QMessageBox::Cancel) {
             return;
         }
     }
     QFile file(fileName_);
-    if(file.open(QIODevice::ReadWrite)) {
+    if (file.open(QIODevice::ReadWrite)) {
         file.remove();
     }
-    if(file.open(QIODevice::ReadWrite)) {
+    if (file.open(QIODevice::ReadWrite)) {
         QTextStream out(&file);
         out.setCodec("UTF-8");
         QString Text = textWid->toPlainText();
         pages_.insert(currentPage_, Text);
-        for(int i = 0; i < pages_.size(); i++) {
+        for (int i = 0; i < pages_.size(); i++) {
             out.setGenerateByteOrderMark(false);
             out << pages_.value(i);
         }
     }
 }
 
-void ViewLog::updateLog() {
+void ViewLog::updateLog()
+{
     pages_.clear();
     init();
 }
 
 bool ViewLog::init()
 {
-    bool b = false;
+    bool  b = false;
     QFile file(fileName_);
-    if(file.open(QIODevice::ReadOnly)) {
-        QString page;
-        int numPage = 0;
+    if (file.open(QIODevice::ReadOnly)) {
+        QString     page;
+        int         numPage = 0;
         QTextStream in(&file);
         in.setCodec("UTF-8");
-        while(!in.atEnd()) {
+        while (!in.atEnd()) {
             page = "";
-            for(int i = 0; i < 500; i++) {
-                if(in.atEnd())
+            for (int i = 0; i < 500; i++) {
+                if (in.atEnd())
                     break;
                 page += in.readLine() + "\n";
             }
             pages_.insert(numPage++, page);
         }
-        currentPage_ = pages_.size()-1;
+        currentPage_  = pages_.size() - 1;
         lastModified_ = QDateTime::currentDateTime();
         setPage();
         b = true;
@@ -159,21 +159,21 @@ void ViewLog::setPage()
 
 void ViewLog::nextPage()
 {
-    if(currentPage_ < pages_.size()-1)
+    if (currentPage_ < pages_.size() - 1)
         currentPage_++;
     setPage();
 }
 
 void ViewLog::prevPage()
 {
-    if(currentPage_ > 0)
+    if (currentPage_ > 0)
         currentPage_--;
     setPage();
 }
 
 void ViewLog::lastPage()
 {
-    currentPage_ = pages_.size()-1;
+    currentPage_ = pages_.size() - 1;
     setPage();
 }
 

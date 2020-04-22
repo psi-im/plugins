@@ -33,33 +33,32 @@
 
 namespace GomokuGame {
 
-class BoardModel : public QAbstractTableModel
-{
-Q_OBJECT
+class BoardModel : public QAbstractTableModel {
+    Q_OBJECT
 public:
     explicit BoardModel(QObject *parent = nullptr);
     ~BoardModel();
-    void init(GameModel *gameModel);
-    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role);
-    virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex & parent = QModelIndex()) const;
+    void                  init(GameModel *gameModel);
+    virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+    virtual QVariant      headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    virtual QVariant      data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    virtual bool          setData(const QModelIndex &index, const QVariant &value, int role);
+    virtual int           rowCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual int           columnCount(const QModelIndex &parent = QModelIndex()) const;
     // --
-    const GameElement *getGameElement(int x, int y);
-    bool clickToBoard(QModelIndex index);
-    bool opponentTurn(int x, int y);
-    void setAccept();
-    void setError();
-    void setClose();
-    void setWin();
-    void opponentDraw();
-    void setResign();
-    int  turnNum();
-    bool doSwitchColor(bool local);
-    QString saveToString() const;
-    void setSelect(int x, int y);
+    const GameElement *      getGameElement(int x, int y);
+    bool                     clickToBoard(QModelIndex index);
+    bool                     opponentTurn(int x, int y);
+    void                     setAccept();
+    void                     setError();
+    void                     setClose();
+    void                     setWin();
+    void                     opponentDraw();
+    void                     setResign();
+    int                      turnNum();
+    bool                     doSwitchColor(bool local);
+    QString                  saveToString() const;
+    void                     setSelect(int x, int y);
     GameElement::ElementType myElementType() const;
 
 public:
@@ -67,8 +66,8 @@ public:
     int selectY;
 
 private:
-    int columnCount_;
-    int rowCount_;
+    int        columnCount_;
+    int        rowCount_;
     GameModel *gameModel;
 
 private:
@@ -83,7 +82,6 @@ signals:
     void switchColor();
     void doPopup(const QString);
     void playSound(const QString);
-
 };
 }
 

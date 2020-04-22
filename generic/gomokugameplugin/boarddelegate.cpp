@@ -29,10 +29,7 @@
 
 using namespace GomokuGame;
 
-BoardPixmaps::BoardPixmaps(QObject *parent) :
-    QObject(parent),
-    width(-1), height(-1),
-    w_cnt(1), h_cnt(1)
+BoardPixmaps::BoardPixmaps(QObject *parent) : QObject(parent), width(-1), height(-1), w_cnt(1), h_cnt(1)
 {
     boardPixmap = new QPixmap(":/gomokugameplugin/goban1");
 }
@@ -55,7 +52,7 @@ void BoardPixmaps::clearPix()
 QPixmap *BoardPixmaps::getBoardPixmap(int x, int y, double w, double h)
 {
     if (w != width || h != height) {
-        width = w;
+        width  = w;
         height = h;
         clearPix();
     }
@@ -63,21 +60,21 @@ QPixmap *BoardPixmaps::getBoardPixmap(int x, int y, double w, double h)
     if (scPixmap == nullptr) {
         // Масштабирование картинки под целое количество единиц ширины и высоты
         scPixmap = new QPixmap();
-        w_cnt = boardPixmap->width() / w;
-        h_cnt = boardPixmap->height() / h;
+        w_cnt    = boardPixmap->width() / w;
+        h_cnt    = boardPixmap->height() / h;
         // Тут можно ограничить максимальное количество кусков
         //--
         *scPixmap = boardPixmap->scaled(QSize(w_cnt * w, h_cnt * h), Qt::IgnoreAspectRatio, Qt::FastTransformation);
         scaledPixmap[0] = scPixmap;
     }
-    int curr_key = (x % w_cnt) * 100 + (y % h_cnt) + 1;
+    int      curr_key  = (x % w_cnt) * 100 + (y % h_cnt) + 1;
     QPixmap *scPixmap2 = scaledPixmap.value(curr_key, NULL);
     if (scPixmap2 == nullptr) {
         // Вырезаем необходимый кусок картинки
-        scPixmap2 = new QPixmap();
-        int xpixpos = (x % w_cnt) * w;
-        int ypixpos = (y % h_cnt) * h;
-        *scPixmap2 = scPixmap->copy(xpixpos, ypixpos, w, h);
+        scPixmap2              = new QPixmap();
+        int xpixpos            = (x % w_cnt) * w;
+        int ypixpos            = (y % h_cnt) * h;
+        *scPixmap2             = scPixmap->copy(xpixpos, ypixpos, w, h);
         scaledPixmap[curr_key] = scPixmap2;
     }
     return scPixmap2;
@@ -86,10 +83,7 @@ QPixmap *BoardPixmaps::getBoardPixmap(int x, int y, double w, double h)
 // -----------------------------------------------------------------------------
 
 BoardDelegate::BoardDelegate(BoardModel *model, QObject *parent) :
-    QItemDelegate(parent),
-    model_(model),
-    skin(0),
-    pixmaps(nullptr)
+    QItemDelegate(parent), model_(model), skin(0), pixmaps(nullptr)
 {
 }
 
@@ -104,7 +98,7 @@ void BoardDelegate::setSkin(int skin_num)
             }
         } else {
             if (pixmaps == nullptr) {
-                pixmaps    = new BoardPixmaps(this);
+                pixmaps = new BoardPixmaps(this);
             }
         }
     }
@@ -132,10 +126,10 @@ void BoardDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
         painter->drawPixmap(rect, *pixmap, pixmap->rect());
     }
     QBrush brush1(Qt::SolidPattern);
-    int row_min = 2;
-    int row_max = model_->rowCount() - 3;
-    int col_min = 2;
-    int col_max = model_->columnCount() - 3;
+    int    row_min = 2;
+    int    row_max = model_->rowCount() - 3;
+    int    col_min = 2;
+    int    col_max = model_->columnCount() - 3;
     if (row >= row_min && row <= row_max && col >= col_min && col <= col_max) {
         // Отрисовка центральных линий
         qreal x = rect.left() + rect.width() / 2.0;
@@ -199,11 +193,11 @@ void BoardDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
         if ((row == 1 || row == model_->columnCount() - 2) && col >= 2 && col <= model_->columnCount() - 3) {
             // Буквы
             QString text = horHeaderString.at(col - 2);
-            painter->drawText(rect, Qt::AlignCenter,text, nullptr);
+            painter->drawText(rect, Qt::AlignCenter, text, nullptr);
         } else if ((col == 1 || model_->rowCount() - 2) && row >= 2 && row <= model_->rowCount() - 3) {
             // Цифры
             QString text = QString::number(row - 1);
-            painter->drawText(rect, Qt::AlignCenter,text, nullptr);
+            painter->drawText(rect, Qt::AlignCenter, text, nullptr);
         }
     }
     painter->restore();

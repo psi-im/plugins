@@ -17,73 +17,46 @@
  *
  */
 
-#include <QMimeData>
-#include <QIODevice>
-#include <QDataStream>
 #include "jd_item.h"
+#include <QDataStream>
+#include <QIODevice>
+#include <QMimeData>
 //#include <QDebug>
 
-JDItem::JDItem(Type t, const QString& name, const QString& size, const QString& descr, int number, JDItem* parent)
-    : parent_(parent)
-    , name_(name)
-    , size_(size)
-    , descr_(descr)
-    , number_(number)
-    , type_(t)
+JDItem::JDItem(Type t, const QString &name, const QString &size, const QString &descr, int number, JDItem *parent) :
+    parent_(parent), name_(name), size_(size), descr_(descr), number_(number), type_(t)
 {
 }
 
-JDItem::JDItem(Type t, JDItem* parent)
-    : parent_(parent)
-        , number_(0)
-    , type_(t)
-{
-}
+JDItem::JDItem(Type t, JDItem *parent) : parent_(parent), number_(0), type_(t) { }
 
-JDItem::~JDItem()
-{
-}
+JDItem::~JDItem() { }
 
-void JDItem::setData(const QString& name, const QString& size, const QString& descr, int number)
+void JDItem::setData(const QString &name, const QString &size, const QString &descr, int number)
 {
-    name_ = name;
-    size_ = size;
-    descr_ = descr;
+    name_   = name;
+    size_   = size;
+    descr_  = descr;
     number_ = number;
 }
 
-JDItem* JDItem::parent() const
-{
-    return parent_;
-}
+JDItem *JDItem::parent() const { return parent_; }
 
-JDItem::Type JDItem::type() const
-{
-    return type_;
-}
+JDItem::Type JDItem::type() const { return type_; }
 
-QString JDItem::name() const
-{
-    return name_;
-}
+QString JDItem::name() const { return name_; }
 
-QString JDItem::size() const
-{
-    return size_;
-}
+QString JDItem::size() const { return size_; }
 
-QString JDItem::description() const
-{
-    return descr_;
-}
+QString JDItem::description() const { return descr_; }
 
 QString JDItem::fullPath() const
 {
     QString path;
-    if(type_ == File) {
+    if (type_ == File) {
         path = QString("#%1").arg(QString::number(number_));
     }
-    if(type_ == Dir) {
+    if (type_ == Dir) {
         path = name_;
     }
     path = parentPath() + path;
@@ -94,34 +67,28 @@ QString JDItem::fullPath() const
 QString JDItem::parentPath() const
 {
     QString path;
-    JDItem* it = parent_;
-    while(it) {
+    JDItem *it = parent_;
+    while (it) {
         path = it->name() + path;
-        it = it->parent();
+        it   = it->parent();
     }
     return path;
 }
 
-int JDItem::number() const
+int JDItem::number() const { return number_; }
+
+const QString JDItem::mimeType() { return "jditem/file"; }
+
+bool JDItem::operator==(const JDItem &i)
 {
-    return number_;
+    return name_ == i.name() && parent_ == i.parent() && number_ == i.number() && size_ == i.size()
+        && descr_ == i.description();
 }
 
-const QString JDItem::mimeType()
+QMimeData *JDItem::mimeData() const
 {
-    return "jditem/file";
-}
-
-bool JDItem::operator==(const JDItem& i)
-{
-    return name_ == i.name() && parent_ == i.parent() && number_ == i.number()
-        && size_ == i.size() && descr_ == i.description();
-}
-
-QMimeData* JDItem::mimeData() const
-{
-    QMimeData* data = new QMimeData();
-    QByteArray ba;
+    QMimeData * data = new QMimeData();
+    QByteArray  ba;
     QDataStream out(&ba, QIODevice::WriteOnly);
     out << name_ << size_ << descr_ << number_ << type_;
     out << fullPath(); //Эта информация нам потребуется в моделе
@@ -136,24 +103,19 @@ void JDItem::fromDataStream(QDataStream *const in)
     type_ = (Type)t;
 }
 
-
 //-----------------------------------
 //------ItemsList--------------------
 //-----------------------------------
 
-ItemsList::ItemsList() : QList<ProxyItem>()
-{
-}
+ItemsList::ItemsList() : QList<ProxyItem>() { }
 
 //ВНИМАНИЕ! Перед удалением листа желательно явно вызвать метод clear();
-ItemsList::~ItemsList()
-{
-}
+ItemsList::~ItemsList() { }
 
 bool ItemsList::contains(const JDItem *const item) const
 {
-    for(int i = 0; i < size(); i++) {
-        if(*at(i).item == *item)
+    for (int i = 0; i < size(); i++) {
+        if (*at(i).item == *item)
             return true;
     }
     return false;
@@ -161,7 +123,7 @@ bool ItemsList::contains(const JDItem *const item) const
 
 void ItemsList::clear()
 {
-    while(!isEmpty())
+    while (!isEmpty())
         delete this->takeFirst().item;
     QList<ProxyItem>::clear();
 }

@@ -24,24 +24,23 @@
 #include <QDomElement>
 #include <QModelIndex>
 
-class EditNote : public QDialog
-{
-        Q_OBJECT
+class EditNote : public QDialog {
+    Q_OBJECT
 public:
-    EditNote( QWidget *parent = nullptr, const QString& tags = "", const QString& title = "", const QString& text = "", const QModelIndex& index = QModelIndex());
-        ~EditNote();
+    EditNote(QWidget *parent = nullptr, const QString &tags = "", const QString &title = "", const QString &text = "",
+             const QModelIndex &index = QModelIndex());
+    ~EditNote();
 
 private:
-        Ui::EditNote ui_;
-        QModelIndex index_;
+    Ui::EditNote ui_;
+    QModelIndex  index_;
 
 signals:
-        void newNote(QDomElement);
-        void editNote(QDomElement, QModelIndex);
+    void newNote(QDomElement);
+    void editNote(QDomElement, QModelIndex);
 
 private slots:
-        void ok();
+    void ok();
 };
-
 
 #endif // EDITNOTE_H

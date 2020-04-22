@@ -24,10 +24,11 @@
 
 class OptionAccessingHost;
 
-namespace Ui { class RipperCCOptions; }
+namespace Ui {
+class RipperCCOptions;
+}
 
-class RipperCCOptions : public QWidget
-{
+class RipperCCOptions : public QWidget {
     Q_OBJECT
 
 public:
@@ -35,7 +36,7 @@ public:
     ~RipperCCOptions();
 
     void update();
-    void setOptionAccessingHost(OptionAccessingHost* host) { _optionHost = host; }
+    void setOptionAccessingHost(OptionAccessingHost *host) { _optionHost = host; }
 
     void loadSettings();
     void saveSettings();

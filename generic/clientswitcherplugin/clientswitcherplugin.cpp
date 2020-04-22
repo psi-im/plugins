@@ -29,37 +29,21 @@
 #include "clientswitcherplugin.h"
 #include "viewer.h"
 
-#define cVer                    "0.0.18"
-#define constPluginShortName    "clientswitcher"
-#define constPluginName         "Client Switcher Plugin"
-#define constForAllAcc          "for_all_acc"
-#define constAccSettingList     "accsettlist"
-#define constShowLogHeight      "showlogheight"
-#define constShowLogWidth       "showlogwidth"
-#define constLastLogItem        "lastlogview"
-#define constPopupDuration      "popupduration"
-
+#define cVer "0.0.18"
+#define constPluginShortName "clientswitcher"
+#define constPluginName "Client Switcher Plugin"
+#define constForAllAcc "for_all_acc"
+#define constAccSettingList "accsettlist"
+#define constShowLogHeight "showlogheight"
+#define constShowLogWidth "showlogwidth"
+#define constLastLogItem "lastlogview"
+#define constPopupDuration "popupduration"
 
 ClientSwitcherPlugin::ClientSwitcherPlugin() :
-    sender_(nullptr),
-    psiOptions(nullptr),
-    psiPopup(nullptr),
-    psiInfo(nullptr),
-    psiAccount(nullptr),
-    psiAccountCtl(nullptr),
-    psiContactInfo(nullptr),
-    psiIcon(nullptr),
-    enabled(false),
-    for_all_acc(false),
-    def_os_name(""),
-    def_client_name(""),
-    def_client_version(""),
-    def_caps_node(""),
-    def_caps_version(""),
-    heightLogsView(500),
-    widthLogsView(600),
-    lastLogItem(""),
-    popupId(0)
+    sender_(nullptr), psiOptions(nullptr), psiPopup(nullptr), psiInfo(nullptr), psiAccount(nullptr),
+    psiAccountCtl(nullptr), psiContactInfo(nullptr), psiIcon(nullptr), enabled(false), for_all_acc(false),
+    def_os_name(""), def_client_name(""), def_client_version(""), def_caps_node(""), def_caps_version(""),
+    heightLogsView(500), widthLogsView(600), lastLogItem(""), popupId(0)
 
 {
     settingsList.clear();
@@ -67,24 +51,16 @@ ClientSwitcherPlugin::ClientSwitcherPlugin() :
     client_presets.clear();
 }
 
-ClientSwitcherPlugin::~ClientSwitcherPlugin() {
-    //disable();
+ClientSwitcherPlugin::~ClientSwitcherPlugin()
+{
+    // disable();
 }
 
-QString ClientSwitcherPlugin::name() const
-{
-    return constPluginName;
-}
+QString ClientSwitcherPlugin::name() const { return constPluginName; }
 
-QString ClientSwitcherPlugin::shortName() const
-{
-    return constPluginShortName;
-}
+QString ClientSwitcherPlugin::shortName() const { return constPluginShortName; }
 
-QString ClientSwitcherPlugin::version() const
-{
-    return cVer;
-}
+QString ClientSwitcherPlugin::version() const { return cVer; }
 
 bool ClientSwitcherPlugin::enable()
 {
@@ -123,11 +99,12 @@ bool ClientSwitcherPlugin::enable()
     QStringList sett_list = psiOptions->getPluginOption(constAccSettingList, QVariant()).toStringList();
     // Get and register popup option
     int popup_duration = psiOptions->getPluginOption(constPopupDuration, QVariant(5000)).toInt() / 1000;
-    popupId = psiPopup->registerOption(constPluginName, popup_duration, "plugins.options." + shortName() + "." + constPopupDuration);
+    popupId            = psiPopup->registerOption(constPluginName, popup_duration,
+                                       "plugins.options." + shortName() + "." + constPopupDuration);
     // Формируем структуры
     int cnt = sett_list.size();
     for (int i = 0; i < cnt; i++) {
-        AccountSettings* ac = new AccountSettings(sett_list.at(i));
+        AccountSettings *ac = new AccountSettings(sett_list.at(i));
         if (ac) {
             if (ac->isValid())
                 settingsList.push_back(ac);
@@ -142,8 +119,8 @@ bool ClientSwitcherPlugin::enable()
         dir.mkpath(logsDir);
     logsDir.append("/");
     heightLogsView = psiOptions->getPluginOption(constShowLogHeight, QVariant(heightLogsView)).toInt();
-    widthLogsView = psiOptions->getPluginOption(constShowLogWidth, QVariant(widthLogsView)).toInt();
-    lastLogItem = psiOptions->getPluginOption(constLastLogItem, QVariant(widthLogsView)).toString();
+    widthLogsView  = psiOptions->getPluginOption(constShowLogWidth, QVariant(widthLogsView)).toInt();
+    lastLogItem    = psiOptions->getPluginOption(constLastLogItem, QVariant(widthLogsView)).toString();
 
     return true;
 }
@@ -151,7 +128,7 @@ bool ClientSwitcherPlugin::enable()
 bool ClientSwitcherPlugin::disable()
 {
     while (settingsList.size() != 0) {
-        AccountSettings* as = settingsList.takeLast();
+        AccountSettings *as = settingsList.takeLast();
         if (as)
             delete as;
     }
@@ -160,12 +137,12 @@ bool ClientSwitcherPlugin::disable()
     return true;
 }
 
-QWidget* ClientSwitcherPlugin::options()
+QWidget *ClientSwitcherPlugin::options()
 {
     if (!enabled) {
         return nullptr;
     }
-    QWidget* optionsWid = new QWidget();
+    QWidget *optionsWid = new QWidget();
     ui_options.setupUi(optionsWid);
     // Заполняем виджет пресетов ОС
     ui_options.cb_ospreset->addItem("default", "default");
@@ -183,8 +160,8 @@ QWidget* ClientSwitcherPlugin::options()
     }
     // Элементы для просмотра логов
     QDir dir(logsDir);
-    int pos = -1;
-    foreach(const QString &file, dir.entryList(QDir::Files)) {
+    int  pos = -1;
+    foreach (const QString &file, dir.entryList(QDir::Files)) {
         ui_options.cb_logslist->addItem(file);
         ++pos;
         if (file == lastLogItem)
@@ -204,11 +181,12 @@ QWidget* ClientSwitcherPlugin::options()
     return optionsWid;
 }
 
-void ClientSwitcherPlugin::applyOptions() {
+void ClientSwitcherPlugin::applyOptions()
+{
     bool caps_updated = false;
     // Аккаунт
     bool for_all_acc_old = for_all_acc;
-    for_all_acc = ui_options.cb_allaccounts->isChecked();
+    for_all_acc          = ui_options.cb_allaccounts->isChecked();
     if (for_all_acc != for_all_acc_old) {
         caps_updated = true;
     }
@@ -218,9 +196,9 @@ void ClientSwitcherPlugin::applyOptions() {
     QString acc_id = "all";
     if (!for_all_acc)
         acc_id = ui_options.cb_accounts->itemData(acc_index).toString();
-    AccountSettings* as = getAccountSetting(acc_id);
+    AccountSettings *as = getAccountSetting(acc_id);
     if (!as) {
-        as = new AccountSettings();
+        as             = new AccountSettings();
         as->account_id = acc_id;
         settingsList.push_back(as);
     }
@@ -228,13 +206,13 @@ void ClientSwitcherPlugin::applyOptions() {
     bool tmp_flag = ui_options.cb_contactsenable->isChecked();
     if (as->enable_contacts != tmp_flag) {
         as->enable_contacts = tmp_flag;
-        caps_updated = true;
+        caps_updated        = true;
     }
     // Подмена/блокировка для конференций
     tmp_flag = ui_options.cb_conferencesenable->isChecked();
     if (as->enable_conferences != tmp_flag) {
         as->enable_conferences = tmp_flag;
-        caps_updated = true;
+        caps_updated           = true;
     }
     // Блокировка запроса версии
     int respMode = ui_options.cmb_lockrequ->currentIndex();
@@ -247,7 +225,7 @@ void ClientSwitcherPlugin::applyOptions() {
     tmp_flag = ui_options.cb_locktimerequ->isChecked();
     if (as->lock_time_requ != tmp_flag) {
         as->lock_time_requ = tmp_flag;
-        caps_updated = true;
+        caps_updated       = true;
     }
     // Уведомления при запросах версии
     as->show_requ_mode = ui_options.cmb_showrequ->currentIndex();
@@ -261,15 +239,15 @@ void ClientSwitcherPlugin::applyOptions() {
     }
     // Клиент
     if (ui_options.cb_clientpreset->currentIndex() == 0) {
-        as->client_name = "";
+        as->client_name    = "";
         as->client_version = "";
         if (!as->caps_node.isEmpty()) {
             as->caps_node = "";
-            caps_updated = true;
+            caps_updated  = true;
         }
         if (!as->caps_version.isEmpty()) {
             as->caps_version = "";
-            caps_updated = true;
+            caps_updated     = true;
         }
     } else {
         // Название клиента
@@ -280,21 +258,21 @@ void ClientSwitcherPlugin::applyOptions() {
         QString str1 = ui_options.le_capsnode->text().trimmed();
         if (as->caps_node != str1) {
             as->caps_node = str1;
-            caps_updated = true;
+            caps_updated  = true;
         }
         // Caps version клиента
         str1 = ui_options.le_capsversion->text().trimmed();
         if (as->caps_version != str1) {
             as->caps_version = str1;
-            caps_updated = true;
+            caps_updated     = true;
         }
     }
     // Сохраняем опции
     psiOptions->setPluginOption(constForAllAcc, QVariant(for_all_acc));
     QStringList sett_list;
-    int cnt = settingsList.size();
+    int         cnt = settingsList.size();
     for (int i = 0; i < cnt; i++) {
-        AccountSettings* as = settingsList.at(i);
+        AccountSettings *as = settingsList.at(i);
         if (as->isValid() && !as->isEmpty()) {
             QString acc_id = as->account_id;
             if ((!for_all_acc && acc_id != "all") || (for_all_acc && acc_id == "all"))
@@ -315,7 +293,8 @@ void ClientSwitcherPlugin::applyOptions() {
     }
 }
 
-void ClientSwitcherPlugin::restoreOptions() {
+void ClientSwitcherPlugin::restoreOptions()
+{
     // Заполняем флаг "для всех аккаунтов"
     ui_options.cb_allaccounts->setChecked(for_all_acc);
     // Заполняем виджет аккаунтов
@@ -323,7 +302,7 @@ void ClientSwitcherPlugin::restoreOptions() {
     if (!psiAccount)
         return;
     int cnt = 0;
-    for (int i = 0; ; i++) {
+    for (int i = 0;; i++) {
         QString id = psiAccount->getId(i);
         if (id == "-1")
             break;
@@ -345,43 +324,32 @@ void ClientSwitcherPlugin::restoreOptions() {
     restoreOptionsAcc(acc_idx);
 }
 
-QPixmap ClientSwitcherPlugin::icon() const
-{
-    return QPixmap(":/icons/clientswitcher.png");
-}
+QPixmap ClientSwitcherPlugin::icon() const { return QPixmap(":/icons/clientswitcher.png"); }
 
 //-- OptionAccessor -------------------------------------------------
 
-void ClientSwitcherPlugin::setOptionAccessingHost(OptionAccessingHost* host)
-{
-    psiOptions = host;
-}
+void ClientSwitcherPlugin::setOptionAccessingHost(OptionAccessingHost *host) { psiOptions = host; }
 
-void ClientSwitcherPlugin::optionChanged(const QString& /*option*/)
-{
-
-}
+void ClientSwitcherPlugin::optionChanged(const QString & /*option*/) { }
 
 //-- StanzaSender ---------------------------------------------------
 
-void ClientSwitcherPlugin::setStanzaSendingHost(StanzaSendingHost *host)
-{
-    sender_ = host;
-}
+void ClientSwitcherPlugin::setStanzaSendingHost(StanzaSendingHost *host) { sender_ = host; }
 
 // ----------------------- StanzaFilter ------------------------------
-bool ClientSwitcherPlugin::incomingStanza(int account, const QDomElement& stanza)
+bool ClientSwitcherPlugin::incomingStanza(int account, const QDomElement &stanza)
 {
     if (!enabled)
         return false;
-    QString acc_id = (for_all_acc) ? "all" : psiAccount->getId(account);
-    AccountSettings *as = getAccountSetting(acc_id);
+    QString          acc_id = (for_all_acc) ? "all" : psiAccount->getId(account);
+    AccountSettings *as     = getAccountSetting(acc_id);
     if (!as)
         return false;
     if (!as->enable_contacts && !as->enable_conferences)
         return false;
     int respMode = as->response_mode;
-    if (respMode != AccountSettings::RespAllow || as->lock_time_requ || !as->caps_node.isEmpty() || !as->caps_version.isEmpty()) {
+    if (respMode != AccountSettings::RespAllow || as->lock_time_requ || !as->caps_node.isEmpty()
+        || !as->caps_version.isEmpty()) {
         if (stanza.tagName() == "iq" && stanza.attribute("type") == "get") {
             const QString s_to = stanza.attribute("from");
             if (isSkipStanza(as, account, s_to))
@@ -393,7 +361,7 @@ bool ClientSwitcherPlugin::incomingStanza(int account, const QDomElement& stanza
                     if (xmlns == "http://jabber.org/protocol/disco#info") {
                         QString node = s_child.toElement().attribute("node");
                         if (!node.isEmpty()) {
-                            QString new_node = def_caps_node;
+                            QString     new_node   = def_caps_node;
                             QStringList split_node = node.split("#");
                             if (split_node.size() > 1) {
                                 split_node.removeFirst();
@@ -405,8 +373,7 @@ bool ClientSwitcherPlugin::incomingStanza(int account, const QDomElement& stanza
                             }
                             s_child.toElement().setAttribute("node", new_node);
                         }
-                    }
-                    else if (xmlns == "jabber:iq:version") {
+                    } else if (xmlns == "jabber:iq:version") {
                         if (respMode == AccountSettings::RespIgnore) {
                             // Showing popup if it is necessary
                             if (as->show_requ_mode == AccountSettings::LogAlways)
@@ -426,12 +393,12 @@ bool ClientSwitcherPlugin::incomingStanza(int account, const QDomElement& stanza
     return false;
 }
 
-bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
+bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement &stanza)
 {
-    if(!enabled)
+    if (!enabled)
         return false;
-    QString acc_id = (for_all_acc) ? "all" : psiAccount->getId(account);
-    AccountSettings *as = getAccountSetting(acc_id);
+    QString          acc_id = (for_all_acc) ? "all" : psiAccount->getId(account);
+    AccountSettings *as     = getAccountSetting(acc_id);
     if (!as)
         return false;
     if (as->response_mode != AccountSettings::RespAllow || !as->caps_node.isEmpty() || !as->caps_version.isEmpty()) {
@@ -444,8 +411,8 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
             if (skipFlag && !as->enable_conferences) // Конференция не определяется при входе в нее, проверим позже
                 return false;
             short unsigned int found_flag = 0; // Чтобы исключить перебор лишних элементов
-            QDomNode s_child = stanza.firstChild();
-            QDomNode caps_node;
+            QDomNode           s_child = stanza.firstChild();
+            QDomNode           caps_node;
             while (!s_child.isNull()) {
                 if (((found_flag & 1) == 0) && s_child.toElement().tagName() == "c") {
                     // Подмена будет отложенной
@@ -467,12 +434,10 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
             }
             if ((found_flag == 1 && as->enable_contacts) || (found_flag == 3 && as->enable_conferences)) {
                 // Подменяем капс
-                if (as->response_mode != AccountSettings::RespNotImpl)
-                {
+                if (as->response_mode != AccountSettings::RespNotImpl) {
                     caps_node.toElement().setAttribute("node", as->caps_node);
                     caps_node.toElement().setAttribute("ver", as->caps_version);
-                }
-                else {
+                } else {
                     caps_node.toElement().setAttribute("node", "unknown");
                     caps_node.toElement().setAttribute("ver", "n/a");
                 }
@@ -481,12 +446,12 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
         }
     }
     if (stanza.tagName() == "iq" && stanza.attribute("type") == "result") {
-        bool is_version_query = false;
-        bool is_version_replaced = false;
-        QString s_to = stanza.attribute("to");
+        bool        is_version_query    = false;
+        bool        is_version_replaced = false;
+        QString     s_to                = stanza.attribute("to");
         QStringList send_ver_list;
-        QDomNode s_child = stanza.firstChild();
-        int respMode = as->response_mode;
+        QDomNode    s_child  = stanza.firstChild();
+        int         respMode = as->response_mode;
         while (!s_child.isNull()) {
             if (s_child.toElement().tagName() == "query") {
                 QString xmlns_str = s_child.namespaceURI();
@@ -494,12 +459,13 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
                     // --- Ответ disco
                     if (isSkipStanza(as, account, s_to))
                         return false;
-                    if (respMode == AccountSettings::RespAllow && !as->lock_time_requ && as->caps_node.isEmpty() && as->caps_version.isEmpty())
+                    if (respMode == AccountSettings::RespAllow && !as->lock_time_requ && as->caps_node.isEmpty()
+                        && as->caps_version.isEmpty())
                         return false;
                     // Подменяем ноду, если она есть
                     QString node = s_child.toElement().attribute("node");
                     if (!node.isEmpty()) {
-                        QString new_node = (respMode == AccountSettings::RespAllow) ? as->caps_node : "unknown";
+                        QString     new_node   = (respMode == AccountSettings::RespAllow) ? as->caps_node : "unknown";
                         QStringList split_node = node.split("#");
                         if (split_node.size() > 1) {
                             split_node.removeFirst();
@@ -522,7 +488,8 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
                     while (!q_child.isNull()) {
                         QString tag_name = q_child.toElement().tagName();
                         if (tag_name == "feature") {
-                            if (respMode != AccountSettings::RespAllow && q_child.toElement().attribute("var") == "jabber:iq:version") {
+                            if (respMode != AccountSettings::RespAllow
+                                && q_child.toElement().attribute("var") == "jabber:iq:version") {
                                 ver_domnode = q_child;
                                 if (++update >= 3)
                                     break;
@@ -533,7 +500,8 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
                             }
                         } else if (tag_name == "identity") {
                             if (!q_child.toElement().attribute("name").isEmpty())
-                                q_child.toElement().setAttribute("name", (respMode == AccountSettings::RespAllow) ? as->client_name : "unknown");
+                                q_child.toElement().setAttribute(
+                                    "name", (respMode == AccountSettings::RespAllow) ? as->client_name : "unknown");
                             if (++update >= 3)
                                 break;
                         }
@@ -554,11 +522,11 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
                     QDomDocument xmldoc = stanza.ownerDocument();
                     if (respMode == AccountSettings::RespAllow) {
                         // Подменяем ответ
-                        bool f_os_name = false;
-                        bool f_client_name = false;
-                        bool f_client_ver = false;
-                        QDomNode q_child = s_child.firstChild();
-                        while(!q_child.isNull()) {
+                        bool     f_os_name     = false;
+                        bool     f_client_name = false;
+                        bool     f_client_ver  = false;
+                        QDomNode q_child       = s_child.firstChild();
+                        while (!q_child.isNull()) {
                             QString tag_name = q_child.toElement().tagName().toLower();
                             if (tag_name == "os") {
                                 QString str1;
@@ -599,7 +567,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
                         // Создаем теги, если их нет в ответе
                         QDomDocument doc;
                         if (!f_client_name && !as->client_name.isEmpty()) {
-                            doc = s_child.ownerDocument();
+                            doc                 = s_child.ownerDocument();
                             QDomElement cl_name = doc.createElement("name");
                             cl_name.appendChild(doc.createTextNode(as->client_name));
                             s_child.appendChild(cl_name);
@@ -630,7 +598,8 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
                         err.setAttribute("type", "cancel");
                         err.setAttribute("code", "501");
                         stanza.appendChild(err);
-                        QDomElement not_imp = xmldoc.createElementNS( "urn:ietf:params:xml:ns:xmpp-stanzas", "feature-not-implemented");
+                        QDomElement not_imp
+                            = xmldoc.createElementNS("urn:ietf:params:xml:ns:xmpp-stanzas", "feature-not-implemented");
                         err.appendChild(not_imp);
                         send_ver_list.push_back("feature-not-implemented");
                     }
@@ -655,7 +624,8 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
                         err.setAttribute("type", "cancel");
                         err.setAttribute("code", "501");
                         stanza.appendChild(err);
-                        QDomElement not_imp = xmldoc.createElementNS("urn:ietf:params:xml:ns:xmpp-stanzas", "feature-not-implemented");
+                        QDomElement not_imp
+                            = xmldoc.createElementNS("urn:ietf:params:xml:ns:xmpp-stanzas", "feature-not-implemented");
                         err.appendChild(not_imp);
                     }
                 }
@@ -676,54 +646,40 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement& stanza)
     return false;
 }
 
-QString ClientSwitcherPlugin::pluginInfo() {
-    return tr("Authors: ") +  "Liuch\n\n"
-         + tr("The plugin is intended for substitution of the client version, his name and operating system type.\n"
-              "You can specify the version of the client and OS or to select them from the preset list.\n");
+QString ClientSwitcherPlugin::pluginInfo()
+{
+    return tr("Authors: ") + "Liuch\n\n"
+        + tr("The plugin is intended for substitution of the client version, his name and operating system type.\n"
+             "You can specify the version of the client and OS or to select them from the preset list.\n");
 }
 
-void ClientSwitcherPlugin::setPopupAccessingHost(PopupAccessingHost* host)
-{
-    psiPopup = host;
-}
+void ClientSwitcherPlugin::setPopupAccessingHost(PopupAccessingHost *host) { psiPopup = host; }
 
 // ----------------------- ApplicationInfoAccessor ------------------------------
-void ClientSwitcherPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host)
+void ClientSwitcherPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host)
 {
     psiInfo = host;
     if (psiInfo) {
         // def_os_name = ;
-        def_client_name = psiInfo->appName();
+        def_client_name    = psiInfo->appName();
         def_client_version = psiInfo->appVersion();
-        def_caps_node = psiInfo->appCapsNode();
-        def_caps_version = psiInfo->appCapsVersion();
-        def_os_name = psiInfo->appOsName();
+        def_caps_node      = psiInfo->appCapsNode();
+        def_caps_version   = psiInfo->appCapsVersion();
+        def_os_name        = psiInfo->appOsName();
     }
 }
 
 // ----------------------- AccountInfoAccessing ------------------------------
-void ClientSwitcherPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost* host)
-{
-    psiAccount = host;
-}
+void ClientSwitcherPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost *host) { psiAccount = host; }
 
 // ----------------------- PsiAccountController ----------------------------------
-void ClientSwitcherPlugin::setPsiAccountControllingHost(PsiAccountControllingHost* host)
-{
-    psiAccountCtl = host;
-}
+void ClientSwitcherPlugin::setPsiAccountControllingHost(PsiAccountControllingHost *host) { psiAccountCtl = host; }
 
 // ----------------------- ContactInfoAccessor -----------------------
-void ClientSwitcherPlugin::setContactInfoAccessingHost(ContactInfoAccessingHost* host)
-{
-    psiContactInfo = host;
-}
+void ClientSwitcherPlugin::setContactInfoAccessingHost(ContactInfoAccessingHost *host) { psiContactInfo = host; }
 
 // ----------------------- IconFactoryAccessor -----------------------
-void ClientSwitcherPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost* host)
-{
-    psiIcon = host;
-}
+void ClientSwitcherPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost *host) { psiIcon = host; }
 
 // ----------------------- Private ------------------------------
 
@@ -741,9 +697,7 @@ int ClientSwitcherPlugin::getOsTemplateIndex(const QString &os_name)
     return 1; // user defined
 }
 
-int ClientSwitcherPlugin::getClientTemplateIndex(const QString &cl_name,
-                                                 const QString &cl_ver,
-                                                 const QString &cp_node,
+int ClientSwitcherPlugin::getClientTemplateIndex(const QString &cl_name, const QString &cl_ver, const QString &cp_node,
                                                  const QString &cp_ver)
 {
     if (cl_name.isEmpty() && cl_ver.isEmpty() && cp_node.isEmpty() && cp_ver.isEmpty())
@@ -764,7 +718,7 @@ int ClientSwitcherPlugin::getAccountById(const QString &acc_id)
 {
     if (!psiAccount || acc_id.isEmpty())
         return -1;
-    for (int i = 0; ; i++) {
+    for (int i = 0;; i++) {
         QString id = psiAccount->getId(i);
         if (id == "-1")
             break;
@@ -774,11 +728,11 @@ int ClientSwitcherPlugin::getAccountById(const QString &acc_id)
     return -1;
 }
 
-AccountSettings* ClientSwitcherPlugin::getAccountSetting(const QString &acc_id)
+AccountSettings *ClientSwitcherPlugin::getAccountSetting(const QString &acc_id)
 {
     int cnt = settingsList.size();
     for (int i = 0; i < cnt; i++) {
-        AccountSettings* as = settingsList.at(i);
+        AccountSettings *as = settingsList.at(i);
         if (as && as->account_id == acc_id)
             return as;
     }
@@ -796,7 +750,7 @@ void ClientSwitcherPlugin::setNewCaps(int account)
     int acc = account;
     if (acc == -1)
         acc = 0;
-    for (; ; acc++) {
+    for (;; acc++) {
         QString acc_id = psiAccount->getId(acc);
         if (acc_id == "-1")
             break;
@@ -810,10 +764,9 @@ void ClientSwitcherPlugin::setNewCaps(int account)
         if (account != -1)
             break;
     }
-
 }
 
-bool ClientSwitcherPlugin::isSkipStanza(AccountSettings* as, const int account, const QString &to)
+bool ClientSwitcherPlugin::isSkipStanza(AccountSettings *as, const int account, const QString &to)
 {
     if (to.isEmpty()) { // Широковещательный
         if (!as->enable_contacts)
@@ -824,11 +777,11 @@ bool ClientSwitcherPlugin::isSkipStanza(AccountSettings* as, const int account, 
             if (as->enable_contacts) {
                 if (!to.contains("/"))
                     return false; // Предполагаем что это сервер
-                return true; // Ошибочный запрос
+                return true;      // Ошибочный запрос
             }
         }
         if (psiContactInfo->isConference(account, to_jid) || psiContactInfo->isPrivate(account, to)) {
-            //if (to.contains("conference.")) {
+            // if (to.contains("conference.")) {
             if (!as->enable_conferences)
                 return true;
         } else {
@@ -862,7 +815,7 @@ void ClientSwitcherPlugin::restoreOptionsAcc(int acc_index)
             acc_id = "all";
         }
         if (!acc_id.isEmpty()) {
-            AccountSettings* as = getAccountSetting(acc_id);
+            AccountSettings *as = getAccountSetting(acc_id);
             if (!as) {
                 as = new AccountSettings(); // Сразу заполняется дефолтными настройками
                 as->account_id = acc_id;
@@ -881,17 +834,17 @@ void ClientSwitcherPlugin::restoreOptionsAcc(int acc_index)
             // Ведение лога
             ui_options.cmb_savetolog->setCurrentIndex(as->log_mode);
             // Виджет шаблона ОС
-            QString os_name = as->os_name;
-            int os_templ = getOsTemplateIndex(os_name);
+            QString os_name  = as->os_name;
+            int     os_templ = getOsTemplateIndex(os_name);
             ui_options.cb_ospreset->setCurrentIndex(os_templ);
             // Название ОС
             ui_options.le_osname->setText(os_name);
             // Виджет шаблона клиента
-            QString cl_name = as->client_name;
-            QString cl_ver = as->client_version;
-            QString cp_node = as->caps_node;
-            QString cp_ver = as->caps_version;
-            int cl_templ = getClientTemplateIndex(cl_name, cl_ver, cp_node, cp_ver);
+            QString cl_name  = as->client_name;
+            QString cl_ver   = as->client_version;
+            QString cp_node  = as->caps_node;
+            QString cp_ver   = as->caps_version;
+            int     cl_templ = getClientTemplateIndex(cl_name, cl_ver, cp_node, cp_ver);
             ui_options.cb_clientpreset->setCurrentIndex(cl_templ);
             // Название клиента
             ui_options.le_clientname->setText(cl_name);
@@ -977,7 +930,8 @@ void ClientSwitcherPlugin::enableClientParams(int mode)
     }
 }
 
-void ClientSwitcherPlugin::viewFromOpt() {
+void ClientSwitcherPlugin::viewFromOpt()
+{
     lastLogItem = ui_options.cb_logslist->currentText();
     if (lastLogItem.isEmpty())
         return;
@@ -999,19 +953,20 @@ void ClientSwitcherPlugin::showPopup(const QString &nick)
 {
     int msecs = psiPopup->popupDuration(constPluginName);
     if (msecs > 0)
-        psiPopup->initPopup(tr("%1 has requested your version").arg(sender_->escape(nick)), constPluginName, "psi/headline", popupId);
+        psiPopup->initPopup(tr("%1 has requested your version").arg(sender_->escape(nick)), constPluginName,
+                            "psi/headline", popupId);
 }
 
 void ClientSwitcherPlugin::showLog(const QString &filename)
 {
     QString fullname = logsDir + filename;
-    Viewer *v = new Viewer(fullname, psiIcon);
+    Viewer *v        = new Viewer(fullname, psiIcon);
     v->resize(widthLogsView, heightLogsView);
-    if(!v->init()) {
-        delete(v);
+    if (!v->init()) {
+        delete (v);
         return;
     }
-    connect(v, SIGNAL(onClose(int,int)), this, SLOT(onCloseView(int,int)));
+    connect(v, SIGNAL(onClose(int, int)), this, SLOT(onCloseView(int, int)));
     v->show();
 }
 
@@ -1022,7 +977,7 @@ void ClientSwitcherPlugin::saveToLog(const int account, const QString &to_jid, c
         return;
     QFile file(logsDir + acc_jid.replace("@", "_at_") + ".log");
     if (file.open(QIODevice::WriteOnly | QIODevice::Append)) {
-        QString time_str = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+        QString     time_str = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
         QTextStream out(&file);
         out.setCodec("UTF-8");
         out.setGenerateByteOrderMark(false);
@@ -1030,14 +985,13 @@ void ClientSwitcherPlugin::saveToLog(const int account, const QString &to_jid, c
     }
 }
 
-void ClientSwitcherPlugin::onCloseView(int w, int h) {
-    if (widthLogsView != w)
-    {
+void ClientSwitcherPlugin::onCloseView(int w, int h)
+{
+    if (widthLogsView != w) {
         widthLogsView = w;
         psiOptions->setPluginOption(constShowLogWidth, QVariant(w));
     }
-    if (heightLogsView != h)
-    {
+    if (heightLogsView != h) {
         heightLogsView = h;
         psiOptions->setPluginOption(constShowLogHeight, QVariant(h));
     }

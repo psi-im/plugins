@@ -22,28 +22,27 @@
 
 #include <QIcon>
 
-//for Psi plugin only
+// for Psi plugin only
 class IconFactoryAccessingHost;
 
-class ScreenshotIconset : public QObject
-{
+class ScreenshotIconset : public QObject {
     Q_OBJECT
 public:
-    static ScreenshotIconset* instance();
-    static void reset();
+    static ScreenshotIconset *instance();
+    static void               reset();
     ~ScreenshotIconset();
 
-    QIcon getIcon(const QString& name);
+    QIcon getIcon(const QString &name);
 
-    //for Psi plugin only
-    void setIconHost(IconFactoryAccessingHost* _icoHost);
+    // for Psi plugin only
+    void setIconHost(IconFactoryAccessingHost *_icoHost);
 
 private:
     ScreenshotIconset();
-    static ScreenshotIconset* instance_;
+    static ScreenshotIconset *instance_;
 
-    //for Psi plugin only
-    IconFactoryAccessingHost* icoHost;
+    // for Psi plugin only
+    IconFactoryAccessingHost *icoHost;
 };
 
 #endif // SCREENSHOTICONSET_H

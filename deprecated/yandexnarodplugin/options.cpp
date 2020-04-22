@@ -13,29 +13,19 @@
  ***************************************************************************
 */
 
-#include <QApplication>
-#include <QByteArray>
 #include "options.h"
 #include "applicationinfoaccessinghost.h"
 #include "optionaccessinghost.h"
-
+#include <QApplication>
+#include <QByteArray>
 
 static const QString passwordKey = "yandexnarodpluginkey";
 
+Options *Options ::instance_ = 0;
 
-Options * Options ::instance_ = 0;
+Options ::Options() : QObject(QApplication::instance()), appInfo(0), options(0) { }
 
-
-Options ::Options ()
-    : QObject(QApplication::instance())
-    , appInfo(0)
-    , options(0)
-{
-}
-
-Options ::~Options()
-{
-}
+Options ::~Options() { }
 
 void Options ::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host)
 {
@@ -43,14 +33,11 @@ void Options ::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *hos
     getProxy();
 }
 
-void Options ::setOptionAccessingHost(OptionAccessingHost *host)
-{
-    options = host;
-}
+void Options ::setOptionAccessingHost(OptionAccessingHost *host) { options = host; }
 
-Options * Options ::instance()
+Options *Options ::instance()
 {
-    if(!instance_)
+    if (!instance_)
         instance_ = new Options();
 
     return instance_;
@@ -65,9 +52,9 @@ void Options ::reset()
 bool Options ::useProxy() const
 {
     bool use = false;
-    if(appInfo) {
+    if (appInfo) {
         Proxy p = appInfo->getProxyFor("Yandex Narod Plugin");
-        use = !p.host.isEmpty();
+        use     = !p.host.isEmpty();
     }
 
     return use;
@@ -76,10 +63,10 @@ bool Options ::useProxy() const
 QNetworkProxy Options ::getProxy() const
 {
     QNetworkProxy np;
-    if(appInfo) {
+    if (appInfo) {
         Proxy p = appInfo->getProxyFor("Yandex Narod Plugin");
-        np = QNetworkProxy(QNetworkProxy::HttpCachingProxy, p.host, p.port, p.user, p.pass);
-        if(p.type != "http")
+        np      = QNetworkProxy(QNetworkProxy::HttpCachingProxy, p.host, p.port, p.user, p.pass);
+        if (p.type != "http")
             np.setType(QNetworkProxy::Socks5Proxy);
     }
 
@@ -88,7 +75,7 @@ QNetworkProxy Options ::getProxy() const
 
 void Options::setOption(const QString &name, const QVariant &value)
 {
-    if(options) {
+    if (options) {
         options->setPluginOption(name, value);
     }
 }
@@ -96,7 +83,7 @@ void Options::setOption(const QString &name, const QVariant &value)
 QVariant Options::getOption(const QString &name, const QVariant &def)
 {
     QVariant ret(def);
-    if(options) {
+    if (options) {
         ret = options->getPluginOption(name, def);
     }
 
@@ -105,10 +92,10 @@ QVariant Options::getOption(const QString &name, const QVariant &def)
 
 void Options::saveCookies(const QList<QNetworkCookie> &cooks)
 {
-    if(options) {
-        QByteArray ba;
+    if (options) {
+        QByteArray  ba;
         QDataStream ds(&ba, QIODevice::WriteOnly);
-        foreach(const QNetworkCookie& cookie, cooks) {
+        foreach (const QNetworkCookie &cookie, cooks) {
             ds << cookie.toRawForm(QNetworkCookie::NameAndValueOnly);
         }
         options->setPluginOption(CONST_COOKIES, ba);
@@ -118,12 +105,12 @@ void Options::saveCookies(const QList<QNetworkCookie> &cooks)
 QList<QNetworkCookie> Options::loadCookies()
 {
     QList<QNetworkCookie> ret;
-    if(options) {
+    if (options) {
         QByteArray ba = options->getPluginOption(CONST_COOKIES, QByteArray()).toByteArray();
-        if(!ba.isEmpty()) {
+        if (!ba.isEmpty()) {
             QDataStream ds(&ba, QIODevice::ReadOnly);
-            QByteArray byte;
-            while(!ds.atEnd()) {
+            QByteArray  byte;
+            while (!ds.atEnd()) {
                 ds >> byte;
                 QList<QNetworkCookie> list = QNetworkCookie::parseCookies(byte);
                 ret += list;
@@ -136,7 +123,7 @@ QList<QNetworkCookie> Options::loadCookies()
 
 QString Options::message(MessageType type)
 {
-    switch(type) {
+    switch (type) {
     case MAuthStart:
         return tr("Authorizing...");
     case MAuthOk:
@@ -161,18 +148,18 @@ QString Options::message(MessageType type)
 QString Options::encodePassword(const QString &pass)
 {
     QString result;
-    int n1, n2;
+    int     n1, n2;
 
     if (passwordKey.length() == 0) {
         return pass;
     }
 
     for (n1 = 0, n2 = 0; n1 < pass.length(); ++n1) {
-        ushort x = pass.at(n1).unicode() ^ passwordKey.at(n2++).unicode();
+        ushort  x = pass.at(n1).unicode() ^ passwordKey.at(n2++).unicode();
         QString hex;
         hex.sprintf("%04x", x);
         result += hex;
-        if(n2 >= passwordKey.length()) {
+        if (n2 >= passwordKey.length()) {
             n2 = 0;
         }
     }
@@ -182,24 +169,24 @@ QString Options::encodePassword(const QString &pass)
 QString Options::decodePassword(const QString &pass)
 {
     QString result;
-    int n1, n2;
+    int     n1, n2;
 
     if (passwordKey.length() == 0) {
         return pass;
     }
 
-    for(n1 = 0, n2 = 0; n1 < pass.length(); n1 += 4) {
+    for (n1 = 0, n2 = 0; n1 < pass.length(); n1 += 4) {
         ushort x = 0;
-        if(n1 + 4 > pass.length()) {
+        if (n1 + 4 > pass.length()) {
             break;
         }
-        x += QString(pass.at(n1)).toInt(NULL,16)*4096;
-        x += QString(pass.at(n1+1)).toInt(NULL,16)*256;
-        x += QString(pass.at(n1+2)).toInt(NULL,16)*16;
-        x += QString(pass.at(n1+3)).toInt(NULL,16);
+        x += QString(pass.at(n1)).toInt(NULL, 16) * 4096;
+        x += QString(pass.at(n1 + 1)).toInt(NULL, 16) * 256;
+        x += QString(pass.at(n1 + 2)).toInt(NULL, 16) * 16;
+        x += QString(pass.at(n1 + 3)).toInt(NULL, 16);
         QChar c(x ^ passwordKey.at(n2++).unicode());
         result += c;
-        if(n2 >= passwordKey.length()) {
+        if (n2 >= passwordKey.length()) {
             n2 = 0;
         }
     }

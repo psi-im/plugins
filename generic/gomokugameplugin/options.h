@@ -29,45 +29,44 @@
 
 #include "optionaccessor.h"
 
-#define constDndDisable         "dnddsbl"
-#define constConfDisable        "confdsbl"
-#define constSaveWndPosition    "savewndpos"
+#define constDndDisable "dnddsbl"
+#define constConfDisable "confdsbl"
+#define constSaveWndPosition "savewndpos"
 #define constSaveWndWidthHeight "savewndwh"
-#define constWindowTop          "wndtop"
-#define constWindowLeft         "wndleft"
-#define constWindowWidth        "wndwidth"
-#define constWindowHeight       "wndheight"
-#define constDefSoundSettings   "defsndstngs"
-#define constSoundStart         "soundstart"
-#define constSoundFinish        "soundfinish"
-#define constSoundMove          "soundmove"
-#define constSoundError         "sounderror"
+#define constWindowTop "wndtop"
+#define constWindowLeft "wndleft"
+#define constWindowWidth "wndwidth"
+#define constWindowHeight "wndheight"
+#define constDefSoundSettings "defsndstngs"
+#define constSoundStart "soundstart"
+#define constSoundFinish "soundfinish"
+#define constSoundMove "soundmove"
+#define constSoundError "sounderror"
 
-class Options : public QObject
-{
-Q_OBJECT
+class Options : public QObject {
+    Q_OBJECT
 public:
     static OptionAccessingHost *psiOptions;
-    static Options *instance();
-    static void reset();
-    QVariant getOption(const QString &option_name) const;
-    void     setOption(const QString &option_name, const QVariant &option_value);
+    static Options *            instance();
+    static void                 reset();
+    QVariant                    getOption(const QString &option_name) const;
+    void                        setOption(const QString &option_name, const QVariant &option_value);
 
 private:
     static Options *instance_;
-    bool dndDisable;
-    bool confDisable;
-    bool saveWndPosition;
-    bool saveWndWidthHeight;
-    int  windowTop;
-    int  windowLeft;
-    int  windowWidth;
-    int  windowHeight;
-    bool defSoundSettings;
-    QString soundStart;
-    QString soundFinish;
-    QString soundMove;
-    QString soundError;
+    bool            dndDisable;
+    bool            confDisable;
+    bool            saveWndPosition;
+    bool            saveWndWidthHeight;
+    int             windowTop;
+    int             windowLeft;
+    int             windowWidth;
+    int             windowHeight;
+    bool            defSoundSettings;
+    QString         soundStart;
+    QString         soundFinish;
+    QString         soundMove;
+    QString         soundError;
 
 private:
     Options(QObject *parent = nullptr);
@@ -75,7 +74,6 @@ private:
 signals:
 
 public slots:
-
 };
 
 #endif // OPTIONS_H

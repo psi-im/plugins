@@ -19,36 +19,37 @@
 
 #include "controller.h"
 
-#include "screenshot.h"
-#include "server.h"
-#include "options.h"
-#include "screenshoticonset.h"
-#include "defines.h"
 #include "applicationinfoaccessinghost.h"
+#include "defines.h"
+#include "options.h"
+#include "screenshot.h"
+#include "screenshoticonset.h"
+#include "server.h"
 
-static const QString pixacadem = "Pix.Academ.info&split&http://pix.academ.info/&split&&split&&split&action=upload_image&split&image&split&<div id='link'><a id=\"original\" href=\"(http[^\"]+)\"&split&true";
-static const QString smages = "Smages.com&split&http://smages.com/&split&&split&&split&&split&fileup&split&<div class=\"codex\"><a href=\"(http://smages.com/[^\"]+)\" target=\"_blank\">URL:</a></div>&split&true";
+static const QString pixacadem
+    = "Pix.Academ.info&split&http://pix.academ.info/&split&&split&&split&action=upload_image&split&image&split&<div "
+      "id='link'><a id=\"original\" href=\"(http[^\"]+)\"&split&true";
+static const QString smages
+    = "Smages.com&split&http://smages.com/&split&&split&&split&&split&fileup&split&<div class=\"codex\"><a "
+      "href=\"(http://smages.com/[^\"]+)\" target=\"_blank\">URL:</a></div>&split&true";
 
 static const QStringList staticHostsList = QStringList() /*<< imageShack*/ << pixacadem << smages;
 
-
-static bool isListContainsServer(const QString& server, const QStringList& servers)
+static bool isListContainsServer(const QString &server, const QStringList &servers)
 {
-    foreach(QString serv, servers) {
-        if(serv.split(Server::splitString()).first() == server.split(Server::splitString()).first())
+    foreach (QString serv, servers) {
+        if (serv.split(Server::splitString()).first() == server.split(Server::splitString()).first())
             return true;
     }
     return false;
 }
 
-Controller::Controller(ApplicationInfoAccessingHost* appInfo)
-    : QObject()
-    , appInfo_(appInfo)
+Controller::Controller(ApplicationInfoAccessingHost *appInfo) : QObject(), appInfo_(appInfo)
 {
-    Options* o = Options::instance();
+    Options *o        = Options::instance();
     QVariant vServers = o->getOption(constServerList);
 
-    if(!vServers.isValid()) { //приложение запущено впервые
+    if (!vServers.isValid()) { //приложение запущено впервые
         o->setOption(constShortCut, QVariant("Alt+Shift+p"));
         o->setOption(constFormat, QVariant("png"));
         o->setOption(constFileName, QVariant("pic-yyyyMMdd-hhmmss"));
@@ -58,16 +59,16 @@ Controller::Controller(ApplicationInfoAccessingHost* appInfo)
     }
 
     QStringList servers = vServers.toStringList();
-    foreach(const QString& host, staticHostsList) {
-        if(!isListContainsServer(host, servers))
+    foreach (const QString &host, staticHostsList) {
+        if (!isListContainsServer(host, servers))
             servers.append(host);
     }
 
-    if(o->getOption(constVersionOption).toString() != cVersion) {
-//        foreach(const QString& host, staticHostsList) {
-//            updateServer(&servers, host);
-//        }
-        //updateServer(&servers, ompldr);
+    if (o->getOption(constVersionOption).toString() != cVersion) {
+        //        foreach(const QString& host, staticHostsList) {
+        //            updateServer(&servers, host);
+        //        }
+        // updateServer(&servers, ompldr);
 
         doUpdate();
         o->setOption(constVersionOption, cVersion);
@@ -86,10 +87,9 @@ Controller::~Controller()
     ScreenshotIconset::reset();
 }
 
-
 void Controller::onShortCutActivated()
 {
-    if(!screenshot) {
+    if (!screenshot) {
         screenshot = new Screenshot();
         screenshot->setProxy(appInfo_->getProxyFor(constName));
     }
@@ -99,7 +99,7 @@ void Controller::onShortCutActivated()
 
 void Controller::openImage()
 {
-    if(!screenshot) {
+    if (!screenshot) {
         screenshot = new Screenshot();
         screenshot->setProxy(appInfo_->getProxyFor(constName));
     }

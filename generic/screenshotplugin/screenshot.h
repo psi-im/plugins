@@ -20,9 +20,9 @@
 #ifndef SCREENSHOT_H
 #define SCREENSHOT_H
 
-#include "ui_screenshot.h"
-#include "toolbar.h"
 #include "applicationinfoaccessinghost.h"
+#include "toolbar.h"
+#include "ui_screenshot.h"
 
 class Server;
 class GrabAreaWidget;
@@ -30,15 +30,14 @@ class ScreenshotOptions;
 class QNetworkAccessManager;
 class QNetworkReply;
 
-class Screenshot : public QMainWindow
-{
+class Screenshot : public QMainWindow {
     Q_OBJECT
 
 public:
     Screenshot();
     ~Screenshot();
 
-    void setProxy(const Proxy& p);
+    void setProxy(const Proxy &p);
     void action(int action);
 
 protected:
@@ -54,12 +53,12 @@ private slots:
     void uploadScreenshot();
     void printScreenshot();
     void cancelUpload();
-    void dataTransferProgress( qint64 done, qint64 total );
+    void dataTransferProgress(qint64 done, qint64 total);
     void ftpReplyFinished();
-    void httpReplyFinished(QNetworkReply*);
+    void httpReplyFinished(QNetworkReply *);
     void captureDesktop(int);
     void captureWindow(int);
-    void captureArea(int);    
+    void captureArea(int);
     void shootWindow();
     void shootArea();
     void screenshotCanceled();
@@ -70,8 +69,8 @@ private slots:
     void doHomePage();
     void doHistory();
     void doOptions();
-    //void doProxySettings();
-    void settingsChanged(const QString& option, const QVariant& value);
+    // void doProxySettings();
+    void settingsChanged(const QString &option, const QVariant &value);
     void copyUrl();
 
 protected:
@@ -85,30 +84,29 @@ private:
     void bringToFront();
     void updateWidgets(bool vis);
     void connectMenu();
-    void setServersList(const QStringList& servers);
-    void setImagePath(const QString& path);
+    void setServersList(const QStringList &servers);
+    void setImagePath(const QString &path);
     void refreshSettings();
     void saveGeometry();
-    void newRequest(const QNetworkReply *const old, const QString& link);
+    void newRequest(const QNetworkReply *const old, const QString &link);
     void setupStatusBar();
     void updateStatusBar();
 
-    bool modified;
-    QPixmap originalPixmap;
-    QString format;
-    QString fileNameFormat;
-    QString lastFolder;
-    QList<Server*> servers;
+    bool                            modified;
+    QPixmap                         originalPixmap;
+    QString                         format;
+    QString                         fileNameFormat;
+    QString                         lastFolder;
+    QList<Server *>                 servers;
     QPointer<QNetworkAccessManager> manager;
-    QByteArray ba;
-    Proxy proxy_;
-    QStringList history_;
-    GrabAreaWidget* grabAreaWidget_;
-    QLabel *sbLbSize;
-    QPointer<ScreenshotOptions> so_;
+    QByteArray                      ba;
+    Proxy                           proxy_;
+    QStringList                     history_;
+    GrabAreaWidget *                grabAreaWidget_;
+    QLabel *                        sbLbSize;
+    QPointer<ScreenshotOptions>     so_;
 
     Ui::Screenshot ui_;
 };
-
 
 #endif

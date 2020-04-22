@@ -23,50 +23,47 @@
 #ifndef HTMLTIDY_H_
 #define HTMLTIDY_H_
 
-#include <QString>
 #include <QByteArray>
+#include <QString>
 
 #include <string>
 
 #ifdef LEGACY_TIDY
-# ifdef Q_OS_WIN
-#  include <tidy/tidy.h>
-#  include <tidy/buffio.h>
-# else
-#  include <tidy.h>
-#  include <buffio.h>
-# endif
+#ifdef Q_OS_WIN
+#include <tidy/buffio.h>
+#include <tidy/tidy.h>
 #else
-# include <tidy.h>
-# include <tidybuffio.h>
+#include <buffio.h>
+#include <tidy.h>
+#endif
+#else
+#include <tidy.h>
+#include <tidybuffio.h>
 #endif
 
 class QDomDocument;
 class QDomElement;
 
-class HtmlTidy
-{
+class HtmlTidy {
 public:
-    HtmlTidy(const QString& html);
+    HtmlTidy(const QString &html);
     ~HtmlTidy();
-    QString output();
-    QDomElement output(QDomDocument& document);
-    static void putByte(void* sinkData, byte bt);
+    QString     output();
+    QDomElement output(QDomDocument &document);
+    static void putByte(void *sinkData, byte bt);
 #ifdef Q_OS_WIN
-    static void TIDY_CALL callPutByte(void* sinkData, byte bt);
+    static void TIDY_CALL callPutByte(void *sinkData, byte bt);
 #endif
 
-
 protected:
-    void putByte(byte bt);
+    void    putByte(byte bt);
     QString writeOutput();
 
-
 private:
-    TidyDoc     m_tidyDoc;
-    TidyBuffer  m_errorOutput;
-    QByteArray  m_output;
-    QString     m_input;
+    TidyDoc    m_tidyDoc;
+    TidyBuffer m_errorOutput;
+    QByteArray m_output;
+    QString    m_input;
 };
 
 #endif

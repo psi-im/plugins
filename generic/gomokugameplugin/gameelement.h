@@ -27,35 +27,29 @@
 
 #include <QPainter>
 
-class GameElement
-{
+class GameElement {
 public:
-    enum ElementType {
-        TypeNone,
-        TypeBlack,
-        TypeWhite
-    };
+    enum ElementType { TypeNone, TypeBlack, TypeWhite };
 
     GameElement(ElementType type, int x, int y);
     GameElement(const GameElement *from);
     ~GameElement();
-    int x() const;
-    int y() const;
+    int         x() const;
+    int         y() const;
     ElementType type() const;
-    void paint(QPainter *painter, const QRectF &rect) const;
+    void        paint(QPainter *painter, const QRectF &rect) const;
 
 private:
-    ElementType type_;
-    int posX;
-    int posY;
-    static int usesCnt;
+    ElementType     type_;
+    int             posX;
+    int             posY;
+    static int      usesCnt;
     static QPixmap *blackstonePixmap;
     static QPixmap *whitestonePixmap;
 
 private:
     QPixmap *getBlackstonePixmap() const;
     QPixmap *getWhitestonePixmap() const;
-
 };
 
 #endif // GAMEELEMENT_H

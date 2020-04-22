@@ -30,14 +30,13 @@
 
 #include "otrmessaging.h"
 
-#include <QList>
 #include <QHash>
+#include <QList>
 
-extern "C"
-{
-#include <libotr/proto.h>
+extern "C" {
 #include <libotr/message.h>
 #include <libotr/privkey.h>
+#include <libotr/proto.h>
 #ifndef OTRL_PRIVKEY_FPRINT_HUMAN_LEN
 #define OTRL_PRIVKEY_FPRINT_HUMAN_LEN 45
 #endif
@@ -54,149 +53,119 @@ class QString;
 /**
  * Handles all libotr calls and callbacks.
  */
-class OtrInternal
-{
+class OtrInternal {
 public:
-
-    OtrInternal(psiotr::OtrCallback* callback, psiotr::OtrPolicy& policy);
+    OtrInternal(psiotr::OtrCallback *callback, psiotr::OtrPolicy &policy);
 
     ~OtrInternal();
 
-    QString encryptMessage(const QString& account, const QString& contact,
-                           const QString& message);
+    QString encryptMessage(const QString &account, const QString &contact, const QString &message);
 
-    psiotr::OtrMessageType decryptMessage(const QString& account,
-                                          const QString& contact,
-                                          const QString& message,
-                                          QString& decrypted);
+    psiotr::OtrMessageType decryptMessage(const QString &account, const QString &contact, const QString &message,
+                                          QString &decrypted);
 
     QList<psiotr::Fingerprint> getFingerprints();
 
-    void verifyFingerprint(const psiotr::Fingerprint& fingerprint, bool verified);
+    void verifyFingerprint(const psiotr::Fingerprint &fingerprint, bool verified);
 
-    void deleteFingerprint(const psiotr::Fingerprint& fingerprint);
+    void deleteFingerprint(const psiotr::Fingerprint &fingerprint);
 
     QHash<QString, QString> getPrivateKeys();
 
-    void deleteKey(const QString& account);
+    void deleteKey(const QString &account);
 
+    void startSession(const QString &account, const QString &contact);
 
-    void startSession(const QString& account, const QString& contact);
+    void endSession(const QString &account, const QString &contact);
 
-    void endSession(const QString& account, const QString& contact);
+    void expireSession(const QString &account, const QString &contact);
 
-    void expireSession(const QString& account, const QString& contact);
+    void startSMP(const QString &account, const QString &contact, const QString &question, const QString &secret);
 
+    void continueSMP(const QString &account, const QString &contact, const QString &secret);
 
-    void startSMP(const QString& account, const QString& contact,
-                  const QString& question, const QString& secret);
+    void abortSMP(const QString &account, const QString &contact);
+    void abortSMP(ConnContext *context);
 
-    void continueSMP(const QString& account, const QString& contact,
-                     const QString& secret);
+    psiotr::OtrMessageState getMessageState(const QString &account, const QString &contact);
 
-    void abortSMP(const QString& account, const QString& contact);
-    void abortSMP(ConnContext* context);
+    QString getMessageStateString(const QString &account, const QString &contact);
 
+    QString getSessionId(const QString &account, const QString &contact);
 
-    psiotr::OtrMessageState getMessageState(const QString& account,
-                                            const QString& contact);
+    psiotr::Fingerprint getActiveFingerprint(const QString &account, const QString &contact);
 
-    QString getMessageStateString(const QString& account,
-                                  const QString& contact);
+    bool isVerified(const QString &account, const QString &contact);
+    bool isVerified(ConnContext *context);
 
-    QString getSessionId(const QString& account, const QString& contact);
+    bool smpSucceeded(const QString &account, const QString &contact);
 
-    psiotr::Fingerprint getActiveFingerprint(const QString& account,
-                                             const QString& contact);
+    void generateKey(const QString &account);
 
-    bool isVerified(const QString& account, const QString& contact);
-    bool isVerified(ConnContext* context);
-
-    bool smpSucceeded(const QString& account, const QString& contact);
-
-    void generateKey(const QString& account);
-
-    static QString humanFingerprint(const unsigned char* fingerprint);
+    static QString humanFingerprint(const unsigned char *fingerprint);
 
     /*** otr callback functions ***/
-    OtrlPolicy policy(ConnContext* context);
-    void create_privkey(const char* accountname, const char* protocol);
-    int is_logged_in(const char* accountname, const char* protocol,
-                     const char* recipient);
-    void inject_message(const char* accountname, const char* protocol,
-                        const char* recipient, const char* message);
+    OtrlPolicy policy(ConnContext *context);
+    void       create_privkey(const char *accountname, const char *protocol);
+    int        is_logged_in(const char *accountname, const char *protocol, const char *recipient);
+    void inject_message(const char *accountname, const char *protocol, const char *recipient, const char *message);
     void update_context_list();
-    void new_fingerprint(OtrlUserState us, const char* accountname,
-                         const char* protocol, const char* username,
+    void new_fingerprint(OtrlUserState us, const char *accountname, const char *protocol, const char *username,
                          unsigned char fingerprint[20]);
     void write_fingerprints();
-    void gone_secure(ConnContext* context);
-    void gone_insecure(ConnContext* context);
-    void still_secure(ConnContext* context, int is_reply);
+    void gone_secure(ConnContext *context);
+    void gone_insecure(ConnContext *context);
+    void still_secure(ConnContext *context, int is_reply);
 #if (OTRL_VERSION_MAJOR >= 4)
-    void handle_msg_event(OtrlMessageEvent msg_event, ConnContext* context,
-                          const char* message, gcry_error_t err);
-    void handle_smp_event(OtrlSMPEvent smp_event, ConnContext* context,
-                          unsigned short progress_percent, char* question);
-    void create_instag(const char* accountname, const char* protocol);
+    void handle_msg_event(OtrlMessageEvent msg_event, ConnContext *context, const char *message, gcry_error_t err);
+    void handle_smp_event(OtrlSMPEvent smp_event, ConnContext *context, unsigned short progress_percent,
+                          char *question);
+    void create_instag(const char *accountname, const char *protocol);
 #else
-    void log_message(const char* message);
-    void notify(OtrlNotifyLevel level, const char* accountname,
-                const char* protocol, const char* username, const char* title,
-                const char* primary, const char* secondary);
-    int display_otr_message(const char* accountname, const char* protocol,
-                            const char* username, const char* msg);
-    const char* protocol_name(const char* protocol);
-    void protocol_name_free(const char* protocol_name);
+    void log_message(const char *message);
+    void notify(OtrlNotifyLevel level, const char *accountname, const char *protocol, const char *username,
+                const char *title, const char *primary, const char *secondary);
+    int  display_otr_message(const char *accountname, const char *protocol, const char *username, const char *msg);
+    const char *protocol_name(const char *protocol);
+    void        protocol_name_free(const char *protocol_name);
 #endif
 
-    const char* account_name(const char* account,
-                             const char* protocol);
-    void account_name_free(const char* account_name);
-
+    const char *account_name(const char *account, const char *protocol);
+    void        account_name_free(const char *account_name);
 
     /*** static otr callback wrapper-functions ***/
-    static OtrlPolicy cb_policy(void* opdata, ConnContext* context);
-    static void cb_create_privkey(void* opdata, const char* accountname,
-                                  const char* protocol);
-    static int cb_is_logged_in(void* opdata, const char* accountname,
-                               const char* protocol, const char* recipient);
-    static void cb_inject_message(void* opdata, const char* accountname,
-                                  const char* protocol, const char* recipient,
-                                  const char* message);
-    static void cb_update_context_list(void* opdata);
-    static void cb_new_fingerprint(void* opdata, OtrlUserState us,
-                                   const char* accountname, const char* protocol,
-                                   const char* username, unsigned char fingerprint[20]);
-    static void cb_write_fingerprints(void* opdata);
-    static void cb_gone_secure(void* opdata, ConnContext* context);
-    static void cb_gone_insecure(void* opdata, ConnContext* context);
-    static void cb_still_secure(void* opdata, ConnContext* context, int is_reply);
+    static OtrlPolicy cb_policy(void *opdata, ConnContext *context);
+    static void       cb_create_privkey(void *opdata, const char *accountname, const char *protocol);
+    static int  cb_is_logged_in(void *opdata, const char *accountname, const char *protocol, const char *recipient);
+    static void cb_inject_message(void *opdata, const char *accountname, const char *protocol, const char *recipient,
+                                  const char *message);
+    static void cb_update_context_list(void *opdata);
+    static void cb_new_fingerprint(void *opdata, OtrlUserState us, const char *accountname, const char *protocol,
+                                   const char *username, unsigned char fingerprint[20]);
+    static void cb_write_fingerprints(void *opdata);
+    static void cb_gone_secure(void *opdata, ConnContext *context);
+    static void cb_gone_insecure(void *opdata, ConnContext *context);
+    static void cb_still_secure(void *opdata, ConnContext *context, int is_reply);
 #if (OTRL_VERSION_MAJOR >= 4)
-    static void cb_handle_msg_event(void* opdata, OtrlMessageEvent msg_event,
-                                    ConnContext* context, const char* message,
+    static void cb_handle_msg_event(void *opdata, OtrlMessageEvent msg_event, ConnContext *context, const char *message,
                                     gcry_error_t err);
-    static void cb_handle_smp_event(void* opdata, OtrlSMPEvent smp_event,
-                                    ConnContext* context, unsigned short progress_percent,
-                                    char* question);
-    static void cb_create_instag(void* opdata, const char* accountname, const char* protocol);
+    static void cb_handle_smp_event(void *opdata, OtrlSMPEvent smp_event, ConnContext *context,
+                                    unsigned short progress_percent, char *question);
+    static void cb_create_instag(void *opdata, const char *accountname, const char *protocol);
 #else
-    static void cb_log_message(void* opdata, const char* message);
-    static void cb_notify(void* opdata, OtrlNotifyLevel level,
-                          const char* accountname, const char* protocol,
-                          const char* username, const char* title,
-                          const char* primary, const char* secondary);
-    static int cb_display_otr_message(void* opdata, const char* accountname,
-                                      const char* protocol, const char* username,
-                                      const char* msg);
-    static const char* cb_protocol_name(void* opdata, const char* protocol);
-    static void cb_protocol_name_free(void* opdata, const char* protocol_name);
+    static void cb_log_message(void *opdata, const char *message);
+    static void cb_notify(void *opdata, OtrlNotifyLevel level, const char *accountname, const char *protocol,
+                          const char *username, const char *title, const char *primary, const char *secondary);
+    static int cb_display_otr_message(void *opdata, const char *accountname, const char *protocol, const char *username,
+                                      const char *msg);
+    static const char *cb_protocol_name(void *opdata, const char *protocol);
+    static void        cb_protocol_name_free(void *opdata, const char *protocol_name);
 #endif
 
-    static const char* cb_account_name(void* opdata, const char* account, const char* protocol);
-    static void cb_account_name_free(void* opdata, const char* account_name);
-private:
+    static const char *cb_account_name(void *opdata, const char *account, const char *protocol);
+    static void        cb_account_name_free(void *opdata, const char *account_name);
 
+private:
     /**
      * The userstate contains keys and known fingerprints.
      */
@@ -210,7 +179,7 @@ private:
     /**
      * Pointer to a class for callbacks from OTR to application.
      */
-    psiotr::OtrCallback* m_callback;
+    psiotr::OtrCallback *m_callback;
 
     /**
      * Name of the file storing dsa-keys.
@@ -230,7 +199,7 @@ private:
     /**
      * Reference to the default OTR policy
      */
-    psiotr::OtrPolicy& m_otrPolicy;
+    psiotr::OtrPolicy &m_otrPolicy;
 
     /**
      * Variable used during generating of private key.

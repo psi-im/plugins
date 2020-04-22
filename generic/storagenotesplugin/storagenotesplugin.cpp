@@ -20,35 +20,21 @@
 #include "storagenotesplugin.h"
 #include "notescontroller.h"
 
-#include <QLabel>
-#include <QVBoxLayout>
 #include <QDomElement>
 #include <QIcon>
+#include <QLabel>
+#include <QVBoxLayout>
 
-StorageNotesPlugin::StorageNotesPlugin()
-    : stanzaSender(nullptr)
-    , iconHost(nullptr)
-    , accInfo(nullptr)
-    , popup(nullptr)
-    , enabled(false)
-    , controller_(nullptr)
+StorageNotesPlugin::StorageNotesPlugin() :
+    stanzaSender(nullptr), iconHost(nullptr), accInfo(nullptr), popup(nullptr), enabled(false), controller_(nullptr)
 {
 }
 
-QString StorageNotesPlugin::name() const
-{
-        return "Storage Notes Plugin";
-}
+QString StorageNotesPlugin::name() const { return "Storage Notes Plugin"; }
 
-QString StorageNotesPlugin::shortName() const
-{
-        return "storagenotes";
-}
+QString StorageNotesPlugin::shortName() const { return "storagenotes"; }
 
-QString StorageNotesPlugin::version() const
-{
-        return constVersion;
-}
+QString StorageNotesPlugin::version() const { return constVersion; }
 
 bool StorageNotesPlugin::enable()
 {
@@ -57,7 +43,7 @@ bool StorageNotesPlugin::enable()
     QFile file(":/storagenotes/storagenotes.png");
     file.open(QIODevice::ReadOnly);
     QByteArray image = file.readAll();
-    iconHost->addIcon("storagenotes/storagenotes",image);
+    iconHost->addIcon("storagenotes/storagenotes", image);
     file.close();
     controller_ = new NotesController(this);
 
@@ -68,47 +54,46 @@ bool StorageNotesPlugin::disable()
 {
     delete controller_;
     controller_ = nullptr;
-    enabled = false;
+    enabled     = false;
 
     return true;
 }
 
-QWidget* StorageNotesPlugin::options()
+QWidget *StorageNotesPlugin::options()
 {
-        if (!enabled) {
+    if (!enabled) {
         return nullptr;
     }
-        QWidget *optionsWid = new QWidget();
-        QVBoxLayout *vbox= new QVBoxLayout(optionsWid);
+    QWidget *    optionsWid = new QWidget();
+    QVBoxLayout *vbox       = new QVBoxLayout(optionsWid);
 
-        QLabel *wikiLink = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#storage_notes_plugin\">Wiki (Online)</a>"),optionsWid);
+    QLabel *wikiLink = new QLabel(
+        tr("<a href=\"https://psi-plus.com/wiki/plugins#storage_notes_plugin\">Wiki (Online)</a>"), optionsWid);
     wikiLink->setOpenExternalLinks(true);
 
-        vbox->addWidget(wikiLink);
-        vbox->addStretch();
+    vbox->addWidget(wikiLink);
+    vbox->addStretch();
 
-        return optionsWid;
+    return optionsWid;
 }
 
-bool StorageNotesPlugin::incomingStanza(int account, const QDomElement& xml)
+bool StorageNotesPlugin::incomingStanza(int account, const QDomElement &xml)
 {
-    if(!enabled)
+    if (!enabled)
         return false;
 
-    if(xml.tagName() == "iq" && xml.attribute("id") == NOTES_ID) {
-        if(xml.attribute("type") == "error") {
+    if (xml.tagName() == "iq" && xml.attribute("id") == NOTES_ID) {
+        if (xml.attribute("type") == "error") {
             controller_->error(account);
-        }
-        else if(xml.attribute("type") == "result") {
+        } else if (xml.attribute("type") == "result") {
             QList<QDomElement> notes;
-            QDomNodeList noteList = xml.elementsByTagName("note");
-            for(int i = 0; i < noteList.size(); i++)
+            QDomNodeList       noteList = xml.elementsByTagName("note");
+            for (int i = 0; i < noteList.size(); i++)
                 notes.append(noteList.at(i).toElement());
 
-            if(!notes.isEmpty()) {
+            if (!notes.isEmpty()) {
                 controller_->incomingNotes(account, notes);
-            }
-            else {
+            } else {
                 controller_->saved(account);
             }
         }
@@ -117,66 +102,46 @@ bool StorageNotesPlugin::incomingStanza(int account, const QDomElement& xml)
     return false;
 }
 
-bool StorageNotesPlugin::outgoingStanza(int/* account*/, QDomElement& /*xml*/)
-{
-    return false;
-}
+bool StorageNotesPlugin::outgoingStanza(int /* account*/, QDomElement & /*xml*/) { return false; }
 
-void StorageNotesPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost* host)
-{
-    accInfo = host;
-}
+void StorageNotesPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost *host) { accInfo = host; }
 
-void StorageNotesPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost* host)
-{
-        iconHost = host;
-}
+void StorageNotesPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost *host) { iconHost = host; }
 
-void StorageNotesPlugin::setStanzaSendingHost(StanzaSendingHost *host)
-{
-        stanzaSender = host;
-}
+void StorageNotesPlugin::setStanzaSendingHost(StanzaSendingHost *host) { stanzaSender = host; }
 
-void StorageNotesPlugin::setPopupAccessingHost(PopupAccessingHost* host)
-{
-    popup = host;
-}
+void StorageNotesPlugin::setPopupAccessingHost(PopupAccessingHost *host) { popup = host; }
 
 void StorageNotesPlugin::start()
 {
-    if(!enabled)
+    if (!enabled)
         return;
 
     int acc = sender()->property("account").toInt();
     controller_->start(acc);
 }
 
-QList < QVariantHash > StorageNotesPlugin::getAccountMenuParam()
+QList<QVariantHash> StorageNotesPlugin::getAccountMenuParam()
 {
     QVariantHash hash;
-    hash["icon"] = QVariant(QString("storagenotes/storagenotes"));
-        hash["name"] = QVariant(tr("Storage Notes"));
-        hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
-        hash["slot"] = QVariant(SLOT(start()));
-    QList< QVariantHash > l;
+    hash["icon"]    = QVariant(QString("storagenotes/storagenotes"));
+    hash["name"]    = QVariant(tr("Storage Notes"));
+    hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+    hash["slot"]    = QVariant(SLOT(start()));
+    QList<QVariantHash> l;
     l.push_back(hash);
-        return l;
+    return l;
 }
 
-QList < QVariantHash > StorageNotesPlugin::getContactMenuParam()
+QList<QVariantHash> StorageNotesPlugin::getContactMenuParam() { return QList<QVariantHash>(); }
+
+QString StorageNotesPlugin::pluginInfo()
 {
-    return QList < QVariantHash >();
+    return tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
+        + tr("This plugin is an implementation of XEP-0049: Private XML Storage.\n"
+             "The plugin is fully compatible with notes saved using Miranda IM.\n"
+             "The plugin is designed to keep notes on the jabber server with the ability to access them from anywhere "
+             "using Psi+ or Miranda IM.");
 }
 
-QString StorageNotesPlugin::pluginInfo() {
-    return tr("Author: ") +  "Dealer_WeARE\n"
-            + tr("Email: ") + "wadealer@gmail.com\n\n"
-            + tr("This plugin is an implementation of XEP-0049: Private XML Storage.\n"
-                 "The plugin is fully compatible with notes saved using Miranda IM.\n"
-                 "The plugin is designed to keep notes on the jabber server with the ability to access them from anywhere using Psi+ or Miranda IM.");
-}
-
-QPixmap StorageNotesPlugin::icon() const
-{
-    return QPixmap(":/storagenotes/storagenotes.png");
-}
+QPixmap StorageNotesPlugin::icon() const { return QPixmap(":/storagenotes/storagenotes.png"); }

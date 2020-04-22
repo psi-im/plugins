@@ -20,33 +20,32 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
-#include <QWidget>
 #include <QList>
 #include <QMetaType>
+#include <QWidget>
 
 class OptionAccessingHost;
 
-namespace Ui { class Options; }
+namespace Ui {
+class Options;
+}
 
 enum ConditionType { From, To, FromFull, ToFull, Message };
 enum Comparison { Equal, NotEqual, Contains, NotContains };
 
-struct Condition
-{
+struct Condition {
     ConditionType type;
-    Comparison comparison;
-    QString text;
+    Comparison    comparison;
+    QString       text;
 };
 
-struct Rule
-{
-    QString name;
-    bool showMessage;
+struct Rule {
+    QString          name;
+    bool             showMessage;
     QList<Condition> conditions;
 };
 
-class Options : public QWidget
-{
+class Options : public QWidget {
     Q_OBJECT
 
 public:
@@ -54,7 +53,7 @@ public:
     ~Options();
 
     void update();
-    void setOptionAccessingHost(OptionAccessingHost* host) { _optionHost = host; }
+    void setOptionAccessingHost(OptionAccessingHost *host) { _optionHost = host; }
 
     void saveSettings();
 
@@ -64,7 +63,7 @@ public slots:
     void upRule();
     void downRule();
     void updateRuleButtons();
-    
+
     void addCondition();
     void removeCondition();
     void upCondition();
@@ -75,16 +74,16 @@ public slots:
     void setRulePane(int row);
 
     void hack();
-    
+
 private:
     void clearConditionsTable();
     void fillCondition(int row);
     void saveCondition(int rule, int row);
 
-    Ui::Options *ui;
-    OptionAccessingHost* _optionHost;
-    QList<Rule> _rules;
-    int _currentRule;
+    Ui::Options *        ui;
+    OptionAccessingHost *_optionHost;
+    QList<Rule>          _rules;
+    int                  _currentRule;
 };
 
 #endif // OPTIONS_H

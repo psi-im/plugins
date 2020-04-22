@@ -16,49 +16,48 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-#include "psiplugin.h"
-#include "plugininfoprovider.h"
-#include "optionaccessinghost.h"
-#include "optionaccessor.h"
 #include "accountinfoaccessinghost.h"
 #include "accountinfoaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
 #include "psiaccountcontroller.h"
 #include "psiaccountcontrollinghost.h"
+#include "psiplugin.h"
 
 #include "ui_options.h"
 
 #ifdef Q_OS_WIN
 #include "windows.h"
-#elif defined (HAVE_DBUS)
+#elif defined(HAVE_DBUS)
+#include "x11info.h"
 #include <QCheckBox>
-#include <QDBusMessage>
 #include <QDBusConnection>
+#include <QDBusConnectionInterface>
+#include <QDBusInterface>
+#include <QDBusMessage>
 #include <QDBusMetaType>
 #include <QDBusReply>
-#include <QDBusInterface>
-#include <QDBusConnectionInterface>
-#include "x11info.h"
 #include <X11/Xlib.h>
 
-static const QString MPRIS_PREFIX = "org.mpris";
+static const QString MPRIS_PREFIX  = "org.mpris";
 static const QString MPRIS2_PREFIX = "org.mpris.MediaPlayer2";
-static const QString GMP_PREFIX = "com.gnome";
+static const QString GMP_PREFIX    = "com.gnome";
 
-static const int StatusPlaying = 0;
+static const int StatusPlaying    = 0;
 static const int gmpStatusPlaying = 3;
 
 using WindowList = QList<Window>;
 typedef QPair<QString, QString> StringMap;
 
 //имена сервисов. Для добавления нового плеера дописываем имя сервиса
-static const QList<StringMap> players({{"vlc", "VLC"},
-                                      {"Totem", "Totem (>=2.30.2)"},
-                                      {"kaffeine", "Kaffeine (>=1.0)"},
-                                      {"mplayer", "GNOME MPlayer"},
-                                      {"dragonplayer", "Dragon Player"},
-                                      {"smplayer", "SMPlayer"}});
-struct PlayerStatus
-{
+static const QList<StringMap> players({ { "vlc", "VLC" },
+                                        { "Totem", "Totem (>=2.30.2)" },
+                                        { "kaffeine", "Kaffeine (>=1.0)" },
+                                        { "mplayer", "GNOME MPlayer" },
+                                        { "dragonplayer", "Dragon Player" },
+                                        { "smplayer", "SMPlayer" } });
+struct PlayerStatus {
     int playStatus;
     int playOrder;
     int playRepeat;
@@ -67,24 +66,18 @@ struct PlayerStatus
 
 Q_DECLARE_METATYPE(PlayerStatus);
 
-static const QDBusArgument & operator<<(QDBusArgument &arg, const PlayerStatus &ps)
+static const QDBusArgument &operator<<(QDBusArgument &arg, const PlayerStatus &ps)
 {
     arg.beginStructure();
-    arg << ps.playStatus
-        << ps.playOrder
-        << ps.playRepeat
-        << ps.stopOnce;
+    arg << ps.playStatus << ps.playOrder << ps.playRepeat << ps.stopOnce;
     arg.endStructure();
     return arg;
 }
 
-static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &ps)
+static const QDBusArgument &operator>>(const QDBusArgument &arg, PlayerStatus &ps)
 {
     arg.beginStructure();
-    arg >> ps.playStatus
-        >> ps.playOrder
-        >> ps.playRepeat
-        >> ps.stopOnce;
+    arg >> ps.playStatus >> ps.playOrder >> ps.playRepeat >> ps.stopOnce;
     arg.endStructure();
     return arg;
 }
@@ -101,52 +94,56 @@ static const QDBusArgument & operator>>(const QDBusArgument &arg, PlayerStatus &
 
 static const int timeout = 10000;
 
-class VideoStatusChanger : public QObject, public PsiPlugin, public PluginInfoProvider, public OptionAccessor
-            , public PsiAccountController, public AccountInfoAccessor
-{
+class VideoStatusChanger : public QObject,
+                           public PsiPlugin,
+                           public PluginInfoProvider,
+                           public OptionAccessor,
+                           public PsiAccountController,
+                           public AccountInfoAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.VideoStatusChanger")
     Q_INTERFACES(PsiPlugin PluginInfoProvider OptionAccessor PsiAccountController AccountInfoAccessor)
 public:
     VideoStatusChanger();
-    virtual QString name() const;
-    virtual QString shortName() const;
-    virtual QString version() const;
-    virtual QWidget* options();
-    virtual bool enable();
-    virtual bool disable();
-    virtual void applyOptions();
-    virtual void restoreOptions();
-    virtual void optionChanged(const QString&) {};
-    virtual void setOptionAccessingHost(OptionAccessingHost* host);
-    virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
-    virtual void setPsiAccountControllingHost(PsiAccountControllingHost* host);
-    virtual QString pluginInfo();
-    virtual QPixmap icon() const;
+    virtual QString  name() const;
+    virtual QString  shortName() const;
+    virtual QString  version() const;
+    virtual QWidget *options();
+    virtual bool     enable();
+    virtual bool     disable();
+    virtual void     applyOptions();
+    virtual void     restoreOptions();
+    virtual void     optionChanged(const QString &) {};
+    virtual void     setOptionAccessingHost(OptionAccessingHost *host);
+    virtual void     setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
+    virtual void     setPsiAccountControllingHost(PsiAccountControllingHost *host);
+    virtual QString  pluginInfo();
+    virtual QPixmap  icon() const;
 
 private:
-    bool enabled;
-    OptionAccessingHost* psiOptions;
-    AccountInfoAccessingHost* accInfo;
-    PsiAccountControllingHost* accControl;
-    QString status, statusMessage;
-    Ui::OptionsWidget ui_;
+    bool                       enabled;
+    OptionAccessingHost *      psiOptions;
+    AccountInfoAccessingHost * accInfo;
+    PsiAccountControllingHost *accControl;
+    QString                    status, statusMessage;
+    Ui::OptionsWidget          ui_;
 #ifdef HAVE_DBUS
-    bool playerGMPlayer_; //только для не MPRIS плеера GMPlayer
+    bool                 playerGMPlayer_; //только для не MPRIS плеера GMPlayer
     QHash<QString, bool> playerDictList;
-    QPointer<QTimer> checkTimer; //Таймер GNOME Mplayer
-    QStringList validPlayers_; //список включенных плееров
-    QStringList services_; //очередь плееров которые слушает плагин
-    void connectToBus(const QString &service_);
-    void disconnectFromBus(const QString &service_);
-    void startCheckTimer();
-    bool isPlayerValid(const QString &service);
+    QPointer<QTimer>     checkTimer;    //Таймер GNOME Mplayer
+    QStringList          validPlayers_; //список включенных плееров
+    QStringList          services_;     //очередь плееров которые слушает плагин
+    void                 connectToBus(const QString &service_);
+    void                 disconnectFromBus(const QString &service_);
+    void                 startCheckTimer();
+    bool                 isPlayerValid(const QString &service);
 #endif
     QTimer fullST;
-    bool isStatusSet; // здесь храним информацию, установлен ли уже статус (чтобы не устанавливать повторно при каждом срабатывании таймера)
+    bool   isStatusSet; // здесь храним информацию, установлен ли уже статус (чтобы не устанавливать повторно при каждом
+                        // срабатывании таймера)
     bool setOnline;
-    int restoreDelay; //задержка восстановления статуса
-    int setDelay; //задержка установки статуса
+    int  restoreDelay; //задержка восстановления статуса
+    int  setDelay;     //задержка установки статуса
     bool fullScreen;
 #ifdef Q_OS_WIN
     HWND lastWorkerWindow = nullptr;
@@ -174,11 +171,9 @@ private slots:
 
     void delayTimeout();
     void fullSTTimeout();
-
 };
 
-VideoStatusChanger::VideoStatusChanger()
-    : status("dnd")
+VideoStatusChanger::VideoStatusChanger() : status("dnd")
 {
     enabled = false;
 #ifdef HAVE_DBUS
@@ -187,61 +182,43 @@ VideoStatusChanger::VideoStatusChanger()
         playerDictList.insert(item.first, false);
     }
 #endif
-    psiOptions = nullptr;
-    accInfo = nullptr;
-    accControl = nullptr;
-    isStatusSet = false;
-    setOnline = true;
+    psiOptions   = nullptr;
+    accInfo      = nullptr;
+    accControl   = nullptr;
+    isStatusSet  = false;
+    setOnline    = true;
     restoreDelay = 20;
-    setDelay = 10;
-    fullScreen = false;
+    setDelay     = 10;
+    fullScreen   = false;
 }
 
-QString VideoStatusChanger::name() const
-{
-    return "Video Status Changer Plugin";
-}
+QString VideoStatusChanger::name() const { return "Video Status Changer Plugin"; }
 
-QString VideoStatusChanger::shortName() const
-{
-    return "videostatus";
-}
+QString VideoStatusChanger::shortName() const { return "videostatus"; }
 
-QString VideoStatusChanger::version() const
-{
-    return constVersion;
-}
+QString VideoStatusChanger::version() const { return constVersion; }
 
-void VideoStatusChanger::setOptionAccessingHost(OptionAccessingHost* host)
-{
-    psiOptions = host;
-}
+void VideoStatusChanger::setOptionAccessingHost(OptionAccessingHost *host) { psiOptions = host; }
 
-void VideoStatusChanger::setAccountInfoAccessingHost(AccountInfoAccessingHost* host)
-{
-    accInfo = host;
-}
+void VideoStatusChanger::setAccountInfoAccessingHost(AccountInfoAccessingHost *host) { accInfo = host; }
 
-void VideoStatusChanger::setPsiAccountControllingHost(PsiAccountControllingHost* host)
-{
-    accControl = host;
-}
+void VideoStatusChanger::setPsiAccountControllingHost(PsiAccountControllingHost *host) { accControl = host; }
 
 bool VideoStatusChanger::enable()
 {
-    if(psiOptions) {
+    if (psiOptions) {
         enabled = true;
 #ifdef HAVE_DBUS
         qDBusRegisterMetaType<PlayerStatus>();
         services_ = QDBusConnection::sessionBus().interface()->registeredServiceNames().value();
         //проверка на наличие уже запущенных плееров
-        foreach (const QString& item, playerDictList.keys()) {
-            bool option = psiOptions->getPluginOption(item, QVariant(playerDictList.value(item))).toBool();
+        foreach (const QString &item, playerDictList.keys()) {
+            bool option          = psiOptions->getPluginOption(item, QVariant(playerDictList.value(item))).toBool();
             playerDictList[item] = option;
             if (item.contains("mplayer")) {
                 playerGMPlayer_ = option;
             }
-            foreach (const QString& service, services_){
+            foreach (const QString &service, services_) {
                 if (service.contains(item, Qt::CaseInsensitive)) {
                     connectToBus(service);
                 }
@@ -249,24 +226,22 @@ bool VideoStatusChanger::enable()
         }
 #endif
         statuses_.clear();
-        status = psiOptions->getPluginOption(constStatus, QVariant(status)).toString();
+        status        = psiOptions->getPluginOption(constStatus, QVariant(status)).toString();
         statusMessage = psiOptions->getPluginOption(constStatusMessage, QVariant(statusMessage)).toString();
-        setOnline = psiOptions->getPluginOption(constSetOnline, QVariant(setOnline)).toBool();
-        restoreDelay = psiOptions->getPluginOption(constRestoreDelay, QVariant(restoreDelay)).toInt();
-        setDelay = psiOptions->getPluginOption(constSetDelay, QVariant(setDelay)).toInt();
-        fullScreen = psiOptions->getPluginOption(constFullScreen, fullScreen).toBool();
+        setOnline     = psiOptions->getPluginOption(constSetOnline, QVariant(setOnline)).toBool();
+        restoreDelay  = psiOptions->getPluginOption(constRestoreDelay, QVariant(restoreDelay)).toInt();
+        setDelay      = psiOptions->getPluginOption(constSetDelay, QVariant(setDelay)).toInt();
+        fullScreen    = psiOptions->getPluginOption(constFullScreen, fullScreen).toBool();
 #ifdef HAVE_DBUS
         //цепляем сигнал появления новых плееров
         QDBusConnection::sessionBus().connect(QLatin1String("org.freedesktop.DBus"),
-                              QLatin1String("/org/freedesktop/DBus"),
-                              QLatin1String("org.freedesktop.DBus"),
-                              QLatin1String("NameOwnerChanged"),
-                              this,
-                              SLOT(checkMprisService(QString, QString, QString)));
+                                              QLatin1String("/org/freedesktop/DBus"),
+                                              QLatin1String("org.freedesktop.DBus"), QLatin1String("NameOwnerChanged"),
+                                              this, SLOT(checkMprisService(QString, QString, QString)));
 #endif
         fullST.setInterval(timeout);
         connect(&fullST, &QTimer::timeout, this, &VideoStatusChanger::fullSTTimeout);
-        if(fullScreen)
+        if (fullScreen)
             fullST.start();
     }
     return enabled;
@@ -278,21 +253,19 @@ bool VideoStatusChanger::disable()
     fullST.stop();
 #ifdef HAVE_DBUS
     //отключаем прослушку активных плееров
-    foreach(const QString& player, services_) {
+    foreach (const QString &player, services_) {
         disconnectFromBus(player);
     }
     //отключаеся от шины
     QDBusConnection::sessionBus().disconnect(QLatin1String("org.freedesktop.DBus"),
-                         QLatin1String("/org/freedesktop/DBus"),
-                         QLatin1String("org.freedesktop.DBus"),
-                         QLatin1String("NameOwnerChanged"),
-                         this,
-                         SLOT(checkMprisService(QString, QString, QString)));
+                                             QLatin1String("/org/freedesktop/DBus"),
+                                             QLatin1String("org.freedesktop.DBus"), QLatin1String("NameOwnerChanged"),
+                                             this, SLOT(checkMprisService(QString, QString, QString)));
     //убиваем таймер если он есть
-    if(checkTimer) {
+    if (checkTimer) {
         checkTimer->stop();
         disconnect(checkTimer, &QTimer::timeout, this, &VideoStatusChanger::timeOut);
-        delete(checkTimer);
+        delete (checkTimer);
     }
 #endif
 #ifdef Q_OS_WIN
@@ -306,7 +279,7 @@ void VideoStatusChanger::applyOptions()
 #ifdef HAVE_DBUS
     //читаем состояние плееров
     if (playerDictList.size() > 0) {
-        foreach (const QString& item, playerDictList.keys()) {
+        foreach (const QString &item, playerDictList.keys()) {
             QCheckBox *cb = ui_.groupBox->findChild<QCheckBox *>(item);
             if (cb) {
                 playerDictList[item] = cb->isChecked();
@@ -332,13 +305,11 @@ void VideoStatusChanger::applyOptions()
     fullScreen = ui_.cb_fullScreen->isChecked();
     psiOptions->setPluginOption(constFullScreen, fullScreen);
 
-    if(fullScreen) {
+    if (fullScreen) {
         fullST.start();
-    }
-    else if (fullST.isActive()) {
+    } else if (fullST.isActive()) {
         fullST.stop();
     }
-
 }
 
 void VideoStatusChanger::restoreOptions()
@@ -346,18 +317,18 @@ void VideoStatusChanger::restoreOptions()
 #ifdef HAVE_DBUS
     //читаем состояние плееров
     if (playerDictList.size() > 0) {
-        foreach (const QString& item, playerDictList.keys()) {
-            bool option = psiOptions->getPluginOption(item, QVariant(playerDictList.value(item))).toBool();
-            QCheckBox *cb = ui_.groupBox->findChild<QCheckBox *>(item);
+        foreach (const QString &item, playerDictList.keys()) {
+            bool       option = psiOptions->getPluginOption(item, QVariant(playerDictList.value(item))).toBool();
+            QCheckBox *cb     = ui_.groupBox->findChild<QCheckBox *>(item);
             if (cb) {
                 cb->setChecked(option);
             }
         }
     }
-#elif defined (Q_OS_WIN)
+#elif defined(Q_OS_WIN)
     ui_.groupBox->hide();
 #endif
-    QStringList list({"away", "xa", "dnd"});
+    QStringList list({ "away", "xa", "dnd" });
     ui_.cb_status->addItems(list);
     ui_.cb_status->setCurrentIndex(ui_.cb_status->findText(status));
     ui_.le_message->setText(statusMessage);
@@ -367,7 +338,7 @@ void VideoStatusChanger::restoreOptions()
     ui_.cb_fullScreen->setChecked(fullScreen);
 }
 
-QWidget* VideoStatusChanger::options()
+QWidget *VideoStatusChanger::options()
 {
     if (!enabled) {
         return nullptr;
@@ -376,7 +347,7 @@ QWidget* VideoStatusChanger::options()
     ui_.setupUi(optionsWid);
 #ifdef HAVE_DBUS
     //добавляем чекбоксы плееров
-    int i = 0;
+    int i       = 0;
     int columns = (players.length() < 5) ? 2 : 3;
     foreach (StringMap item, players) {
         i = players.indexOf(item);
@@ -384,8 +355,8 @@ QWidget* VideoStatusChanger::options()
             QCheckBox *cb = new QCheckBox(item.second);
             cb->setObjectName(item.first);
             cb->setChecked(false);
-            int row = (i - columns) < 0 ? 0 : i/columns;
-            ui_.gridLayout->addWidget(cb,row,i%columns);
+            int row = (i - columns) < 0 ? 0 : i / columns;
+            ui_.gridLayout->addWidget(cb, row, i % columns);
         }
     }
 #endif
@@ -396,26 +367,28 @@ QWidget* VideoStatusChanger::options()
 
 QString VideoStatusChanger::pluginInfo()
 {
-    return tr("Authors: ") +  "Dealer_WeARE, KukuRuzo\n\n"
-            + tr("This plugin is designed to set the custom status when you watching the video in selected video players. \n"
-                 "Note: This plugin is designed to work in Linux family operating systems and in Windows OS. \n\n"
-                 "In Linux plugin uses DBUS to work with video players and X11 functions to detect fullscreen applications. \n"
-                 "In Windows plugin uses WinAPI functions to detect fullscreen applications. \n\n"
-                 "To work with Totem player you need to enable appropriate plugin in this player (Edit\\Plugins\\D-Bus);\n\n"
-                 "To work with VLC player you need to enable the option \"Control Interface D-Bus\" in the Advanced Settings tab on \"Interface\\Control Interface\" section of the player settings; \n\n"
-                 "To work with Kaffeine player you must have player version (>= 1.0), additional configuration is not needed; \n\n"
-                 "To work with GNOME MPlayer additional configuration is not needed.");
+    return tr("Authors: ") + "Dealer_WeARE, KukuRuzo\n\n"
+        + tr("This plugin is designed to set the custom status when you watching the video in selected video players. "
+             "\n"
+             "Note: This plugin is designed to work in Linux family operating systems and in Windows OS. \n\n"
+             "In Linux plugin uses DBUS to work with video players and X11 functions to detect fullscreen "
+             "applications. \n"
+             "In Windows plugin uses WinAPI functions to detect fullscreen applications. \n\n"
+             "To work with Totem player you need to enable appropriate plugin in this player "
+             "(Edit\\Plugins\\D-Bus);\n\n"
+             "To work with VLC player you need to enable the option \"Control Interface D-Bus\" in the Advanced "
+             "Settings tab on \"Interface\\Control Interface\" section of the player settings; \n\n"
+             "To work with Kaffeine player you must have player version (>= 1.0), additional configuration is not "
+             "needed; \n\n"
+             "To work with GNOME MPlayer additional configuration is not needed.");
 }
 
-QPixmap VideoStatusChanger::icon() const
-{
-    return QPixmap(":/icons/videostatus.png");
-}
+QPixmap VideoStatusChanger::icon() const { return QPixmap(":/icons/videostatus.png"); }
 
 #ifdef HAVE_DBUS
 bool VideoStatusChanger::isPlayerValid(const QString &service) //проверка является ли плеер разрешенным
 {
-    foreach (const QString& item, playerDictList.keys()) {
+    foreach (const QString &item, playerDictList.keys()) {
         if (service.contains(item, Qt::CaseInsensitive) && playerDictList.value(item)) {
             return true;
         }
@@ -435,8 +408,7 @@ void VideoStatusChanger::checkMprisService(const QString &name, const QString &o
                 services_.append(name);
                 connectToBus(name);
             }
-        }
-        else if (newOwner.isEmpty()) {
+        } else if (newOwner.isEmpty()) {
             //если сервис был то отключаемся от него и удаляем из очереди
             disconnectFromBus(name);
             services_.removeAt(playerIndex);
@@ -444,21 +416,19 @@ void VideoStatusChanger::checkMprisService(const QString &name, const QString &o
     }
 }
 
-
 void VideoStatusChanger::startCheckTimer()
 {
     //работа с таймером для плеера GNOME MPlayer
-    if(!checkTimer) {
+    if (!checkTimer) {
         checkTimer = new QTimer();
         checkTimer->setInterval(timeout);
         connect(checkTimer, &QTimer::timeout, this, &VideoStatusChanger::timeOut);
         checkTimer->setInterval(timeout);
         checkTimer->start();
-    }
-    else {
+    } else {
         checkTimer->stop();
         disconnect(checkTimer);
-        delete(checkTimer);
+        delete (checkTimer);
         setStatusTimer(restoreDelay, false);
     }
 }
@@ -466,23 +436,14 @@ void VideoStatusChanger::startCheckTimer()
 void VideoStatusChanger::connectToBus(const QString &service_)
 {
     if (service_.contains(MPRIS_PREFIX) && !service_.contains(MPRIS2_PREFIX)) {
-        QDBusConnection::sessionBus().connect(service_,
-                              QLatin1String("/Player"),
-                              QLatin1String("org.freedesktop.MediaPlayer"),
-                              QLatin1String("StatusChange"),
-                              QLatin1String("(iiii)"),
-                              this,
-                              SLOT(onPlayerStatusChange(PlayerStatus)));
-    }
-    else if (service_.contains(MPRIS2_PREFIX)) {
-        QDBusConnection::sessionBus().connect(service_,
-                              QLatin1String("/org/mpris/MediaPlayer2"),
-                              QLatin1String("org.freedesktop.DBus.Properties"),
-                              QLatin1String("PropertiesChanged"),
-                              this,
-                              SLOT(onPropertyChange(QDBusMessage)));
-    }
-    else if (service_.contains(GMP_PREFIX)) {
+        QDBusConnection::sessionBus().connect(
+            service_, QLatin1String("/Player"), QLatin1String("org.freedesktop.MediaPlayer"),
+            QLatin1String("StatusChange"), QLatin1String("(iiii)"), this, SLOT(onPlayerStatusChange(PlayerStatus)));
+    } else if (service_.contains(MPRIS2_PREFIX)) {
+        QDBusConnection::sessionBus().connect(
+            service_, QLatin1String("/org/mpris/MediaPlayer2"), QLatin1String("org.freedesktop.DBus.Properties"),
+            QLatin1String("PropertiesChanged"), this, SLOT(onPropertyChange(QDBusMessage)));
+    } else if (service_.contains(GMP_PREFIX)) {
         startCheckTimer();
     }
 }
@@ -490,26 +451,18 @@ void VideoStatusChanger::connectToBus(const QString &service_)
 void VideoStatusChanger::disconnectFromBus(const QString &service_)
 {
     if (service_.contains(MPRIS_PREFIX) && !service_.contains(MPRIS2_PREFIX)) {
-        QDBusConnection::sessionBus().disconnect(MPRIS_PREFIX + "." + service_,
-                             QLatin1String("/Player"),
-                             QLatin1String("org.freedesktop.MediaPlayer"),
-                             QLatin1String("StatusChange"),
-                             QLatin1String("(iiii)"),
-                             this,
-                             SLOT(onPlayerStatusChange(PlayerStatus)));
+        QDBusConnection::sessionBus().disconnect(
+            MPRIS_PREFIX + "." + service_, QLatin1String("/Player"), QLatin1String("org.freedesktop.MediaPlayer"),
+            QLatin1String("StatusChange"), QLatin1String("(iiii)"), this, SLOT(onPlayerStatusChange(PlayerStatus)));
         if (isStatusSet) {
             setStatusTimer(restoreDelay, false);
         }
-    }
-    else if (service_.contains(MPRIS2_PREFIX)) {
-        QDBusConnection::sessionBus().disconnect(MPRIS2_PREFIX + "." + service_.toLower(),
-                             QLatin1String("/org/mpris/MediaPlayer2"),
-                             QLatin1String("org.freedesktop.DBus.Properties"),
-                             QLatin1String("PropertiesChanged"),
-                             this,
-                             SLOT(onPropertyChange(QDBusMessage)));
-    }
-    else if (service_.contains("mplayer")) {
+    } else if (service_.contains(MPRIS2_PREFIX)) {
+        QDBusConnection::sessionBus().disconnect(
+            MPRIS2_PREFIX + "." + service_.toLower(), QLatin1String("/org/mpris/MediaPlayer2"),
+            QLatin1String("org.freedesktop.DBus.Properties"), QLatin1String("PropertiesChanged"), this,
+            SLOT(onPropertyChange(QDBusMessage)));
+    } else if (service_.contains("mplayer")) {
         startCheckTimer();
     }
     if (!fullST.isActive() && fullScreen) {
@@ -522,8 +475,7 @@ void VideoStatusChanger::onPlayerStatusChange(const PlayerStatus &st)
     if (st.playStatus == StatusPlaying) {
         fullST.stop();
         setStatusTimer(setDelay, true);
-    }
-    else {
+    } else {
         setStatusTimer(restoreDelay, false);
         fullST.start();
     }
@@ -532,46 +484,43 @@ void VideoStatusChanger::onPlayerStatusChange(const PlayerStatus &st)
 void VideoStatusChanger::onPropertyChange(const QDBusMessage &msg)
 {
     QDBusArgument arg = msg.arguments().at(1).value<QDBusArgument>();
-    QVariantMap map = qdbus_cast<QVariantMap>(arg);
-    QVariant v = map.value(QLatin1String("PlaybackStatus"));
+    QVariantMap   map = qdbus_cast<QVariantMap>(arg);
+    QVariant      v   = map.value(QLatin1String("PlaybackStatus"));
     if (v.isValid()) {
         if (v.toString() == QLatin1String("Playing")) {
             fullST.stop();
             setStatusTimer(setDelay, true);
-        }
-        else if (v.toString() == QLatin1String("Paused") || v.toString() == QLatin1String("Stopped")) {
+        } else if (v.toString() == QLatin1String("Paused") || v.toString() == QLatin1String("Stopped")) {
             setStatusTimer(restoreDelay, false);
             fullST.start();
         }
     }
-
 }
 
 void VideoStatusChanger::timeOut()
 {
-    if(playerGMPlayer_) {
-        QString gmplayerService = GMP_PREFIX + ".mplayer";
-        QDBusMessage msg = QDBusMessage::createMethodCall(gmplayerService, "/", gmplayerService, "GetPlayState");
+    if (playerGMPlayer_) {
+        QString          gmplayerService = GMP_PREFIX + ".mplayer";
+        QDBusMessage     msg  = QDBusMessage::createMethodCall(gmplayerService, "/", gmplayerService, "GetPlayState");
         QDBusPendingCall call = QDBusConnection::sessionBus().asyncCall(msg);
         QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(call, this);
-        connect(watcher, &QDBusPendingCallWatcher::finished,
-                 this, &VideoStatusChanger::asyncCallFinished);
+        connect(watcher, &QDBusPendingCallWatcher::finished, this, &VideoStatusChanger::asyncCallFinished);
     }
 }
 
 static WindowList getWindows(Atom prop)
 {
     WindowList res;
-    Atom type = 0;
-    int format = 0;
-    uchar* data = nullptr;
-    ulong count, after;
-    Display* display = X11Info::display();
-    Window window = X11Info::appRootWindow();
-    if (XGetWindowProperty(display, window, prop, 0, 1024 * sizeof(Window) / 4, False, AnyPropertyType,
-                   &type, &format, &count, &after, &data) == Success)
-    {
-        Window* list = reinterpret_cast<Window*>(data);
+    Atom       type   = 0;
+    int        format = 0;
+    uchar *    data   = nullptr;
+    ulong      count, after;
+    Display *  display = X11Info::display();
+    Window     window  = X11Info::appRootWindow();
+    if (XGetWindowProperty(display, window, prop, 0, 1024 * sizeof(Window) / 4, False, AnyPropertyType, &type, &format,
+                           &count, &after, &data)
+        == Success) {
+        Window *list = reinterpret_cast<Window *>(data);
         for (uint i = 0; i < count; ++i)
             res += list[i];
         if (data)
@@ -599,14 +548,13 @@ void VideoStatusChanger::asyncCallFinished(QDBusPendingCallWatcher *watcher)
     QVariant reply = msg.arguments().first();
     if (reply.type() != QVariant::Int) {
         return;
-    }
-    else {
+    } else {
         int stat = reply.toInt();
         if (stat == gmpStatusPlaying && (!isStatusSet)) {
             fullST.stop();
             setStatusTimer(setDelay, true);
         }
-        if(stat != gmpStatusPlaying && isStatusSet) {
+        if (stat != gmpStatusPlaying && isStatusSet) {
             setStatusTimer(restoreDelay, false);
             fullST.start();
         }
@@ -618,42 +566,42 @@ void VideoStatusChanger::asyncCallFinished(QDBusPendingCallWatcher *watcher)
 void VideoStatusChanger::fullSTTimeout()
 {
 #ifdef HAVE_DBUS
-    Window w = activeWindow();
-    Display  *display = X11Info::display();
-    bool full = false;
-    static Atom state = XInternAtom(display, "_NET_WM_STATE", False);
-    static Atom  fullScreen = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);
-    Atom actual_type;
-    int actual_format;
-    unsigned long nitems;
-    unsigned long bytes;
+    Window         w          = activeWindow();
+    Display *      display    = X11Info::display();
+    bool           full       = false;
+    static Atom    state      = XInternAtom(display, "_NET_WM_STATE", False);
+    static Atom    fullScreen = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);
+    Atom           actual_type;
+    int            actual_format;
+    unsigned long  nitems;
+    unsigned long  bytes;
     unsigned char *data = nullptr;
 
-    if (XGetWindowProperty(display, w, state, 0, (~0L), False, AnyPropertyType,
-                   &actual_type, &actual_format, &nitems, &bytes, &data) == Success) {
-        if(nitems != 0) {
-            Atom *atom = reinterpret_cast<Atom*>(data);
+    if (XGetWindowProperty(display, w, state, 0, (~0L), False, AnyPropertyType, &actual_type, &actual_format, &nitems,
+                           &bytes, &data)
+        == Success) {
+        if (nitems != 0) {
+            Atom *atom = reinterpret_cast<Atom *>(data);
             for (ulong i = 0; i < nitems; i++) {
-                if(atom[i] == fullScreen) {
+                if (atom[i] == fullScreen) {
                     full = true;
                     break;
                 }
             }
         }
     }
-    if(data)
+    if (data)
         XFree(data);
-#elif defined (Q_OS_WIN)
+#elif defined(Q_OS_WIN)
     bool full = isFullscreenWindow();
-#elif defined (Q_OS_HAIKU)
+#elif defined(Q_OS_HAIKU)
     bool full = false;
 #endif
-    if(full) {
-        if(!isStatusSet) {
+    if (full) {
+        if (!isStatusSet) {
             setStatusTimer(setDelay, true);
         }
-    }
-    else if(isStatusSet) {
+    } else if (isStatusSet) {
         setStatusTimer(restoreDelay, false);
     }
 }
@@ -661,32 +609,30 @@ void VideoStatusChanger::fullSTTimeout()
 #ifdef Q_OS_WIN
 bool VideoStatusChanger::isFullscreenWindow()
 {
-    HWND hWnd = GetForegroundWindow();
+    HWND hWnd    = GetForegroundWindow();
     HWND desktop = GetDesktopWindow();
-    HWND shellW = GetShellWindow();
-    if(hWnd == nullptr || desktop == nullptr) {
+    HWND shellW  = GetShellWindow();
+    if (hWnd == nullptr || desktop == nullptr) {
         return false;
     }
-    if(hWnd == desktop || hWnd == shellW || hWnd == lastWorkerWindow){
+    if (hWnd == desktop || hWnd == shellW || hWnd == lastWorkerWindow) {
         return false;
     }
-    //Hack to ignore all windows with WorkerW class in Win10
+    // Hack to ignore all windows with WorkerW class in Win10
     HWND workerW = nullptr;
     do {
         workerW = FindWindowExW(desktop, workerW, L"WorkerW", nullptr);
-        if(workerW == hWnd){
-            lastWorkerWindow = workerW; //store last WorkerW to save CPU
+        if (workerW == hWnd) {
+            lastWorkerWindow = workerW; // store last WorkerW to save CPU
             return false;
         }
     } while (workerW != nullptr);
     //
     RECT appBounds;
     RECT rc;
-    if(GetWindowRect(desktop, &rc)) {
+    if (GetWindowRect(desktop, &rc)) {
         if (GetWindowRect(hWnd, &appBounds)) {
-            return (appBounds.left == rc.left
-                    && appBounds.right == rc.right
-                    && appBounds.top == rc.top
+            return (appBounds.left == rc.left && appBounds.right == rc.right && appBounds.top == rc.top
                     && appBounds.bottom == rc.bottom);
         }
     }
@@ -698,36 +644,32 @@ void VideoStatusChanger::setStatusTimer(const int delay, const bool isStart)
 {
     //запуск таймера установки / восстановления статуса
     if ((isStart | setOnline) != 0) {
-        QTimer::singleShot(delay*1000, this, SLOT(delayTimeout()));
+        QTimer::singleShot(delay * 1000, this, SLOT(delayTimeout()));
         isStatusSet = isStart;
     }
 }
 
-void VideoStatusChanger::delayTimeout()
+void VideoStatusChanger::delayTimeout() { setPsiGlobalStatus(!isStatusSet); }
+
+void VideoStatusChanger::setPsiGlobalStatus(const bool set)
 {
-    setPsiGlobalStatus(!isStatusSet);
-}
-
-
-void VideoStatusChanger::setPsiGlobalStatus(const bool set) {
-    if (!enabled) return;
-    int account = 0;
+    if (!enabled)
+        return;
+    int          account = 0;
     StatusString s;
     while (accInfo->getJid(account) != "-1") {
         QString accStatus = accInfo->getStatus(account);
-        if(accStatus != "offline" && accStatus != "invisible") {
-            if(set) {
-                if(statuses_.contains(account)) {
+        if (accStatus != "offline" && accStatus != "invisible") {
+            if (set) {
+                if (statuses_.contains(account)) {
                     s = statuses_.value(account);
                     accControl->setStatus(account, s.status, s.message);
-                }
-                else
+                } else
                     accControl->setStatus(account, "online", "");
-            }
-            else {
-                s.status = accStatus;
+            } else {
+                s.status  = accStatus;
                 s.message = accInfo->getStatusMessage(account);
-                if(s.status != status || s.message != statusMessage)
+                if (s.status != status || s.message != statusMessage)
                     statuses_.insert(account, s);
                 accControl->setStatus(account, status, statusMessage);
             }

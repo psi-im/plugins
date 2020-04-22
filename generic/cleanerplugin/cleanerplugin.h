@@ -20,56 +20,57 @@
 #ifndef CLEANERPLUGIN_H
 #define CLEANERPLUGIN_H
 
-
-#include "psiplugin.h"
-#include "applicationinfoaccessor.h"
 #include "applicationinfoaccessinghost.h"
-#include "iconfactoryaccessor.h"
+#include "applicationinfoaccessor.h"
 #include "iconfactoryaccessinghost.h"
-#include "optionaccessor.h"
+#include "iconfactoryaccessor.h"
 #include "optionaccessinghost.h"
+#include "optionaccessor.h"
 #include "plugininfoprovider.h"
+#include "psiplugin.h"
 
 class CleanerMainWindow;
 
-class CleanerPlugin : public QObject, public PsiPlugin, public ApplicationInfoAccessor,
-                      public IconFactoryAccessor, public OptionAccessor, public PluginInfoProvider
-{
+class CleanerPlugin : public QObject,
+                      public PsiPlugin,
+                      public ApplicationInfoAccessor,
+                      public IconFactoryAccessor,
+                      public OptionAccessor,
+                      public PluginInfoProvider {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.CleanerPlugin")
     Q_INTERFACES(PsiPlugin ApplicationInfoAccessor IconFactoryAccessor OptionAccessor PluginInfoProvider)
 
 public:
     CleanerPlugin();
-    virtual QString name() const;
-    virtual QString shortName() const;
-    virtual QString version() const;
-    virtual QWidget* options();
-    virtual bool enable();
-    virtual bool disable();
+    virtual QString  name() const;
+    virtual QString  shortName() const;
+    virtual QString  version() const;
+    virtual QWidget *options();
+    virtual bool     enable();
+    virtual bool     disable();
 
-    virtual void applyOptions() {};
-    virtual void restoreOptions() {};
-    virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
-    virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
-    virtual void setOptionAccessingHost(OptionAccessingHost* host);
-    virtual void optionChanged(const QString& ) {};
+    virtual void    applyOptions() {};
+    virtual void    restoreOptions() {};
+    virtual void    setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
+    virtual void    setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
+    virtual void    setOptionAccessingHost(OptionAccessingHost *host);
+    virtual void    optionChanged(const QString &) {};
     virtual QString pluginInfo();
     virtual QPixmap icon() const;
 
 private:
-    bool enabled;
+    bool                          enabled;
     ApplicationInfoAccessingHost *appInfo;
-    IconFactoryAccessingHost* iconHost;
-    OptionAccessingHost* psiOptions;
-    QPointer<CleanerMainWindow> cln;
+    IconFactoryAccessingHost *    iconHost;
+    OptionAccessingHost *         psiOptions;
+    QPointer<CleanerMainWindow>   cln;
     friend class CleanerMainWindow;
     int height, width;
 
 private slots:
     void start();
     void deleteCln();
-
 };
 
 #endif // CLEANERPLUGIN_H

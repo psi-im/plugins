@@ -22,46 +22,37 @@
 
 #include "ripperccoptions.h"
 
-#include <psiplugin.h>
-#include <applicationinfoaccessinghost.h>
-#include <plugininfoprovider.h>
-#include <stanzafilter.h>
-#include <stanzasender.h>
-#include <psiaccountcontroller.h>
-#include <optionaccessor.h>
 #include <accountinfoaccessor.h>
-#include <applicationinfoaccessor.h>
 #include <applicationinfoaccessinghost.h>
+#include <applicationinfoaccessor.h>
 #include <contactinfoaccessinghost.h>
 #include <contactinfoaccessor.h>
+#include <optionaccessor.h>
+#include <plugininfoprovider.h>
+#include <psiaccountcontroller.h>
+#include <psiplugin.h>
+#include <stanzafilter.h>
+#include <stanzasender.h>
 
-#include <QStringList>
-#include <QNetworkAccessManager>
-#include <QTimer>
 #include <QList>
+#include <QNetworkAccessManager>
+#include <QStringList>
+#include <QTimer>
 
-class RipperCC : public QObject
-               , public PsiPlugin
-               , public PluginInfoProvider
-               , public StanzaFilter
-               , public PsiAccountController
-               , public OptionAccessor
-               , public StanzaSender
-               , public AccountInfoAccessor
-               , public ApplicationInfoAccessor
-               , public ContactInfoAccessor
-{
+class RipperCC : public QObject,
+                 public PsiPlugin,
+                 public PluginInfoProvider,
+                 public StanzaFilter,
+                 public PsiAccountController,
+                 public OptionAccessor,
+                 public StanzaSender,
+                 public AccountInfoAccessor,
+                 public ApplicationInfoAccessor,
+                 public ContactInfoAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.RipperCC")
-    Q_INTERFACES(PsiPlugin
-                 PluginInfoProvider
-                 StanzaFilter
-                 PsiAccountController
-                 OptionAccessor
-                 StanzaSender
-                 AccountInfoAccessor
-                 ApplicationInfoAccessor
-                 ContactInfoAccessor)
+    Q_INTERFACES(PsiPlugin PluginInfoProvider StanzaFilter PsiAccountController OptionAccessor StanzaSender
+                     AccountInfoAccessor ApplicationInfoAccessor ContactInfoAccessor)
 public:
     RipperCC();
     ~RipperCC();
@@ -72,11 +63,11 @@ public:
     QString version() const { return "0.0.3"; }
 
     QWidget *options();
-    bool enable();
-    bool disable();
-    void applyOptions();
-    void restoreOptions();
-    QPixmap icon() const;
+    bool     enable();
+    bool     disable();
+    void     applyOptions();
+    void     restoreOptions();
+    QPixmap  icon() const;
 
     // from PluginInfoProvider
     QString pluginInfo();
@@ -93,10 +84,10 @@ public:
 
     // from OptionAccessor
     void setOptionAccessingHost(OptionAccessingHost *host) { _optionHost = host; }
-    void optionChanged(const QString &/*option*/) { }
+    void optionChanged(const QString & /*option*/) { }
 
     // from AccountInfoAccessor
-    void setAccountInfoAccessingHost(AccountInfoAccessingHost* host) { _accountInfo = host; }
+    void setAccountInfoAccessingHost(AccountInfoAccessingHost *host) { _accountInfo = host; }
 
     // from ApplicationInfoAccessor
     void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) { _appInfo = host; }
@@ -113,20 +104,20 @@ public slots:
 private:
     void updateNameGroup(int account, const QString &jid, const QString &name, const QString &group);
 
-    bool _enabled;
-    PsiAccountControllingHost *_accountHost;
-    OptionAccessingHost *_optionHost;
-    StanzaSendingHost *_stanzaSending;
-    AccountInfoAccessingHost *_accountInfo;
+    bool                          _enabled;
+    PsiAccountControllingHost *   _accountHost;
+    OptionAccessingHost *         _optionHost;
+    StanzaSendingHost *           _stanzaSending;
+    AccountInfoAccessingHost *    _accountInfo;
     ApplicationInfoAccessingHost *_appInfo;
-    ContactInfoAccessingHost *_contactInfo;
-    QNetworkAccessManager *_nam;
-    QTimer *_timer;
-    RipperCCOptions *_optionsForm;
+    ContactInfoAccessingHost *    _contactInfo;
+    QNetworkAccessManager *       _nam;
+    QTimer *                      _timer;
+    RipperCCOptions *             _optionsForm;
 
     struct Ripper {
-        QString jid;
-        QString url;
+        QString   jid;
+        QString   url;
         QDateTime lastAttentionTime;
     };
 

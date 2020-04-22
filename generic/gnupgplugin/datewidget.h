@@ -1,25 +1,22 @@
 #ifndef DATEWIDGET_H
 #define DATEWIDGET_H
 
-#include <QDate>
 #include "lineeditwidget.h"
+#include <QDate>
 
 class QToolButton;
 class QCalendarWidget;
 
-class DateWidget : public LineEditWidget
-{
+class DateWidget : public LineEditWidget {
     Q_OBJECT
 
-    Q_PROPERTY(QDate date
-               READ date
-               WRITE setDate)
+    Q_PROPERTY(QDate date READ date WRITE setDate)
 
 public:
     explicit DateWidget(QWidget *parent = nullptr);
 
     // get/set date
-    void setDate(const QDate &date);
+    void  setDate(const QDate &date);
     QDate date() const;
 
 protected slots:
@@ -30,8 +27,8 @@ protected slots:
 
 private:
     // Inner widgets
-    QToolButton *_tbCalendar;
-    QToolButton *_tbClean;
+    QToolButton *    _tbCalendar;
+    QToolButton *    _tbClean;
     QCalendarWidget *_calendar;
 };
 

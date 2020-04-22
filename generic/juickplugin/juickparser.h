@@ -17,7 +17,6 @@
  *
  */
 
-
 #ifndef JUICKPARSER_H
 #define JUICKPARSER_H
 
@@ -25,26 +24,26 @@
 #include <QStringList>
 
 struct JuickMessage {
-    JuickMessage(const QString& _unick, const QString& _mes, const QStringList& _tags,
-             const QString& _body, const QString& _link, const QString& info)
-        : unick(_unick), messageId(_mes), tags(_tags), body(_body), link(_link), infoText(info)
+    JuickMessage(const QString &_unick, const QString &_mes, const QStringList &_tags, const QString &_body,
+                 const QString &_link, const QString &info) :
+        unick(_unick),
+        messageId(_mes), tags(_tags), body(_body), link(_link), infoText(info)
     {
     }
-    QString unick;
-    QString messageId;
+    QString     unick;
+    QString     messageId;
     QStringList tags;
-    QString body;
-    QString link;
-    QString infoText;
+    QString     body;
+    QString     link;
+    QString     infoText;
 };
 
 using JuickMessages = QList<JuickMessage>;
 
-class JuickParser
-{
-public:    
-    JuickParser(QDomElement* elem);
-    virtual ~JuickParser() {}
+class JuickParser {
+public:
+    JuickParser(QDomElement *elem);
+    virtual ~JuickParser() { }
 
     static void reset();
 
@@ -65,30 +64,30 @@ public:
         JM_Your_Post_Recommended
     };
 
-    bool hasJuckNamespace() const;
-    QString avatarLink() const;
-    QString photoLink() const;
-    QString nick() const;
-    QString infoText() const { return infoText_; }
-    JMType type() const { return type_; }
+    bool          hasJuckNamespace() const;
+    QString       avatarLink() const;
+    QString       photoLink() const;
+    QString       nick() const;
+    QString       infoText() const { return infoText_; }
+    JMType        type() const { return type_; }
     JuickMessages getMessages() const { return messages_; }
-    QString originMessage() const;
-    QString timeStamp() const;
-    QDomElement findElement(const QString& tagName, const QString& xmlns) const;    
+    QString       originMessage() const;
+    QString       timeStamp() const;
+    QDomElement   findElement(const QString &tagName, const QString &xmlns) const;
 
 private:
-    JuickParser() {}
+    JuickParser() { }
     Q_DISABLE_COPY(JuickParser)
 
 private:
-    QDomElement* elem_;
-    QDomElement juickElement_;
-    QDomElement userElement_;
-    JMType type_;
-    QString infoText_;
+    QDomElement * elem_;
+    QDomElement   juickElement_;
+    QDomElement   userElement_;
+    JMType        type_;
+    QString       infoText_;
     JuickMessages messages_;
     class Private;
-    static Private* d;
+    static Private *d;
 };
 
 #endif // JUICKPARSER_H

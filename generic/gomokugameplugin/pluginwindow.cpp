@@ -22,26 +22,22 @@
  *
  */
 
-#include <QMessageBox>
-#include <QFileDialog>
 #include <QFile>
+#include <QFileDialog>
+#include <QMessageBox>
 #include <QTextStream>
 
+#include "common.h"
+#include "gamemodel.h"
+#include "options.h"
 #include "pluginwindow.h"
 #include "ui_pluginwindow.h"
-#include "common.h"
-#include "options.h"
-#include "gamemodel.h"
 
 const QString fileFilter = "Gomoku save files (*.gmk)";
 
 //-------------------------- HintElementWidget -------------------------
 
-HintElementWidget::HintElementWidget(QWidget *parent) :
-    QFrame(parent),
-    hintElement(nullptr)
-{
-}
+HintElementWidget::HintElementWidget(QWidget *parent) : QFrame(parent), hintElement(nullptr) { }
 
 HintElementWidget::~HintElementWidget()
 {
@@ -62,7 +58,7 @@ void HintElementWidget::paintEvent(QPaintEvent *event)
     QFrame::paintEvent(event);
     if (!hintElement)
         return;
-    QRect rect = this->rect();
+    QRect    rect = this->rect();
     QPainter painter(this);
     hintElement->paint(&painter, rect);
 }
@@ -70,21 +66,14 @@ void HintElementWidget::paintEvent(QPaintEvent *event)
 //------------------------ PluginWindow --------------------------
 
 PluginWindow::PluginWindow(const QString &full_jid, QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::PluginWindow),
-    bmodel(nullptr),
-    delegate(nullptr),
-    gameActive(false)
+    QMainWindow(parent), ui(new Ui::PluginWindow), bmodel(nullptr), delegate(nullptr), gameActive(false)
 {
     ui->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);
     ui->lbOpponent->setText(full_jid);
 }
 
-PluginWindow::~PluginWindow()
-{
-    delete ui;
-}
+PluginWindow::~PluginWindow() { delete ui; }
 
 void PluginWindow::init(const QString &element)
 {
@@ -97,7 +86,8 @@ void PluginWindow::init(const QString &element)
     // Инициируем модель доски
     if (bmodel == nullptr) {
         bmodel = new BoardModel(this);
-        connect(bmodel, SIGNAL(changeGameStatus(GameModel::GameStatus)), this, SLOT(changeGameStatus(GameModel::GameStatus)));
+        connect(bmodel, SIGNAL(changeGameStatus(GameModel::GameStatus)), this,
+                SLOT(changeGameStatus(GameModel::GameStatus)));
         connect(bmodel, SIGNAL(setupElement(int, int)), this, SLOT(setupElement(int, int)));
         connect(bmodel, SIGNAL(lose()), this, SLOT(setLose()), Qt::QueuedConnection);
         connect(bmodel, SIGNAL(draw()), this, SLOT(setDraw()), Qt::QueuedConnection);
@@ -210,14 +200,12 @@ void PluginWindow::appendTurn(const int num, const int x, const int y, const boo
     if (x == -1 && y == -1) {
         msg = tr("%1: %2 - swch", "Switch color").arg(num).arg(str1);
     } else {
-        msg = QString("%1: %2 - %3%4").arg(num).arg(str1)
-            .arg(horHeaderString.at(x))
-            .arg(QString::number(y + 1));
+        msg = QString("%1: %2 - %3%4").arg(num).arg(str1).arg(horHeaderString.at(x)).arg(QString::number(y + 1));
     }
     QListWidgetItem *item = new QListWidgetItem(msg, ui->lsTurnsList);
     item->setData(Qt::UserRole, x);
     item->setData(Qt::UserRole + 1, y);
-    //item->setFlags((item->flags() | Qt::ItemIsUserCheckable) & ~Qt::ItemIsUserCheckable);
+    // item->setFlags((item->flags() | Qt::ItemIsUserCheckable) & ~Qt::ItemIsUserCheckable);
     ui->lsTurnsList->addItem(item);
     ui->lsTurnsList->setCurrentItem(item);
 }
@@ -307,7 +295,7 @@ void PluginWindow::setClose()
 /**
  * Реакция на закрытие нашей доски
  */
-void PluginWindow::closeEvent (QCloseEvent *event)
+void PluginWindow::closeEvent(QCloseEvent *event)
 {
     emit closeBoard(gameActive, y(), x(), width(), height()); // Отправляем сообщение оппоненту
     gameActive = false;
@@ -341,7 +329,7 @@ void PluginWindow::doSwitchColor()
  */
 void PluginWindow::setLose()
 {
-    emit lose();
+    emit         lose();
     QMessageBox *msgBox = new QMessageBox(this);
     msgBox->setIcon(QMessageBox::Information);
     msgBox->setWindowTitle(tr("Gomoku Plugin"));
@@ -364,10 +352,7 @@ void PluginWindow::setDraw()
 /**
  * Мы сдались (выбран пункт меню "Resign" на доске)
  */
-void PluginWindow::setResign()
-{
-    bmodel->setResign();
-}
+void PluginWindow::setResign() { bmodel->setResign(); }
 
 /**
  * Сообщение о том что оппонент проиграл, т.е. мы выиграли
@@ -431,7 +416,7 @@ void PluginWindow::loadGame()
     if (fileName.isEmpty())
         return;
     QFile file(fileName);
-    if(file.open(QIODevice::ReadOnly)) {
+    if (file.open(QIODevice::ReadOnly)) {
         QTextStream in(&file);
         in.setCodec("UTF-8");
         QString saved_str = in.readAll();
@@ -463,7 +448,7 @@ bool PluginWindow::tryLoadGame(const QString &load_str, const bool local)
     if (!load_str.isEmpty()) {
         GameModel *gm = new GameModel(load_str, local);
         if (gm->isValid()) {
-            QString info = gm->gameInfo();
+            QString      info   = gm->gameInfo();
             QMessageBox *msgBox = new QMessageBox(this);
             msgBox->setIcon(QMessageBox::Question);
             msgBox->setWindowTitle(tr("Gomoku Plugin"));

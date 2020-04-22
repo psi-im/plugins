@@ -24,21 +24,20 @@
 
 #include "gamemodel.h"
 
-class BoardModel : public QAbstractTableModel
-{
+class BoardModel : public QAbstractTableModel {
     Q_OBJECT
 public:
     BoardModel(QObject *parent = nullptr);
     ~BoardModel();
-    void init(GameModel *gm);
-    GameModel *gameModel() const { return gameModel_; }
-    int model2oppboard(const QPoint &p);
-    int model2myboard(const QPoint &p);
-    virtual Qt::ItemFlags flags(const QModelIndex & index) const;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    void                  init(GameModel *gm);
+    GameModel *           gameModel() const { return gameModel_; }
+    int                   model2oppboard(const QPoint &p);
+    int                   model2myboard(const QPoint &p);
+    virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+    virtual QVariant      headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    virtual QVariant      data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    virtual int           rowCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual int           columnCount(const QModelIndex &parent = QModelIndex()) const;
 
 private:
     QPoint myboard2model(const QPoint &p) const;
@@ -50,7 +49,6 @@ private:
 private slots:
     void updateMyBoard(int x, int y, int width, int height);
     void updateOppBoard(int x, int y, int width, int height);
-
 };
 
 #endif // BOARDMODEL_H

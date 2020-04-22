@@ -19,35 +19,29 @@
 
 #include "skin.h"
 #include <QDir>
-#include <QMessageBox>
 #include <QDomDocument>
+#include <QMessageBox>
 
-void Skin::setFile(const QString &file)
-{
-    filePass_ = file;
-}
+void Skin::setFile(const QString &file) { filePass_ = file; }
 
-QString Skin::filePass()
-{
-    return filePass_;
-}
+QString Skin::filePass() { return filePass_; }
 
 QString Skin::skinFolder()
 {
     QString folder = filePass_;
-    int index = folder.lastIndexOf("/");
+    int     index  = folder.lastIndexOf("/");
     folder.chop(folder.size() - index);
     return folder;
 }
 
 QPixmap Skin::previewPixmap()
 {
-    QDir dir(skinFolder());
+    QDir    dir(skinFolder());
     QString skinName = name();
-    QPixmap pix = QPixmap();
-    foreach(QString fileName, dir.entryList(QDir::Files)) {
-        if((fileName.endsWith(".png", Qt::CaseInsensitive) || fileName.endsWith(".jpg", Qt::CaseInsensitive))
-            && skinName.left(skinName.length()-4) == fileName.left(fileName.length()-4)) {
+    QPixmap pix      = QPixmap();
+    foreach (QString fileName, dir.entryList(QDir::Files)) {
+        if ((fileName.endsWith(".png", Qt::CaseInsensitive) || fileName.endsWith(".jpg", Qt::CaseInsensitive))
+            && skinName.left(skinName.length() - 4) == fileName.left(fileName.length() - 4)) {
             pix = QPixmap(dir.absolutePath() + "/" + fileName);
             break;
         }
@@ -57,63 +51,54 @@ QPixmap Skin::previewPixmap()
 
 QString Skin::name()
 {
-    QString name = filePass_;
-    int index = name.lastIndexOf("/");
-    index = name.size() - index - 1;
-    name = name.right(index);
+    QString name  = filePass_;
+    int     index = name.lastIndexOf("/");
+    index         = name.size() - index - 1;
+    name          = name.right(index);
     return name;
 }
-
-
 
 //---------------------------------
 //---Previewer---------------------
 //---------------------------------
-Previewer::Previewer(Skin *skin, QWidget *parent)
-        : QDialog(parent)
-        , skin_(skin)
+Previewer::Previewer(Skin *skin, QWidget *parent) : QDialog(parent), skin_(skin)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setModal(true);
-    ui_.setupUi(this);    
+    ui_.setupUi(this);
 
     connect(ui_.pb_close, SIGNAL(released()), this, SLOT(close()));
     connect(ui_.pb_apply, SIGNAL(released()), this, SIGNAL(applySkin()));
-
 }
 
 bool Previewer::loadSkinInformation()
 {
-    QFile file(skin_->filePass());
+    QFile        file(skin_->filePass());
     QDomDocument doc;
-    if(!doc.setContent(&file)) {
+    if (!doc.setContent(&file)) {
         QMessageBox::warning(this, tr("Preview Skin"), tr("Skin is not valid!"));
         return false;
     }
     QDomElement elem = doc.documentElement();
-    if(elem.tagName() != "skin") {        
+    if (elem.tagName() != "skin") {
         QMessageBox::warning(this, tr("Preview Skin"), tr("Skin is not valid!"));
         return false;
     }
-    ui_.lbl_author->setText( elem.attribute("author") );
-    ui_.lbl_version->setText( elem.attribute("version") );
-    ui_.lbl_name->setText( elem.attribute("name") );
+    ui_.lbl_author->setText(elem.attribute("author"));
+    ui_.lbl_version->setText(elem.attribute("version"));
+    ui_.lbl_name->setText(elem.attribute("name"));
     QPixmap pix = skin_->previewPixmap();
-    if(!pix.isNull())
+    if (!pix.isNull())
         ui_.lbl_preview->setPixmap(pix);
 
     return true;
 }
 
-
-
-
 //-----------------------------
 //------GetSkinName------------
 //-----------------------------
-GetSkinName::GetSkinName(QString name, QString author, QString version, QWidget *parent)
-        :QDialog(parent)
-{    
+GetSkinName::GetSkinName(QString name, QString author, QString version, QWidget *parent) : QDialog(parent)
+{
     setAttribute(Qt::WA_DeleteOnClose);
     setModal(true);
     ui_.setupUi(this);
@@ -131,4 +116,3 @@ void GetSkinName::okPressed()
     emit ok(ui_.le_name->text(), ui_.le_author->text(), ui_.le_version->text());
     close();
 }
-

@@ -16,28 +16,26 @@
 #ifndef UPLOADMANAGER_H
 #define UPLOADMANAGER_H
 
-
 #include <QNetworkCookie>
 
 class QNetworkAccessManager;
 class QFile;
 class HttpDevice;
 
-class UploadManager : public QObject
-{
+class UploadManager : public QObject {
     Q_OBJECT
 public:
-    UploadManager(QObject* p = 0);
+    UploadManager(QObject *p = 0);
     ~UploadManager();
-    void go(const QString& file);
-    void setCookies(const QList<QNetworkCookie>& cookies);
+    void go(const QString &file);
+    void setCookies(const QList<QNetworkCookie> &cookies);
     bool success() const { return success_; };
 
 signals:
     void transferProgress(qint64, qint64);
     void uploaded();
-    void statusText(const QString&);
-    void uploadFileURL(const QString&);
+    void statusText(const QString &);
+    void uploadFileURL(const QString &);
 
 private slots:
     void getStorageFinished();
@@ -45,13 +43,13 @@ private slots:
     void verifyingFinished();
 
 private:
-    void doUpload(const QUrl& url);
+    void doUpload(const QUrl &url);
 
 private:
-    QNetworkAccessManager* manager_;
-    QString fileName_;
-    bool success_;
-    HttpDevice *hd_;
+    QNetworkAccessManager *manager_;
+    QString                fileName_;
+    bool                   success_;
+    HttpDevice *           hd_;
 };
 
 #endif // UPLOADMANAGER_H

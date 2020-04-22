@@ -1,8 +1,8 @@
 #ifndef QXTWINDOWSYSTEM_MAC_CPP
 #define QXTWINDOWSYSTEM_MAC_CPP
 
-#include "qxtwindowsystem.h"
 #include "qxtwindowsystem_mac.h"
+#include "qxtwindowsystem.h"
 
 // WId to return when error
 #define WINDOW_NOT_FOUND (WId)(0)
@@ -12,12 +12,14 @@ WindowList qxt_getWindowsForPSN(ProcessSerialNumber *psn)
     static CGSConnection connection = _CGSDefaultConnection();
 
     WindowList wlist;
-    if (!psn) return wlist;
+    if (!psn)
+        return wlist;
 
     // get onnection for given process psn
     CGSConnection procConnection;
-    CGError err = CGSGetConnectionIDForPSN(connection, psn, &procConnection);
-    if (err != noErr) return wlist;
+    CGError       err = CGSGetConnectionIDForPSN(connection, psn, &procConnection);
+    if (err != noErr)
+        return wlist;
 
     /* get number of windows open by given process
        in Mac OS X an application may have multiple windows, which generally
@@ -27,23 +29,23 @@ WindowList qxt_getWindowsForPSN(ProcessSerialNumber *psn)
     int windowCount(0);
     err = CGSGetOnScreenWindowCount(connection, procConnection, &windowCount);
     // if there are no windows open by this application, skip
-    if (err != noErr || windowCount == 0) return wlist;
+    if (err != noErr || windowCount == 0)
+        return wlist;
 
     // get list of windows
     int windowList[windowCount];
     int outCount(0);
     err = CGSGetOnScreenWindowList(connection, procConnection, windowCount, windowList, &outCount);
 
-    if (err != noErr || outCount == 0) return wlist;
+    if (err != noErr || outCount == 0)
+        return wlist;
 
-    for (int i=0; i<outCount; ++i)
-    {
+    for (int i = 0; i < outCount; ++i) {
         wlist += windowList[i];
     }
 
     return wlist;
 }
-
 
 WindowList QxtWindowSystem::windows()
 {
@@ -63,9 +65,10 @@ WindowList QxtWindowSystem::windows()
 WId QxtWindowSystem::activeWindow()
 {
     ProcessSerialNumber psn;
-    OSErr err(noErr);
+    OSErr               err(noErr);
     err = ::GetFrontProcess(&psn);
-    if (err != noErr) return WINDOW_NOT_FOUND;
+    if (err != noErr)
+        return WINDOW_NOT_FOUND;
 
     // in Mac OS X, first window for given PSN is always the active one
     WindowList wlist = qxt_getWindowsForPSN(&psn);
@@ -99,14 +102,14 @@ QString QxtWindowSystem::windowTitle(WId /*window*/)
 }
 
 QRect QxtWindowSystem::windowGeometry(WId /*window*/)
-{/*
-    CGRect rect;
-    static CGSConnection connection = _CGSDefaultConnection();
+{ /*
+     CGRect rect;
+     static CGSConnection connection = _CGSDefaultConnection();
 
-    CGError err = CGSGetWindowBounds(connection, window, &rect);
-    if (err != noErr) return QRect();
+     CGError err = CGSGetWindowBounds(connection, window, &rect);
+     if (err != noErr) return QRect();
 
-    return QRect(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);*/
+     return QRect(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);*/
     return QRect();
 }
 
@@ -118,13 +121,13 @@ uint QxtWindowSystem::idleTime()
 {
     // CGEventSourceSecondsSinceLastEventType returns time in seconds as a double
     // also has extremely long name
-    double idle = 0;//1000 * ::CGEventSourceSecondsSinceLastEventType(kCGEventSourceStateCombinedSessionState, kCGAnyInputEventType);
+    double idle = 0; // 1000 * ::CGEventSourceSecondsSinceLastEventType(kCGEventSourceStateCombinedSessionState,
+                     // kCGAnyInputEventType);
     return (uint)idle;
 }
 
-
 // these are copied from X11 implementation
-WId QxtWindowSystem::findWindow(const QString& /*title*/)
+WId QxtWindowSystem::findWindow(const QString & /*title*/)
 {
     WId result = 0;
     /*WindowList list = windows();
@@ -139,7 +142,7 @@ WId QxtWindowSystem::findWindow(const QString& /*title*/)
     return result;
 }
 
-WId QxtWindowSystem::windowAt(const QPoint& /*pos*/)
+WId QxtWindowSystem::windowAt(const QPoint & /*pos*/)
 {
     WId result = 0;
     /*WindowList list = windows();
@@ -156,4 +159,3 @@ WId QxtWindowSystem::windowAt(const QPoint& /*pos*/)
 }
 
 #endif // QXTWINDOWSYSTEM_MAC_CPP
-

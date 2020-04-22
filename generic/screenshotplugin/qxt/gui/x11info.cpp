@@ -18,14 +18,11 @@
 
 #include "x11info.h"
 
+#include <QtGlobal>
+#include <X11/Xlib.h>
+#include <xcb/xcb.h>
 
-# include <X11/Xlib.h>
-# include <xcb/xcb.h>
-# include <QtGlobal>
-
-
-
-Display* X11Info::display()
+Display *X11Info::display()
 {
     if (!_display) {
         _display = XOpenDisplay(NULL);
@@ -35,14 +32,12 @@ Display* X11Info::display()
 
 unsigned long X11Info::appRootWindow(int screen)
 {
-    return screen == -1?
-                XDefaultRootWindow(display()) :
-                XRootWindowOfScreen(XScreenOfDisplay(display(), screen));
+    return screen == -1 ? XDefaultRootWindow(display()) : XRootWindowOfScreen(XScreenOfDisplay(display(), screen));
 }
 
 int X11Info::appScreen()
 {
-    #error X11Info::appScreen not implemented for Qt5! You must skip this plugin.
+#error X11Info::appScreen not implemented for Qt5! You must skip this plugin.
 }
 
 xcb_connection_t *X11Info::xcbConnection()
@@ -54,7 +49,7 @@ xcb_connection_t *X11Info::xcbConnection()
     return _xcb;
 }
 
-xcb_connection_t* X11Info::_xcb = 0;
+xcb_connection_t *X11Info::_xcb = 0;
 
-Display* X11Info::_display = 0;
-int X11Info::_xcbPreferredScreen = 0;
+Display *X11Info::_display            = 0;
+int      X11Info::_xcbPreferredScreen = 0;

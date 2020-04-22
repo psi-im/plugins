@@ -25,24 +25,22 @@
 #include <QObject>
 #include <QStringList>
 
-class OptionsParser : public QObject
-{
+class OptionsParser : public QObject {
     Q_OBJECT
 
 public:
-    OptionsParser(const QString& fileName, QObject *parent = nullptr);
-    QStringList getMissingNodesString() const;
+    OptionsParser(const QString &fileName, QObject *parent = nullptr);
+    QStringList     getMissingNodesString() const;
     QList<QDomNode> getMissingNodes() const;
-    QDomNode nodeByString(const QString& key) const;
-
+    QDomNode        nodeByString(const QString &key) const;
 
 private:
-    QString fileName_;
-    QDomElement optionsElement_, defaultsElement_;
+    QString                 fileName_;
+    QDomElement             optionsElement_, defaultsElement_;
     QMap<QString, QDomNode> missingNodes;
 
-    void findMissingOptions(const QDomElement& optElement, QString *root);
-    bool findNode(const QDomElement& elem) const;
+    void findMissingOptions(const QDomElement &optElement, QString *root);
+    bool findNode(const QDomElement &elem) const;
 };
 
 #endif // OPTIONSPARSER_H

@@ -23,8 +23,7 @@
 
 static const QString allTags = QObject::tr("All Tags");
 
-TagModel::TagModel(QObject *parent)
-    : QAbstractItemModel(parent)
+TagModel::TagModel(QObject *parent) : QAbstractItemModel(parent)
 {
     stringList.clear();
     pIndex = createIndex(0, 0, -1);
@@ -32,9 +31,9 @@ TagModel::TagModel(QObject *parent)
 
 int TagModel::rowCount(const QModelIndex &parent) const
 {
-    if(parent == QModelIndex())
+    if (parent == QModelIndex())
         return 1;
-    else if(parent == createAllTagsIndex())
+    else if (parent == createAllTagsIndex())
         return stringList.count();
 
     return 0;
@@ -45,34 +44,32 @@ QVariant TagModel::headerData(int /*section*/, Qt::Orientation /*orientation*/, 
     return QVariant();
 }
 
-QModelIndex TagModel::index(int row, int column, const QModelIndex& parent) const
+QModelIndex TagModel::index(int row, int column, const QModelIndex &parent) const
 {
-    if(row > stringList.size() || column != 0)
+    if (row > stringList.size() || column != 0)
         return QModelIndex();
 
-    if(parent == QModelIndex()) {
-        if(row == 0)
+    if (parent == QModelIndex()) {
+        if (row == 0)
             return createAllTagsIndex();
         else
             return QModelIndex();
-    }
-    else if(parent == createAllTagsIndex())
+    } else if (parent == createAllTagsIndex())
         return createIndex(row, column, row);
 
     return QModelIndex();
 }
 
-QModelIndex TagModel::parent(const QModelIndex& index) const
+QModelIndex TagModel::parent(const QModelIndex &index) const
 {
-    if(!index.isValid())
+    if (!index.isValid())
         return QModelIndex();
-    if(index.internalId() == (quintptr)-1)
+    if (index.internalId() == (quintptr)-1)
         return QModelIndex();
-    if((quintptr)index.row() == index.internalId())
+    if ((quintptr)index.row() == index.internalId())
         return createAllTagsIndex();
     return QModelIndex();
 }
-
 
 QVariant TagModel::data(const QModelIndex &index, int role) const
 {
@@ -82,20 +79,19 @@ QVariant TagModel::data(const QModelIndex &index, int role) const
     if (role != Qt::DisplayRole)
         return QVariant();
 
-    if(index.internalId() == (quintptr)-1)
+    if (index.internalId() == (quintptr)-1)
         return allTags;
 
     if (index.row() >= stringList.size() || (quintptr)index.row() != index.internalId())
         return QVariant();
 
     return stringList.at(index.row());
-
 }
 
-void TagModel::addTag(const QString& tag_)
+void TagModel::addTag(const QString &tag_)
 {
     const QString tag = tag_.toLower();
-    if(stringList.contains(tag))
+    if (stringList.contains(tag))
         return;
     beginInsertRows(createAllTagsIndex(), stringList.size(), stringList.size());
     stringList.append(tag);
@@ -103,11 +99,11 @@ void TagModel::addTag(const QString& tag_)
     endInsertRows();
 }
 
-void TagModel::removeTag(const QString& tag_)
+void TagModel::removeTag(const QString &tag_)
 {
     const QString tag = tag_.toLower();
-    int i = stringList.indexOf(tag);
-    if(i == -1)
+    int           i   = stringList.indexOf(tag);
+    if (i == -1)
         return;
 
     beginRemoveRows(QModelIndex(), i, i);
@@ -122,37 +118,23 @@ void TagModel::clear()
     endResetModel();
 }
 
-QModelIndex TagModel::indexByTag(const QString& tag) const
+QModelIndex TagModel::indexByTag(const QString &tag) const
 {
     int row = stringList.indexOf(tag);
-    if(row == -1)
+    if (row == -1)
         return QModelIndex();
 
-    return index(row,0, createAllTagsIndex());
+    return index(row, 0, createAllTagsIndex());
 }
 
-QModelIndex TagModel::createAllTagsIndex() const
-{
-    return pIndex;
-}
+QModelIndex TagModel::createAllTagsIndex() const { return pIndex; }
 
-QString TagModel::allTagsName()
-{
-    return allTags;
-}
-
-
-
+QString TagModel::allTagsName() { return allTags; }
 
 ////--------NoteModel---------------------
-NoteModel::NoteModel(QObject *parent) : QAbstractListModel(parent)
-{
-}
+NoteModel::NoteModel(QObject *parent) : QAbstractListModel(parent) { }
 
-int NoteModel::rowCount(const QModelIndex &/*parent*/) const
-{
-    return notesList.count();
-}
+int NoteModel::rowCount(const QModelIndex & /*parent*/) const { return notesList.count(); }
 
 QVariant NoteModel::data(const QModelIndex &index, int role) const
 {
@@ -162,34 +144,30 @@ QVariant NoteModel::data(const QModelIndex &index, int role) const
     if (index.row() >= notesList.size())
         return QVariant();
 
-    if(role == Qt::DisplayRole){
+    if (role == Qt::DisplayRole) {
         QDomElement note = notesList.at(index.row());
-        QString textNote;
-        QString tag = note.attribute("tags");
-        QString text = note.firstChildElement("text").text();
-        QString title = note.firstChildElement("title").text();
-        if(!title.isEmpty())
+        QString     textNote;
+        QString     tag   = note.attribute("tags");
+        QString     text  = note.firstChildElement("text").text();
+        QString     title = note.firstChildElement("title").text();
+        if (!title.isEmpty())
             textNote += tr("Title: %1").arg(title);
-        if(!tag.isEmpty())
+        if (!tag.isEmpty())
             textNote += tr("\nTags: %1").arg(tag);
-        if(!text.isEmpty())
-            textNote += "\n"+text;
+        if (!text.isEmpty())
+            textNote += "\n" + text;
 
         return textNote.isEmpty() ? QVariant() : QVariant(textNote);
-    }
-    else if (role == NoteRole) {
+    } else if (role == NoteRole) {
         QDomElement note = notesList.at(index.row());
         return QVariant(note.firstChildElement("text").text());
-    }
-    else if(role == TagRole) {
+    } else if (role == TagRole) {
         QDomElement note = notesList.at(index.row());
         return QVariant(note.attribute("tags"));
-    }
-    else if(role == TitleRole) {
+    } else if (role == TitleRole) {
         QDomElement note = notesList.at(index.row());
         return QVariant(note.firstChildElement("title").text());
-    }
-    else
+    } else
         return QVariant();
 }
 
@@ -200,20 +178,20 @@ void NoteModel::clear()
     endResetModel();
 }
 
-void NoteModel::editNote(const QDomElement& note, const QModelIndex &index)
+void NoteModel::editNote(const QDomElement &note, const QModelIndex &index)
 {
     delNote(index);
     insertNote(note, index);
 }
 
-void NoteModel::addNote(const QDomElement& note)
+void NoteModel::addNote(const QDomElement &note)
 {
     beginInsertRows(QModelIndex(), notesList.size(), notesList.size());
     notesList.append(note);
     endInsertRows();
 }
 
-void NoteModel::insertNote(const QDomElement& note, const QModelIndex &index)
+void NoteModel::insertNote(const QDomElement &note, const QModelIndex &index)
 {
     if (!index.isValid())
         return;
@@ -236,32 +214,27 @@ void NoteModel::delNote(const QModelIndex &index)
     endRemoveRows();
 }
 
-QList<QDomElement> NoteModel::getAllNotes() const
-{
-    return notesList;
-}
+QList<QDomElement> NoteModel::getAllNotes() const { return notesList; }
 
 QStringList NoteModel::getAllTags() const
 {
     QStringList tagsList;
-    foreach(const QDomElement& note, notesList) {
+    foreach (const QDomElement &note, notesList) {
         QStringList tags = note.attribute("tags").split(" ", QString::SkipEmptyParts);
         tagsList += tags;
     }
     return tagsList;
 }
 
-
-
 /////-------------ProxyModel---------------
 
 bool ProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &parent) const
 {
-    QModelIndex index = sourceModel()->index(sourceRow, 0, parent);
-    QString filter = filterRegExp().pattern();
-    if(allTags.contains(filter))
+    QModelIndex index  = sourceModel()->index(sourceRow, 0, parent);
+    QString     filter = filterRegExp().pattern();
+    if (allTags.contains(filter))
         return true;
 
     QStringList tags = index.data(NoteModel::TagRole).toString().split(" ");
-    return  tags.contains(filter, Qt::CaseInsensitive);
+    return tags.contains(filter, Qt::CaseInsensitive);
 }

@@ -27,8 +27,8 @@
 
 #include <QString>
 
-#define constPluginName         "Gomoku Game Plugin"
-#define constProtoType          "gomoku"
+#define constPluginName "Gomoku Game Plugin"
+#define constProtoType "gomoku"
 
 const QString horHeaderString = "ABCDEFGHJKLMNOP";
 

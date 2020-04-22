@@ -22,24 +22,14 @@
  *
  */
 
-#include <QStringList>
 #include <QCryptographicHash>
+#include <QStringList>
 
 #include "gamemodel.h"
 
 GameModel::GameModel(GameElement::ElementType my, int row_count, int col_count, QObject *parent) :
-    QObject(parent),
-    valid_(true),
-    status_(StatusNone),
-    accepted_(true),
-    turnsCount_(0),
-    blackCount_(0),
-    whiteCount_(0),
-    my_el(my),
-    switchColor(false),
-    boardSizeX_(col_count),
-    boardSizeY_(row_count),
-    loadedTurnsCount(0),
+    QObject(parent), valid_(true), status_(StatusNone), accepted_(true), turnsCount_(0), blackCount_(0), whiteCount_(0),
+    my_el(my), switchColor(false), boardSizeX_(col_count), boardSizeY_(row_count), loadedTurnsCount(0),
     chksum(ChksumNone)
 {
     if (my_el == GameElement::TypeNone || col_count <= 0 || row_count <= 0)
@@ -49,28 +39,18 @@ GameModel::GameModel(GameElement::ElementType my, int row_count, int col_count, 
 }
 
 GameModel::GameModel(const QString &load_str, const bool local, QObject *parent) :
-    QObject(parent),
-    valid_(false),
-    status_(StatusNone),
-    accepted_(!local),
-    turnsCount_(0),
-    blackCount_(0),
-    whiteCount_(0),
-    my_el(GameElement::TypeNone),
-    switchColor(false),
-    boardSizeX_(0),
-    boardSizeY_(0),
-    loadedTurnsCount(0),
-    chksum(ChksumNone)
+    QObject(parent), valid_(false), status_(StatusNone), accepted_(!local), turnsCount_(0), blackCount_(0),
+    whiteCount_(0), my_el(GameElement::TypeNone), switchColor(false), boardSizeX_(0), boardSizeY_(0),
+    loadedTurnsCount(0), chksum(ChksumNone)
 {
     QStringList loadList = load_str.split(";");
     if (loadList.isEmpty() || loadList.takeFirst() != "gomokugameplugin.save.1")
         return;
-    bool res = true;
-    int black_cnt = 0;
-    int white_cnt = 0;
-    int maxCol = 0;
-    int maxRow = 0;
+    bool res       = true;
+    int  black_cnt = 0;
+    int  white_cnt = 0;
+    int  maxCol    = 0;
+    int  maxRow    = 0;
     while (!loadList.isEmpty()) {
         QString str1 = loadList.takeFirst().trimmed();
         if (str1.isEmpty())
@@ -88,7 +68,7 @@ GameModel::GameModel(const QString &load_str, const bool local, QObject *parent)
                 break;
             }
             bool fOk;
-            int x = elemPar.at(0).toInt(&fOk);
+            int  x = elemPar.at(0).toInt(&fOk);
             if (!fOk || x < 0) {
                 res = false;
                 break;
@@ -142,8 +122,9 @@ GameModel::GameModel(const QString &load_str, const bool local, QObject *parent)
     }
     boardSizeX_ = 15;
     boardSizeY_ = 15;
-    int delta = black_cnt - white_cnt;
-    if (!res || delta < 0 || delta > 1 || my_el == GameElement::TypeNone || maxRow >= boardSizeY_ || maxCol >= boardSizeX_) {
+    int delta   = black_cnt - white_cnt;
+    if (!res || delta < 0 || delta > 1 || my_el == GameElement::TypeNone || maxRow >= boardSizeY_
+        || maxCol >= boardSizeX_) {
         // Неудачная загрузка, удаляем созданные объекты
         while (!elementsList.isEmpty())
             delete elementsList.takeFirst();
@@ -161,9 +142,11 @@ GameModel::GameModel(const QString &load_str, const bool local, QObject *parent)
     if (switchColor)
         turnsCount_++;
     loadedTurnsCount = turnsCount_;
-    const int pos = load_str.indexOf("sha1sum:", 0, Qt::CaseInsensitive);
+    const int pos    = load_str.indexOf("sha1sum:", 0, Qt::CaseInsensitive);
     if (pos != -1) {
-        const QString sum_str = QCryptographicHash::hash(load_str.left(pos).toLatin1().data(), QCryptographicHash::Sha1).toHex().constData();
+        const QString sum_str = QCryptographicHash::hash(load_str.left(pos).toLatin1().data(), QCryptographicHash::Sha1)
+                                    .toHex()
+                                    .constData();
         if (sum_str == load_str.mid(pos + 8, 40))
             chksum = ChksumCorrect;
         else
@@ -191,7 +174,8 @@ GameModel::GameStatus GameModel::gameStatus() const
 
 bool GameModel::selectGameStatus()
 {
-    if (status_ == StatusError || status_ == StatusBreak || status_ == StatusWin || status_ == StatusLose || status_ == StatusDraw)
+    if (status_ == StatusError || status_ == StatusBreak || status_ == StatusWin || status_ == StatusLose
+        || status_ == StatusDraw)
         return false; // Эти статусы автоматически не меняются.
     GameStatus new_status;
     if (!accepted_) {
@@ -200,7 +184,7 @@ bool GameModel::selectGameStatus()
         new_status = (my_el == GameElement::TypeBlack) ? StatusWaitingLocalAction : StatusWaitingOpponent;
     } else {
         bool my_last_turn = (elementsList.last()->type() == my_el);
-        //if (turnsCount_ == 4 && switchColor)
+        // if (turnsCount_ == 4 && switchColor)
         //    my_last_turn = !my_last_turn;
         new_status = (my_last_turn) ? StatusWaitingOpponent : StatusWaitingLocalAction;
     }
@@ -213,11 +197,10 @@ bool GameModel::selectGameStatus()
 
 const GameElement *GameModel::getElement(int x, int y) const
 {
-    const int idx =  getElementIndex(x, y);
+    const int idx = getElementIndex(x, y);
     if (idx == -1)
         return nullptr;
     return elementsList.at(idx);
-
 }
 
 int GameModel::getElementIndex(int x, int y) const
@@ -230,7 +213,6 @@ int GameModel::getElementIndex(int x, int y) const
         }
     }
     return -1;
-
 }
 
 /**
@@ -309,9 +291,9 @@ bool GameModel::doSwitchColor(bool local)
     if (turnsCount_ != 3)
         return false;
     // Переключаем
-    my_el = (my_el == GameElement::TypeBlack) ? GameElement::TypeWhite : GameElement::TypeBlack;
+    my_el       = (my_el == GameElement::TypeBlack) ? GameElement::TypeWhite : GameElement::TypeBlack;
     switchColor = true;
-    accepted_ = !local;
+    accepted_   = !local;
     turnsCount_++;
     if (selectGameStatus())
         emit statusUpdated(status_);
@@ -332,7 +314,7 @@ bool GameModel::accept()
 void GameModel::setErrorStatus()
 {
     if (status_ != StatusError) {
-        status_ = StatusError;
+        status_   = StatusError;
         accepted_ = true;
         emit statusUpdated(status_);
     }
@@ -341,7 +323,7 @@ void GameModel::setErrorStatus()
 void GameModel::breakGame()
 {
     if (status_ == StatusWaitingAccept || status_ == StatusWaitingLocalAction || status_ == StatusWaitingOpponent) {
-        status_ = StatusBreak;
+        status_   = StatusBreak;
         accepted_ = true;
         emit statusUpdated(status_);
     }
@@ -350,7 +332,7 @@ void GameModel::breakGame()
 void GameModel::setWin()
 {
     if (status_ == StatusWaitingAccept || status_ == StatusWaitingLocalAction || status_ == StatusWaitingOpponent) {
-        status_ = StatusWin;
+        status_   = StatusWin;
         accepted_ = true;
         emit statusUpdated(status_);
     }
@@ -359,7 +341,7 @@ void GameModel::setWin()
 void GameModel::setDraw()
 {
     if (status_ == StatusWaitingAccept || status_ == StatusWaitingLocalAction || status_ == StatusWaitingOpponent) {
-        status_ = StatusDraw;
+        status_   = StatusDraw;
         accepted_ = true;
         emit statusUpdated(status_);
     }
@@ -368,7 +350,7 @@ void GameModel::setDraw()
 void GameModel::setLose()
 {
     if (status_ == StatusWaitingAccept || status_ == StatusWaitingLocalAction || status_ == StatusWaitingOpponent) {
-        status_ = StatusLose;
+        status_   = StatusLose;
         accepted_ = true;
         emit statusUpdated(status_);
     }
@@ -376,8 +358,8 @@ void GameModel::setLose()
 
 bool GameModel::checkForLose()
 {
-    int max_x = boardSizeX_ - 1;
-    int max_y = boardSizeY_ - 1;
+    int max_x  = boardSizeX_ - 1;
+    int max_y  = boardSizeY_ - 1;
     int last_x = lastX();
     int last_y = lastY();
     if (last_x < 0 || last_x >= max_x || last_y < 0 || last_y >= max_y)
@@ -509,22 +491,25 @@ bool GameModel::checkForDraw()
 
 QString GameModel::toString() const
 {
-    QString res_str = "gomokugameplugin.save.1;\n";
-    GameElement *lastEl = nullptr;
+    QString      res_str = "gomokugameplugin.save.1;\n";
+    GameElement *lastEl  = nullptr;
     if (!elementsList.isEmpty())
         lastEl = elementsList.last();
     foreach (GameElement *el, elementsList) {
         if (el == lastEl && !accepted_)
             continue; // Не сохраняем не подтвержденное
         res_str.append(QString("Element:%1,%2,%3;\n")
-            .arg(el->x()).arg(el->y())
-            .arg((el->type() == GameElement::TypeBlack) ? "black" : "white"));
+                           .arg(el->x())
+                           .arg(el->y())
+                           .arg((el->type() == GameElement::TypeBlack) ? "black" : "white"));
     }
     res_str.append(QString("SwitchColor:%1;\n").arg((switchColor) ? "yes" : "no"));
     res_str.append(QString("Color:%1;\n").arg((my_el == GameElement::TypeBlack) ? "black" : "white"));
     res_str.append(QString("Status:%1;\n").arg(statusString()));
     QString tmp_str = res_str;
-    QString crcStr = QCryptographicHash::hash(tmp_str.replace("\n", "").toLatin1().data(), QCryptographicHash::Sha1).toHex().constData();
+    QString crcStr  = QCryptographicHash::hash(tmp_str.replace("\n", "").toLatin1().data(), QCryptographicHash::Sha1)
+                         .toHex()
+                         .constData();
     res_str.append(QString("Sha1Sum:%1;\n").arg(crcStr));
 
     return res_str;
@@ -564,10 +549,7 @@ QString GameModel::statusString() const
     return stat_str;
 }
 
-bool GameModel::isLoaded() const
-{
-    return (loadedTurnsCount > 0 && loadedTurnsCount == turnsCount_);
-}
+bool GameModel::isLoaded() const { return (loadedTurnsCount > 0 && loadedTurnsCount == turnsCount_); }
 
 QString GameModel::gameInfo() const
 {
@@ -597,19 +579,19 @@ QString GameModel::gameInfo() const
 GameModel::TurnInfo GameModel::turnInfo(int num) const
 {
     TurnInfo res;
-    res.x = 0;
-    res.y = 0;
+    res.x  = 0;
+    res.y  = 0;
     res.my = GameElement::TypeNone;
     if (num > 0 && num <= turnsCount_) {
-        int i = num - 1;
+        int  i        = num - 1;
         bool myInvert = false;
         if (switchColor) {
             if (num >= 4) {
                 i--;
                 if (num == 4) {
-                     // Этот ход - переключение цвета
-                    res.x = -1;
-                    res.y = -1;
+                    // Этот ход - переключение цвета
+                    res.x  = -1;
+                    res.y  = -1;
                     res.my = (elementsList.at(i)->type() == my_el);
                     return res;
                 }
@@ -618,9 +600,9 @@ GameModel::TurnInfo GameModel::turnInfo(int num) const
             }
         }
         const GameElement *el = elementsList.at(i);
-        res.x = el->x();
-        res.y = el->y();
-        res.my = (elementsList.at(i)->type() == my_el);
+        res.x                 = el->x();
+        res.y                 = el->y();
+        res.my                = (elementsList.at(i)->type() == my_el);
         if (myInvert)
             res.my = !res.my;
     }

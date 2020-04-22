@@ -17,31 +17,30 @@
  *
  */
 
-#include <QDesktopWidget>
 #include <QBuffer>
+#include <QClipboard>
+#include <QCloseEvent>
+#include <QDateTime>
+#include <QDesktopServices>
+#include <QDesktopWidget>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QNetworkReply>
 #include <QNetworkProxy>
-#include <QDateTime>
-#include <QTimer>
+#include <QNetworkReply>
+#include <QPainter>
 #include <QPrintDialog>
 #include <QPrinter>
-#include <QPainter>
-#include <QCloseEvent>
-#include <QDesktopServices>
-#include <QClipboard>
 #include <QScreen>
+#include <QTimer>
 
-
-#include "screenshot.h"
-#include "server.h"
-#include "screenshotoptions.h"
+#include "defines.h"
 #include "options.h"
-#include "screenshoticonset.h"
 #include "optionsdlg.h"
 #include "proxysettingsdlg.h"
-#include "defines.h"
+#include "screenshot.h"
+#include "screenshoticonset.h"
+#include "screenshotoptions.h"
+#include "server.h"
 
 #include "qxtwindowsystem.h"
 
@@ -49,27 +48,24 @@
 #define PROTOCOL_HTTP "http"
 #define MAX_HISTORY_SIZE 10
 
-
 //----------------------------------------------
 //-----------HistoryDlg-------------------------
 //----------------------------------------------
-class HistoryDlg : public QDialog
-{
+class HistoryDlg : public QDialog {
     Q_OBJECT
 public:
-    HistoryDlg(const QStringList& list, QWidget* p = nullptr)
-        : QDialog(p, Qt::Window)
+    HistoryDlg(const QStringList &list, QWidget *p = nullptr) : QDialog(p, Qt::Window)
     {
         setAttribute(Qt::WA_DeleteOnClose);
         setModal(false);
         setWindowModality(Qt::NonModal);
         setWindowTitle(tr("History"));
         QVBoxLayout *l = new QVBoxLayout(this);
-        lw = new QListWidget(this);
+        lw             = new QListWidget(this);
         lw->addItems(list);
         l->addWidget(lw);
 
-        QHBoxLayout *bl = new QHBoxLayout();
+        QHBoxLayout *bl         = new QHBoxLayout();
         QPushButton *copyButton = new QPushButton(tr("Copy"));
         copyButton->setToolTip(tr("Copy link to the clipboard"));
         copyButton->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
@@ -99,7 +95,7 @@ private slots:
     void itemActivated()
     {
         QListWidgetItem *lwi = lw->currentItem();
-        if(lwi) {
+        if (lwi) {
             QDesktopServices::openUrl(QUrl(lwi->text()));
         }
     }
@@ -107,27 +103,22 @@ private slots:
     void copy()
     {
         QListWidgetItem *lwi = lw->currentItem();
-        if(lwi) {
+        if (lwi) {
             qApp->clipboard()->setText(lwi->text());
         }
     }
 
 private:
-    QListWidget* lw;
+    QListWidget *lw;
 };
-
 
 //----------------------------------------------
 //-----------GrabAreaWidget-------------------------
 //----------------------------------------------
-class GrabAreaWidget : public QDialog
-{
+class GrabAreaWidget : public QDialog {
     Q_OBJECT
 public:
-    GrabAreaWidget()
-        : QDialog()
-        , startPoint(QPoint(-1, -1))
-        , endPoint(QPoint(-1, -1))
+    GrabAreaWidget() : QDialog(), startPoint(QPoint(-1, -1)), endPoint(QPoint(-1, -1))
     {
         setAttribute(Qt::WA_TranslucentBackground, true);
         setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
@@ -137,16 +128,14 @@ public:
         resize(QApplication::desktop()->size());
     }
 
-    ~GrabAreaWidget()
-    {
-    }
+    ~GrabAreaWidget() { }
 
     QRect getRect() const
     {
         QRect r;
-        if(endPoint.x() != -1) {
+        if (endPoint.x() != -1) {
             r = QRect(qMin(startPoint.x(), endPoint.x()), qMin(startPoint.y(), endPoint.y()),
-                  qAbs(startPoint.x() - endPoint.x()), qAbs(startPoint.y() - endPoint.y()));
+                      qAbs(startPoint.x() - endPoint.x()), qAbs(startPoint.y() - endPoint.y()));
         }
         return r;
     }
@@ -154,26 +143,24 @@ public:
 protected:
     void mousePressEvent(QMouseEvent *e)
     {
-        if(e->button() == Qt::LeftButton) {
+        if (e->button() == Qt::LeftButton) {
             startPoint = e->pos();
-        }
-        else {
+        } else {
             QDialog::reject();
         }
     }
 
     void mouseMoveEvent(QMouseEvent *e)
     {
-        if(e->buttons() & Qt::LeftButton) {
+        if (e->buttons() & Qt::LeftButton) {
             endPoint = e->pos();
             update();
         }
-
     }
 
     void mouseReleaseEvent(QMouseEvent *e)
     {
-        if(!(e->buttons() & Qt::LeftButton)) {
+        if (!(e->buttons() & Qt::LeftButton)) {
             endPoint = e->pos();
             QDialog::accept();
         }
@@ -182,23 +169,22 @@ protected:
     void paintEvent(QPaintEvent *)
     {
         QPainter painter(this);
-        QColor c("#f0f0f0");
+        QColor   c("#f0f0f0");
         c.setAlpha(80);
         QRect r = getRect();
-        if(r.isValid()) {
+        if (r.isValid()) {
             QPainterPath path;
             path.addRect(0, 0, width(), r.top());
-            path.addRect(r.right(), r.top(), rect().width() - r.right(), r.height()-1);
+            path.addRect(r.right(), r.top(), rect().width() - r.right(), r.height() - 1);
             path.addRect(0, r.bottom(), width(), height() - r.bottom());
-            path.addRect(0, r.top(), r.left(), r.height()-1);
+            path.addRect(0, r.top(), r.left(), r.height() - 1);
             painter.fillPath(path, c);
 
             QPen pen(Qt::gray);
             pen.setWidth(1);
             painter.setPen(pen);
             painter.drawRect(r);
-        }
-        else {
+        } else {
             painter.fillRect(rect(), c);
         }
     }
@@ -207,16 +193,11 @@ private:
     QPoint startPoint, endPoint;
 };
 
-
 //----------------------------------------------
 //-----------Screenshot-------------------------
 //----------------------------------------------
-Screenshot::Screenshot()
-    : QMainWindow()
-    , modified(false)
-    , lastFolder(QDir::home().absolutePath())
-    , grabAreaWidget_(nullptr)
-    , so_(nullptr)
+Screenshot::Screenshot() :
+    QMainWindow(), modified(false), lastFolder(QDir::home().absolutePath()), grabAreaWidget_(nullptr), so_(nullptr)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     ui_.setupUi(this);
@@ -229,7 +210,7 @@ Screenshot::Screenshot()
 
     ui_.lb_pixmap->setToolBar(ui_.tb_bar);
 
-    ScreenshotIconset* icoHost = ScreenshotIconset::instance();
+    ScreenshotIconset *icoHost = ScreenshotIconset::instance();
     ui_.pb_upload->setIcon(icoHost->getIcon("psi/upload"));
     ui_.pb_cancel->setIcon(icoHost->getIcon("psi/cancel"));
     ui_.pb_open->setIcon(icoHost->getIcon("psi/browse"));
@@ -251,10 +232,10 @@ Screenshot::Screenshot()
     connect(ui_.pb_upload, SIGNAL(clicked()), this, SLOT(uploadScreenshot()));
     connect(ui_.pb_print, SIGNAL(clicked()), this, SLOT(printScreenshot()));
     connect(ui_.pb_new_screenshot, SIGNAL(clicked()), this, SLOT(newScreenshot()));
-    connect(ui_.pb_cancel,SIGNAL(clicked()),this,SLOT(cancelUpload()));
+    connect(ui_.pb_cancel, SIGNAL(clicked()), this, SLOT(cancelUpload()));
     connect(ui_.pb_open, SIGNAL(clicked()), this, SLOT(openImage()));
     connect(ui_.lb_pixmap, SIGNAL(adjusted()), this, SLOT(pixmapAdjusted()));
-    connect(ui_.lb_pixmap, SIGNAL(settingsChanged(QString,QVariant)), SLOT(settingsChanged(QString, QVariant)));
+    connect(ui_.lb_pixmap, SIGNAL(settingsChanged(QString, QVariant)), SLOT(settingsChanged(QString, QVariant)));
     connect(ui_.lb_pixmap, SIGNAL(modified(bool)), this, SLOT(setModified(bool)));
     connect(ui_.tb_copyUrl, SIGNAL(clicked()), this, SLOT(copyUrl()));
 
@@ -282,14 +263,14 @@ void Screenshot::connectMenu()
     connect(ui_.actionOpen_Image, SIGNAL(triggered()), SLOT(openImage()));
     connect(ui_.actionOptions, SIGNAL(triggered()), SLOT(doOptions()));
     connect(ui_.actionPrint, SIGNAL(triggered()), SLOT(printScreenshot()));
-    //connect(ui_.actionProxy_Settings, SIGNAL(triggered()), SLOT(doProxySettings()));
+    // connect(ui_.actionProxy_Settings, SIGNAL(triggered()), SLOT(doProxySettings()));
     connect(ui_.actionSave, SIGNAL(triggered()), SLOT(saveScreenshot()));
     connect(ui_.actionUpload, SIGNAL(triggered()), SLOT(uploadScreenshot()));
 }
 
 void Screenshot::action(int action)
 {
-    switch(action) {
+    switch (action) {
     case Area:
         captureArea(0);
         break;
@@ -306,7 +287,7 @@ void Screenshot::action(int action)
 void Screenshot::setupStatusBar()
 {
     QStatusBar *sb = statusBar();
-    sbLbSize = new QLabel;
+    sbLbSize       = new QLabel;
     sbLbSize->setAlignment(Qt::AlignRight);
     sbLbSize->setTextInteractionFlags(Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
     sb->addPermanentWidget(sbLbSize);
@@ -315,18 +296,15 @@ void Screenshot::setupStatusBar()
 void Screenshot::updateStatusBar()
 {
     const QSize s = ui_.lb_pixmap->getPixmap().size();
-    QBuffer buffer;
-    buffer.open( QBuffer::ReadWrite );
-    ui_.lb_pixmap->getPixmap().save( &buffer , format.toLatin1() );
+    QBuffer     buffer;
+    buffer.open(QBuffer::ReadWrite);
+    ui_.lb_pixmap->getPixmap().save(&buffer, format.toLatin1());
     const qint64 size = buffer.size();
     sbLbSize->setText(tr("Size: %1x%2px; %3 bytes").arg(s.width()).arg(s.height()).arg(size));
-//    sbLbSize->setMaximumWidth( QFontMetrics( sbLbSize->font() ).width( sbLbSize->text() ) + 10 );
+    //    sbLbSize->setMaximumWidth( QFontMetrics( sbLbSize->font() ).width( sbLbSize->text() ) + 10 );
 }
 
-void Screenshot::aboutQt()
-{
-    qApp->aboutQt();
-}
+void Screenshot::aboutQt() { qApp->aboutQt(); }
 
 void Screenshot::doHomePage()
 {
@@ -341,15 +319,15 @@ void Screenshot::updateWidgets(bool vis)
     ui_.pb_upload->setEnabled(!vis);
 }
 
-void Screenshot::setServersList(const QStringList& l)
-{    
+void Screenshot::setServersList(const QStringList &l)
+{
     ui_.cb_servers->clear();
     qDeleteAll(servers);
     servers.clear();
     ui_.cb_servers->setEnabled(false);
     ui_.pb_upload->setEnabled(false);
-    foreach(QString settings, l) {
-        if(settings.isEmpty()) {
+    foreach (QString settings, l) {
+        if (settings.isEmpty()) {
             continue;
         }
         Server *s = new Server();
@@ -357,21 +335,19 @@ void Screenshot::setServersList(const QStringList& l)
         servers.append(s);
         ui_.cb_servers->addItem(s->displayName());
     }
-    if(servers.size() > 0) {
+    if (servers.size() > 0) {
         ui_.cb_servers->setEnabled(true);
         ui_.pb_upload->setEnabled(true);
     }
 }
 
-void Screenshot::setProxy(const Proxy& p)
-{
-    proxy_ = p;
-}
+void Screenshot::setProxy(const Proxy &p) { proxy_ = p; }
 
 void Screenshot::openImage()
 {
-    QString fileName = QFileDialog::getOpenFileName(nullptr,tr("Open Image"), lastFolder,tr("Images (*.png *.gif *.jpg *.jpeg *.ico)"));
-    if(!fileName.isEmpty()) {
+    QString fileName = QFileDialog::getOpenFileName(nullptr, tr("Open Image"), lastFolder,
+                                                    tr("Images (*.png *.gif *.jpg *.jpeg *.ico)"));
+    if (!fileName.isEmpty()) {
         setImagePath(fileName);
         QFileInfo fi(fileName);
         lastFolder = fi.absoluteDir().path();
@@ -382,7 +358,7 @@ void Screenshot::openImage()
     }
 }
 
-void Screenshot::setImagePath(const QString& path)
+void Screenshot::setImagePath(const QString &path)
 {
     originalPixmap = QPixmap(path);
     updateScreenshotLabel();
@@ -398,39 +374,33 @@ void Screenshot::pixmapAdjusted()
 {
     updateStatusBar();
 
-    if(windowState() == Qt::WindowMaximized)
+    if (windowState() == Qt::WindowMaximized)
         return;
 
     QSize s = ui_.lb_pixmap->size();
-    if(s.height() > 600 || s.width() > 800)
-        resize(800,600);
+    if (s.height() > 600 || s.width() > 800)
+        resize(800, 600);
     else {
-        ui_.scrollArea->setMinimumSize(s + QSize(15,20)); //хак, для красивого уменьшения размера главного окна
+        ui_.scrollArea->setMinimumSize(s + QSize(15, 20)); //хак, для красивого уменьшения размера главного окна
         adjustSize();
         QTimer::singleShot(100, this, SLOT(fixSizes())); // необходимо время, чтобы ресайзить главное окно
     }
 }
 
-void Screenshot::fixSizes()
-{
-    ui_.scrollArea->setMinimumSize(0,0);
-}
+void Screenshot::fixSizes() { ui_.scrollArea->setMinimumSize(0, 0); }
 
-void Screenshot::setModified(bool m)
-{
-    modified = m;
-}
+void Screenshot::setModified(bool m) { modified = m; }
 
 void Screenshot::printScreenshot()
 {
-    QPrinter p;
+    QPrinter      p;
     QPrintDialog *pd = new QPrintDialog(&p, this);
-    if(pd->exec() == QDialog::Accepted && p.isValid()) {
+    if (pd->exec() == QDialog::Accepted && p.isValid()) {
         QPainter painter;
-        painter.begin(&p); 
-        QPixmap pix = ui_.lb_pixmap->getPixmap();
+        painter.begin(&p);
+        QPixmap     pix  = ui_.lb_pixmap->getPixmap();
         const QSize size = p.pageRect().size();
-        if(pix.size().height() > size.height() || pix.size().width() > size.width()) {
+        if (pix.size().height() > size.height() || pix.size().width() > size.width()) {
             pix = pix.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         }
         painter.drawPixmap(0, 0, pix);
@@ -441,7 +411,7 @@ void Screenshot::printScreenshot()
 
 void Screenshot::cancelUpload()
 {
-    if(manager) {
+    if (manager) {
         manager->disconnect();
         manager->deleteLater();
     }
@@ -450,16 +420,16 @@ void Screenshot::cancelUpload()
 
 void Screenshot::bringToFront()
 {
-    Options* o = Options::instance();
-    int x = o->getOption(constWindowX, 0).toInt();
-    int y = o->getOption(constWindowY, 0).toInt();
-    int h = o->getOption(constWindowHeight, 600).toInt();
-    int w = o->getOption(constWindowWidth, 800).toInt();
-    bool max = o->getOption(constWindowState, true).toBool();
+    Options *o   = Options::instance();
+    int      x   = o->getOption(constWindowX, 0).toInt();
+    int      y   = o->getOption(constWindowY, 0).toInt();
+    int      h   = o->getOption(constWindowHeight, 600).toInt();
+    int      w   = o->getOption(constWindowWidth, 800).toInt();
+    bool     max = o->getOption(constWindowState, true).toBool();
 
     resize(w, h);
     move(x, y);
-    if(max)
+    if (max)
         showMaximized();
     else
         showNormal();
@@ -486,7 +456,7 @@ void Screenshot::newScreenshot()
 void Screenshot::screenshotCanceled()
 {
     ui_.pb_new_screenshot->setEnabled(true);
-    if(!isHidden())
+    if (!isHidden())
         bringToFront();
 }
 
@@ -502,10 +472,9 @@ void Screenshot::refreshWindow()
 void Screenshot::captureArea(int delay)
 {
     grabAreaWidget_ = new GrabAreaWidget();
-    if(grabAreaWidget_->exec() == QDialog::Accepted) {
-        QTimer::singleShot(delay*1000, this, SLOT(shootArea()));
-    }
-    else {
+    if (grabAreaWidget_->exec() == QDialog::Accepted) {
+        QTimer::singleShot(delay * 1000, this, SLOT(shootArea()));
+    } else {
         delete grabAreaWidget_;
         grabAreaWidget_ = nullptr;
         qApp->desktop()->repaint();
@@ -515,14 +484,15 @@ void Screenshot::captureArea(int delay)
 
 void Screenshot::shootArea()
 {
-    if(!grabAreaWidget_) {
+    if (!grabAreaWidget_) {
         return;
     }
     const QRect rect = grabAreaWidget_->getRect();
-    if(rect.isValid()) {
+    if (rect.isValid()) {
         qApp->desktop()->repaint();
         qApp->beep();
-        originalPixmap = qApp->primaryScreen()->grabWindow(QApplication::desktop()->winId(), rect.x(), rect.y(), rect.width(), rect.height());
+        originalPixmap = qApp->primaryScreen()->grabWindow(QApplication::desktop()->winId(), rect.x(), rect.y(),
+                                                           rect.width(), rect.height());
     }
 
     delete grabAreaWidget_;
@@ -531,10 +501,7 @@ void Screenshot::shootArea()
     refreshWindow();
 }
 
-void Screenshot::captureWindow(int delay)
-{
-    QTimer::singleShot(delay*1000, this, SLOT(shootWindow()));
-}
+void Screenshot::captureWindow(int delay) { QTimer::singleShot(delay * 1000, this, SLOT(shootWindow())); }
 
 void Screenshot::shootWindow()
 {
@@ -544,10 +511,7 @@ void Screenshot::shootWindow()
     refreshWindow();
 }
 
-void Screenshot::captureDesktop(int delay)
-{
-    QTimer::singleShot(delay*1000, this, SLOT(shootScreen()));
-}
+void Screenshot::captureDesktop(int delay) { QTimer::singleShot(delay * 1000, this, SLOT(shootScreen())); }
 
 void Screenshot::shootScreen()
 {
@@ -560,14 +524,11 @@ void Screenshot::shootScreen()
 void Screenshot::saveScreenshot()
 {
     ui_.pb_save->setEnabled(false);
-    originalPixmap = ui_.lb_pixmap->getPixmap();
+    originalPixmap      = ui_.lb_pixmap->getPixmap();
     QString initialPath = lastFolder + tr("/%1.").arg(QDateTime::currentDateTime().toString(fileNameFormat)) + format;
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"),
-                               initialPath,
-                               tr("%1 Files (*.%2);;All Files (*)")
-                               .arg(format.toUpper())
-                               .arg(format));
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Save As"), initialPath, tr("%1 Files (*.%2);;All Files (*)").arg(format.toUpper()).arg(format));
     if (!fileName.isEmpty()) {
         originalPixmap.save(fileName, format.toLatin1());
         QFileInfo fi(fileName);
@@ -581,9 +542,9 @@ void Screenshot::saveScreenshot()
 void Screenshot::copyUrl()
 {
     QString url = ui_.lb_url->text();
-    if(!url.isEmpty()) {
+    if (!url.isEmpty()) {
         QRegExp re("<a href=\".+\">([^<]+)</a>");
-        if(re.indexIn(url) != -1) {
+        if (re.indexIn(url) != -1) {
             url = re.cap(1);
             qApp->clipboard()->setText(url);
         }
@@ -598,15 +559,15 @@ void Screenshot::dataTransferProgress(qint64 done, qint64 total)
 
 void Screenshot::uploadScreenshot()
 {
-    if(!ui_.cb_servers->isEnabled())
+    if (!ui_.cb_servers->isEnabled())
         return;
 
     int index = ui_.cb_servers->currentIndex();
-    if(index == -1 || servers.size() <= index)
+    if (index == -1 || servers.size() <= index)
         return;
 
     Server *s = servers.at(index);
-    if(!s)
+    if (!s)
         return;
 
     QString scheme = QUrl(s->url()).scheme();
@@ -618,20 +579,18 @@ void Screenshot::uploadScreenshot()
 
     if (scheme.toLower() == QLatin1String(PROTOCOL_FTP)) {
         uploadFtp();
-    }
-    else if (scheme.toLower() == QLatin1String(PROTOCOL_HTTP)) {
+    } else if (scheme.toLower() == QLatin1String(PROTOCOL_HTTP)) {
         uploadHttp();
-    }
-    else
+    } else
         cancelUpload();
 }
 
 void Screenshot::uploadFtp()
 {
     ba.clear();
-    QBuffer buffer( &ba );
-    buffer.open( QBuffer::ReadWrite );
-    originalPixmap.save( &buffer , format.toLatin1() );
+    QBuffer buffer(&ba);
+    buffer.open(QBuffer::ReadWrite);
+    originalPixmap.save(&buffer, format.toLatin1());
 
     QString fileName = tr("%1.").arg(QDateTime::currentDateTime().toString(fileNameFormat)) + format;
 
@@ -639,7 +598,7 @@ void Screenshot::uploadFtp()
     fileName = fi.fileName();
 
     Server *s = servers.at(ui_.cb_servers->currentIndex());
-    if(!s)
+    if (!s)
         cancelUpload();
 
     QUrl u;
@@ -648,22 +607,23 @@ void Screenshot::uploadFtp()
     u.setUserName(s->userName());
     u.setPassword(s->password());
 
-    if(manager) {
+    if (manager) {
         delete manager;
     }
 
     manager = new QNetworkAccessManager(this);
-    if(s->useProxy() && !proxy_.host.isEmpty()) {
-        QNetworkProxy p = QNetworkProxy(QNetworkProxy::HttpCachingProxy, proxy_.host, quint16(proxy_.port), proxy_.user, proxy_.pass);
-        if(proxy_.type == "socks")
+    if (s->useProxy() && !proxy_.host.isEmpty()) {
+        QNetworkProxy p = QNetworkProxy(QNetworkProxy::HttpCachingProxy, proxy_.host, quint16(proxy_.port), proxy_.user,
+                                        proxy_.pass);
+        if (proxy_.type == "socks")
             p.setType(QNetworkProxy::Socks5Proxy);
         manager->setProxy(p);
     }
 
     QString path = u.path();
-    if(path.right(1) != "/")
+    if (path.right(1) != "/")
         path += "/";
-    u.setPath(path+fileName);
+    u.setPath(path + fileName);
 
     ui_.progressBar->setValue(0);
     ui_.progressBar->show();
@@ -671,8 +631,8 @@ void Screenshot::uploadFtp()
 
     QNetworkReply *reply = manager->put(QNetworkRequest(u), ba);
 
-    connect(reply, SIGNAL(uploadProgress(qint64 , qint64)), this, SLOT(dataTransferProgress(qint64 , qint64)));
-    //connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(replyError(QNetworkReply::NetworkError)));
+    connect(reply, SIGNAL(uploadProgress(qint64, qint64)), this, SLOT(dataTransferProgress(qint64, qint64)));
+    // connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(replyError(QNetworkReply::NetworkError)));
     connect(reply, SIGNAL(finished()), this, SLOT(ftpReplyFinished()));
 
     modified = false;
@@ -686,13 +646,13 @@ void Screenshot::uploadHttp()
     QString filename = tr("%1.").arg(QDateTime::currentDateTime().toString(fileNameFormat)) + format;
 
     Server *s = servers.at(ui_.cb_servers->currentIndex());
-    if(!s)
+    if (!s)
         cancelUpload();
 
-    if (s->servPostdata().length()>0) {
+    if (s->servPostdata().length() > 0) {
         foreach (QString poststr, s->servPostdata().split("&")) {
             QStringList postpair = poststr.split("=");
-            if(postpair.count() < 2)
+            if (postpair.count() < 2)
                 continue;
             ba.append("--" + boundary + "\r\n");
             ba.append("Content-Disposition: form-data; name=\"" + postpair[0] + "\"\r\n");
@@ -701,30 +661,32 @@ void Screenshot::uploadHttp()
     }
 
     ba.append("--" + boundary + "\r\n");
-    ba.append("Content-Disposition: form-data; name=\"" + s->servFileinput() + "\"; filename=\"" + filename.toUtf8() + "\"\r\n");
+    ba.append("Content-Disposition: form-data; name=\"" + s->servFileinput() + "\"; filename=\"" + filename.toUtf8()
+              + "\"\r\n");
     ba.append("Content-Transfer-Encoding: binary\r\n");
     ba.append(QString("Content-Type: image/%1\r\n")
-          .arg(format == "jpg" ? "jpeg" : format) // FIXME!!!!! жуткий костыль, но что поделаешь
-          .toUtf8());
+                  .arg(format == "jpg" ? "jpeg" : format) // FIXME!!!!! жуткий костыль, но что поделаешь
+                  .toUtf8());
     ba.append("\r\n");
 
     QByteArray a;
-    QBuffer buffer(&a);
-    buffer.open( QBuffer::ReadWrite );
-    originalPixmap.save( &buffer , format.toLatin1() );
+    QBuffer    buffer(&a);
+    buffer.open(QBuffer::ReadWrite);
+    originalPixmap.save(&buffer, format.toLatin1());
     ba.append(a);
 
     ba.append("\r\n--" + boundary + "--\r\n");
 
-    if(manager) {
+    if (manager) {
         delete manager;
     }
 
     manager = new QNetworkAccessManager(this);
 
-    if(s->useProxy() && !proxy_.host.isEmpty()) {
-        QNetworkProxy p = QNetworkProxy(QNetworkProxy::HttpCachingProxy, proxy_.host, quint16(proxy_.port), proxy_.user, proxy_.pass);
-        if(proxy_.type == "socks")
+    if (s->useProxy() && !proxy_.host.isEmpty()) {
+        QNetworkProxy p = QNetworkProxy(QNetworkProxy::HttpCachingProxy, proxy_.host, quint16(proxy_.port), proxy_.user,
+                                        proxy_.pass);
+        if (proxy_.type == "socks")
             p.setType(QNetworkProxy::Socks5Proxy);
         manager->setProxy(p);
     }
@@ -742,26 +704,25 @@ void Screenshot::uploadHttp()
     ui_.progressBar->show();
     ui_.urlFrame->setVisible(false);
 
-    QNetworkReply* reply = manager->post(netreq, ba);
-    connect(reply, SIGNAL(uploadProgress(qint64 , qint64)), this, SLOT(dataTransferProgress(qint64 , qint64)));
-    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(httpReplyFinished(QNetworkReply*)));
+    QNetworkReply *reply = manager->post(netreq, ba);
+    connect(reply, SIGNAL(uploadProgress(qint64, qint64)), this, SLOT(dataTransferProgress(qint64, qint64)));
+    connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(httpReplyFinished(QNetworkReply *)));
     modified = false;
 }
 
 void Screenshot::ftpReplyFinished()
 {
-    QNetworkReply *reply = static_cast<QNetworkReply*>(sender());
+    QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
     ui_.urlFrame->setVisible(true);
-    if(reply->error() == QNetworkReply::NoError) {
+    if (reply->error() == QNetworkReply::NoError) {
         const QString url = reply->url().toString(QUrl::RemoveUserInfo | QUrl::StripTrailingSlash);
         ui_.lb_url->setText(QString("<a href=\"%1\">%1</a>").arg(url));
         history_.push_front(url);
-        if(history_.size() > MAX_HISTORY_SIZE) {
+        if (history_.size() > MAX_HISTORY_SIZE) {
             history_.removeLast();
         }
         settingsChanged(constHistory, history_);
-    }
-    else {
+    } else {
         ui_.lb_url->setText(reply->errorString());
     }
     reply->close();
@@ -771,7 +732,7 @@ void Screenshot::ftpReplyFinished()
 
 void Screenshot::httpReplyFinished(QNetworkReply *reply)
 {
-    if(reply->error() != QNetworkReply::NoError) {
+    if (reply->error() != QNetworkReply::NoError) {
         ui_.urlFrame->setVisible(true);
         ui_.lb_url->setText(reply->errorString());
         updateWidgets(false);
@@ -780,30 +741,28 @@ void Screenshot::httpReplyFinished(QNetworkReply *reply)
         return;
     }
 
-    const QString loc = reply->rawHeader("Location");
+    const QString loc     = reply->rawHeader("Location");
     const QString refresh = reply->rawHeader("refresh");
     if (!loc.isEmpty()) {
         newRequest(reply, loc);
-    }
-    else if(!refresh.isEmpty() && refresh.contains("url=", Qt::CaseInsensitive)) {
+    } else if (!refresh.isEmpty() && refresh.contains("url=", Qt::CaseInsensitive)) {
         QStringList tmp = refresh.split("=");
-        if(tmp.size() > 1) {
+        if (tmp.size() > 1) {
             newRequest(reply, tmp.last());
         }
-    }
-    else {
-        Server *s = servers.at(ui_.cb_servers->currentIndex());
+    } else {
+        Server *s    = servers.at(ui_.cb_servers->currentIndex());
         QString page = reply->readAll();
 
-//
-//        //Код нужен для анализа html и нахождения ссылки на картинку
-//        QFile f(QDir::home().absolutePath() + "/page.html");
-//        if(f.open(QIODevice::WriteOnly)) {
-//            QTextStream out(&f);
-//            out << page;
-//            f.close();
-//        }
-//
+        //
+        //        //Код нужен для анализа html и нахождения ссылки на картинку
+        //        QFile f(QDir::home().absolutePath() + "/page.html");
+        //        if(f.open(QIODevice::WriteOnly)) {
+        //            QTextStream out(&f);
+        //            out << page;
+        //            f.close();
+        //        }
+        //
 
         QRegExp rx(s->servRegexp());
         ui_.urlFrame->setVisible(true);
@@ -811,12 +770,11 @@ void Screenshot::httpReplyFinished(QNetworkReply *reply)
             QString imageurl = rx.cap(1);
             ui_.lb_url->setText(QString("<a href=\"%1\">%1</a>").arg(imageurl));
             history_.push_front(imageurl);
-            if(history_.size() > MAX_HISTORY_SIZE) {
+            if (history_.size() > MAX_HISTORY_SIZE) {
                 history_.removeLast();
             }
             settingsChanged(constHistory, history_);
-        }
-        else
+        } else
             ui_.lb_url->setText(tr("Can't parse URL (Reply URL: <a href=\"%1\">%1</a>)").arg(reply->url().toString()));
 
         updateWidgets(false);
@@ -827,7 +785,7 @@ void Screenshot::httpReplyFinished(QNetworkReply *reply)
 
 void Screenshot::newRequest(const QNetworkReply *const old, const QString &link)
 {
-    if(!manager || !old || link.isEmpty())
+    if (!manager || !old || link.isEmpty())
         return;
 
     QUrl netrequrl(link);
@@ -836,19 +794,18 @@ void Screenshot::newRequest(const QNetworkReply *const old, const QString &link)
     QNetworkRequest netreq(netrequrl);
 
     ui_.progressBar->setValue(0);
-    QNetworkReply* reply = manager->get(netreq);
-    connect(reply, SIGNAL(uploadProgress(qint64 , qint64)), this, SLOT(dataTransferProgress(qint64 , qint64)));
+    QNetworkReply *reply = manager->get(netreq);
+    connect(reply, SIGNAL(uploadProgress(qint64, qint64)), this, SLOT(dataTransferProgress(qint64, qint64)));
 }
 
 void Screenshot::closeEvent(QCloseEvent *e)
 {
-    if(modified) {
+    if (modified) {
         int ret = QMessageBox::question(this, tr("Close Screenshot"), tr("Are you sure?"),
-                        QMessageBox::Ok | QMessageBox::Cancel);
-        if(ret == QMessageBox::Ok) {
+                                        QMessageBox::Ok | QMessageBox::Cancel);
+        if (ret == QMessageBox::Ok) {
             e->accept();
-        }
-        else {
+        } else {
             e->ignore();
         }
     }
@@ -862,17 +819,14 @@ void Screenshot::settingsChanged(const QString &option, const QVariant &value)
 void Screenshot::doOptions()
 {
     OptionsDlg od(this);
-    if(od.exec() == QDialog::Accepted) {
+    if (od.exec() == QDialog::Accepted) {
         refreshSettings();
     }
 }
 
-void Screenshot::doHistory()
-{
-    new HistoryDlg(history_, this);
-}
+void Screenshot::doHistory() { new HistoryDlg(history_, this); }
 
-//void Screenshot::doProxySettings()
+// void Screenshot::doProxySettings()
 //{
 //    ProxySettingsDlg ps(this);
 //    ps.setProxySettings(proxy_);
@@ -883,16 +837,16 @@ void Screenshot::doHistory()
 
 void Screenshot::refreshSettings()
 {
-    Options* o = Options::instance();
-    format = o->getOption(constFormat, format).toString();
+    Options *o     = Options::instance();
+    format         = o->getOption(constFormat, format).toString();
     fileNameFormat = o->getOption(constFileName, fileNameFormat).toString();
-    lastFolder = o->getOption(constLastFolder, lastFolder).toString();
+    lastFolder     = o->getOption(constLastFolder, lastFolder).toString();
     setServersList(o->getOption(constServerList).toStringList());
 }
 
 void Screenshot::saveGeometry()
 {
-    Options* o = Options::instance();
+    Options *o = Options::instance();
     o->setOption(constWindowState, QVariant(windowState() & Qt::WindowMaximized));
     o->setOption(constWindowX, x());
     o->setOption(constWindowY, y());
@@ -902,9 +856,9 @@ void Screenshot::saveGeometry()
 
 bool Screenshot::eventFilter(QObject *o, QEvent *e)
 {
-    if(o == ui_.lb_pixmap && e->type() == QEvent::MouseMove) {
-        QMouseEvent *me = static_cast<QMouseEvent*>(e);
-        if(me->buttons() == Qt::LeftButton) {
+    if (o == ui_.lb_pixmap && e->type() == QEvent::MouseMove) {
+        QMouseEvent *me = static_cast<QMouseEvent *>(e);
+        if (me->buttons() == Qt::LeftButton) {
             QPoint pos = me->pos();
             ui_.scrollArea->ensureVisible(pos.x(), pos.y(), 10, 10);
         }

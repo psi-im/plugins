@@ -34,11 +34,9 @@ inline QString uidToName(const QString &uid)
 {
     if (uid.contains('(')) {
         return uid.section('(', 0, 0).trimmed();
-    }
-    else if (uid.contains('<')) {
+    } else if (uid.contains('<')) {
         return uid.section('<', 0, 0).trimmed();
-    }
-    else {
+    } else {
         return uid.trimmed();
     }
 }
@@ -47,8 +45,7 @@ inline QString uidToEMail(const QString &uid)
 {
     if (uid.contains('<') && uid.contains('>')) {
         return uid.section('<', 1).section('>', 0, 0).trimmed();
-    }
-    else
+    } else
         return "";
 }
 
@@ -56,15 +53,14 @@ inline QString uidToComment(const QString &uid)
 {
     if (uid.contains('(') && uid.contains(')')) {
         return uid.section('(', 1).section(')', 0, 0).trimmed();
-    }
-    else {
+    } else {
         return "";
     }
 }
 
-QList<QStandardItem*> parseLine(const QString &line)
+QList<QStandardItem *> parseLine(const QString &line)
 {
-    QList<QStandardItem*> rows;
+    QList<QStandardItem *> rows;
 
     // Used ID
     QString uid = line.section(':', 9, 9);
@@ -92,12 +88,22 @@ QList<QStandardItem*> parseLine(const QString &line)
 
     // Algorithm
     int alg = line.section(':', 3, 3).toInt();
-    switch(alg) {
-    case 1: rows << new QStandardItem("RSA"); break;
-    case 16: rows << new QStandardItem("ELG-E"); break;
-    case 17: rows << new QStandardItem("DSA"); break;
-    case 18: rows << new QStandardItem("ECC"); break;
-    default: rows << new QStandardItem(""); break;
+    switch (alg) {
+    case 1:
+        rows << new QStandardItem("RSA");
+        break;
+    case 16:
+        rows << new QStandardItem("ELG-E");
+        break;
+    case 17:
+        rows << new QStandardItem("DSA");
+        break;
+    case 18:
+        rows << new QStandardItem("ECC");
+        break;
+    default:
+        rows << new QStandardItem("");
+        break;
     }
 
     // Short ID
@@ -109,10 +115,7 @@ QList<QStandardItem*> parseLine(const QString &line)
     return rows;
 }
 
-Model::Model(QObject *parent)
-    : QStandardItemModel(parent)
-{
-}
+Model::Model(QObject *parent) : QStandardItemModel(parent) { }
 
 void Model::listKeys()
 {
@@ -125,15 +128,15 @@ void Model::listKeys()
             headerLabels << QString();
         }
 
-        headerLabels[Type] = tr("Type");
-        headerLabels[Name] = tr("Name");
-        headerLabels[Email] = tr("E-Mail");
-        headerLabels[Created] = tr("Created");
-        headerLabels[Expiration] = tr("Expiration");
-        headerLabels[Length] = tr("Length");
-        headerLabels[Comment] = tr("Comment");
-        headerLabels[Algorithm] = tr("Algorithm");
-        headerLabels[ShortId] = tr("Short ID");
+        headerLabels[Type]        = tr("Type");
+        headerLabels[Name]        = tr("Name");
+        headerLabels[Email]       = tr("E-Mail");
+        headerLabels[Created]     = tr("Created");
+        headerLabels[Expiration]  = tr("Expiration");
+        headerLabels[Length]      = tr("Length");
+        headerLabels[Comment]     = tr("Comment");
+        headerLabels[Algorithm]   = tr("Algorithm");
+        headerLabels[ShortId]     = tr("Short ID");
         headerLabels[Fingerprint] = tr("Fingerprint");
     }
 
@@ -160,16 +163,15 @@ void Model::listKeys()
     process.waitForFinished();
     keysRaw += QString::fromUtf8(process.readAll());
 
-
     showKeys(keysRaw);
 }
 
 void Model::showKeys(const QString &keysRaw)
 {
-    QStringList list = keysRaw.split("\n");
-    QList<QStandardItem*> lastRow;
-    QList<QStandardItem*> row;
-    QStringList secretKeys;
+    QStringList            list = keysRaw.split("\n");
+    QList<QStandardItem *> lastRow;
+    QList<QStandardItem *> row;
+    QStringList            secretKeys;
     foreach (QString line, list) {
         QString type = line.section(':', 0, 0);
         if (type == "pub" || type == "sec") {
@@ -178,16 +180,14 @@ void Model::showKeys(const QString &keysRaw)
             // Show only secret part for keys pair
             if (type == "sec") {
                 secretKeys << row.at(Algorithm)->text();
-            }
-            else if (secretKeys.indexOf(row.at(ShortId)->text()) >= 0) {
+            } else if (secretKeys.indexOf(row.at(ShortId)->text()) >= 0) {
                 lastRow.clear();
                 continue;
             }
 
             appendRow(row);
             lastRow = row;
-        }
-        else if ((type == "uid" || type == "ssb" || type == "sub") && !lastRow.isEmpty()) {
+        } else if ((type == "uid" || type == "ssb" || type == "sub") && !lastRow.isEmpty()) {
             row = parseLine(line);
             lastRow.first()->appendRow(row);
             if (lastRow.first()->rowCount() == 1) {
@@ -195,8 +195,7 @@ void Model::showKeys(const QString &keysRaw)
                 lastRow.at(Email)->setText(row.at(Email)->text());
                 lastRow.at(Comment)->setText(row.at(Comment)->text());
             }
-        }
-        else if (type == "fpr") {
+        } else if (type == "fpr") {
             row.at(Fingerprint)->setText(line.section(':', Fingerprint, Fingerprint));
         }
     }

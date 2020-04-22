@@ -26,112 +26,106 @@
 
 #include "iconfactoryaccessinghost.h"
 
-
-
 //------------------------------------------
 //-----------ClearingViewer-----------------
 //------------------------------------------
 void ClearingViewer::init(IconFactoryAccessingHost *iconHost)
 {
-        iconHost_ = iconHost;
-        resizeColumnsToContents();
-        horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-        horizontalHeader()->setStretchLastSection(true);
-        horizontalHeader()->setSortIndicator(-1, Qt::AscendingOrder);
-        verticalHeader()->setDefaultAlignment( Qt::AlignHCenter );
+    iconHost_ = iconHost;
+    resizeColumnsToContents();
+    horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    horizontalHeader()->setStretchLastSection(true);
+    horizontalHeader()->setSortIndicator(-1, Qt::AscendingOrder);
+    verticalHeader()->setDefaultAlignment(Qt::AlignHCenter);
 
-        connect(horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(sortByColumn(int)));
-        connect(this, SIGNAL(clicked(QModelIndex)), this, SLOT(itemClicked(QModelIndex)));
+    connect(horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(sortByColumn(int)));
+    connect(this, SIGNAL(clicked(QModelIndex)), this, SLOT(itemClicked(QModelIndex)));
 }
 
-void ClearingViewer::keyPressEvent(QKeyEvent * e)
+void ClearingViewer::keyPressEvent(QKeyEvent *e)
 {
-        if (e->key() == Qt::Key_Space) {
-                foreach(const QModelIndex &check, selectionModel()->selectedRows(0)) {
-                        model()->setData(check, 3); //invert
-                }
-                e->accept();
-        } else {
-                QTableView::keyPressEvent(e);
-                e->ignore();
+    if (e->key() == Qt::Key_Space) {
+        foreach (const QModelIndex &check, selectionModel()->selectedRows(0)) {
+            model()->setData(check, 3); // invert
         }
-}
-
-void ClearingViewer::contextMenuEvent( QContextMenuEvent * e )
-{
-        QMenu *popup = new QMenu(this);
-        QList<QAction *> actions;
-        actions <<new QAction(iconHost_->getIcon("psi/cm_check"), tr("Check"), popup)
-                        <<new QAction(iconHost_->getIcon("psi/cm_uncheck"), tr("Uncheck"), popup)
-                        <<new QAction(iconHost_->getIcon("psi/cm_invertcheck"), tr("Invert"), popup);
-        popup->addActions(actions);
-        QAction *result = popup->exec(e->globalPos());
-        int iresult;
-        if (result) {
-                iresult = actions.indexOf(result);
-                foreach(const QModelIndex &check, selectionModel()->selectedRows(0)) {
-                        switch (iresult) {
-            case 0: //check
-                model()->setData(check, QVariant(2));
-                break;
-            case 1: //uncheck
-                model()->setData(check, QVariant(0));
-                break;
-            case 2: //invert
-                model()->setData(check, QVariant(3));
-                break;
-                        }
-                }
-        }
-        delete popup;
-}
-
-void ClearingViewer::itemClicked(const QModelIndex& index)
-{
-    if(index.column() == 0) {
-        model()->setData(currentIndex(), 3); //invert
+        e->accept();
+    } else {
+        QTableView::keyPressEvent(e);
+        e->ignore();
     }
 }
 
+void ClearingViewer::contextMenuEvent(QContextMenuEvent *e)
+{
+    QMenu *          popup = new QMenu(this);
+    QList<QAction *> actions;
+    actions << new QAction(iconHost_->getIcon("psi/cm_check"), tr("Check"), popup)
+            << new QAction(iconHost_->getIcon("psi/cm_uncheck"), tr("Uncheck"), popup)
+            << new QAction(iconHost_->getIcon("psi/cm_invertcheck"), tr("Invert"), popup);
+    popup->addActions(actions);
+    QAction *result = popup->exec(e->globalPos());
+    int      iresult;
+    if (result) {
+        iresult = actions.indexOf(result);
+        foreach (const QModelIndex &check, selectionModel()->selectedRows(0)) {
+            switch (iresult) {
+            case 0: // check
+                model()->setData(check, QVariant(2));
+                break;
+            case 1: // uncheck
+                model()->setData(check, QVariant(0));
+                break;
+            case 2: // invert
+                model()->setData(check, QVariant(3));
+                break;
+            }
+        }
+    }
+    delete popup;
+}
 
-
+void ClearingViewer::itemClicked(const QModelIndex &index)
+{
+    if (index.column() == 0) {
+        model()->setData(currentIndex(), 3); // invert
+    }
+}
 
 //------------------------------------------
 //-----------AvatarDelegate-----------------
 //------------------------------------------
-QSize AvatarDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, const QModelIndex & index) const
+QSize AvatarDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, const QModelIndex &index) const
 {
-    if(!index.isValid())
-        return QSize(0,0);
+    if (!index.isValid())
+        return QSize(0, 0);
 
     return QSize(300, 120);
 }
 
-void AvatarDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
+void AvatarDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QPalette palette = option.palette;
-    QRect r = option.rect;
-    QColor c = (option.state & QStyle::State_Selected) ? palette.color(QPalette::Highlight) : palette.color(QPalette::Base);
+    QRect    r       = option.rect;
+    QColor   c
+        = (option.state & QStyle::State_Selected) ? palette.color(QPalette::Highlight) : palette.color(QPalette::Base);
     painter->fillRect(r, c);
 
     QPixmap pix = index.data(Qt::DisplayRole).value<QPixmap>();
     painter->save();
     painter->setClipRect(r);
-    if(!pix.isNull()) {
-        pix = pix.scaled(100,100, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        r.translate(10,10);
+    if (!pix.isNull()) {
+        pix = pix.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        r.translate(10, 10);
         r.setSize(pix.size());
         painter->drawPixmap(r, pix);
     } else {
-        QPalette::ColorGroup cg = option.state & QStyle::State_Enabled
-                      ? QPalette::Normal : QPalette::Disabled;
+        QPalette::ColorGroup cg = option.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
         if (option.state & QStyle::State_Selected) {
             painter->setPen(option.palette.color(cg, QPalette::HighlightedText));
-        }
-        else {
+        } else {
             painter->setPen(option.palette.color(cg, QPalette::Text));
         }
-        r.translate(20,50);
+        r.translate(20, 50);
         painter->drawText(r, tr("Empty file"));
     }
     painter->restore();

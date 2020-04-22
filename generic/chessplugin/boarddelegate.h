@@ -23,14 +23,12 @@
 #include <QItemDelegate>
 namespace Chess {
 
-class BoardDelegate : public QItemDelegate
-{
+class BoardDelegate : public QItemDelegate {
     Q_OBJECT
 
 public:
     BoardDelegate(QObject *parent) : QItemDelegate(parent) {};
-    virtual void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
-
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 }
 #endif // BOARDDELEGATE_H

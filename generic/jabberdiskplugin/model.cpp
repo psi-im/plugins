@@ -19,23 +19,18 @@
 
 #include "model.h"
 #include <QApplication>
-#include <QStyle>
 #include <QMimeData>
+#include <QStyle>
 //#include <QDebug>
 
-JDModel::JDModel(const QString &diskName, QObject *parent)
-    : QAbstractItemModel(parent)
-    , diskName_(diskName)
-    , rootIndex_(createIndex(0, 0, static_cast<quintptr>(0)))
+JDModel::JDModel(const QString &diskName, QObject *parent) :
+    QAbstractItemModel(parent), diskName_(diskName), rootIndex_(createIndex(0, 0, static_cast<quintptr>(0)))
 {
 }
 
-JDModel::~JDModel()
-{
-    removeAll();
-}
+JDModel::~JDModel() { removeAll(); }
 
-Qt::ItemFlags JDModel::flags(const QModelIndex& index) const
+Qt::ItemFlags JDModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags f = QAbstractItemModel::flags(index);
 
@@ -43,7 +38,7 @@ Qt::ItemFlags JDModel::flags(const QModelIndex& index) const
         return f;
 
     f |= Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-    if(index.data(RoleType) == JDItem::File)
+    if (index.data(RoleType) == JDItem::File)
         f |= Qt::ItemIsDragEnabled;
     else
         f |= Qt::ItemIsDropEnabled;
@@ -52,28 +47,28 @@ Qt::ItemFlags JDModel::flags(const QModelIndex& index) const
 }
 
 int JDModel::rowCount(const QModelIndex &parent) const
- {
-    if(parent == QModelIndex()) {
+{
+    if (parent == QModelIndex()) {
         return 1;
     }
 
     int count = 0;
-    foreach(const ProxyItem& i, items_) {
-        if(i.parent == parent)
+    foreach (const ProxyItem &i, items_) {
+        if (i.parent == parent)
             ++count;
     }
 
     return count;
- }
+}
 
 bool JDModel::hasChildren(const QModelIndex &parent) const
 {
-    JDItem *i = (JDItem*)parent.internalPointer();
-    if(i) {
-        if(i->type() == JDItem::File)
+    JDItem *i = (JDItem *)parent.internalPointer();
+    if (i) {
+        if (i->type() == JDItem::File)
             return false;
-        foreach(const ProxyItem& item, items_) {
-            if(item.item->parent() == i)
+        foreach (const ProxyItem &item, items_) {
+            if (item.item->parent() == i)
                 return true;
         }
     }
@@ -86,22 +81,22 @@ QVariant JDModel::headerData(int /*section*/, Qt::Orientation /*orientation*/, i
     return QVariant();
 }
 
-QModelIndex JDModel::index(int row, int column, const QModelIndex& parent) const
+QModelIndex JDModel::index(int row, int column, const QModelIndex &parent) const
 {
-    if(column != 0)
+    if (column != 0)
         return QModelIndex();
 
-    if(parent == QModelIndex()) {
-        if(row == 0)
+    if (parent == QModelIndex()) {
+        if (row == 0)
             return rootIndex();
         else
             return QModelIndex();
     }
 
     int c = 0;
-    foreach(const ProxyItem& i, items_) {
-        if(i.parent == parent) {
-            if(row == c)
+    foreach (const ProxyItem &i, items_) {
+        if (i.parent == parent) {
+            if (row == c)
                 return i.index;
             ++c;
         }
@@ -110,15 +105,15 @@ QModelIndex JDModel::index(int row, int column, const QModelIndex& parent) const
     return QModelIndex();
 }
 
-QModelIndex JDModel::parent(const QModelIndex& index) const
+QModelIndex JDModel::parent(const QModelIndex &index) const
 {
-    if(!index.isValid())
+    if (!index.isValid())
         return QModelIndex();
-    else if(!index.internalPointer())
+    else if (!index.internalPointer())
         return QModelIndex();
 
-    foreach(const ProxyItem& i, items_)
-        if(i.index == index)
+    foreach (const ProxyItem &i, items_)
+        if (i.index == index)
             return i.parent;
 
     return QModelIndex();
@@ -126,50 +121,45 @@ QModelIndex JDModel::parent(const QModelIndex& index) const
 
 QModelIndex JDModel::indexForItem(JDItem *item) const
 {
-    foreach(const ProxyItem& i, items_)
-        if(i.item == item)
+    foreach (const ProxyItem &i, items_)
+        if (i.item == item)
             return i.index;
 
     return QModelIndex();
 }
 
-const QModelIndex JDModel::rootIndex() const
-{
-    return rootIndex_;
-}
+const QModelIndex JDModel::rootIndex() const { return rootIndex_; }
 
-const QString JDModel::disk() const
-{
-    return diskName_.split("@").first();
-}
+const QString JDModel::disk() const { return diskName_.split("@").first(); }
 
-bool JDModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int /*row*/, int /*column*/, const QModelIndex &parent)
+bool JDModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int /*row*/, int /*column*/,
+                           const QModelIndex &parent)
 {
-    if(!parent.isValid())
+    if (!parent.isValid())
         return false;
-    if(action != Qt::CopyAction && action != Qt::MoveAction)
+    if (action != Qt::CopyAction && action != Qt::MoveAction)
         return false;
-    if(!data->hasFormat(JDItem::mimeType()))
+    if (!data->hasFormat(JDItem::mimeType()))
         return false;
 
     JDItem *p = nullptr;
-    if(parent != rootIndex()) {
-        foreach(const ProxyItem& i, items_) {
-            if(i.index == parent) {
+    if (parent != rootIndex()) {
+        foreach (const ProxyItem &i, items_) {
+            if (i.index == parent) {
                 p = i.item;
                 break;
             }
         }
     }
-    if(p && p->type() == JDItem::File)
+    if (p && p->type() == JDItem::File)
         return false;
 
-    JDItem* newItem = new JDItem(JDItem::File, p);
-    QByteArray ba = data->data(JDItem::mimeType());
+    JDItem *    newItem = new JDItem(JDItem::File, p);
+    QByteArray  ba      = data->data(JDItem::mimeType());
     QDataStream in(&ba, QIODevice::ReadOnly);
     newItem->fromDataStream(&in);
 
-    if(addItem(newItem)) {
+    if (addItem(newItem)) {
         //В DataStream осталась только информация о полном пути
         //к старому элементу, и ее можно получить
         QString path;
@@ -180,15 +170,15 @@ bool JDModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int /*r
     return true;
 }
 
-QMimeData* JDModel::mimeData(const QModelIndexList &indexes) const
+QMimeData *JDModel::mimeData(const QModelIndexList &indexes) const
 {
-    if(indexes.isEmpty())
+    if (indexes.isEmpty())
         return nullptr;
 
-    QMimeData *data = nullptr;
-    QModelIndex i = indexes.first();
-    foreach(const ProxyItem& item, items_) {
-        if(item.index == i) {
+    QMimeData * data = nullptr;
+    QModelIndex i    = indexes.first();
+    foreach (const ProxyItem &item, items_) {
+        if (item.index == i) {
             data = item.item->mimeData();
             break;
         }
@@ -197,17 +187,11 @@ QMimeData* JDModel::mimeData(const QModelIndexList &indexes) const
     return data;
 }
 
-Qt::DropActions JDModel::supportedDropActions() const
-{
-    return Qt::MoveAction;
-}
+Qt::DropActions JDModel::supportedDropActions() const { return Qt::MoveAction; }
 
-QStringList JDModel::mimeTypes() const
-{
-    return QStringList(JDItem::mimeType());
-}
+QStringList JDModel::mimeTypes() const { return QStringList(JDItem::mimeType()); }
 
-//bool JDModel::removeRow(int row, const QModelIndex &parent)
+// bool JDModel::removeRow(int row, const QModelIndex &parent)
 //{
 //    if(!parent.isValid())
 //        return false;
@@ -235,42 +219,39 @@ QVariant JDModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    if(!index.internalPointer()) {
-        if(role == Qt::DisplayRole) {
+    if (!index.internalPointer()) {
+        if (role == Qt::DisplayRole) {
             return diskName_;
-        }
-        else if(role == RoleFullPath)
+        } else if (role == RoleFullPath)
             return rootPath();
-    }
-    else {
-        JDItem* i = (JDItem*)index.internalPointer();
-        if(i) {
-            if(role == Qt::DisplayRole) {
+    } else {
+        JDItem *i = (JDItem *)index.internalPointer();
+        if (i) {
+            if (role == Qt::DisplayRole) {
                 QString text;
-                if(i->type() == JDItem::Dir)
+                if (i->type() == JDItem::Dir)
                     text = i->name();
                 else
-                    text = QString("%1 - %2 [%3] - %4").arg(QString::number(i->number()), i->name(), i->size(), i->description());
+                    text = QString("%1 - %2 [%3] - %4")
+                               .arg(QString::number(i->number()), i->name(), i->size(), i->description());
 
                 return text;
-            }
-            else if(role == RoleName)
+            } else if (role == RoleName)
                 return i->name();
-            else if(role == RoleSize)
+            else if (role == RoleSize)
                 return i->size();
-            else if(role == RoleNumber)
+            else if (role == RoleNumber)
                 return i->number();
-            else if(role == RoleType)
+            else if (role == RoleType)
                 return i->type();
-            else if(role == Qt::DecorationRole) {
-                if(i->type() == JDItem::Dir)
+            else if (role == Qt::DecorationRole) {
+                if (i->type() == JDItem::Dir)
                     return qApp->style()->standardIcon(QStyle::SP_DirIcon);
                 else
                     return qApp->style()->standardIcon(QStyle::SP_FileIcon);
-            }
-            else if(role == RoleFullPath)
+            } else if (role == RoleFullPath)
                 return i->fullPath();
-            else if(role == RoleParentPath)
+            else if (role == RoleParentPath)
                 return i->parentPath();
         }
     }
@@ -280,27 +261,26 @@ QVariant JDModel::data(const QModelIndex &index, int role) const
 
 bool JDModel::addItem(JDItem *i)
 {
-    if(items_.contains(i))
+    if (items_.contains(i))
         return false;
 
     ProxyItem pi;
     pi.item = i;
 
-    if(i->parent()) {
-        foreach(const ProxyItem& item, items_) {
-            if(item.item == i->parent()) {
+    if (i->parent()) {
+        foreach (const ProxyItem &item, items_) {
+            if (item.item == i->parent()) {
                 pi.parent = item.index;
                 break;
             }
         }
-    }
-    else {
+    } else {
         pi.parent = rootIndex();
     }
 
     int count = 0;
-    foreach(const ProxyItem& item, items_) {
-        if(item.item->parent() == i->parent())
+    foreach (const ProxyItem &item, items_) {
+        if (item.item->parent() == i->parent())
             ++count;
     }
 
@@ -321,19 +301,19 @@ void JDModel::clear()
 
 void JDModel::removeAll()
 {
-//    while(!items_.isEmpty())
-//        delete items_.takeFirst().item;
+    //    while(!items_.isEmpty())
+    //        delete items_.takeFirst().item;
     items_.clear();
 }
 
-JDItem* JDModel::findDirItem(const QString &path) const
+JDItem *JDModel::findDirItem(const QString &path) const
 {
-    if(!path.isEmpty()) {
-        foreach(const ProxyItem i, items_) {
-            if(i.item->type() != JDItem::Dir)
+    if (!path.isEmpty()) {
+        foreach (const ProxyItem i, items_) {
+            if (i.item->type() != JDItem::Dir)
                 continue;
 
-            if(i.item->fullPath() == path)
+            if (i.item->fullPath() == path)
                 return i.item;
         }
     }
@@ -344,15 +324,14 @@ JDItem* JDModel::findDirItem(const QString &path) const
 QStringList JDModel::dirs(const QString &path) const
 {
     QStringList dirs_;
-    foreach(const ProxyItem& i, items_) {
-        if(i.item->type() != JDItem::Dir)
+    foreach (const ProxyItem &i, items_) {
+        if (i.item->type() != JDItem::Dir)
             continue;
-        if(i.item->parent()) {
-            if(i.item->parent()->fullPath() == path)
+        if (i.item->parent()) {
+            if (i.item->parent()->fullPath() == path)
                 dirs_.append(i.item->name());
-        }
-        else if(path.isEmpty()) {
-                dirs_.append(i.item->name());
+        } else if (path.isEmpty()) {
+            dirs_.append(i.item->name());
         }
     }
 
@@ -366,7 +345,8 @@ void JDModel::addDir(const QString &curPath, const QString &name)
     addItem(i);
 }
 
-void JDModel::addFile(const QString &curPath, const QString &name, const QString &size, const QString &descr, int number)
+void JDModel::addFile(const QString &curPath, const QString &name, const QString &size, const QString &descr,
+                      int number)
 {
     JDItem *i = new JDItem(JDItem::File, name, size, descr, number, findDirItem(curPath));
     addItem(i);

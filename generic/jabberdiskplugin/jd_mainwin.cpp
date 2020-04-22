@@ -20,20 +20,16 @@
 #include "jd_mainwin.h"
 #include "model.h"
 
+#include <QInputDialog>
+#include <QMenu>
+#include <QMessageBox>
 #include <QTextStream>
 #include <QTimer>
-#include <QMenu>
-#include <QInputDialog>
-#include <QMessageBox>
 
 //#include <QDebug>
 
-JDMainWin::JDMainWin(const QString &name, const QString &jid, int acc, QWidget *p)
-    : QDialog(p, Qt::Window)
-    , model_(nullptr)
-    , commands_(nullptr)
-    , refreshInProgres_(false)
-    , yourJid_(name)
+JDMainWin::JDMainWin(const QString &name, const QString &jid, int acc, QWidget *p) :
+    QDialog(p, Qt::Window), model_(nullptr), commands_(nullptr), refreshInProgres_(false), yourJid_(name)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     ui_.setupUi(this);
@@ -46,7 +42,8 @@ JDMainWin::JDMainWin(const QString &name, const QString &jid, int acc, QWidget *
     commands_ = new JDCommands(acc, jid, this);
 
     ui_.pb_send->setShortcut(QKeySequence("Ctrl+Return"));
-    connect(commands_, SIGNAL(incomingMessage(QString,JDCommands::Command)), SLOT(incomingMessage(QString,JDCommands::Command)));
+    connect(commands_, SIGNAL(incomingMessage(QString, JDCommands::Command)),
+            SLOT(incomingMessage(QString, JDCommands::Command)));
     connect(commands_, SIGNAL(outgoingMessage(QString)), SLOT(outgoingMessage(QString)));
     connect(ui_.pb_refresh, SIGNAL(clicked()), SLOT(refresh()));
     connect(ui_.pb_send, SIGNAL(clicked()), SLOT(doSend()));
@@ -55,20 +52,18 @@ JDMainWin::JDMainWin(const QString &name, const QString &jid, int acc, QWidget *
     connect(ui_.lv_disk, SIGNAL(newIndex(QModelIndex)), SLOT(indexChanged(QModelIndex)));
     connect(ui_.lv_disk, SIGNAL(contextMenu(QModelIndex)), SLOT(indexContextMenu(QModelIndex)));
 
-    connect(model_, SIGNAL(moveItem(QString,QString)), SLOT(moveItem(QString,QString)));
+    connect(model_, SIGNAL(moveItem(QString, QString)), SLOT(moveItem(QString, QString)));
 
     show();
 
     QTimer::singleShot(0, this, SLOT(refresh()));
 }
 
-JDMainWin::~JDMainWin()
-{
-}
+JDMainWin::~JDMainWin() { }
 
 void JDMainWin::incomingMessage(const QString &message, JDCommands::Command command)
 {
-    switch(command) {
+    switch (command) {
     case JDCommands::CommandLs:
         parse(message);
         break;
@@ -113,12 +108,12 @@ void JDMainWin::refresh()
     refreshInProgres_ = false;
 }
 
-void JDMainWin::recursiveFind(const QString& dir)
+void JDMainWin::recursiveFind(const QString &dir)
 {
     QString tmp = currentDir_;
     commands_->ls(dir);
     QStringList dirs = model_->dirs(dir);
-    foreach(const QString& d, dirs) {
+    foreach (const QString &d, dirs) {
         currentDir_ += d;
         recursiveFind(currentDir_);
         currentDir_ = tmp;
@@ -128,32 +123,26 @@ void JDMainWin::recursiveFind(const QString& dir)
 void JDMainWin::doSend()
 {
     const QString mes = ui_.te_message->toPlainText();
-    if(!mes.isEmpty()) {
+    if (!mes.isEmpty()) {
         commands_->sendStanzaDirect(mes);
         ui_.te_message->clear();
     }
 }
 
-void JDMainWin::outgoingMessage(const QString &message)
-{
-    appendMessage(message);
-}
+void JDMainWin::outgoingMessage(const QString &message) { appendMessage(message); }
 
-void JDMainWin::appendMessage(const QString& message, bool outgoing)
+void JDMainWin::appendMessage(const QString &message, bool outgoing)
 {
     QString msg = message.toHtmlEscaped().replace("\n", "<br>");
     if (outgoing)
-        msg = "<span style='color:blue'>" + tr("<b>You:</b> ") + msg+ "</span>";
+        msg = "<span style='color:blue'>" + tr("<b>You:</b> ") + msg + "</span>";
     else
         msg = "<span style='color:red'>" + tr("<b>Disk:</b> ") + msg + "</span>";
 
     ui_.te_log->append(msg);
 }
 
-void JDMainWin::clearLog()
-{
-    ui_.te_log->clear();
-}
+void JDMainWin::clearLog() { ui_.te_log->clear(); }
 
 void JDMainWin::parse(QString message)
 {
@@ -161,122 +150,116 @@ void JDMainWin::parse(QString message)
     static const QRegExp fileRE("([0-9]+) - (.*) \\[(\\S+)\\] - (.*)");
 
     QTextStream str(&message, QIODevice::ReadOnly);
-    while(!str.atEnd()) {
+    while (!str.atEnd()) {
         QString line = str.readLine();
-        if(dirRE.indexIn(line) != -1) {
+        if (dirRE.indexIn(line) != -1) {
             model_->addDir(currentDir_, dirRE.cap(1));
-        }
-        else if(fileRE.indexIn(line) != -1) {
-            model_->addFile(currentDir_,fileRE.cap(2), fileRE.cap(3), fileRE.cap(4), fileRE.cap(1).toInt());
+        } else if (fileRE.indexIn(line) != -1) {
+            model_->addFile(currentDir_, fileRE.cap(2), fileRE.cap(3), fileRE.cap(4), fileRE.cap(1).toInt());
         }
     }
 }
 
-void JDMainWin::indexChanged(const QModelIndex& index)
+void JDMainWin::indexChanged(const QModelIndex &index)
 {
-    if(refreshInProgres_)
+    if (refreshInProgres_)
         return;
 
     const QString tmp = currentDir_;
 
-    if(model_->data(index, JDModel::RoleType).toInt() != JDItem::File) {
+    if (model_->data(index, JDModel::RoleType).toInt() != JDItem::File) {
         currentDir_ = model_->data(index, JDModel::RoleFullPath).toString();
-    }
-    else {
+    } else {
         currentDir_ = model_->data(index, JDModel::RoleParentPath).toString();
     }
 
-    if(currentDir_ == JDModel::rootPath())
+    if (currentDir_ == JDModel::rootPath())
         currentDir_.clear();
 
-    if(tmp != currentDir_) {
-        if(!tmp.isEmpty())
+    if (tmp != currentDir_) {
+        if (!tmp.isEmpty())
             commands_->cd(JDModel::rootPath());
 
-        if(!currentDir_.isEmpty())
+        if (!currentDir_.isEmpty())
             commands_->cd(currentDir_);
     }
 }
 
-void JDMainWin::indexContextMenu(const QModelIndex& index)
+void JDMainWin::indexContextMenu(const QModelIndex &index)
 {
-    QMenu m;
-    JDItem::Type type = (JDItem::Type)index.data(JDModel::RoleType).toInt();
-    QList<QAction*> aList;
-    QAction* actRemove = new QAction(tr("Remove"), &m);
-    QAction* actMake = new QAction(tr("Make dir"), &m);
-    QAction* actGet = new QAction(tr("Get File"), &m);
-    QAction* actSend = new QAction(tr("Send File"), &m);
-    QAction* actHash = new QAction(tr("Hash"), &m);
-    QAction* actLink = new QAction(tr("Link"), &m);
-    QAction* actHelp = new QAction(tr("Help"), &m);
-    QAction* actIntro = new QAction(tr("Intro"), &m);
-    QAction* actDu = new QAction(tr("Statistics"), &m);
-    QAction* actRename = new QAction(tr("Rename"), &m);
+    QMenu            m;
+    JDItem::Type     type = (JDItem::Type)index.data(JDModel::RoleType).toInt();
+    QList<QAction *> aList;
+    QAction *        actRemove = new QAction(tr("Remove"), &m);
+    QAction *        actMake   = new QAction(tr("Make dir"), &m);
+    QAction *        actGet    = new QAction(tr("Get File"), &m);
+    QAction *        actSend   = new QAction(tr("Send File"), &m);
+    QAction *        actHash   = new QAction(tr("Hash"), &m);
+    QAction *        actLink   = new QAction(tr("Link"), &m);
+    QAction *        actHelp   = new QAction(tr("Help"), &m);
+    QAction *        actIntro  = new QAction(tr("Intro"), &m);
+    QAction *        actDu     = new QAction(tr("Statistics"), &m);
+    QAction *        actRename = new QAction(tr("Rename"), &m);
 
     QMenu move;
     move.setTitle(tr("Move to..."));
-    QAction *actPublic = new QAction("public", &move);
-    QAction *actAlbum = new QAction("album", &move);
+    QAction *actPublic  = new QAction("public", &move);
+    QAction *actAlbum   = new QAction("album", &move);
     QAction *actPrivate = new QAction("private", &move);
-    move.addActions({actPublic, actAlbum, actPrivate});
+    move.addActions({ actPublic, actAlbum, actPrivate });
 
-    if(type == JDItem::File) {
+    if (type == JDItem::File) {
         aList << actRename << actGet << actSend << actLink << actHash << actRemove << move.menuAction();
-    }
-    else {
+    } else {
         aList << actMake;
     }
-    if(type == JDItem::Dir) {
+    if (type == JDItem::Dir) {
         aList << actRemove;
     }
-    if(type == JDItem::None) {
+    if (type == JDItem::None) {
         aList << actDu << actHelp << actIntro;
     }
     m.addActions(aList);
 
-    QAction* result = m.exec(QCursor::pos());
-    if(result == actRemove) {
-        int rez = QMessageBox::question(this, tr("Remove Item"), tr("Are you sure?"),
-                        QMessageBox::Yes | QMessageBox::No);
-        if(rez == QMessageBox::No)
+    QAction *result = m.exec(QCursor::pos());
+    if (result == actRemove) {
+        int rez
+            = QMessageBox::question(this, tr("Remove Item"), tr("Are you sure?"), QMessageBox::Yes | QMessageBox::No);
+        if (rez == QMessageBox::No)
             return;
         commands_->cd(JDModel::rootPath());
         commands_->rm(model_->data(index, JDModel::RoleFullPath).toString());
-    }
-    else if(result == actMake) {
+    } else if (result == actMake) {
         const QString name = QInputDialog::getText(this, tr("Input Dir Name"), QString());
-        if(!name.isEmpty())
+        if (!name.isEmpty())
             commands_->mkDir(name);
-    }
-    else if(result == actGet)
+    } else if (result == actGet)
         commands_->get(QString("#%1").arg(index.data(JDModel::RoleNumber).toInt()));
-    else if(result == actHash)
+    else if (result == actHash)
         commands_->hash(QString("#%1").arg(index.data(JDModel::RoleNumber).toInt()));
-    else if(result == actSend) {
+    else if (result == actSend) {
         const QString name = QInputDialog::getText(this, tr("Input Full JID"), QString());
-        if(!name.isEmpty()) {
+        if (!name.isEmpty()) {
             commands_->send(name, QString("#%1").arg(index.data(JDModel::RoleNumber).toInt()));
         }
-    }
-    else if(result == actDu)
+    } else if (result == actDu)
         commands_->du();
-    else if(result == actHelp)
+    else if (result == actHelp)
         commands_->help();
-    else if(result == actIntro)
+    else if (result == actIntro)
         commands_->intro();
-    else if(result == actLink)
+    else if (result == actLink)
         commands_->link(QString("#%1").arg(index.data(JDModel::RoleNumber).toInt()));
-    else if(result == actRename) {
+    else if (result == actRename) {
         const QString name = QInputDialog::getText(this, tr("Input New Name"), QString());
-        if(!name.isEmpty()) {
+        if (!name.isEmpty()) {
             commands_->mv(QString("#%1").arg(index.data(JDModel::RoleNumber).toInt()), name);
         }
-    }
-    else if(result == actPublic || result == actAlbum || result == actPrivate) {
+    } else if (result == actPublic || result == actAlbum || result == actPrivate) {
         const QString path = result->text();
-        commands_->mv(QString("'//%1%%2/%3'").arg(yourJid_, model_->disk() ,index.data(JDModel::RoleFullPath).toString()),
-                      QString("'//%1%%2/%3'").arg(yourJid_, path ,index.data(JDModel::RoleName).toString()));
+        commands_->mv(
+            QString("'//%1%%2/%3'").arg(yourJid_, model_->disk(), index.data(JDModel::RoleFullPath).toString()),
+            QString("'//%1%%2/%3'").arg(yourJid_, path, index.data(JDModel::RoleName).toString()));
     }
 }
 
@@ -285,4 +268,3 @@ void JDMainWin::moveItem(const QString &oldPath, const QString &newPath)
     commands_->cd(JDModel::rootPath());
     commands_->mv(oldPath, newPath);
 }
-

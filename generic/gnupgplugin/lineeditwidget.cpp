@@ -1,16 +1,13 @@
-#include <QBoxLayout>
 #include <QApplication>
+#include <QBoxLayout>
 #include <QDesktopWidget>
 #include <QEvent>
 #include <QRegExpValidator>
 
 #include "lineeditwidget.h"
 
-LineEditWidget::LineEditWidget(QWidget *parent)
-    : QLineEdit(parent)
-    , _layout(new QHBoxLayout())
-    , _popup(nullptr)
-    , _optimalLength(0)
+LineEditWidget::LineEditWidget(QWidget *parent) :
+    QLineEdit(parent), _layout(new QHBoxLayout()), _popup(nullptr), _optimalLength(0)
 {
     _layout->setSpacing(0);
     _layout->setContentsMargins(1, 3, 2, 3);
@@ -21,11 +18,7 @@ LineEditWidget::LineEditWidget(QWidget *parent)
     installEventFilter(this);
 }
 
-LineEditWidget::~LineEditWidget()
-{
-    _toolbuttons.clear();
-}
-
+LineEditWidget::~LineEditWidget() { _toolbuttons.clear(); }
 
 QSize LineEditWidget::sizeHint() const
 {
@@ -34,14 +27,13 @@ QSize LineEditWidget::sizeHint() const
 
     int width = 0;
 
-    if(_optimalLength) {
+    if (_optimalLength) {
 #if QT_VERSION < QT_VERSION_CHECK(5, 11, 0)
         width += fontMetrics().width("0") * _optimalLength;
 #else
         width += fontMetrics().horizontalAdvance("0") * _optimalLength;
 #endif
-    }
-    else {
+    } else {
         width += size.width();
     }
     width += textMargins().right();
@@ -53,7 +45,7 @@ void LineEditWidget::showEvent(QShowEvent *e)
 {
     // Width of standard QLineEdit plus extended tool buttons
     int width = 0;
-    for(int i = _toolbuttons.size() - 1; i >= 0; i--) {
+    for (int i = _toolbuttons.size() - 1; i >= 0; i--) {
         width += _toolbuttons[i]->width();
     }
 
@@ -61,10 +53,7 @@ void LineEditWidget::showEvent(QShowEvent *e)
     QLineEdit::showEvent(e);
 }
 
-bool LineEditWidget::eventFilter(QObject *o, QEvent *e)
-{
-    return QLineEdit::eventFilter(o, e);
-}
+bool LineEditWidget::eventFilter(QObject *o, QEvent *e) { return QLineEdit::eventFilter(o, e); }
 
 void LineEditWidget::setRxValidator(const QString &str)
 {
@@ -73,7 +62,7 @@ void LineEditWidget::setRxValidator(const QString &str)
         return;
     }
 
-    QRegExp rx(str);
+    QRegExp           rx(str);
     QRegExpValidator *validator = new QRegExpValidator(rx, this);
     setValidator(validator);
 }
@@ -86,7 +75,7 @@ void LineEditWidget::addWidget(QWidget *w)
 
 void LineEditWidget::setPopup(QWidget *w)
 {
-    if(_popup) {
+    if (_popup) {
         delete _popup;
         _popup = nullptr;
     }
@@ -113,11 +102,11 @@ void LineEditWidget::showPopup()
     QRect rect = _popup->geometry();
 
     // if widget is beyond edge of display
-    if(rect.right() > size.width()) {
+    if (rect.right() > size.width()) {
         rect.moveRight(size.width());
     }
 
-    if(rect.bottom() > size.height()) {
+    if (rect.bottom() > size.height()) {
         rect.moveBottom(size.height());
     }
 

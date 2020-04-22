@@ -17,14 +17,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <QPushButton>
 #include "addkeydlg.h"
-#include "ui_addkeydlg.h"
 #include "datewidget.h"
+#include "ui_addkeydlg.h"
+#include <QPushButton>
 
-AddKeyDlg::AddKeyDlg(QWidget *parent)
-    : QDialog(parent)
-    , ui(new Ui::AddKeyDlg)
+AddKeyDlg::AddKeyDlg(QWidget *parent) : QDialog(parent), ui(new Ui::AddKeyDlg)
 {
     ui->setupUi(this);
     adjustSize();
@@ -34,45 +32,21 @@ AddKeyDlg::AddKeyDlg(QWidget *parent)
     ui->lineName->setFocus();
 }
 
-AddKeyDlg::~AddKeyDlg()
-{
-    delete ui;
-}
+AddKeyDlg::~AddKeyDlg() { delete ui; }
 
-QString AddKeyDlg::name() const
-{
-    return ui->lineName->text().trimmed();
-}
+QString AddKeyDlg::name() const { return ui->lineName->text().trimmed(); }
 
-QString AddKeyDlg::email() const
-{
-    return ui->lineEmail->text().trimmed();
-}
+QString AddKeyDlg::email() const { return ui->lineEmail->text().trimmed(); }
 
-QString AddKeyDlg::comment() const
-{
-    return ui->lineComment->text().trimmed();
-}
+QString AddKeyDlg::comment() const { return ui->lineComment->text().trimmed(); }
 
-int AddKeyDlg::type() const
-{
-    return ui->cmbType->currentIndex();
-}
+int AddKeyDlg::type() const { return ui->cmbType->currentIndex(); }
 
-int AddKeyDlg::length() const
-{
-    return ui->cmbLength->currentText().toInt();
-}
+int AddKeyDlg::length() const { return ui->cmbLength->currentText().toInt(); }
 
-QDate AddKeyDlg::expiration() const
-{
-    return ui->dateExpiration->date();
-}
+QDate AddKeyDlg::expiration() const { return ui->dateExpiration->date(); }
 
-QString AddKeyDlg::pass() const
-{
-    return ui->linePass->text();
-}
+QString AddKeyDlg::pass() const { return ui->linePass->text(); }
 
 void AddKeyDlg::checkPass()
 {
@@ -82,7 +56,9 @@ void AddKeyDlg::checkPass()
 void AddKeyDlg::fillLenght(const QString &type)
 {
     QStringList lengths;
-    lengths << "1024" << "2048" << "3072";
+    lengths << "1024"
+            << "2048"
+            << "3072";
     if (!type.contains("DSA")) {
         lengths << "4096";
     }

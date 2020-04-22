@@ -20,31 +20,28 @@
 #ifndef OPTIONSPARSER_H
 #define OPTIONSPARSER_H
 
+#include <QByteArray>
 #include <QDomElement>
 #include <QVariant>
-#include <QByteArray>
 
-class OptionsParser : public QObject
-{
+class OptionsParser : public QObject {
     Q_OBJECT
 
-    public:
-        OptionsParser(QObject* parent = nullptr);
-        static OptionsParser* instance();
-        QVariant elementToVariant(const QDomElement& e);
-        void variantToElement(const QVariant& var, QDomElement& e);
+public:
+    OptionsParser(QObject *parent = nullptr);
+    static OptionsParser *instance();
+    QVariant              elementToVariant(const QDomElement &e);
+    void                  variantToElement(const QVariant &var, QDomElement &e);
 
-    private:
-       static OptionsParser *instance_;
-
+private:
+    static OptionsParser *instance_;
 };
 
-//stolen from iris
-class Base64
-        {
-                public:
-                        static QString encode(const QByteArray&);
-                        static QByteArray decode(const QString &s);
-        };
+// stolen from iris
+class Base64 {
+public:
+    static QString    encode(const QByteArray &);
+    static QByteArray decode(const QString &s);
+};
 
 #endif // OPTIONSPARSER_H

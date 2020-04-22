@@ -23,17 +23,17 @@
 
 void Viewer::init()
 {
-        setSelectionBehavior(QAbstractItemView::SelectRows);
-        resizeColumnsToContents();
-        horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-        horizontalHeader()->setStretchLastSection(true);
-        verticalHeader()->setDefaultAlignment( Qt::AlignHCenter );
+    setSelectionBehavior(QAbstractItemView::SelectRows);
+    resizeColumnsToContents();
+    horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    horizontalHeader()->setStretchLastSection(true);
+    verticalHeader()->setDefaultAlignment(Qt::AlignHCenter);
 
-        connect(this, SIGNAL(clicked(QModelIndex)), this, SLOT(itemClicked(QModelIndex)));
+    connect(this, SIGNAL(clicked(QModelIndex)), this, SLOT(itemClicked(QModelIndex)));
 }
 
 void Viewer::itemClicked(QModelIndex index)
 {
-    if(index.column() == 0)
-        model()->setData(index, 3); //invert
+    if (index.column() == 0)
+        model()->setData(index, 3); // invert
 }

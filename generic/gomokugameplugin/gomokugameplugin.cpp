@@ -23,43 +23,26 @@
  */
 
 #include "gomokugameplugin.h"
-#include "gamesessions.h"
 #include "common.h"
+#include "gamesessions.h"
 #include "options.h"
 #include <QFileDialog>
 
-#define constVersion            "0.1.2"
-#define constShortPluginName    "gomokugameplugin"
+#define constVersion "0.1.2"
+#define constShortPluginName "gomokugameplugin"
 
 GomokuGamePlugin::GomokuGamePlugin(QObject *parent) :
-        QObject(parent),
-        enabled_(false),
-        psiTab(nullptr),
-        psiIcon(nullptr),
-        psiAccInfo(nullptr),
-        psiContactInfo(nullptr),
-        psiSender(nullptr),
-        psiEvent(nullptr),
-        psiSound(nullptr),
-        psiPopup(nullptr)
+    QObject(parent), enabled_(false), psiTab(nullptr), psiIcon(nullptr), psiAccInfo(nullptr), psiContactInfo(nullptr),
+    psiSender(nullptr), psiEvent(nullptr), psiSound(nullptr), psiPopup(nullptr)
 {
     Options::psiOptions = nullptr;
 }
 
-QString GomokuGamePlugin::name() const
-{
-    return constPluginName;
-}
+QString GomokuGamePlugin::name() const { return constPluginName; }
 
-QString GomokuGamePlugin::shortName() const
-{
-    return constShortPluginName;
-}
+QString GomokuGamePlugin::shortName() const { return constShortPluginName; }
 
-QString GomokuGamePlugin::version() const
-{
-    return constVersion;
-}
+QString GomokuGamePlugin::version() const { return constVersion; }
 
 QWidget *GomokuGamePlugin::options()
 {
@@ -67,7 +50,8 @@ QWidget *GomokuGamePlugin::options()
     ui_.setupUi(options);
     ui_.play_error->setIcon(psiIcon->getIcon("psi/play"));
     ui_.play_finish->setIcon(psiIcon->getIcon("psi/play"));
-    ui_.play_move->setIcon(psiIcon->getIcon("psi/play"));;
+    ui_.play_move->setIcon(psiIcon->getIcon("psi/play"));
+    ;
     ui_.play_start->setIcon(psiIcon->getIcon("psi/play"));
     ui_.select_error->setIcon(psiIcon->getIcon("psi/browse"));
     ui_.select_finish->setIcon(psiIcon->getIcon("psi/browse"));
@@ -91,7 +75,7 @@ bool GomokuGamePlugin::enable()
         return true;
     // Грузим иконку плагина
     QFile file(":/gomokugameplugin/gomoku");
-    if(file.open(QIODevice::ReadOnly)) {
+    if (file.open(QIODevice::ReadOnly)) {
         QByteArray ico = file.readAll();
         psiIcon->addIcon("gomokugameplugin/gomoku", ico);
         file.close();
@@ -103,7 +87,8 @@ bool GomokuGamePlugin::enable()
     connect(sessions, SIGNAL(sendStanza(int, QString)), this, SLOT(sendGameStanza(int, QString)), Qt::QueuedConnection);
     connect(sessions, SIGNAL(doPopup(const QString)), this, SLOT(doPopup(const QString)), Qt::QueuedConnection);
     connect(sessions, SIGNAL(playSound(const QString)), this, SLOT(playSound(const QString)), Qt::QueuedConnection);
-    connect(sessions, SIGNAL(doInviteEvent(int,QString,QString,QObject*,const char*)), this, SLOT(doPsiEvent(int,QString,QString,QObject*,const char*)), Qt::QueuedConnection);
+    connect(sessions, SIGNAL(doInviteEvent(int, QString, QString, QObject *, const char *)), this,
+            SLOT(doPsiEvent(int, QString, QString, QObject *, const char *)), Qt::QueuedConnection);
     // Выставляем флаг и уходим
     enabled_ = true;
     return true;
@@ -145,10 +130,7 @@ void GomokuGamePlugin::restoreOptions()
     ui_.cb_save_w_h->setChecked(options->getOption(constSaveWndWidthHeight).toBool());
 }
 
-QPixmap GomokuGamePlugin::icon() const
-{
-    return QPixmap(":/gomokugameplugin/img/gomoku_16.png");
-}
+QPixmap GomokuGamePlugin::icon() const { return QPixmap(":/gomokugameplugin/img/gomoku_16.png"); }
 
 /**
  * Получение списка ресурсов и вызов формы для отправки приглашения
@@ -156,7 +138,7 @@ QPixmap GomokuGamePlugin::icon() const
 void GomokuGamePlugin::invite(int account, QString full_jid)
 {
     QStringList jid_parse = full_jid.split("/");
-    QString jid = jid_parse.takeFirst();
+    QString     jid       = jid_parse.takeFirst();
     if (jid.isEmpty())
         return;
     QStringList res_list;
@@ -183,9 +165,9 @@ void GomokuGamePlugin::toolButtonPressed()
     if (!enabled_)
         return;
     // Получаем наш account id
-    QString jid = psiTab->getYourJid();
-    int account = -1;
-    for (int i = 0; ; i++) {
+    QString jid     = psiTab->getYourJid();
+    int     account = -1;
+    for (int i = 0;; i++) {
         QString str1 = psiAccInfo->getJid(i);
         if (str1 == jid) {
             account = i;
@@ -206,7 +188,7 @@ void GomokuGamePlugin::toolButtonPressed()
  */
 void GomokuGamePlugin::menuActivated()
 {
-    if(!enabled_)
+    if (!enabled_)
         return;
     int account = sender()->property("account").toInt();
     if (psiAccInfo->getStatus(account) == "offline")
@@ -233,7 +215,8 @@ void GomokuGamePlugin::sendGameStanza(int account, QString stanza)
     psiSender->sendStanza(account, stanza);
 }
 
-void GomokuGamePlugin::testSound() {
+void GomokuGamePlugin::testSound()
+{
     QObject *sender_ = sender();
     if (sender_ == (ui_.play_error)) {
         psiSound->playSound(ui_.le_error->text());
@@ -246,9 +229,10 @@ void GomokuGamePlugin::testSound() {
     }
 }
 
-void GomokuGamePlugin::getSound() {
-    QObject *sender_ = sender();
-    QLineEdit *le = nullptr;
+void GomokuGamePlugin::getSound()
+{
+    QObject *  sender_ = sender();
+    QLineEdit *le      = nullptr;
     if (sender_ == ui_.select_error) {
         le = ui_.le_error;
     } else if (sender_ == ui_.select_finish) {
@@ -266,13 +250,16 @@ void GomokuGamePlugin::getSound() {
     le->setText(file_name);
 }
 
-void GomokuGamePlugin::doPopup(const QString &text) {
+void GomokuGamePlugin::doPopup(const QString &text)
+{
     psiPopup->initPopup(text, tr(constPluginName), "gomokugameplugin/gomoku");
 }
 
-void GomokuGamePlugin::playSound(const QString &sound_id) {
+void GomokuGamePlugin::playSound(const QString &sound_id)
+{
     Options *options = Options::instance();
-    if (options->getOption(constDefSoundSettings).toBool() || Options::psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool()) {
+    if (options->getOption(constDefSoundSettings).toBool()
+        || Options::psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool()) {
         if (sound_id == constSoundMove) {
             psiSound->playSound(options->getOption(constSoundMove).toString());
         } else if (sound_id == constSoundStart) {
@@ -289,143 +276,103 @@ void GomokuGamePlugin::playSound(const QString &sound_id) {
 
 QString GomokuGamePlugin::pluginInfo()
 {
-    return tr("Author: ") +  "Liuch\n"
-        + tr("Email: ") + "liuch@mail.ru\n\n"
+    return tr("Author: ") + "Liuch\n" + tr("Email: ") + "liuch@mail.ru\n\n"
         + tr("This plugin allows you to play gomoku with your friends.\n"
-             "For sending commands, normal messages are used, so this plugin will always work wherever you are able to log in."
-             "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat window.");
+             "For sending commands, normal messages are used, so this plugin will always work wherever you are able to "
+             "log in."
+             "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat "
+             "window.");
 }
 
 // --------------------- Option accessor ---------------------------
 
-void GomokuGamePlugin::setOptionAccessingHost(OptionAccessingHost *host)
-{
-    Options::psiOptions = host;
-}
+void GomokuGamePlugin::setOptionAccessingHost(OptionAccessingHost *host) { Options::psiOptions = host; }
 
-void GomokuGamePlugin::optionChanged(const QString &/*option*/)
-{
-}
+void GomokuGamePlugin::optionChanged(const QString & /*option*/) { }
 
 // --------------------- Iconfactory accessor ---------------------------
-void GomokuGamePlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost *host)
-{
-    psiIcon = host;
-}
+void GomokuGamePlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost *host) { psiIcon = host; }
 
 // --------------------- Toolbar icon accessor ---------------------------
 QList<QVariantHash> GomokuGamePlugin::getButtonParam()
 {
     QList<QVariantHash> list;
-    QVariantHash hash;
+    QVariantHash        hash;
     hash["tooltip"] = QVariant(tr("Gomoku game"));
-    hash["icon"] = QVariant(QString("gomokugameplugin/gomoku"));
+    hash["icon"]    = QVariant(QString("gomokugameplugin/gomoku"));
     hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
-    hash["slot"] = QVariant(SLOT(toolButtonPressed()));
+    hash["slot"]    = QVariant(SLOT(toolButtonPressed()));
     list.push_back(hash);
     return list;
 }
 
-QAction* GomokuGamePlugin::getAction(QObject* /*parent*/, int /*account*/, const QString& /*contact*/)
+QAction *GomokuGamePlugin::getAction(QObject * /*parent*/, int /*account*/, const QString & /*contact*/)
 {
     return nullptr;
 }
 
 // --------------------- Activetab accessor ---------------------------
 
-void GomokuGamePlugin::setActiveTabAccessingHost(ActiveTabAccessingHost *host)
-{
-    psiTab = host;
-}
+void GomokuGamePlugin::setActiveTabAccessingHost(ActiveTabAccessingHost *host) { psiTab = host; }
 
 // --------------------- Account info accessor ---------------------------
 
-void GomokuGamePlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost * host)
-{
-    psiAccInfo = host;
-}
+void GomokuGamePlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost *host) { psiAccInfo = host; }
 
 // --------------------- Contact info accessor ---------------------------
 
-void GomokuGamePlugin::setContactInfoAccessingHost(ContactInfoAccessingHost * host)
-{
-    psiContactInfo = host;
-}
+void GomokuGamePlugin::setContactInfoAccessingHost(ContactInfoAccessingHost *host) { psiContactInfo = host; }
 
 // --------------------- Stanza sender ---------------------------
 
-void GomokuGamePlugin::setStanzaSendingHost(StanzaSendingHost *host)
-{
-    psiSender = host;
-}
+void GomokuGamePlugin::setStanzaSendingHost(StanzaSendingHost *host) { psiSender = host; }
 
 // --------------------- Stanza filter ---------------------------
 
-bool GomokuGamePlugin::incomingStanza(int account, const QDomElement& xml)
+bool GomokuGamePlugin::incomingStanza(int account, const QDomElement &xml)
 {
-    if(xml.tagName() == "iq") {
+    if (xml.tagName() == "iq") {
         QString acc_status = "";
-        bool confPriv = false;
+        bool    confPriv   = false;
         if (xml.attribute("type") == "set") {
             acc_status = psiAccInfo->getStatus(account);
-            confPriv = psiContactInfo->isPrivate(account, xml.attribute("from"));
+            confPriv   = psiContactInfo->isPrivate(account, xml.attribute("from"));
         }
         return GameSessions::instance()->processIncomingIqStanza(account, xml, acc_status, confPriv);
     }
     return false;
 }
 
-bool GomokuGamePlugin::outgoingStanza(int /*account*/, QDomElement& /*xml*/)
-{
-    return false;
-}
+bool GomokuGamePlugin::outgoingStanza(int /*account*/, QDomElement & /*xml*/) { return false; }
 
 // --------------------- Event creator ---------------------------
 
-void GomokuGamePlugin::setEventCreatingHost(EventCreatingHost *host)
-{
-    psiEvent = host;
-}
+void GomokuGamePlugin::setEventCreatingHost(EventCreatingHost *host) { psiEvent = host; }
 
 // --------------------- Sound accessor ---------------------------
 
-void GomokuGamePlugin::setSoundAccessingHost(SoundAccessingHost *host)
-{
-    psiSound = host;
-}
+void GomokuGamePlugin::setSoundAccessingHost(SoundAccessingHost *host) { psiSound = host; }
 
 // --------------------- Menu accessor ---------------------------
 
-QList<QVariantHash> GomokuGamePlugin::getAccountMenuParam()
-{
-    return QList<QVariantHash>();
-}
+QList<QVariantHash> GomokuGamePlugin::getAccountMenuParam() { return QList<QVariantHash>(); }
 
 QList<QVariantHash> GomokuGamePlugin::getContactMenuParam()
 {
     QList<QVariantHash> menu_list;
-    QVariantHash hash;
-    hash["name"] = QVariant(tr("Gomoku game!"));
-    hash["icon"] = QVariant(QString("gomokugameplugin/gomoku"));
+    QVariantHash        hash;
+    hash["name"]    = QVariant(tr("Gomoku game!"));
+    hash["icon"]    = QVariant(QString("gomokugameplugin/gomoku"));
     hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
-    hash["slot"] = QVariant(SLOT(menuActivated()));
+    hash["slot"]    = QVariant(SLOT(menuActivated()));
     menu_list.push_back(hash);
     return menu_list;
 }
 
-QAction* GomokuGamePlugin::getContactAction(QObject*, int, const QString&)
-{
-    return nullptr;
-}
+QAction *GomokuGamePlugin::getContactAction(QObject *, int, const QString &) { return nullptr; }
 
-QAction* GomokuGamePlugin::getAccountAction(QObject*, int)
-{
-    return nullptr;
-}
+QAction *GomokuGamePlugin::getAccountAction(QObject *, int) { return nullptr; }
 
 // --------------------- Popup accessor ---------------------------
 
-void GomokuGamePlugin::setPopupAccessingHost(PopupAccessingHost *host)
-{
-    psiPopup = host;
-}
+void GomokuGamePlugin::setPopupAccessingHost(PopupAccessingHost *host) { psiPopup = host; }

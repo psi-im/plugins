@@ -23,8 +23,8 @@
 #include <QHeaderView>
 #include <QMenu>
 
-#include "iconfactoryaccessinghost.h"
 #include "delegate.h"
+#include "iconfactoryaccessinghost.h"
 
 void Viewer::init(IconFactoryAccessingHost *iconHost)
 {
@@ -37,21 +37,22 @@ void Viewer::init(IconFactoryAccessingHost *iconHost)
 
     QHeaderView *header = horizontalHeader();
     header->setSectionResizeMode(QHeaderView::ResizeToContents);
-    verticalHeader()->setDefaultAlignment( Qt::AlignHCenter );
+    verticalHeader()->setDefaultAlignment(Qt::AlignHCenter);
 
     resizeColumnsToContents();
 
-    setFixedSize(header->sectionSize(0)+header->sectionSize(1)+header->sectionSize(2)+
-                 header->sectionSize(3)+header->sectionSize(4)+verticalHeader()->width()+5, 300); //не очень красиво, но по-другому не получилось %)
+    setFixedSize(header->sectionSize(0) + header->sectionSize(1) + header->sectionSize(2) + header->sectionSize(3)
+                     + header->sectionSize(4) + verticalHeader()->width() + 5,
+                 300); //не очень красиво, но по-другому не получилось %)
 
     connect(this, SIGNAL(clicked(QModelIndex)), this, SLOT(itemClicked(QModelIndex)));
 }
 
-void Viewer::keyPressEvent(QKeyEvent * e)
+void Viewer::keyPressEvent(QKeyEvent *e)
 {
     if (e->key() == Qt::Key_Space) {
-        foreach(const QModelIndex &check, selectionModel()->selectedRows(0)) {
-            model()->setData(check, 3); //invert
+        foreach (const QModelIndex &check, selectionModel()->selectedRows(0)) {
+            model()->setData(check, 3); // invert
         }
     } else {
         QTableView::keyPressEvent(e);
@@ -59,27 +60,27 @@ void Viewer::keyPressEvent(QKeyEvent * e)
     e->accept();
 }
 
-void Viewer::contextMenuEvent( QContextMenuEvent * e )
+void Viewer::contextMenuEvent(QContextMenuEvent *e)
 {
-    QMenu *popup = new QMenu(this);
+    QMenu *          popup = new QMenu(this);
     QList<QAction *> actions;
-    actions <<new QAction(iconHost_->getIcon("psi/cm_check"), tr("Check"), popup)
-            <<new QAction(iconHost_->getIcon("psi/cm_uncheck"), tr("Uncheck"), popup)
-            <<new QAction(iconHost_->getIcon("psi/cm_invertcheck"), tr("Invert"), popup);
+    actions << new QAction(iconHost_->getIcon("psi/cm_check"), tr("Check"), popup)
+            << new QAction(iconHost_->getIcon("psi/cm_uncheck"), tr("Uncheck"), popup)
+            << new QAction(iconHost_->getIcon("psi/cm_invertcheck"), tr("Invert"), popup);
     popup->addActions(actions);
     QAction *result = popup->exec(e->globalPos());
-    int iresult;
+    int      iresult;
     if (result) {
         iresult = actions.indexOf(result);
-        foreach(const QModelIndex &check, selectionModel()->selectedRows(0)) {
+        foreach (const QModelIndex &check, selectionModel()->selectedRows(0)) {
             switch (iresult) {
-            case 0: //check
+            case 0: // check
                 model()->setData(check, QVariant(2));
                 break;
-            case 1: //uncheck
+            case 1: // uncheck
                 model()->setData(check, QVariant(0));
                 break;
-            case 2: //invert
+            case 2: // invert
                 model()->setData(check, QVariant(3));
                 break;
             }
@@ -88,13 +89,13 @@ void Viewer::contextMenuEvent( QContextMenuEvent * e )
     delete popup;
 }
 
-void Viewer::itemClicked(const QModelIndex& index)
+void Viewer::itemClicked(const QModelIndex &index)
 {
-    if(index.column() == 0) {
-        model()->setData(index, 3); //invert
-    } else if(index.column() == 4) {
+    if (index.column() == 0) {
+        model()->setData(index, 3); // invert
+    } else if (index.column() == 4) {
         emit checkSound(index);
-    } else if(index.column() == 3) {
+    } else if (index.column() == 3) {
         emit getSound(index);
     }
 }
@@ -102,5 +103,5 @@ void Viewer::itemClicked(const QModelIndex& index)
 void Viewer::deleteSelected()
 {
     QItemSelectionModel *selection = selectionModel();
-    qobject_cast<Model*>(model())->deleteRows(selection->selectedRows());
+    qobject_cast<Model *>(model())->deleteRows(selection->selectedRows());
 }

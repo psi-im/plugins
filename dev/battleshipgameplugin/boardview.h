@@ -24,8 +24,7 @@
 
 #include "boardmodel.h"
 
-class BoardView : public QTableView
-{
+class BoardView : public QTableView {
     Q_OBJECT
 public:
     BoardView(QWidget *parent = nullptr);
@@ -34,11 +33,10 @@ public:
 private:
     virtual void resizeEvent(QResizeEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
-    void setCellsSize();
+    void         setCellsSize();
 
 private:
     BoardModel *bmodel_;
-
 };
 
 #endif // BOARDVIEW_H

@@ -17,7 +17,6 @@
  *
  */
 
-
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
@@ -26,13 +25,11 @@
 class Screenshot;
 class ApplicationInfoAccessingHost;
 
-class Controller : public QObject
-{
+class Controller : public QObject {
     Q_OBJECT
 public:
-    Controller(ApplicationInfoAccessingHost* appInfo);
+    Controller(ApplicationInfoAccessingHost *appInfo);
     ~Controller();
-
 
 public slots:
     void onShortCutActivated();
@@ -41,9 +38,8 @@ public slots:
 private:
     void doUpdate();
 
-    QPointer<Screenshot> screenshot;
-    ApplicationInfoAccessingHost* appInfo_;
-
+    QPointer<Screenshot>          screenshot;
+    ApplicationInfoAccessingHost *appInfo_;
 };
 
 #endif // CONTROLLER_H

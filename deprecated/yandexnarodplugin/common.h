@@ -22,8 +22,7 @@ class QNetworkAccessManager;
 const QUrl mainUrl = QUrl("http://narod.yandex.ru");
 const QUrl authUrl = QUrl("http://passport.yandex.ru/passport?mode=auth");
 
-QNetworkRequest newRequest();
-QNetworkAccessManager* newManager(QObject* parent);
-
+QNetworkRequest        newRequest();
+QNetworkAccessManager *newManager(QObject *parent);
 
 #endif // COMMON_H

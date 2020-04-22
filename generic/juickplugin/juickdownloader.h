@@ -20,20 +20,17 @@
 #ifndef JUICKDOWNLOADER_H
 #define JUICKDOWNLOADER_H
 
-#include <QVariant>
 #include <QQueue>
+#include <QVariant>
 
 class QNetworkAccessManager;
 class QNetworkReply;
 class ApplicationInfoAccessingHost;
 class QTimer;
 
-struct JuickDownloadItem
-{
-    JuickDownloadItem() {} //need for Q_DECLARE_METATYPE
-    JuickDownloadItem(const QString& _path, const QString& _url)
-        : path(_path), url(_url)
-    {}
+struct JuickDownloadItem {
+    JuickDownloadItem() { } // need for Q_DECLARE_METATYPE
+    JuickDownloadItem(const QString &_path, const QString &_url) : path(_path), url(_url) { }
 
     QString path;
     QString url;
@@ -41,36 +38,35 @@ struct JuickDownloadItem
 
 Q_DECLARE_METATYPE(JuickDownloadItem)
 
-class JuickDownloader : public QObject
-{
+class JuickDownloader : public QObject {
     Q_OBJECT
 
 public:
-    JuickDownloader(ApplicationInfoAccessingHost * host, QObject *p = nullptr);
-    ~JuickDownloader() {}
+    JuickDownloader(ApplicationInfoAccessingHost *host, QObject *p = nullptr);
+    ~JuickDownloader() { }
 
-    void get(const JuickDownloadItem& item);
+    void get(const JuickDownloadItem &item);
 
 private slots:
     void requestFinished(QNetworkReply *reply);
     void timeOut();
 
 signals:
-    void finished(const QList<QByteArray>& urls);
+    void finished(const QList<QByteArray> &urls);
 
 private:
-    void dataReady(const QByteArray& ba, const JuickDownloadItem &it);
-    void setProxyHostPort(const QString& host, int port, const QString& username = "",
-                  const QString& pass = "", const QString& type = "http");
+    void dataReady(const QByteArray &ba, const JuickDownloadItem &it);
+    void setProxyHostPort(const QString &host, int port, const QString &username = "", const QString &pass = "",
+                          const QString &type = "http");
     void peekNext();
 
 private:
-    bool inProgress_;
-    QNetworkAccessManager *manager_;
+    bool                          inProgress_;
+    QNetworkAccessManager *       manager_;
     ApplicationInfoAccessingHost *appInfo_;
-    QQueue<JuickDownloadItem> items_;
-    QList<QByteArray> urls_;
-    QTimer *waitTimer_;
-}; 
+    QQueue<JuickDownloadItem>     items_;
+    QList<QByteArray>             urls_;
+    QTimer *                      waitTimer_;
+};
 
 #endif

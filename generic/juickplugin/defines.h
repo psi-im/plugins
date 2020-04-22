@@ -46,7 +46,6 @@
 #define constWorkInGroupchat "workingroupchat"
 #define constVersionOpt "version"
 
-
 #define constVersion "0.11.7"
 #define constPluginName "Juick Plugin"
 

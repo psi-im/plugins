@@ -27,37 +27,33 @@ extern "C" {
 }
 
 namespace psiomemo {
-  enum TRUST_STATE {
-    UNDECIDED,
-    TRUSTED,
-    UNTRUSTED
-  };
+enum TRUST_STATE { UNDECIDED, TRUSTED, UNTRUSTED };
 
-  class Storage {
-  public:
+class Storage {
+public:
     void init(signal_context *ctx, const QString &dataPath, const QString &accountId);
     void deinit();
 
     QSet<uint32_t> getDeviceList(const QString &user, bool onlyTrusted = true);
     QSet<uint32_t> getUndecidedDeviceList(const QString &user);
-    void updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds);
+    void           updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds);
 
     QVector<QPair<uint32_t, QByteArray>> loadAllPreKeys(int limit = 100);
-    uint32_t preKeyCount();
-    void storePreKeys(QVector<QPair<uint32_t, QByteArray>> keys);
-    bool isTrusted(const QString &user, uint32_t deviceId);
-    QByteArray loadDeviceIdentity(const QString &user, uint32_t deviceId);
-    void setDeviceTrust(const QString &user, uint32_t deviceId, bool trusted);
+    uint32_t                             preKeyCount();
+    void                                 storePreKeys(QVector<QPair<uint32_t, QByteArray>> keys);
+    bool                                 isTrusted(const QString &user, uint32_t deviceId);
+    QByteArray                           loadDeviceIdentity(const QString &user, uint32_t deviceId);
+    void                                 setDeviceTrust(const QString &user, uint32_t deviceId, bool trusted);
     QVector<std::tuple<QString, QByteArray, uint32_t, TRUST_STATE>> getKnownFingerprints();
 
-    uint32_t maxPreKeyId();
+    uint32_t                       maxPreKeyId();
     signal_protocol_store_context *storeContext() const;
-    bool identityExists(const signal_protocol_address *addr_p) const;
-    uint32_t signedPreKeyid();
-    bool isEnabledForUser(const QString &user);
-    void setEnabledForUser(const QString &user, bool enabled);
+    bool                           identityExists(const signal_protocol_address *addr_p) const;
+    uint32_t                       signedPreKeyid();
+    bool                           isEnabledForUser(const QString &user);
+    void                           setEnabledForUser(const QString &user, bool enabled);
 
-  private:
+private:
     QString m_databaseConnectionName;
 
     signal_protocol_store_context *m_storeContext = nullptr;
@@ -65,19 +61,22 @@ namespace psiomemo {
     void initializeDB(signal_context *signalContext);
     void migrateDatabase();
 
-    QSqlDatabase db() const;
+    QSqlDatabase     db() const;
     static QSqlQuery getQuery(const void *user_data);
-    static QString toQString(const char *name, size_t name_len);
-    static QString addrName(const signal_protocol_address *address);
+    static QString   toQString(const char *name, size_t name_len);
+    static QString   addrName(const signal_protocol_address *address);
 
-    static int toSignalBuffer(const QVariant &q, signal_buffer **record);
+    static int       toSignalBuffer(const QVariant &q, signal_buffer **record);
     static QSqlQuery lookupSession(const signal_protocol_address *address, const void *user_data);
 #ifdef OLD_SIGNAL
     static int loadSession(signal_buffer **record, const signal_protocol_address *address, void *user_data);
-    static int storeSession(const signal_protocol_address *address, uint8_t *record, size_t record_len, void *user_data);
+    static int storeSession(const signal_protocol_address *address, uint8_t *record, size_t record_len,
+                            void *user_data);
 #else
-    static int loadSession(signal_buffer **record, signal_buffer **user_record, const signal_protocol_address *address, void *user_data);
-    static int storeSession(const signal_protocol_address *address, uint8_t *record, size_t record_len, uint8_t *user_record, size_t user_record_len, void *user_data);
+    static int loadSession(signal_buffer **record, signal_buffer **user_record, const signal_protocol_address *address,
+                           void *user_data);
+    static int storeSession(const signal_protocol_address *address, uint8_t *record, size_t record_len,
+                            uint8_t *user_record, size_t user_record_len, void *user_data);
 #endif
     static int containsSession(const signal_protocol_address *address, void *user_data);
     static int loadPreKey(signal_buffer **record, uint32_t pre_key_id, void *user_data);
@@ -88,12 +87,13 @@ namespace psiomemo {
     static int getIdentityKeyPair(signal_buffer **public_data, signal_buffer **private_data, void *user_data);
     static int getLocalRegistrationId(void *user_data, uint32_t *registration_id);
     static int saveIdentity(const signal_protocol_address *addr_p, uint8_t *key_data, size_t key_len, void *user_data);
-    static int isTrustedIdentity(const signal_protocol_address *addr_p, uint8_t *key_data, size_t key_len, void *user_data);
+    static int isTrustedIdentity(const signal_protocol_address *addr_p, uint8_t *key_data, size_t key_len,
+                                 void *user_data);
     static QVariant lookupValue(void *user_data, const QString &key);
-    void storeValue(const QString &key, const QVariant &value);
-  };
+    void            storeValue(const QString &key, const QVariant &value);
+};
 
-  QByteArray toQByteArray(signal_buffer *buffer);
+QByteArray toQByteArray(signal_buffer *buffer);
 }
 
-#endif //PSIOMEMO_STORAGE_H
+#endif // PSIOMEMO_STORAGE_H

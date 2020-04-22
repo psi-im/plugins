@@ -12,35 +12,29 @@
  *                                                                         *
  ***************************************************************************
 */
+#include <QBuffer>
 #include <QFile>
 #include <QFileInfo>
-#include <QRegExp>
-#include <QBuffer>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QRegExp>
 
-#include "uploadmanager.h"
+#include "authmanager.h"
 #include "common.h"
 #include "options.h"
-#include "authmanager.h"
+#include "uploadmanager.h"
 
 static const QString boundary = "AaB03x";
-
 
 //---------------------------------
 //-------HttpDevice----------------
 //---------------------------------
-class HttpDevice : public QIODevice
-{
+class HttpDevice : public QIODevice {
 public:
-    HttpDevice(const QString& fileName, QObject *p = 0)
-        : QIODevice(p)
-        , totalSize(0)
-        , ioIndex(0)
-        , lastIndex(0)
-        , fileName_(fileName)
+    HttpDevice(const QString &fileName, QObject *p = 0) :
+        QIODevice(p), totalSize(0), ioIndex(0), lastIndex(0), fileName_(fileName)
     {
-        QFileInfo fi(fileName_);
+        QFileInfo  fi(fileName_);
         QByteArray mpData;
         mpData.append("--" + boundary + "\r\n");
         mpData.append("Content-Disposition: form-data; name=\"file\"; filename=\"" + fi.fileName().toUtf8() + "\"\r\n");
@@ -53,7 +47,7 @@ public:
 
         Range r;
         r.start = totalSize;
-        r.end = totalSize + device->size() - 1;
+        r.end   = totalSize + device->size() - 1;
 
         ioDevices.append(QPair<Range, QIODevice *>(r, device));
         totalSize += device->size();
@@ -61,31 +55,26 @@ public:
         appendData("\r\n--" + boundary.toLatin1() + "--\r\n");
     }
 
-    ~HttpDevice()
-    {
-    }
+    ~HttpDevice() { }
 
-    virtual qint64 size() const
-    {
-        return totalSize;
-    }
+    virtual qint64 size() const { return totalSize; }
 
     virtual bool seek(qint64 pos)
     {
-        if(pos >= totalSize)
+        if (pos >= totalSize)
             return false;
-        ioIndex = pos;
+        ioIndex   = pos;
         lastIndex = 0;
         return QIODevice::seek(pos);
     }
 
     virtual bool open(QIODevice::OpenMode mode)
     {
-        if(mode != QIODevice::ReadOnly)
+        if (mode != QIODevice::ReadOnly)
             return false;
 
-        for(int i = 0; i < ioDevices.size(); i++) {
-            if(!ioDevices.at(i).second->open(mode))
+        for (int i = 0; i < ioDevices.size(); i++) {
+            if (!ioDevices.at(i).second->open(mode))
                 return false;
         }
 
@@ -100,40 +89,32 @@ protected:
 
         qint64 totalRead = 0;
 
-        while(len > 0)
-        {
-            if( ioIndex >= ioDevices[lastIndex].first.start &&
-                ioIndex <= ioDevices[lastIndex].first.end )
-            {
+        while (len > 0) {
+            if (ioIndex >= ioDevices[lastIndex].first.start && ioIndex <= ioDevices[lastIndex].first.end) {
 
             } else {
-                for(int i = 0 ; i < ioDevices.count() ; ++i)
-                {
-                    if( ioIndex >= ioDevices[i].first.start &&
-                        ioIndex <= ioDevices[i].first.end )
-                    {
+                for (int i = 0; i < ioDevices.count(); ++i) {
+                    if (ioIndex >= ioDevices[i].first.start && ioIndex <= ioDevices[i].first.end) {
                         lastIndex = i;
                     }
                 }
             }
 
-            QIODevice * chunk = ioDevices[lastIndex].second;
+            QIODevice *chunk = ioDevices[lastIndex].second;
 
-            if(!ioDevices[lastIndex].second->seek(ioIndex - ioDevices[lastIndex].first.start))
-            {
+            if (!ioDevices[lastIndex].second->seek(ioIndex - ioDevices[lastIndex].first.start)) {
                 qDebug("HttpDevice: Failed to seek inner device");
                 break;
             }
 
-            qint64 bytesLeftInThisChunk = chunk->size() - chunk->pos();
+            qint64 bytesLeftInThisChunk     = chunk->size() - chunk->pos();
             qint64 bytesToReadInThisRequest = qMin(bytesLeftInThisChunk, len);
 
             qint64 readLen = chunk->read(data, bytesToReadInThisRequest);
-            if( readLen != bytesToReadInThisRequest ) {
+            if (readLen != bytesToReadInThisRequest) {
                 qDebug("HttpDevice: Failed to read requested amount of data");
                 break;
             }
-
 
             data += bytesToReadInThisRequest;
             len -= bytesToReadInThisRequest;
@@ -144,10 +125,7 @@ protected:
         return totalRead;
     }
 
-    virtual qint64 writeData(const char */*data*/, qint64 /*len*/)
-    {
-        return -1;
-    }
+    virtual qint64 writeData(const char * /*data*/, qint64 /*len*/) { return -1; }
 
 private:
     struct Range {
@@ -155,46 +133,35 @@ private:
         int end;
     };
 
-    void appendData(const QByteArray& data)
+    void appendData(const QByteArray &data)
     {
-        QBuffer * buffer = new QBuffer(this);
+        QBuffer *buffer = new QBuffer(this);
         buffer->setData(data);
 
         Range r;
         r.start = totalSize;
-        r.end = totalSize + data.size() - 1;
+        r.end   = totalSize + data.size() - 1;
 
         ioDevices.append(QPair<Range, QIODevice *>(r, buffer));
         totalSize += data.size();
     }
 
 private:
-    QVector< QPair<Range, QIODevice *> > ioDevices;
-    int totalSize;
-    qint64 ioIndex;
-    int lastIndex;
-    QString fileName_;
+    QVector<QPair<Range, QIODevice *>> ioDevices;
+    int                                totalSize;
+    qint64                             ioIndex;
+    int                                lastIndex;
+    QString                            fileName_;
 };
-
-
-
 
 //-----------------------------------------
 //-------UploadManager---------------------
 //-----------------------------------------
-UploadManager::UploadManager(QObject* p)
-    : QObject(p)
-    , success_(false)
-    , hd_(0)
-{
-    manager_ = newManager(this);
-}
+UploadManager::UploadManager(QObject *p) : QObject(p), success_(false), hd_(0) { manager_ = newManager(this); }
 
-UploadManager::~UploadManager()
-{
-}
+UploadManager::~UploadManager() { }
 
-void UploadManager::go(const QString& file)
+void UploadManager::go(const QString &file)
 {
     if (file.isEmpty()) {
         emit statusText(O_M(MCancel));
@@ -202,53 +169,50 @@ void UploadManager::go(const QString& file)
         return;
     }
 
-    //manager_->cookieJar()->setCookiesFromUrl(Options::instance()->loadCookies(), mainUrl);
+    // manager_->cookieJar()->setCookiesFromUrl(Options::instance()->loadCookies(), mainUrl);
 
-    if(manager_->cookieJar()->cookiesForUrl(mainUrl).isEmpty()) {
+    if (manager_->cookieJar()->cookiesForUrl(mainUrl).isEmpty()) {
         AuthManager am;
-        emit statusText(O_M(MAuthStart));
-        bool auth = am.go(Options::instance()->getOption(CONST_LOGIN, "").toString(),
-                  Options::decodePassword(Options::instance()->getOption(CONST_PASS, "").toString()) );
-        if(auth) {
+        emit        statusText(O_M(MAuthStart));
+        bool        auth = am.go(Options::instance()->getOption(CONST_LOGIN, "").toString(),
+                          Options::decodePassword(Options::instance()->getOption(CONST_PASS, "").toString()));
+        if (auth) {
             setCookies(am.cookies());
             Options::instance()->saveCookies(am.cookies());
             emit statusText(O_M(MAuthOk));
-        }
-        else {
+        } else {
             emit statusText(O_M(MAuthError));
             emit uploaded();
             return;
         }
     }
 
-    fileName_ = file;
+    fileName_          = file;
     QNetworkRequest nr = newRequest();
     nr.setUrl(QUrl("http://narod.yandex.ru/disk/getstorage/"));
-    emit statusText(tr("Getting storage..."));
-    QNetworkReply* reply = manager_->get(nr);
+    emit           statusText(tr("Getting storage..."));
+    QNetworkReply *reply = manager_->get(nr);
     connect(reply, SIGNAL(finished()), SLOT(getStorageFinished()));
 }
 
-void UploadManager::setCookies(const QList<QNetworkCookie>& cookies)
+void UploadManager::setCookies(const QList<QNetworkCookie> &cookies)
 {
     manager_->cookieJar()->setCookiesFromUrl(cookies, mainUrl);
 }
 
 void UploadManager::getStorageFinished()
 {
-    QNetworkReply *reply = static_cast<QNetworkReply*>(sender());
-    if(reply->error() == QNetworkReply::NoError) {
+    QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
+    if (reply->error() == QNetworkReply::NoError) {
         QString page = reply->readAll();
         QRegExp rx("\"url\":\"(\\S+)\".+\"hash\":\"(\\S+)\".+\"purl\":\"(\\S+)\"");
         if (rx.indexIn(page) > -1) {
             doUpload(QUrl(rx.cap(1) + "?tid=" + rx.cap(2)));
-        }
-        else {
+        } else {
             emit statusText(tr("Can't get storage"));
             emit uploaded();
         }
-    }
-    else {
+    } else {
         emit statusText(O_M(MError).arg(reply->errorString()));
         emit uploaded();
     }
@@ -261,10 +225,10 @@ void UploadManager::doUpload(const QUrl &url)
     emit statusText(tr("Starting upload..."));
 
     hd_ = new HttpDevice(fileName_, this);
-    if(!hd_->open(QIODevice::ReadOnly)) {
-               emit statusText(tr("Error opening file!"));
-               emit uploaded();
-               return;
+    if (!hd_->open(QIODevice::ReadOnly)) {
+        emit statusText(tr("Error opening file!"));
+        emit uploaded();
+        return;
     }
 
     QNetworkRequest nr = newRequest();
@@ -272,22 +236,21 @@ void UploadManager::doUpload(const QUrl &url)
     nr.setHeader(QNetworkRequest::ContentTypeHeader, "multipart/form-data, boundary=" + boundary.toLatin1());
     nr.setHeader(QNetworkRequest::ContentLengthHeader, hd_->size());
 
-    QNetworkReply* netrp = manager_->post(nr, hd_);
-    connect(netrp, SIGNAL(uploadProgress(qint64,qint64)), this, SIGNAL(transferProgress(qint64,qint64)));
+    QNetworkReply *netrp = manager_->post(nr, hd_);
+    connect(netrp, SIGNAL(uploadProgress(qint64, qint64)), this, SIGNAL(transferProgress(qint64, qint64)));
     connect(netrp, SIGNAL(finished()), this, SLOT(uploadFinished()));
 }
 
 void UploadManager::uploadFinished()
 {
-    QNetworkReply *reply = static_cast<QNetworkReply*>(sender());
-    if(reply->error() == QNetworkReply::NoError) {
-        emit statusText(tr("Verifying..."));
+    QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
+    if (reply->error() == QNetworkReply::NoError) {
+        emit            statusText(tr("Verifying..."));
         QNetworkRequest nr = newRequest();
         nr.setUrl(QUrl("http://narod.yandex.ru/disk/last/"));
-        QNetworkReply* netrp = manager_->get(nr);
+        QNetworkReply *netrp = manager_->get(nr);
         connect(netrp, SIGNAL(finished()), SLOT(verifyingFinished()));
-    }
-    else {
+    } else {
         emit statusText(O_M(MError).arg(reply->errorString()));
         emit uploaded();
     }
@@ -299,21 +262,19 @@ void UploadManager::uploadFinished()
 
 void UploadManager::verifyingFinished()
 {
-    QNetworkReply *reply = static_cast<QNetworkReply*>(sender());
-    if(reply->error() == QNetworkReply::NoError) {
+    QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
+    if (reply->error() == QNetworkReply::NoError) {
         QString page = reply->readAll();
         QRegExp rx("<span class='b-fname'><a href=\"(http://narod.ru/disk/\\S+html)\">[^<]+</a></span><br/>");
         if (rx.indexIn(page) != -1) {
             success_ = true;
-            emit statusText(tr("Uploaded successfully"));
+            emit    statusText(tr("Uploaded successfully"));
             QString url = rx.cap(1);
-            emit uploadFileURL(url);
-        }
-        else {
+            emit    uploadFileURL(url);
+        } else {
             emit statusText(tr("Verifying failed"));
         }
-    }
-    else {
+    } else {
         emit statusText(O_M(MError).arg(reply->errorString()));
     }
 

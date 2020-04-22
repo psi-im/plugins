@@ -28,12 +28,7 @@
 using namespace GomokuGame;
 
 BoardModel::BoardModel(QObject *parent) :
-    QAbstractTableModel(parent),
-    selectX(-1),
-    selectY(-1),
-    columnCount_(0),
-    rowCount_(0),
-    gameModel(nullptr)
+    QAbstractTableModel(parent), selectX(-1), selectY(-1), columnCount_(0), rowCount_(0), gameModel(nullptr)
 {
 }
 
@@ -48,25 +43,26 @@ void BoardModel::init(GameModel *gm)
     if (gameModel)
         delete gameModel;
     gameModel = gm;
-    selectX = -1;
-    selectY = -1;
+    selectX   = -1;
+    selectY   = -1;
     setHeaders();
     beginResetModel();
     endResetModel();
-    connect(gameModel, SIGNAL(statusUpdated(GameModel::GameStatus)), this, SIGNAL(changeGameStatus(GameModel::GameStatus)));
+    connect(gameModel, SIGNAL(statusUpdated(GameModel::GameStatus)), this,
+            SIGNAL(changeGameStatus(GameModel::GameStatus)));
     emit changeGameStatus(gm->gameStatus());
 }
 
 void BoardModel::setHeaders()
 {
-    rowCount_ = gameModel->boardSizeY() + 4;
+    rowCount_    = gameModel->boardSizeY() + 4;
     columnCount_ = gameModel->boardSizeX() + 4;
 }
 
 Qt::ItemFlags BoardModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags flags = Qt::NoItemFlags | Qt::ItemIsEnabled;
-    int row = index.row();
+    int           row   = index.row();
     if (row < 2 || row > rowCount_ - 2) {
         return flags;
     }
@@ -74,7 +70,7 @@ Qt::ItemFlags BoardModel::flags(const QModelIndex &index) const
     if (col < 2 || col > columnCount_ - 2) {
         return flags;
     }
-    return (flags |  Qt::ItemIsSelectable);
+    return (flags | Qt::ItemIsSelectable);
 }
 
 QVariant BoardModel::headerData(int /*section*/, Qt::Orientation /*orientation*/, int /*role*/) const
@@ -82,12 +78,9 @@ QVariant BoardModel::headerData(int /*section*/, Qt::Orientation /*orientation*/
     return QVariant();
 }
 
-QVariant BoardModel::data(const QModelIndex & /*index*/, int /*role*/) const
-{
-    return QVariant();
-}
+QVariant BoardModel::data(const QModelIndex & /*index*/, int /*role*/) const { return QVariant(); }
 
-bool BoardModel::setData(const QModelIndex &index, const QVariant &/*value*/, int role)
+bool BoardModel::setData(const QModelIndex &index, const QVariant & /*value*/, int role)
 {
     if (index.isValid() && role == Qt::DisplayRole) {
         emit dataChanged(index, index);
@@ -96,20 +89,11 @@ bool BoardModel::setData(const QModelIndex &index, const QVariant &/*value*/, in
     return false;
 }
 
-int BoardModel::rowCount(const QModelIndex & /*parent*/) const
-{
-    return rowCount_;
-}
+int BoardModel::rowCount(const QModelIndex & /*parent*/) const { return rowCount_; }
 
-int BoardModel::columnCount(const QModelIndex & /*parent*/) const
-{
-    return columnCount_;
-}
+int BoardModel::columnCount(const QModelIndex & /*parent*/) const { return columnCount_; }
 
-const GameElement *BoardModel::getGameElement(int x, int y)
-{
-    return gameModel->getElement(x - 2, y - 2);
-}
+const GameElement *BoardModel::getGameElement(int x, int y) { return gameModel->getElement(x - 2, y - 2); }
 
 /**
  * Был щелчек мышью по доске
@@ -145,30 +129,15 @@ bool BoardModel::opponentTurn(int x, int y)
     return false;
 }
 
-void BoardModel::setAccept()
-{
-    gameModel->accept();
-}
+void BoardModel::setAccept() { gameModel->accept(); }
 
-void BoardModel::setError()
-{
-    gameModel->setErrorStatus();
-}
+void BoardModel::setError() { gameModel->setErrorStatus(); }
 
-void BoardModel::setClose()
-{
-    gameModel->breakGame();
-}
+void BoardModel::setClose() { gameModel->breakGame(); }
 
-void BoardModel::setWin()
-{
-    gameModel->setWin();
-}
+void BoardModel::setWin() { gameModel->setWin(); }
 
-void BoardModel::opponentDraw()
-{
-    gameModel->setDraw();
-}
+void BoardModel::opponentDraw() { gameModel->setDraw(); }
 
 /**
  * Мы сдались. Сообщаем оппоненту и самому себе.
@@ -187,7 +156,7 @@ bool BoardModel::setElementToBoard(int x, int y, bool local)
 {
     if (gameModel->doTurn(x, y, local)) {
         const QModelIndex mi = index(y + 2, x + 2); // Offset for margin
-        emit dataChanged(mi, mi);
+        emit              dataChanged(mi, mi);
         return true;
     }
     const QString msg = gameModel->getLastError();
@@ -199,10 +168,7 @@ bool BoardModel::setElementToBoard(int x, int y, bool local)
 /**
  * Возвращает номер  ожидаемого хода
  */
-int BoardModel::turnNum()
-{
-    return (gameModel->turnsCount() + 1);
-}
+int BoardModel::turnNum() { return (gameModel->turnsCount() + 1); }
 
 /**
  * Переключает цвет игрока (предусмотрено международными правилами)
@@ -220,10 +186,7 @@ bool BoardModel::doSwitchColor(bool local)
 /**
  * Сохраняет состояние игры в строку
  */
-QString BoardModel::saveToString() const
-{
-    return gameModel->toString();
-}
+QString BoardModel::saveToString() const { return gameModel->toString(); }
 
 /**
  * Устанавливает новые координаты подсвечиваемого объекта и дает команды на перисовку
@@ -232,15 +195,15 @@ void BoardModel::setSelect(int x, int y)
 {
     int old_x = selectX;
     int old_y = selectY;
-    selectX = x + 2;
-    selectY = y + 2;
+    selectX   = x + 2;
+    selectY   = y + 2;
     if (old_x != selectX || old_y != selectY) {
         if (old_x != -1 && old_y != -1) {
             QModelIndex idx = index(old_y, old_x);
-            emit dataChanged(idx, idx);
+            emit        dataChanged(idx, idx);
         }
         QModelIndex idx = index(selectY, selectX);
-        emit dataChanged(idx, idx);
+        emit        dataChanged(idx, idx);
     }
 }
 

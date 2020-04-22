@@ -14,16 +14,14 @@
  ***************************************************************************
 */
 
-#include <QNetworkCookieJar>
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
 #include "requestauthdialog.h"
 #include "options.h"
+#include <QNetworkAccessManager>
+#include <QNetworkCookieJar>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 
-requestAuthDialog::requestAuthDialog(QWidget *parent)
-    : QDialog(parent)
-    , manager_(0)
+requestAuthDialog::requestAuthDialog(QWidget *parent) : QDialog(parent), manager_(0)
 {
     ui.setupUi(this);
     setFixedHeight(210);
@@ -31,20 +29,16 @@ requestAuthDialog::requestAuthDialog(QWidget *parent)
     setFixedSize(size());
 }
 
-
-requestAuthDialog::~requestAuthDialog()
-{
-    
-}
+requestAuthDialog::~requestAuthDialog() { }
 
 void requestAuthDialog::setCaptcha(const QList<QNetworkCookie> &cooks, const QString &url)
 {
-    if(!manager_) {
+    if (!manager_) {
         manager_ = new QNetworkAccessManager(this);
-        if(Options::instance()->useProxy())
+        if (Options::instance()->useProxy())
             manager_->setProxy(Options::instance()->getProxy());
 
-        connect(manager_, SIGNAL(finished(QNetworkReply*)), SLOT(reply(QNetworkReply*)));
+        connect(manager_, SIGNAL(finished(QNetworkReply *)), SLOT(reply(QNetworkReply *)));
     }
     manager_->cookieJar()->setCookiesFromUrl(cooks, url);
     manager_->get(QNetworkRequest(QUrl(url)));
@@ -52,7 +46,7 @@ void requestAuthDialog::setCaptcha(const QList<QNetworkCookie> &cooks, const QSt
 
 void requestAuthDialog::reply(QNetworkReply *r)
 {
-    if(r->error() == QNetworkReply::NoError) {
+    if (r->error() == QNetworkReply::NoError) {
         ui.frameCaptcha->show();
         ui.labelCaptcha->show();
         QPixmap pix = QPixmap::fromImage(QImage::fromData(r->readAll()));

@@ -20,63 +20,52 @@
 #include "optionsparser.h"
 #include <QFile>
 
-OptionsParser::OptionsParser(const QString& fileName, QObject *parent)
-        : QObject(parent)
-        , fileName_(fileName)
+OptionsParser::OptionsParser(const QString &fileName, QObject *parent) : QObject(parent), fileName_(fileName)
 {
-    QFile optionsFile(fileName_);
-    QFile defaultsFile(":/cleanerplugin/default.xml");
+    QFile        optionsFile(fileName_);
+    QFile        defaultsFile(":/cleanerplugin/default.xml");
     QDomDocument optionsDoc, defaultsDoc;
     optionsDoc.setContent(&optionsFile);
     defaultsDoc.setContent(&defaultsFile);
-    QDomElement optionsElement = optionsDoc.documentElement();
+    QDomElement optionsElement  = optionsDoc.documentElement();
     QDomElement defaultsElement = defaultsDoc.documentElement();
-    defaultsElement_ = defaultsElement.firstChildElement("options");
-    optionsElement_ = optionsElement.firstChildElement("options");
+    defaultsElement_            = defaultsElement.firstChildElement("options");
+    optionsElement_             = optionsElement.firstChildElement("options");
 
     QString root;
     findMissingOptions(optionsElement_, &root);
 }
 
-QStringList OptionsParser::getMissingNodesString() const
-{
-    return missingNodes.keys();
-}
+QStringList OptionsParser::getMissingNodesString() const { return missingNodes.keys(); }
 
-QList <QDomNode> OptionsParser::getMissingNodes() const
-{
-    return missingNodes.values();
-}
+QList<QDomNode> OptionsParser::getMissingNodes() const { return missingNodes.values(); }
 
-QDomNode OptionsParser::nodeByString(const QString& key) const
-{
-    return missingNodes.value(key);
-}
+QDomNode OptionsParser::nodeByString(const QString &key) const { return missingNodes.value(key); }
 
-void OptionsParser::findMissingOptions(const QDomElement& optElement, QString *root)
+void OptionsParser::findMissingOptions(const QDomElement &optElement, QString *root)
 {
     QDomNode optionNode = optElement.firstChild();
-    while(!optionNode.isNull()) {
-        if(!findNode(optionNode.toElement())) {
-            QString nodeString = *root + optElement.tagName() + "." + optionNode.toElement().tagName();
+    while (!optionNode.isNull()) {
+        if (!findNode(optionNode.toElement())) {
+            QString nodeString       = *root + optElement.tagName() + "." + optionNode.toElement().tagName();
             missingNodes[nodeString] = optionNode;
         }
 
         QDomNode childNode = optionNode.firstChild();
-        while(!childNode.isNull()) {
-            QString childRoot = *root + optElement.tagName()+"." + optionNode.toElement().tagName() + ".";
+        while (!childNode.isNull()) {
+            QString childRoot = *root + optElement.tagName() + "." + optionNode.toElement().tagName() + ".";
             findMissingOptions(childNode.toElement(), &childRoot);
             childNode = childNode.nextSibling();
         }
         optionNode = optionNode.nextSibling();
     }
-    *root += optElement.tagName()+".";
+    *root += optElement.tagName() + ".";
 }
 
-bool OptionsParser::findNode(const QDomElement& elem) const
+bool OptionsParser::findNode(const QDomElement &elem) const
 {
     QString tag = elem.tagName();
-    if(defaultsElement_.elementsByTagName(tag).isEmpty())
+    if (defaultsElement_.elementsByTagName(tag).isEmpty())
         return false;
     else
         return true;

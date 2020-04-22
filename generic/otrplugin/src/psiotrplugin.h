@@ -27,28 +27,28 @@
 #ifndef PSIOTRPLUGIN_H_
 #define PSIOTRPLUGIN_H_
 
-#include <QObject>
 #include <QMessageBox>
+#include <QObject>
 #include <QQueue>
 
-#include "otrmessaging.h"
-#include "psiplugin.h"
-#include "plugininfoprovider.h"
-#include "eventfilter.h"
-#include "optionaccessinghost.h"
-#include "optionaccessor.h"
-#include "stanzasender.h"
-#include "stanzasendinghost.h"
-#include "applicationinfoaccessor.h"
-#include "psiaccountcontroller.h"
-#include "stanzafilter.h"
-#include "toolbariconaccessor.h"
 #include "accountinfoaccessor.h"
+#include "applicationinfoaccessor.h"
 #include "contactinfoaccessor.h"
-#include "iconfactoryaccessor.h"
+#include "encryptionsupport.h"
 #include "eventcreatinghost.h"
 #include "eventcreator.h"
-#include "encryptionsupport.h"
+#include "eventfilter.h"
+#include "iconfactoryaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "otrmessaging.h"
+#include "plugininfoprovider.h"
+#include "psiaccountcontroller.h"
+#include "psiplugin.h"
+#include "stanzafilter.h"
+#include "stanzasender.h"
+#include "stanzasendinghost.h"
+#include "toolbariconaccessor.h"
 
 class ApplicationInfoAccessingHost;
 class PsiAccountControllingHost;
@@ -60,8 +60,7 @@ class QDomElement;
 class QString;
 class QAction;
 
-namespace psiotr
-{
+namespace psiotr {
 
 class PsiOtrClosure;
 
@@ -81,38 +80,27 @@ class PsiOtrPlugin : public QObject,
                      public ContactInfoAccessor,
                      public IconFactoryAccessor,
                      public OtrCallback,
-                     public EncryptionSupport
-{
+                     public EncryptionSupport {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.PsiOtrPlugin")
-    Q_INTERFACES(PsiPlugin
-                 PluginInfoProvider
-                 EventCreator
-                 OptionAccessor
-                 StanzaSender
-                 ApplicationInfoAccessor
-                 PsiAccountController
-                 StanzaFilter
-                 ToolbarIconAccessor
-                 AccountInfoAccessor
-                 ContactInfoAccessor
-                 IconFactoryAccessor
-                 EncryptionSupport)
+    Q_INTERFACES(PsiPlugin PluginInfoProvider EventCreator OptionAccessor StanzaSender ApplicationInfoAccessor
+                     PsiAccountController StanzaFilter ToolbarIconAccessor AccountInfoAccessor ContactInfoAccessor
+                         IconFactoryAccessor EncryptionSupport)
 
 public:
     PsiOtrPlugin();
     ~PsiOtrPlugin();
 
     // PsiPlugin
-    virtual QString name() const;
-    virtual QString shortName() const;
-    virtual QString version() const;
-    virtual QWidget* options();
-    virtual bool enable();
-    virtual bool disable();
-    virtual void applyOptions();
-    virtual void restoreOptions();
-    virtual QPixmap icon() const;
+    virtual QString  name() const;
+    virtual QString  shortName() const;
+    virtual QString  version() const;
+    virtual QWidget *options();
+    virtual bool     enable();
+    virtual bool     disable();
+    virtual void     applyOptions();
+    virtual void     restoreOptions();
+    virtual QPixmap  icon() const;
 
     // PluginInfoProvider
     virtual QString pluginInfo();
@@ -121,35 +109,34 @@ public:
     virtual void setEventCreatingHost(EventCreatingHost *host);
 
     // OptionAccessor
-    virtual void setOptionAccessingHost(OptionAccessingHost* host);
-    virtual void optionChanged(const QString& option);
+    virtual void setOptionAccessingHost(OptionAccessingHost *host);
+    virtual void optionChanged(const QString &option);
 
     // StanzaSender
-    virtual void setStanzaSendingHost(StanzaSendingHost* host);
+    virtual void setStanzaSendingHost(StanzaSendingHost *host);
 
     // ApplicationInfoAccessor
-    virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
+    virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
 
     // PsiAccountController
-    virtual void setPsiAccountControllingHost(PsiAccountControllingHost* host);
+    virtual void setPsiAccountControllingHost(PsiAccountControllingHost *host);
 
     // StanzaFilter
-    virtual bool incomingStanza(int accountIndex, const QDomElement& xml);
-    virtual bool outgoingStanza(int accountIndex, QDomElement& xml);
+    virtual bool incomingStanza(int accountIndex, const QDomElement &xml);
+    virtual bool outgoingStanza(int accountIndex, QDomElement &xml);
 
     // ToolbarIconAccessor
     virtual QList<QVariantHash> getButtonParam();
-    virtual QAction* getAction(QObject* parent, int accountIndex,
-                               const QString& contact);
+    virtual QAction *           getAction(QObject *parent, int accountIndex, const QString &contact);
 
     // AccountInfoAccessor
-    virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost* host);
+    virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
 
     // ContactInfoAccessor
-    virtual void setContactInfoAccessingHost(ContactInfoAccessingHost* host);
+    virtual void setContactInfoAccessingHost(ContactInfoAccessingHost *host);
 
     // IconFactoryAccessingHost
-    virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
+    virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
 
     // EncryptionSupport
     virtual bool decryptMessageElement(int account, QDomElement &message);
@@ -157,51 +144,44 @@ public:
 
     // OtrCallback
     virtual QString dataDir();
-    virtual void sendMessage(const QString& account, const QString& contact,
-                             const QString& message);
-    virtual bool isLoggedIn(const QString& account, const QString& contact);
-    virtual void notifyUser(const QString& account, const QString& contact,
-                            const QString& message, const OtrNotifyType& type);
+    virtual void    sendMessage(const QString &account, const QString &contact, const QString &message);
+    virtual bool    isLoggedIn(const QString &account, const QString &contact);
+    virtual void    notifyUser(const QString &account, const QString &contact, const QString &message,
+                               const OtrNotifyType &type);
 
-    virtual bool displayOtrMessage(const QString& account, const QString& contact,
-                                   const QString& message);
-    virtual void stateChange(const QString& account, const QString& contact,
-                             OtrStateChange change);
+    virtual bool displayOtrMessage(const QString &account, const QString &contact, const QString &message);
+    virtual void stateChange(const QString &account, const QString &contact, OtrStateChange change);
 
-    virtual void receivedSMP(const QString& account, const QString& contact,
-                             const QString& question);
-    virtual void updateSMP(const QString& account, const QString& contact,
-                           int progress);
+    virtual void receivedSMP(const QString &account, const QString &contact, const QString &question);
+    virtual void updateSMP(const QString &account, const QString &contact, int progress);
 
     virtual void stopMessages();
     virtual void startMessages();
 
-    virtual QString humanAccount(const QString& accountId);
-    virtual QString humanAccountPublic(const QString& accountId);
-    virtual QString humanContact(const QString& accountId,
-                                 const QString& contact);
+    virtual QString humanAccount(const QString &accountId);
+    virtual QString humanAccountPublic(const QString &accountId);
+    virtual QString humanContact(const QString &accountId, const QString &contact);
 
     /**
      * Displays a rich text system message for (account, contact)
      */
-    bool appendSysMsg(const QString& account, const QString& contact,
-                      const QString& message, const QString& icon = "");
+    bool appendSysMsg(const QString &account, const QString &contact, const QString &message, const QString &icon = "");
 
     // Helper methods
     /**
      * Returns the index of the account identified by accountId or -1
      */
-    int getAccountIndexById(const QString& accountId);
+    int getAccountIndexById(const QString &accountId);
 
     /**
      * Returns the name of the account identified by accountId or ""
      */
-    QString getAccountNameById(const QString& accountId);
+    QString getAccountNameById(const QString &accountId);
 
     /**
      * Returns the Jid of the account identified by accountId or "-1"
      */
-    QString getAccountJidById(const QString& accountId);
+    QString getAccountJidById(const QString &accountId);
 
 private slots:
     void eventActivated();
@@ -211,20 +191,20 @@ private:
      * Returns full Jid for private contacts,
      * bare Jid for non-private contacts.
      */
-    QString getCorrectJid(int accountIndex, const QString& fullJid);
+    QString getCorrectJid(int accountIndex, const QString &fullJid);
 
     bool                                            m_enabled;
-    OtrMessaging*                                   m_otrConnection;
-    QHash<QString, QHash<QString, PsiOtrClosure*> > m_onlineUsers;
-    OptionAccessingHost*                            m_optionHost;
-    StanzaSendingHost*                              m_senderHost;
-    ApplicationInfoAccessingHost*                   m_applicationInfo;
-    PsiAccountControllingHost*                      m_accountHost;
-    AccountInfoAccessingHost*                       m_accountInfo;
-    ContactInfoAccessingHost*                       m_contactInfo;
-    IconFactoryAccessingHost*                       m_iconHost;
-    EventCreatingHost*                              m_psiEvent;
-    QQueue<QMessageBox*>                            m_messageBoxList;
+    OtrMessaging *                                  m_otrConnection;
+    QHash<QString, QHash<QString, PsiOtrClosure *>> m_onlineUsers;
+    OptionAccessingHost *                           m_optionHost;
+    StanzaSendingHost *                             m_senderHost;
+    ApplicationInfoAccessingHost *                  m_applicationInfo;
+    PsiAccountControllingHost *                     m_accountHost;
+    AccountInfoAccessingHost *                      m_accountInfo;
+    ContactInfoAccessingHost *                      m_contactInfo;
+    IconFactoryAccessingHost *                      m_iconHost;
+    EventCreatingHost *                             m_psiEvent;
+    QQueue<QMessageBox *>                           m_messageBoxList;
 };
 
 //-----------------------------------------------------------------------------

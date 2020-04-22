@@ -18,18 +18,19 @@
  */
 
 #include "configwidget.h"
-#include <QVBoxLayout>
 #include <QHeaderView>
+#include <QVBoxLayout>
 
 namespace psiomemo {
-  ConfigWidget::ConfigWidget(OMEMO *omemo, AccountInfoAccessingHost *accountInfo) : QWidget(), m_accountInfo(accountInfo) {
+ConfigWidget::ConfigWidget(OMEMO *omemo, AccountInfoAccessingHost *accountInfo) : QWidget(), m_accountInfo(accountInfo)
+{
     auto mainLayout = new QVBoxLayout(this);
 
-    int curIndex = 0;
+    int  curIndex   = 0;
     auto accountBox = new QComboBox(this);
     while (m_accountInfo->getId(curIndex) != "-1") {
-      accountBox->addItem(m_accountInfo->getName(curIndex), curIndex);
-      curIndex++;
+        accountBox->addItem(m_accountInfo->getName(curIndex), curIndex);
+        curIndex++;
     }
     mainLayout->addWidget(accountBox);
 
@@ -43,9 +44,11 @@ namespace psiomemo {
     setLayout(mainLayout);
 
     connect(accountBox, SIGNAL(currentIndexChanged(int)), SLOT(currentAccountChanged(int)));
-  }
+}
 
-  ConfigWidgetTabWithTable::ConfigWidgetTabWithTable(int account, OMEMO *omemo, QWidget *parent): ConfigWidgetTab(account, omemo, parent) {
+ConfigWidgetTabWithTable::ConfigWidgetTabWithTable(int account, OMEMO *omemo, QWidget *parent) :
+    ConfigWidgetTab(account, omemo, parent)
+{
     m_table = new QTableView(this);
     m_table->setShowGrid(true);
     m_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -56,29 +59,32 @@ namespace psiomemo {
 
     m_tableModel = new QStandardItemModel(this);
     m_table->setModel(m_tableModel);
-  }
+}
 
-  void ConfigWidgetTabWithTable::updateData() {
-    int sortSection = m_table->horizontalHeader()->sortIndicatorSection();
-    Qt::SortOrder sortOrder = m_table->horizontalHeader()->sortIndicatorOrder();
+void ConfigWidgetTabWithTable::updateData()
+{
+    int           sortSection = m_table->horizontalHeader()->sortIndicatorSection();
+    Qt::SortOrder sortOrder   = m_table->horizontalHeader()->sortIndicatorOrder();
     m_tableModel->clear();
 
     doUpdateData();
 
     m_table->sortByColumn(sortSection, sortOrder);
     m_table->resizeColumnsToContents();
-  }
+}
 
-  void ConfigWidget::currentAccountChanged(int index) {
+void ConfigWidget::currentAccountChanged(int index)
+{
     int account = dynamic_cast<QComboBox *>(sender())->itemData(index).toInt();
     for (int i = 0; i < m_tabWidget->count(); i++) {
-      dynamic_cast<ConfigWidgetTab *>(m_tabWidget->widget(i))->setAccount(account);
+        dynamic_cast<ConfigWidgetTab *>(m_tabWidget->widget(i))->setAccount(account);
     }
-  }
+}
 
-  OwnFingerprint::OwnFingerprint(int account, OMEMO *omemo, QWidget *parent) : ConfigWidgetTab(account, omemo, parent) {
+OwnFingerprint::OwnFingerprint(int account, OMEMO *omemo, QWidget *parent) : ConfigWidgetTab(account, omemo, parent)
+{
     auto mainLayout = new QVBoxLayout(this);
-    m_deviceLabel = new QLabel(this);
+    m_deviceLabel   = new QLabel(this);
     m_deviceLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
     mainLayout->addWidget(m_deviceLabel);
     m_fingerprintLabel = new QLabel(this);
@@ -87,14 +93,17 @@ namespace psiomemo {
     mainLayout->addWidget(m_fingerprintLabel);
     setLayout(mainLayout);
     updateData();
-  }
+}
 
-  void OwnFingerprint::updateData() {
+void OwnFingerprint::updateData()
+{
     m_deviceLabel->setText("Device ID: " + QString::number(m_omemo->getDeviceId(m_account)));
     m_fingerprintLabel->setText(QString("Fingerprint: <code>%1</code>").arg(m_omemo->getOwnFingerprint(m_account)));
-  }
+}
 
-  KnownFingerprints::KnownFingerprints(int account, OMEMO *omemo, QWidget *parent) : ConfigWidgetTabWithTable(account, omemo, parent) {
+KnownFingerprints::KnownFingerprints(int account, OMEMO *omemo, QWidget *parent) :
+    ConfigWidgetTabWithTable(account, omemo, parent)
+{
     auto mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(m_table);
 
@@ -104,45 +113,48 @@ namespace psiomemo {
 
     setLayout(mainLayout);
     updateData();
-  }
+}
 
-  void KnownFingerprints::doUpdateData() {
+void KnownFingerprints::doUpdateData()
+{
     m_tableModel->setColumnCount(3);
-    m_tableModel->setHorizontalHeaderLabels({"Contact", "Trust" , "Fingerprint"});
+    m_tableModel->setHorizontalHeaderLabels({ "Contact", "Trust", "Fingerprint" });
     foreach (auto fingerprint, m_omemo->getKnownFingerprints(m_account)) {
-      QList<QStandardItem*> row;
-      auto contact = new QStandardItem(fingerprint.contact);
-      contact->setData(QVariant(fingerprint.deviceId));
-      row.append(contact);
-      TRUST_STATE state = fingerprint.trust;
-      row.append(new QStandardItem(state == TRUSTED ? "Trusted" : state == UNTRUSTED ? "Untrusted" : "Undecided"));
-      auto fpItem = new QStandardItem(fingerprint.fingerprint);
-      fpItem->setData(QColor(state == TRUSTED ? Qt::darkGreen : state == UNTRUSTED ? Qt::darkRed : Qt::darkYellow),
-                      Qt::ForegroundRole);
-      fpItem->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
-      row.append(fpItem);
-      m_tableModel->appendRow(row);
+        QList<QStandardItem *> row;
+        auto                   contact = new QStandardItem(fingerprint.contact);
+        contact->setData(QVariant(fingerprint.deviceId));
+        row.append(contact);
+        TRUST_STATE state = fingerprint.trust;
+        row.append(new QStandardItem(state == TRUSTED ? "Trusted" : state == UNTRUSTED ? "Untrusted" : "Undecided"));
+        auto fpItem = new QStandardItem(fingerprint.fingerprint);
+        fpItem->setData(QColor(state == TRUSTED ? Qt::darkGreen : state == UNTRUSTED ? Qt::darkRed : Qt::darkYellow),
+                        Qt::ForegroundRole);
+        fpItem->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+        row.append(fpItem);
+        m_tableModel->appendRow(row);
     }
-  }
+}
 
-  void KnownFingerprints::trustRevokeFingerprint() {
+void KnownFingerprints::trustRevokeFingerprint()
+{
     if (!m_table->selectionModel()->hasSelection()) {
-      return;
+        return;
     }
 
     QStandardItem *item = m_tableModel->item(m_table->selectionModel()->selectedRows(0).at(0).row(), 0);
     m_omemo->confirmDeviceTrust(m_account, item->text(), item->data().toUInt());
     updateData();
-  }
+}
 
-  ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) : ConfigWidgetTabWithTable(account, omemo, parent) {
+ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
+    ConfigWidgetTabWithTable(account, omemo, parent)
+{
     m_ourDeviceId = m_omemo->getDeviceId(account);
 
     auto mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(m_table);
 
-    connect(m_table->selectionModel(),
-            SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), 
+    connect(m_table->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
             SLOT(selectionChanged(const QItemSelection &, const QItemSelection &)));
 
     connect(m_omemo, SIGNAL(deviceListUpdated(int)), SLOT(deviceListUpdated(int)));
@@ -154,39 +166,44 @@ namespace psiomemo {
 
     setLayout(mainLayout);
     updateData();
-  }
-  
-  void ManageDevices::selectionChanged(const QItemSelection &selected, const QItemSelection &) {
+}
+
+void ManageDevices::selectionChanged(const QItemSelection &selected, const QItemSelection &)
+{
     QModelIndexList selection = selected.indexes();
     if (!selection.isEmpty()) {
-      m_deleteButton->setEnabled(selectedDeviceId(selection) != m_ourDeviceId);
+        m_deleteButton->setEnabled(selectedDeviceId(selection) != m_ourDeviceId);
     }
-  }
+}
 
-  uint32_t ManageDevices::selectedDeviceId(const QModelIndexList &selection) const {
+uint32_t ManageDevices::selectedDeviceId(const QModelIndexList &selection) const
+{
     return m_tableModel->itemFromIndex(selection.first())->data().toUInt();
-  }
+}
 
-  void ManageDevices::doUpdateData() {
+void ManageDevices::doUpdateData()
+{
     m_tableModel->setColumnCount(1);
-    m_tableModel->setHorizontalHeaderLabels({"Device ID"});
+    m_tableModel->setHorizontalHeaderLabels({ "Device ID" });
     foreach (auto deviceId, m_omemo->getOwnDeviceList(m_account)) {
-      QStandardItem *item = new QStandardItem(QString::number(deviceId));
-      item->setData(deviceId);
-      m_tableModel->appendRow(item);
+        QStandardItem *item = new QStandardItem(QString::number(deviceId));
+        item->setData(deviceId);
+        m_tableModel->appendRow(item);
     }
-  }
+}
 
-  void ManageDevices::deleteDevice() {
+void ManageDevices::deleteDevice()
+{
     QModelIndexList selection = m_table->selectionModel()->selectedIndexes();
     if (!selection.isEmpty()) {
-      m_omemo->unpublishDevice(m_account, selectedDeviceId(selection));
+        m_omemo->unpublishDevice(m_account, selectedDeviceId(selection));
     }
-  }
+}
 
-  void ManageDevices::deviceListUpdated(int account) {
+void ManageDevices::deviceListUpdated(int account)
+{
     if (account == m_account) {
-      updateData();
+        updateData();
     }
-  }
+}
 }

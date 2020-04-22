@@ -1,8 +1,6 @@
 #include "signal_protocol.h"
 
-int my_load_session_func(signal_buffer **record, const signal_protocol_address *address, void *user_data)
-{
-}
+int my_load_session_func(signal_buffer **record, const signal_protocol_address *address, void *user_data) { }
 
 int main()
 {

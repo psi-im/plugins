@@ -23,18 +23,17 @@
 #include <QDialog>
 
 namespace Ui {
-    class JuickJidDialog;
+class JuickJidDialog;
 }
 
-class JuickJidList : public QDialog
-{
+class JuickJidList : public QDialog {
     Q_OBJECT
 public:
-    JuickJidList(const QStringList& jids, QWidget *p = nullptr);
+    JuickJidList(const QStringList &jids, QWidget *p = nullptr);
     ~JuickJidList();
 
 signals:
-    void listUpdated(const QStringList&);
+    void listUpdated(const QStringList &);
 
 private slots:
     void addPressed();
@@ -44,7 +43,7 @@ private slots:
 
 private:
     Ui::JuickJidDialog *ui_;
-    QStringList jidList_;
+    QStringList         jidList_;
 };
 
 #endif // JUICKJIDLIST_H

@@ -19,14 +19,9 @@
 #include "jd_view.h"
 #include <QMouseEvent>
 
-JDView::JDView(QWidget* p)
-    : QTreeView(p)
-{
-}
+JDView::JDView(QWidget *p) : QTreeView(p) { }
 
-JDView::~JDView()
-{
-}
+JDView::~JDView() { }
 
 void JDView::currentChanged(const QModelIndex &current, const QModelIndex &previous)
 {
@@ -37,18 +32,18 @@ void JDView::currentChanged(const QModelIndex &current, const QModelIndex &previ
 void JDView::mousePressEvent(QMouseEvent *e)
 {
     QTreeView::mousePressEvent(e);
-    if(e->button() == Qt::RightButton) {
+    if (e->button() == Qt::RightButton) {
         emit contextMenu(currentIndex());
     }
 }
 
-//void JDView::dragEnterEvent(QDragEnterEvent *event)
+// void JDView::dragEnterEvent(QDragEnterEvent *event)
 //{
 //    if(event->mimeData()->hasFormat(JDItem::mimeType()))
 //        event->acceptProposedAction();
 //}
 //
-//void JDView::dropEvent(QDropEvent *event)
+// void JDView::dropEvent(QDropEvent *event)
 //{
 //    QTreeView::dropEvent(event);
 //}

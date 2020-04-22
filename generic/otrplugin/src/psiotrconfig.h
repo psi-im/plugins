@@ -25,8 +25,8 @@
 
 #include "otrmessaging.h"
 
-#include <QWidget>
 #include <QVariant>
+#include <QWidget>
 
 class OptionAccessingHost;
 class AccountInfoAccessingHost;
@@ -39,8 +39,7 @@ class QPoint;
 
 // ---------------------------------------------------------------------------
 
-namespace psiotr
-{
+namespace psiotr {
 
 // ---------------------------------------------------------------------------
 
@@ -54,19 +53,17 @@ const QVariant DEFAULT_END_WHEN_OFFLINE = QVariant(false);
 /**
  * This dialog appears in the 'Plugins' section of the Psi configuration.
  */
-class ConfigDialog : public QWidget
-{
-Q_OBJECT
+class ConfigDialog : public QWidget {
+    Q_OBJECT
 
 public:
-    ConfigDialog(OtrMessaging* otr, OptionAccessingHost* optionHost,
-                 AccountInfoAccessingHost* accountInfo,
-                 QWidget* parent = nullptr);
+    ConfigDialog(OtrMessaging *otr, OptionAccessingHost *optionHost, AccountInfoAccessingHost *accountInfo,
+                 QWidget *parent = nullptr);
 
 private:
-    OtrMessaging*             m_otr;
-    OptionAccessingHost*      m_optionHost;
-    AccountInfoAccessingHost* m_accountInfo;
+    OtrMessaging *            m_otr;
+    OptionAccessingHost *     m_optionHost;
+    AccountInfoAccessingHost *m_accountInfo;
 };
 
 // ---------------------------------------------------------------------------
@@ -74,22 +71,19 @@ private:
 /**
  * Configure OTR policy.
  */
-class ConfigOtrWidget : public QWidget
-{
-Q_OBJECT
+class ConfigOtrWidget : public QWidget {
+    Q_OBJECT
 
 public:
-    ConfigOtrWidget(OptionAccessingHost* optionHost,
-                    OtrMessaging* otr,
-                    QWidget* parent = nullptr);
+    ConfigOtrWidget(OptionAccessingHost *optionHost, OtrMessaging *otr, QWidget *parent = nullptr);
 
 private:
-    OptionAccessingHost* m_optionHost;
-    OtrMessaging*        m_otr;
+    OptionAccessingHost *m_optionHost;
+    OtrMessaging *       m_otr;
 
-    QButtonGroup*        m_policy;
+    QButtonGroup *m_policy;
 
-    QCheckBox*           m_endWhenOffline;
+    QCheckBox *m_endWhenOffline;
 
 private slots:
     void updateOptions();
@@ -100,27 +94,26 @@ private slots:
 /**
  * Show fingerprint of your contacts.
  */
-class FingerprintWidget : public QWidget
-{
-Q_OBJECT
+class FingerprintWidget : public QWidget {
+    Q_OBJECT
 
 public:
-    FingerprintWidget(OtrMessaging* otr, QWidget* parent = nullptr);
+    FingerprintWidget(OtrMessaging *otr, QWidget *parent = nullptr);
 
 protected:
     void updateData();
 
 private:
-    OtrMessaging*       m_otr;
-    QTableView*         m_table;
-    QStandardItemModel* m_tableModel;
+    OtrMessaging *      m_otr;
+    QTableView *        m_table;
+    QStandardItemModel *m_tableModel;
     QList<Fingerprint>  m_fingerprints;
 
 private slots:
     void deleteFingerprint();
     void verifyFingerprint();
     void copyFingerprint();
-    void contextMenu(const QPoint& pos);
+    void contextMenu(const QPoint &pos);
 };
 
 // ---------------------------------------------------------------------------
@@ -128,30 +121,28 @@ private slots:
 /**
  * Display a table with account and fingerprint of private key.
  */
-class PrivKeyWidget : public QWidget
-{
-Q_OBJECT
+class PrivKeyWidget : public QWidget {
+    Q_OBJECT
 
 public:
-    PrivKeyWidget(AccountInfoAccessingHost* accountInfo,
-                  OtrMessaging* otr, QWidget* parent);
+    PrivKeyWidget(AccountInfoAccessingHost *accountInfo, OtrMessaging *otr, QWidget *parent);
 
 protected:
     void updateData();
 
 private:
-    AccountInfoAccessingHost* m_accountInfo;
-    OtrMessaging*             m_otr;
-    QTableView*               m_table;
-    QStandardItemModel*       m_tableModel;
+    AccountInfoAccessingHost *m_accountInfo;
+    OtrMessaging *            m_otr;
+    QTableView *              m_table;
+    QStandardItemModel *      m_tableModel;
     QHash<QString, QString>   m_keys;
-    QComboBox*                m_accountBox;
+    QComboBox *               m_accountBox;
 
 private slots:
     void deleteKey();
     void generateKey();
     void copyFingerprint();
-    void contextMenu(const QPoint& pos);
+    void contextMenu(const QPoint &pos);
 };
 
 //-----------------------------------------------------------------------------

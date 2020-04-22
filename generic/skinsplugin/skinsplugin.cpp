@@ -20,106 +20,103 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-#include "psiplugin.h"
-#include "applicationinfoaccessor.h"
 #include "applicationinfoaccessinghost.h"
-#include "optionaccessor.h"
+#include "applicationinfoaccessor.h"
 #include "optionaccessinghost.h"
+#include "optionaccessor.h"
 #include "plugininfoprovider.h"
+#include "psiplugin.h"
 
-#include "ui_skinsplugin.h"
-#include "skin.h"
 #include "optionsparser.h"
-
+#include "skin.h"
+#include "ui_skinsplugin.h"
 
 #define cVer "0.3.3"
 
-
-class SkinsPlugin: public QObject, public PsiPlugin, public ApplicationInfoAccessor, public OptionAccessor, public PluginInfoProvider
-{
+class SkinsPlugin : public QObject,
+                    public PsiPlugin,
+                    public ApplicationInfoAccessor,
+                    public OptionAccessor,
+                    public PluginInfoProvider {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.SkinsPlugin")
     Q_INTERFACES(PsiPlugin OptionAccessor ApplicationInfoAccessor PluginInfoProvider)
 
 public:
-        SkinsPlugin();
-    virtual QString name() const;
-    virtual QString shortName() const;
-    virtual QString version() const;
-        virtual QWidget* options();
-    virtual bool enable();
-        virtual bool disable();
-        virtual void applyOptions() {};
-        virtual void restoreOptions();
-        virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
-        virtual void setOptionAccessingHost(OptionAccessingHost* host);
-        virtual void optionChanged(const QString& /*option*/) {};
-    virtual QString pluginInfo();
-    virtual QPixmap icon() const;
+    SkinsPlugin();
+    virtual QString  name() const;
+    virtual QString  shortName() const;
+    virtual QString  version() const;
+    virtual QWidget *options();
+    virtual bool     enable();
+    virtual bool     disable();
+    virtual void     applyOptions() {};
+    virtual void     restoreOptions();
+    virtual void     setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
+    virtual void     setOptionAccessingHost(OptionAccessingHost *host);
+    virtual void     optionChanged(const QString & /*option*/) {};
+    virtual QString  pluginInfo();
+    virtual QPixmap  icon() const;
 
 private:
-        bool enabled;
-        OptionAccessingHost* psiOptions;
-        ApplicationInfoAccessingHost *appInfo;
-    Ui::SkinsPlugin ui_;
-        QStringList skins_;
-        void findSkins(QString dir);
-    QDomDocument createSkinDocument(QDomElement sampleDoc, QString name = "",
-                    QString author = "", QString version = "", QString path = "");
-        bool validateOption(QString option);
-        void appendSkin(QString fileName);
+    bool                          enabled;
+    OptionAccessingHost *         psiOptions;
+    ApplicationInfoAccessingHost *appInfo;
+    Ui::SkinsPlugin               ui_;
+    QStringList                   skins_;
+    void                          findSkins(QString dir);
+    QDomDocument createSkinDocument(QDomElement sampleDoc, QString name = "", QString author = "", QString version = "",
+                                    QString path = "");
+    bool         validateOption(QString option);
+    void         appendSkin(QString fileName);
     QPointer<QWidget> optionsWidget;
 
-
 private slots:
-        void updateSkins();
-        void loadPreview();
-        void updateButtonPressed();
-        void openButtonPressed();
-        void enableButton();
-        void createSkin(const QString &name, const QString &author, const QString &version);
-        void getSkinName();
-        void applySkin();
-        void removeSkin();
-        void overwrite();
+    void updateSkins();
+    void loadPreview();
+    void updateButtonPressed();
+    void openButtonPressed();
+    void enableButton();
+    void createSkin(const QString &name, const QString &author, const QString &version);
+    void getSkinName();
+    void applySkin();
+    void removeSkin();
+    void overwrite();
+};
 
-    };
-
-SkinsPlugin::SkinsPlugin() {
-        enabled = false;
-        appInfo = nullptr;
-        psiOptions = nullptr;
-    }
-
-QString SkinsPlugin::name() const {
-        return "Skins Plugin";
-    }
-
-QString SkinsPlugin::shortName() const {
-        return "skins";
+SkinsPlugin::SkinsPlugin()
+{
+    enabled    = false;
+    appInfo    = nullptr;
+    psiOptions = nullptr;
 }
 
-QString SkinsPlugin::version() const {
-        return cVer;
-}
+QString SkinsPlugin::name() const { return "Skins Plugin"; }
 
-bool SkinsPlugin::enable() {
-    if(psiOptions) {
+QString SkinsPlugin::shortName() const { return "skins"; }
+
+QString SkinsPlugin::version() const { return cVer; }
+
+bool SkinsPlugin::enable()
+{
+    if (psiOptions) {
         enabled = true;
     }
     return enabled;
 }
 
-bool SkinsPlugin::disable() {
-    if(optionsWidget){
-        delete(ui_.lw_skins);
+bool SkinsPlugin::disable()
+{
+    if (optionsWidget) {
+        delete (ui_.lw_skins);
     }
-        enabled = false;
+    enabled = false;
     return true;
 }
 
-QWidget* SkinsPlugin::options() {
-    if(!enabled) {
+QWidget *SkinsPlugin::options()
+{
+    if (!enabled) {
         return nullptr;
     }
 
@@ -147,42 +144,38 @@ QWidget* SkinsPlugin::options() {
     connect(ui_.lw_skins, SIGNAL(currentRowChanged(int)), this, SLOT(enableButton()));
     connect(ui_.lw_skins, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(loadPreview()));
 
-    ui_.cb_hack->setVisible(false); //Hack, to enable Apply button
+    ui_.cb_hack->setVisible(false); // Hack, to enable Apply button
 
     return optionsWidget;
 }
 
-void SkinsPlugin::restoreOptions() {
+void SkinsPlugin::restoreOptions() { }
 
-}
+void SkinsPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) { appInfo = host; }
 
-void SkinsPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host) {
-     appInfo = host;
- }
+void SkinsPlugin::setOptionAccessingHost(OptionAccessingHost *host) { psiOptions = host; }
 
-void SkinsPlugin::setOptionAccessingHost(OptionAccessingHost* host) {
-    psiOptions = host;
-}
-
-void SkinsPlugin::updateSkins() {
+void SkinsPlugin::updateSkins()
+{
     QStringList dirs;
-    dirs << appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation)
-         << appInfo->appResourcesDir() + "/skins"
+    dirs << appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation) << appInfo->appResourcesDir() + "/skins"
          << appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation) + "/skins";
 
-    foreach(QString dirName, dirs) {
+    foreach (QString dirName, dirs) {
         findSkins(dirName);
     }
 }
 
-void SkinsPlugin::findSkins(QString path) {
-    if(!ui_.lw_skins) return;
+void SkinsPlugin::findSkins(QString path)
+{
+    if (!ui_.lw_skins)
+        return;
 
     QDir dir(path);
     foreach (QString filename, dir.entryList(QDir::Files)) {
-        if(filename.endsWith(".skn", Qt::CaseInsensitive)) {
+        if (filename.endsWith(".skn", Qt::CaseInsensitive)) {
             QString file = dir.absolutePath() + QString("/") + filename;
-            if(skins_.contains(file))
+            if (skins_.contains(file))
                 continue;
 
             skins_.append(file);
@@ -197,40 +190,48 @@ void SkinsPlugin::findSkins(QString path) {
     }
 }
 
-void SkinsPlugin::updateButtonPressed() {
-    if(!ui_.lw_skins) return;
+void SkinsPlugin::updateButtonPressed()
+{
+    if (!ui_.lw_skins)
+        return;
 
     updateSkins();
 
-   // ui_.pb_apply->setEnabled(false);
+    // ui_.pb_apply->setEnabled(false);
 }
 
 void SkinsPlugin::loadPreview()
 {
-    Skin *skin = (Skin*)ui_.lw_skins->currentItem();
-    if(!skin)
+    Skin *skin = (Skin *)ui_.lw_skins->currentItem();
+    if (!skin)
         return;
 
     Previewer *prev = new Previewer(skin);
-    if(prev->loadSkinInformation()) {
+    if (prev->loadSkinInformation()) {
         connect(prev, SIGNAL(applySkin()), this, SLOT(applySkin()));
         prev->show();
     } else
-        delete(prev);
+        delete (prev);
 }
 
-void SkinsPlugin::openButtonPressed() {
-    QString fileName = QFileDialog::getOpenFileName(nullptr,tr("Choose a skin file"), appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation), tr("*.skn"));
-    if(fileName.isEmpty()) return;
+void SkinsPlugin::openButtonPressed()
+{
+    QString fileName
+        = QFileDialog::getOpenFileName(nullptr, tr("Choose a skin file"),
+                                       appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation), tr("*.skn"));
+    if (fileName.isEmpty())
+        return;
 
-    if(skins_.contains(fileName))
+    if (skins_.contains(fileName))
         return;
 
     appendSkin(fileName);
 }
 
-void SkinsPlugin::appendSkin(QString fileName) {
-    if(!ui_.lw_skins) return;
+void SkinsPlugin::appendSkin(QString fileName)
+{
+    if (!ui_.lw_skins)
+        return;
 
     skins_.append(fileName);
     Skin *newItem = new Skin(ui_.lw_skins);
@@ -238,49 +239,55 @@ void SkinsPlugin::appendSkin(QString fileName) {
     newItem->setText(newItem->name());
 }
 
-void SkinsPlugin::enableButton() {
+void SkinsPlugin::enableButton()
+{
     ui_.pb_apply->setEnabled(true);
     ui_.pb_remove->setEnabled(true);
     ui_.pb_save->setEnabled(true);
 }
 
-void SkinsPlugin::getSkinName() {
+void SkinsPlugin::getSkinName()
+{
     QString name, author, version;
-    Skin *skin = (Skin*)ui_.lw_skins->currentItem();
-    if(skin) {
-    QFile file(skin->filePass());
+    Skin *  skin = (Skin *)ui_.lw_skins->currentItem();
+    if (skin) {
+        QFile        file(skin->filePass());
         QDomDocument doc;
-    if(doc.setContent(&file)) {
+        if (doc.setContent(&file)) {
             QDomElement elem = doc.documentElement();
-            if(elem.tagName() == "skin") {
-                author = elem.attribute("author");
+            if (elem.tagName() == "skin") {
+                author  = elem.attribute("author");
                 version = elem.attribute("version");
-                name = elem.attribute("name");
+                name    = elem.attribute("name");
             }
         }
     }
     GetSkinName *getName = new GetSkinName(name, author, version);
-    connect(getName, SIGNAL(ok(QString,QString,QString)), this, SLOT(createSkin(QString,QString,QString)));
+    connect(getName, SIGNAL(ok(QString, QString, QString)), this, SLOT(createSkin(QString, QString, QString)));
     getName->show();
 }
 
-void SkinsPlugin::createSkin(const QString &name, const QString &author, const QString &version) {
-    QFile file(":/skinsplugin/defskin.skn");
+void SkinsPlugin::createSkin(const QString &name, const QString &author, const QString &version)
+{
+    QFile        file(":/skinsplugin/defskin.skn");
     QDomDocument doc, newDoc;
-    if(!doc.setContent(&file)) {
+    if (!doc.setContent(&file)) {
         QMessageBox::warning(nullptr, tr("Create Skin"), tr("Unknown error!"));
         return;
     }
     QDomElement elem = doc.documentElement();
-    if(elem.tagName() != "skin") {
+    if (elem.tagName() != "skin") {
         QMessageBox::warning(nullptr, tr("Create Skin"), tr("Unknown error!"));
         return;
     }
 
-    QString fileName = QFileDialog::getSaveFileName(nullptr,tr("Save a skin file"), appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation) + QString("/%1_%2").arg(name, version), tr("*.skn"));
-    if(fileName.isEmpty())
+    QString fileName = QFileDialog::getSaveFileName(nullptr, tr("Save a skin file"),
+                                                    appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation)
+                                                        + QString("/%1_%2").arg(name, version),
+                                                    tr("*.skn"));
+    if (fileName.isEmpty())
         return;
-    if(fileName.right(4) != ".skn")
+    if (fileName.right(4) != ".skn")
         fileName.append(".skn");
 
     QString skinPath = fileName;
@@ -289,50 +296,52 @@ void SkinsPlugin::createSkin(const QString &name, const QString &author, const Q
 
     QFile saveFile(fileName);
 
-    if(saveFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+    if (saveFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         QTextStream str(&saveFile);
-    str.setCodec("UTF-8");
+        str.setCodec("UTF-8");
         int indent = 4;
         str.setGenerateByteOrderMark(false);
         newDoc.save(str, indent);
-        if(!skins_.contains(fileName))
+        if (!skins_.contains(fileName))
             appendSkin(fileName);
     } else {
         QMessageBox::warning(nullptr, tr("Create Skin"), tr("Can't save skin!"));
     }
 }
 
-void SkinsPlugin::applySkin() {
-    Skin *skin = (Skin*)ui_.lw_skins->currentItem();
-    if(!skin)
+void SkinsPlugin::applySkin()
+{
+    Skin *skin = (Skin *)ui_.lw_skins->currentItem();
+    if (!skin)
         return;
 
-    QFile file(skin->filePass());
+    QFile        file(skin->filePass());
     QDomDocument doc;
-    if(!doc.setContent(&file)) {
+    if (!doc.setContent(&file)) {
         QMessageBox::warning(nullptr, tr("Apply Skin"), tr("Unknown error!"));
         return;
     }
     QDomElement elem = doc.documentElement();
-    if(elem.tagName() != "skin") {
+    if (elem.tagName() != "skin") {
         QMessageBox::warning(nullptr, tr("Apply Skin"), tr("Unknown error!"));
         return;
     }
 
-    bool backup = ui_.cb_backup->isChecked();
+    bool    backup = ui_.cb_backup->isChecked();
     QString fileName;
-    if(backup && skin->name().left(11) != "backupSkin_") {
+    if (backup && skin->name().left(11) != "backupSkin_") {
         QDomDocument backUp = createSkinDocument(elem, "backup", "SkinsPlugin", "0");
 
         QDir skinsDir(appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation) + QString("/skins"));
-        if(!skinsDir.exists())
+        if (!skinsDir.exists())
             skinsDir.mkdir(appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation) + QString("/skins"));
 
-        fileName = skinsDir.absolutePath() + "/backupSkin_" + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + ".skn";
+        fileName = skinsDir.absolutePath() + "/backupSkin_"
+            + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss") + ".skn";
         QFile backUpFile(fileName);
-    if(backUpFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        if (backUpFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
             QTextStream str(&backUpFile);
-        str.setCodec("UTF-8");
+            str.setCodec("UTF-8");
             int indent = 4;
             str.setGenerateByteOrderMark(false);
             backUp.save(str, indent);
@@ -343,35 +352,37 @@ void SkinsPlugin::applySkin() {
         }
     }
 
-    QDomElement options = elem.firstChildElement("options");
-    QDomNode optionNode = options.firstChild();
-    while(!optionNode.isNull()) {
+    QDomElement options    = elem.firstChildElement("options");
+    QDomNode    optionNode = options.firstChild();
+    while (!optionNode.isNull()) {
         QDomElement optionElem = optionNode.toElement();
-    QString oldPath = elem.attribute("path");
-        QString optionName = optionElem.tagName();
-        if(validateOption(optionName)) {
+        QString     oldPath    = elem.attribute("path");
+        QString     optionName = optionElem.tagName();
+        if (validateOption(optionName)) {
             QVariant optionValue = OptionsParser::instance()->elementToVariant(optionElem);
-        if(!oldPath.isEmpty() && optionValue.type() == QVariant::String) {
-            QString str = optionValue.toString();
-            str.replace(oldPath, skin->skinFolder());
-            optionValue = str;
-        }
+            if (!oldPath.isEmpty() && optionValue.type() == QVariant::String) {
+                QString str = optionValue.toString();
+                str.replace(oldPath, skin->skinFolder());
+                optionValue = str;
+            }
             psiOptions->setGlobalOption(optionName, optionValue);
         }
         optionNode = optionNode.nextSibling();
     }
     QString mes = QString("Skin %1 successfully applied!\n"
-                  "Some changes may only have full effect upon restart!").arg(elem.attribute("name"));
-    if(backup) {
+                          "Some changes may only have full effect upon restart!")
+                      .arg(elem.attribute("name"));
+    if (backup) {
         mes += QString("\nBackup skin saved to %2").arg(fileName);
     }
 
     QMessageBox::information(nullptr, tr("Apply Skin"), mes);
 
-    ui_.cb_hack->toggle(); //enable Apply button
+    ui_.cb_hack->toggle(); // enable Apply button
 }
 
-QDomDocument SkinsPlugin::createSkinDocument(QDomElement elem, QString name, QString author, QString version, QString path)
+QDomDocument SkinsPlugin::createSkinDocument(QDomElement elem, QString name, QString author, QString version,
+                                             QString path)
 {
     QDomDocument newDoc;
 
@@ -382,13 +393,13 @@ QDomDocument SkinsPlugin::createSkinDocument(QDomElement elem, QString name, QSt
     newElem.setAttribute("path", path);
     QDomElement newOptions = newDoc.createElement("options");
 
-    QDomElement options = elem.firstChildElement("options");
-    QDomNode optionNode = options.firstChild();
-    while(!optionNode.isNull()) {
+    QDomElement options    = elem.firstChildElement("options");
+    QDomNode    optionNode = options.firstChild();
+    while (!optionNode.isNull()) {
         QString optionName = optionNode.toElement().tagName();
-        if(validateOption(optionName)) {
-            QVariant optionValue = psiOptions->getGlobalOption(optionName);
-            QDomElement newOption = newDoc.createElement(optionName);
+        if (validateOption(optionName)) {
+            QVariant    optionValue = psiOptions->getGlobalOption(optionName);
+            QDomElement newOption   = newDoc.createElement(optionName);
             OptionsParser::instance()->variantToElement(optionValue, newOption);
             newOptions.appendChild(newOption);
         }
@@ -403,87 +414,86 @@ QDomDocument SkinsPlugin::createSkinDocument(QDomElement elem, QString name, QSt
 
 bool SkinsPlugin::validateOption(QString optionName)
 {
-    bool b =(optionName.contains("options.ui.") || optionName.contains("options.iconsets.")) &&
-            !optionName.contains("notifications.send-receipts") &&
-            !optionName.contains("spell-check.enabled") &&
-            !optionName.contains("service-discovery");
+    bool b = (optionName.contains("options.ui.") || optionName.contains("options.iconsets."))
+        && !optionName.contains("notifications.send-receipts") && !optionName.contains("spell-check.enabled")
+        && !optionName.contains("service-discovery");
 
     return b;
 }
 
-void SkinsPlugin::overwrite() {
-    int ret = QMessageBox::question(nullptr, tr("Overwrite selected skin"),
-                                tr("Are You Sure?"),
-                                QMessageBox::Ok  | QMessageBox::Cancel);
-    if(ret == QMessageBox::Cancel) return;
-
-    Skin *skin = (Skin*)ui_.lw_skins->currentItem();
-    if(!skin)
+void SkinsPlugin::overwrite()
+{
+    int ret = QMessageBox::question(nullptr, tr("Overwrite selected skin"), tr("Are You Sure?"),
+                                    QMessageBox::Ok | QMessageBox::Cancel);
+    if (ret == QMessageBox::Cancel)
         return;
 
-    QFile file(skin->filePass());
+    Skin *skin = (Skin *)ui_.lw_skins->currentItem();
+    if (!skin)
+        return;
+
+    QFile        file(skin->filePass());
     QDomDocument doc;
-    if(!doc.setContent(&file)) {
+    if (!doc.setContent(&file)) {
         QMessageBox::warning(nullptr, tr("Overwrite Skin"), tr("Unknown error!"));
         return;
     }
     QDomElement elem = doc.documentElement();
-    if(elem.tagName() != "skin") {
+    if (elem.tagName() != "skin") {
         QMessageBox::warning(nullptr, tr("Overwrite Skin"), tr("Unknown error!"));
         return;
     }
 
     QDomDocument overwriteDoc = createSkinDocument(elem, elem.attribute("name"), elem.attribute("author"),
-                         elem.attribute("version"), skin->skinFolder());
-    if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+                                                   elem.attribute("version"), skin->skinFolder());
+    if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         QTextStream str(&file);
         str.setCodec("UTF-8");
-            int indent = 4;
-            str.setGenerateByteOrderMark(false);
+        int indent = 4;
+        str.setGenerateByteOrderMark(false);
         overwriteDoc.save(str, indent);
-        } else {
-            QMessageBox::warning(nullptr, tr("Overwrite Skin"), tr("Can't save the skin!"));
-            return;
-        }
+    } else {
+        QMessageBox::warning(nullptr, tr("Overwrite Skin"), tr("Can't save the skin!"));
+        return;
+    }
 }
 
-void SkinsPlugin::removeSkin() {
-    Skin *skin = (Skin*)ui_.lw_skins->currentItem();
-    if(!skin)
+void SkinsPlugin::removeSkin()
+{
+    Skin *skin = (Skin *)ui_.lw_skins->currentItem();
+    if (!skin)
         return;
 
-    int ret = QMessageBox::question(nullptr, tr("Delete skin"),
-                                tr("Are You Sure?"),
-                                QMessageBox::Ok  | QMessageBox::Cancel);
-    if(ret == QMessageBox::Cancel) return;
+    int ret
+        = QMessageBox::question(nullptr, tr("Delete skin"), tr("Are You Sure?"), QMessageBox::Ok | QMessageBox::Cancel);
+    if (ret == QMessageBox::Cancel)
+        return;
 
     QString filePass = skin->filePass();
-    QFile file(filePass);
-    if(file.open(QIODevice::ReadWrite)) {
+    QFile   file(filePass);
+    if (file.open(QIODevice::ReadWrite)) {
         ui_.lw_skins->removeItemWidget(skin);
-        delete(skin);
+        delete (skin);
         file.remove();
         skins_.removeAt(skins_.indexOf(filePass));
     }
 }
 
-QString SkinsPlugin::pluginInfo() {
-    return tr("Author: ") +  "Dealer_WeARE\n"
-            + tr("Email: ") + "wadealer@gmail.com\n\n"
-            + tr("This plugin is designed to create, store and apply skins to Psi+.\n"
+QString SkinsPlugin::pluginInfo()
+{
+    return tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
+        + tr("This plugin is designed to create, store and apply skins to Psi+.\n"
              "Skin - a set of custom settings.\n"
-             "To download a new skin, create a folder named skins in the PsiData directory and put the new skin in it. You can also just open a skin file.\n"
+             "To download a new skin, create a folder named skins in the PsiData directory and put the new skin in it. "
+             "You can also just open a skin file.\n"
              "Each skin must be in a separate directory. You can also add a screenshot to the skin file.\n"
              "In most cases, to be sure that the skin is applied correctly, you must perform a sequence of actions:\n"
-              "1. Apply the skin\n"
-               "2. Restart the application\n"
-               "3. Apply the same skin again\n"
+             "1. Apply the skin\n"
+             "2. Restart the application\n"
+             "3. Apply the same skin again\n"
              "This allows all settings (icons, toolbar layout) to be picked up correctly. ");
 }
 
-QPixmap SkinsPlugin::icon() const
-{
-    return QPixmap(":/skinsplugin/skins.png");
-}
+QPixmap SkinsPlugin::icon() const { return QPixmap(":/skinsplugin/skins.png"); }
 
 #include "skinsplugin.moc"

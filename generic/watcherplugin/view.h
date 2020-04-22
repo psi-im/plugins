@@ -20,13 +20,12 @@
 #ifndef VIEW_H
 #define VIEW_H
 
-#include <QTableView>
 #include <QKeyEvent>
+#include <QTableView>
 
 class IconFactoryAccessingHost;
 
-class Viewer : public QTableView
-{
+class Viewer : public QTableView {
     Q_OBJECT
 
 public:
@@ -39,15 +38,14 @@ private:
 
 protected:
     void keyPressEvent(QKeyEvent *e);
-    void contextMenuEvent( QContextMenuEvent * e );
+    void contextMenuEvent(QContextMenuEvent *e);
 
 private slots:
-    void itemClicked(const QModelIndex& index);
+    void itemClicked(const QModelIndex &index);
 
 signals:
-    void getSound(const QModelIndex&);
-    void checkSound(const QModelIndex&);
-
+    void getSound(const QModelIndex &);
+    void checkSound(const QModelIndex &);
 };
 
 #endif // VIEW_H

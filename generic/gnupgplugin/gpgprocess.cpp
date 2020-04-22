@@ -17,20 +17,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <QFileInfo>
 #include "gpgprocess.h"
 #include <QCoreApplication>
 #include <QDir>
+#include <QFileInfo>
 #ifdef Q_OS_WIN
 #include <windows.h>
 #endif
 
-GpgProcess::GpgProcess(QObject *parent)
-    : QProcess(parent)
-    , _bin("")
-{
-    _bin = findBin();
-}
+GpgProcess::GpgProcess(QObject *parent) : QProcess(parent), _bin("") { _bin = findBin(); }
 
 inline bool checkBin(const QString &bin)
 {
@@ -42,15 +37,15 @@ inline bool checkBin(const QString &bin)
 static bool getRegKey(HKEY root, const char *path, QString &value)
 {
     HKEY hkey = 0;
-    bool res = false;
+    bool res  = false;
 
-    if(RegOpenKeyExA(root, path, 0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {
+    if (RegOpenKeyExA(root, path, 0, KEY_QUERY_VALUE, &hkey) == ERROR_SUCCESS) {
         DWORD dwLen = 256;
-        char szValue[256];
+        char  szValue[256];
 
         if (RegQueryValueExA(hkey, "Install Directory", NULL, NULL, (LPBYTE)szValue, &dwLen) == ERROR_SUCCESS) {
             value = QString::fromLocal8Bit(szValue);
-            res = true;
+            res   = true;
         }
         RegCloseKey(hkey);
     }
@@ -60,18 +55,17 @@ static bool getRegKey(HKEY root, const char *path, QString &value)
 static QString findRegGpgProgram()
 {
     QStringList bins;
-    bins << "gpg.exe" << "gpg2.exe";
+    bins << "gpg.exe"
+         << "gpg2.exe";
 
-    const char *path = "Software\\GNU\\GnuPG";
+    const char *path  = "Software\\GNU\\GnuPG";
     const char *path2 = "Software\\Wow6432Node\\GNU\\GnuPG";
 
     QString dir;
-    getRegKey(HKEY_CURRENT_USER, path, dir)  ||
-    getRegKey(HKEY_CURRENT_USER, path2, dir) ||
-    getRegKey(HKEY_LOCAL_MACHINE, path, dir) ||
-    getRegKey(HKEY_LOCAL_MACHINE, path2, dir);
+    getRegKey(HKEY_CURRENT_USER, path, dir) || getRegKey(HKEY_CURRENT_USER, path2, dir)
+        || getRegKey(HKEY_LOCAL_MACHINE, path, dir) || getRegKey(HKEY_LOCAL_MACHINE, path2, dir);
 
-    if (!dir.isEmpty())    {
+    if (!dir.isEmpty()) {
         foreach (const QString &bin, bins) {
             if (checkBin(dir + "\\" + bin)) {
                 return dir + "\\" + bin;
@@ -88,13 +82,15 @@ QString GpgProcess::findBin() const
     // so any from them can be used
     QStringList bins;
 #ifdef Q_OS_WIN
-    bins << "gpg.exe" << "gpg2.exe";
+    bins << "gpg.exe"
+         << "gpg2.exe";
 #else
-    bins << "gpg" << "gpg2";
+    bins << "gpg"
+         << "gpg2";
 #endif
 
     // Prefer bundled gpg
-    foreach (const QString &bin, bins)    {
+    foreach (const QString &bin, bins) {
         if (checkBin(QCoreApplication::applicationDirPath() + "/" + bin)) {
             return QCoreApplication::applicationDirPath() + "/" + bin;
         }
@@ -107,7 +103,7 @@ QString GpgProcess::findBin() const
         return bin;
 #endif
 
-    // Look up at PATH environment
+        // Look up at PATH environment
 #ifdef Q_OS_WIN
     QString pathSep = ";";
 #else
@@ -122,7 +118,8 @@ QString GpgProcess::findBin() const
     // contain gpg
     // Mac GPG and brew use /usr/local/bin
     // MacPorts uses /opt/local/bin
-    paths << "/usr/local/bin" << "/opt/local/bin";
+    paths << "/usr/local/bin"
+          << "/opt/local/bin";
 #endif
     paths.removeDuplicates();
 
@@ -151,13 +148,14 @@ bool GpgProcess::info(QString &message)
     if (!_bin.isEmpty()) {
         if (error() == FailedToStart) {
             message = tr("Can't start ") + _bin;
-        }
-        else {
-            message = QString("%1 %2\n%3").arg(QDir::toNativeSeparators(_bin)).arg(arguments.join(" ")).arg(QString::fromLocal8Bit(readAll()));
+        } else {
+            message = QString("%1 %2\n%3")
+                          .arg(QDir::toNativeSeparators(_bin))
+                          .arg(arguments.join(" "))
+                          .arg(QString::fromLocal8Bit(readAll()));
             res = true;
         }
-    }
-    else {
+    } else {
         message = tr("GnuPG program not found");
     }
 

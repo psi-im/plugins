@@ -22,28 +22,33 @@
 class QNetworkAccessManager;
 class QNetworkReply;
 
-class requestAuthDialog : public QDialog
-{
+class requestAuthDialog : public QDialog {
     Q_OBJECT;
 
 public:
     requestAuthDialog(QWidget *parent = 0);
     ~requestAuthDialog();
-    void setLogin(const QString& login) { ui.editLogin->setText(login); ui.editPasswd->setFocus(); }
-    void setPasswd(const QString& passwd) { ui.editPasswd->setText(passwd); ui.editPasswd->setFocus(); }
+    void setLogin(const QString &login)
+    {
+        ui.editLogin->setText(login);
+        ui.editPasswd->setFocus();
+    }
+    void setPasswd(const QString &passwd)
+    {
+        ui.editPasswd->setText(passwd);
+        ui.editPasswd->setFocus();
+    }
     QString getLogin() const { return ui.editLogin->text(); }
     QString getPasswd() const { return ui.editPasswd->text(); }
-    bool getRemember() const { return ui.cbRemember->isChecked(); }
+    bool    getRemember() const { return ui.cbRemember->isChecked(); }
     QString getCode() const { return ui.editCaptcha->text(); }
-    void setCaptcha(const QList<QNetworkCookie>& cooks, const QString& url);
+    void    setCaptcha(const QList<QNetworkCookie> &cooks, const QString &url);
 
 private slots:
-    void reply(QNetworkReply* r);
-
+    void reply(QNetworkReply *r);
 
 private:
     Ui::requestAuthDialogClass ui;
-    QNetworkAccessManager *manager_;
-
+    QNetworkAccessManager *    manager_;
 };
 #endif

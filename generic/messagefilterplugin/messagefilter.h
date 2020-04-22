@@ -22,39 +22,33 @@
 
 #include "options.h"
 
-#include <psiplugin.h>
+#include <accountinfoaccessor.h>
+#include <activetabaccessor.h>
 #include <applicationinfoaccessinghost.h>
+#include <iconfactoryaccessor.h>
+#include <optionaccessor.h>
 #include <plugininfoprovider.h>
+#include <psiaccountcontroller.h>
+#include <psiplugin.h>
 #include <stanzafilter.h>
 #include <stanzasender.h>
-#include <psiaccountcontroller.h>
-#include <optionaccessor.h>
 #include <toolbariconaccessor.h>
-#include <iconfactoryaccessor.h>
-#include <activetabaccessor.h>
-#include <accountinfoaccessor.h>
 
 class Options;
 class QMenu;
 
-class MessageFilter : public QObject
-                    , public PsiPlugin
-                    , public PluginInfoProvider
-                    , public StanzaFilter
-                    , public PsiAccountController
-                    , public OptionAccessor
-                    , public StanzaSender
-                    , public AccountInfoAccessor
-{
+class MessageFilter : public QObject,
+                      public PsiPlugin,
+                      public PluginInfoProvider,
+                      public StanzaFilter,
+                      public PsiAccountController,
+                      public OptionAccessor,
+                      public StanzaSender,
+                      public AccountInfoAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.MessageFilter")
-    Q_INTERFACES(PsiPlugin
-                 PluginInfoProvider
-                 StanzaFilter
-                 PsiAccountController
-                 OptionAccessor
-                 StanzaSender
-                 AccountInfoAccessor)
+    Q_INTERFACES(
+        PsiPlugin PluginInfoProvider StanzaFilter PsiAccountController OptionAccessor StanzaSender AccountInfoAccessor)
 
 public:
     MessageFilter();
@@ -66,11 +60,11 @@ public:
     QString version() const { return "0.0.2"; }
 
     QWidget *options();
-    bool enable();
-    bool disable();
-    void applyOptions();
-    void restoreOptions();
-    QPixmap icon() const;
+    bool     enable();
+    bool     disable();
+    void     applyOptions();
+    void     restoreOptions();
+    QPixmap  icon() const;
 
     // from PluginInfoProvider
     QString pluginInfo();
@@ -80,27 +74,27 @@ public:
 
     // from StanzaFilter
     bool incomingStanza(int account, const QDomElement &stanza);
-    bool outgoingStanza(int /*account*/, QDomElement &/*stanza*/) { return false; }
+    bool outgoingStanza(int /*account*/, QDomElement & /*stanza*/) { return false; }
 
     // from PsiAccountController
     void setPsiAccountControllingHost(PsiAccountControllingHost *host) { _accountHost = host; }
 
     // from OptionAccessor
     void setOptionAccessingHost(OptionAccessingHost *host) { _optionHost = host; }
-    void optionChanged(const QString &/*option*/) { }
+    void optionChanged(const QString & /*option*/) { }
 
     // from AccountInfoAccessor
-    void setAccountInfoAccessingHost(AccountInfoAccessingHost* host) { _accountInfo = host; }
+    void setAccountInfoAccessingHost(AccountInfoAccessingHost *host) { _accountInfo = host; }
 
 private:
-    void loadRules();
-    bool _enabled;
-    Options *_optionsForm;
+    void                       loadRules();
+    bool                       _enabled;
+    Options *                  _optionsForm;
     PsiAccountControllingHost *_accountHost;
-    OptionAccessingHost *_optionHost;
-    StanzaSendingHost *_stanzaSending;
-    AccountInfoAccessingHost *_accountInfo;
-    QList<Rule> _rules;
+    OptionAccessingHost *      _optionHost;
+    StanzaSendingHost *        _stanzaSending;
+    AccountInfoAccessingHost * _accountInfo;
+    QList<Rule>                _rules;
 };
 
 #endif // MESSAGEFILTER_H

@@ -22,11 +22,10 @@
 
 #include "ui_optionsdlg.h"
 
-class OptionsDlg : public QDialog
-{
+class OptionsDlg : public QDialog {
     Q_OBJECT
 public:
-    OptionsDlg(QWidget* p = nullptr);
+    OptionsDlg(QWidget *p = nullptr);
 
 public slots:
     void accept();

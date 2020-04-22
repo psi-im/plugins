@@ -19,54 +19,40 @@
 
 #include "watcheditem.h"
 
-WatchedItem::WatchedItem(QListWidget *parent)
-    : QListWidgetItem(parent)
-    , jid_("")
-    , text_("")
-    , sFile_("")
-    , aUse_(false)
-    , groupChat_(false)
+WatchedItem::WatchedItem(QListWidget *parent) :
+    QListWidgetItem(parent), jid_(""), text_(""), sFile_(""), aUse_(false), groupChat_(false)
 {
 }
 
-WatchedItem::WatchedItem(const QString &jid, const QString &text, const QString &sFile, bool aUse, QListWidget *parent)
-    : QListWidgetItem(parent)
-    , jid_(jid)
-    , text_(text)
-    , sFile_(sFile)
-    , aUse_(aUse)
-    , groupChat_(false)
+WatchedItem::WatchedItem(const QString &jid, const QString &text, const QString &sFile, bool aUse,
+                         QListWidget *parent) :
+    QListWidgetItem(parent),
+    jid_(jid), text_(text), sFile_(sFile), aUse_(aUse), groupChat_(false)
 {
 }
 
 QString WatchedItem::settingsString() const
 {
-    const QStringList &list = {
-        jid_,
-        text_,
-        sFile_,
-        (aUse_ ? "1" : "0"),
-        (groupChat_ ? "1" : "0")
-    };
+    const QStringList &list = { jid_, text_, sFile_, (aUse_ ? "1" : "0"), (groupChat_ ? "1" : "0") };
     return list.join(splitStr);
 }
 
 void WatchedItem::setSettings(const QString &settings)
 {
     QStringList l = settings.split(splitStr);
-    if(!l.isEmpty())
+    if (!l.isEmpty())
         jid_ = l.takeFirst();
-    if(!l.isEmpty())
+    if (!l.isEmpty())
         text_ = l.takeFirst();
-    if(!l.isEmpty())
+    if (!l.isEmpty())
         sFile_ = l.takeFirst();
-    if(!l.isEmpty())
+    if (!l.isEmpty())
         aUse_ = l.takeFirst().toInt();
-    if(!l.isEmpty())
+    if (!l.isEmpty())
         groupChat_ = l.takeFirst().toInt();
 }
 
-WatchedItem* WatchedItem::copy()
+WatchedItem *WatchedItem::copy()
 {
     WatchedItem *wi = new WatchedItem();
     wi->setWatchedText(text_);

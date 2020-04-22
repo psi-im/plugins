@@ -21,70 +21,62 @@
 #include "applicationinfoaccessinghost.h"
 #include "defines.h"
 
+#include <QDebug>
+#include <QFile>
+#include <QMessageBox>
 #include <QNetworkProxy>
 #include <QNetworkReply>
-#include <QMessageBox>
-#include <QFile>
 #include <QTimer>
-#include <QDebug>
-
 
 static void save(const QString &path, const QByteArray &img)
 {
     QFile file(path);
 
-    if(file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+    if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         file.write(img);
-    }
-    else
-        QMessageBox::warning(nullptr, QObject::tr("Warning"), QObject::tr("Cannot write to file %1:\n%2.")
-                     .arg(file.fileName())
-                     .arg(file.errorString()));
+    } else
+        QMessageBox::warning(nullptr, QObject::tr("Warning"),
+                             QObject::tr("Cannot write to file %1:\n%2.").arg(file.fileName()).arg(file.errorString()));
 }
 
-
-
-JuickDownloader::JuickDownloader(ApplicationInfoAccessingHost *host, QObject *p)
-    : QObject(p)
-    , inProgress_(false)
-    , manager_(new QNetworkAccessManager(this))
-    , appInfo_(host)
-    , waitTimer_(new QTimer(this))
-{    
-    connect(manager_, SIGNAL(finished(QNetworkReply*)), SLOT(requestFinished(QNetworkReply*)));
+JuickDownloader::JuickDownloader(ApplicationInfoAccessingHost *host, QObject *p) :
+    QObject(p), inProgress_(false), manager_(new QNetworkAccessManager(this)), appInfo_(host),
+    waitTimer_(new QTimer(this))
+{
+    connect(manager_, SIGNAL(finished(QNetworkReply *)), SLOT(requestFinished(QNetworkReply *)));
 
     waitTimer_->setSingleShot(true);
     waitTimer_->setInterval(1000);
     connect(waitTimer_, SIGNAL(timeout()), SLOT(timeOut()));
 
-//    qRegisterMetaType<JuickDownloadItem>("JuickDownloadItem");
+    //    qRegisterMetaType<JuickDownloadItem>("JuickDownloadItem");
 }
 
 void JuickDownloader::get(const JuickDownloadItem &item)
 {
-    if(waitTimer_->isActive())
+    if (waitTimer_->isActive())
         waitTimer_->stop();
 
     items_.enqueue(item);
     Proxy prx = appInfo_->getProxyFor(constPluginName);
     setProxyHostPort(prx.host, prx.port, prx.user, prx.pass, prx.type);
-    if(!inProgress_) {
+    if (!inProgress_) {
         peekNext();
     }
 }
 
-
-void JuickDownloader::setProxyHostPort(const QString& host, int port, const QString& username, const QString& pass, const QString& type)
+void JuickDownloader::setProxyHostPort(const QString &host, int port, const QString &username, const QString &pass,
+                                       const QString &type)
 {
     QNetworkProxy prx;
 
-    if(!host.isEmpty()) {
+    if (!host.isEmpty()) {
         prx.setType(QNetworkProxy::HttpCachingProxy);
-        if(type == "socks")
+        if (type == "socks")
             prx.setType(QNetworkProxy::Socks5Proxy);
         prx.setPort(port);
         prx.setHostName(host);
-        if(!username.isEmpty()) {
+        if (!username.isEmpty()) {
             prx.setUser(username);
             prx.setPassword(pass);
         }
@@ -95,18 +87,17 @@ void JuickDownloader::setProxyHostPort(const QString& host, int port, const QStr
 
 void JuickDownloader::peekNext()
 {
-    if(items_.isEmpty()) {
+    if (items_.isEmpty()) {
         inProgress_ = false;
         waitTimer_->start();
-    }
-    else {
-        inProgress_ = true;
+    } else {
+        inProgress_          = true;
         JuickDownloadItem it = items_.dequeue();
-        QNetworkRequest request;
+        QNetworkRequest   request;
         request.setUrl(QUrl(it.url));
         request.setRawHeader("User-Agent", "Juick Plugin (Psi+)");
         QNetworkReply *reply = manager_->get(request);
-        QVariant v;
+        QVariant       v;
         v.setValue(it);
         reply->setProperty("jdi", v);
     }
@@ -114,12 +105,11 @@ void JuickDownloader::peekNext()
 
 void JuickDownloader::requestFinished(QNetworkReply *reply)
 {
-    if (reply->error() == QNetworkReply::NoError ) {
-        QByteArray ba = reply->readAll();
+    if (reply->error() == QNetworkReply::NoError) {
+        QByteArray        ba = reply->readAll();
         JuickDownloadItem it = reply->property("jdi").value<JuickDownloadItem>();
         dataReady(ba, it);
-    }
-    else {
+    } else {
         qDebug() << reply->errorString();
     }
 
@@ -133,8 +123,7 @@ void JuickDownloader::timeOut()
     urls_.clear();
 }
 
-
-void JuickDownloader::dataReady(const QByteArray &ba, const JuickDownloadItem& it)
+void JuickDownloader::dataReady(const QByteArray &ba, const JuickDownloadItem &it)
 {
     urls_.append(QUrl::fromLocalFile(it.path).toEncoded());
     save(it.path, ba);

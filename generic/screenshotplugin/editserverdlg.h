@@ -20,26 +20,25 @@
 #ifndef EDITSERVERDLG_H
 #define EDITSERVERDLG_H
 
-#include <QPointer>
 #include "ui_editserverdlg.h"
+#include <QPointer>
 
 class Server;
 
-class EditServerDlg : public QDialog
-{
+class EditServerDlg : public QDialog {
     Q_OBJECT
 public:
     EditServerDlg(QWidget *parent = nullptr);
     void setServer(Server *const s);
 
 signals:
-    void okPressed(const QString&);
+    void okPressed(const QString &);
 
 private:
     Ui::EditServerDlg ui_;
 
     void processOldSettingString(QStringList l);
-    void setSettings(const QString& settings);
+    void setSettings(const QString &settings);
 
 private slots:
     void onOkPressed();

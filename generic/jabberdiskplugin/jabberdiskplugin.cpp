@@ -17,42 +17,29 @@
  *
  */
 
-#include <QDomElement>
 #include <QAction>
+#include <QDomElement>
 
-#include "jabberdiskplugin.h"
 #include "jabberdiskcontroller.h"
-
+#include "jabberdiskplugin.h"
 
 static const QString constJids_ = "jids";
 
-JabberDiskPlugin::JabberDiskPlugin()
-    : enabled(false)
-    , psiOptions(nullptr)
-    , jids_({"disk.jabbim.cz"})
-    , iconHost(nullptr)
+JabberDiskPlugin::JabberDiskPlugin() :
+    enabled(false), psiOptions(nullptr), jids_({ "disk.jabbim.cz" }), iconHost(nullptr)
 {
 }
 
-QString JabberDiskPlugin::name() const
-{
-    return "Jabber Disk Plugin";
-}
+QString JabberDiskPlugin::name() const { return "Jabber Disk Plugin"; }
 
-QString JabberDiskPlugin::shortName() const
-{
-    return "jabberdisk";
-}
+QString JabberDiskPlugin::shortName() const { return "jabberdisk"; }
 
-QString JabberDiskPlugin::version() const
-{
-    return constVersion;
-}
+QString JabberDiskPlugin::version() const { return constVersion; }
 
 bool JabberDiskPlugin::enable()
 {
     enabled = true;
-    jids_ = psiOptions->getPluginOption(constJids_, jids_).toStringList();
+    jids_   = psiOptions->getPluginOption(constJids_, jids_).toStringList();
 
     return enabled;
 }
@@ -66,11 +53,11 @@ bool JabberDiskPlugin::disable()
 
 void JabberDiskPlugin::applyOptions()
 {
-    if(!options_)
+    if (!options_)
         return;
 
     jids_.clear();
-    for(int i = 0; i < ui_.lw_jids->count(); i++) {
+    for (int i = 0; i < ui_.lw_jids->count(); i++) {
         jids_.append(ui_.lw_jids->item(i)->text());
     }
     psiOptions->setPluginOption(constJids_, jids_);
@@ -78,13 +65,13 @@ void JabberDiskPlugin::applyOptions()
 
 void JabberDiskPlugin::restoreOptions()
 {
-    if(!options_)
+    if (!options_)
         return;
 
     ui_.lw_jids->addItems(jids_);
 }
 
-QWidget* JabberDiskPlugin::options()
+QWidget *JabberDiskPlugin::options()
 {
     if (!enabled) {
         return nullptr;
@@ -102,26 +89,23 @@ QWidget* JabberDiskPlugin::options()
 }
 
 //этот слот нужен для активации кнопки "Применить"
-void JabberDiskPlugin::hack()
-{
-    ui_.cb_hack->toggle();
-}
+void JabberDiskPlugin::hack() { ui_.cb_hack->toggle(); }
 
-bool JabberDiskPlugin::incomingStanza(int account, const QDomElement& xml)
+bool JabberDiskPlugin::incomingStanza(int account, const QDomElement &xml)
 {
-    if(!enabled)
+    if (!enabled)
         return false;
 
-    if(xml.tagName() == "message" && !xml.firstChildElement("body").isNull()) {
+    if (xml.tagName() == "message" && !xml.firstChildElement("body").isNull()) {
         const QString from = xml.attribute("from");
-        bool find = false;
-        foreach(const QString& jid, jids_) {
-            if(from.contains(jid, Qt::CaseInsensitive)) {
+        bool          find = false;
+        foreach (const QString &jid, jids_) {
+            if (from.contains(jid, Qt::CaseInsensitive)) {
                 find = true;
                 break;
             }
         }
-        if(find) {
+        if (find) {
             return JabberDiskController::instance()->incomingStanza(account, xml);
         }
     }
@@ -131,20 +115,19 @@ bool JabberDiskPlugin::incomingStanza(int account, const QDomElement& xml)
 
 void JabberDiskPlugin::addJid()
 {
-    if(!options_)
+    if (!options_)
         return;
 
-    const QString& txt = ui_.le_addJid->text();
-    if(!txt.isEmpty()) {
+    const QString &txt = ui_.le_addJid->text();
+    if (!txt.isEmpty()) {
         ui_.lw_jids->addItem(txt);
         hack();
     }
-
 }
 
 void JabberDiskPlugin::removeJid()
 {
-    if(!options_)
+    if (!options_)
         return;
 
     QListWidgetItem *i = ui_.lw_jids->currentItem();
@@ -154,20 +137,17 @@ void JabberDiskPlugin::removeJid()
     hack();
 }
 
-bool JabberDiskPlugin::outgoingStanza(int/* account*/, QDomElement&/* xml*/)
-{
-    return false;
-}
+bool JabberDiskPlugin::outgoingStanza(int /* account*/, QDomElement & /* xml*/) { return false; }
 
-void JabberDiskPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost* host)
+void JabberDiskPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost *host)
 {
     JabberDiskController::instance()->setAccountInfoAccessingHost(host);
 }
 
-void JabberDiskPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost* host)
+void JabberDiskPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost *host)
 {
     iconHost = host;
-    //JabberDiskController::instance()->setIconFactoryAccessingHost(host);
+    // JabberDiskController::instance()->setIconFactoryAccessingHost(host);
 }
 
 void JabberDiskPlugin::setStanzaSendingHost(StanzaSendingHost *host)
@@ -175,31 +155,22 @@ void JabberDiskPlugin::setStanzaSendingHost(StanzaSendingHost *host)
     JabberDiskController::instance()->setStanzaSendingHost(host);
 }
 
-void JabberDiskPlugin::setOptionAccessingHost(OptionAccessingHost *host)
-{
-    psiOptions = host;
-}
+void JabberDiskPlugin::setOptionAccessingHost(OptionAccessingHost *host) { psiOptions = host; }
 
-//void JabberDiskPlugin::setPopupAccessingHost(PopupAccessingHost* host)
+// void JabberDiskPlugin::setPopupAccessingHost(PopupAccessingHost* host)
 //{
 //    popup = host;
 //}
 
-QList < QVariantHash > JabberDiskPlugin::getAccountMenuParam()
-{
-    return QList < QVariantHash >();
-}
+QList<QVariantHash> JabberDiskPlugin::getAccountMenuParam() { return QList<QVariantHash>(); }
 
-QList < QVariantHash > JabberDiskPlugin::getContactMenuParam()
-{
-    return QList < QVariantHash >();
-}
+QList<QVariantHash> JabberDiskPlugin::getContactMenuParam() { return QList<QVariantHash>(); }
 
-QAction* JabberDiskPlugin::getContactAction(QObject *p, int acc, const QString &jid)
+QAction *JabberDiskPlugin::getContactAction(QObject *p, int acc, const QString &jid)
 {
-    foreach(const QString& j, jids_) {
-        if(jid.contains(j)) {
-            QAction* act = new QAction(iconHost->getIcon("psi/save"), tr("Jabber Disk"), p);
+    foreach (const QString &j, jids_) {
+        if (jid.contains(j)) {
+            QAction *act = new QAction(iconHost->getIcon("psi/save"), tr("Jabber Disk"), p);
             act->setProperty("account", acc);
             act->setProperty("jid", jid.toLower().split("/").at(0));
             connect(act, SIGNAL(triggered()), JabberDiskController::instance(), SLOT(initSession()));
@@ -212,11 +183,7 @@ QAction* JabberDiskPlugin::getContactAction(QObject *p, int acc, const QString &
 
 QString JabberDiskPlugin::pluginInfo()
 {
-    return tr("Author: ") +  "Dealer_WeARE\n"
-            + tr("Email: ") + "wadealer@gmail.com\n\n";
+    return tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n";
 }
 
-QPixmap JabberDiskPlugin::icon() const
-{
-    return QPixmap(":/icons/jabberdisk.png");
-}
+QPixmap JabberDiskPlugin::icon() const { return QPixmap(":/icons/jabberdisk.png"); }

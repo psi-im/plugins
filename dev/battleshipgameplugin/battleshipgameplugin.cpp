@@ -28,40 +28,22 @@
 
 #include <QFileDialog>
 
-#define constVersion            "0.0.1"
-#define constShortPluginName    "battleshipgameplugin"
-#define constPluginName         "Battleship Game Plugin"
-
+#define constVersion "0.0.1"
+#define constShortPluginName "battleshipgameplugin"
+#define constPluginName "Battleship Game Plugin"
 
 BattleshipGamePlugin::BattleshipGamePlugin(QObject *parent) :
-        QObject(parent),
-        enabled_(false),
-        psiTab(nullptr),
-        psiIcon(nullptr),
-        psiAccInfo(nullptr),
-        psiContactInfo(nullptr),
-        psiSender(nullptr),
-        psiEvent(nullptr),
-        psiSound(nullptr),
-        psiPopup(nullptr)
+    QObject(parent), enabled_(false), psiTab(nullptr), psiIcon(nullptr), psiAccInfo(nullptr), psiContactInfo(nullptr),
+    psiSender(nullptr), psiEvent(nullptr), psiSound(nullptr), psiPopup(nullptr)
 {
     Options::psiOptions = nullptr;
 }
 
-QString BattleshipGamePlugin::name() const
-{
-    return constPluginName;
-}
+QString BattleshipGamePlugin::name() const { return constPluginName; }
 
-QString BattleshipGamePlugin::shortName() const
-{
-    return constShortPluginName;
-}
+QString BattleshipGamePlugin::shortName() const { return constShortPluginName; }
 
-QString BattleshipGamePlugin::version() const
-{
-    return constVersion;
-}
+QString BattleshipGamePlugin::version() const { return constVersion; }
 
 QWidget *BattleshipGamePlugin::options()
 {
@@ -93,7 +75,7 @@ bool BattleshipGamePlugin::enable()
         return true;
     // Грузим иконку плагина
     QFile file(":/battleshipgameplugin/battleship");
-    if(file.open(QIODevice::ReadOnly)) {
+    if (file.open(QIODevice::ReadOnly)) {
         QByteArray ico = file.readAll();
         psiIcon->addIcon("battleshipgameplugin/battleship", ico);
         file.close();
@@ -103,7 +85,8 @@ bool BattleshipGamePlugin::enable()
     connect(gsl, SIGNAL(sendStanza(int, QString)), this, SLOT(sendGameStanza(int, QString)), Qt::QueuedConnection);
     connect(gsl, SIGNAL(doPopup(QString)), this, SLOT(doPopup(QString)), Qt::QueuedConnection);
     connect(gsl, SIGNAL(playSound(QString)), this, SLOT(playSound(QString)), Qt::QueuedConnection);
-    connect(gsl, SIGNAL(doInviteEvent(int,QString,QString,QObject*,const char*)), this, SLOT(doPsiEvent(int,QString,QString,QObject*,const char*)), Qt::QueuedConnection);
+    connect(gsl, SIGNAL(doInviteEvent(int, QString, QString, QObject *, const char *)), this,
+            SLOT(doPsiEvent(int, QString, QString, QObject *, const char *)), Qt::QueuedConnection);
 
     // Выставляем флаг и уходим
     enabled_ = true;
@@ -146,10 +129,7 @@ void BattleshipGamePlugin::restoreOptions()
     ui_.cb_save_w_h->setChecked(options->getOption(constSaveWndWidthHeight).toBool());
 }
 
-QPixmap BattleshipGamePlugin::icon() const
-{
-    return QPixmap(":/battleshipgameplugin/battleship");
-}
+QPixmap BattleshipGamePlugin::icon() const { return QPixmap(":/battleshipgameplugin/battleship"); }
 
 /**
  * Получение списка ресурсов и вызов формы для отправки приглашения
@@ -157,21 +137,18 @@ QPixmap BattleshipGamePlugin::icon() const
 void BattleshipGamePlugin::inviteDlg(const int account, const QString &full_jid)
 {
     QString bareJid = full_jid.section('/', 0, 0);
-    //QStringList jid_parse = full_jid.split("/");
-    //QString jid = jid_parse.takeFirst();
+    // QStringList jid_parse = full_jid.split("/");
+    // QString jid = jid_parse.takeFirst();
     if (bareJid.isEmpty())
         return;
     QStringList resList;
-    if (psiContactInfo->isPrivate(account, full_jid))
-    {
+    if (psiContactInfo->isPrivate(account, full_jid)) {
         // This is conference
         QString res = full_jid.section('/', 1);
         if (res.isEmpty())
             return;
         resList.append(res);
-    }
-    else
-    {
+    } else {
         // Получаем список ресурсов оппонента
         resList = psiContactInfo->resources(account, bareJid);
     }
@@ -189,9 +166,9 @@ void BattleshipGamePlugin::toolButtonPressed()
     if (!enabled_)
         return;
     // Получаем наш account id
-    QString jid = psiTab->getYourJid();
-    int account = -1;
-    for (int i = 0; ; i++) {
+    QString jid     = psiTab->getYourJid();
+    int     account = -1;
+    for (int i = 0;; i++) {
         QString str1 = psiAccInfo->getJid(i);
         if (str1 == jid) {
             account = i;
@@ -212,7 +189,7 @@ void BattleshipGamePlugin::toolButtonPressed()
  */
 void BattleshipGamePlugin::menuActivated()
 {
-    if(!enabled_)
+    if (!enabled_)
         return;
     int account = sender()->property("account").toInt();
     if (psiAccInfo->getStatus(account) == "offline")
@@ -238,7 +215,8 @@ void BattleshipGamePlugin::sendGameStanza(const int account, const QString &stan
         psiSender->sendStanza(account, stanza);
 }
 
-void BattleshipGamePlugin::testSound() {
+void BattleshipGamePlugin::testSound()
+{
     QObject *sender_ = sender();
     if (sender_ == (ui_.play_error)) {
         psiSound->playSound(ui_.le_error->text());
@@ -251,9 +229,10 @@ void BattleshipGamePlugin::testSound() {
     }
 }
 
-void BattleshipGamePlugin::getSound() {
-    QObject *sender_ = sender();
-    QLineEdit *le = nullptr;
+void BattleshipGamePlugin::getSound()
+{
+    QObject *  sender_ = sender();
+    QLineEdit *le      = nullptr;
     if (sender_ == ui_.select_error) {
         le = ui_.le_error;
     } else if (sender_ == ui_.select_finish) {
@@ -279,8 +258,8 @@ void BattleshipGamePlugin::doPopup(const QString &text)
 void BattleshipGamePlugin::playSound(const QString &sound_id)
 {
     Options *options = Options::instance();
-    if (options->getOption(constDefSoundSettings).toBool() || Options::psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool())
-    {
+    if (options->getOption(constDefSoundSettings).toBool()
+        || Options::psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool()) {
         if (sound_id == constSoundMove)
             psiSound->playSound(options->getOption(constSoundMove).toString());
         else if (sound_id == constSoundStart)
@@ -296,143 +275,103 @@ void BattleshipGamePlugin::playSound(const QString &sound_id)
 
 QString BattleshipGamePlugin::pluginInfo()
 {
-    return tr("Author: ") +  "Liuch\n"
-        + tr("Email: ") + "liuch@mail.ru\n\n"
+    return tr("Author: ") + "Liuch\n" + tr("Email: ") + "liuch@mail.ru\n\n"
         + tr("This plugin allows you to play battleship with your friends.\n"
-             "For sending commands, normal messages are used, so this plugin will always work wherever you are able to log in."
-             "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat window.");
+             "For sending commands, normal messages are used, so this plugin will always work wherever you are able to "
+             "log in."
+             "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat "
+             "window.");
 }
 
 // --------------------- Option accessor ---------------------------
 
-void BattleshipGamePlugin::setOptionAccessingHost(OptionAccessingHost *host)
-{
-    Options::psiOptions = host;
-}
+void BattleshipGamePlugin::setOptionAccessingHost(OptionAccessingHost *host) { Options::psiOptions = host; }
 
-void BattleshipGamePlugin::optionChanged(const QString &/*option*/)
-{
-}
+void BattleshipGamePlugin::optionChanged(const QString & /*option*/) { }
 
 // --------------------- Iconfactory accessor ---------------------------
-void BattleshipGamePlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost *host)
-{
-    psiIcon = host;
-}
+void BattleshipGamePlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost *host) { psiIcon = host; }
 
 // --------------------- Toolbar icon accessor ---------------------------
 QList<QVariantHash> BattleshipGamePlugin::getButtonParam()
 {
     QList<QVariantHash> list;
-    QVariantHash hash;
+    QVariantHash        hash;
     hash["tooltip"] = QVariant(tr("Battleship game"));
-    hash["icon"] = QVariant(QString("battleshipgameplugin/battleship"));
+    hash["icon"]    = QVariant(QString("battleshipgameplugin/battleship"));
     hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
-    hash["slot"] = QVariant(SLOT(toolButtonPressed()));
+    hash["slot"]    = QVariant(SLOT(toolButtonPressed()));
     list.push_back(hash);
     return list;
 }
 
-QAction* BattleshipGamePlugin::getAction(QObject* /*parent*/, int /*account*/, const QString& /*contact*/)
+QAction *BattleshipGamePlugin::getAction(QObject * /*parent*/, int /*account*/, const QString & /*contact*/)
 {
     return nullptr;
 }
 
 // --------------------- Activetab accessor ---------------------------
 
-void BattleshipGamePlugin::setActiveTabAccessingHost(ActiveTabAccessingHost *host)
-{
-    psiTab = host;
-}
+void BattleshipGamePlugin::setActiveTabAccessingHost(ActiveTabAccessingHost *host) { psiTab = host; }
 
 // --------------------- Account info accessor ---------------------------
 
-void BattleshipGamePlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost * host)
-{
-    psiAccInfo = host;
-}
+void BattleshipGamePlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost *host) { psiAccInfo = host; }
 
 // --------------------- Contact info accessor ---------------------------
 
-void BattleshipGamePlugin::setContactInfoAccessingHost(ContactInfoAccessingHost * host)
-{
-    psiContactInfo = host;
-}
+void BattleshipGamePlugin::setContactInfoAccessingHost(ContactInfoAccessingHost *host) { psiContactInfo = host; }
 
 // --------------------- Stanza sender ---------------------------
 
-void BattleshipGamePlugin::setStanzaSendingHost(StanzaSendingHost *host)
-{
-    psiSender = host;
-}
+void BattleshipGamePlugin::setStanzaSendingHost(StanzaSendingHost *host) { psiSender = host; }
 
 // --------------------- Stanza filter ---------------------------
 
-bool BattleshipGamePlugin::incomingStanza(int account, const QDomElement& xml)
+bool BattleshipGamePlugin::incomingStanza(int account, const QDomElement &xml)
 {
-    if(xml.tagName() == "iq") {
+    if (xml.tagName() == "iq") {
         QString acc_status = "";
-        bool confPriv = false;
+        bool    confPriv   = false;
         if (xml.attribute("type") == "set") {
             acc_status = psiAccInfo->getStatus(account);
-            confPriv = psiContactInfo->isPrivate(account, xml.attribute("from"));
+            confPriv   = psiContactInfo->isPrivate(account, xml.attribute("from"));
         }
         return GameSessionList::instance()->processIncomingIqStanza(account, xml, acc_status, confPriv);
     }
     return false;
 }
 
-bool BattleshipGamePlugin::outgoingStanza(int /*account*/, QDomElement& /*xml*/)
-{
-    return false;
-}
+bool BattleshipGamePlugin::outgoingStanza(int /*account*/, QDomElement & /*xml*/) { return false; }
 
 // --------------------- Event creator ---------------------------
 
-void BattleshipGamePlugin::setEventCreatingHost(EventCreatingHost *host)
-{
-    psiEvent = host;
-}
+void BattleshipGamePlugin::setEventCreatingHost(EventCreatingHost *host) { psiEvent = host; }
 
 // --------------------- Sound accessor ---------------------------
 
-void BattleshipGamePlugin::setSoundAccessingHost(SoundAccessingHost *host)
-{
-    psiSound = host;
-}
+void BattleshipGamePlugin::setSoundAccessingHost(SoundAccessingHost *host) { psiSound = host; }
 
 // --------------------- Menu accessor ---------------------------
 
-QList<QVariantHash> BattleshipGamePlugin::getAccountMenuParam()
-{
-    return QList<QVariantHash>();
-}
+QList<QVariantHash> BattleshipGamePlugin::getAccountMenuParam() { return QList<QVariantHash>(); }
 
 QList<QVariantHash> BattleshipGamePlugin::getContactMenuParam()
 {
     QList<QVariantHash> menu_list;
-    QVariantHash hash;
-    hash["name"] = QVariant(tr("Battleship game!"));
-    hash["icon"] = QVariant(QString("battleshipgameplugin/battleship"));
+    QVariantHash        hash;
+    hash["name"]    = QVariant(tr("Battleship game!"));
+    hash["icon"]    = QVariant(QString("battleshipgameplugin/battleship"));
     hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
-    hash["slot"] = QVariant(SLOT(menuActivated()));
+    hash["slot"]    = QVariant(SLOT(menuActivated()));
     menu_list.push_back(hash);
     return menu_list;
 }
 
-QAction* BattleshipGamePlugin::getContactAction(QObject*, int, const QString&)
-{
-    return nullptr;
-}
+QAction *BattleshipGamePlugin::getContactAction(QObject *, int, const QString &) { return nullptr; }
 
-QAction* BattleshipGamePlugin::getAccountAction(QObject*, int)
-{
-    return nullptr;
-}
+QAction *BattleshipGamePlugin::getAccountAction(QObject *, int) { return nullptr; }
 
 // --------------------- Popup accessor ---------------------------
 
-void BattleshipGamePlugin::setPopupAccessingHost(PopupAccessingHost *host)
-{
-    psiPopup = host;
-}
+void BattleshipGamePlugin::setPopupAccessingHost(PopupAccessingHost *host) { psiPopup = host; }

@@ -17,23 +17,17 @@
  *
  */
 
-
 #include "proxysettingsdlg.h"
 #include "ui_proxysettingsdlg.h"
 
-ProxySettingsDlg::ProxySettingsDlg(QWidget *parent)
-    : QDialog(parent)
-    , ui(new Ui::ProxySettingsDlg)
+ProxySettingsDlg::ProxySettingsDlg(QWidget *parent) : QDialog(parent), ui(new Ui::ProxySettingsDlg)
 {
     ui->setupUi(this);
-    ui->cb_type->addItems({"HTTP", "SOCKS5"});
+    ui->cb_type->addItems({ "HTTP", "SOCKS5" });
     ui->cb_type->setCurrentIndex(0);
 }
 
-ProxySettingsDlg::~ProxySettingsDlg()
-{
-    delete ui;
-}
+ProxySettingsDlg::~ProxySettingsDlg() { delete ui; }
 
 void ProxySettingsDlg::setProxySettings(const Proxy &p)
 {
@@ -42,17 +36,16 @@ void ProxySettingsDlg::setProxySettings(const Proxy &p)
     ui->le_pass->setText(p.pass);
     ui->le_port->setText(QString::number(p.port));
     ui->le_user->setText(p.user);
-    if(p.type == "socks") {
+    if (p.type == "socks") {
         ui->cb_type->setCurrentIndex(1);
     }
 }
 
 void ProxySettingsDlg::accept()
 {
-    if(ui->cb_type->currentText() == "HTTP") {
+    if (ui->cb_type->currentText() == "HTTP") {
         proxy_.type = "http";
-    }
-    else {
+    } else {
         proxy_.type = "socks";
     }
     proxy_.host = ui->le_host->text();

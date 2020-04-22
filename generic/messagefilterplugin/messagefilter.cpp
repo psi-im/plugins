@@ -21,35 +21,27 @@
 
 #include "options.h"
 
-#include <psiaccountcontrollinghost.h>
-#include <optionaccessinghost.h>
-#include <iconfactoryaccessinghost.h>
-#include <activetabaccessinghost.h>
 #include <accountinfoaccessinghost.h>
+#include <activetabaccessinghost.h>
+#include <iconfactoryaccessinghost.h>
+#include <optionaccessinghost.h>
+#include <psiaccountcontrollinghost.h>
 #include <stanzasendinghost.h>
 
-#include <QRegExp>
-#include <QDomElement>
-#include <QMessageBox>
-#include <QFile>
 #include <QCursor>
+#include <QDomElement>
+#include <QFile>
 #include <QMenu>
+#include <QMessageBox>
+#include <QRegExp>
 
-MessageFilter::MessageFilter()
-    : _enabled(false)
-    , _optionsForm(nullptr)
-    , _accountHost(nullptr)
-    , _optionHost(nullptr)
-    , _stanzaSending(nullptr)
-    , _accountInfo(nullptr)
-    , _rules(QList<Rule>())
+MessageFilter::MessageFilter() :
+    _enabled(false), _optionsForm(nullptr), _accountHost(nullptr), _optionHost(nullptr), _stanzaSending(nullptr),
+    _accountInfo(nullptr), _rules(QList<Rule>())
 {
 }
 
-
-MessageFilter::~MessageFilter()
-{
-}
+MessageFilter::~MessageFilter() { }
 
 QWidget *MessageFilter::options()
 {
@@ -60,7 +52,7 @@ QWidget *MessageFilter::options()
     loadRules();
     _optionsForm = new Options(_rules);
     _optionsForm->setOptionAccessingHost(_optionHost);
-    return qobject_cast<QWidget*>(_optionsForm);
+    return qobject_cast<QWidget *>(_optionsForm);
 }
 
 bool MessageFilter::enable()
@@ -82,20 +74,11 @@ void MessageFilter::applyOptions()
     loadRules();
 }
 
-void MessageFilter::restoreOptions()
-{
-}
+void MessageFilter::restoreOptions() { }
 
-QPixmap MessageFilter::icon() const
-{
-    return QPixmap(":/icons/messagefilter.png");
-}
+QPixmap MessageFilter::icon() const { return QPixmap(":/icons/messagefilter.png"); }
 
-QString MessageFilter::pluginInfo()
-{
-    return tr("Author: ") +     "Ivan Romanov\n"
-           + tr("e-mail: ") + "drizt@land.ru\n\n";
-}
+QString MessageFilter::pluginInfo() { return tr("Author: ") + "Ivan Romanov\n" + tr("e-mail: ") + "drizt@land.ru\n\n"; }
 
 bool MessageFilter::incomingStanza(int account, const QDomElement &stanza)
 {
@@ -109,22 +92,32 @@ bool MessageFilter::incomingStanza(int account, const QDomElement &stanza)
         return false;
     }
 
-    QString message = stanza.firstChildElement("body").text();
+    QString message   = stanza.firstChildElement("body").text();
     QString from_full = stanza.attribute("from");
-    QString from = from_full.split("/").takeFirst();
-    QString to_full = stanza.attribute("to");
-    QString to = to_full.split("/").takeFirst();
+    QString from      = from_full.split("/").takeFirst();
+    QString to_full   = stanza.attribute("to");
+    QString to        = to_full.split("/").takeFirst();
 
     foreach (const Rule &rule, _rules) {
         bool match = true;
         foreach (const Condition &condition, rule.conditions) {
             QString val;
             switch (condition.type) {
-            case From: val = from; break;
-            case To: val = to; break;
-            case FromFull: val = from_full; break;
-            case ToFull: val = to_full; break;
-            case Message: val = message; break;
+            case From:
+                val = from;
+                break;
+            case To:
+                val = to;
+                break;
+            case FromFull:
+                val = from_full;
+                break;
+            case ToFull:
+                val = to_full;
+                break;
+            case Message:
+                val = message;
+                break;
             }
 
             switch (condition.comparison) {
@@ -169,18 +162,19 @@ void MessageFilter::loadRules()
     int rulesSize = _optionHost->getPluginOption("rules.size", 0).toInt();
     for (int i = 0; i < rulesSize; ++i) {
         QString optionName = QString("rules.l%1.").arg(i);
-        Rule rule;
-        rule.name = _optionHost->getPluginOption(optionName + "name").toString();
-        rule.showMessage = _optionHost->getPluginOption(optionName + "show-message").toBool();
+        Rule    rule;
+        rule.name          = _optionHost->getPluginOption(optionName + "name").toString();
+        rule.showMessage   = _optionHost->getPluginOption(optionName + "show-message").toBool();
         int conditionsSize = _optionHost->getPluginOption(optionName + "conditions.size").toInt();
         for (int j = 0; j < conditionsSize; ++j) {
-            QString optionName1 = QString("%1conditions.l%2.").arg(optionName).arg(j);
+            QString   optionName1 = QString("%1conditions.l%2.").arg(optionName).arg(j);
             Condition condition;
             condition.type = static_cast<ConditionType>(_optionHost->getPluginOption(optionName1 + "type").toInt());
-            condition.comparison = static_cast<Comparison>(_optionHost->getPluginOption(optionName1 + "comparison").toInt());
+            condition.comparison
+                = static_cast<Comparison>(_optionHost->getPluginOption(optionName1 + "comparison").toInt());
             condition.text = _optionHost->getPluginOption(optionName1 + "text").toString();
             rule.conditions << condition;
         }
         _rules << rule;
-    }    
+    }
 }

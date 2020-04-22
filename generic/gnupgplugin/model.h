@@ -22,8 +22,7 @@
 
 #include <QStandardItemModel>
 
-class Model : public QStandardItemModel
-{
+class Model : public QStandardItemModel {
     Q_OBJECT
 
 public:
@@ -40,7 +39,7 @@ public:
         Fingerprint,
         Count, // Trick to count items in enum
         First = 0,
-        Last = Count - 1
+        Last  = Count - 1
     };
 
     Model(QObject *parent = nullptr);
@@ -50,7 +49,6 @@ public slots:
 
 private:
     void showKeys(const QString &keysRaw);
-
 };
 
 #endif // MODEL_H

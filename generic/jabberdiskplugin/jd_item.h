@@ -22,67 +22,56 @@
 
 #include <QModelIndex>
 
-class JDItem
-{
+class JDItem {
 public:
     enum Type { None, Dir, File };
 
-    JDItem(Type t, const QString& name, const QString& size = QString(), const QString& descr = QString(), int number = -1, JDItem* parent = nullptr);
-    JDItem(Type t, JDItem* parent = nullptr);
-    virtual ~JDItem();    
+    JDItem(Type t, const QString &name, const QString &size = QString(), const QString &descr = QString(),
+           int number = -1, JDItem *parent = nullptr);
+    JDItem(Type t, JDItem *parent = nullptr);
+    virtual ~JDItem();
 
-    void setData(const QString& name, const QString& size = QString(), const QString& descr = QString(), int number = -1);
-    JDItem* parent() const;
-    Type type() const;
-    QString name() const;
-    QString size() const;
-    QString description() const;
-    int number() const;
-    QString fullPath() const;
-    QString parentPath() const;
-    QMimeData* mimeData() const;
-    void fromDataStream(QDataStream *const in);
+    void       setData(const QString &name, const QString &size = QString(), const QString &descr = QString(),
+                       int number = -1);
+    JDItem *   parent() const;
+    Type       type() const;
+    QString    name() const;
+    QString    size() const;
+    QString    description() const;
+    int        number() const;
+    QString    fullPath() const;
+    QString    parentPath() const;
+    QMimeData *mimeData() const;
+    void       fromDataStream(QDataStream *const in);
 
     static const QString mimeType();
 
-//    bool operator<(const JDItem& i);
-//    bool operator>(const JDItem& i);
-    bool operator==(const JDItem& i);
+    //    bool operator<(const JDItem& i);
+    //    bool operator>(const JDItem& i);
+    bool operator==(const JDItem &i);
 
 private:
-    JDItem* parent_;
+    JDItem *parent_;
     QString name_;
     QString size_;
     QString descr_;
-    int number_;
-    Type type_;
+    int     number_;
+    Type    type_;
 };
 
 struct ProxyItem {
-    ProxyItem()
-        : item(nullptr)
-        , index(QModelIndex())
-        , parent(QModelIndex())
-    {
-    }
+    ProxyItem() : item(nullptr), index(QModelIndex()), parent(QModelIndex()) { }
 
-    JDItem* item;
+    JDItem *    item;
     QModelIndex index;
     QModelIndex parent;
 
-    bool isNull()
-    {
-        return !index.isValid() && !parent.isValid() && !item;
-    }
+    bool isNull() { return !index.isValid() && !parent.isValid() && !item; }
 
-    bool operator==(const ProxyItem& i)
-    {
-        return item == i.item && index == i.index && parent == i.parent;
-    }
+    bool operator==(const ProxyItem &i) { return item == i.item && index == i.index && parent == i.parent; }
 };
 
-class ItemsList : public QList<ProxyItem>
-{
+class ItemsList : public QList<ProxyItem> {
 public:
     ItemsList();
     ~ItemsList();

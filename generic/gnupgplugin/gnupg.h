@@ -20,45 +20,36 @@
 #ifndef GNUPG_H
 #define GNUPG_H
 
-#include "psiplugin.h"
+#include "accountinfoaccessor.h"
+#include "activetabaccessor.h"
 #include "applicationinfoaccessinghost.h"
+#include "iconfactoryaccessor.h"
+#include "optionaccessor.h"
 #include "plugininfoprovider.h"
+#include "psiaccountcontroller.h"
+#include "psiplugin.h"
 #include "stanzafilter.h"
 #include "stanzasender.h"
-#include "psiaccountcontroller.h"
-#include "optionaccessor.h"
 #include "toolbariconaccessor.h"
-#include "iconfactoryaccessor.h"
-#include "activetabaccessor.h"
-#include "accountinfoaccessor.h"
 
 class Options;
 class QMenu;
 
-class GnuPG : public QObject
-            , public PsiPlugin
-            , public PluginInfoProvider
-            , public StanzaFilter
-            , public PsiAccountController
-            , public OptionAccessor
-            , public ToolbarIconAccessor
-            , public IconFactoryAccessor
-            , public StanzaSender
-            , public ActiveTabAccessor
-            , public AccountInfoAccessor
-{
+class GnuPG : public QObject,
+              public PsiPlugin,
+              public PluginInfoProvider,
+              public StanzaFilter,
+              public PsiAccountController,
+              public OptionAccessor,
+              public ToolbarIconAccessor,
+              public IconFactoryAccessor,
+              public StanzaSender,
+              public ActiveTabAccessor,
+              public AccountInfoAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.GnuPG")
-    Q_INTERFACES(PsiPlugin
-                 PluginInfoProvider
-                 StanzaFilter
-                 PsiAccountController
-                 OptionAccessor
-                 ToolbarIconAccessor
-                 IconFactoryAccessor
-                 StanzaSender
-                 ActiveTabAccessor
-                 AccountInfoAccessor)
+    Q_INTERFACES(PsiPlugin PluginInfoProvider StanzaFilter PsiAccountController OptionAccessor ToolbarIconAccessor
+                     IconFactoryAccessor StanzaSender ActiveTabAccessor AccountInfoAccessor)
 
 public:
     GnuPG();
@@ -70,11 +61,11 @@ public:
     QString version() const { return "0.3.9"; }
 
     QWidget *options();
-    bool enable();
-    bool disable();
-    void applyOptions();
-    void restoreOptions();
-    QPixmap icon() const;
+    bool     enable();
+    bool     disable();
+    void     applyOptions();
+    void     restoreOptions();
+    QPixmap  icon() const;
 
     // from PluginInfoProvider
     QString pluginInfo();
@@ -84,42 +75,42 @@ public:
 
     // from StanzaFilter
     bool incomingStanza(int account, const QDomElement &stanza);
-    bool outgoingStanza(int /*account*/, QDomElement &/*stanza*/) { return false; }
+    bool outgoingStanza(int /*account*/, QDomElement & /*stanza*/) { return false; }
 
     // from PsiAccountController
     void setPsiAccountControllingHost(PsiAccountControllingHost *host) { _accountHost = host; }
 
     // from OptionAccessor
     void setOptionAccessingHost(OptionAccessingHost *host) { _optionHost = host; }
-    void optionChanged(const QString &/*option*/) { }
+    void optionChanged(const QString & /*option*/) { }
 
     // from ToolbarIconAccessor
     QList<QVariantHash> getButtonParam();
-    QAction* getAction(QObject * /*parent*/, int /*account*/, const QString &/*contact*/) { return nullptr; }
+    QAction *getAction(QObject * /*parent*/, int /*account*/, const QString & /*contact*/) { return nullptr; }
 
     // from IconFactoryAccessor
     void setIconFactoryAccessingHost(IconFactoryAccessingHost *host) { _iconFactory = host; }
 
     // from ActiveTabAccessor
-    void setActiveTabAccessingHost(ActiveTabAccessingHost* host) { _activeTab = host; }
+    void setActiveTabAccessingHost(ActiveTabAccessingHost *host) { _activeTab = host; }
 
     // from AccountInfoAccessor
-    void setAccountInfoAccessingHost(AccountInfoAccessingHost* host) { _accountInfo = host; }
+    void setAccountInfoAccessingHost(AccountInfoAccessingHost *host) { _accountInfo = host; }
 
 private slots:
     void actionActivated();
     void sendPublicKey();
 
 private:
-    bool _enabled;
-    Options *_optionsForm;
+    bool                       _enabled;
+    Options *                  _optionsForm;
     PsiAccountControllingHost *_accountHost;
-    OptionAccessingHost *_optionHost;
-    IconFactoryAccessingHost *_iconFactory;
-    QMenu *_menu;
-    StanzaSendingHost *_stanzaSending;
-    ActiveTabAccessingHost *_activeTab;
-    AccountInfoAccessingHost *_accountInfo;
+    OptionAccessingHost *      _optionHost;
+    IconFactoryAccessingHost * _iconFactory;
+    QMenu *                    _menu;
+    StanzaSendingHost *        _stanzaSending;
+    ActiveTabAccessingHost *   _activeTab;
+    AccountInfoAccessingHost * _accountInfo;
 };
 
 #endif // GNUPG_H

@@ -25,41 +25,40 @@
 #ifndef GAMESESSIONS_H
 #define GAMESESSIONS_H
 
+#include <QDomElement>
 #include <QObject>
 #include <QPointer>
-#include <QDomElement>
 
 #include "pluginwindow.h"
 
-#define constProtoId    "gomoku_01"
+#define constProtoId "gomoku_01"
 
 namespace XML {
-    QString escapeString(const QString &str);
-    QString iqErrorString(const QString &jid, const QString &id);
+QString escapeString(const QString &str);
+QString iqErrorString(const QString &jid, const QString &id);
 }
 
-class GameSessions : public QObject
-{
-Q_OBJECT
+class GameSessions : public QObject {
+    Q_OBJECT
 
 public:
     explicit GameSessions(QObject *parent = nullptr);
     ~GameSessions();
     static GameSessions *instance();
-    static void reset();
-    bool processIncomingIqStanza(int accont, const QDomElement& xml, const QString &acc_status, bool conf_priv);
+    static void          reset();
+    bool processIncomingIqStanza(int accont, const QDomElement &xml, const QString &acc_status, bool conf_priv);
     void invite(int account, const QString &jid, const QStringList &res_list, QWidget *parent = nullptr);
     int  activeCount() const;
 
 private:
     enum SessionStatus {
         StatusNone,
-        StatusInviteOutDialog,      // Окно приглашения с нашей стороны
-        StatusInviteSend,           // Отправлено приглашение
-        StatusInviteInDialog,       // Окно приглашения к нам (входящий инвайт)
-        StatusWaitOpponentCommand,  // Ожидается входящая команда от оппонента (ход, сдача, загрузка игры и т.д.)
-        StatusWaitGameWindow,       // Ожидается активность от окна игры
-        StatusWaitOpponentAccept    // Ожидается входящий ответ от оппонента на нашу команду (Accept или Error)
+        StatusInviteOutDialog,     // Окно приглашения с нашей стороны
+        StatusInviteSend,          // Отправлено приглашение
+        StatusInviteInDialog,      // Окно приглашения к нам (входящий инвайт)
+        StatusWaitOpponentCommand, // Ожидается входящая команда от оппонента (ход, сдача, загрузка игры и т.д.)
+        StatusWaitGameWindow,      // Ожидается активность от окна игры
+        StatusWaitOpponentAccept // Ожидается входящий ответ от оппонента на нашу команду (Accept или Error)
     };
     struct GameSession {
         SessionStatus          status;
@@ -69,30 +68,31 @@ private:
         QString                last_iq_id;
         QString                element;
     };
-    QList<GameSession> gameSessions;
-    int  stanzaId;
+    QList<GameSession>   gameSessions;
+    int                  stanzaId;
     static GameSessions *instance_;
-    QString errorStr;
+    QString              errorStr;
 
 private:
-    bool incomingInvitation(const int account, const QString &from, const QString &color, const QString &iq_id);
-    bool doResult(const int account, const QString &from, const QString &iq_id);
-    bool doReject(const int account, const QString &from, const QString &iq_id);
-    bool doTurnAction(const int account, const QString &from, const QString &iq_id, const QString &value);
-    bool youWin(const int account, const QString &from, const QString &iq_id);
-    bool setDraw(const int account, const QString &from, const QString &iq_id);
-    bool closeRemoteGameBoard(const int account, const QString &from, const QString &iq_id);
-    bool remoteLoad(const int account, const QString &from, const QString &iq_id, const QString &value);
-    bool regGameSession(const SessionStatus status, const int account, const QString &jid, const QString &id = "", const QString &element = "");
-    void startGame(const int sess_index);
-    int  findGameSessionByWnd(QObject *wnd) const;
-    int  findGameSessionById(const int account, const QString &id) const;
-    int  findGameSessionByJid(const int account, const QString &jid) const;
-    int  findGameSessionByJid(const QString &jid) const;
-    bool removeGameSession(const int account, const QString &jid);
+    bool    incomingInvitation(const int account, const QString &from, const QString &color, const QString &iq_id);
+    bool    doResult(const int account, const QString &from, const QString &iq_id);
+    bool    doReject(const int account, const QString &from, const QString &iq_id);
+    bool    doTurnAction(const int account, const QString &from, const QString &iq_id, const QString &value);
+    bool    youWin(const int account, const QString &from, const QString &iq_id);
+    bool    setDraw(const int account, const QString &from, const QString &iq_id);
+    bool    closeRemoteGameBoard(const int account, const QString &from, const QString &iq_id);
+    bool    remoteLoad(const int account, const QString &from, const QString &iq_id, const QString &value);
+    bool    regGameSession(const SessionStatus status, const int account, const QString &jid, const QString &id = "",
+                           const QString &element = "");
+    void    startGame(const int sess_index);
+    int     findGameSessionByWnd(QObject *wnd) const;
+    int     findGameSessionById(const int account, const QString &id) const;
+    int     findGameSessionByJid(const int account, const QString &jid) const;
+    int     findGameSessionByJid(const QString &jid) const;
+    bool    removeGameSession(const int account, const QString &jid);
     QString newId(const bool big_add = false);
     QString getLastError() const;
-    void sendErrorIq(const int account, const QString &jid, const QString &id, const QString &/*err_str*/);
+    void    sendErrorIq(const int account, const QString &jid, const QString &id, const QString & /*err_str*/);
 
 private slots:
     void showInvitation(const QString &from);
@@ -117,7 +117,6 @@ signals:
     void doInviteEvent(int, QString, QString, QObject *, const char *);
     void doPopup(const QString);
     void playSound(const QString);
-
 };
 
 #endif // GAMESESSIONS_H

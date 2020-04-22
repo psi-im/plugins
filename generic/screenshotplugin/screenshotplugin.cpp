@@ -19,58 +19,62 @@
 
 class QAction;
 
-#include "psiplugin.h"
-#include "optionaccessor.h"
-#include "optionaccessinghost.h"
-#include "shortcutaccessor.h"
-#include "shortcutaccessinghost.h"
-#include "plugininfoprovider.h"
+#include "applicationinfoaccessinghost.h"
+#include "applicationinfoaccessor.h"
 #include "iconfactoryaccessinghost.h"
 #include "iconfactoryaccessor.h"
 #include "menuaccessor.h"
-#include "applicationinfoaccessinghost.h"
-#include "applicationinfoaccessor.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
+#include "plugininfoprovider.h"
+#include "psiplugin.h"
+#include "shortcutaccessinghost.h"
+#include "shortcutaccessor.h"
 
-#include "defines.h"
-#include "optionswidget.h"
-#include "options.h"
-#include "screenshoticonset.h"
 #include "controller.h"
+#include "defines.h"
+#include "options.h"
+#include "optionswidget.h"
+#include "screenshoticonset.h"
 
-
-class ScreenshotPlugin : public QObject, public PsiPlugin, public OptionAccessor, public ShortcutAccessor, public PluginInfoProvider,
-        public IconFactoryAccessor, public MenuAccessor, public ApplicationInfoAccessor
-{
+class ScreenshotPlugin : public QObject,
+                         public PsiPlugin,
+                         public OptionAccessor,
+                         public ShortcutAccessor,
+                         public PluginInfoProvider,
+                         public IconFactoryAccessor,
+                         public MenuAccessor,
+                         public ApplicationInfoAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.ScreenshotPlugin")
-    Q_INTERFACES(PsiPlugin OptionAccessor ShortcutAccessor PluginInfoProvider IconFactoryAccessor MenuAccessor ApplicationInfoAccessor)
+    Q_INTERFACES(PsiPlugin OptionAccessor ShortcutAccessor PluginInfoProvider IconFactoryAccessor MenuAccessor
+                     ApplicationInfoAccessor)
 
 public:
     ScreenshotPlugin();
 
-    virtual QString name() const;
-    virtual QString shortName() const;
-    virtual QString version() const;
-    virtual QWidget* options();
-    virtual bool enable();
-    virtual bool disable();
-    virtual void setOptionAccessingHost(OptionAccessingHost* host);
-    virtual void optionChanged(const QString& /*option*/) { };
-    virtual void setShortcutAccessingHost(ShortcutAccessingHost* host);
-    virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost* host);
-    virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost* host);
-    virtual QList < QVariantHash > getAccountMenuParam();
-    virtual QList < QVariantHash > getContactMenuParam();
-    virtual QAction* getContactAction(QObject* , int , const QString& ) { return nullptr; };
-    virtual QAction* getAccountAction(QObject* , int ) { return nullptr; };
-    virtual void setShortcuts();
+    virtual QString             name() const;
+    virtual QString             shortName() const;
+    virtual QString             version() const;
+    virtual QWidget *           options();
+    virtual bool                enable();
+    virtual bool                disable();
+    virtual void                setOptionAccessingHost(OptionAccessingHost *host);
+    virtual void                optionChanged(const QString & /*option*/) {};
+    virtual void                setShortcutAccessingHost(ShortcutAccessingHost *host);
+    virtual void                setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
+    virtual void                setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
+    virtual QList<QVariantHash> getAccountMenuParam();
+    virtual QList<QVariantHash> getContactMenuParam();
+    virtual QAction *           getContactAction(QObject *, int, const QString &) { return nullptr; };
+    virtual QAction *           getAccountAction(QObject *, int) { return nullptr; };
+    virtual void                setShortcuts();
 
     virtual void applyOptions();
     virtual void restoreOptions();
 
     virtual QString pluginInfo();
     virtual QPixmap icon() const;
-
 
 private slots:
     void openImage();
@@ -79,42 +83,29 @@ private:
     void disconnectShortcut();
 
 private:
-    bool enabled_;
-    OptionAccessingHost* psiOptions;
-    ShortcutAccessingHost* psiShortcuts;
-    IconFactoryAccessingHost* icoHost;
-    ApplicationInfoAccessingHost* appInfo;
+    bool                          enabled_;
+    OptionAccessingHost *         psiOptions;
+    ShortcutAccessingHost *       psiShortcuts;
+    IconFactoryAccessingHost *    icoHost;
+    ApplicationInfoAccessingHost *appInfo;
 
     QPointer<OptionsWidget> optionsWid;
-    Controller* controller_;
+    Controller *            controller_;
 };
 
-ScreenshotPlugin::ScreenshotPlugin()
-    : enabled_(false)
-    , psiOptions(nullptr)
-    , psiShortcuts(nullptr)
-    , icoHost(nullptr)
-    , appInfo(nullptr)
-    , controller_(nullptr)
+ScreenshotPlugin::ScreenshotPlugin() :
+    enabled_(false), psiOptions(nullptr), psiShortcuts(nullptr), icoHost(nullptr), appInfo(nullptr),
+    controller_(nullptr)
 {
 }
 
-QString ScreenshotPlugin::name() const
-{
-    return constName;
-}
+QString ScreenshotPlugin::name() const { return constName; }
 
-QString ScreenshotPlugin::shortName() const
-{
-    return "Screenshot";
-}
+QString ScreenshotPlugin::shortName() const { return "Screenshot"; }
 
-QString ScreenshotPlugin::version() const
-{
-    return cVersion;
-}
+QString ScreenshotPlugin::version() const { return cVersion; }
 
-QWidget* ScreenshotPlugin::options()
+QWidget *ScreenshotPlugin::options()
 {
     if (!enabled_) {
         return nullptr;
@@ -130,14 +121,14 @@ bool ScreenshotPlugin::enable()
     QFile file(":/screenshotplugin/screenshot");
     file.open(QIODevice::ReadOnly);
     QByteArray image = file.readAll();
-    icoHost->addIcon("screenshotplugin/screenshot",image);
+    icoHost->addIcon("screenshotplugin/screenshot", image);
     file.close();
 
     Options::instance()->setPsiOptions(psiOptions);
     ScreenshotIconset::instance()->setIconHost(icoHost);
 
     controller_ = new Controller(appInfo);
-    appInfo->getProxyFor(constName); //init proxy settings
+    appInfo->getProxyFor(constName); // init proxy settings
 
     enabled_ = true;
     return enabled_;
@@ -149,63 +140,50 @@ bool ScreenshotPlugin::disable()
 
     delete controller_;
     controller_ = nullptr;
-    enabled_ = false;
+    enabled_    = false;
 
     return true;
 }
 
-void ScreenshotPlugin::setOptionAccessingHost(OptionAccessingHost* host)
-{
-    psiOptions = host;
-}
+void ScreenshotPlugin::setOptionAccessingHost(OptionAccessingHost *host) { psiOptions = host; }
 
-void ScreenshotPlugin::setShortcutAccessingHost(ShortcutAccessingHost* host)
-{
-    psiShortcuts = host;
-}
+void ScreenshotPlugin::setShortcutAccessingHost(ShortcutAccessingHost *host) { psiShortcuts = host; }
 
-void ScreenshotPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost* host)
-{
-    icoHost = host;
-}
+void ScreenshotPlugin::setIconFactoryAccessingHost(IconFactoryAccessingHost *host) { icoHost = host; }
 
-void ScreenshotPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host)
-{
-    appInfo = host;
-}
+void ScreenshotPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) { appInfo = host; }
 
 void ScreenshotPlugin::setShortcuts()
 {
     const QString shortCut = psiOptions->getPluginOption(constShortCut).toString();
-    psiShortcuts->connectShortcut(QKeySequence::fromString(shortCut, QKeySequence::NativeText), controller_, SLOT(onShortCutActivated()));
+    psiShortcuts->connectShortcut(QKeySequence::fromString(shortCut, QKeySequence::NativeText), controller_,
+                                  SLOT(onShortCutActivated()));
 }
 
 void ScreenshotPlugin::disconnectShortcut()
 {
     const QString shortCut = psiOptions->getPluginOption(constShortCut).toString();
-    psiShortcuts->disconnectShortcut(QKeySequence::fromString(shortCut, QKeySequence::NativeText), controller_,  SLOT(onShortCutActivated()));
+    psiShortcuts->disconnectShortcut(QKeySequence::fromString(shortCut, QKeySequence::NativeText), controller_,
+                                     SLOT(onShortCutActivated()));
 }
 
-QList < QVariantHash > ScreenshotPlugin::getAccountMenuParam()
+QList<QVariantHash> ScreenshotPlugin::getAccountMenuParam()
 {
-        QVariantHash hash;
-        hash["icon"] = QVariant(QString("screenshotplugin/screenshot"));
-        hash["name"] = QVariant(tr("Upload Image"));
-        hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
-        hash["slot"] = QVariant(SLOT(openImage()));
-        QList< QVariantHash > l;
-        l.push_back(hash);
-        return l;
+    QVariantHash hash;
+    hash["icon"]    = QVariant(QString("screenshotplugin/screenshot"));
+    hash["name"]    = QVariant(tr("Upload Image"));
+    hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+    hash["slot"]    = QVariant(SLOT(openImage()));
+    QList<QVariantHash> l;
+    l.push_back(hash);
+    return l;
 }
 
-QList < QVariantHash > ScreenshotPlugin::getContactMenuParam()
-{
-    return QList < QVariantHash >();
-}
+QList<QVariantHash> ScreenshotPlugin::getContactMenuParam() { return QList<QVariantHash>(); }
 
 void ScreenshotPlugin::openImage()
 {
-    if(!enabled_)
+    if (!enabled_)
         return;
 
     controller_->openImage();
@@ -219,26 +197,23 @@ void ScreenshotPlugin::applyOptions()
     setShortcuts();
 }
 
-void ScreenshotPlugin::restoreOptions()
-{
-    optionsWid->restoreOptions();
-}
+void ScreenshotPlugin::restoreOptions() { optionsWid->restoreOptions(); }
 
 QString ScreenshotPlugin::pluginInfo()
 {
-    return tr("Authors: ") +  "C.H., Dealer_WeARE\n\n"
-            + tr("This plugin allows you to make screenshots and save them to your hard drive or upload them to an FTP or HTTP server.\n"
+    return tr("Authors: ") + "C.H., Dealer_WeARE\n\n"
+        + tr("This plugin allows you to make screenshots and save them to your hard drive or upload them to an FTP or "
+             "HTTP server.\n"
              "The plugin has the following settings:\n"
              "* Shortcut -- hotkey to make the screenshot (by default, Ctrl+Alt+P)\n"
              "* Format -- the file format in which the screenshot will be stored (default: .jpg)\n"
-             "* File Name -- format of the filename (default: pic-yyyyMMdd-hhmmss, where yyyyMMdd=YYYYMMDD, and hhmmss are current date in the format yearmonthday-hourminutesecond)\n"
+             "* File Name -- format of the filename (default: pic-yyyyMMdd-hhmmss, where yyyyMMdd=YYYYMMDD, and hhmmss "
+             "are current date in the format yearmonthday-hourminutesecond)\n"
              "The address of FTP server is specified as ftp://ftp.domain.tld/path1/path2")
-             + tr("\n\nSettings for authorization on some hostings can be found here: http://code.google.com/p/qscreenshot/wiki/Authorization");
+        + tr("\n\nSettings for authorization on some hostings can be found here: "
+             "http://code.google.com/p/qscreenshot/wiki/Authorization");
 }
 
-QPixmap ScreenshotPlugin::icon() const
-{
-    return QPixmap(":/screenshotplugin/screenshot");
-}
+QPixmap ScreenshotPlugin::icon() const { return QPixmap(":/screenshotplugin/screenshot"); }
 
 #include "screenshotplugin.moc"

@@ -32,8 +32,8 @@
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0500
 #endif
-#include <qt_windows.h>
 #include <qglobal.h> // QT_WA
+#include <qt_windows.h>
 
 static WindowList qxt_Windows;
 
@@ -54,25 +54,19 @@ WindowList QxtWindowSystem::windows()
     return qxt_Windows;
 }
 
-WId QxtWindowSystem::activeWindow()
-{
-    return (WId)::GetForegroundWindow();
-}
+WId QxtWindowSystem::activeWindow() { return (WId)::GetForegroundWindow(); }
 
-WId QxtWindowSystem::findWindow(const QString& title)
+WId QxtWindowSystem::findWindow(const QString &title)
 {
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-    QT_WA({
-        return (WId)::FindWindow(NULL, (TCHAR*)title.utf16());
-    }, {
-        return (WId)::FindWindowA(NULL, title.toLocal8Bit());
-    });
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    QT_WA({ return (WId)::FindWindow(NULL, (TCHAR *)title.utf16()); },
+          { return (WId)::FindWindowA(NULL, title.toLocal8Bit()); });
 #else
-    return (WId)::FindWindow(NULL, (TCHAR*)title.utf16());
+    return (WId)::FindWindow(NULL, (TCHAR *)title.utf16());
 #endif
 }
 
-WId QxtWindowSystem::windowAt(const QPoint& pos)
+WId QxtWindowSystem::windowAt(const QPoint &pos)
 {
     POINT pt;
     pt.x = pos.x();
@@ -83,19 +77,15 @@ WId QxtWindowSystem::windowAt(const QPoint& pos)
 QString QxtWindowSystem::windowTitle(WId window)
 {
     QString title;
-    int len = ::GetWindowTextLength((HWND)window);
-    if (len >= 0)
-    {
-        TCHAR* buf = new TCHAR[len+1];
-        len = ::GetWindowText((HWND)window, buf, len+1);
-#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-        QT_WA({
-            title = QString::fromUtf16((const ushort*)buf, len);
-        }, {
-            title = QString::fromLocal8Bit((const char*)buf, len);
-        });
+    int     len = ::GetWindowTextLength((HWND)window);
+    if (len >= 0) {
+        TCHAR *buf = new TCHAR[len + 1];
+        len        = ::GetWindowText((HWND)window, buf, len + 1);
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+        QT_WA({ title = QString::fromUtf16((const ushort *)buf, len); },
+              { title = QString::fromLocal8Bit((const char *)buf, len); });
 #else
-            title = QString::fromUtf16((const ushort*)buf, len);
+        title = QString::fromUtf16((const ushort *)buf, len);
 #endif
         delete[] buf;
     }
@@ -104,10 +94,9 @@ QString QxtWindowSystem::windowTitle(WId window)
 
 QRect QxtWindowSystem::windowGeometry(WId window)
 {
-    RECT rc;
+    RECT  rc;
     QRect rect;
-    if (::GetWindowRect((HWND)window, &rc))
-    {
+    if (::GetWindowRect((HWND)window, &rc)) {
         rect.setTop(rc.top);
         rect.setBottom(rc.bottom);
         rect.setLeft(rc.left);
@@ -118,7 +107,7 @@ QRect QxtWindowSystem::windowGeometry(WId window)
 
 uint QxtWindowSystem::idleTime()
 {
-    uint idle = -1;
+    uint          idle = -1;
     LASTINPUTINFO info;
     info.cbSize = sizeof(LASTINPUTINFO);
     if (::GetLastInputInfo(&info))

@@ -26,21 +26,20 @@
 
 using namespace Chess;
 
-BoardView::BoardView(QWidget *parent)
-        :QTableView(parent)
+BoardView::BoardView(QWidget *parent) : QTableView(parent)
 {
     QHeaderView *hHeader = horizontalHeader();
     hHeader->setSectionResizeMode(QHeaderView::Fixed);
     hHeader->setSectionsMovable(false);
     hHeader->setSectionsClickable(false);
-    hHeader->setDefaultAlignment( Qt::AlignHCenter );
+    hHeader->setDefaultAlignment(Qt::AlignHCenter);
     hHeader->setDefaultSectionSize(50);
 
     QHeaderView *vHeader = verticalHeader();
     vHeader->setSectionResizeMode(QHeaderView::Fixed);
     vHeader->setSectionsClickable(false);
     vHeader->setSectionsMovable(false);
-    vHeader->setDefaultAlignment( Qt::AlignVCenter );
+    vHeader->setDefaultAlignment(Qt::AlignVCenter);
     vHeader->setDefaultSectionSize(50);
 
     setSelectionMode(QAbstractItemView::SingleSelection);
@@ -50,53 +49,52 @@ BoardView::BoardView(QWidget *parent)
     setItemDelegate(new BoardDelegate(this));
 
     setStyleSheet("QHeaderView::section {background-color: #ffffe7; border: 1px solid #74440e; color: black;  }"
-              "QTableCornerButton::section { background-color: #ffffe7; border: 1px solid #74440e; color: black;  }"
-              "QToolTip { background-color: #ffeeaf; padding: 2px; border: 1px solid #74440e; }");
+                  "QTableCornerButton::section { background-color: #ffffe7; border: 1px solid #74440e; color: black;  }"
+                  "QToolTip { background-color: #ffeeaf; padding: 2px; border: 1px solid #74440e; }");
 }
 
 void BoardView::mousePressEvent(QMouseEvent *e)
 {
     QModelIndex oldIndex = currentIndex();
-    BoardModel *model_ = (BoardModel*)model();
-    if(!model_->myMove || model_->waitForFigure || model_->gameState_) {
+    BoardModel *model_   = (BoardModel *)model();
+    if (!model_->myMove || model_->waitForFigure || model_->gameState_) {
         e->ignore();
         return;
     }
     QTableView::mousePressEvent(e);
     e->accept();
     QModelIndex newIndex = currentIndex();
-    if(model_->gameType_ == Figure::BlackPlayer) {
+    if (model_->gameType_ == Figure::BlackPlayer) {
         newIndex = model_->invert(newIndex);
     }
-    if(!model_->isYourFigure(newIndex))
+    if (!model_->isYourFigure(newIndex))
         setCurrentIndex(oldIndex);
 }
 
 void BoardView::mouseReleaseEvent(QMouseEvent *e)
 {
     QModelIndex oldIndex = currentIndex();
-    BoardModel *model_ = (BoardModel*)model();
-    if(!model_->myMove || model_->waitForFigure || model_->gameState_) {
+    BoardModel *model_   = (BoardModel *)model();
+    if (!model_->myMove || model_->waitForFigure || model_->gameState_) {
         e->ignore();
         return;
     }
     QTableView::mousePressEvent(e);
     e->accept();
     QModelIndex newIndex = currentIndex();
-    if(model_->gameType_ == Figure::BlackPlayer) {
+    if (model_->gameType_ == Figure::BlackPlayer) {
         oldIndex = model_->invert(oldIndex);
         newIndex = model_->invert(newIndex);
     }
 
-    if(!model_->isYourFigure(newIndex)) {
-        if(!model_->moveRequested(oldIndex, newIndex)) {
-            if(model_->gameType_ == Figure::BlackPlayer)
+    if (!model_->isYourFigure(newIndex)) {
+        if (!model_->moveRequested(oldIndex, newIndex)) {
+            if (model_->gameType_ == Figure::BlackPlayer)
                 setCurrentIndex(model_->invert(oldIndex));
             else
                 setCurrentIndex(oldIndex);
-        }
-        else {
-            if(model_->gameType_ == Figure::BlackPlayer)
+        } else {
+            if (model_->gameType_ == Figure::BlackPlayer)
                 setCurrentIndex(model_->invert(newIndex));
             else
                 setCurrentIndex(newIndex);
@@ -104,29 +102,22 @@ void BoardView::mouseReleaseEvent(QMouseEvent *e)
     }
 }
 
-void BoardView::mouseMoveEvent(QMouseEvent *e)
-{
-    e->ignore();
-}
+void BoardView::mouseMoveEvent(QMouseEvent *e) { e->ignore(); }
 
-void BoardView::keyPressEvent(QKeyEvent *e)
-{
-    e->ignore();
-}
+void BoardView::keyPressEvent(QKeyEvent *e) { e->ignore(); }
 
 bool BoardView::event(QEvent *e)
 {
-    if(e->type() == QEvent::ToolTip) {
+    if (e->type() == QEvent::ToolTip) {
         QPoint p = ((QHelpEvent *)e)->pos();
         p.setX(p.x() - verticalHeader()->width());
         p.setY(p.y() - horizontalHeader()->height());
         QModelIndex i = indexAt(p);
-        if(i.isValid()) {
-            BoardModel *model_ = (BoardModel*)model();
+        if (i.isValid()) {
+            BoardModel *model_ = (BoardModel *)model();
             setToolTip(QString("%1%2").arg(model_->headerData(i.column(), Qt::Horizontal).toString(),
-                               model_->headerData(i.row(), Qt::Vertical).toString()));
-        }
-        else
+                                           model_->headerData(i.row(), Qt::Vertical).toString()));
+        } else
             setToolTip("");
     }
     return QTableView::event(e);

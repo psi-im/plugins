@@ -17,38 +17,30 @@
  *
  */
 
-#include <QTimer>
+#include <QDomElement>
 #include <QEventLoop>
 #include <QStringList>
-#include <QDomElement>
+#include <QTimer>
 
-#include "jd_commands.h"
 #include "jabberdiskcontroller.h"
+#include "jd_commands.h"
 
 #define TIMER_INTERVAL 5000
 
-JDCommands::JDCommands(int account, const QString &jid, QObject *p)
-    : QObject(p)
-    , account_(account)
-    , jid_(jid)
-    , jdc(JabberDiskController::instance())
-    , timer_(new QTimer(this))
-    , eventLoop_(new QEventLoop(this))
-    , lastCommand_(CommandNoCommand)
+JDCommands::JDCommands(int account, const QString &jid, QObject *p) :
+    QObject(p), account_(account), jid_(jid), jdc(JabberDiskController::instance()), timer_(new QTimer(this)),
+    eventLoop_(new QEventLoop(this)), lastCommand_(CommandNoCommand)
 {
     timer_->setInterval(TIMER_INTERVAL);
-    connect(jdc, SIGNAL(stanza(int,QDomElement)), this, SLOT(incomingStanza(int,QDomElement)));
+    connect(jdc, SIGNAL(stanza(int, QDomElement)), this, SLOT(incomingStanza(int, QDomElement)));
     connect(timer_, SIGNAL(timeout()), this, SLOT(timeOut()));
 }
 
-JDCommands::~JDCommands()
-{
-    timeOut();
-}
+JDCommands::~JDCommands() { timeOut(); }
 
 void JDCommands::incomingStanza(int account, const QDomElement &xml)
 {
-    if(account != account_ || xml.attribute("from").split("/").at(0).toLower() != jid_)
+    if (account != account_ || xml.attribute("from").split("/").at(0).toLower() != jid_)
         return;
 
     emit incomingMessage(xml.firstChildElement("body").text(), lastCommand_);
@@ -57,82 +49,49 @@ void JDCommands::incomingStanza(int account, const QDomElement &xml)
     timeOut();
 }
 
-void JDCommands::get(const QString& file)
-{
-    sendStanza("get "+file, CommandGet);
-}
+void JDCommands::get(const QString &file) { sendStanza("get " + file, CommandGet); }
 
-void JDCommands::cd(const QString& dir)
-{
-    sendStanza("cd "+dir, CommandCd);
-}
+void JDCommands::cd(const QString &dir) { sendStanza("cd " + dir, CommandCd); }
 
-void JDCommands::help()
-{
-    sendStanza("help", CommandHelp);
-}
+void JDCommands::help() { sendStanza("help", CommandHelp); }
 
-void JDCommands::intro()
-{
-    sendStanza("intro", CommandIntro);
-}
+void JDCommands::intro() { sendStanza("intro", CommandIntro); }
 
-void JDCommands::hash(const QString& file)
-{
-    sendStanza("hash "+file, CommandHash);
-}
+void JDCommands::hash(const QString &file) { sendStanza("hash " + file, CommandHash); }
 
-void JDCommands::rm(const QString& path)
-{
-    sendStanza("rm "+path, CommandRm);
-}
+void JDCommands::rm(const QString &path) { sendStanza("rm " + path, CommandRm); }
 
-void JDCommands::du()
-{
-    sendStanza("du", CommandDu);
-}
+void JDCommands::du() { sendStanza("du", CommandDu); }
 
-void JDCommands::mkDir(const QString& dir)
-{
-    sendStanza("mkdir "+dir, CommandMkDir);
-}
+void JDCommands::mkDir(const QString &dir) { sendStanza("mkdir " + dir, CommandMkDir); }
 
-void JDCommands::lang(const QString& l)
-{
-    sendStanza("lang "+l, CommandLang);
-}
+void JDCommands::lang(const QString &l) { sendStanza("lang " + l, CommandLang); }
 
-void JDCommands::pwd()
-{
-    sendStanza("pwd", CommandPwd);
-}
+void JDCommands::pwd() { sendStanza("pwd", CommandPwd); }
 
-void JDCommands::ls(const QString& dir)
+void JDCommands::ls(const QString &dir)
 {
     QString txt = "ls";
-    if(!dir.isEmpty())
-        txt += " "+dir;
+    if (!dir.isEmpty())
+        txt += " " + dir;
     sendStanza(txt, CommandLs);
 }
 
 void JDCommands::send(const QString &toJid, const QString &file)
 {
-    sendStanza("send "+toJid+" "+file, CommandSend);
+    sendStanza("send " + toJid + " " + file, CommandSend);
 }
 
-void JDCommands::mv(const QString& oldFile, const QString& newFile)
+void JDCommands::mv(const QString &oldFile, const QString &newFile)
 {
-    sendStanza("mv "+oldFile+" "+newFile, CommandMv);
+    sendStanza("mv " + oldFile + " " + newFile, CommandMv);
 }
 
-void JDCommands::link(const QString &file)
-{
-    sendStanza("link "+file, CommandLink);
-}
+void JDCommands::link(const QString &file) { sendStanza("link " + file, CommandLink); }
 
 void JDCommands::sendStanzaDirect(const QString &text)
 {
-    emit outgoingMessage(text);
+    emit    outgoingMessage(text);
     QString id;
     jdc->sendStanza(account_, jid_, text, &id);
 }
@@ -150,14 +109,11 @@ void JDCommands::sendStanza(const QString &text, Command c)
 
 void JDCommands::timeOut()
 {
-    if(timer_->isActive())
+    if (timer_->isActive())
         timer_->stop();
 
-    if(eventLoop_->isRunning())
+    if (eventLoop_->isRunning())
         eventLoop_->quit();
 }
 
-bool JDCommands::isReady() const
-{
-    return !eventLoop_->isRunning();
-}
+bool JDCommands::isReady() const { return !eventLoop_->isRunning(); }

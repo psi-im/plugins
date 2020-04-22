@@ -21,18 +21,15 @@
 
 using namespace Chess;
 
-InviteDialog::InviteDialog(const Request& _r, const QStringList& resources, QWidget *parent)
-    : QDialog(parent)
-        , resources_(resources)
-    , r(_r)
+InviteDialog::InviteDialog(const Request &_r, const QStringList &resources, QWidget *parent) :
+    QDialog(parent), resources_(resources), r(_r)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     ui_.setupUi(this);
     ui_.cb_resource->setEditable(true);
-    if(!resources.isEmpty()) {
+    if (!resources.isEmpty()) {
         ui_.cb_resource->addItems(resources_);
-    }
-    else {
+    } else {
         ui_.cb_resource->addItem("Enter resource");
     }
 
@@ -46,7 +43,7 @@ InviteDialog::InviteDialog(const Request& _r, const QStringList& resources, QWid
 void InviteDialog::buttonPressed()
 {
     QString color = "white";
-    if(ui_.pb_black->isDown()) {
+    if (ui_.pb_black->isDown()) {
         color = "black";
     }
 
@@ -54,9 +51,7 @@ void InviteDialog::buttonPressed()
     close();
 }
 
-
-
-static QString unescape(const QString& escaped)
+static QString unescape(const QString &escaped)
 {
     QString plain = escaped;
     plain.replace("&lt;", "<");
@@ -66,23 +61,20 @@ static QString unescape(const QString& escaped)
     return plain;
 }
 
-
-
-InvitationDialog::InvitationDialog(const QString& jid, QString color,  QWidget *parent)
-        :  QDialog(parent)
+InvitationDialog::InvitationDialog(const QString &jid, QString color, QWidget *parent) : QDialog(parent)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setModal(false);
     ui_.setupUi(this);
     accepted = false;
 
-    if(color == "white")
+    if (color == "white")
         color = tr("white");
     else
         color = tr("black");
 
-    ui_.lbl_text->setText(tr("Player %1 invites you \nto play chess. He wants to play %2.")
-                  .arg(unescape(jid)).arg(color));
+    ui_.lbl_text->setText(
+        tr("Player %1 invites you \nto play chess. He wants to play %2.").arg(unescape(jid)).arg(color));
 
     connect(ui_.pb_accept, SIGNAL(pressed()), this, SLOT(buttonPressed()));
     connect(ui_.pb_reject, SIGNAL(pressed()), this, SLOT(close()));
@@ -93,14 +85,14 @@ InvitationDialog::InvitationDialog(const QString& jid, QString color,  QWidget *
 
 void InvitationDialog::buttonPressed()
 {
-        emit accept();
-        accepted = true;
-        close();
+    emit accept();
+    accepted = true;
+    close();
 }
 
 void InvitationDialog::closeEvent(QCloseEvent *e)
 {
-    if(!accepted)
+    if (!accepted)
         emit reject();
     e->accept();
     close();

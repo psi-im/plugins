@@ -7,6 +7,7 @@
 
 #include "uploadservice.h"
 
-UploadService::UploadService(const QString& serviceName, int sizeLimit) :
-        serviceName_(serviceName), sizeLimit_(sizeLimit) {
+UploadService::UploadService(const QString &serviceName, int sizeLimit) :
+    serviceName_(serviceName), sizeLimit_(sizeLimit)
+{
 }

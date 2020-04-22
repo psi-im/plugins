@@ -22,14 +22,14 @@
 #ifndef __OTRLEXT_H__
 #define __OTRLEXT_H__
 
-#include <stdio.h>
 #include <libotr/userstate.h>
+#include <stdio.h>
 
 /* Store all keys of an OtrlUserState. */
-gcry_error_t otrl_privkey_write(OtrlUserState us, const char* filename);
+gcry_error_t otrl_privkey_write(OtrlUserState us, const char *filename);
 
 /* Store all keys of an OtrlUserState.
  * The FILE* must be open for reading and writing. */
-gcry_error_t otrl_privkey_write_FILEp(OtrlUserState us, FILE* privf);
+gcry_error_t otrl_privkey_write_FILEp(OtrlUserState us, FILE *privf);
 
 #endif

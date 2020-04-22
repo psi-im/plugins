@@ -17,48 +17,40 @@
  *
  */
 
-#include <QDomElement>
 #include <QAction>
+#include <QDomElement>
 
 #include "jabberdiskcontroller.h"
 #include "jd_mainwin.h"
 
 struct Session {
-    Session(int a, const QString& j, JDMainWin* w = nullptr)
-        : account(a)
-        , jid(j)
-        , window(w)
-    {
-    }
+    Session(int a, const QString &j, JDMainWin *w = nullptr) : account(a), jid(j), window(w) { }
 
-    int account;
-    QString jid;
-    JDMainWin* window;
+    int        account;
+    QString    jid;
+    JDMainWin *window;
 
-    bool operator==(const Session& s)
-    {
-        return account == s.account && jid == s.jid;
-    }
+    bool operator==(const Session &s) { return account == s.account && jid == s.jid; }
 };
 
-JabberDiskController::JabberDiskController()
-    : QObject(nullptr)
-    , stanzaSender(nullptr)
-//    , iconHost(0)
-    , accInfo(nullptr)
+JabberDiskController::JabberDiskController() :
+    QObject(nullptr), stanzaSender(nullptr)
+    //    , iconHost(0)
+    ,
+    accInfo(nullptr)
 {
 }
 
 JabberDiskController::~JabberDiskController()
 {
-    while(!sessions_.isEmpty()) {
+    while (!sessions_.isEmpty()) {
         delete sessions_.takeFirst().window;
     }
 }
 
-JabberDiskController* JabberDiskController::instance()
+JabberDiskController *JabberDiskController::instance()
 {
-    if(instance_)
+    if (instance_)
         return instance_;
     return instance_ = new JabberDiskController();
 }
@@ -71,10 +63,10 @@ void JabberDiskController::reset()
 
 void JabberDiskController::viewerDestroyed()
 {
-    JDMainWin *w = static_cast<JDMainWin*>(sender());
-    for(int i = 0; i < sessions_.size(); i++) {
+    JDMainWin *w = static_cast<JDMainWin *>(sender());
+    for (int i = 0; i < sessions_.size(); i++) {
         Session s = sessions_.at(i);
-        if(s.window == w) {
+        if (s.window == w) {
             sessions_.removeAt(i);
             break;
         }
@@ -83,15 +75,14 @@ void JabberDiskController::viewerDestroyed()
 
 void JabberDiskController::initSession()
 {
-    QAction* act = dynamic_cast<QAction*>(sender());
-    if(act) {
-        int account = act->property("account").toInt();
-        const QString jid = act->property("jid").toString();
-        Session s(account, jid);
-        if(sessions_.contains(s)) {
+    QAction *act = dynamic_cast<QAction *>(sender());
+    if (act) {
+        int           account = act->property("account").toInt();
+        const QString jid     = act->property("jid").toString();
+        Session       s(account, jid);
+        if (sessions_.contains(s)) {
             sessions_.at(sessions_.indexOf(s)).window->raise();
-        }
-        else {
+        } else {
             s.window = new JDMainWin(accInfo->getJid(account), jid, account);
             connect(s.window, SIGNAL(destroyed()), SLOT(viewerDestroyed()));
             sessions_.append(s);
@@ -99,42 +90,35 @@ void JabberDiskController::initSession()
     }
 }
 
-void JabberDiskController::sendStanza(int account, const QString &to, const QString &message, QString* id)
+void JabberDiskController::sendStanza(int account, const QString &to, const QString &message, QString *id)
 {
-    *id = stanzaSender->uniqueId(account);
+    *id         = stanzaSender->uniqueId(account);
     QString txt = QString("<message from=\"%1\" id=\"%3\" type=\"chat\" to=\"%2\">"
-              "<body>%4</body></message>")
-            .arg(accInfo->getJid(account))
-            .arg(to)
-            .arg(*id)
-            .arg(message.toHtmlEscaped());
+                          "<body>%4</body></message>")
+                      .arg(accInfo->getJid(account))
+                      .arg(to)
+                      .arg(*id)
+                      .arg(message.toHtmlEscaped());
     stanzaSender->sendStanza(account, txt);
 }
 
-//void JabberDiskController::setIconFactoryAccessingHost(IconFactoryAccessingHost* host)
+// void JabberDiskController::setIconFactoryAccessingHost(IconFactoryAccessingHost* host)
 //{
 //    iconHost = host;
 //}
 
-void JabberDiskController::setStanzaSendingHost(StanzaSendingHost *host)
-{
-    stanzaSender = host;
-}
+void JabberDiskController::setStanzaSendingHost(StanzaSendingHost *host) { stanzaSender = host; }
 
-void JabberDiskController::setAccountInfoAccessingHost(AccountInfoAccessingHost* host)
-{
-    accInfo = host;
-}
+void JabberDiskController::setAccountInfoAccessingHost(AccountInfoAccessingHost *host) { accInfo = host; }
 
-bool JabberDiskController::incomingStanza(int account, const QDomElement& xml)
+bool JabberDiskController::incomingStanza(int account, const QDomElement &xml)
 {
     Session s(account, xml.attribute("from").split("/").at(0).toLower());
-    if(sessions_.contains(s)) {
+    if (sessions_.contains(s)) {
         emit stanza(account, xml);
         return true;
     }
     return false;
 }
 
-
-JabberDiskController* JabberDiskController::instance_ = nullptr;
+JabberDiskController *JabberDiskController::instance_ = nullptr;

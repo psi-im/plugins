@@ -29,35 +29,26 @@
 #include "optionaccessinghost.h"
 
 Options::Options(QObject *parent) :
-    QObject(parent),
-    dndDisable(false),
-    confDisable(false),
-    saveWndPosition(false),
-    saveWndWidthHeight(false),
-    windowTop(-1),
-    windowLeft(-1),
-    windowWidth(-1),
-    windowHeight(-1),
-    defSoundSettings(false),
-    soundStart("sound/chess_start.wav"),
-    soundFinish("sound/chess_finish.wav"),
-    soundMove("sound/chess_move.wav"),
+    QObject(parent), dndDisable(false), confDisable(false), saveWndPosition(false), saveWndWidthHeight(false),
+    windowTop(-1), windowLeft(-1), windowWidth(-1), windowHeight(-1), defSoundSettings(false),
+    soundStart("sound/chess_start.wav"), soundFinish("sound/chess_finish.wav"), soundMove("sound/chess_move.wav"),
     soundError("sound/chess_error.wav")
 {
     if (psiOptions) {
-        dndDisable = psiOptions->getPluginOption(constDndDisable, QVariant(dndDisable)).toBool();
-        confDisable = psiOptions->getPluginOption(constConfDisable, QVariant(confDisable)).toBool();
+        dndDisable      = psiOptions->getPluginOption(constDndDisable, QVariant(dndDisable)).toBool();
+        confDisable     = psiOptions->getPluginOption(constConfDisable, QVariant(confDisable)).toBool();
         saveWndPosition = psiOptions->getPluginOption(constSaveWndPosition, QVariant(saveWndPosition)).toBool();
-        saveWndWidthHeight = psiOptions->getPluginOption(constSaveWndWidthHeight, QVariant(saveWndWidthHeight)).toBool();
-        windowTop = psiOptions->getPluginOption(constWindowTop, QVariant(windowTop)).toInt();
-        windowLeft = psiOptions->getPluginOption(constWindowLeft, QVariant(windowLeft)).toInt();
-        windowWidth = psiOptions->getPluginOption(constWindowWidth, QVariant(windowWidth)).toInt();
-        windowHeight = psiOptions->getPluginOption(constWindowHeight, QVariant(windowHeight)).toInt();
+        saveWndWidthHeight
+            = psiOptions->getPluginOption(constSaveWndWidthHeight, QVariant(saveWndWidthHeight)).toBool();
+        windowTop        = psiOptions->getPluginOption(constWindowTop, QVariant(windowTop)).toInt();
+        windowLeft       = psiOptions->getPluginOption(constWindowLeft, QVariant(windowLeft)).toInt();
+        windowWidth      = psiOptions->getPluginOption(constWindowWidth, QVariant(windowWidth)).toInt();
+        windowHeight     = psiOptions->getPluginOption(constWindowHeight, QVariant(windowHeight)).toInt();
         defSoundSettings = psiOptions->getPluginOption(constDefSoundSettings, QVariant(defSoundSettings)).toBool();
-        soundStart = psiOptions->getPluginOption(constSoundStart, QVariant(soundStart)).toString();
-        soundFinish = psiOptions->getPluginOption(constSoundFinish, QVariant(soundFinish)).toString();
-        soundMove = psiOptions->getPluginOption(constSoundMove, QVariant(soundMove)).toString();
-        soundError = psiOptions->getPluginOption(constSoundError, QVariant(soundError)).toString();
+        soundStart       = psiOptions->getPluginOption(constSoundStart, QVariant(soundStart)).toString();
+        soundFinish      = psiOptions->getPluginOption(constSoundFinish, QVariant(soundFinish)).toString();
+        soundMove        = psiOptions->getPluginOption(constSoundMove, QVariant(soundMove)).toString();
+        soundError       = psiOptions->getPluginOption(constSoundError, QVariant(soundError)).toString();
     }
 }
 

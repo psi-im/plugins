@@ -22,24 +22,13 @@
 
 #include "optionaccessinghost.h"
 
-RipperCCOptions::RipperCCOptions(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::RipperCCOptions)
-{
-    ui->setupUi(this);
-}
+RipperCCOptions::RipperCCOptions(QWidget *parent) : QWidget(parent), ui(new Ui::RipperCCOptions) { ui->setupUi(this); }
 
-RipperCCOptions::~RipperCCOptions()
-{
-    delete ui;
-}
+RipperCCOptions::~RipperCCOptions() { delete ui; }
 
 void RipperCCOptions::loadSettings()
 {
     ui->sbInterval->setValue(_optionHost->getPluginOption("attention-interval", 1).toInt());
 }
 
-void RipperCCOptions::saveSettings()
-{
-    _optionHost->setPluginOption("attention-interval", ui->sbInterval->value());
-}
+void RipperCCOptions::saveSettings() { _optionHost->setPluginOption("attention-interval", ui->sbInterval->value()); }

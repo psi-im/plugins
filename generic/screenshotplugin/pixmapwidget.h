@@ -30,28 +30,25 @@
 #define constColor "color"
 #define constFont "font"
 
-class SelectionRect : public QRect
-{
+class SelectionRect : public QRect {
 public:
     SelectionRect();
     SelectionRect(int left, int top, int w, int h);
     void clear();
     enum CornerType { NoCorner, TopLeft, BottomLeft, TopRight, BottomRight };
-    CornerType cornerUnderMouse(const QPoint& pos) const;
+    CornerType cornerUnderMouse(const QPoint &pos) const;
 };
 
-
-class PixmapWidget : public QWidget
-{
+class PixmapWidget : public QWidget {
     Q_OBJECT
 public:
     PixmapWidget(QWidget *parent);
     ~PixmapWidget();
-    void setToolBar(ToolBar *bar);
-    void setPixmap(const QPixmap& pix);
+    void    setToolBar(ToolBar *bar);
+    void    setPixmap(const QPixmap &pix);
     QPixmap getPixmap() const { return mainPixmap; }
 
-private slots:    
+private slots:
     void checkedButtonChanged(ToolBar::ButtonType type);
     void paintToPixmap(QString text = "");
     void newWidth(int w);
@@ -74,26 +71,26 @@ private:
     void selectColor();
     void undo();
     void rotate();
-    void init(int lineWidth, const QString& color, const QString& font);
+    void init(int lineWidth, const QString &color, const QString &font);
 
 signals:
     void adjusted();
-    void settingsChanged(const QString&, const QVariant&);
+    void settingsChanged(const QString &, const QVariant &);
     void modified(bool);
 
 private:
-    ToolBar *bar_;
-    QColor color_;
-    QList<QPixmap> undoList_;
-    QPixmap mainPixmap;
-    ToolBar::ButtonType type_;
-    QPoint p1;
-    QPoint p2;
-    QPen pen;
-    QPen draftPen;
-    QFont font_;
-    SelectionRect* selectionRect;
-    QCursor currentCursor;
+    ToolBar *                 bar_;
+    QColor                    color_;
+    QList<QPixmap>            undoList_;
+    QPixmap                   mainPixmap;
+    ToolBar::ButtonType       type_;
+    QPoint                    p1;
+    QPoint                    p2;
+    QPen                      pen;
+    QPen                      draftPen;
+    QFont                     font_;
+    SelectionRect *           selectionRect;
+    QCursor                   currentCursor;
     SelectionRect::CornerType cornerType;
 
     enum SmoothLineType { None, Horizontal, Vertical };

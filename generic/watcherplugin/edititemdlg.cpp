@@ -24,12 +24,11 @@
 
 static const QString splitStr = "&split&";
 
-EditItemDlg::EditItemDlg(IconFactoryAccessingHost* icoHost, OptionAccessingHost *psiOptions_, QWidget *p)
-    : QDialog(p, Qt::Window)
-    , psiOptions(psiOptions_)
+EditItemDlg::EditItemDlg(IconFactoryAccessingHost *icoHost, OptionAccessingHost *psiOptions_, QWidget *p) :
+    QDialog(p, Qt::Window), psiOptions(psiOptions_)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    //setModal(true);
+    // setModal(true);
     ui_.setupUi(this);
     ui_.tb_open->setIcon(icoHost->getIcon("psi/browse"));
     ui_.tb_test->setIcon(icoHost->getIcon("psi/play"));
@@ -41,41 +40,37 @@ EditItemDlg::EditItemDlg(IconFactoryAccessingHost* icoHost, OptionAccessingHost 
 void EditItemDlg::init(const QString &settings)
 {
     QStringList l = settings.split(splitStr);
-    if(!l.isEmpty()) {
+    if (!l.isEmpty()) {
         ui_.le_jid->setText(l.takeFirst());
         ui_.le_jid->setEnabled(!ui_.le_jid->text().isEmpty());
         ui_.rb_text->setChecked(ui_.le_jid->text().isEmpty());
     }
-    if(!l.isEmpty()) {
+    if (!l.isEmpty()) {
         ui_.te_text->setText(l.takeFirst());
         ui_.te_text->setEnabled(!ui_.te_text->toPlainText().isEmpty());
         ui_.rb_jid->setChecked(ui_.te_text->toPlainText().isEmpty());
     }
-    if(!l.isEmpty())
+    if (!l.isEmpty())
         ui_.le_sound->setText(l.takeFirst());
-    if(!l.isEmpty())
+    if (!l.isEmpty())
         ui_.cb_always_play->setChecked(l.takeFirst().toInt());
-    if(!l.isEmpty())
+    if (!l.isEmpty())
         ui_.rb_groupchat->setChecked(l.takeFirst().toInt());
-
 }
 
 void EditItemDlg::getFileName()
 {
-    QString fileName = QFileDialog::getOpenFileName(nullptr,tr("Choose a sound file"),
+    QString fileName = QFileDialog::getOpenFileName(nullptr, tr("Choose a sound file"),
                                                     psiOptions->getPluginOption(constLastFile, QVariant("")).toString(),
                                                     tr("Sound (*.wav)"));
-    if(fileName.isEmpty())
+    if (fileName.isEmpty())
         return;
     QFileInfo fi(fileName);
     psiOptions->setPluginOption(constLastFile, QVariant(fi.absolutePath()));
     ui_.le_sound->setText(fileName);
 }
 
-void EditItemDlg::doTestSound()
-{
-    emit testSound(ui_.le_sound->text());
-}
+void EditItemDlg::doTestSound() { emit testSound(ui_.le_sound->text()); }
 
 void EditItemDlg::accept()
 {

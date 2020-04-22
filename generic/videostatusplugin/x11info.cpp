@@ -18,12 +18,11 @@
 
 #include "x11info.h"
 
-# include <X11/Xlib.h>
-# include <xcb/xcb.h>
-# include <QtGlobal>
+#include <QtGlobal>
+#include <X11/Xlib.h>
+#include <xcb/xcb.h>
 
-
-Display* X11Info::display()
+Display *X11Info::display()
 {
     if (!_display) {
         _display = XOpenDisplay(nullptr);
@@ -33,9 +32,7 @@ Display* X11Info::display()
 
 unsigned long X11Info::appRootWindow(int screen)
 {
-    return screen == -1?
-                XDefaultRootWindow(display()) :
-                XRootWindowOfScreen(XScreenOfDisplay(display(), screen));
+    return screen == -1 ? XDefaultRootWindow(display()) : XRootWindowOfScreen(XScreenOfDisplay(display(), screen));
 }
 
 xcb_connection_t *X11Info::xcbConnection()
@@ -47,7 +44,7 @@ xcb_connection_t *X11Info::xcbConnection()
     return _xcb;
 }
 
-xcb_connection_t* X11Info::_xcb = nullptr;
+xcb_connection_t *X11Info::_xcb = nullptr;
 
-Display* X11Info::_display = nullptr;
-int X11Info::_xcbPreferredScreen = 0;
+Display *X11Info::_display            = nullptr;
+int      X11Info::_xcbPreferredScreen = 0;

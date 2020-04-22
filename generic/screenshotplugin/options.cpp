@@ -17,31 +17,23 @@
  *
  */
 
-
 #include "options.h"
 #include "optionaccessinghost.h"
 
+Options *Options::instance_ = nullptr;
 
-Options* Options::instance_ = nullptr;
-
-Options* Options::instance()
+Options *Options::instance()
 {
-    if(!instance_) {
+    if (!instance_) {
         instance_ = new Options();
     }
 
     return instance_;
 }
 
-Options::Options()
-    : QObject(nullptr)
-    , psiOptions(nullptr)
-{
-}
+Options::Options() : QObject(nullptr), psiOptions(nullptr) { }
 
-Options::~Options()
-{
-}
+Options::~Options() { }
 
 void Options::reset()
 {
@@ -49,26 +41,22 @@ void Options::reset()
     instance_ = nullptr;
 }
 
-QVariant Options::getOption(const QString& name, const QVariant& defValue)
+QVariant Options::getOption(const QString &name, const QVariant &defValue)
 {
     QVariant val = defValue;
-    if(psiOptions) {
+    if (psiOptions) {
         val = psiOptions->getPluginOption(name, val);
     }
 
     return val;
 }
 
-void Options::setOption(const QString& name, const QVariant& value)
+void Options::setOption(const QString &name, const QVariant &value)
 {
-    if(psiOptions) {
+    if (psiOptions) {
         psiOptions->setPluginOption(name, value);
     }
 }
 
-//for Psi plugin only
-void Options::setPsiOptions(OptionAccessingHost* _psiOptions)
-{
-    psiOptions = _psiOptions;
-}
-
+// for Psi plugin only
+void Options::setPsiOptions(OptionAccessingHost *_psiOptions) { psiOptions = _psiOptions; }

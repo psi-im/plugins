@@ -17,33 +17,35 @@
  *
  */
 
-#include <QDomElement>
 #include <QDateTime>
+#include <QDomElement>
 #include <QTextDocument>
 
 #include "redirectplugin.h"
 
-#include "optionaccessinghost.h"
-#include "stanzasendinghost.h"
 #include "accountinfoaccessinghost.h"
 #include "applicationinfoaccessinghost.h"
 #include "contactinfoaccessinghost.h"
+#include "optionaccessinghost.h"
+#include "stanzasendinghost.h"
 
-
-bool Redirector::enable() {
+bool Redirector::enable()
+{
     if (psiOptions) {
-        enabled = true;
+        enabled   = true;
         targetJid = psiOptions->getPluginOption("jid").toString();
     }
     return enabled;
 }
 
-bool Redirector::disable() {
+bool Redirector::disable()
+{
     enabled = false;
     return true;
 }
 
-void Redirector::applyOptions() {
+void Redirector::applyOptions()
+{
     if (!options_)
         return;
 
@@ -51,7 +53,8 @@ void Redirector::applyOptions() {
     psiOptions->setPluginOption("jid", targetJid);
 }
 
-void Redirector::restoreOptions() {
+void Redirector::restoreOptions()
+{
     if (!options_)
         return;
 
@@ -59,7 +62,8 @@ void Redirector::restoreOptions() {
     ui_.le_jid->setText(targetJid);
 }
 
-QWidget* Redirector::options() {
+QWidget *Redirector::options()
+{
     if (!enabled) {
         return 0;
     }
@@ -71,23 +75,24 @@ QWidget* Redirector::options() {
     return options_;
 }
 
-bool Redirector::incomingStanza(int account, const QDomElement& stanza) {
+bool Redirector::incomingStanza(int account, const QDomElement &stanza)
+{
     Q_UNUSED(account)
 
     if (!enabled || stanza.tagName() != "message") {
         return false;
     }
-    int targetAccount = accInfoHost->findOnlineAccountForContact(targetJid);
-    QDomNodeList bodies = stanza.elementsByTagName("body");
+    int          targetAccount = accInfoHost->findOnlineAccountForContact(targetJid);
+    QDomNodeList bodies        = stanza.elementsByTagName("body");
     if (targetAccount == -1 || bodies.count() == 0) {
         return false;
     }
 
-    int contactId;
+    int     contactId;
     QString from = stanza.attribute("from");
 
     QDomDocument doc;
-    QDomElement e = doc.createElement("message");
+    QDomElement  e = doc.createElement("message");
     e.setAttribute("to", ui_.le_jid->text());
     e.setAttribute("type", "chat");
     // TODO id?
@@ -98,10 +103,12 @@ bool Redirector::incomingStanza(int account, const QDomElement& stanza) {
     }
     QDomElement body = doc.createElement("body");
     e.appendChild(body);
-    body.appendChild(doc.createTextNode(QString("#%1 %2").arg(contactId).arg(bodies.at(0).toElement().text().toHtmlEscaped())));
+    body.appendChild(
+        doc.createTextNode(QString("#%1 %2").arg(contactId).arg(bodies.at(0).toElement().text().toHtmlEscaped())));
     QDomElement forward = e.appendChild(doc.createElementNS("urn:xmpp:forward:0", "forwarded")).toElement();
-    forward.appendChild(doc.createElementNS("urn:xmpp:delay", "delay")).toElement()
-            .setAttribute("stamp", QDateTime::currentDateTimeUtc().toString("yyyy-MM-ddThh:mm:ssZ"));
+    forward.appendChild(doc.createElementNS("urn:xmpp:delay", "delay"))
+        .toElement()
+        .setAttribute("stamp", QDateTime::currentDateTimeUtc().toString("yyyy-MM-ddThh:mm:ssZ"));
 
     forward.appendChild(doc.importNode(stanza, true));
 
@@ -110,12 +117,10 @@ bool Redirector::incomingStanza(int account, const QDomElement& stanza) {
     return true;
 }
 
-bool Redirector::outgoingStanza(int /*account*/, QDomElement& /*xml*/) {
-    return false;
-}
+bool Redirector::outgoingStanza(int /*account*/, QDomElement & /*xml*/) { return false; }
 
-QString Redirector::pluginInfo() {
-    return tr("Author: ") +  "rion\n"
-            + tr("Email: ") + "rion4ik@gmail.com\n\n"
-            + trUtf8("Redirects all incoming messages to some jid and allows one to redirect messages back.");
+QString Redirector::pluginInfo()
+{
+    return tr("Author: ") + "rion\n" + tr("Email: ") + "rion4ik@gmail.com\n\n"
+        + trUtf8("Redirects all incoming messages to some jid and allows one to redirect messages back.");
 }

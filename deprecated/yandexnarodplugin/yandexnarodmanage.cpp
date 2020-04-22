@@ -15,76 +15,60 @@
 */
 
 #include <QClipboard>
+#include <QDesktopServices>
 #include <QFileDialog>
-#include <QMimeData>
 #include <QListWidgetItem>
-#include <QMouseEvent>
 #include <QMenu>
 #include <QMessageBox>
-#include <QDesktopServices>
+#include <QMimeData>
+#include <QMouseEvent>
 
-#include "yandexnarodmanage.h"
-#include "uploaddialog.h"
 #include "optionaccessinghost.h"
-#include "yandexnarodsettings.h"
 #include "options.h"
 #include "ui_yandexnarodmanage.h"
-
-
+#include "uploaddialog.h"
+#include "yandexnarodmanage.h"
+#include "yandexnarodsettings.h"
 
 //------------------------------------------
 //-------ListWidgetItem---------------------
 //------------------------------------------
-class ListWidgetItem : public QListWidgetItem
-{
+class ListWidgetItem : public QListWidgetItem {
 public:
-    ListWidgetItem(const QIcon& ico, const yandexnarodNetMan::FileItem& fileitem)
-        : QListWidgetItem(ico, fileitem.filename)
-        , item_(fileitem)
+    ListWidgetItem(const QIcon &ico, const yandexnarodNetMan::FileItem &fileitem) :
+        QListWidgetItem(ico, fileitem.filename), item_(fileitem)
     {
         QString toolTip = QObject::tr("Name: %1\nSize: %2\nDate prolongate: %3\nURL: %4\nPassword: %5")
-                    .arg(fileitem.filename)
-                    .arg( QString(fileitem.size).replace("&nbsp;", " ") )
-                    .arg(fileitem.date)
-                    .arg(fileitem.fileurl)
-                    .arg(fileitem.passset ? QObject::tr("Yes") : QObject::tr("No"));
+                              .arg(fileitem.filename)
+                              .arg(QString(fileitem.size).replace("&nbsp;", " "))
+                              .arg(fileitem.date)
+                              .arg(fileitem.fileurl)
+                              .arg(fileitem.passset ? QObject::tr("Yes") : QObject::tr("No"));
         setToolTip(toolTip);
     }
 
-    const yandexnarodNetMan::FileItem& fileItem() const
-    {
-        return item_;
-    }
+    const yandexnarodNetMan::FileItem &fileItem() const { return item_; }
 
 private:
     yandexnarodNetMan::FileItem item_;
 };
 
-
-
-
 //------------------------------------------
 //-------ListWidget-------------------------
 //------------------------------------------
-ListWidget::ListWidget(QWidget* p)
-    : QListWidget(p)
-{
-}
+ListWidget::ListWidget(QWidget *p) : QListWidget(p) { }
 
-QStringList ListWidget::mimeTypes() const
-{
-    return QStringList() << "text/plain";
-}
+QStringList ListWidget::mimeTypes() const { return QStringList() << "text/plain"; }
 
-QMimeData* ListWidget::mimeData(const QList<QListWidgetItem *> &items) const
+QMimeData *ListWidget::mimeData(const QList<QListWidgetItem *> &items) const
 {
-    if(items.isEmpty())
+    if (items.isEmpty())
         return 0;
 
-    QMimeData* d = new QMimeData();
-    QString text;
-    foreach(QListWidgetItem *i, items) {
-        text += static_cast<ListWidgetItem*>(i)->fileItem().fileurl + "\n";
+    QMimeData *d = new QMimeData();
+    QString    text;
+    foreach (QListWidgetItem *i, items) {
+        text += static_cast<ListWidgetItem *>(i)->fileItem().fileurl + "\n";
     }
     d->setText(text);
 
@@ -94,11 +78,11 @@ QMimeData* ListWidget::mimeData(const QList<QListWidgetItem *> &items) const
 void ListWidget::mousePressEvent(QMouseEvent *event)
 {
     QListWidget::mousePressEvent(event);
-    if(event->button() == Qt::RightButton) {
+    if (event->button() == Qt::RightButton) {
         QListWidgetItem *lwi = itemAt(event->pos());
-        if(lwi) {
-            ListWidgetItem *it = static_cast<ListWidgetItem*>(lwi);
-            emit menu(it->fileItem());
+        if (lwi) {
+            ListWidgetItem *it = static_cast<ListWidgetItem *>(lwi);
+            emit            menu(it->fileItem());
             event->accept();
         }
     }
@@ -106,29 +90,29 @@ void ListWidget::mousePressEvent(QMouseEvent *event)
 
 static QStringList files(const QMimeData *md)
 {
-    QString str = QFile::decodeName(QByteArray::fromPercentEncoding(md->data("text/uri-list")));
-    QRegExp re("file://(.+)");
+    QString     str = QFile::decodeName(QByteArray::fromPercentEncoding(md->data("text/uri-list")));
+    QRegExp     re("file://(.+)");
     QStringList files;
-    int index = re.indexIn(str);
-    while(index != -1) {
+    int         index = re.indexIn(str);
+    while (index != -1) {
         files.append(re.cap(1).trimmed());
-        index = re.indexIn(str, index+1);
+        index = re.indexIn(str, index + 1);
     }
     return files;
 }
 
 void ListWidget::dragEnterEvent(QDragEnterEvent *event)
 {
-    const QMimeData *md = event->mimeData();
-    QStringList list = files(md);
-    bool ok = false;
-    if(list.size() == 1) {
+    const QMimeData *md   = event->mimeData();
+    QStringList      list = files(md);
+    bool             ok   = false;
+    if (list.size() == 1) {
         QFile file(list.takeFirst());
-        if(file.exists()) {
+        if (file.exists()) {
             ok = true;
         }
     }
-    if(ok) {
+    if (ok) {
         event->acceptProposedAction();
     }
 }
@@ -136,10 +120,10 @@ void ListWidget::dragEnterEvent(QDragEnterEvent *event)
 void ListWidget::dropEvent(QDropEvent *event)
 {
     QStringList list = files(event->mimeData());
-    if(list.size() == 1) {
+    if (list.size() == 1) {
         const QString path = list.takeFirst();
-        QFile file(path);
-        if(file.exists())
+        QFile         file(path);
+        if (file.exists())
             emit uploadFile(path);
     }
 
@@ -147,13 +131,10 @@ void ListWidget::dropEvent(QDropEvent *event)
     event->accept();
 }
 
-
 //------------------------------------------
 //-------yandexnarodManage------------------
 //------------------------------------------
-yandexnarodManage::yandexnarodManage(QWidget* p)
-    : QDialog(p, Qt::Window)
-    , ui_(new Ui::yandexnarodManageClass)
+yandexnarodManage::yandexnarodManage(QWidget *p) : QDialog(p, Qt::Window), ui_(new Ui::yandexnarodManageClass)
 {
     ui_->setupUi(this);
     setWindowTitle(tr("Yandex.Narod file manager"));
@@ -167,22 +148,22 @@ yandexnarodManage::yandexnarodManage(QWidget* p)
     newNetMan();
 
     QPixmap iconimage(":/icons/yandexnarod-icons-files.png");
-    for (int i=0; i<(iconimage.width()/16); i++) {
-        QIcon icon(iconimage.copy((i*16),0,16,16));
+    for (int i = 0; i < (iconimage.width() / 16); i++) {
+        QIcon icon(iconimage.copy((i * 16), 0, 16, 16));
         fileicons.append(icon);
     }
 
-    fileiconstyles["b-icon-music"] = 0;
-    fileiconstyles["b-icon-video"] = 1;
-    fileiconstyles["b-icon-arc"] = 2;
-    fileiconstyles["b-icon-doc"] = 3;
-    fileiconstyles["b-icon-soft"] = 4;
+    fileiconstyles["b-icon-music"]   = 0;
+    fileiconstyles["b-icon-video"]   = 1;
+    fileiconstyles["b-icon-arc"]     = 2;
+    fileiconstyles["b-icon-doc"]     = 3;
+    fileiconstyles["b-icon-soft"]    = 4;
     fileiconstyles["b-icon-unknown"] = 5;
     fileiconstyles["b-icon-picture"] = 14;
 
-    Options* o = Options::instance();
-    int h = o->getOption(CONST_HEIGHT, 200).toInt();
-    int w = o->getOption(CONST_WIDTH, 300).toInt();
+    Options *o = Options::instance();
+    int      h = o->getOption(CONST_HEIGHT, 200).toInt();
+    int      w = o->getOption(CONST_WIDTH, 300).toInt();
 
     resize(w, h);
 
@@ -195,7 +176,7 @@ yandexnarodManage::yandexnarodManage(QWidget* p)
 
 yandexnarodManage::~yandexnarodManage()
 {
-    Options* o = Options::instance();
+    Options *o = Options::instance();
     o->setOption(CONST_HEIGHT, height());
     o->setOption(CONST_WIDTH, width());
 
@@ -206,13 +187,14 @@ void yandexnarodManage::newNetMan()
 {
     netman = new yandexnarodNetMan(this);
     connect(netman, SIGNAL(statusText(QString)), ui_->labelStatus, SLOT(setText(QString)));
-    connect(netman, SIGNAL(newFileItem(yandexnarodNetMan::FileItem)), this, SLOT(newFileItem(yandexnarodNetMan::FileItem)));
+    connect(netman, SIGNAL(newFileItem(yandexnarodNetMan::FileItem)), this,
+            SLOT(newFileItem(yandexnarodNetMan::FileItem)));
     connect(netman, SIGNAL(finished()), this, SLOT(netmanFinished()));
 }
 
 void yandexnarodManage::newFileItem(yandexnarodNetMan::FileItem fileitem)
 {
-    int iconnum = 5;
+    int     iconnum      = 5;
     QString fileiconname = fileitem.fileicon.replace("-old", "");
     if (fileiconstyles.contains(fileiconname))
         iconnum = fileiconstyles[fileiconname];
@@ -229,10 +211,7 @@ void yandexnarodManage::netmanPrepare()
     ui_->btnReload->setEnabled(false);
 }
 
-void yandexnarodManage::netmanFinished()
-{
-    ui_->btnReload->setEnabled(true);
-}
+void yandexnarodManage::netmanFinished() { ui_->btnReload->setEnabled(true); }
 
 void yandexnarodManage::on_btnReload_clicked()
 {
@@ -244,22 +223,23 @@ void yandexnarodManage::on_btnReload_clicked()
 void yandexnarodManage::on_btnDelete_clicked()
 {
     QList<yandexnarodNetMan::FileItem> out;
-    foreach(QListWidgetItem* i, ui_->listWidget->selectedItems()) {
-        ListWidgetItem* lwi = static_cast<ListWidgetItem*>(i);
-        yandexnarodNetMan::FileItem &f = const_cast<yandexnarodNetMan::FileItem&>(lwi->fileItem());
-        if(!f.deleted) {
+    foreach (QListWidgetItem *i, ui_->listWidget->selectedItems()) {
+        ListWidgetItem *             lwi = static_cast<ListWidgetItem *>(i);
+        yandexnarodNetMan::FileItem &f   = const_cast<yandexnarodNetMan::FileItem &>(lwi->fileItem());
+        if (!f.deleted) {
             out.append(f);
             f.deleted = true;
         }
     }
-    if(out.isEmpty())
+    if (out.isEmpty())
         return;
 
-    int rez = QMessageBox::question(this, tr("Delete file(s)"), tr("Are you sure?"), QMessageBox::Ok | QMessageBox::Cancel);
-    if(rez == QMessageBox::Cancel)
+    int rez
+        = QMessageBox::question(this, tr("Delete file(s)"), tr("Are you sure?"), QMessageBox::Ok | QMessageBox::Cancel);
+    if (rez == QMessageBox::Cancel)
         return;
 
-    foreach(QListWidgetItem* i, ui_->listWidget->selectedItems()) {
+    foreach (QListWidgetItem *i, ui_->listWidget->selectedItems()) {
         i->setIcon(fileicons[15]);
     }
     netmanPrepare();
@@ -270,10 +250,10 @@ void yandexnarodManage::on_btnProlong_clicked()
 {
     netmanPrepare();
     QList<yandexnarodNetMan::FileItem> out;
-    foreach(QListWidgetItem* i, ui_->listWidget->selectedItems()) {
-        ListWidgetItem* lwi = static_cast<ListWidgetItem*>(i);
-        yandexnarodNetMan::FileItem f = lwi->fileItem();
-        if(f.prolong() < 45) {
+    foreach (QListWidgetItem *i, ui_->listWidget->selectedItems()) {
+        ListWidgetItem *            lwi = static_cast<ListWidgetItem *>(i);
+        yandexnarodNetMan::FileItem f   = lwi->fileItem();
+        if (f.prolong() < 45) {
             out.append(f);
         }
     }
@@ -303,9 +283,9 @@ void yandexnarodManage::on_listWidget_pressed(QModelIndex)
         ui_->frameFileActions->show();
 
     bool prolong = false;
-    foreach(QListWidgetItem* i, ui_->listWidget->selectedItems()) {
-        ListWidgetItem* lwi = static_cast<ListWidgetItem*>(i);
-        if(lwi->fileItem().prolong() < 45) {
+    foreach (QListWidgetItem *i, ui_->listWidget->selectedItems()) {
+        ListWidgetItem *lwi = static_cast<ListWidgetItem *>(i);
+        if (lwi->fileItem().prolong() < 45) {
             prolong = true;
             break;
         }
@@ -316,8 +296,8 @@ void yandexnarodManage::on_listWidget_pressed(QModelIndex)
 void yandexnarodManage::on_btnClipboard_clicked()
 {
     QStringList text;
-    foreach(QListWidgetItem* i, ui_->listWidget->selectedItems()) {
-        text << static_cast<ListWidgetItem*>(i)->fileItem().fileurl;
+    foreach (QListWidgetItem *i, ui_->listWidget->selectedItems()) {
+        text << static_cast<ListWidgetItem *>(i)->fileItem().fileurl;
     }
     copyToClipboard(text.join("\n"));
 }
@@ -330,7 +310,8 @@ void yandexnarodManage::copyToClipboard(const QString &text)
 
 void yandexnarodManage::on_btnUpload_clicked()
 {
-    QString filePath = QFileDialog::getOpenFileName(this, O_M(MChooseFile), Options::instance()->getOption(CONST_LAST_FOLDER).toString());
+    QString filePath = QFileDialog::getOpenFileName(this, O_M(MChooseFile),
+                                                    Options::instance()->getOption(CONST_LAST_FOLDER).toString());
 
     if (!filePath.isEmpty()) {
         QFileInfo fi(filePath);
@@ -342,7 +323,7 @@ void yandexnarodManage::on_btnUpload_clicked()
 
 void yandexnarodManage::uploadFile(const QString &path)
 {
-    uploadDialog* uploadwidget = new uploadDialog(this);
+    uploadDialog *uploadwidget = new uploadDialog(this);
     connect(uploadwidget, SIGNAL(canceled()), this, SLOT(netmanFinished()));
     connect(uploadwidget, SIGNAL(finished()), this, SLOT(netmanFinished()));
     uploadwidget->show();
@@ -351,9 +332,9 @@ void yandexnarodManage::uploadFile(const QString &path)
 
 void yandexnarodManage::doMenu(const yandexnarodNetMan::FileItem &it)
 {
-    QMenu m;
-    QList<QAction*> actions;
-    QAction *act = new QAction(tr("Set password"), &m);
+    QMenu            m;
+    QList<QAction *> actions;
+    QAction *        act = new QAction(tr("Set password"), &m);
     act->setVisible(!it.passset);
     act->setData(1);
     actions << act;
@@ -369,9 +350,9 @@ void yandexnarodManage::doMenu(const yandexnarodNetMan::FileItem &it)
     act->setEnabled(it.prolong() < 45);
     actions << act;
     m.addActions(actions);
-    QAction* ret = m.exec(QCursor::pos());
-    if(ret) {
-        switch(ret->data().toInt()) {
+    QAction *ret = m.exec(QCursor::pos());
+    if (ret) {
+        switch (ret->data().toInt()) {
         case 1:
             netman->startSetPass(it);
             break;
@@ -388,4 +369,3 @@ void yandexnarodManage::doMenu(const yandexnarodNetMan::FileItem &it)
         }
     }
 }
-
