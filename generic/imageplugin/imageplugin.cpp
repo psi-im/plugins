@@ -142,7 +142,7 @@ QWidget *ImagePlugin::options()
     QWidget *    optionsWid = new QWidget();
     QVBoxLayout *vbox       = new QVBoxLayout(optionsWid);
     QLabel *     wikiLink
-        = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#image_plugin\">Wiki (Online)</a>"), optionsWid);
+        = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/en:plugins#image_plugin\">Wiki (Online)</a>"), optionsWid);
     wikiLink->setOpenExternalLinks(true);
     vbox->addWidget(wikiLink);
     vbox->addStretch();

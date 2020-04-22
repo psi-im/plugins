@@ -22,7 +22,7 @@ v0.1.9
 
 2010-09-11
 v0.1.7
-  * обновлена ссылка на wiki ( https://psi-plus.com/wiki/plugins#conference_logger_plugin )
+  * обновлена ссылка на wiki ( https://psi-plus.com/wiki/en:plugins#conference_logger_plugin )
 
 
 2010-08-25

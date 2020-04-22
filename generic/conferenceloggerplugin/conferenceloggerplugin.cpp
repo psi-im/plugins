@@ -174,7 +174,7 @@ QWidget *ConferenceLogger::options()
     viewButton = new QPushButton(IcoHost->getIcon("psi/search"), tr("View Log"));
     connect(viewButton, SIGNAL(released()), SLOT(viewFromOpt()));
     QLabel *wikiLink
-        = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#conference_logger_plugin\">Wiki (Online)</a>"));
+        = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/en:plugins#conference_logger_plugin\">Wiki (Online)</a>"));
     wikiLink->setOpenExternalLinks(true);
     filesLayout->addWidget(viewButton);
     layout->addWidget(label);
@@ -322,7 +322,7 @@ QList<QVariantHash> ConferenceLogger::getGCButtonParam()
 QString ConferenceLogger::pluginInfo()
 {
     return tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
-        + tr("This plugin is designed to save groupchat logs in which the Psi+ user sits.\n"
+        + tr("This plugin is designed to save groupchat logs in which the Psi user sits.\n"
              "Groupchats logs can be viewed from the plugin settings or by clicking on the appropriate button on the "
              "toolbar in the active window/tab with groupchat.\n\n"
              "Note: To work correctly, the the Groupchat Toolbar must be enabled.");

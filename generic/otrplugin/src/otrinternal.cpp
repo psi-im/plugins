@@ -1,7 +1,7 @@
 /*
  * otrinternal.cpp - Manages the OTR connection
  *
- * Off-the-Record Messaging plugin for Psi+
+ * Off-the-Record Messaging plugin for Psi
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
  *               2011-2012  Florian Fieber
  *                    2013  Georg Rudoy
@@ -673,7 +673,7 @@ void OtrInternal::create_privkey(const char *accountname, const char *protocol)
     QMessageBox qMB(QMessageBox::Question, QObject::tr("Psi OTR"),
                     QObject::tr("Private keys for account \"%1\" need to be generated. "
                                 "This takes quite some time (from a few seconds to a "
-                                "couple of minutes), and while you can use Psi+ in the "
+                                "couple of minutes), and while you can use Psi in the "
                                 "meantime, all the messages will be sent unencrypted "
                                 "until keys are generated. You will be notified when "
                                 "this process finishes.\n"

@@ -68,7 +68,7 @@ QWidget *StorageNotesPlugin::options()
     QVBoxLayout *vbox       = new QVBoxLayout(optionsWid);
 
     QLabel *wikiLink = new QLabel(
-        tr("<a href=\"https://psi-plus.com/wiki/plugins#storage_notes_plugin\">Wiki (Online)</a>"), optionsWid);
+        tr("<a href=\"https://psi-plus.com/wiki/en:plugins#storage_notes_plugin\">Wiki (Online)</a>"), optionsWid);
     wikiLink->setOpenExternalLinks(true);
 
     vbox->addWidget(wikiLink);
@@ -141,7 +141,7 @@ QString StorageNotesPlugin::pluginInfo()
         + tr("This plugin is an implementation of XEP-0049: Private XML Storage.\n"
              "The plugin is fully compatible with notes saved using Miranda IM.\n"
              "The plugin is designed to keep notes on the jabber server with the ability to access them from anywhere "
-             "using Psi+ or Miranda IM.");
+             "using Psi or Miranda IM.");
 }
 
 QPixmap StorageNotesPlugin::icon() const { return QPixmap(":/storagenotes/storagenotes.png"); }

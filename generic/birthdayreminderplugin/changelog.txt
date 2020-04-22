@@ -39,7 +39,7 @@ v0.3.0
 
 2010-09-11
 v0.2.6
-  * обновлена ссылка на wiki ( https://psi-plus.com/wiki/plugins#birthday_reminder_plugin )
+  * обновлена ссылка на wiki ( https://psi-plus.com/wiki/en:plugins#birthday_reminder_plugin )
 
 
 2010-05-22

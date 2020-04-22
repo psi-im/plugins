@@ -72,7 +72,7 @@ v0.10.1
 
 2010-09-11  zet
 v0.9.17
-  * обновлена ссылка на wiki ( https://psi-plus.com/wiki/plugins#juick_plugin )
+  * обновлена ссылка на wiki ( https://psi-plus.com/wiki/en:plugins#juick_plugin )
 
 
 2010-08-30 Dealer_WeARE

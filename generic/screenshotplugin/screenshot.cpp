@@ -308,7 +308,7 @@ void Screenshot::aboutQt() { qApp->aboutQt(); }
 
 void Screenshot::doHomePage()
 {
-    QDesktopServices::openUrl(QUrl("https://psi-plus.com/wiki/plugins#screenshot_plugin"));
+    QDesktopServices::openUrl(QUrl("https://psi-plus.com/wiki/en:plugins#screenshot_plugin"));
 }
 
 void Screenshot::updateWidgets(bool vis)
@@ -694,7 +694,7 @@ void Screenshot::uploadHttp()
     QNetworkRequest netreq;
     netreq.setUrl(QUrl(s->url()));
 
-    netreq.setRawHeader("User-Agent", "Psi-Plus Screenshot plugin");
+    netreq.setRawHeader("User-Agent", "Screenshot plugin (Psi)");
     netreq.setRawHeader("Content-Type", "multipart/form-data, boundary=" + boundary.toLatin1());
     netreq.setRawHeader("Cache-Control", "no-cache");
     netreq.setRawHeader("Accept", "*/*");

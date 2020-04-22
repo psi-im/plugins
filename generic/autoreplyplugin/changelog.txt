@@ -6,7 +6,7 @@ v0.3.2 - taurus
 2010-09-11
 v0.3.0
   + добавлены в исключения некоторые боты (rss@isida-bot.com, huti.ua@gmail.com)
-  * обновлена ссылка на wiki ( https://psi-plus.com/wiki/plugins#autoreply_plugin )
+  * обновлена ссылка на wiki ( https://psi-plus.com/wiki/en:plugins#autoreply_plugin )
 
 
 2010-05-17

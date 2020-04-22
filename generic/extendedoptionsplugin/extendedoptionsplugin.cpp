@@ -603,7 +603,7 @@ QWidget *ExtendedOptions::options()
     cssTab->addTab(popupCss, tr("Popup"));
     cssTab->addTab(tooltipCss, tr("Tooltip"));
 
-    QLabel *cssLabel = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/skins_css\">CSS for Psi+</a>"));
+    QLabel *cssLabel = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/en:skins_css\">CSS for Psi</a>"));
     cssLabel->setOpenExternalLinks(true);
 
     tab7Layout->addWidget(cssTab);
@@ -672,7 +672,7 @@ QWidget *ExtendedOptions::options()
     tab8Layout->addStretch();
 
     QLabel *wikiLink
-        = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/plugins#extended_options_plugin\">Wiki (Online)</a>"));
+        = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/en:plugins#extended_options_plugin\">Wiki (Online)</a>"));
     wikiLink->setOpenExternalLinks(true);
 
     mainLayout->addWidget(tabs);
@@ -1182,7 +1182,7 @@ QString ExtendedOptions::profileDir()
 QString ExtendedOptions::pluginInfo()
 {
     return tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
-        + tr("This plugin is designed to allow easy configuration of some advanced options in Psi+.\n"
+        + tr("This plugin is designed to allow easy configuration of some advanced options in Psi.\n"
              "This plugin gives you access to advanced application options, which do not have a graphical user "
              "interface.\n\n"
              "Importantly: a large part of the options are important system settings. These require extra attention "

@@ -282,10 +282,10 @@ bool AttentionPlugin::incomingStanza(int account, const QDomElement &stanza)
         else if (stanza.tagName() == "iq" && stanza.attribute("type") == "get") {
             QDomElement query = stanza.firstChildElement("query");
             if (!query.isNull() && query.namespaceURI() == "http://jabber.org/protocol/disco#info") {
-                if (query.attribute("node") == "http://psi-dev.googlecode.com/caps#at-pl") {
+                if (query.attribute("node") == "https://psi-im.org#at-pl") {
                     QString reply = QString("<iq type=\"result\" to=\"%1\" id=\"%2\">"
                                             "<query xmlns=\"http://jabber.org/protocol/disco#info\" "
-                                            "node=\"http://psi-dev.googlecode.com/caps#at-pl\">"
+                                            "node=\"https://psi-im.org#at-pl\">"
                                             "<feature var=\"urn:xmpp:attention:0\"/></query></iq>")
                                         .arg(stanzaSender->escape(stanza.attribute("from")),
                                              stanzaSender->escape(stanza.attribute("id")));
