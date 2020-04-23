@@ -15,7 +15,6 @@ set( plugins_list
     gnupgplugin
     gomokugameplugin
     historykeeperplugin
-    icqdieplugin
     imageplugin
     imagepreviewplugin
     jabberdiskplugin

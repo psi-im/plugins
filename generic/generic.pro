@@ -14,7 +14,6 @@ extendedoptionsplugin \
 gnupgplugin \
 gomokugameplugin \
 historykeeperplugin \
-icqdieplugin \
 imageplugin \
 imagepreviewplugin \
 jabberdiskplugin \
