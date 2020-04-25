@@ -20,9 +20,9 @@
  */
 
 /* system headers */
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <sys/stat.h>
 
 /* libgcrypt headers */
@@ -33,13 +33,13 @@
 
 #include "otrlextensions.h"
 
-static gcry_error_t sexp_write(FILE* privf, gcry_sexp_t sexp)
+static gcry_error_t sexp_write(FILE *privf, gcry_sexp_t sexp)
 {
     size_t buflen;
-    char* buf;
+    char * buf;
 
     buflen = gcry_sexp_sprint(sexp, GCRYSEXP_FMT_ADVANCED, NULL, 0);
-    buf = malloc(buflen);
+    buf    = malloc(buflen);
     if (buf == NULL && buflen > 0) {
         return gcry_error(GPG_ERR_ENOMEM);
     }
@@ -51,11 +51,10 @@ static gcry_error_t sexp_write(FILE* privf, gcry_sexp_t sexp)
     return gcry_error(GPG_ERR_NO_ERROR);
 }
 
-static gcry_error_t account_write(FILE* privf, const char* accountname,
-    const char* protocol, gcry_sexp_t privkey)
+static gcry_error_t account_write(FILE *privf, const char *accountname, const char *protocol, gcry_sexp_t privkey)
 {
     gcry_error_t err;
-    gcry_sexp_t names, protos;
+    gcry_sexp_t  names, protos;
 
     fprintf(privf, " (account\n");
 
@@ -64,12 +63,14 @@ static gcry_error_t account_write(FILE* privf, const char* accountname,
         err = sexp_write(privf, names);
         gcry_sexp_release(names);
     }
-    if (!err) err = gcry_sexp_build(&protos, NULL, "(protocol %s)", protocol);
+    if (!err)
+        err = gcry_sexp_build(&protos, NULL, "(protocol %s)", protocol);
     if (!err) {
         err = sexp_write(privf, protos);
         gcry_sexp_release(protos);
     }
-    if (!err) err = sexp_write(privf, privkey);
+    if (!err)
+        err = sexp_write(privf, privkey);
 
     fprintf(privf, " )\n");
 
@@ -78,14 +79,14 @@ static gcry_error_t account_write(FILE* privf, const char* accountname,
 
 /* Store all keys of an OtrlUserState.
  * The FILE* must be open for reading and writing. */
-gcry_error_t otrl_privkey_write_FILEp(OtrlUserState us, FILE* privf)
+gcry_error_t otrl_privkey_write_FILEp(OtrlUserState us, FILE *privf)
 {
-    OtrlPrivKey* p;
+    OtrlPrivKey *p;
 
     /* Output the other keys we know */
     fprintf(privf, "(privkeys\n");
 
-    for (p=us->privkey_root; p; p=p->next) {
+    for (p = us->privkey_root; p; p = p->next) {
         account_write(privf, p->accountname, p->protocol, p->privkey);
     }
 
@@ -97,10 +98,10 @@ gcry_error_t otrl_privkey_write_FILEp(OtrlUserState us, FILE* privf)
 }
 
 /* Store all keys of an OtrlUserState. */
-gcry_error_t otrl_privkey_write(OtrlUserState us, const char* filename)
+gcry_error_t otrl_privkey_write(OtrlUserState us, const char *filename)
 {
     gcry_error_t err;
-    FILE* privf;
+    FILE *       privf;
 #ifndef WIN32
     mode_t oldmask;
 #endif

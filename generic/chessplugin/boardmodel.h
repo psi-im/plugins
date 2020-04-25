@@ -57,7 +57,7 @@ public:
     bool             waitForFigure;
     bool             check;
     Figure::GameType gameType_;
-    int gameState_; // 0 - in progress, 1 - draw, 2 - win, 3 - lose;
+    int              gameState_; // 0 - in progress, 1 - draw, 2 - win, 3 - lose;
 
 signals:
     void move(int, int, int, int, QString);
