@@ -1,15 +1,31 @@
+2020-04-29
+v0.5 tehnick
+  * added internationalization
+  * improved plugin description
+  * updated changelog
+
+2020.02.17
+v0.1 rion
+  * changed OMEMO Initialization Vector length to 12
+    see: https://github.com/xsf/xeps/pull/894
+
 2018-07-15
-    * added a hacky MUC support
+v0.1 stigger
+  * added a hacky MUC support
 
 2018-06-11
-    * provided a way for httpuploadplugin to encrypt files before uploading
-    * correctly decrypting carbons now
+v0.1 stigger
+  * provided a way for httpuploadplugin to encrypt files before uploading
+  * correctly decrypting carbons now
 
 2018-05-02
-    * provided ability to delete published devices from PEP
+v0.1 stigger
+  * provided ability to delete published devices from PEP
 
 2018-05-01
-    * using dedicated OMEMO identities per account instead of per profile
+v0.1 stigger
+  * using dedicated OMEMO identities per account instead of per profile
 
 2018-04-08
-    * added auto-downloading and decrypting of aesgcm:// links
+v0.1 stigger
+  * added auto-downloading and decrypting of aesgcm:// links

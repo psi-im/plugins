@@ -35,7 +35,7 @@ QString OMEMOPlugin::name() const { return "OMEMO Plugin"; }
 
 QString OMEMOPlugin::shortName() const { return "omemo"; }
 
-QString OMEMOPlugin::version() const { return "0.1"; }
+QString OMEMOPlugin::version() const { return "0.5"; }
 
 QWidget *OMEMOPlugin::options() { return new ConfigWidget(&m_omemo, m_accountInfo); }
 
@@ -75,13 +75,13 @@ void OMEMOPlugin::restoreOptions() { }
 
 QString OMEMOPlugin::pluginInfo()
 {
-    return QString("<strong>OMEMO Multi-End Message and Object Encryption</strong><br/>"
-                   "Author: Vyacheslav Karpukhin (vyacheslav@karpukhin.com)<br/><br/>"
-                   "Credits:<br/>"
-                   "<dl>"
-                   "<dt>libsignal-protocol-c</dt><dd>Copyright 2015-2016 Open Whisper Systems</dd>"
-                   "<dt>OMEMO logo</dt><dd>fiaxh (https://github.com/fiaxh)</dd>"
-                   "</dl>");
+    return "<strong>" + name() + "</strong><br/><br/>"
+            + tr("Author: ") + "Vyacheslav Karpukhin<br/>" + tr("Email: ") + "vyacheslav@karpukhin.com<br/><br/>"
+            + tr("Credits: ") +
+            "<dl>"
+            "<dt>libsignal-protocol-c</dt><dd>Copyright 2015-2016 Open Whisper Systems</dd>"
+            "<dt>OMEMO logo</dt><dd>fiaxh (https://github.com/fiaxh)</dd>"
+            "</dl>";
 }
 
 bool OMEMOPlugin::incomingStanza(int account, const QDomElement &xml)
@@ -264,7 +264,7 @@ QAction *OMEMOPlugin::getAction(QObject *parent, int account, const QString &con
 QAction *OMEMOPlugin::createAction(QObject *parent, int account, const QString &contact, bool isGroup)
 {
     QString  bareJid = m_contactInfo->realJid(account, contact).split("/").first();
-    QAction *action  = new QAction(getIcon(), "Enable OMEMO", parent);
+    QAction *action  = new QAction(getIcon(), tr("Enable OMEMO"), parent);
     action->setCheckable(true);
     action->setProperty("isGroup", QVariant(isGroup));
     connect(action, SIGNAL(triggered(bool)), SLOT(onEnableOMEMOAction(bool)));
@@ -299,8 +299,16 @@ void OMEMOPlugin::updateAction(int account, const QString &user)
         action->setChecked(enabled);
         action->setProperty("jid", bareJid);
         action->setProperty("account", account);
-        action->setText(!available ? (QString("OMEMO is not available for this ") + (isGroup ? "group" : "contact"))
-                                   : enabled ? "OMEMO is enabled" : "Enable OMEMO");
+        if (!available) {
+            if (isGroup)
+                action->setText(tr("OMEMO is not available for this group"));
+            else
+                action->setText(tr("OMEMO is not available for this contact"));
+        }
+        else {
+            action->setText(enabled ? tr("OMEMO is enabled") : tr("Enable OMEMO"));
+        }
+
     }
 }
 
