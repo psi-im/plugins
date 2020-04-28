@@ -367,7 +367,8 @@ QWidget *VideoStatusChanger::options()
 
 QString VideoStatusChanger::pluginInfo()
 {
-    return tr("Authors: ") + "Dealer_WeARE, KukuRuzo\n\n"
+    return name() + "\n\n"
+        + tr("Authors: ") + "Dealer_WeARE, KukuRuzo\n\n"
         + tr("This plugin is designed to set the custom status when you watching the video in selected video players. "
              "\n"
              "Note: This plugin is designed to work in Linux family operating systems and in Windows OS. \n\n"

@@ -78,7 +78,11 @@ void MessageFilter::restoreOptions() { }
 
 QPixmap MessageFilter::icon() const { return QPixmap(":/icons/messagefilter.png"); }
 
-QString MessageFilter::pluginInfo() { return tr("Author: ") + "Ivan Romanov\n" + tr("e-mail: ") + "drizt@land.ru\n\n"; }
+QString MessageFilter::pluginInfo()
+{
+    return name() + "\n\n"
+        + tr("Author: ") + "Ivan Romanov\n" + tr("Email: ") + "drizt@land.ru\n\n";
+}
 
 bool MessageFilter::incomingStanza(int account, const QDomElement &stanza)
 {

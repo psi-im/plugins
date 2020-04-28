@@ -1181,7 +1181,8 @@ QString ExtendedOptions::profileDir()
 
 QString ExtendedOptions::pluginInfo()
 {
-    return tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
+    return name() + "\n\n"
+        + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
         + tr("This plugin is designed to allow easy configuration of some advanced options in Psi.\n"
              "This plugin gives you access to advanced application options, which do not have a graphical user "
              "interface.\n\n"

@@ -93,6 +93,7 @@ void ContentDownloader::setApplicationInfoAccessingHost(ApplicationInfoAccessing
 
 QString ContentDownloader::pluginInfo()
 {
-    return tr("Author: ") + "Ivan Romanov\n" + tr("e-mail: ") + "drizt@land.ru\n\n"
+    return name() + "\n\n"
+        + tr("Author: ") + "Ivan Romanov\n" + tr("Email: ") + "drizt@land.ru\n\n"
         + tr("This plugin is designed to make it easy to download and install iconsets and other resources for Psi.");
 }

@@ -121,6 +121,7 @@ bool Redirector::outgoingStanza(int /*account*/, QDomElement & /*xml*/) { return
 
 QString Redirector::pluginInfo()
 {
-    return tr("Author: ") + "rion\n" + tr("Email: ") + "rion4ik@gmail.com\n\n"
+    return name() + "\n\n"
+        + tr("Author: ") + "rion\n" + tr("Email: ") + "rion4ik@gmail.com\n\n"
         + trUtf8("Redirects all incoming messages to some jid and allows one to redirect messages back.");
 }

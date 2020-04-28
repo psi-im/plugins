@@ -862,7 +862,8 @@ void ChessPlugin::toggleEnableSound(bool enable) { enableSound = enable; }
 
 QString ChessPlugin::pluginInfo()
 {
-    return tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
+    return name() + "\n\n"
+        + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
         + tr("This plugin allows you to play chess with your friends.\n"
              "The plugin is compatible with a similar plugin for Tkabber.\n"
              "For sending commands, normal messages are used, so this plugin will always work wherever you are able to "

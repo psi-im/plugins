@@ -206,7 +206,8 @@ void yandexnarodPlugin::showPopup(int /* account*/, const QString & /* jid*/, co
 
 QString yandexnarodPlugin::pluginInfo()
 {
-    return trUtf8("Ported from QutIM Yandex.Narod plugin\nhttp://qutim.org/forum/viewtopic.php?f=62&t=711\n\n");
+    return name() + "\n\n"
+        + tr("Ported from QutIM Yandex.Narod plugin\nhttp://qutim.org/forum/viewtopic.php?f=62&t=711\n\n");
 }
 
 QPixmap yandexnarodPlugin::icon() const { return QPixmap(":/icons/yandexnarodplugin.png"); }

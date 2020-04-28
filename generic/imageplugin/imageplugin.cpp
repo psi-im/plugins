@@ -267,7 +267,8 @@ void ImagePlugin::actionActivated()
 
 QString ImagePlugin::pluginInfo()
 {
-    return tr("Authors: ") + "VampiRUS, Dealer_WeARE\n\n"
+    return name() + "\n\n"
+        + tr("Authors: ") + "VampiRUS, Dealer_WeARE\n\n"
         + tr("This plugin is designed to send images to roster contacts.\n"
              "Your contact's client must be support XEP-0071: XHTML-IM and support the data:URI scheme.\n"
              "Note: To work correctly, the option options.ui.chat.central-toolbar  must be set to true.");

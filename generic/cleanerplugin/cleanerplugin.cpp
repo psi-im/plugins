@@ -111,7 +111,8 @@ void CleanerPlugin::deleteCln()
 
 QString CleanerPlugin::pluginInfo()
 {
-    return tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
+    return name() + "\n\n"
+        + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
         + tr("This plugin is designed to clear the avatar cache, saved local copies of vCards and history logs.\n"
              "You can preview items before deleting them from your hard drive.");
 }

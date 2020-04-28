@@ -81,7 +81,8 @@ QPixmap GnuPG::icon() const { return QPixmap(":/icons/gnupg.png"); }
 
 QString GnuPG::pluginInfo()
 {
-    return tr("Author: ") + "Ivan Romanov\n" + tr("e-mail: ") + "drizt@land.ru\n\n"
+    return name() + "\n\n"
+        + tr("Author: ") + "Ivan Romanov\n" + tr("Email: ") + "drizt@land.ru\n\n"
         + tr("GnuPG Key Manager can create, remove, export and import GnuPG keys. "
              "It can do only the base operations but I hope it will be enough for your needs.");
 }

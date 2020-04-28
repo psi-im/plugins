@@ -321,7 +321,8 @@ QList<QVariantHash> ConferenceLogger::getGCButtonParam()
 
 QString ConferenceLogger::pluginInfo()
 {
-    return tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
+    return name() + "\n\n"
+        + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
         + tr("This plugin is designed to save groupchat logs in which the Psi user sits.\n"
              "Groupchats logs can be viewed from the plugin settings or by clicking on the appropriate button on the "
              "toolbar in the active window/tab with groupchat.\n\n"

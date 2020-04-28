@@ -276,7 +276,8 @@ void GomokuGamePlugin::playSound(const QString &sound_id)
 
 QString GomokuGamePlugin::pluginInfo()
 {
-    return tr("Author: ") + "Liuch\n" + tr("Email: ") + "liuch@mail.ru\n\n"
+    return name() + "\n\n"
+        + tr("Author: ") + "Liuch\n" + tr("Email: ") + "liuch@mail.ru\n\n"
         + tr("This plugin allows you to play gomoku with your friends.\n"
              "For sending commands, normal messages are used, so this plugin will always work wherever you are able to "
              "log in."

@@ -492,7 +492,8 @@ void Reminder::checkSound() { playSound(ui_.le_sound->text()); }
 
 QString Reminder::pluginInfo()
 {
-    return tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
+    return name() + "\n\n"
+        + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
         + tr("This plugin is designed to show reminders of upcoming birthdays.\n"
              "The first time you install this plugin, you need to log on to all of your accounts, go to the plugin "
              "settings and click \"Update Birthdays\"."

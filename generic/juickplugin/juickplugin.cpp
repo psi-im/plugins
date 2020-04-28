@@ -1109,7 +1109,8 @@ void JuickPlugin::updateWidgets(const QList<QByteArray> &urls)
 
 QString JuickPlugin::pluginInfo()
 {
-    return tr("Authors: ") + "VampiRUS, Dealer_WeARE\n\n"
+    return name() + "\n\n"
+        + tr("Authors: ") + "VampiRUS, Dealer_WeARE\n\n"
         + tr("This plugin is designed to work efficiently and comfortably with the Juick microblogging service.\n"
              "Currently, the plugin is able to: \n"
              "* Coloring @nick, *tag and #message_id in messages from the juick@juick.com bot\n"
