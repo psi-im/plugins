@@ -264,7 +264,7 @@ QAction *OMEMOPlugin::getAction(QObject *parent, int account, const QString &con
 QAction *OMEMOPlugin::createAction(QObject *parent, int account, const QString &contact, bool isGroup)
 {
     QString  bareJid = m_contactInfo->realJid(account, contact).split("/").first();
-    QAction *action  = new QAction(getIcon(), tr("Enable OMEMO"), parent);
+    QAction *action  = new QAction(getIcon(), tr("Enable OMEMO encryption"), parent);
     action->setCheckable(true);
     action->setProperty("isGroup", QVariant(isGroup));
     connect(action, SIGNAL(triggered(bool)), SLOT(onEnableOMEMOAction(bool)));
@@ -301,12 +301,12 @@ void OMEMOPlugin::updateAction(int account, const QString &user)
         action->setProperty("account", account);
         if (!available) {
             if (isGroup)
-                action->setText(tr("OMEMO is not available for this group"));
+                action->setText(tr("OMEMO encryption is not available for this group"));
             else
-                action->setText(tr("OMEMO is not available for this contact"));
+                action->setText(tr("OMEMO encryption is not available for this contact"));
         }
         else {
-            action->setText(enabled ? tr("OMEMO is enabled") : tr("Enable OMEMO"));
+            action->setText(enabled ? tr("OMEMO encryption is enabled") : tr("Enable OMEMO encryption"));
         }
 
     }
