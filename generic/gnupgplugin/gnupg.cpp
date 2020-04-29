@@ -129,6 +129,9 @@ bool GnuPG::incomingStanza(int account, const QDomElement &stanza)
     // Cut trash from gpg command output
     QString res = QString::fromUtf8(gpg.readAllStandardError());
     res         = _stanzaSending->escape(res.mid(0, res.indexOf('\n')));
+    res.replace("&quot;","\"");
+    res.replace("&lt;","<");
+    res.replace("&gt;",">");
     _accountHost->appendSysMsg(account, from, res);
 
     // Don't hide message if an error occurred
@@ -240,6 +243,11 @@ void GnuPG::sendPublicKey()
     }
 
     _stanzaSending->sendMessage(account, jidToSend, key, "", "chat");
-    _accountHost->appendSysMsg(account, jidToSend,
-                               _stanzaSending->escape(QString(tr("Public key %1 sent")).arg(action->text())));
+
+    QString res = tr("Public key \"%1\" sent").arg(action->text());
+    res         = _stanzaSending->escape(res);
+    res.replace("&quot;","\"");
+    res.replace("&lt;","<");
+    res.replace("&gt;",">");
+    _accountHost->appendSysMsg(account, jidToSend, res);
 }
