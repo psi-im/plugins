@@ -1,6 +1,7 @@
 /*
  * OMEMO Plugin for Psi
  * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2020 Boris Pek
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,6 +19,7 @@
  */
 
 #include <QAction>
+#include <QMenu>
 #include <QtGui>
 #include <QtSql>
 #include <QtXml>
@@ -35,7 +37,7 @@ QString OMEMOPlugin::name() const { return "OMEMO Plugin"; }
 
 QString OMEMOPlugin::shortName() const { return "omemo"; }
 
-QString OMEMOPlugin::version() const { return "0.5"; }
+QString OMEMOPlugin::version() const { return "0.6"; }
 
 QWidget *OMEMOPlugin::options() { return new ConfigWidget(&m_omemo, m_accountInfo); }
 
@@ -65,8 +67,10 @@ QPixmap OMEMOPlugin::icon() const { return getIcon(); }
 
 QPixmap OMEMOPlugin::getIcon() const
 {
-    return QPixmap(QGuiApplication::primaryScreen()->devicePixelRatio() >= 2 ? ":/omemoplugin/omemo@2x.png"
-                                                                             : ":/omemoplugin/omemo.png");
+    if (QGuiApplication::primaryScreen()->devicePixelRatio() >= 2)
+        return QPixmap(":/omemoplugin/omemo@2x.png");
+
+    return QPixmap(":/omemoplugin/omemo.png");
 }
 
 void OMEMOPlugin::applyOptions() { }
@@ -75,13 +79,12 @@ void OMEMOPlugin::restoreOptions() { }
 
 QString OMEMOPlugin::pluginInfo()
 {
-    return "<strong>" + name() + "</strong><br/><br/>"
-            + tr("Author: ") + "Vyacheslav Karpukhin<br/>" + tr("Email: ") + "vyacheslav@karpukhin.com<br/><br/>"
-            + tr("Credits: ") +
-            "<dl>"
-            "<dt>libsignal-protocol-c</dt><dd>Copyright 2015-2016 Open Whisper Systems</dd>"
-            "<dt>OMEMO logo</dt><dd>fiaxh (https://github.com/fiaxh)</dd>"
-            "</dl>";
+    return "<strong>" + name() + "</strong><br/><br/>" + tr("Author: ") + "Vyacheslav Karpukhin<br/>" + tr("Email: ")
+        + "vyacheslav@karpukhin.com<br/><br/>" + tr("Credits: ")
+        + "<dl>"
+          "<dt>libsignal-protocol-c</dt><dd>Copyright 2015-2016 Open Whisper Systems</dd>"
+          "<dt>OMEMO logo</dt><dd>fiaxh (https://github.com/fiaxh)</dd>"
+          "</dl>";
 }
 
 bool OMEMOPlugin::incomingStanza(int account, const QDomElement &xml)
@@ -172,6 +175,14 @@ void OMEMOPlugin::processEncryptedFile(int account, QDomElement &xml)
     reply->setProperty("xml", string);
 }
 
+void OMEMOPlugin::showOwnFingerprint(int account, const QString &jid)
+{
+    const QString &&msg = tr("Fingerprint for account \"%1\": %2")
+                              .arg(m_accountInfo->getName(account))
+                              .arg(m_omemo.getOwnFingerprint(account));
+    m_omemo.appendSysMsg(account, jid, msg);
+}
+
 void OMEMOPlugin::onFileDownloadFinished()
 {
     auto reply = dynamic_cast<QNetworkReply *>(sender());
@@ -247,11 +258,41 @@ void OMEMOPlugin::setContactInfoAccessingHost(ContactInfoAccessingHost *host)
 
 void OMEMOPlugin::onEnableOMEMOAction(bool checked)
 {
-    auto    action  = dynamic_cast<QAction *>(sender());
-    QString jid     = action->property("jid").toString();
-    int     account = action->property("account").toInt();
-    m_omemo.setEnabledForUser(account, jid, checked);
-    updateAction(account, jid);
+    QAction *action = dynamic_cast<QAction *>(sender());
+    if (!action)
+        return;
+
+    action->setChecked(!checked);
+
+    QMenu *  menu                  = new QMenu();
+    QAction *actEnableOmemo        = new QAction(tr("Enable OMEMO encryption"), this);
+    QAction *actDisableOmemo       = new QAction(tr("Disable OMEMO encryption"), this);
+    QAction *actShowOwnFingerprint = new QAction(tr("Show own &fingerprint"), this);
+
+    actEnableOmemo->setVisible(checked);
+    actDisableOmemo->setVisible(!checked);
+
+    menu->addAction(actEnableOmemo);
+    menu->addAction(actDisableOmemo);
+
+    menu->addSeparator();
+    menu->addAction(actShowOwnFingerprint);
+
+    const QString jid     = action->property("jid").toString();
+    const int     account = action->property("account").toInt();
+
+    QAction *act = menu->exec(QCursor::pos());
+    if (act == actEnableOmemo) {
+        m_omemo.setEnabledForUser(account, jid, checked);
+        updateAction(account, jid);
+    } else if (act == actDisableOmemo) {
+        m_omemo.setEnabledForUser(account, jid, checked);
+        updateAction(account, jid);
+    } else if (act == actShowOwnFingerprint) {
+        showOwnFingerprint(account, jid);
+    }
+
+    delete menu;
 }
 
 QList<QVariantHash> OMEMOPlugin::getButtonParam() { return QList<QVariantHash>(); }
@@ -264,7 +305,7 @@ QAction *OMEMOPlugin::getAction(QObject *parent, int account, const QString &con
 QAction *OMEMOPlugin::createAction(QObject *parent, int account, const QString &contact, bool isGroup)
 {
     QString  bareJid = m_contactInfo->realJid(account, contact).split("/").first();
-    QAction *action  = new QAction(getIcon(), tr("Enable OMEMO encryption"), parent);
+    QAction *action  = new QAction(getIcon(), tr("OMEMO encryption"), parent);
     action->setCheckable(true);
     action->setProperty("isGroup", QVariant(isGroup));
     connect(action, SIGNAL(triggered(bool)), SLOT(onEnableOMEMOAction(bool)));
@@ -304,11 +345,9 @@ void OMEMOPlugin::updateAction(int account, const QString &user)
                 action->setText(tr("OMEMO encryption is not available for this group"));
             else
                 action->setText(tr("OMEMO encryption is not available for this contact"));
+        } else {
+            action->setText(tr("OMEMO encryption"));
         }
-        else {
-            action->setText(enabled ? tr("OMEMO encryption is enabled") : tr("Enable OMEMO encryption"));
-        }
-
     }
 }
 

@@ -506,8 +506,7 @@ QDomElement PepPlugin::getFirstChildElement(const QDomElement &elem)
 
 QString PepPlugin::pluginInfo()
 {
-    return name() + "\n\n"
-        + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
+    return name() + "\n\n" + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
         + tr("This plugin shows popup notifications when users from your roster changes their mood, tune or activity.");
 }
 

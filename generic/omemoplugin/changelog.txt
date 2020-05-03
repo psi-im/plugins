@@ -1,3 +1,8 @@
+2020-05-04
+v0.6 tehnick
+  * add menu to plugin button on toolbar
+  * improve internationalization
+
 2020-04-29
 v0.5 tehnick
   * added internationalization

@@ -53,7 +53,7 @@
 #include "request.h"
 #include "ui_options.h"
 
-#define cVer "0.2.8"
+#define cVer "0.2.9"
 
 #define soundStartConst "soundstart"
 #define soundFinishConst "soundfinish"
@@ -103,7 +103,7 @@ public:
     virtual void                setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
     virtual void                setStanzaSendingHost(StanzaSendingHost *host);
     virtual QList<QVariantHash> getButtonParam();
-    virtual QAction *           getAction(QObject *, int, const QString &) { return nullptr; };
+    virtual QAction *           getAction(QObject *, int, const QString &);
     virtual QList<QVariantHash> getAccountMenuParam();
     virtual QList<QVariantHash> getContactMenuParam();
     virtual QAction *           getContactAction(QObject *, int, const QString &) { return nullptr; };
@@ -321,16 +321,13 @@ void ChessPlugin::setSoundAccessingHost(SoundAccessingHost *host) { sound_ = hos
 
 void ChessPlugin::doPopup(const QString &text) { popup->initPopup(text, tr("Chess Plugin"), "chessplugin/chess"); }
 
-QList<QVariantHash> ChessPlugin::getButtonParam()
+QList<QVariantHash> ChessPlugin::getButtonParam() { return QList<QVariantHash>(); }
+
+QAction *ChessPlugin::getAction(QObject *parent, int, const QString &)
 {
-    QList<QVariantHash> l;
-    QVariantHash        hash;
-    hash["tooltip"] = QVariant(tr("Chess!"));
-    hash["icon"]    = QVariant(QString("chessplugin/chess"));
-    hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
-    hash["slot"]    = QVariant(SLOT(toolButtonPressed()));
-    l.push_back(hash);
-    return l;
+    QAction *action = new QAction(icon(), tr("Chess!"), parent);
+    connect(action, SIGNAL(triggered(bool)), SLOT(toolButtonPressed()));
+    return action;
 }
 
 QList<QVariantHash> ChessPlugin::getAccountMenuParam() { return QList<QVariantHash>(); }
@@ -862,8 +859,7 @@ void ChessPlugin::toggleEnableSound(bool enable) { enableSound = enable; }
 
 QString ChessPlugin::pluginInfo()
 {
-    return name() + "\n\n"
-        + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
+    return name() + "\n\n" + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
         + tr("This plugin allows you to play chess with your friends.\n"
              "The plugin is compatible with a similar plugin for Tkabber.\n"
              "For sending commands, normal messages are used, so this plugin will always work wherever you are able to "

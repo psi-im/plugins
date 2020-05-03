@@ -31,12 +31,14 @@
 namespace psiomemo {
 class OMEMO : public QObject {
     Q_OBJECT
+
 public:
     void init(const QString &dataPath);
     void setStanzaSender(StanzaSendingHost *stanzaSender);
     void setAccountController(PsiAccountControllingHost *accountController);
     void setAccountInfoAccessor(AccountInfoAccessingHost *accountInfoAccessor);
     void setContactInfoAccessor(ContactInfoAccessingHost *contactInfoAccessor);
+    bool appendSysMsg(int account, const QString &jid, const QString &message);
 
     bool decryptMessage(int account, QDomElement &message);
     bool encryptMessage(const QString &ownJid, int account, QDomElement &xml, bool buildSessions = true,

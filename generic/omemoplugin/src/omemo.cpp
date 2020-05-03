@@ -176,11 +176,10 @@ bool OMEMO::decryptMessage(int account, QDomElement &xml)
 
                 if (!trusted) {
                     bool res = !isCarbon
-                        && m_accountController->appendSysMsg(
-                            account, message.attribute("from"),
-                            "[OMEMO] The following message is from an untrusted device:");
+                        && appendSysMsg(account, message.attribute("from"),
+                                        "[OMEMO] " + tr("The following message is from an untrusted device:"));
                     if (!res) {
-                        text = "[UNTRUSTED]: " + text;
+                        text = tr("[UNTRUSTED]: ") + text;
                     }
                 }
 
@@ -266,8 +265,8 @@ bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml,
     }
 
     if (encryptedKeys.isEmpty()) {
-        m_accountController->appendSysMsg(account, xml.attribute("to"),
-                                          "[OMEMO] Unable to build any sessions, the message was not sent");
+        appendSysMsg(account, xml.attribute("to"),
+                     "[OMEMO] " + tr("Unable to build any sessions, the message was not sent"));
         xml = QDomElement();
     } else {
         foreach (EncryptedKey encKey, encryptedKeys) {
@@ -536,6 +535,11 @@ void OMEMO::setContactInfoAccessor(ContactInfoAccessingHost *contactInfoAccessor
     m_contactInfoAccessor = contactInfoAccessor;
 }
 
+bool OMEMO::appendSysMsg(int account, const QString &jid, const QString &message)
+{
+    m_accountController->appendSysMsg(account, jid, message);
+}
+
 const QString OMEMO::bundleNodeName(uint32_t deviceId) const
 {
     return QString("%1.bundles:%2").arg(OMEMO_XMLNS).arg(deviceId);
@@ -555,9 +559,9 @@ bool OMEMO::isAvailableForGroup(int account, const QString &ownJid, const QStrin
         any = true;
         if (!isAvailableForUser(account, userJid)) {
             if (isEnabledForUser(account, bareJid)) {
-                QString message = QString("[OMEMO] %1 does not seem to support OMEMO, disabling for the entire group!")
-                                      .arg(userJid);
-                m_accountController->appendSysMsg(account, bareJid, message);
+                QString message = "[OMEMO] "
+                    + tr("%1 does not seem to support OMEMO, disabling for the entire group!").arg(userJid);
+                appendSysMsg(account, bareJid, message);
                 setEnabledForUser(account, bareJid, false);
             }
             return false;

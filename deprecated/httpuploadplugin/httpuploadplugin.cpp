@@ -420,8 +420,8 @@ void HttpUploadPlugin::upload(bool anything)
 
 QString HttpUploadPlugin::pluginInfo()
 {
-    return name() + "\n\n"
-        + tr("Authors: ") + "rkfg\n\n" + tr("This plugin allows uploading images and other files via XEP-0363.");
+    return name() + "\n\n" + tr("Authors: ") + "rkfg\n\n"
+        + tr("This plugin allows uploading images and other files via XEP-0363.");
 }
 
 QPixmap HttpUploadPlugin::icon() const { return QPixmap(":/httpuploadplugin/upload_image.png"); }

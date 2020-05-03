@@ -506,8 +506,7 @@ void AttentionPlugin::nudgeTimerTimeout()
 
 QString AttentionPlugin::pluginInfo()
 {
-    return name() + "\n\n"
-        + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
+    return name() + "\n\n" + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
         + tr("This plugin is designed to send and receive special messages such as Attentions.\n"
              "To work correctly, the plugin requires that the client of the other part supports XEP-0224 (for example: "
              "Pidgin, Miranda IM with Nudge plugin).");

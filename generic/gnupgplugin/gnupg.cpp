@@ -81,8 +81,7 @@ QPixmap GnuPG::icon() const { return QPixmap(":/icons/gnupg.png"); }
 
 QString GnuPG::pluginInfo()
 {
-    return name() + "\n\n"
-        + tr("Author: ") + "Ivan Romanov\n" + tr("Email: ") + "drizt@land.ru\n\n"
+    return name() + "\n\n" + tr("Author: ") + "Ivan Romanov\n" + tr("Email: ") + "drizt@land.ru\n\n"
         + tr("GnuPG Key Manager can create, remove, export and import GnuPG keys. "
              "It can do only the base operations but I hope it will be enough for your needs.");
 }
@@ -129,9 +128,9 @@ bool GnuPG::incomingStanza(int account, const QDomElement &stanza)
     // Cut trash from gpg command output
     QString res = QString::fromUtf8(gpg.readAllStandardError());
     res         = _stanzaSending->escape(res.mid(0, res.indexOf('\n')));
-    res.replace("&quot;","\"");
-    res.replace("&lt;","<");
-    res.replace("&gt;",">");
+    res.replace("&quot;", "\"");
+    res.replace("&lt;", "<");
+    res.replace("&gt;", ">");
     _accountHost->appendSysMsg(account, from, res);
 
     // Don't hide message if an error occurred
@@ -246,8 +245,8 @@ void GnuPG::sendPublicKey()
 
     QString res = tr("Public key \"%1\" sent").arg(action->text());
     res         = _stanzaSending->escape(res);
-    res.replace("&quot;","\"");
-    res.replace("&lt;","<");
-    res.replace("&gt;",">");
+    res.replace("&quot;", "\"");
+    res.replace("&lt;", "<");
+    res.replace("&gt;", ">");
     _accountHost->appendSysMsg(account, jidToSend, res);
 }

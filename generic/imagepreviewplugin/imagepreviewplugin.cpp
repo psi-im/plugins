@@ -192,8 +192,7 @@ void ImagePreviewPlugin::setOptionAccessingHost(OptionAccessingHost *host) { psi
 
 QString ImagePreviewPlugin::pluginInfo()
 {
-    return name() + "\n\n"
-        + tr("Author: ") + "rkfg\n\n"
+    return name() + "\n\n" + tr("Author: ") + "rkfg\n\n"
         + tr("This plugin shows images URLs' previews in chats for non-webkit Psi version.\n");
 }
 

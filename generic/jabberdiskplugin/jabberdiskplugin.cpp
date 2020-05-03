@@ -183,8 +183,7 @@ QAction *JabberDiskPlugin::getContactAction(QObject *p, int acc, const QString &
 
 QString JabberDiskPlugin::pluginInfo()
 {
-    return name() + "\n\n"
-        + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n";
+    return name() + "\n\n" + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n";
 }
 
 QPixmap JabberDiskPlugin::icon() const { return QPixmap(":/icons/jabberdisk.png"); }

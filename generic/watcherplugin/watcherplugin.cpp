@@ -692,8 +692,7 @@ void Watcher::editCurrentItem(const QString &settings)
 
 QString Watcher::pluginInfo()
 {
-    return name() + "\n\n"
-        + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
+    return name() + "\n\n" + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
         + tr("This plugin is designed to monitor the status of specific roster "
              "contacts, as well as for substitution of standard sounds of "
              "incoming messages.\n"

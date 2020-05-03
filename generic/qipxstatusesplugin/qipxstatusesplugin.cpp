@@ -335,8 +335,7 @@ QDomElement QipXStatuses::MoodToXml(QString type, QString text)
 
 QString QipXStatuses::pluginInfo()
 {
-    return name() + "\n\n"
-        + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
+    return name() + "\n\n" + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
         + tr("This plugin is designed to display x-statuses of contacts using the QIP Infium jabber client.");
 }
 

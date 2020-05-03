@@ -107,6 +107,8 @@ private:
     QAction *createAction(QObject *parent, int account, const QString &contact, bool isGroup);
     void     updateAction(int account, const QString &user);
     void     processEncryptedFile(int account, QDomElement &xml);
+    void     showOwnFingerprint(int account, const QString &jid);
+
 private slots:
     void onEnableOMEMOAction(bool);
     void onFileDownloadFinished();

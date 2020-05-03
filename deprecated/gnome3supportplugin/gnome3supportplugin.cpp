@@ -136,8 +136,7 @@ QWidget *Gnome3StatusWatcher::options() { return 0; }
 
 QString Gnome3StatusWatcher::pluginInfo()
 {
-    return name() + "\n\n"
-        + tr("Authors: ") + "KukuRuzo\n\n"
+    return name() + "\n\n" + tr("Authors: ") + "KukuRuzo\n\n"
         + tr("This plugin is designed to add support of GNOME 3 presence status changes");
 }
 
