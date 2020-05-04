@@ -232,7 +232,7 @@ void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actual
         q.prepare("INSERT INTO devices (jid, device_id, trust) VALUES (?, ?, ?)");
         q.bindValue(0, user);
         q.bindValue(2, knownIds.isEmpty() ? TRUSTED : UNDECIDED);
-        foreach (uint32_t id, added) {
+        for (auto id : added) {
             q.bindValue(1, id);
             q.exec();
         }
@@ -251,7 +251,7 @@ void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actual
         q3.bindValue(0, user);
 
         _db.transaction();
-        foreach (uint32_t id, removed) {
+        for (auto id : removed) {
             q.bindValue(1, id);
             q.exec();
 
@@ -304,7 +304,7 @@ void Storage::storePreKeys(QVector<QPair<uint32_t, QByteArray>> keys)
 
     database.transaction();
 
-    foreach (auto key, keys) {
+    for (auto key : keys) {
         q.bindValue(0, key.first);
         q.bindValue(1, key.second);
         q.exec();

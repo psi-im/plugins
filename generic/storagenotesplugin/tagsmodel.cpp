@@ -219,7 +219,7 @@ QList<QDomElement> NoteModel::getAllNotes() const { return notesList; }
 QStringList NoteModel::getAllTags() const
 {
     QStringList tagsList;
-    foreach (const QDomElement &note, notesList) {
+    for (const QDomElement &note : notesList) {
         QStringList tags = note.attribute("tags").split(" ", QString::SkipEmptyParts);
         tagsList += tags;
     }

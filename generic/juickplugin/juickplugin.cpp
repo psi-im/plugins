@@ -59,7 +59,7 @@ static const int avatarsUpdateInterval = 10;
 
 static void nl2br(QDomElement *body, QDomDocument *e, const QString &msg)
 {
-    foreach (const QString &str, msg.split("\n")) {
+    for (const QString &str : msg.split("\n")) {
         body->appendChild(e->createTextNode(str));
         body->appendChild(e->createElement("br"));
     }
@@ -97,7 +97,7 @@ QWidget *JuickPlugin::options()
     ui_.setupUi(optionsWid);
 
     const QList<QToolButton *> list = { ui_.tb_link, ui_.tb_message, ui_.tb_name, ui_.tb_quote, ui_.tb_tag };
-    foreach (QToolButton *b, list) {
+    for (QToolButton *b : list) {
         connect(b, &QToolButton::clicked, this, [this, b]() { chooseColor(b); });
     }
 
@@ -118,10 +118,10 @@ bool JuickPlugin::enable()
     //Проверяем, обновился ли плагин
     if (!v.isValid() || v.toString() != constVersion) {
         QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation) + "/avatars");
-        foreach (const QString &f, QDir(dir.path() + "/juick/per").entryList(QDir::Files)) {
+        for (const QString &f : QDir(dir.path() + "/juick/per").entryList(QDir::Files)) {
             QFile::remove(dir.path() + "/juick/per/" + f);
         }
-        foreach (const QString &f, QDir(dir.path() + "/juick").entryList(QDir::Files)) {
+        for (const QString &f : QDir(dir.path() + "/juick").entryList(QDir::Files)) {
             QFile::remove(dir.path() + "/juick/" + f);
         }
         dir.rmdir("juick/per");
@@ -179,7 +179,7 @@ bool JuickPlugin::disable()
     enabled = false;
     logs_.clear();
     QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation) + "/avatars/juick/photos");
-    foreach (const QString &file, dir.entryList(QDir::Files)) {
+    for (const QString &file : dir.entryList(QDir::Files)) {
         QFile::remove(dir.absolutePath() + "/" + file);
     }
     JuickParser::reset();
@@ -406,7 +406,7 @@ void JuickPlugin::chooseColor(QWidget *w)
 void JuickPlugin::clearCache()
 {
     QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation) + "/avatars/juick");
-    foreach (const QString &file, dir.entryList(QDir::Files)) {
+    for (const QString &file : dir.entryList(QDir::Files)) {
         QFile::remove(dir.absolutePath() + "/" + file);
     }
 }
@@ -528,12 +528,12 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
             switch (type) {
             case JuickParser::JM_10_Messages: {
                 body.appendChild(doc.createTextNode(jp.infoText()));
-                foreach (const JuickMessage &m, jm) {
+                for (const JuickMessage &m : jm) {
                     body.appendChild(doc.createElement("br"));
                     addUserLink(&body, &doc, "@" + m.unick, altTextUser, chatPlusAction, jidToSend);
                     body.appendChild(doc.createTextNode(": "));
                     //добавляем теги
-                    foreach (const QString &tag, m.tags) {
+                    for (const QString &tag : m.tags) {
                         addTagLink(&body, &doc, tag, jidToSend);
                     }
                     body.appendChild(doc.createElement("br"));
@@ -561,7 +561,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                 body.appendChild(doc.createTextNode(jp.infoText()));
                 body.appendChild(doc.createElement("br"));
                 JuickMessage m = jm.first();
-                foreach (const QString &tag, m.tags) {
+                for (const QString &tag : m.tags) {
                     addTagLink(&body, &doc, tag, jidToSend);
                     body.appendChild(doc.createElement("br"));
                 }
@@ -599,7 +599,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                 addUserLink(&body, &doc, "@" + m.unick, altTextUser, chatPlusAction, jidToSend);
                 body.appendChild(doc.createTextNode(": "));
                 //добавляем теги
-                foreach (const QString &tag, m.tags) {
+                for (const QString &tag : m.tags) {
                     addTagLink(&body, &doc, tag, jidToSend);
                 }
                 msg = " " + m.body + " ";
@@ -1082,11 +1082,11 @@ void JuickPlugin::removeWidget()
 // картинки с диска.
 void JuickPlugin::updateWidgets(const QList<QByteArray> &urls)
 {
-    foreach (QWidget *w, logs_) {
+    for (QWidget *w : logs_) {
         QTextEdit *te = qobject_cast<QTextEdit *>(w);
         if (te) {
             QTextDocument *td = te->document();
-            foreach (const QByteArray &url, urls) {
+            for (const QByteArray &url : urls) {
                 QUrl u(url);
                 td->addResource(QTextDocument::ImageResource, u, QPixmap(u.toLocalFile()));
             }
@@ -1095,7 +1095,7 @@ void JuickPlugin::updateWidgets(const QList<QByteArray> &urls)
             int t = qrand() % (QTime::currentTime().msec() + 1);
             if (webkit->chatLogRenderType() == WebkitAccessingHost::RT_WebKit
                 || webkit->chatLogRenderType() == WebkitAccessingHost::RT_WebEngine) {
-                foreach (const QByteArray &url, urls) {
+                for (const QByteArray &url : urls) {
                     QUrl          u(url);
                     const QString js = QString("var els=document.querySelectorAll(\"img[src='%1']\");"
                                                "for(var i=0;i<els.length;++i){var el=els[i];el.src='%1'+'?%2';}")

@@ -53,7 +53,7 @@ int JDModel::rowCount(const QModelIndex &parent) const
     }
 
     int count = 0;
-    foreach (const ProxyItem &i, items_) {
+    for (const ProxyItem &i : items_) {
         if (i.parent == parent)
             ++count;
     }
@@ -67,7 +67,7 @@ bool JDModel::hasChildren(const QModelIndex &parent) const
     if (i) {
         if (i->type() == JDItem::File)
             return false;
-        foreach (const ProxyItem &item, items_) {
+        for (const ProxyItem &item : items_) {
             if (item.item->parent() == i)
                 return true;
         }
@@ -94,7 +94,7 @@ QModelIndex JDModel::index(int row, int column, const QModelIndex &parent) const
     }
 
     int c = 0;
-    foreach (const ProxyItem &i, items_) {
+    for (const ProxyItem &i : items_) {
         if (i.parent == parent) {
             if (row == c)
                 return i.index;
@@ -112,7 +112,7 @@ QModelIndex JDModel::parent(const QModelIndex &index) const
     else if (!index.internalPointer())
         return QModelIndex();
 
-    foreach (const ProxyItem &i, items_)
+    for (const ProxyItem &i : items_)
         if (i.index == index)
             return i.parent;
 
@@ -121,7 +121,7 @@ QModelIndex JDModel::parent(const QModelIndex &index) const
 
 QModelIndex JDModel::indexForItem(JDItem *item) const
 {
-    foreach (const ProxyItem &i, items_)
+    for (const ProxyItem &i : items_)
         if (i.item == item)
             return i.index;
 
@@ -144,7 +144,7 @@ bool JDModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int /*r
 
     JDItem *p = nullptr;
     if (parent != rootIndex()) {
-        foreach (const ProxyItem &i, items_) {
+        for (const ProxyItem &i : items_) {
             if (i.index == parent) {
                 p = i.item;
                 break;
@@ -177,7 +177,7 @@ QMimeData *JDModel::mimeData(const QModelIndexList &indexes) const
 
     QMimeData * data = nullptr;
     QModelIndex i    = indexes.first();
-    foreach (const ProxyItem &item, items_) {
+    for (const ProxyItem &item : items_) {
         if (item.index == i) {
             data = item.item->mimeData();
             break;
@@ -268,7 +268,7 @@ bool JDModel::addItem(JDItem *i)
     pi.item = i;
 
     if (i->parent()) {
-        foreach (const ProxyItem &item, items_) {
+        for (const ProxyItem &item : items_) {
             if (item.item == i->parent()) {
                 pi.parent = item.index;
                 break;
@@ -279,7 +279,7 @@ bool JDModel::addItem(JDItem *i)
     }
 
     int count = 0;
-    foreach (const ProxyItem &item, items_) {
+    for (const ProxyItem &item : items_) {
         if (item.item->parent() == i->parent())
             ++count;
     }
@@ -309,7 +309,7 @@ void JDModel::removeAll()
 JDItem *JDModel::findDirItem(const QString &path) const
 {
     if (!path.isEmpty()) {
-        foreach (const ProxyItem i, items_) {
+        for (const ProxyItem i : items_) {
             if (i.item->type() != JDItem::Dir)
                 continue;
 
@@ -324,7 +324,7 @@ JDItem *JDModel::findDirItem(const QString &path) const
 QStringList JDModel::dirs(const QString &path) const
 {
     QStringList dirs_;
-    foreach (const ProxyItem &i, items_) {
+    for (const ProxyItem &i : items_) {
         if (i.item->type() != JDItem::Dir)
             continue;
         if (i.item->parent()) {

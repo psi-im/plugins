@@ -172,7 +172,7 @@ void Model::showKeys(const QString &keysRaw)
     QList<QStandardItem *> lastRow;
     QList<QStandardItem *> row;
     QStringList            secretKeys;
-    foreach (QString line, list) {
+    for (auto line : list) {
         QString type = line.section(':', 0, 0);
         if (type == "pub" || type == "sec") {
             row = parseLine(line);

@@ -161,7 +161,7 @@ QWidget *ClientSwitcherPlugin::options()
     // Элементы для просмотра логов
     QDir dir(logsDir);
     int  pos = -1;
-    foreach (const QString &file, dir.entryList(QDir::Files)) {
+    for (const QString &file : dir.entryList(QDir::Files)) {
         ui_options.cb_logslist->addItem(file);
         ++pos;
         if (file == lastLogItem)

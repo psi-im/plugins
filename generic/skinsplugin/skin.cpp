@@ -39,7 +39,7 @@ QPixmap Skin::previewPixmap()
     QDir    dir(skinFolder());
     QString skinName = name();
     QPixmap pix      = QPixmap();
-    foreach (QString fileName, dir.entryList(QDir::Files)) {
+    for (auto fileName : dir.entryList(QDir::Files)) {
         if ((fileName.endsWith(".png", Qt::CaseInsensitive) || fileName.endsWith(".jpg", Qt::CaseInsensitive))
             && skinName.left(skinName.length() - 4) == fileName.left(fileName.length() - 4)) {
             pix = QPixmap(dir.absolutePath() + "/" + fileName);

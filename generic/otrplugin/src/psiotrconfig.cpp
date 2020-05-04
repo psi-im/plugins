@@ -218,7 +218,7 @@ void FingerprintWidget::deleteFingerprint()
     if (!m_table->selectionModel()->hasSelection()) {
         return;
     }
-    foreach (QModelIndex selectIndex, m_table->selectionModel()->selectedRows()) {
+    for (auto selectIndex : m_table->selectionModel()->selectedRows()) {
         int fpIndex = m_tableModel->item(selectIndex.row(), 0)->data().toInt();
 
         QString msg(tr("Are you sure you want to delete the following fingerprint?") + "\n\n" + tr("Account: ")
@@ -243,7 +243,7 @@ void FingerprintWidget::verifyFingerprint()
     if (!m_table->selectionModel()->hasSelection()) {
         return;
     }
-    foreach (QModelIndex selectIndex, m_table->selectionModel()->selectedRows()) {
+    for (auto selectIndex : m_table->selectionModel()->selectedRows()) {
         int fpIndex = m_tableModel->item(selectIndex.row(), 0)->data().toInt();
 
         QString msg(tr("Have you verified that this is in fact the correct fingerprint?") + "\n\n" + tr("Account: ")
@@ -267,7 +267,7 @@ void FingerprintWidget::copyFingerprint()
         return;
     }
     QString text;
-    foreach (QModelIndex selectIndex, m_table->selectionModel()->selectedRows(1)) {
+    for (auto selectIndex : m_table->selectionModel()->selectedRows(1)) {
         int fpIndex = m_tableModel->item(selectIndex.row(), 0)->data().toInt();
 
         if (!text.isEmpty()) {
@@ -385,7 +385,7 @@ void PrivKeyWidget::deleteKey()
     if (!m_table->selectionModel()->hasSelection()) {
         return;
     }
-    foreach (QModelIndex selectIndex, m_table->selectionModel()->selectedRows(1)) {
+    for (auto selectIndex : m_table->selectionModel()->selectedRows(1)) {
         QString fpr(m_tableModel->item(selectIndex.row(), 1)->text());
         QString account(m_tableModel->item(selectIndex.row(), 0)->data().toString());
 
@@ -440,7 +440,7 @@ void PrivKeyWidget::copyFingerprint()
         return;
     }
     QString text;
-    foreach (QModelIndex selectIndex, m_table->selectionModel()->selectedRows(1)) {
+    for (auto selectIndex : m_table->selectionModel()->selectedRows(1)) {
         if (!text.isEmpty()) {
             text += "\n";
         }

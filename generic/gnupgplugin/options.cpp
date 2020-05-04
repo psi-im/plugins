@@ -200,7 +200,7 @@ void Options::removeKey()
 
     QModelIndexList indexes = selModel->selectedIndexes();
     QModelIndexList pkeys; // Key IDs
-    foreach (QModelIndex index, indexes) {
+    for (auto index : indexes) {
         // Every selection contains all columns. Need to work only with first
         if (index.column() > 0) {
             continue;
@@ -226,7 +226,7 @@ void Options::removeKey()
     }
 
     // Remove primary keys
-    foreach (QModelIndex key, pkeys) {
+    for (auto key : pkeys) {
         GpgProcess  gpg;
         QStringList arguments;
         arguments << "--yes"
@@ -253,7 +253,7 @@ void Options::importKeyFromFile()
     }
 
     QStringList allFiles = dlg.selectedFiles();
-    foreach (QString filename, allFiles) {
+    for (auto filename : allFiles) {
         GpgProcess  gpg;
         QStringList arguments;
         arguments << "--batch"
@@ -275,7 +275,7 @@ void Options::exportKeyToFile()
 
     QModelIndexList indexes = selModel->selectedIndexes();
     QModelIndexList pkeys; // Key IDs
-    foreach (QModelIndex index, indexes) {
+    for (auto index : indexes) {
         // Every selection contains all columns. Need to work only with first
         if (index.column() > 0) {
             continue;
@@ -293,7 +293,7 @@ void Options::exportKeyToFile()
     }
 
     // Remove primary keys
-    foreach (QModelIndex key, pkeys) {
+    for (auto key : pkeys) {
         QString filename
             = key.sibling(key.row(), 1).data().toString() + " " + key.sibling(key.row(), 2).data().toString() + ".asc";
         QFileDialog dlg(this);
@@ -356,7 +356,7 @@ void Options::exportKeyToClipboard()
 
     QModelIndexList indexes = selModel->selectedIndexes();
     QModelIndexList pkeys; // Key IDs
-    foreach (QModelIndex index, indexes) {
+    for (auto index : indexes) {
         // Every selection contains all columns. Need to work only with first
         if (index.column() > 0) {
             continue;
@@ -375,7 +375,7 @@ void Options::exportKeyToClipboard()
 
     // Remove primary keys
     QString strKey = "";
-    foreach (QModelIndex key, pkeys) {
+    for (auto key : pkeys) {
         GpgProcess  gpg;
         QStringList arguments;
         QString     fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();

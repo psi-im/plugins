@@ -29,7 +29,7 @@ Model::Model(const QStringList &watchedJids_, const QStringList &Sounds_, const 
     tmpWatchedJids_ = watchedJids;
     tmpSounds_      = sounds;
 
-    foreach (QString enabledJid, enabledJids_) {
+    for (auto enabledJid : enabledJids_) {
         tmpEnabledJids_ << (enabledJid == "true" ? true : false);
     }
 }
@@ -170,7 +170,7 @@ void Model::deleteRows(const QModelIndexList &indexList)
         selected << false;
     }
 
-    foreach (QModelIndex index, indexList) {
+    for (auto index : indexList) {
         selected[index.row()] = true;
     }
 
@@ -201,7 +201,7 @@ void Model::reset()
     tmpSounds_      = sounds;
 
     tmpEnabledJids_.clear();
-    foreach (QString enabledJid, enabledJids) {
+    for (auto enabledJid : enabledJids) {
         tmpEnabledJids_ << (enabledJid == "true" ? true : false);
     }
 }
@@ -241,7 +241,7 @@ void Model::apply()
     watchedJids = tmpWatchedJids_;
     sounds      = tmpSounds_;
     enabledJids.clear();
-    foreach (bool enabledJid, tmpEnabledJids_) {
+    for (auto enabledJid : tmpEnabledJids_) {
         enabledJids << (enabledJid ? "true" : "false");
     }
 }

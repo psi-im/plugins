@@ -47,7 +47,7 @@ ToolBar::ToolBar(QWidget *parent) : QToolBar(parent) { init(); }
 
 ToolBar::~ToolBar()
 {
-    foreach (Button *b, buttons_) {
+    for (Button *b : buttons_) {
         delete (b);
     }
     buttons_.clear();
@@ -85,7 +85,7 @@ void ToolBar::init()
     buttons_.append(new Button(tr("Undo"), icoHost->getIcon("psi/undo"), ToolBar::ButtonUndo, false, this));
     buttons_.last()->setShortcut(QKeySequence("Ctrl+z"));
 
-    foreach (Button *b, buttons_) {
+    for (Button *b : buttons_) {
         addAction(b);
         connect(b, SIGNAL(triggered(bool)), SLOT(buttonChecked(bool)));
         connect(b, SIGNAL(triggered()), SLOT(buttonClicked()));
@@ -96,7 +96,7 @@ void ToolBar::init()
 
 void ToolBar::enableButton(bool enable, ToolBar::ButtonType type)
 {
-    foreach (Button *b, buttons_) {
+    for (Button *b : buttons_) {
         if (b->type() == type) {
             b->setEnabled(enable);
             break;
@@ -106,7 +106,7 @@ void ToolBar::enableButton(bool enable, ToolBar::ButtonType type)
 
 void ToolBar::checkButton(ToolBar::ButtonType type)
 {
-    foreach (Button *b, buttons_) {
+    for (Button *b : buttons_) {
         if (b->type() == type && b->isCheckable()) {
             b->setChecked(true);
             break;
@@ -130,7 +130,7 @@ void ToolBar::buttonChecked(bool check)
     }
 
     if (check) {
-        foreach (Button *b, buttons_) {
+        for (Button *b : buttons_) {
             if (b != s)
                 b->setChecked(false);
         }
@@ -141,7 +141,7 @@ void ToolBar::buttonChecked(bool check)
 
 void ToolBar::setColorForColorButton(const QColor &color)
 {
-    foreach (Button *b, buttons_) {
+    for (Button *b : buttons_) {
         if (b->type() == ButtonColor) {
             QPixmap pix(16, 16);
             pix.fill(color);
@@ -160,7 +160,7 @@ void ToolBar::buttonClicked()
 
 ToolBar::ButtonType ToolBar::currentButton() const
 {
-    foreach (Button *b, buttons_) {
+    for (Button *b : buttons_) {
         if (b->isChecked())
             return b->type();
     }

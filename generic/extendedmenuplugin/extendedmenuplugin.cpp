@@ -305,7 +305,7 @@ bool ExtendedMenuPlugin::incomingStanza(int account, const QDomElement &xml)
         if (xml.tagName() == "iq" && xml.hasAttribute("id")) {
             if (requestList_.contains(account)) {
                 Requests rl = requestList_.value(account);
-                foreach (const Request &r, rl) {
+                for (const Request &r : rl) {
                     if (r.id == xml.attribute("id")) {
                         const QString jid = xml.attribute("from");
                         QString       name;
@@ -555,7 +555,7 @@ void ExtendedMenuPlugin::menuActivated()
         if (type == RequestLastSeen && res.isEmpty()) {
             doCommand(account, jid, command, type);
         } else {
-            foreach (const QString &resource, res) {
+            for (const QString &resource : res) {
                 QString fullJid = jid;
                 if (!resource.isEmpty()) {
                     fullJid += QString("/") + resource;

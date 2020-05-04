@@ -132,11 +132,11 @@ QVariant BoardModel::data(const QModelIndex &i, int role) const
     } else if (role == Qt::DisplayRole) {
         int x = index.column();
         int y = index.row();
-        foreach (Figure *figure, whiteFigures_) {
+        for (Figure *figure : whiteFigures_) {
             if (x == figure->positionX() && y == figure->positionY())
                 return figure->getPixmap();
         }
-        foreach (Figure *figure, blackFigures_) {
+        for (Figure *figure : blackFigures_) {
             if (x == figure->positionX() && y == figure->positionY())
                 return figure->getPixmap();
         }
@@ -310,14 +310,14 @@ Figure *BoardModel::findFigure(QModelIndex index) const
     Figure *figure_ = nullptr;
     int     x       = index.column();
     int     y       = index.row();
-    foreach (Figure *figure, whiteFigures_) {
+    for (Figure *figure : whiteFigures_) {
         if (x == figure->positionX() && y == figure->positionY()) {
             figure_ = figure;
             break;
         }
     }
     if (!figure_) {
-        foreach (Figure *figure, blackFigures_) {
+        for (Figure *figure : blackFigures_) {
             if (x == figure->positionX() && y == figure->positionY()) {
                 figure_ = figure;
                 break;
@@ -338,13 +338,13 @@ QModelIndex BoardModel::findFigure(Figure::FigureType type, Figure::GameType gam
 {
     QModelIndex index;
     if (game == Figure::WhitePlayer) {
-        foreach (Figure *figure, whiteFigures_) {
+        for (Figure *figure : whiteFigures_) {
             if (type == figure->type()) {
                 index = createIndex(figure->positionY(), figure->positionX());
             }
         }
     } else {
-        foreach (Figure *figure, blackFigures_) {
+        for (Figure *figure : blackFigures_) {
             if (type == figure->type()) {
                 index = createIndex(figure->positionY(), figure->positionX());
             }
@@ -525,7 +525,7 @@ int BoardModel::canMove(Figure *figure, int newX, int newY) const
                 return 0;
             }
             figure->setPosition(5, 7);
-            foreach (Figure *figure_, blackFigures_) {
+            for (Figure *figure_ : blackFigures_) {
                 if (figure_->positionX() != -1) {
                     if (canMove(figure_, 5, 7)) {
                         figure->setPosition(positionX_, positionY_);
@@ -551,7 +551,7 @@ int BoardModel::canMove(Figure *figure, int newX, int newY) const
             if (figure_)
                 return 0;
             figure->setPosition(3, 7);
-            foreach (Figure *figure_, blackFigures_) {
+            for (Figure *figure_ : blackFigures_) {
                 if (figure_->positionX() != -1) {
                     if (canMove(figure_, 3, 7)) {
                         figure->setPosition(positionX_, positionY_);
@@ -585,7 +585,7 @@ int BoardModel::canMove(Figure *figure, int newX, int newY) const
             if (figure_)
                 return 0;
             figure->setPosition(5, 0);
-            foreach (Figure *figure_, whiteFigures_) {
+            for (Figure *figure_ : whiteFigures_) {
                 if (figure_->positionX() != -1) {
                     if (canMove(figure_, 5, 0)) {
                         figure->setPosition(positionX_, positionY_);
@@ -611,7 +611,7 @@ int BoardModel::canMove(Figure *figure, int newX, int newY) const
             if (figure_)
                 return 0;
             figure->setPosition(3, 0);
-            foreach (Figure *figure_, whiteFigures_) {
+            for (Figure *figure_ : whiteFigures_) {
                 if (figure_->positionX() != -1) {
                     if (canMove(figure_, 3, 0)) {
                         figure->setPosition(positionX_, positionY_);
@@ -885,12 +885,12 @@ int BoardModel::checkGameState()
     int state = 0;
     check     = isCheck();
     if (gameType_ == Figure::WhitePlayer) {
-        foreach (Figure *figure, whiteFigures_) {
+        for (Figure *figure : whiteFigures_) {
             if (figure->positionX() != -1) {
                 QMultiMap<QModelIndex, int> moves = availableMoves(figure);
                 if (!moves.isEmpty()) {
                     QList<QModelIndex> ml = moves.keys();
-                    foreach (QModelIndex index, ml) {
+                    for (auto index : ml) {
                         if (doTestMove(figure, index, moves.value(index))) {
                             return state; // in progress
                         }
@@ -899,12 +899,12 @@ int BoardModel::checkGameState()
             }
         }
     } else {
-        foreach (Figure *figure, blackFigures_) {
+        for (Figure *figure : blackFigures_) {
             if (figure->positionX() != -1) {
                 QMultiMap<QModelIndex, int> moves = availableMoves(figure);
                 if (!moves.isEmpty()) {
                     QList<QModelIndex> ml = moves.keys();
-                    foreach (QModelIndex index, ml) {
+                    for (auto index : ml) {
                         if (doTestMove(figure, index, moves.value(index))) {
                             return state; // in progress
                         }
@@ -979,7 +979,7 @@ bool BoardModel::isCheck() const
     int         kingX  = king.column();
     int         kingY  = king.row();
     if (gameType_ == Figure::WhitePlayer) {
-        foreach (Figure *figure, blackFigures_) {
+        for (Figure *figure : blackFigures_) {
             if (figure->positionX() != -1) {
                 if (canMove(figure, kingX, kingY) == 2) {
                     check_ = true;
@@ -988,7 +988,7 @@ bool BoardModel::isCheck() const
             }
         }
     } else if (gameType_ == Figure::BlackPlayer) {
-        foreach (Figure *figure, whiteFigures_) {
+        for (Figure *figure : whiteFigures_) {
             if (figure->positionX() != -1) {
                 if (canMove(figure, kingX, kingY) == 2) {
                     check_ = true;
@@ -1074,14 +1074,14 @@ static inline Figure::FigureType rankFigure(int i)
 QString BoardModel::saveString() const
 {
     QString save;
-    foreach (Figure *figure, whiteFigures_) {
+    for (Figure *figure : whiteFigures_) {
         save += QString("%1,%2,%3,%4;")
                     .arg(QString::number(figure->type()))
                     .arg(QString::number(figure->positionY()))
                     .arg(QString::number(figure->positionX()))
                     .arg(figure->isMoved ? QString::number(1) : QString::number(0));
     }
-    foreach (Figure *figure, blackFigures_) {
+    for (Figure *figure : blackFigures_) {
         save += QString("%1,%2,%3,%4;")
                     .arg(QString::number(figure->type()))
                     .arg(QString::number(figure->positionY()))
@@ -1098,7 +1098,7 @@ void BoardModel::loadSettings(const QString &settings, bool myLoad)
     reset();
 
     QStringList figuresSettings = settings.split(";");
-    foreach (Figure *figure, whiteFigures_) {
+    for (Figure *figure : whiteFigures_) {
         if (!figuresSettings.isEmpty()) {
             QStringList set = figuresSettings.takeFirst().split(",");
             figure->setType(rankFigure(set.takeFirst().toInt()));
@@ -1106,7 +1106,7 @@ void BoardModel::loadSettings(const QString &settings, bool myLoad)
             figure->isMoved = set.takeFirst().toInt();
         }
     }
-    foreach (Figure *figure, blackFigures_) {
+    for (Figure *figure : blackFigures_) {
         if (!figuresSettings.isEmpty()) {
             QStringList set = figuresSettings.takeFirst().split(",");
             figure->setType(rankFigure(set.takeFirst().toInt()));

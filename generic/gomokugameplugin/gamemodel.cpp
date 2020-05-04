@@ -495,7 +495,7 @@ QString GameModel::toString() const
     GameElement *lastEl  = nullptr;
     if (!elementsList.isEmpty())
         lastEl = elementsList.last();
-    foreach (GameElement *el, elementsList) {
+    for (GameElement *el : elementsList) {
         if (el == lastEl && !accepted_)
             continue; // Не сохраняем не подтвержденное
         res_str.append(QString("Element:%1,%2,%3;\n")

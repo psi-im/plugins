@@ -53,7 +53,7 @@ void JuickJidList::addPressed()
 void JuickJidList::delPressed()
 {
     QList<QListWidgetItem *> list = ui_->listWidget->selectedItems();
-    foreach (QListWidgetItem *i, list) {
+    for (auto i : list) {
         QString jid = i->text();
         jidList_.removeAll(jid);
         ui_->listWidget->removeItemWidget(i);

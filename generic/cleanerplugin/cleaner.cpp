@@ -323,7 +323,7 @@ void CleanerMainWindow::viewAvatar(const QModelIndex &index)
 void CleanerMainWindow::chooseProfileAct()
 {
     QStringList prof;
-    foreach (const QString &dir, QDir(profilesConfigDir_).entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+    for (const QString &dir : QDir(profilesConfigDir_).entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
         prof.append(dir);
     }
     const QString profile = QInputDialog::getItem(this, tr("Choose profile"), tr("Profile:"), prof,
@@ -395,7 +395,7 @@ bool CleanerMainWindow::clearDir(const QString &path)
 {
     bool b = true;
     QDir dir(path);
-    foreach (QString filename, dir.entryList(QDir::Files)) {
+    for (auto filename : dir.entryList(QDir::Files)) {
         QFile file(path + QDir::separator() + filename);
         if (file.open(QIODevice::ReadWrite)) {
             b = file.remove();
@@ -403,7 +403,7 @@ bool CleanerMainWindow::clearDir(const QString &path)
                 return b;
         }
     }
-    foreach (QString subDir, dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+    for (auto subDir : dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
         b = clearDir(path + QDir::separator() + subDir);
         if (!b)
             return b;

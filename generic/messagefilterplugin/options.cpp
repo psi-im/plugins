@@ -46,7 +46,7 @@ Options::Options(const QList<Rule> &rules, QWidget *parent) :
     updateRuleButtons();
     updateConditionButtons();
 
-    foreach (const Rule &rule, _rules) {
+    for (const Rule &rule : _rules) {
         ui->lwRules->addItem(rule.name);
     }
 }

@@ -113,7 +113,7 @@ void JDMainWin::recursiveFind(const QString &dir)
     QString tmp = currentDir_;
     commands_->ls(dir);
     QStringList dirs = model_->dirs(dir);
-    foreach (const QString &d, dirs) {
+    for (const QString &d : dirs) {
         currentDir_ += d;
         recursiveFind(currentDir_);
         currentDir_ = tmp;

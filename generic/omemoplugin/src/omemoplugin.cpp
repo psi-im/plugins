@@ -344,7 +344,7 @@ void OMEMOPlugin::onActionDestroyed(QObject *action)
 void OMEMOPlugin::updateAction(int account, const QString &user)
 {
     QString bareJid = m_contactInfo->realJid(account, user).split("/").first();
-    foreach (QAction *action, m_actions.values(bareJid)) {
+    for (QAction *action : m_actions.values(bareJid)) {
         bool isGroup   = action->property("isGroup").toBool();
         bool available = isGroup
             ? m_omemo.isAvailableForGroup(account, m_accountInfo->getJid(account).split("/").first(), bareJid)

@@ -243,7 +243,7 @@ void ManageDevices::doUpdateData()
 {
     m_tableModel->setColumnCount(1);
     m_tableModel->setHorizontalHeaderLabels({ tr("Device ID") });
-    foreach (auto deviceId, m_omemo->getOwnDeviceList(m_account)) {
+    for (auto deviceId : m_omemo->getOwnDeviceList(m_account)) {
         QStandardItem *item = new QStandardItem(QString::number(deviceId));
         item->setData(deviceId);
         m_tableModel->appendRow(item);

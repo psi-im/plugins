@@ -183,7 +183,7 @@ bool AttentionPlugin::enable()
                                         "plugins.options." + shortName() + "." + constInterval);
 
         QWidgetList wl = qApp->allWidgets();
-        foreach (QWidget *w, wl) {
+        for (QWidget *w : wl) {
             if (w->objectName() == "MainWin") {
                 nudgeWindow_ = w;
                 break;

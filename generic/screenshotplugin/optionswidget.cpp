@@ -229,7 +229,7 @@ void OptionsWidget::restoreOptions()
     ui_.le_shortcut->setText(shortCut);
     if (ui_.lw_servers->count() > 0)
         ui_.lw_servers->clear();
-    foreach (QString settings, servers) {
+    for (auto settings : servers) {
         Server *s = new Server(ui_.lw_servers);
         s->setFromString(settings);
         s->setText(s->displayName());

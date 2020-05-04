@@ -206,7 +206,7 @@ bool Watcher::enable()
 
         items_.clear();
         QStringList list = psiOptions->getPluginOption(constWatchedItems).toStringList();
-        foreach (const QString &settings, list) {
+        for (const QString &settings : list) {
             WatchedItem *wi = new WatchedItem();
             wi->setSettings(settings);
             items_.push_back(wi);
@@ -221,7 +221,7 @@ bool Watcher::enable()
         QStringList files;
         files << "watcher_on"
               << "watcher";
-        foreach (QString filename, files) {
+        for (auto filename : files) {
 
             QFile file(":/icons/" + filename + ".png");
             file.open(QIODevice::ReadOnly);
@@ -242,7 +242,7 @@ bool Watcher::disable()
     model_ = nullptr;
 
     qDeleteAll(items_);
-    foreach (QAction *action, actions_) {
+    for (QAction *action : actions_) {
         action->disconnect();
         action->deleteLater();
     }
@@ -326,8 +326,9 @@ void Watcher::applyOptions()
     psiOptions->setPluginOption(constJids, QVariant(model_->getWatchedJids()));
     psiOptions->setPluginOption(constSndFiles, QVariant(model_->getSounds()));
 
-    foreach (WatchedItem *wi, items_)
+    for (auto wi : items_) {
         delete (wi);
+    }
     items_.clear();
     QStringList l;
     for (int i = 0; i < ui_.listWidget->count(); i++) {
@@ -352,7 +353,7 @@ void Watcher::restoreOptions()
     ui_.cb_disable_snd->setChecked(disableSnd);
     ui_.cb_disableDnd->setChecked(disablePopupDnd);
     model_->reset();
-    foreach (WatchedItem *wi, items_) {
+    for (auto wi : items_) {
         ui_.listWidget->addItem(wi->copy());
     }
 }
@@ -427,7 +428,7 @@ bool Watcher::incomingStanza(int acc, const QDomElement &stanza)
                 }
 
                 if (type == "groupchat") {
-                    foreach (WatchedItem *wi, items_) {
+                    for (auto wi : items_) {
                         if (!wi->groupChat())
                             continue;
 
@@ -435,7 +436,7 @@ bool Watcher::incomingStanza(int acc, const QDomElement &stanza)
                             break;
                     }
                 } else {
-                    foreach (WatchedItem *wi, items_) {
+                    for (auto wi : items_) {
                         if (wi->groupChat())
                             continue;
 
@@ -465,7 +466,7 @@ bool Watcher::checkWatchedItem(const QString &from, const QString &body, Watched
         }
     }
     if (!wi->watchedText().isEmpty()) {
-        foreach (QString txt, wi->watchedText().split(QRegExp("\\s+"), QString::SkipEmptyParts)) {
+        for (auto txt : wi->watchedText().split(QRegExp("\\s+"), QString::SkipEmptyParts)) {
             if (body.contains(QRegExp(txt, Qt::CaseInsensitive, QRegExp::Wildcard))) {
                 psiOptions->setGlobalOption("options.ui.notifications.sounds.enable", QVariant(false));
                 playSound(wi->sFile());

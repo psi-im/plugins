@@ -161,7 +161,7 @@ void SkinsPlugin::updateSkins()
     dirs << appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation) << appInfo->appResourcesDir() + "/skins"
          << appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation) + "/skins";
 
-    foreach (QString dirName, dirs) {
+    for (auto dirName : dirs) {
         findSkins(dirName);
     }
 }
@@ -172,7 +172,7 @@ void SkinsPlugin::findSkins(QString path)
         return;
 
     QDir dir(path);
-    foreach (QString filename, dir.entryList(QDir::Files)) {
+    for (auto filename : dir.entryList(QDir::Files)) {
         if (filename.endsWith(".skn", Qt::CaseInsensitive)) {
             QString file = dir.absolutePath() + QString("/") + filename;
             if (skins_.contains(file))
@@ -185,7 +185,7 @@ void SkinsPlugin::findSkins(QString path)
         }
     }
 
-    foreach (QString subDir, dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+    for (auto subDir : dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
         findSkins(path + QDir::separator() + subDir);
     }
 }

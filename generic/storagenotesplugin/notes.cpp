@@ -107,7 +107,7 @@ void Notes::save()
 {
     QList<QDomElement> notesList = noteModel_->getAllNotes();
     QString            notes;
-    foreach (const QDomElement &note, notesList) {
+    for (const QDomElement &note : notesList) {
         QString tag   = note.attribute("tags");
         QString text  = note.firstChildElement("text").text();
         QString title = note.firstChildElement("title").text();
@@ -155,7 +155,7 @@ void Notes::updateTags()
 
     tagModel_->clear();
 
-    foreach (const QString &tag, tags) {
+    for (const QString &tag : tags) {
         if (!tag.isEmpty())
             tagModel_->addTag(tag);
     }
@@ -221,7 +221,7 @@ void Notes::load()
 
 void Notes::incomingNotes(const QList<QDomElement> &notes)
 {
-    foreach (const QDomElement &note, notes) {
+    for (const QDomElement &note : notes) {
         addNote(note);
     }
 }

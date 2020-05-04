@@ -319,7 +319,7 @@ void Reminder::updateVCard()
         updateInProgress   = true;
         const QString path = appInfoHost->appVCardDir();
         QDir          dir(path);
-        foreach (QString filename, dir.entryList(QDir::Files)) {
+        for (auto filename : dir.entryList(QDir::Files)) {
             QFile file(path + QDir::separator() + filename);
             if (file.open(QIODevice::ReadOnly)) {
                 QTextStream in(&file);
@@ -357,7 +357,7 @@ void Reminder::updateVCard()
                 } else if (accInfoHost->getStatus(accs) != "offline") {
                     QString text = "<iq type=\"get\" to=\"%1\" id=\"%2\">"
                                    "<vCard xmlns=\"vcard-temp\" /></iq>";
-                    foreach (const QString &Jid, Jids) {
+                    for (const QString &Jid : Jids) {
                         stanzaHost->sendStanza(accs, text.arg(Jid, id));
                     }
                 }
@@ -391,7 +391,7 @@ QString Reminder::checkBirthdays()
     }
 
     QString CheckResult;
-    foreach (QString jid, QDir(bdaysDir()).entryList(QDir::Files)) {
+    for (auto jid : QDir(bdaysDir()).entryList(QDir::Files)) {
         if (jid.contains("_at_")) {
             QFile file(bdaysDir() + QDir::separator() + jid);
             if (file.open(QIODevice::ReadOnly)) {
@@ -466,7 +466,7 @@ bool Reminder::check()
 void Reminder::clearCache()
 {
     QDir dir(bdaysDir());
-    foreach (const QString &file, dir.entryList(QDir::Files)) {
+    for (const QString &file : dir.entryList(QDir::Files)) {
         QFile File(bdaysDir() + QDir::separator() + file);
         if (File.open(QIODevice::ReadWrite)) {
             File.remove();

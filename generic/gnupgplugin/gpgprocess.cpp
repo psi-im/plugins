@@ -66,7 +66,7 @@ static QString findRegGpgProgram()
         || getRegKey(HKEY_LOCAL_MACHINE, path, dir) || getRegKey(HKEY_LOCAL_MACHINE, path2, dir);
 
     if (!dir.isEmpty()) {
-        foreach (const QString &bin, bins) {
+        for (const QString &bin : bins) {
             if (checkBin(dir + "\\" + bin)) {
                 return dir + "\\" + bin;
             }
@@ -90,7 +90,7 @@ QString GpgProcess::findBin() const
 #endif
 
     // Prefer bundled gpg
-    foreach (const QString &bin, bins) {
+    for (const QString &bin : bins) {
         if (checkBin(QCoreApplication::applicationDirPath() + "/" + bin)) {
             return QCoreApplication::applicationDirPath() + "/" + bin;
         }
@@ -123,8 +123,8 @@ QString GpgProcess::findBin() const
 #endif
     paths.removeDuplicates();
 
-    foreach (const QString &path, paths) {
-        foreach (const QString &bin, bins) {
+    for (const QString &path : paths) {
+        for (const QString &bin : bins) {
             if (checkBin(path + "/" + bin)) {
                 return path + "/" + bin;
             }

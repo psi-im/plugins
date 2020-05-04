@@ -101,9 +101,9 @@ bool MessageFilter::incomingStanza(int account, const QDomElement &stanza)
     QString to_full   = stanza.attribute("to");
     QString to        = to_full.split("/").takeFirst();
 
-    foreach (const Rule &rule, _rules) {
+    for (const Rule &rule : _rules) {
         bool match = true;
-        foreach (const Condition &condition, rule.conditions) {
+        for (const Condition &condition : rule.conditions) {
             QString val;
             switch (condition.type) {
             case From:

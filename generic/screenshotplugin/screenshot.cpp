@@ -326,7 +326,7 @@ void Screenshot::setServersList(const QStringList &l)
     servers.clear();
     ui_.cb_servers->setEnabled(false);
     ui_.pb_upload->setEnabled(false);
-    foreach (QString settings, l) {
+    for (auto settings : l) {
         if (settings.isEmpty()) {
             continue;
         }
@@ -650,7 +650,7 @@ void Screenshot::uploadHttp()
         cancelUpload();
 
     if (s->servPostdata().length() > 0) {
-        foreach (QString poststr, s->servPostdata().split("&")) {
+        for (auto poststr : s->servPostdata().split("&")) {
             QStringList postpair = poststr.split("=");
             if (postpair.count() < 2)
                 continue;

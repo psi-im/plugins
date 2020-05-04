@@ -170,7 +170,7 @@ void BaseFileModel::deleteSelected()
 {
     emit layoutAboutToBeChanged();
 
-    foreach (const QModelIndex &index, selected_) {
+    for (const QModelIndex &index : selected_) {
         const QString fileName = filePass(index);
         if (fileName.isEmpty())
             continue;
@@ -190,9 +190,9 @@ void BaseFileModel::setDirs(const QStringList &dirs)
 {
     reset();
     dirs_ = dirs;
-    foreach (const QString &dirName, dirs_) {
+    for (const QString &dirName : dirs_) {
         QDir Dir(dirName);
-        foreach (const QString &fileName, Dir.entryList(QDir::Files)) {
+        for (const QString &fileName : Dir.entryList(QDir::Files)) {
             files_.append(Dir.absoluteFilePath(fileName));
         }
     }

@@ -51,7 +51,7 @@ void Viewer::init(IconFactoryAccessingHost *iconHost)
 void Viewer::keyPressEvent(QKeyEvent *e)
 {
     if (e->key() == Qt::Key_Space) {
-        foreach (const QModelIndex &check, selectionModel()->selectedRows(0)) {
+        for (const QModelIndex &check : selectionModel()->selectedRows(0)) {
             model()->setData(check, 3); // invert
         }
     } else {
@@ -72,7 +72,7 @@ void Viewer::contextMenuEvent(QContextMenuEvent *e)
     int      iresult;
     if (result) {
         iresult = actions.indexOf(result);
-        foreach (const QModelIndex &check, selectionModel()->selectedRows(0)) {
+        for (const QModelIndex &check : selectionModel()->selectedRows(0)) {
             switch (iresult) {
             case 0: // check
                 model()->setData(check, QVariant(2));

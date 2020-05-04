@@ -334,7 +334,7 @@ QWidget *TranslatePlugin::options()
     restoreButton->setFixedWidth(220);
     rightSide->addWidget(restoreButton, 30, Qt::AlignBottom);
     if (!map.isEmpty()) {
-        foreach (QString symbol, map.keys()) {
+        for (auto symbol : map.keys()) {
             table->insertRow(table->rowCount());
             table->setItem(table->rowCount() - 1, 0, new QTableWidgetItem(symbol));
             table->setItem(table->rowCount() - 1, 1, new QTableWidgetItem(map.value(symbol)));
@@ -358,7 +358,7 @@ bool TranslatePlugin::enable()
     notTranslate = psiOptions->getPluginOption(constNotTranslate, notTranslate).toBool();
     //    psiShortcuts->connectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
 
-    foreach (QAction *act, actions_) {
+    for (auto act : actions_) {
         act->setShortcut(QKeySequence(shortCut));
     }
 
@@ -366,7 +366,7 @@ bool TranslatePlugin::enable()
     QStringList newList  = psiOptions->getPluginOption(constNew, QStringList(map.values())).toStringList();
     int         iterator = 0;
     map.clear();
-    foreach (const QString &symbol, oldList) {
+    for (const QString &symbol : oldList) {
         map.insert(symbol, newList.at(iterator++));
     }
 
@@ -376,7 +376,7 @@ bool TranslatePlugin::enable()
 bool TranslatePlugin::disable()
 {
     enabled_ = false;
-    foreach (QAction *act, actions_) {
+    for (auto act : actions_) {
         act->disconnect(this, SLOT(trans()));
     }
 
@@ -425,7 +425,7 @@ void TranslatePlugin::trans()
     while (index != -1 && !isSelect) {
         QString newStr;
         QString oldStr = toReverse.left(index);
-        foreach (const QString &symbol, oldStr) {
+        for (const QString &symbol : oldStr) {
             newStr.append(map.value(symbol, symbol));
         }
         newStrings << newStr << link.cap();
@@ -434,7 +434,7 @@ void TranslatePlugin::trans()
     }
 
     QString newStr;
-    foreach (const QString &symbol, toReverse) {
+    for (const QString &symbol : toReverse) {
         newStr.append(map.value(symbol, symbol));
     }
     newStrings << newStr;
@@ -499,7 +499,7 @@ void TranslatePlugin::applyOptions()
     //    psiShortcuts->disconnectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
     shortCut = shortCutWidget->text();
     psiOptions->setPluginOption(constShortCut, shortCut);
-    foreach (QAction *act, actions_) {
+    for (auto act : actions_) {
         act->setShortcut(QKeySequence(shortCut));
     }
 
@@ -527,7 +527,7 @@ void TranslatePlugin::restoreOptions()
 
     shortCutWidget->setText(shortCut);
     check_button->setChecked(notTranslate);
-    foreach (const QString &symbol, map.keys()) {
+    for (const QString &symbol : map.keys()) {
         table->insertRow(table->rowCount());
         table->setItem(table->rowCount() - 1, 0, new QTableWidgetItem(symbol));
         table->setItem(table->rowCount() - 1, 1, new QTableWidgetItem(map.value(symbol)));
@@ -573,7 +573,7 @@ void TranslatePlugin::restoreMap()
     disconnect(table, SIGNAL(cellChanged(int, int)), this, SLOT(changeItem(int, int)));
     table->clear();
     table->setRowCount(0);
-    foreach (const QString &symbol, mapBackup.keys()) {
+    for (const QString &symbol : mapBackup.keys()) {
         table->insertRow(table->rowCount());
         table->setItem(table->rowCount() - 1, 0, new QTableWidgetItem(symbol));
         table->setItem(table->rowCount() - 1, 1, new QTableWidgetItem(mapBackup.value(symbol)));

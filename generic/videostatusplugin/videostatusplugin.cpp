@@ -178,7 +178,7 @@ VideoStatusChanger::VideoStatusChanger() : status("dnd")
     enabled = false;
 #ifdef HAVE_DBUS
     playerGMPlayer_ = false;
-    foreach (StringMap item, players) {
+    for (auto item : players) {
         playerDictList.insert(item.first, false);
     }
 #endif
@@ -212,13 +212,13 @@ bool VideoStatusChanger::enable()
         qDBusRegisterMetaType<PlayerStatus>();
         services_ = QDBusConnection::sessionBus().interface()->registeredServiceNames().value();
         //проверка на наличие уже запущенных плееров
-        foreach (const QString &item, playerDictList.keys()) {
+        for (const QString &item : playerDictList.keys()) {
             bool option          = psiOptions->getPluginOption(item, QVariant(playerDictList.value(item))).toBool();
             playerDictList[item] = option;
             if (item.contains("mplayer")) {
                 playerGMPlayer_ = option;
             }
-            foreach (const QString &service, services_) {
+            for (const QString &service : services_) {
                 if (service.contains(item, Qt::CaseInsensitive)) {
                     connectToBus(service);
                 }
@@ -253,7 +253,7 @@ bool VideoStatusChanger::disable()
     fullST.stop();
 #ifdef HAVE_DBUS
     //отключаем прослушку активных плееров
-    foreach (const QString &player, services_) {
+    for (const QString &player : services_) {
         disconnectFromBus(player);
     }
     //отключаеся от шины
@@ -279,7 +279,7 @@ void VideoStatusChanger::applyOptions()
 #ifdef HAVE_DBUS
     //читаем состояние плееров
     if (playerDictList.size() > 0) {
-        foreach (const QString &item, playerDictList.keys()) {
+        for (const QString &item : playerDictList.keys()) {
             QCheckBox *cb = ui_.groupBox->findChild<QCheckBox *>(item);
             if (cb) {
                 playerDictList[item] = cb->isChecked();
@@ -317,7 +317,7 @@ void VideoStatusChanger::restoreOptions()
 #ifdef HAVE_DBUS
     //читаем состояние плееров
     if (playerDictList.size() > 0) {
-        foreach (const QString &item, playerDictList.keys()) {
+        for (const QString &item : playerDictList.keys()) {
             bool       option = psiOptions->getPluginOption(item, QVariant(playerDictList.value(item))).toBool();
             QCheckBox *cb     = ui_.groupBox->findChild<QCheckBox *>(item);
             if (cb) {
@@ -349,7 +349,7 @@ QWidget *VideoStatusChanger::options()
     //добавляем чекбоксы плееров
     int i       = 0;
     int columns = (players.length() < 5) ? 2 : 3;
-    foreach (StringMap item, players) {
+    for (auto item : players) {
         i = players.indexOf(item);
         if (i != -1) {
             QCheckBox *cb = new QCheckBox(item.second);
@@ -388,7 +388,7 @@ QPixmap VideoStatusChanger::icon() const { return QPixmap(":/icons/videostatus.p
 #ifdef HAVE_DBUS
 bool VideoStatusChanger::isPlayerValid(const QString &service) //проверка является ли плеер разрешенным
 {
-    foreach (const QString &item, playerDictList.keys()) {
+    for (const QString &item : playerDictList.keys()) {
         if (service.contains(item, Qt::CaseInsensitive) && playerDictList.value(item)) {
             return true;
         }

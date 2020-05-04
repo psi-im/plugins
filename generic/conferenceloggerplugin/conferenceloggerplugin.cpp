@@ -157,7 +157,7 @@ QWidget *ConferenceLogger::options()
     path->setEnabled(false);
     FilesBox = new QComboBox();
     QDir dir(HistoryDir);
-    foreach (QString file, dir.entryList(QDir::Files)) {
+    for (auto file : dir.entryList(QDir::Files)) {
         if (file.contains("_in_")) {
             FilesBox->addItem(file);
         }
@@ -274,7 +274,7 @@ void ConferenceLogger::view()
     YourJid          = YourJid.replace("@", "_at_");
     QString FName    = YourJid + "_in_" + Jid + ".conferencehistory";
     QDir    dir(HistoryDir);
-    foreach (QString file, dir.entryList(QDir::Files)) {
+    for (auto file : dir.entryList(QDir::Files)) {
         if (file == FName) {
             showLog(file);
             break;

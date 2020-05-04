@@ -29,7 +29,7 @@ void OMEMO::init(const QString &dataPath) { m_dataPath = dataPath; }
 
 void OMEMO::deinit()
 {
-    foreach (auto signal, m_accountToSignal.values()) {
+    for (auto signal : m_accountToSignal.values()) {
         signal->deinit();
     }
 }
@@ -74,7 +74,7 @@ void OMEMO::publishOwnBundle(int account)
     QDomElement preKeys = doc.createElement("prekeys");
     bundle.appendChild(preKeys);
 
-    foreach (auto preKey, b.preKeys) {
+    for (auto preKey : b.preKeys) {
         QDomElement preKeyPublic = doc.createElement("preKeyPublic");
         preKeyPublic.setAttribute("preKeyId", preKey.first);
         setNodeText(preKeyPublic, preKey.second);
@@ -270,7 +270,7 @@ bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml,
                      "[OMEMO] " + tr("Unable to build any sessions, the message was not sent"));
         xml = QDomElement();
     } else {
-        foreach (EncryptedKey encKey, encryptedKeys) {
+        for (auto encKey : encryptedKeys) {
             if (toDeviceId != nullptr && *toDeviceId != encKey.deviceId) {
                 continue;
             }
@@ -373,7 +373,7 @@ void OMEMO::publishDeviceList(int account, const QSet<uint32_t> &devices) const
 
     publish.setAttribute("node", deviceListNodeName());
 
-    foreach (uint32_t id, devices) {
+    for (auto id : devices) {
         QDomElement device = doc.createElement("device");
         device.setAttribute("id", id);
         list.appendChild(device);
@@ -394,13 +394,13 @@ void OMEMO::buildSessionsFromBundle(const QMap<QString, QVector<uint32_t>> &reci
         message->sentStanzas.insert(stanza, deviceId);
     };
 
-    foreach (QString recipient, recipientInvalidSessions.keys()) {
+    for (auto recipient : recipientInvalidSessions.keys()) {
         QString bareRecipient = recipient.split("/").first();
-        foreach (uint32_t deviceId, recipientInvalidSessions.value(recipient)) {
+        for (auto deviceId : recipientInvalidSessions.value(recipient)) {
             requestBundle(deviceId, bareRecipient);
         }
     }
-    foreach (uint32_t deviceId, ownInvalidSessions) {
+    for (auto deviceId : ownInvalidSessions) {
         requestBundle(deviceId, ownJid);
     }
 
@@ -414,7 +414,7 @@ bool OMEMO::processBundle(const QString &ownJid, int account, const QDomElement 
         return false;
 
     std::shared_ptr<MessageWaitingForBundles> message;
-    foreach (std::shared_ptr<MessageWaitingForBundles> msg, m_pendingMessages) {
+    for (auto msg : m_pendingMessages) {
         if (msg->sentStanzas.contains(stanzaId)) {
             message = msg;
             break;
@@ -636,7 +636,7 @@ bool OMEMO::forEachMucParticipant(int account, const QString &ownJid, const QStr
 {
     QStringList list;
 
-    foreach (QString nick, m_contactInfoAccessor->mucNicks(account, conferenceJid)) {
+    for (auto nick : m_contactInfoAccessor->mucNicks(account, conferenceJid)) {
         QString contactMucJid = conferenceJid + "/" + nick;
         QString realJid       = m_contactInfoAccessor->realJid(account, contactMucJid);
         if (realJid == contactMucJid) {
@@ -649,7 +649,7 @@ bool OMEMO::forEachMucParticipant(int account, const QString &ownJid, const QStr
         }
     }
 
-    foreach (QString jid, list) {
+    for (auto jid : list) {
         if (!lambda(jid)) {
             return false;
         }
