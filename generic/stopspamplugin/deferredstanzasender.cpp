@@ -25,7 +25,7 @@ DefferedStanzaSender::DefferedStanzaSender(StanzaSendingHost *host, QObject *p) 
     QObject(p), stanzaSender_(host), timer_(new QTimer(this))
 {
     timer_->setInterval(DELAY);
-    connect(timer_, SIGNAL(timeout()), SLOT(timeout()));
+    connect(timer_, &QTimer::timeout, this, &DefferedStanzaSender::timeout);
 }
 
 void DefferedStanzaSender::sendStanza(int account, const QDomElement &xml)

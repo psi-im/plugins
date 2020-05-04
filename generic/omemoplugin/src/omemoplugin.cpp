@@ -164,7 +164,7 @@ void OMEMOPlugin::processEncryptedFile(int account, QDomElement &xml)
 
     QNetworkReply *reply = m_networkManager.get(QNetworkRequest(url));
 
-    connect(reply, SIGNAL(finished()), SLOT(onFileDownloadFinished()));
+    connect(reply, &QNetworkReply::finished, this, &OMEMOPlugin::onFileDownloadFinished);
     reply->setProperty("keyData", keyData);
     reply->setProperty("account", account);
     reply->setProperty("filePath", f.fileName());
@@ -321,8 +321,8 @@ QAction *OMEMOPlugin::createAction(QObject *parent, int account, const QString &
     QAction *action  = new QAction(getIcon(), tr("OMEMO encryption"), parent);
     action->setCheckable(true);
     action->setProperty("isGroup", QVariant(isGroup));
-    connect(action, SIGNAL(triggered(bool)), SLOT(onEnableOMEMOAction(bool)));
-    connect(action, SIGNAL(destroyed(QObject *)), SLOT(onActionDestroyed(QObject *)));
+    connect(action, &QAction::triggered, this, &OMEMOPlugin::onEnableOMEMOAction);
+    connect(action, &QAction::destroyed, this, &OMEMOPlugin::onActionDestroyed);
     m_actions.insert(bareJid, action);
     updateAction(account, bareJid);
     return action;

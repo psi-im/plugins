@@ -76,8 +76,8 @@ InvitationDialog::InvitationDialog(const int account, const QString &jid, QStrin
 
     ui_.lbl_text->setText(tr("Player %1 invites you \nto play gomoku. He wants to play %2.").arg(jid).arg(color));
 
-    connect(ui_.pb_accept, SIGNAL(clicked()), this, SLOT(buttonPressed()));
-    connect(ui_.pb_reject, SIGNAL(clicked()), this, SLOT(close()));
+    connect(ui_.pb_accept, &QPushButton::clicked, this, &InvitationDialog::buttonPressed);
+    connect(ui_.pb_reject, &QPushButton::clicked, this, &InvitationDialog::close);
 
     adjustSize();
     setFixedSize(size());

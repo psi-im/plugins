@@ -52,7 +52,7 @@ void NotesController::start(int account)
         note->raise();
     } else {
         note = new Notes(plugin_, account);
-        connect(note, SIGNAL(notesDeleted(int)), this, SLOT(notesDeleted(int)));
+        connect(note, &Notes::notesDeleted, this, &NotesController::notesDeleted);
 
         notesList_.insert(account, note);
         note->load();

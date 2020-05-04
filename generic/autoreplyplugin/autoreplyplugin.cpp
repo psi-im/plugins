@@ -559,6 +559,7 @@ QWidget *AutoReply::options()
     tab1Layout->addWidget(groupBox);
     tab1Layout->addWidget(wikiLink);
 
+    // TODO: update after stopping support of Ubuntu Xenial:
     connect(enabledisableWidget, SIGNAL(currentIndexChanged(int)), SLOT(setEnableDisableText(int)));
 
     return optionsWid;

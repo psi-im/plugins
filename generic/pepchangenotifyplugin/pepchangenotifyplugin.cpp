@@ -204,8 +204,8 @@ QWidget *PepPlugin::options()
     ui_.pb_check->setIcon(iconHost->getIcon("psi/play"));
     ui_.pb_get->setIcon(iconHost->getIcon("psi/browse"));
 
-    connect(ui_.pb_check, SIGNAL(clicked()), SLOT(checkSound()));
-    connect(ui_.pb_get, SIGNAL(clicked()), SLOT(getSound()));
+    connect(ui_.pb_check, &QToolButton::clicked, this, &PepPlugin::checkSound);
+    connect(ui_.pb_get, &QToolButton::clicked, this, &PepPlugin::getSound);
 
     restoreOptions();
 

@@ -38,8 +38,9 @@ void ClearingViewer::init(IconFactoryAccessingHost *iconHost)
     horizontalHeader()->setSortIndicator(-1, Qt::AscendingOrder);
     verticalHeader()->setDefaultAlignment(Qt::AlignHCenter);
 
+    // TODO: update after stopping support of Ubuntu Xenial:
     connect(horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(sortByColumn(int)));
-    connect(this, SIGNAL(clicked(QModelIndex)), this, SLOT(itemClicked(QModelIndex)));
+    connect(this, &ClearingViewer::clicked, this, &ClearingViewer::itemClicked);
 }
 
 void ClearingViewer::keyPressEvent(QKeyEvent *e)

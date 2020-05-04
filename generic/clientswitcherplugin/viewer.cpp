@@ -51,15 +51,15 @@ Viewer::Viewer(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *par
     butLayout->addWidget(Close);
     layout->addWidget(findBar);
     layout->addLayout(butLayout);
-    connect(Close, SIGNAL(released()), this, SLOT(close()));
-    connect(Delete, SIGNAL(released()), this, SLOT(deleteLog()));
-    connect(Save, SIGNAL(released()), this, SLOT(saveLog()));
-    connect(Update, SIGNAL(released()), this, SLOT(updateLog()));
+    connect(Close, &QPushButton::released, this, &Viewer::close);
+    connect(Delete, &QPushButton::released, this, &Viewer::deleteLog);
+    connect(Save, &QPushButton::released, this, &Viewer::saveLog);
+    connect(Update, &QPushButton::released, this, &Viewer::updateLog);
 
-    connect(findBar, SIGNAL(firstPage()), this, SLOT(firstPage()));
-    connect(findBar, SIGNAL(lastPage()), this, SLOT(lastPage()));
-    connect(findBar, SIGNAL(prevPage()), this, SLOT(prevPage()));
-    connect(findBar, SIGNAL(nextPage()), this, SLOT(nextPage()));
+    connect(findBar, &ClientSwitcher::TypeAheadFindBar::firstPage, this, &Viewer::firstPage);
+    connect(findBar, &ClientSwitcher::TypeAheadFindBar::lastPage, this, &Viewer::lastPage);
+    connect(findBar, &ClientSwitcher::TypeAheadFindBar::prevPage, this, &Viewer::prevPage);
+    connect(findBar, &ClientSwitcher::TypeAheadFindBar::nextPage, this, &Viewer::nextPage);
 }
 
 void Viewer::closeEvent(QCloseEvent *e)

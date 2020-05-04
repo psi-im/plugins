@@ -94,53 +94,53 @@ void TypeAheadFindBar::init()
 
     d->le_find = new QLineEdit(this);
     d->le_find->setMaximumWidth(128);
-    connect(d->le_find, SIGNAL(textEdited(const QString &)), SLOT(textChanged(const QString &)));
+    connect(d->le_find, &QLineEdit::textEdited, this, &TypeAheadFindBar::textChanged);
     addWidget(d->le_find);
 
     d->but_prev = new QPushButton(this);
     d->but_prev->setFixedSize(25, 25);
     d->but_prev->setIcon(icoHost_->getIcon("psi/arrowUp"));
     d->but_prev->setEnabled(false);
-    connect(d->but_prev, SIGNAL(released()), SLOT(findPrevious()));
+    connect(d->but_prev, &QPushButton::released, this, &TypeAheadFindBar::findPrevious);
     addWidget(d->but_prev);
 
     d->but_next = new QPushButton(this);
     d->but_next->setFixedSize(25, 25);
     d->but_next->setIcon(icoHost_->getIcon("psi/arrowDown"));
     d->but_next->setEnabled(false);
-    connect(d->but_next, SIGNAL(released()), SLOT(findNext()));
+    connect(d->but_next, &QPushButton::released, this, &TypeAheadFindBar::findNext);
     addWidget(d->but_next);
 
     d->cb_case = new QCheckBox(tr("&Case sensitive"), this);
-    connect(d->cb_case, SIGNAL(clicked()), SLOT(caseToggled()));
+    connect(d->cb_case, &QCheckBox::clicked, this, &TypeAheadFindBar::caseToggled);
     addWidget(d->cb_case);
 
     addSeparator();
 
     d->first_page = new QPushButton(this);
     d->first_page->setToolTip(tr("First page"));
-    connect(d->first_page, SIGNAL(released()), SIGNAL(firstPage()));
+    connect(d->first_page, &QPushButton::released, this, &TypeAheadFindBar::firstPage);
     d->first_page->setFixedSize(25, 25);
     d->first_page->setIcon(icoHost_->getIcon("psi/doubleBackArrow"));
     addWidget(d->first_page);
 
     d->prev_page = new QPushButton(this);
     d->prev_page->setToolTip(tr("Previous page"));
-    connect(d->prev_page, SIGNAL(released()), SIGNAL(prevPage()));
+    connect(d->prev_page, &QPushButton::released, this, &TypeAheadFindBar::prevPage);
     d->prev_page->setFixedSize(25, 25);
     d->prev_page->setIcon(icoHost_->getIcon("psi/arrowLeft"));
     addWidget(d->prev_page);
 
     d->next_page = new QPushButton(this);
     d->next_page->setToolTip(tr("Next page"));
-    connect(d->next_page, SIGNAL(released()), SIGNAL(nextPage()));
+    connect(d->next_page, &QPushButton::released, this, &TypeAheadFindBar::nextPage);
     d->next_page->setFixedSize(25, 25);
     d->next_page->setIcon(icoHost_->getIcon("psi/arrowRight"));
     addWidget(d->next_page);
 
     d->last_page = new QPushButton(this);
     d->last_page->setToolTip(tr("Last page"));
-    connect(d->last_page, SIGNAL(released()), SIGNAL(lastPage()));
+    connect(d->last_page, &QPushButton::released, this, &TypeAheadFindBar::lastPage);
     d->last_page->setFixedSize(25, 25);
     d->last_page->setIcon(icoHost_->getIcon("psi/doubleNextArrow"));
     addWidget(d->last_page);

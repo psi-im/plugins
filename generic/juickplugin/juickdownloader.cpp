@@ -43,11 +43,11 @@ JuickDownloader::JuickDownloader(ApplicationInfoAccessingHost *host, QObject *p)
     QObject(p), inProgress_(false), manager_(new QNetworkAccessManager(this)), appInfo_(host),
     waitTimer_(new QTimer(this))
 {
-    connect(manager_, SIGNAL(finished(QNetworkReply *)), SLOT(requestFinished(QNetworkReply *)));
+    connect(manager_, &QNetworkAccessManager::finished, this, &JuickDownloader::requestFinished);
 
     waitTimer_->setSingleShot(true);
     waitTimer_->setInterval(1000);
-    connect(waitTimer_, SIGNAL(timeout()), SLOT(timeOut()));
+    connect(waitTimer_, &QTimer::timeout, this, &JuickDownloader::timeOut);
 
     //    qRegisterMetaType<JuickDownloadItem>("JuickDownloadItem");
 }

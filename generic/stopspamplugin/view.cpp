@@ -29,7 +29,7 @@ void Viewer::init()
     horizontalHeader()->setStretchLastSection(true);
     verticalHeader()->setDefaultAlignment(Qt::AlignHCenter);
 
-    connect(this, SIGNAL(clicked(QModelIndex)), this, SLOT(itemClicked(QModelIndex)));
+    connect(this, &Viewer::clicked, this, &Viewer::itemClicked);
 }
 
 void Viewer::itemClicked(QModelIndex index)

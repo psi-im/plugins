@@ -195,13 +195,15 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging *otrc, const QString &ac
     mainLayout->addLayout(buttonLayout);
     setLayout(mainLayout);
 
+    // TODO: update after stopping support of Ubuntu Xenial:
     connect(m_methodBox, SIGNAL(currentIndexChanged(int)), this, SLOT(changeMethod(int)));
     connect(m_methodBox, SIGNAL(currentIndexChanged(int)), this, SLOT(checkRequirements()));
-    connect(m_questionEdit, SIGNAL(textChanged(const QString &)), this, SLOT(checkRequirements()));
-    connect(m_answerEdit, SIGNAL(textChanged(const QString &)), this, SLOT(checkRequirements()));
-    connect(m_sharedSecretEdit, SIGNAL(textChanged(const QString &)), this, SLOT(checkRequirements()));
-    connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-    connect(m_startButton, SIGNAL(clicked()), this, SLOT(startAuthentication()));
+
+    connect(m_questionEdit, &QLineEdit::textChanged, this, &AuthenticationDialog::checkRequirements);
+    connect(m_answerEdit, &QLineEdit::textChanged, this, &AuthenticationDialog::checkRequirements);
+    connect(m_sharedSecretEdit, &QLineEdit::textChanged, this, &AuthenticationDialog::checkRequirements);
+    connect(m_cancelButton, &QPushButton::clicked, this, &AuthenticationDialog::reject);
+    connect(m_startButton, &QPushButton::clicked, this, &AuthenticationDialog::startAuthentication);
 
     if (!m_isSender) {
         if (question.isEmpty()) {
@@ -424,7 +426,7 @@ void PsiOtrClosure::authenticateContact(bool)
 
     m_authDialog = new AuthenticationDialog(m_otr, m_account, m_contact, QString(), true);
 
-    connect(m_authDialog, SIGNAL(destroyed()), this, SLOT(finishAuth()));
+    connect(m_authDialog, &AuthenticationDialog::destroyed, this, &PsiOtrClosure::finishAuth);
 
     m_authDialog->show();
 }
@@ -438,13 +440,13 @@ void PsiOtrClosure::receivedSMP(const QString &question)
         return;
     }
     if (m_authDialog) {
-        disconnect(m_authDialog, SIGNAL(destroyed()), this, SLOT(finishAuth()));
+        disconnect(m_authDialog, &AuthenticationDialog::destroyed, this, &PsiOtrClosure::finishAuth);
         finishAuth();
     }
 
     m_authDialog = new AuthenticationDialog(m_otr, m_account, m_contact, question, false);
 
-    connect(m_authDialog, SIGNAL(destroyed()), this, SLOT(finishAuth()));
+    connect(m_authDialog, &AuthenticationDialog::destroyed, this, &PsiOtrClosure::finishAuth);
 
     m_authDialog->show();
 }
@@ -566,23 +568,23 @@ QAction *PsiOtrClosure::getChatDlgMenu(QObject *parent)
     m_chatDlgMenu = new QMenu();
 
     m_startSessionAction = m_chatDlgMenu->addAction(QString());
-    connect(m_startSessionAction, SIGNAL(triggered(bool)), this, SLOT(initiateSession(bool)));
+    connect(m_startSessionAction, &QAction::triggered, this, &PsiOtrClosure::initiateSession);
 
     m_endSessionAction = m_chatDlgMenu->addAction(tr("&End private conversation"));
-    connect(m_endSessionAction, SIGNAL(triggered(bool)), this, SLOT(endSession(bool)));
+    connect(m_endSessionAction, &QAction::triggered, this, &PsiOtrClosure::endSession);
 
     m_chatDlgMenu->insertSeparator(nullptr);
 
     m_authenticateAction = m_chatDlgMenu->addAction(tr("&Authenticate contact"));
-    connect(m_authenticateAction, SIGNAL(triggered(bool)), this, SLOT(authenticateContact(bool)));
+    connect(m_authenticateAction, &QAction::triggered, this, &PsiOtrClosure::authenticateContact);
 
     m_sessionIdAction = m_chatDlgMenu->addAction(tr("Show secure session &ID"));
-    connect(m_sessionIdAction, SIGNAL(triggered(bool)), this, SLOT(sessionID(bool)));
+    connect(m_sessionIdAction, &QAction::triggered, this, &PsiOtrClosure::sessionID);
 
     m_fingerprintAction = m_chatDlgMenu->addAction(tr("Show own &fingerprint"));
-    connect(m_fingerprintAction, SIGNAL(triggered(bool)), this, SLOT(fingerprint(bool)));
+    connect(m_fingerprintAction, &QAction::triggered, this, &PsiOtrClosure::fingerprint);
 
-    connect(m_chatDlgAction, SIGNAL(triggered()), this, SLOT(showMenu()));
+    connect(m_chatDlgAction, &QAction::triggered, this, &PsiOtrClosure::showMenu);
 
     updateMessageState();
 

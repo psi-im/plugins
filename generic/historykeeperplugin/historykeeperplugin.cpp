@@ -243,7 +243,7 @@ QAction *HistoryKeeperPlugin::getContactAction(QObject *p, int /*acc*/, const QS
     act->setCheckable(true);
     act->setChecked(contacts.contains(jid));
     act->setProperty("jid", jid);
-    connect(act, SIGNAL(triggered(bool)), SLOT(actionActivated(bool)));
+    connect(act, &QAction::triggered, this, &HistoryKeeperPlugin::actionActivated);
 
     return act;
 }

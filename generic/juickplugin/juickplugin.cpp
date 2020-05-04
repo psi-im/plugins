@@ -103,8 +103,8 @@ QWidget *JuickPlugin::options()
 
     restoreOptions();
 
-    connect(ui_.pb_clearCache, SIGNAL(released()), SLOT(clearCache()));
-    connect(ui_.pb_editJids, SIGNAL(released()), SLOT(requestJidList()));
+    connect(ui_.pb_clearCache, &QPushButton::released, this, &JuickPlugin::clearCache);
+    connect(ui_.pb_editJids, &QPushButton::released, this, &JuickPlugin::requestJidList);
 
     return optionsWid;
 }
@@ -167,7 +167,7 @@ bool JuickPlugin::enable()
         createAvatarsDir();
     }
     downloader_ = new JuickDownloader(applicationInfo, this);
-    connect(downloader_, SIGNAL(finished(QList<QByteArray>)), SLOT(updateWidgets(QList<QByteArray>)));
+    connect(downloader_, &JuickDownloader::finished, this, &JuickPlugin::updateWidgets);
 
     setStyles();
 
@@ -319,7 +319,7 @@ QPixmap JuickPlugin::icon() const { return QPixmap(":/icons/juick.png"); }
 void JuickPlugin::requestJidList()
 {
     JuickJidList *jjl = new JuickJidList(jidList_, optionsWid);
-    connect(jjl, SIGNAL(listUpdated(QStringList)), SLOT(updateJidList(QStringList)));
+    connect(jjl, &JuickJidList::listUpdated, this, &JuickPlugin::updateJidList);
     jjl->show();
 }
 
@@ -1067,7 +1067,7 @@ void JuickPlugin::setupChatTab(QWidget *tab, int /*account*/, const QString &con
         QWidget *log = tab->findChild<QWidget *>("log");
         if (log) {
             logs_.append(log);
-            connect(log, SIGNAL(destroyed()), SLOT(removeWidget()));
+            connect(log, &QWidget::destroyed, this, &JuickPlugin::removeWidget);
         }
     }
 }

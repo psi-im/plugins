@@ -287,7 +287,7 @@ void Options::setRulePane(int row)
             QLineEdit *lineEdit = new QLineEdit();
             lineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
             ui->twConditions->setCellWidget(i, 2, lineEdit);
-            connect(lineEdit, SIGNAL(textEdited(QString)), SLOT(hack()));
+            connect(lineEdit, &QLineEdit::textEdited, this, &Options::hack);
 
             fillCondition(i);
         }

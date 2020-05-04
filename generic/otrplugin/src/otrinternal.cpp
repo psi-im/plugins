@@ -697,6 +697,7 @@ void OtrInternal::create_privkey(const char *accountname, const char *protocol)
     QEventLoop                   loop;
     QFutureWatcher<gcry_error_t> watcher;
 
+    // TODO: update after stopping support of Ubuntu Xenial:
     QObject::connect(&watcher, SIGNAL(finished()), &loop, SLOT(quit()));
 
     QFuture<gcry_error_t> future = QtConcurrent::run(otrl_privkey_generate_calculate, newkeyp);

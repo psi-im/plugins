@@ -191,7 +191,7 @@ bool AttentionPlugin::enable()
         }
         nudgeTimer_ = new QTimer(this);
         nudgeTimer_->setInterval(50);
-        connect(nudgeTimer_, SIGNAL(timeout()), SLOT(nudgeTimerTimeout()));
+        connect(nudgeTimer_, &QTimer::timeout, this, &AttentionPlugin::nudgeTimerTimeout);
     }
     return enabled;
 }
@@ -217,8 +217,8 @@ QWidget *AttentionPlugin::options()
     ui_.tb_open->setIcon(icoHost->getIcon("psi/browse"));
     ui_.tb_test->setIcon(icoHost->getIcon("psi/play"));
 
-    connect(ui_.tb_open, SIGNAL(clicked()), SLOT(getSound()));
-    connect(ui_.tb_test, SIGNAL(clicked()), SLOT(checkSound()));
+    connect(ui_.tb_open, &QToolButton::clicked, this, &AttentionPlugin::getSound);
+    connect(ui_.tb_test, &QToolButton::clicked, this, &AttentionPlugin::checkSound);
 
     restoreOptions();
 

@@ -212,11 +212,11 @@ QWidget *Reminder::options()
     ui_.tb_get->setIcon(icoHost->getIcon("psi/browse"));
     ui_.tb_check->setIcon(icoHost->getIcon("psi/play"));
 
-    connect(ui_.pb_update, SIGNAL(clicked()), SLOT(updateVCard()));
-    connect(ui_.pb_check, SIGNAL(clicked()), SLOT(check()));
-    connect(ui_.pb_clear_cache, SIGNAL(clicked()), SLOT(clearCache()));
-    connect(ui_.tb_check, SIGNAL(clicked()), SLOT(checkSound()));
-    connect(ui_.tb_get, SIGNAL(clicked()), SLOT(getSound()));
+    connect(ui_.pb_update, &QPushButton::clicked, this, &Reminder::updateVCard);
+    connect(ui_.pb_check, &QPushButton::clicked, this, &Reminder::check);
+    connect(ui_.pb_clear_cache, &QPushButton::clicked, this, &Reminder::clearCache);
+    connect(ui_.tb_check, &QPushButton::clicked, this, &Reminder::checkSound);
+    connect(ui_.tb_get, &QPushButton::clicked, this, &Reminder::getSound);
 
     restoreOptions();
 

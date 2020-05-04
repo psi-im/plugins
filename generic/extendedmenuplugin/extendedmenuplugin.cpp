@@ -443,7 +443,7 @@ QAction *ExtendedMenuPlugin::getAction(QObject *parent, int account, const QStri
     QAction *act = new QAction(icoHost->getIcon("menu/extendedmenu"), tr("Extended Actions"), parent);
     act->setProperty("account", account);
     act->setProperty("jid", contact);
-    connect(act, SIGNAL(triggered()), SLOT(toolbarActionActivated()));
+    connect(act, &QAction::triggered, this, &ExtendedMenuPlugin::toolbarActionActivated);
     return act;
 }
 

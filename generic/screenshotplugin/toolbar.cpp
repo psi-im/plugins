@@ -63,6 +63,7 @@ void ToolBar::init()
     setLineWidth(2);
     sb->setToolTip(tr("Line width"));
     addWidget(sb);
+    // TODO: update after stopping support of Ubuntu Xenial:
     connect(sb, SIGNAL(valueChanged(int)), this, SIGNAL(newWidth(int)));
 
     QPixmap pix(16, 16);
@@ -87,6 +88,7 @@ void ToolBar::init()
 
     for (Button *b : buttons_) {
         addAction(b);
+        // TODO: update after stopping support of Ubuntu Xenial:
         connect(b, SIGNAL(triggered(bool)), SLOT(buttonChecked(bool)));
         connect(b, SIGNAL(triggered()), SLOT(buttonClicked()));
     }

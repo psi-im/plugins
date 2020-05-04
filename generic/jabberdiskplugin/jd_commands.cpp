@@ -32,8 +32,8 @@ JDCommands::JDCommands(int account, const QString &jid, QObject *p) :
     eventLoop_(new QEventLoop(this)), lastCommand_(CommandNoCommand)
 {
     timer_->setInterval(TIMER_INTERVAL);
-    connect(jdc, SIGNAL(stanza(int, QDomElement)), this, SLOT(incomingStanza(int, QDomElement)));
-    connect(timer_, SIGNAL(timeout()), this, SLOT(timeOut()));
+    connect(jdc, &JabberDiskController::stanza, this, &JDCommands::incomingStanza);
+    connect(timer_, &QTimer::timeout, this, &JDCommands::timeOut);
 }
 
 JDCommands::~JDCommands() { timeOut(); }

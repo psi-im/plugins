@@ -71,10 +71,10 @@ SelectFigure::SelectFigure(const QString &player, QWidget *parent) : QWidget(par
     layout->addWidget(tb_knight, 0, 1);
     layout->addWidget(tb_bishop, 1, 1);
 
-    connect(tb_queen, SIGNAL(clicked()), this, SLOT(figureSelected()));
-    connect(tb_castle, SIGNAL(clicked()), this, SLOT(figureSelected()));
-    connect(tb_knight, SIGNAL(clicked()), this, SLOT(figureSelected()));
-    connect(tb_bishop, SIGNAL(clicked()), this, SLOT(figureSelected()));
+    connect(tb_queen,  &QPushButton::clicked, this, &SelectFigure::figureSelected);
+    connect(tb_castle, &QPushButton::clicked, this, &SelectFigure::figureSelected);
+    connect(tb_knight, &QPushButton::clicked, this, &SelectFigure::figureSelected);
+    connect(tb_bishop, &QPushButton::clicked, this, &SelectFigure::figureSelected);
 }
 
 void SelectFigure::figureSelected()
@@ -115,10 +115,10 @@ ChessWindow::ChessWindow(Figure::GameType type, bool enableSound_, QWidget *pare
 
     ui_.te_moves->setText(tr("    White    Black\n"));
 
-    connect(model_, SIGNAL(move(int, int, int, int, QString)), this, SIGNAL(move(int, int, int, int, QString)));
-    connect(model_, SIGNAL(move(int, int, int, int, QString)), this, SLOT(addMove(int, int, int, int)));
-    connect(model_, SIGNAL(figureKilled(Figure *)), this, SLOT(figureKilled(Figure *)));
-    connect(model_, SIGNAL(needNewFigure(QModelIndex, QString)), this, SLOT(needNewFigure(QModelIndex, QString)));
+    connect(model_, &BoardModel::move, this, &ChessWindow::move);
+    connect(model_, &BoardModel::move, this, &ChessWindow::addMove);
+    connect(model_, &BoardModel::figureKilled, this, &ChessWindow::figureKilled);
+    connect(model_, &BoardModel::needNewFigure, this, &ChessWindow::needNewFigure);
 
     createMenu();
 }
@@ -216,11 +216,13 @@ void ChessWindow::createMenu()
     gameMenu->addSeparator();
     gameMenu->addAction(soundAction);
 
+    // TODO: update after stopping support of Ubuntu Xenial:
     connect(loadAction, SIGNAL(triggered()), this, SLOT(load()));
-    connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
-    connect(quitAction, SIGNAL(triggered()), this, SLOT(close()), Qt::QueuedConnection);
-    connect(loseAction, SIGNAL(triggered()), this, SIGNAL(lose()));
-    connect(soundAction, SIGNAL(triggered(bool)), this, SIGNAL(toggleEnableSound(bool)));
+
+    connect(saveAction, &QAction::triggered, this, &ChessWindow::save);
+    connect(quitAction, &QAction::triggered, this, &ChessWindow::close, Qt::QueuedConnection);
+    connect(loseAction, &QAction::triggered, this, &ChessWindow::lose);
+    connect(soundAction, &QAction::triggered, this, &ChessWindow::toggleEnableSound);
 }
 
 void ChessWindow::load()
@@ -303,7 +305,7 @@ void ChessWindow::needNewFigure(QModelIndex index, const QString &player)
     pos.setX(pos.x() + index.column() * 50 + 4);
     pos.setY(pos.y() + index.row() * 50 + 25);
     sf->move(pos);
-    connect(sf, SIGNAL(newFigure(QString)), this, SLOT(newFigure(QString)));
+    connect(sf, &SelectFigure::newFigure, this, &ChessWindow::newFigure);
     sf->show();
 }
 

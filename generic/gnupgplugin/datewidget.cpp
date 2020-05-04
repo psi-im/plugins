@@ -44,11 +44,10 @@ DateWidget::DateWidget(QWidget *parent) :
 
     setPopup(_calendar);
 
-    connect(_calendar, SIGNAL(clicked(const QDate &)), SLOT(closeCalendar(const QDate &)));
-    connect(_tbCalendar, SIGNAL(clicked()), SLOT(showPopup()));
-    connect(_tbCalendar, SIGNAL(clicked()), SLOT(calendarSetDate()));
-
-    connect(_tbClean, SIGNAL(clicked()), SLOT(disableExpiration()));
+    connect(_calendar, &QCalendarWidget::clicked, this, &DateWidget::closeCalendar);
+    connect(_tbCalendar, &QToolButton::clicked, this, &DateWidget::showPopup);
+    connect(_tbCalendar, &QToolButton::clicked, this, &DateWidget::calendarSetDate);
+    connect(_tbClean, &QToolButton::clicked, this, &DateWidget::disableExpiration);
 }
 
 // Always use format of current locale

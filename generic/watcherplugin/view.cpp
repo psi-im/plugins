@@ -45,7 +45,7 @@ void Viewer::init(IconFactoryAccessingHost *iconHost)
                      + header->sectionSize(4) + verticalHeader()->width() + 5,
                  300); //не очень красиво, но по-другому не получилось %)
 
-    connect(this, SIGNAL(clicked(QModelIndex)), this, SLOT(itemClicked(QModelIndex)));
+    connect(this, &Viewer::clicked, this, &Viewer::itemClicked);
 }
 
 void Viewer::keyPressEvent(QKeyEvent *e)

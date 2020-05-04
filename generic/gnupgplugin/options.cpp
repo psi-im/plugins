@@ -50,10 +50,10 @@ Options::Options(QWidget *parent) : QWidget(parent), ui(new Ui::Options)
     QMenu *  menu = new QMenu(this);
 
     action = menu->addAction(tr("from file"));
-    connect(action, SIGNAL(triggered()), SLOT(importKeyFromFile()));
+    connect(action, &QAction::triggered, this, &Options::importKeyFromFile);
 
     action = menu->addAction(tr("from clipboard"));
-    connect(action, SIGNAL(triggered()), SLOT(importKeyFromClipboard()));
+    connect(action, &QAction::triggered, this, &Options::importKeyFromClipboard);
 
     ui->btnImport->setMenu(menu);
 
@@ -61,11 +61,11 @@ Options::Options(QWidget *parent) : QWidget(parent), ui(new Ui::Options)
 
     menu   = new QMenu(this);
     action = menu->addAction(tr("to file"));
-    connect(action, SIGNAL(triggered()), SLOT(exportKeyToFile()));
+    connect(action, &QAction::triggered, this, &Options::exportKeyToFile);
     ui->btnExport->addAction(action);
 
     action = menu->addAction(tr("to clipboard"));
-    connect(action, SIGNAL(triggered()), SLOT(exportKeyToClipboard()));
+    connect(action, &QAction::triggered, this, &Options::exportKeyToClipboard);
 
     ui->btnExport->setMenu(menu);
 }

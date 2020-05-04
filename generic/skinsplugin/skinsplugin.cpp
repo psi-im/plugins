@@ -133,16 +133,16 @@ QWidget *SkinsPlugin::options()
     ui_.lbl_wiki->setText(tr("<a href=\"https://psi-plus.com/wiki/en:plugins#skins_plugin\">Wiki (Online)</a>"));
     ui_.lbl_wiki->setOpenExternalLinks(true);
 
-    connect(ui_.pb_update, SIGNAL(released()), this, SLOT(updateSkins()));
-    connect(ui_.pb_preview, SIGNAL(released()), this, SLOT(loadPreview()));
-    connect(ui_.pb_update, SIGNAL(released()), this, SLOT(updateButtonPressed()));
-    connect(ui_.pb_open, SIGNAL(released()), this, SLOT(openButtonPressed()));
-    connect(ui_.pb_apply, SIGNAL(released()), this, SLOT(applySkin()));
-    connect(ui_.pb_create, SIGNAL(released()), this, SLOT(getSkinName()));
-    connect(ui_.pb_remove, SIGNAL(released()), this, SLOT(removeSkin()));
-    connect(ui_.pb_save, SIGNAL(released()), this, SLOT(overwrite()));
-    connect(ui_.lw_skins, SIGNAL(currentRowChanged(int)), this, SLOT(enableButton()));
-    connect(ui_.lw_skins, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(loadPreview()));
+    connect(ui_.pb_update, &QPushButton::released, this, &SkinsPlugin::updateSkins);
+    connect(ui_.pb_preview, &QPushButton::released, this, &SkinsPlugin::loadPreview);
+    connect(ui_.pb_update, &QPushButton::released, this, &SkinsPlugin::updateButtonPressed);
+    connect(ui_.pb_open, &QPushButton::released, this, &SkinsPlugin::openButtonPressed);
+    connect(ui_.pb_apply, &QPushButton::released, this, &SkinsPlugin::applySkin);
+    connect(ui_.pb_create, &QPushButton::released, this, &SkinsPlugin::getSkinName);
+    connect(ui_.pb_remove, &QPushButton::released, this, &SkinsPlugin::removeSkin);
+    connect(ui_.pb_save, &QPushButton::released, this, &SkinsPlugin::overwrite);
+    connect(ui_.lw_skins, &QListWidget::currentRowChanged, this, &SkinsPlugin::enableButton);
+    connect(ui_.lw_skins, &QListWidget::doubleClicked, this, &SkinsPlugin::loadPreview);
 
     ui_.cb_hack->setVisible(false); // Hack, to enable Apply button
 
@@ -208,7 +208,7 @@ void SkinsPlugin::loadPreview()
 
     Previewer *prev = new Previewer(skin);
     if (prev->loadSkinInformation()) {
-        connect(prev, SIGNAL(applySkin()), this, SLOT(applySkin()));
+        connect(prev, &Previewer::applySkin, this, &SkinsPlugin::applySkin);
         prev->show();
     } else
         delete (prev);
@@ -263,7 +263,7 @@ void SkinsPlugin::getSkinName()
         }
     }
     GetSkinName *getName = new GetSkinName(name, author, version);
-    connect(getName, SIGNAL(ok(QString, QString, QString)), this, SLOT(createSkin(QString, QString, QString)));
+    connect(getName, &GetSkinName::ok, this, &SkinsPlugin::createSkin);
     getName->show();
 }
 

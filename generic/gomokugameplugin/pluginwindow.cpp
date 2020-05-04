@@ -86,13 +86,12 @@ void PluginWindow::init(const QString &element)
     // Инициируем модель доски
     if (bmodel == nullptr) {
         bmodel = new BoardModel(this);
-        connect(bmodel, SIGNAL(changeGameStatus(GameModel::GameStatus)), this,
-                SLOT(changeGameStatus(GameModel::GameStatus)));
-        connect(bmodel, SIGNAL(setupElement(int, int)), this, SLOT(setupElement(int, int)));
-        connect(bmodel, SIGNAL(lose()), this, SLOT(setLose()), Qt::QueuedConnection);
-        connect(bmodel, SIGNAL(draw()), this, SLOT(setDraw()), Qt::QueuedConnection);
-        connect(bmodel, SIGNAL(switchColor()), this, SIGNAL(switchColor()));
-        connect(bmodel, SIGNAL(doPopup(const QString)), this, SIGNAL(doPopup(const QString)));
+        connect(bmodel, &BoardModel::changeGameStatus, this, &PluginWindow::changeGameStatus);
+        connect(bmodel, &BoardModel::setupElement, this, &PluginWindow::setupElement);
+        connect(bmodel, &BoardModel::lose, this, &PluginWindow::setLose, Qt::QueuedConnection);
+        connect(bmodel, &BoardModel::draw, this, &PluginWindow::setDraw, Qt::QueuedConnection);
+        connect(bmodel, &BoardModel::switchColor, this, &PluginWindow::switchColor);
+        connect(bmodel, &BoardModel::doPopup, this, &PluginWindow::doPopup);
     }
     bmodel->init(new GameModel(elemType, 15, 15)); // GameModel убивается при уничтожении BoardModel
     ui->board->setModel(bmodel);

@@ -137,7 +137,7 @@ ImagePreviewPlugin::ImagePreviewPlugin() :
     psiOptions(nullptr), enabled(false), manager(new QNetworkAccessManager(this)), previewSize(0), sizeLimit(0),
     allowUpscale(false), appInfoHost(nullptr)
 {
-    connect(manager, SIGNAL(finished(QNetworkReply *)), SLOT(imageReply(QNetworkReply *)));
+    connect(manager, &QNetworkAccessManager::finished, this, &ImagePreviewPlugin::imageReply);
 }
 
 QString ImagePreviewPlugin::name() const { return "Image Preview Plugin"; }

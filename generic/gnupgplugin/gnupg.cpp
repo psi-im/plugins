@@ -204,7 +204,7 @@ void GnuPG::actionActivated()
 
         QAction *action = _menu->addAction(str);
         action->setData(model->item(i, Model::Fingerprint)->text());
-        connect(action, SIGNAL(triggered()), SLOT(sendPublicKey()));
+        connect(action, &QAction::triggered, this, &GnuPG::sendPublicKey);
     }
 
     _menu->popup(QCursor::pos());

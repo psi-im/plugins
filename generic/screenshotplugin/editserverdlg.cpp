@@ -26,7 +26,7 @@ EditServerDlg::EditServerDlg(QWidget *parent) : QDialog(parent)
     setModal(false);
     ui_.setupUi(this);
 
-    connect(ui_.buttonBox, SIGNAL(accepted()), SLOT(onOkPressed()));
+    connect(ui_.buttonBox, &QDialogButtonBox::accepted, this, &EditServerDlg::onOkPressed);
 }
 
 void EditServerDlg::onOkPressed()

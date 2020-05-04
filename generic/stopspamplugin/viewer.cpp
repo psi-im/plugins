@@ -47,15 +47,15 @@ ViewLog::ViewLog(const QString &filename, IconFactoryAccessingHost *IcoHost, QWi
     butLayout->addWidget(Close);
     layout->addWidget(findBar);
     layout->addLayout(butLayout);
-    connect(Close, SIGNAL(released()), this, SLOT(close()));
-    connect(Delete, SIGNAL(released()), this, SLOT(deleteLog()));
-    connect(Save, SIGNAL(released()), this, SLOT(saveLog()));
-    connect(Update, SIGNAL(released()), this, SLOT(updateLog()));
+    connect(Close, &QPushButton::released, this, &ViewLog::close);
+    connect(Delete, &QPushButton::released, this, &ViewLog::deleteLog);
+    connect(Save, &QPushButton::released, this, &ViewLog::saveLog);
+    connect(Update, &QPushButton::released, this, &ViewLog::updateLog);
 
-    connect(findBar, SIGNAL(firstPage()), this, SLOT(firstPage()));
-    connect(findBar, SIGNAL(lastPage()), this, SLOT(lastPage()));
-    connect(findBar, SIGNAL(prevPage()), this, SLOT(prevPage()));
-    connect(findBar, SIGNAL(nextPage()), this, SLOT(nextPage()));
+    connect(findBar, &Stopspam::TypeAheadFindBar::firstPage, this, &ViewLog::firstPage);
+    connect(findBar, &Stopspam::TypeAheadFindBar::lastPage, this, &ViewLog::lastPage);
+    connect(findBar, &Stopspam::TypeAheadFindBar::prevPage, this, &ViewLog::prevPage);
+    connect(findBar, &Stopspam::TypeAheadFindBar::nextPage, this, &ViewLog::nextPage);
 }
 
 void ViewLog::closeEvent(QCloseEvent *e)

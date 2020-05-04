@@ -341,12 +341,12 @@ QWidget *TranslatePlugin::options()
         }
     }
     hBox->addLayout(rightSide);
-    connect(delButton, SIGNAL(clicked()), this, SLOT(del()));
-    connect(addButton, SIGNAL(clicked()), this, SLOT(addToMap()));
-    connect(modShortCut, SIGNAL(clicked()), this, SLOT(grep()));
-    connect(restoreButton, SIGNAL(clicked()), this, SLOT(restoreMap()));
-    connect(table, SIGNAL(cellChanged(int, int)), this, SLOT(changeItem(int, int)));
-    connect(table, SIGNAL(itemDoubleClicked(QTableWidgetItem *)), this, SLOT(storeItem(QTableWidgetItem *)));
+    connect(delButton, &QPushButton::clicked, this, &TranslatePlugin::del);
+    connect(addButton, &QPushButton::clicked, this, &TranslatePlugin::addToMap);
+    connect(modShortCut, &QPushButton::clicked, this, &TranslatePlugin::grep);
+    connect(restoreButton, &QPushButton::clicked, this, &TranslatePlugin::restoreMap);
+    connect(table, &QTableWidget::cellChanged, this, &TranslatePlugin::changeItem);
+    connect(table, &QTableWidget::itemDoubleClicked, this, &TranslatePlugin::storeItem);
     return options_;
 }
 
@@ -570,7 +570,7 @@ void TranslatePlugin::storeItem(QTableWidgetItem *item) { storage = item->text()
 
 void TranslatePlugin::restoreMap()
 {
-    disconnect(table, SIGNAL(cellChanged(int, int)), this, SLOT(changeItem(int, int)));
+    disconnect(table, &QTableWidget::cellChanged, this, &TranslatePlugin::changeItem);
     table->clear();
     table->setRowCount(0);
     for (const QString &symbol : mapBackup.keys()) {
@@ -578,7 +578,7 @@ void TranslatePlugin::restoreMap()
         table->setItem(table->rowCount() - 1, 0, new QTableWidgetItem(symbol));
         table->setItem(table->rowCount() - 1, 1, new QTableWidgetItem(mapBackup.value(symbol)));
     }
-    connect(table, SIGNAL(cellChanged(int, int)), this, SLOT(changeItem(int, int)));
+    connect(table, &QTableWidget::cellChanged, this, &TranslatePlugin::changeItem);
     hack();
 }
 
@@ -597,8 +597,8 @@ void TranslatePlugin::setupTab(QWidget *tab, const QString &data)
     act->setData(data);
     act->setShortcut(QKeySequence(shortCut));
     act->setShortcutContext(Qt::WindowShortcut);
-    connect(act, SIGNAL(triggered()), SLOT(trans()));
-    connect(act, SIGNAL(destroyed(QObject *)), SLOT(actionDestroyed(QObject *)));
+    connect(act, &QAction::triggered, this, &TranslatePlugin::trans);
+    connect(act, &QAction::destroyed, this, &TranslatePlugin::actionDestroyed);
     actions_.append(act);
 }
 

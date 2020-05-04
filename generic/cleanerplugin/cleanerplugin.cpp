@@ -74,7 +74,7 @@ QWidget *CleanerPlugin::options()
     wikiLink->setOpenExternalLinks(true);
     hbox->addStretch();
     hbox->addWidget(wikiLink);
-    connect(goButton, SIGNAL(released()), SLOT(start()));
+    connect(goButton, &QPushButton::released, this, &CleanerPlugin::start);
 
     return options;
 }

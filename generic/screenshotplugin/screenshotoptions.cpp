@@ -28,8 +28,8 @@ ScreenshotOptions::ScreenshotOptions(int delay, QWidget *parent) : QDialog(paren
     ui_.setupUi(this);
     ui_.sb_delay->setValue(delay);
 
-    connect(ui_.buttonBox, SIGNAL(accepted()), SLOT(okPressed()));
-    connect(ui_.buttonBox, SIGNAL(rejected()), SLOT(cancelPressed()));
+    connect(ui_.buttonBox, &QDialogButtonBox::accepted, this, &ScreenshotOptions::okPressed);
+    connect(ui_.buttonBox, &QDialogButtonBox::rejected, this, &ScreenshotOptions::cancelPressed);
 
     adjustSize();
     setFixedSize(size());

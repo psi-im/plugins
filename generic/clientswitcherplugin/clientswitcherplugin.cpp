@@ -170,12 +170,13 @@ QWidget *ClientSwitcherPlugin::options()
     if (pos < 0)
         ui_options.bt_viewlog->setEnabled(false);
     //--
-    connect(ui_options.cb_allaccounts, SIGNAL(stateChanged(int)), this, SLOT(enableAccountsList(int)));
+    connect(ui_options.cb_allaccounts, &QCheckBox::stateChanged, this, &ClientSwitcherPlugin::enableAccountsList);
+    connect(ui_options.bt_viewlog, &QPushButton::released, this, &ClientSwitcherPlugin::viewFromOpt);
+    // TODO: update after stopping support of Ubuntu Xenial:
     connect(ui_options.cb_accounts, SIGNAL(currentIndexChanged(int)), this, SLOT(restoreOptionsAcc(int)));
     connect(ui_options.cmb_lockrequ, SIGNAL(currentIndexChanged(int)), this, SLOT(enableMainParams(int)));
     connect(ui_options.cb_ospreset, SIGNAL(currentIndexChanged(int)), this, SLOT(enableOsParams(int)));
     connect(ui_options.cb_clientpreset, SIGNAL(currentIndexChanged(int)), this, SLOT(enableClientParams(int)));
-    connect(ui_options.bt_viewlog, SIGNAL(released()), this, SLOT(viewFromOpt()));
     restoreOptions();
 
     return optionsWid;
@@ -966,7 +967,7 @@ void ClientSwitcherPlugin::showLog(const QString &filename)
         delete (v);
         return;
     }
-    connect(v, SIGNAL(onClose(int, int)), this, SLOT(onCloseView(int, int)));
+    connect(v, &Viewer::onClose, this, &ClientSwitcherPlugin::onCloseView);
     v->show();
 }
 

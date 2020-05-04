@@ -33,8 +33,8 @@ EditItemDlg::EditItemDlg(IconFactoryAccessingHost *icoHost, OptionAccessingHost 
     ui_.tb_open->setIcon(icoHost->getIcon("psi/browse"));
     ui_.tb_test->setIcon(icoHost->getIcon("psi/play"));
 
-    connect(ui_.tb_test, SIGNAL(pressed()), SLOT(doTestSound()));
-    connect(ui_.tb_open, SIGNAL(pressed()), SLOT(getFileName()));
+    connect(ui_.tb_test, &QToolButton::pressed, this, &EditItemDlg::doTestSound);
+    connect(ui_.tb_open, &QToolButton::pressed, this, &EditItemDlg::getFileName);
 }
 
 void EditItemDlg::init(const QString &settings)

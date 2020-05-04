@@ -32,8 +32,8 @@ EditNote::EditNote(QWidget *parent, const QString &tags, const QString &title, c
     ui_.le_tags->setText(tags);
     ui_.pte_text->insertPlainText(text);
 
-    connect(ui_.buttonBox, SIGNAL(accepted()), this, SLOT(ok()));
-    connect(ui_.buttonBox, SIGNAL(rejected()), this, SLOT(close()));
+    connect(ui_.buttonBox, &QDialogButtonBox::accepted, this, &EditNote::ok);
+    connect(ui_.buttonBox, &QDialogButtonBox::rejected, this, &EditNote::close);
 }
 
 EditNote::~EditNote() { }

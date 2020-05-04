@@ -82,8 +82,8 @@ QWidget *JabberDiskPlugin::options()
 
     restoreOptions();
 
-    connect(ui_.pb_add, SIGNAL(clicked()), SLOT(addJid()));
-    connect(ui_.pb_delete, SIGNAL(clicked()), SLOT(removeJid()));
+    connect(ui_.pb_add, &QPushButton::clicked, this, &JabberDiskPlugin::addJid);
+    connect(ui_.pb_delete, &QPushButton::clicked, this, &JabberDiskPlugin::removeJid);
 
     return options_;
 }
@@ -173,7 +173,7 @@ QAction *JabberDiskPlugin::getContactAction(QObject *p, int acc, const QString &
             QAction *act = new QAction(iconHost->getIcon("psi/save"), tr("Jabber Disk"), p);
             act->setProperty("account", acc);
             act->setProperty("jid", jid.toLower().split("/").at(0));
-            connect(act, SIGNAL(triggered()), JabberDiskController::instance(), SLOT(initSession()));
+            connect(act, &QAction::triggered, JabberDiskController::instance(), &JabberDiskController::initSession);
             return act;
         }
     }

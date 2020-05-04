@@ -254,7 +254,7 @@ bool StopSpam::enable()
         Jids     = psiOptions->getPluginOption(constJids, QVariant(Jids)).toStringList();
         selected = psiOptions->getPluginOption(constselected, QVariant(selected)).value<QVariantList>();
         model_   = new Model(Jids, selected, this);
-        connect(model_, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(hack()));
+        connect(model_, &Model::dataChanged, this, &StopSpam::hack);
 
         // register popup option
         int interval = psiOptions->getPluginOption(constInterval, QVariant(5000)).toInt() / 1000;
@@ -380,20 +380,20 @@ QWidget *StopSpam::options()
     }
     options_ = new QWidget();
     ui_.setupUi(options_);
-    connect(options_, SIGNAL(destroyed()), SLOT(onOptionsClose()));
+    connect(options_, &QWidget::destroyed, this, &StopSpam::onOptionsClose);
 
     ui_.tv_rules->setModel(model_);
     ui_.tv_rules->init();
 
-    connect(ui_.cb_send_block_all_mes, SIGNAL(stateChanged(int)), SLOT(changeWidgetsState()));
-    connect(ui_.cb_enable_muc, SIGNAL(stateChanged(int)), SLOT(changeWidgetsState()));
-    connect(ui_.cb_block_privates, SIGNAL(stateChanged(int)), SLOT(changeWidgetsState()));
+    connect(ui_.cb_send_block_all_mes, &QCheckBox::stateChanged, this, &StopSpam::changeWidgetsState);
+    connect(ui_.cb_enable_muc, &QCheckBox::stateChanged, this, &StopSpam::changeWidgetsState);
+    connect(ui_.cb_block_privates, &QCheckBox::stateChanged, this, &StopSpam::changeWidgetsState);
 
-    connect(ui_.pb_add, SIGNAL(released()), SLOT(addRow()));
-    connect(ui_.pb_del, SIGNAL(released()), SLOT(removeRow()));
+    connect(ui_.pb_add, &QPushButton::released, this, &StopSpam::addRow);
+    connect(ui_.pb_del, &QPushButton::released, this, &StopSpam::removeRow);
 
-    connect(ui_.pb_reset, SIGNAL(released()), SLOT(resetCounter()));
-    connect(ui_.pb_view, SIGNAL(released()), SLOT(view()));
+    connect(ui_.pb_reset, &QPushButton::released, this, &StopSpam::resetCounter);
+    connect(ui_.pb_view, &QPushButton::released, this, &StopSpam::view);
 
     restoreOptions();
     changeWidgetsState();
@@ -716,7 +716,7 @@ void StopSpam::view()
         QString path = appInfoHost->appProfilesDir(ApplicationInfoAccessingHost::DataLocation) + QDir::separator()
             + "Blockedstanzas.log";
         viewer = new ViewLog(path, icoHost);
-        connect(viewer, SIGNAL(onClose(int, int)), this, SLOT(close(int, int)));
+        connect(viewer, &ViewLog::onClose, this, &StopSpam::close);
         if (!viewer->init())
             return;
         viewer->resize(Width, Height);

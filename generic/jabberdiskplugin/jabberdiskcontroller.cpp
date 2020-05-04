@@ -84,7 +84,7 @@ void JabberDiskController::initSession()
             sessions_.at(sessions_.indexOf(s)).window->raise();
         } else {
             s.window = new JDMainWin(accInfo->getJid(account), jid, account);
-            connect(s.window, SIGNAL(destroyed()), SLOT(viewerDestroyed()));
+            connect(s.window, &JDMainWin::destroyed, this, &JabberDiskController::viewerDestroyed);
             sessions_.append(s);
         }
     }

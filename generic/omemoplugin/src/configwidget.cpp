@@ -46,6 +46,7 @@ ConfigWidget::ConfigWidget(OMEMO *omemo, AccountInfoAccessingHost *accountInfo) 
     mainLayout->addWidget(m_tabWidget);
     setLayout(mainLayout);
 
+    // TODO: update after stopping support of Ubuntu Xenial:
     connect(accountBox, SIGNAL(currentIndexChanged(int)), SLOT(currentAccountChanged(int)));
 }
 
@@ -214,14 +215,13 @@ ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
     auto mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(m_table);
 
-    connect(m_table->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-            SLOT(selectionChanged(const QItemSelection &, const QItemSelection &)));
+    connect(m_table->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ManageDevices::selectionChanged);
 
-    connect(m_omemo, SIGNAL(deviceListUpdated(int)), SLOT(deviceListUpdated(int)));
+    connect(m_omemo, &OMEMO::deviceListUpdated, this, &ManageDevices::deviceListUpdated);
 
     m_deleteButton = new QPushButton(tr("Delete"), this);
     m_deleteButton->setEnabled(false);
-    connect(m_deleteButton, SIGNAL(clicked()), SLOT(deleteDevice()));
+    connect(m_deleteButton, &QPushButton::clicked, this, &ManageDevices::deleteDevice);
     mainLayout->addWidget(m_deleteButton);
 
     setLayout(mainLayout);

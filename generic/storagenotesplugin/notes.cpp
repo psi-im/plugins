@@ -49,20 +49,20 @@ Notes::Notes(StorageNotesPlugin *storageNotes, int acc, QWidget *parent) :
     ui_.lv_notes->setItemDelegate(new NotesViewDelegate(this));
     ui_.lv_notes->setModel(proxyModel_);
 
-    connect(ui_.tv_tags, SIGNAL(clicked(QModelIndex)), this, SLOT(selectTag()));
-    connect(ui_.lv_notes, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(edit()));
-    connect(ui_.pb_save, SIGNAL(released()), this, SLOT(save()));
-    connect(ui_.pb_close, SIGNAL(released()), this, SLOT(close()));
-    connect(ui_.pb_load, SIGNAL(released()), this, SLOT(load()));
-    connect(ui_.pb_add, SIGNAL(released()), this, SLOT(add()));
-    connect(ui_.pb_delete, SIGNAL(released()), this, SLOT(del()));
-    connect(ui_.pb_edit, SIGNAL(released()), this, SLOT(edit()));
+    connect(ui_.tv_tags, &QTreeView::clicked, this, &Notes::selectTag);
+    connect(ui_.lv_notes, &QListView::doubleClicked, this, &Notes::edit);
+    connect(ui_.pb_save, &QPushButton::released, this, &Notes::save);
+    connect(ui_.pb_close, &QPushButton::released, this, &Notes::close);
+    connect(ui_.pb_load, &QPushButton::released, this, &Notes::load);
+    connect(ui_.pb_add, &QPushButton::released, this, &Notes::add);
+    connect(ui_.pb_delete, &QPushButton::released, this, &Notes::del);
+    connect(ui_.pb_edit, &QPushButton::released, this, &Notes::edit);
 
     ui_.tv_tags->installEventFilter(this);
 
     updateTagsTimer_->setSingleShot(true);
     updateTagsTimer_->setInterval(100);
-    connect(updateTagsTimer_, SIGNAL(timeout()), this, SLOT(updateTags()));
+    connect(updateTagsTimer_, &QTimer::timeout, this, &Notes::updateTags);
 }
 
 Notes::~Notes() { }
@@ -134,7 +134,7 @@ void Notes::add()
         tag = QString();
 
     EditNote *editNote = new EditNote(this, tag);
-    connect(editNote, SIGNAL(newNote(QDomElement)), this, SLOT(addNote(QDomElement)));
+    connect(editNote, &EditNote::newNote, this, &Notes::addNote);
     editNote->show();
 
     newNotes = true;
@@ -180,7 +180,7 @@ void Notes::edit()
     QString tags  = index.data(NoteModel::TagRole).toString();
 
     EditNote *editNote = new EditNote(this, tags, title, text, index);
-    connect(editNote, SIGNAL(editNote(QDomElement, QModelIndex)), this, SLOT(noteEdited(QDomElement, QModelIndex)));
+    connect(editNote, &EditNote::editNote, this, &Notes::noteEdited);
     editNote->show();
 }
 

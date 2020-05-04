@@ -48,8 +48,7 @@ void BoardModel::init(GameModel *gm)
     setHeaders();
     beginResetModel();
     endResetModel();
-    connect(gameModel, SIGNAL(statusUpdated(GameModel::GameStatus)), this,
-            SIGNAL(changeGameStatus(GameModel::GameStatus)));
+    connect(gameModel, &GameModel::statusUpdated, this, &BoardModel::changeGameStatus);
     emit changeGameStatus(gm->gameStatus());
 }
 

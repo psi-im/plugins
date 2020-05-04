@@ -523,7 +523,7 @@ QWidget *ExtendedOptions::options()
     mucRosterLay->addLayout(parcLayout);
     mucRosterLay->addLayout(vscLayout);
     mucRosterLay->addLayout(nrcLayout);
-    connect(groupMucRoster, SIGNAL(toggled(bool)), SLOT(hack()));
+    connect(groupMucRoster, &QGroupBox::toggled, this, &ExtendedOptions::hack);
 
     tipText               = new ExtToolButton;
     QHBoxLayout *ttLayout = new QHBoxLayout;
@@ -542,7 +542,7 @@ QWidget *ExtendedOptions::options()
     QVBoxLayout *tipLay = new QVBoxLayout(groupTip);
     tipLay->addLayout(ttLayout);
     tipLay->addLayout(tbLayout);
-    connect(groupTip, SIGNAL(toggled(bool)), SLOT(hack()));
+    connect(groupTip, &QGroupBox::toggled, this, &ExtendedOptions::hack);
 
     composingBut                 = new ExtToolButton;
     QHBoxLayout *composingLayout = new QHBoxLayout;
@@ -568,6 +568,7 @@ QWidget *ExtendedOptions::options()
     b_color->addButton(tipBase);
     b_color->addButton(composingBut);
     b_color->addButton(unreadBut);
+    // TODO: update after stopping support of Ubuntu Xenial:
     connect(b_color, SIGNAL(buttonClicked(QAbstractButton *)), SLOT(chooseColor(QAbstractButton *)));
 
     QGroupBox *  group3Box  = new QGroupBox(tr("Colors:"));

@@ -55,7 +55,7 @@ HistoryView::HistoryView(const QString &filename, QWidget *parent) : QDialog(par
         butLayout->addWidget(Close);
         butLayout->addStretch();
         layout->addLayout(butLayout);
-        connect(Close, SIGNAL(released()), this, SLOT(close()));
+        connect(Close, &QPushButton::released, this, &HistoryView::close);
         resize(800, 500);
         show();
     } else
@@ -109,7 +109,7 @@ vCardView::vCardView(const QString &filename, QWidget *parent) : QDialog(parent,
         butLayout->addWidget(Close);
         butLayout->addStretch();
         layout->addLayout(butLayout);
-        connect(Close, SIGNAL(released()), this, SLOT(close()));
+        connect(Close, &QPushButton::released, this, &vCardView::close);
         setFixedSize(400, 200);
         show();
     } else
@@ -131,7 +131,7 @@ AvatarView::AvatarView(const QPixmap &pix, QWidget *parent) : QDialog(parent), p
     pbSave->setToolTip(tr("Save Image"));
     layout->addWidget(pbSave);
     layout->addWidget(pixLabel);
-    connect(pbSave, SIGNAL(released()), this, SLOT(save()));
+    connect(pbSave, &QPushButton::released, this, &AvatarView::save);
     adjustSize();
 }
 

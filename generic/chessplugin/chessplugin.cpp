@@ -261,15 +261,15 @@ QWidget *ChessPlugin::options()
 
     restoreOptions();
 
-    connect(ui_.play_error, SIGNAL(pressed()), this, SLOT(testSound()));
-    connect(ui_.play_finish, SIGNAL(pressed()), this, SLOT(testSound()));
-    connect(ui_.play_move, SIGNAL(pressed()), this, SLOT(testSound()));
-    connect(ui_.play_start, SIGNAL(pressed()), this, SLOT(testSound()));
+    connect(ui_.play_error, &QPushButton::pressed, this, &ChessPlugin::testSound);
+    connect(ui_.play_finish, &QPushButton::pressed, this, &ChessPlugin::testSound);
+    connect(ui_.play_move, &QPushButton::pressed, this, &ChessPlugin::testSound);
+    connect(ui_.play_start, &QPushButton::pressed, this, &ChessPlugin::testSound);
 
-    connect(ui_.select_error, SIGNAL(pressed()), this, SLOT(getSound()));
-    connect(ui_.select_finish, SIGNAL(pressed()), this, SLOT(getSound()));
-    connect(ui_.select_start, SIGNAL(pressed()), this, SLOT(getSound()));
-    connect(ui_.select_move, SIGNAL(pressed()), this, SLOT(getSound()));
+    connect(ui_.select_error, &QPushButton::pressed, this, &ChessPlugin::getSound);
+    connect(ui_.select_finish, &QPushButton::pressed, this, &ChessPlugin::getSound);
+    connect(ui_.select_start, &QPushButton::pressed, this, &ChessPlugin::getSound);
+    connect(ui_.select_move, &QPushButton::pressed, this, &ChessPlugin::getSound);
     return options;
 }
 
@@ -326,7 +326,7 @@ QList<QVariantHash> ChessPlugin::getButtonParam() { return QList<QVariantHash>()
 QAction *ChessPlugin::getAction(QObject *parent, int, const QString &)
 {
     QAction *action = new QAction(icon(), tr("Chess!"), parent);
-    connect(action, SIGNAL(triggered(bool)), SLOT(toolButtonPressed()));
+    connect(action, &QAction::triggered, this, &ChessPlugin::toolButtonPressed);
     return action;
 }
 
@@ -418,8 +418,7 @@ void ChessPlugin::invite(Request &r)
         resList = contactInfo->resources(r.account, r.jid);
     }
     InviteDialog *id = new InviteDialog(r, resList);
-    connect(id, SIGNAL(play(const Request &, const QString &, const QString &)), this,
-            SLOT(sendInvite(const Request &, const QString &, const QString &)));
+    connect(id, &InviteDialog::play, this, &ChessPlugin::sendInvite);
     id->show();
 }
 
@@ -511,14 +510,17 @@ void ChessPlugin::acceptGame()
     waitFor = false;
     theEnd_ = false;
     board   = new ChessWindow(currentGame_.type, enableSound);
-    connect(board, SIGNAL(closeBoard()), this, SLOT(closeBoardEvent()), Qt::QueuedConnection);
-    connect(board, SIGNAL(move(int, int, int, int, QString)), this, SLOT(move(int, int, int, int, QString)));
-    connect(board, SIGNAL(moveAccepted()), this, SLOT(moveAccepted()));
-    connect(board, SIGNAL(error()), this, SLOT(error()));
+
+    // TODO: update after stopping support of Ubuntu Xenial:
     connect(board, SIGNAL(load(QString)), this, SLOT(load(QString)));
-    connect(board, SIGNAL(draw()), this, SLOT(draw()));
-    connect(board, SIGNAL(lose()), this, SLOT(youLose()));
-    connect(board, SIGNAL(toggleEnableSound(bool)), this, SLOT(toggleEnableSound(bool)));
+
+    connect(board, &ChessWindow::closeBoard, this, &ChessPlugin::closeBoardEvent, Qt::QueuedConnection);
+    connect(board, &ChessWindow::move, this, &ChessPlugin::move);
+    connect(board, &ChessWindow::moveAccepted, this, &ChessPlugin::moveAccepted);
+    connect(board, &ChessWindow::error, this, &ChessPlugin::error);
+    connect(board, &ChessWindow::draw, this, &ChessPlugin::draw);
+    connect(board, &ChessWindow::lose, this, &ChessPlugin::youLose);
+    connect(board, &ChessWindow::toggleEnableSound, this, &ChessPlugin::toggleEnableSound);
     board->show();
     if ((DefSoundSettings || psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool())
         && enableSound)
@@ -782,8 +784,8 @@ void ChessPlugin::doInviteDialog(const QString &jid)
         color = "white";
 
     InvitationDialog *id = new InvitationDialog(currentGame_.jid, color);
-    connect(id, SIGNAL(accept()), this, SLOT(accept()));
-    connect(id, SIGNAL(reject()), this, SLOT(reject()));
+    connect(id, &InvitationDialog::accept, this, &ChessPlugin::accept);
+    connect(id, &InvitationDialog::reject, this, &ChessPlugin::reject);
     id->show();
 }
 

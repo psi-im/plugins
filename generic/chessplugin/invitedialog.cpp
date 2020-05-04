@@ -33,8 +33,8 @@ InviteDialog::InviteDialog(const Request &_r, const QStringList &resources, QWid
         ui_.cb_resource->addItem("Enter resource");
     }
 
-    connect(ui_.pb_black, SIGNAL(pressed()), this, SLOT(buttonPressed()));
-    connect(ui_.pb_white, SIGNAL(pressed()), this, SLOT(buttonPressed()));
+    connect(ui_.pb_black, &QPushButton::pressed, this, &InviteDialog::buttonPressed);
+    connect(ui_.pb_white, &QPushButton::pressed, this, &InviteDialog::buttonPressed);
 
     adjustSize();
     setFixedSize(size());
@@ -76,8 +76,8 @@ InvitationDialog::InvitationDialog(const QString &jid, QString color, QWidget *p
     ui_.lbl_text->setText(
         tr("Player %1 invites you \nto play chess. He wants to play %2.").arg(unescape(jid)).arg(color));
 
-    connect(ui_.pb_accept, SIGNAL(pressed()), this, SLOT(buttonPressed()));
-    connect(ui_.pb_reject, SIGNAL(pressed()), this, SLOT(close()));
+    connect(ui_.pb_accept, &QPushButton::pressed, this, &InvitationDialog::buttonPressed);
+    connect(ui_.pb_reject, &QPushButton::pressed, this, &InvitationDialog::close);
 
     adjustSize();
     setFixedSize(size());
