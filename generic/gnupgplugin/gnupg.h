@@ -56,7 +56,7 @@ public:
     ~GnuPG();
 
     // from PsiPlugin
-    QString name() const { return "GnuPG Key Manager"; }
+    QString name() const { return "GnuPG Key Manager Plugin"; }
     QString shortName() const { return "gnupg"; }
     QString version() const { return "0.4.0"; }
 
