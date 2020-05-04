@@ -84,7 +84,7 @@ vCardView::vCardView(const QString &filename, QWidget *parent) : QDialog(parent,
         main->addWidget(nick, 1, 1);
         main->addWidget(new QLabel(tr("Birthday:")), 2, 0);
         main->addWidget(birth, 2, 1);
-        main->addWidget(new QLabel(tr("E-Mail:")), 3, 0);
+        main->addWidget(new QLabel(tr("Email:")), 3, 0);
         main->addWidget(email, 3, 1);
         QTextStream in(&file);
         in.setCodec("UTF-8");

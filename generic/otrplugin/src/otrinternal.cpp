@@ -302,7 +302,7 @@ void OtrInternal::verifyFingerprint(const psiotr::Fingerprint &fingerprint, bool
     if (context) {
         ::Fingerprint *fp = otrl_context_find_fingerprint(context, fingerprint.fingerprint, 0, nullptr);
         if (fp) {
-            otrl_context_set_trust(fp, verified ? "verified" : "");
+            otrl_context_set_trust(fp, verified ? QObject::tr("verified").toUtf8().constData() : "");
             write_fingerprints();
 
             if (context->active_fingerprint == fp) {

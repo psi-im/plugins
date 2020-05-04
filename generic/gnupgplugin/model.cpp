@@ -71,7 +71,7 @@ QList<QStandardItem *> parseLine(const QString &line)
     // Name
     rows << new QStandardItem(uidToName(uid));
 
-    // E-mail
+    // Email
     rows << new QStandardItem(uidToEMail(uid));
 
     // Creation key time in human readable format
@@ -130,7 +130,7 @@ void Model::listKeys()
 
         headerLabels[Type]        = tr("Type");
         headerLabels[Name]        = tr("Name");
-        headerLabels[Email]       = tr("E-Mail");
+        headerLabels[Email]       = tr("Email");
         headerLabels[Created]     = tr("Created");
         headerLabels[Expiration]  = tr("Expiration");
         headerLabels[Length]      = tr("Length");
