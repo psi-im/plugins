@@ -41,6 +41,7 @@ void Storage::init(signal_context *ctx, const QString &dataPath, const QString &
     }
 
     initializeDB(ctx);
+    db().exec("VACUUM");
 
     signal_protocol_session_store        session_store        = { /*.load_session_func =*/&loadSession,
                                                     /*.get_sub_device_sessions_func =*/nullptr,
@@ -515,6 +516,15 @@ QByteArray Storage::loadDeviceIdentity(const QString &user, uint32_t deviceId)
         res = q.value(0).toByteArray();
     }
     return res;
+}
+
+void Storage::removeDevice(const QString &user, uint32_t deviceId)
+{
+    QSqlQuery q(db());
+    q.prepare("DELETE FROM devices WHERE jid IS ? AND device_id IS ?");
+    q.addBindValue(user);
+    q.addBindValue(deviceId);
+    q.exec();
 }
 
 void Storage::setDeviceTrust(const QString &user, uint32_t deviceId, bool trusted)

@@ -1,6 +1,7 @@
 /*
  * OMEMO Plugin for Psi
  * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2020 Boris Pek
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -537,7 +538,7 @@ void OMEMO::setContactInfoAccessor(ContactInfoAccessingHost *contactInfoAccessor
 
 bool OMEMO::appendSysMsg(int account, const QString &jid, const QString &message)
 {
-    m_accountController->appendSysMsg(account, jid, message);
+    return m_accountController->appendSysMsg(account, jid, message);
 }
 
 const QString OMEMO::bundleNodeName(uint32_t deviceId) const
@@ -590,9 +591,24 @@ QSet<uint32_t> OMEMO::getOwnDeviceList(int account)
 
 QList<Fingerprint> OMEMO::getKnownFingerprints(int account) { return getSignal(account)->getKnownFingerprints(); }
 
+void OMEMO::askDeviceTrust(int account, const QString &user, uint32_t deviceId)
+{
+    getSignal(account)->askDeviceTrust(user, deviceId, true);
+}
+
+void OMEMO::removeDevice(int account, const QString &user, uint32_t deviceId)
+{
+    getSignal(account)->removeDevice(user, deviceId);
+}
+
 void OMEMO::confirmDeviceTrust(int account, const QString &user, uint32_t deviceId)
 {
-    getSignal(account)->confirmDeviceTrust(user, deviceId, true);
+    getSignal(account)->confirmDeviceTrust(user, deviceId);
+}
+
+void OMEMO::revokeDeviceTrust(int account, const QString &user, uint32_t deviceId)
+{
+    getSignal(account)->revokeDeviceTrust(user, deviceId);
 }
 
 void OMEMO::unpublishDevice(int account, uint32_t deviceId)

@@ -1,6 +1,7 @@
 /*
  * OMEMO Plugin for Psi
  * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2020 Boris Pek
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -58,7 +59,10 @@ public:
     QString            getOwnFingerprint(int account);
     QList<Fingerprint> getKnownFingerprints(int account);
     QSet<uint32_t>     getOwnDeviceList(int account);
+    void               askDeviceTrust(int account, const QString &user, uint32_t deviceId);
+    void               removeDevice(int account, const QString &user, uint32_t deviceId);
     void               confirmDeviceTrust(int account, const QString &user, uint32_t deviceId);
+    void               revokeDeviceTrust(int account, const QString &user, uint32_t deviceId);
     void               unpublishDevice(int account, uint32_t deviceId);
 
 private:

@@ -1,6 +1,7 @@
 /*
  * OMEMO Plugin for Psi
  * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2020 Boris Pek
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -323,26 +324,61 @@ void Signal::processUndecidedDevices(const QString &user, bool ownJid)
 {
     QSet<uint32_t> devices = m_storage.getUndecidedDeviceList(user);
     foreach (uint32_t deviceId, devices) {
-        confirmDeviceTrust(user, deviceId, false, ownJid);
+        askDeviceTrust(user, deviceId, false, ownJid);
     }
 }
 
-void Signal::confirmDeviceTrust(const QString &user, uint32_t deviceId, bool skipNewDevicePart, bool ownJid)
+void Signal::askDeviceTrust(const QString &user, uint32_t deviceId, bool skipNewDevicePart, bool ownJid)
 {
     QString publicKey = getFingerprint(m_storage.loadDeviceIdentity(user, deviceId));
     QString message;
     if (!skipNewDevicePart) {
-        message += QString("New OMEMO device has been discovered for %1.<br/><br/>").arg(user);
+        message += QObject::tr("New OMEMO device has been discovered for \"%1\".").arg(user) + "<br/><br/>";
     }
-    message += ownJid
-        ? "Do you want to trust this device and allow it to decrypt copies of your messages?<br/><br/>"
-        : "Do you want to trust this device and allow it to receive the encrypted messages from you?<br/><br/>";
-    message += QString("Device public key:<br/><code>%1</code>").arg(publicKey);
-    QMessageBox messageBox(QMessageBox::Warning, "New OMEMO Device", message);
-    messageBox.addButton("Trust", QMessageBox::AcceptRole);
-    messageBox.addButton("Do Not Trust", QMessageBox::RejectRole);
-    int res = messageBox.exec();
-    m_storage.setDeviceTrust(user, deviceId, res == 0);
+    if (ownJid) {
+        message += QObject::tr("Do you want to trust this device and allow it to decrypt copies of your messages?") + "<br/><br/>";
+    }
+    else {
+        message += QObject::tr("Do you want to trust this device and allow it to receive the encrypted messages from you?") + "<br/><br/>";
+    }
+    message += QObject::tr("Device public key:") + QString("<br/><code>%1</code>").arg(publicKey);
+
+    QMessageBox messageBox(QMessageBox::Question, QObject::tr("Managing of OMEMO keys"), message);
+    messageBox.addButton(QObject::tr("Trust"), QMessageBox::AcceptRole);
+    messageBox.addButton(QObject::tr("Do Not Trust"), QMessageBox::RejectRole);
+
+    if (messageBox.exec() == 0) {
+        confirmDeviceTrust(user, deviceId);
+    }
+    else {
+        revokeDeviceTrust(user, deviceId);
+    }
+}
+
+void Signal::removeDevice(const QString &user, uint32_t deviceId)
+{
+    const QString publicKey = getFingerprint(m_storage.loadDeviceIdentity(user, deviceId));
+    const QString message = QObject::tr("Delete selected device from list of known devices of user \"%1\"?").arg(user) + "<br/><br/>"
+            + QObject::tr("Device public key:")
+            + QString("<br/><code>%1</code>").arg(publicKey);
+
+    QMessageBox messageBox(QMessageBox::Question, QObject::tr("Confirm action"), message);
+    messageBox.addButton(QObject::tr("Delete"), QMessageBox::AcceptRole);
+    messageBox.addButton(QObject::tr("Cancel"), QMessageBox::RejectRole);
+
+    if (messageBox.exec() == 0) {
+        m_storage.removeDevice(user, deviceId);
+    }
+}
+
+void Signal::confirmDeviceTrust(const QString &user, uint32_t deviceId)
+{
+    m_storage.setDeviceTrust(user, deviceId, true);
+}
+
+void Signal::revokeDeviceTrust(const QString &user, uint32_t deviceId)
+{
+    m_storage.setDeviceTrust(user, deviceId, false);
 }
 
 QString Signal::getFingerprint(const QByteArray &publicKeyBytes) const

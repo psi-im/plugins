@@ -20,12 +20,14 @@
 
 #include <QAction>
 #include <QMenu>
+#include <QScreen>
 #include <QtGui>
 #include <QtSql>
 #include <QtXml>
 
 #include "accountinfoaccessinghost.h"
 #include "applicationinfoaccessinghost.h"
+#include "configwidget.h"
 #include "eventcreatinghost.h"
 #include "stanzasendinghost.h"
 
@@ -267,6 +269,7 @@ void OMEMOPlugin::onEnableOMEMOAction(bool checked)
     QMenu *  menu                  = new QMenu();
     QAction *actEnableOmemo        = new QAction(tr("Enable OMEMO encryption"), this);
     QAction *actDisableOmemo       = new QAction(tr("Disable OMEMO encryption"), this);
+    QAction *actManageFingerprints = new QAction(tr("Manage contact fingerprints"), this);
     QAction *actShowOwnFingerprint = new QAction(tr("Show own &fingerprint"), this);
 
     actEnableOmemo->setVisible(checked);
@@ -276,6 +279,7 @@ void OMEMOPlugin::onEnableOMEMOAction(bool checked)
     menu->addAction(actDisableOmemo);
 
     menu->addSeparator();
+    menu->addAction(actManageFingerprints);
     menu->addAction(actShowOwnFingerprint);
 
     const QString jid     = action->property("jid").toString();
@@ -288,6 +292,16 @@ void OMEMOPlugin::onEnableOMEMOAction(bool checked)
     } else if (act == actDisableOmemo) {
         m_omemo.setEnabledForUser(account, jid, checked);
         updateAction(account, jid);
+    } else if (act == actManageFingerprints) {
+        auto screen = QGuiApplication::primaryScreen();
+        auto w = new KnownFingerprints(account, &m_omemo, nullptr);
+        w->filterContacts(jid);
+        w->setWindowTitle(tr("Manage contact fingerprints"));
+        w->resize(1000, 500);
+        w->move((screen->geometry().width() / 2) - 500,
+                (screen->geometry().height() / 2) - 250);
+        w->show();
+        w->raise();
     } else if (act == actShowOwnFingerprint) {
         showOwnFingerprint(account, jid);
     }

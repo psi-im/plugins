@@ -1,6 +1,7 @@
 /*
  * OMEMO Plugin for Psi
  * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2020 Boris Pek
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -33,6 +34,7 @@ class ConfigWidgetTab : public QWidget {
 public:
     ConfigWidgetTab(int account, OMEMO *omemo, QWidget *parent) :
         QWidget(parent), m_account(account), m_omemo(omemo) { }
+
     void setAccount(int account)
     {
         m_account = account;
@@ -49,18 +51,22 @@ protected:
 
 class ConfigWidgetTabWithTable : public ConfigWidgetTab {
     Q_OBJECT
+
 public:
     ConfigWidgetTabWithTable(int account, OMEMO *omemo, QWidget *parent);
+    void filterContacts(const QString &jid);
 
 protected:
     void                updateData() override;
     virtual void        doUpdateData() = 0;
     QTableView *        m_table;
     QStandardItemModel *m_tableModel;
+    QString             m_jid;
 };
 
 class OwnFingerprint : public ConfigWidgetTab {
     Q_OBJECT
+
 public:
     OwnFingerprint(int account, OMEMO *omemo, QWidget *parent);
 
@@ -79,12 +85,16 @@ public:
 
 protected:
     void doUpdateData() override;
+
 private slots:
-    void trustRevokeFingerprint();
+    void removeFingerprint();
+    void trustFingerprint();
+    void revokeFingerprint();
 };
 
 class ManageDevices : public ConfigWidgetTabWithTable {
     Q_OBJECT
+
 public:
     ManageDevices(int account, OMEMO *omemo, QWidget *parent);
 
@@ -95,6 +105,7 @@ private:
 
 protected:
     void doUpdateData() override;
+
 private slots:
     void selectionChanged(const QItemSelection &, const QItemSelection &);
     void deleteDevice();
@@ -103,12 +114,14 @@ private slots:
 
 class ConfigWidget : public QWidget {
     Q_OBJECT
+
 public:
     ConfigWidget(OMEMO *omemo, AccountInfoAccessingHost *accountInfo);
 
 private:
     AccountInfoAccessingHost *m_accountInfo;
     QTabWidget *              m_tabWidget;
+
 private slots:
     void currentAccountChanged(int index);
 };

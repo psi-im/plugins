@@ -1,6 +1,7 @@
 /*
  * OMEMO Plugin for Psi
  * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2020 Boris Pek
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +19,9 @@
  */
 
 #include "configwidget.h"
+#include <QHBoxLayout>
 #include <QHeaderView>
+#include <QLabel>
 #include <QVBoxLayout>
 
 namespace psiomemo {
@@ -37,9 +40,9 @@ ConfigWidget::ConfigWidget(OMEMO *omemo, AccountInfoAccessingHost *accountInfo) 
     int account = accountBox->itemData(accountBox->currentIndex()).toInt();
 
     m_tabWidget = new QTabWidget(this);
-    m_tabWidget->addTab(new KnownFingerprints(account, omemo, this), "Fingerprints");
-    m_tabWidget->addTab(new OwnFingerprint(account, omemo, this), "Own Fingerprint");
-    m_tabWidget->addTab(new ManageDevices(account, omemo, this), "Manage Devices");
+    m_tabWidget->addTab(new KnownFingerprints(account, omemo, this), tr("Fingerprints"));
+    m_tabWidget->addTab(new OwnFingerprint(account, omemo, this), tr("Own Fingerprint"));
+    m_tabWidget->addTab(new ManageDevices(account, omemo, this), tr("Manage Devices"));
     mainLayout->addWidget(m_tabWidget);
     setLayout(mainLayout);
 
@@ -59,6 +62,12 @@ ConfigWidgetTabWithTable::ConfigWidgetTabWithTable(int account, OMEMO *omemo, QW
 
     m_tableModel = new QStandardItemModel(this);
     m_table->setModel(m_tableModel);
+}
+
+void ConfigWidgetTabWithTable::filterContacts(const QString &jid)
+{
+    m_jid = jid;
+    updateData();
 }
 
 void ConfigWidgetTabWithTable::updateData()
@@ -97,8 +106,8 @@ OwnFingerprint::OwnFingerprint(int account, OMEMO *omemo, QWidget *parent) : Con
 
 void OwnFingerprint::updateData()
 {
-    m_deviceLabel->setText("Device ID: " + QString::number(m_omemo->getDeviceId(m_account)));
-    m_fingerprintLabel->setText(QString("Fingerprint: <code>%1</code>").arg(m_omemo->getOwnFingerprint(m_account)));
+    m_deviceLabel->setText(tr("Device ID: ") + QString::number(m_omemo->getDeviceId(m_account)));
+    m_fingerprintLabel->setText(tr("Fingerprint: ") + QString("<code>%1</code>").arg(m_omemo->getOwnFingerprint(m_account)));
 }
 
 KnownFingerprints::KnownFingerprints(int account, OMEMO *omemo, QWidget *parent) :
@@ -107,9 +116,20 @@ KnownFingerprints::KnownFingerprints(int account, OMEMO *omemo, QWidget *parent)
     auto mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(m_table);
 
-    auto trustRevokeButton = new QPushButton("Trust/Revoke Selected Fingerprint", this);
-    connect(trustRevokeButton, SIGNAL(clicked()), SLOT(trustRevokeFingerprint()));
-    mainLayout->addWidget(trustRevokeButton);
+    auto buttonsLayout = new QHBoxLayout(this);
+    auto removeButton  = new QPushButton(tr("Delete"), this);
+    auto trustButton   = new QPushButton(tr("Trust"), this);
+    auto revokeButton  = new QPushButton(tr("Revoke"), this);
+
+    connect(removeButton, &QPushButton::clicked, this, &KnownFingerprints::removeFingerprint);
+    connect(trustButton,  &QPushButton::clicked, this, &KnownFingerprints::trustFingerprint);
+    connect(revokeButton, &QPushButton::clicked, this, &KnownFingerprints::revokeFingerprint);
+
+    buttonsLayout->addWidget(removeButton);
+    buttonsLayout->addWidget(new QLabel(this));
+    buttonsLayout->addWidget(trustButton);
+    buttonsLayout->addWidget(revokeButton);
+    mainLayout->addLayout(buttonsLayout);
 
     setLayout(mainLayout);
     updateData();
@@ -118,14 +138,20 @@ KnownFingerprints::KnownFingerprints(int account, OMEMO *omemo, QWidget *parent)
 void KnownFingerprints::doUpdateData()
 {
     m_tableModel->setColumnCount(3);
-    m_tableModel->setHorizontalHeaderLabels({ "Contact", "Trust", "Fingerprint" });
-    foreach (auto fingerprint, m_omemo->getKnownFingerprints(m_account)) {
+    m_tableModel->setHorizontalHeaderLabels({ tr("Contact"), tr("Trust"), tr("Fingerprint") });
+    for (auto fingerprint : m_omemo->getKnownFingerprints(m_account)) {
+        if (!m_jid.isEmpty()) {
+            if (fingerprint.contact != m_jid) {
+                continue;
+            }
+        }
+
         QList<QStandardItem *> row;
         auto                   contact = new QStandardItem(fingerprint.contact);
         contact->setData(QVariant(fingerprint.deviceId));
         row.append(contact);
         TRUST_STATE state = fingerprint.trust;
-        row.append(new QStandardItem(state == TRUSTED ? "Trusted" : state == UNTRUSTED ? "Untrusted" : "Undecided"));
+        row.append(new QStandardItem(state == TRUSTED ? tr("trusted") : state == UNTRUSTED ? tr("untrusted") : QString()));
         auto fpItem = new QStandardItem(fingerprint.fingerprint);
         fpItem->setData(QColor(state == TRUSTED ? Qt::darkGreen : state == UNTRUSTED ? Qt::darkRed : Qt::darkYellow),
                         Qt::ForegroundRole);
@@ -135,15 +161,47 @@ void KnownFingerprints::doUpdateData()
     }
 }
 
-void KnownFingerprints::trustRevokeFingerprint()
+void KnownFingerprints::removeFingerprint()
 {
-    if (!m_table->selectionModel()->hasSelection()) {
+    if (!m_table->selectionModel()->hasSelection())
         return;
-    }
+
+    QStandardItem *item = m_tableModel->item(m_table->selectionModel()->selectedRows(0).at(0).row(), 0);
+    m_omemo->removeDevice(m_account, item->text(), item->data().toUInt());
+
+    updateData();
+}
+
+void KnownFingerprints::trustFingerprint()
+{
+    if (!m_table->selectionModel()->hasSelection())
+        return;
 
     QStandardItem *item = m_tableModel->item(m_table->selectionModel()->selectedRows(0).at(0).row(), 0);
     m_omemo->confirmDeviceTrust(m_account, item->text(), item->data().toUInt());
+
+    const int index = item->row();
+    const int rowCount = m_tableModel->rowCount();
     updateData();
+
+    if (rowCount == m_tableModel->rowCount())
+        m_table->selectRow(index);
+}
+
+void KnownFingerprints::revokeFingerprint()
+{
+    if (!m_table->selectionModel()->hasSelection())
+        return;
+
+    QStandardItem *item = m_tableModel->item(m_table->selectionModel()->selectedRows(0).at(0).row(), 0);
+    m_omemo->revokeDeviceTrust(m_account, item->text(), item->data().toUInt());
+
+    const int index = item->row();
+    const int rowCount = m_tableModel->rowCount();
+    updateData();
+
+    if (rowCount == m_tableModel->rowCount())
+        m_table->selectRow(index);
 }
 
 ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
@@ -159,7 +217,7 @@ ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
 
     connect(m_omemo, SIGNAL(deviceListUpdated(int)), SLOT(deviceListUpdated(int)));
 
-    m_deleteButton = new QPushButton("Delete", this);
+    m_deleteButton = new QPushButton(tr("Delete"), this);
     m_deleteButton->setEnabled(false);
     connect(m_deleteButton, SIGNAL(clicked()), SLOT(deleteDevice()));
     mainLayout->addWidget(m_deleteButton);
@@ -184,7 +242,7 @@ uint32_t ManageDevices::selectedDeviceId(const QModelIndexList &selection) const
 void ManageDevices::doUpdateData()
 {
     m_tableModel->setColumnCount(1);
-    m_tableModel->setHorizontalHeaderLabels({ "Device ID" });
+    m_tableModel->setHorizontalHeaderLabels({ tr("Device ID") });
     foreach (auto deviceId, m_omemo->getOwnDeviceList(m_account)) {
         QStandardItem *item = new QStandardItem(QString::number(deviceId));
         item->setData(deviceId);

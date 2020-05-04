@@ -43,6 +43,7 @@ public:
     void                                 storePreKeys(QVector<QPair<uint32_t, QByteArray>> keys);
     bool                                 isTrusted(const QString &user, uint32_t deviceId);
     QByteArray                           loadDeviceIdentity(const QString &user, uint32_t deviceId);
+    void                                 removeDevice(const QString &user, uint32_t deviceId);
     void                                 setDeviceTrust(const QString &user, uint32_t deviceId, bool trusted);
     QVector<std::tuple<QString, QByteArray, uint32_t, TRUST_STATE>> getKnownFingerprints();
 
