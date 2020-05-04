@@ -294,12 +294,11 @@ void OMEMOPlugin::onEnableOMEMOAction(bool checked)
         updateAction(account, jid);
     } else if (act == actManageFingerprints) {
         auto screen = QGuiApplication::primaryScreen();
-        auto w = new KnownFingerprints(account, &m_omemo, nullptr);
+        auto w      = new KnownFingerprints(account, &m_omemo, nullptr);
         w->filterContacts(jid);
         w->setWindowTitle(tr("Manage contact fingerprints"));
         w->resize(1000, 500);
-        w->move((screen->geometry().width() / 2) - 500,
-                (screen->geometry().height() / 2) - 250);
+        w->move((screen->geometry().width() / 2) - 500, (screen->geometry().height() / 2) - 250);
         w->show();
         w->raise();
     } else if (act == actShowOwnFingerprint) {

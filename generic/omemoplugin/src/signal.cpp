@@ -336,10 +336,12 @@ void Signal::askDeviceTrust(const QString &user, uint32_t deviceId, bool skipNew
         message += QObject::tr("New OMEMO device has been discovered for \"%1\".").arg(user) + "<br/><br/>";
     }
     if (ownJid) {
-        message += QObject::tr("Do you want to trust this device and allow it to decrypt copies of your messages?") + "<br/><br/>";
-    }
-    else {
-        message += QObject::tr("Do you want to trust this device and allow it to receive the encrypted messages from you?") + "<br/><br/>";
+        message += QObject::tr("Do you want to trust this device and allow it to decrypt copies of your messages?")
+            + "<br/><br/>";
+    } else {
+        message
+            += QObject::tr("Do you want to trust this device and allow it to receive the encrypted messages from you?")
+            + "<br/><br/>";
     }
     message += QObject::tr("Device public key:") + QString("<br/><code>%1</code>").arg(publicKey);
 
@@ -349,8 +351,7 @@ void Signal::askDeviceTrust(const QString &user, uint32_t deviceId, bool skipNew
 
     if (messageBox.exec() == 0) {
         confirmDeviceTrust(user, deviceId);
-    }
-    else {
+    } else {
         revokeDeviceTrust(user, deviceId);
     }
 }
@@ -358,9 +359,8 @@ void Signal::askDeviceTrust(const QString &user, uint32_t deviceId, bool skipNew
 void Signal::removeDevice(const QString &user, uint32_t deviceId)
 {
     const QString publicKey = getFingerprint(m_storage.loadDeviceIdentity(user, deviceId));
-    const QString message = QObject::tr("Delete selected device from list of known devices of user \"%1\"?").arg(user) + "<br/><br/>"
-            + QObject::tr("Device public key:")
-            + QString("<br/><code>%1</code>").arg(publicKey);
+    const QString message   = QObject::tr("Delete selected device from list of known devices of user \"%1\"?").arg(user)
+        + "<br/><br/>" + QObject::tr("Device public key:") + QString("<br/><code>%1</code>").arg(publicKey);
 
     QMessageBox messageBox(QMessageBox::Question, QObject::tr("Confirm action"), message);
     messageBox.addButton(QObject::tr("Delete"), QMessageBox::AcceptRole);
