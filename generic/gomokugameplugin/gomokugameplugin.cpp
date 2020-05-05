@@ -300,7 +300,7 @@ QList<QVariantHash> GomokuGamePlugin::getButtonParam()
     QVariantHash        hash;
     hash["tooltip"] = QVariant(tr("Gomoku game"));
     hash["icon"]    = QVariant(QString("gomokugameplugin/gomoku"));
-    hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+    hash["reciver"] = QVariant::fromValue(qobject_cast<QObject *>(this));
     hash["slot"]    = QVariant(SLOT(toolButtonPressed()));
     list.push_back(hash);
     return list;
@@ -363,7 +363,7 @@ QList<QVariantHash> GomokuGamePlugin::getContactMenuParam()
     QVariantHash        hash;
     hash["name"]    = QVariant(tr("Gomoku game!"));
     hash["icon"]    = QVariant(QString("gomokugameplugin/gomoku"));
-    hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+    hash["reciver"] = QVariant::fromValue(qobject_cast<QObject *>(this));
     hash["slot"]    = QVariant(SLOT(menuActivated()));
     menu_list.push_back(hash);
     return menu_list;

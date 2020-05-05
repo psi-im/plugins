@@ -115,7 +115,7 @@ QList<QVariantHash> yandexnarodPlugin::getAccountMenuParam()
     QVariantHash        hash;
     hash["icon"]    = QVariant(QString("yandexnarod/logo"));
     hash["name"]    = QVariant(tr("Open Yandex Narod Manager"));
-    hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+    hash["reciver"] = QVariant::fromValue(qobject_cast<QObject *>(this));
     hash["slot"]    = QVariant(SLOT(manage_clicked()));
 
     list.append(hash);
@@ -128,7 +128,7 @@ QList<QVariantHash> yandexnarodPlugin::getContactMenuParam()
     QVariantHash        hash;
     hash["icon"]    = QVariant(QString("yandexnarod/logo"));
     hash["name"]    = QVariant(tr("Send file via Yandex Narod"));
-    hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+    hash["reciver"] = QVariant::fromValue(qobject_cast<QObject *>(this));
     hash["slot"]    = QVariant(SLOT(actionStart()));
 
     list.append(hash);

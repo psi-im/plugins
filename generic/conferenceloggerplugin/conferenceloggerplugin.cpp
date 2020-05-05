@@ -313,7 +313,7 @@ QList<QVariantHash> ConferenceLogger::getGCButtonParam()
     QVariantHash        hash;
     hash["tooltip"] = QVariant(tr("Groupchat History"));
     hash["icon"]    = QVariant(QString("loggerplugin/openlog"));
-    hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+    hash["reciver"] = QVariant::fromValue(qobject_cast<QObject *>(this));
     hash["slot"]    = QVariant(SLOT(view()));
     l.push_back(hash);
     return l;

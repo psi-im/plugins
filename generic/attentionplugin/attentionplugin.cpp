@@ -380,7 +380,7 @@ QList<QVariantHash> AttentionPlugin::getButtonParam()
     QVariantHash        hash;
     hash["tooltip"] = QVariant(tr("Send Attention"));
     hash["icon"]    = QVariant(QString("attentionplugin/attention"));
-    hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+    hash["reciver"] = QVariant::fromValue(qobject_cast<QObject *>(this));
     hash["slot"]    = QVariant(SLOT(sendAttentionFromTab()));
     l.push_back(hash);
     return l;
@@ -467,7 +467,7 @@ QList<QVariantHash> AttentionPlugin::getContactMenuParam()
     QVariantHash hash;
     hash["icon"]    = QVariant(QString("attentionplugin/attention"));
     hash["name"]    = QVariant(tr("Send Attention"));
-    hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+    hash["reciver"] = QVariant::fromValue(qobject_cast<QObject *>(this));
     hash["slot"]    = QVariant(SLOT(sendAttentionFromMenu()));
     QList<QVariantHash> l;
     l.push_back(hash);

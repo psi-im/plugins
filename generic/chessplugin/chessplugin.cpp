@@ -338,7 +338,7 @@ QList<QVariantHash> ChessPlugin::getContactMenuParam()
     QVariantHash        hash;
     hash["name"]    = QVariant(tr("Chess!"));
     hash["icon"]    = QVariant(QString("chessplugin/chess"));
-    hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+    hash["reciver"] = QVariant::fromValue(qobject_cast<QObject *>(this));
     hash["slot"]    = QVariant(SLOT(menuActivated()));
     l.push_back(hash);
     return l;

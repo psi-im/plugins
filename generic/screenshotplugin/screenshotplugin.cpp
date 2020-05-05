@@ -172,7 +172,7 @@ QList<QVariantHash> ScreenshotPlugin::getAccountMenuParam()
     QVariantHash hash;
     hash["icon"]    = QVariant(QString("screenshotplugin/screenshot"));
     hash["name"]    = QVariant(tr("Upload Image"));
-    hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+    hash["reciver"] = QVariant::fromValue(qobject_cast<QObject *>(this));
     hash["slot"]    = QVariant(SLOT(openImage()));
     QList<QVariantHash> l;
     l.push_back(hash);

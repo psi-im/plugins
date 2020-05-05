@@ -154,7 +154,7 @@ QList<QVariantHash> ImagePlugin::getButtonParam()
     QVariantHash hash;
     hash["tooltip"] = QVariant(tr("Send Image"));
     hash["icon"]    = QVariant(QString("imageplugin/icon"));
-    hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+    hash["reciver"] = QVariant::fromValue(qobject_cast<QObject *>(this));
     hash["slot"]    = QVariant(SLOT(actionActivated()));
     QList<QVariantHash> l;
     l.push_back(hash);

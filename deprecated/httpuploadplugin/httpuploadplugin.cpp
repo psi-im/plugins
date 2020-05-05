@@ -276,13 +276,13 @@ QList<QVariantHash> HttpUploadPlugin::getButtonParam()
     QVariantHash        uploadImg;
     uploadImg["tooltip"] = tr("Upload Image");
     uploadImg["icon"]    = QString("httpuploadplugin/upload_image");
-    uploadImg["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+    uploadImg["reciver"] = QVariant::fromValue(qobject_cast<QObject *>(this));
     uploadImg["slot"]    = QVariant(SLOT(uploadImage()));
     l.push_back(uploadImg);
     QVariantHash uploadFile;
     uploadFile["tooltip"] = tr("Upload File");
     uploadFile["icon"]    = QString("httpuploadplugin/upload_file");
-    uploadFile["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+    uploadFile["reciver"] = QVariant::fromValue(qobject_cast<QObject *>(this));
     uploadFile["slot"]    = QVariant(SLOT(uploadFile()));
     l.push_back(uploadFile);
     return l;

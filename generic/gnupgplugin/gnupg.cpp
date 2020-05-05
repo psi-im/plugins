@@ -152,7 +152,7 @@ QList<QVariantHash> GnuPG::getButtonParam()
     QVariantHash hash;
     hash["tooltip"] = QVariant(tr("Send GnuPG Public Key"));
     hash["icon"]    = QVariant(QString("gnupg/icon"));
-    hash["reciver"] = qVariantFromValue(qobject_cast<QObject *>(this));
+    hash["reciver"] = QVariant::fromValue(qobject_cast<QObject *>(this));
     hash["slot"]    = QVariant(SLOT(actionActivated()));
     l << hash;
     return l;
