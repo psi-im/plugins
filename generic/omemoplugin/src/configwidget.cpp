@@ -19,6 +19,7 @@
  */
 
 #include "configwidget.h"
+#include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
@@ -41,7 +42,6 @@ ConfigWidget::ConfigWidget(OMEMO *omemo, AccountInfoAccessingHost *accountInfo) 
 
     m_tabWidget = new QTabWidget(this);
     m_tabWidget->addTab(new KnownFingerprints(account, omemo, this), tr("Fingerprints"));
-    m_tabWidget->addTab(new OwnFingerprint(account, omemo, this), tr("Own Fingerprint"));
     m_tabWidget->addTab(new ManageDevices(account, omemo, this), tr("Manage Devices"));
     mainLayout->addWidget(m_tabWidget);
     setLayout(mainLayout);
@@ -91,27 +91,6 @@ void ConfigWidget::currentAccountChanged(int index)
     }
 }
 
-OwnFingerprint::OwnFingerprint(int account, OMEMO *omemo, QWidget *parent) : ConfigWidgetTab(account, omemo, parent)
-{
-    auto mainLayout = new QVBoxLayout(this);
-    m_deviceLabel   = new QLabel(this);
-    m_deviceLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    mainLayout->addWidget(m_deviceLabel);
-    m_fingerprintLabel = new QLabel(this);
-    m_fingerprintLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    m_fingerprintLabel->setWordWrap(true);
-    mainLayout->addWidget(m_fingerprintLabel);
-    setLayout(mainLayout);
-    updateData();
-}
-
-void OwnFingerprint::updateData()
-{
-    m_deviceLabel->setText(tr("Device ID: ") + QString::number(m_omemo->getDeviceId(m_account)));
-    m_fingerprintLabel->setText(tr("Fingerprint: ")
-                                + QString("<code>%1</code>").arg(m_omemo->getOwnFingerprint(m_account)));
-}
-
 KnownFingerprints::KnownFingerprints(int account, OMEMO *omemo, QWidget *parent) :
     ConfigWidgetTabWithTable(account, omemo, parent)
 {
@@ -127,10 +106,10 @@ KnownFingerprints::KnownFingerprints(int account, OMEMO *omemo, QWidget *parent)
     connect(trustButton, &QPushButton::clicked, this, &KnownFingerprints::trustFingerprint);
     connect(revokeButton, &QPushButton::clicked, this, &KnownFingerprints::revokeFingerprint);
 
-    buttonsLayout->addWidget(removeButton);
-    buttonsLayout->addWidget(new QLabel(this));
     buttonsLayout->addWidget(trustButton);
     buttonsLayout->addWidget(revokeButton);
+    buttonsLayout->addWidget(new QLabel(this));
+    buttonsLayout->addWidget(removeButton);
     mainLayout->addLayout(buttonsLayout);
 
     setLayout(mainLayout);
@@ -212,11 +191,23 @@ ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
 {
     m_ourDeviceId = m_omemo->getDeviceId(account);
 
+    auto groupBox = new QGroupBox(tr("Current device"), this);
+    auto groupBoxLayout = new QVBoxLayout(this);
+    m_deviceLabel   = new QLabel(this);
+    m_deviceLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    groupBoxLayout->addWidget(m_deviceLabel);
+    m_fingerprintLabel = new QLabel(this);
+    m_fingerprintLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    m_fingerprintLabel->setWordWrap(true);
+    groupBoxLayout->addWidget(m_fingerprintLabel);
+    groupBox->setLayout(groupBoxLayout);
+    groupBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
     auto mainLayout = new QVBoxLayout(this);
+    mainLayout->addWidget(groupBox);
     mainLayout->addWidget(m_table);
 
     connect(m_table->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ManageDevices::selectionChanged);
-
     connect(m_omemo, &OMEMO::deviceListUpdated, this, &ManageDevices::deviceListUpdated);
 
     m_deleteButton = new QPushButton(tr("Delete"), this);
@@ -226,6 +217,15 @@ ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
 
     setLayout(mainLayout);
     updateData();
+}
+
+void ManageDevices::updateData()
+{
+    m_deviceLabel->setText(tr("Device ID: ") + QString::number(m_omemo->getDeviceId(m_account)));
+    m_fingerprintLabel->setText(tr("Fingerprint: ")
+                                + QString("<code>%1</code>").arg(m_omemo->getOwnFingerprint(m_account)));
+
+    ConfigWidgetTabWithTable::updateData();
 }
 
 void ManageDevices::selectionChanged(const QItemSelection &selected, const QItemSelection &)

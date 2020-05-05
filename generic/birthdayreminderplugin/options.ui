@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>528</width>
-    <height>312</height>
+    <width>572</width>
+    <height>347</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,10 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>If you use this plugin at first time, make sure that all your accounts
-is online and then press &quot;Update Birthdays&quot; button. It takes some time.</string>
+      <string>If you use this plugin at first time, make sure that all your accounts is online and then press &quot;Update Birthdays&quot; button. It takes some time.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -39,17 +41,11 @@ is online and then press &quot;Update Birthdays&quot; button. It takes some time
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string/>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pb_check">

@@ -1,3 +1,7 @@
+2020-05-06
+v0.8 tehnick
+  * improve plugin settings dialog
+
 2020-05-04
 v0.7 tehnick
   * add "Manage contact fingerprints" item to plugin button on toolbar

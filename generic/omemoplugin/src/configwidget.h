@@ -64,20 +64,6 @@ protected:
     QString             m_jid;
 };
 
-class OwnFingerprint : public ConfigWidgetTab {
-    Q_OBJECT
-
-public:
-    OwnFingerprint(int account, OMEMO *omemo, QWidget *parent);
-
-protected:
-    void updateData() override;
-
-private:
-    QLabel *m_deviceLabel;
-    QLabel *m_fingerprintLabel;
-};
-
 class KnownFingerprints : public ConfigWidgetTabWithTable {
     Q_OBJECT
 public:
@@ -98,7 +84,12 @@ class ManageDevices : public ConfigWidgetTabWithTable {
 public:
     ManageDevices(int account, OMEMO *omemo, QWidget *parent);
 
+protected:
+    void updateData() override;
+
 private:
+    QLabel      *m_deviceLabel;
+    QLabel      *m_fingerprintLabel;
     uint32_t     m_ourDeviceId;
     QPushButton *m_deleteButton;
     uint32_t     selectedDeviceId(const QModelIndexList &selection) const;

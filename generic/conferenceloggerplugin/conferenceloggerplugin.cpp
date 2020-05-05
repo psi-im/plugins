@@ -156,6 +156,8 @@ QWidget *ConferenceLogger::options()
     path->setText(HistoryDir);
     path->setEnabled(false);
     FilesBox = new QComboBox();
+    FilesBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
     QDir dir(HistoryDir);
     for (auto file : dir.entryList(QDir::Files)) {
         if (file.contains("_in_")) {
@@ -170,17 +172,22 @@ QWidget *ConferenceLogger::options()
     QHBoxLayout *filesLayout = new QHBoxLayout();
     filesLayout->addWidget(new QLabel(tr("Logs:")));
     filesLayout->addWidget(FilesBox);
-    filesLayout->addStretch();
+
     viewButton = new QPushButton(IcoHost->getIcon("psi/search"), tr("View Log"));
+    viewButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     connect(viewButton, &QPushButton::released, this, &ConferenceLogger::viewFromOpt);
     QLabel *wikiLink
         = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/en:plugins#conference_logger_plugin\">Wiki (Online)</a>"));
     wikiLink->setOpenExternalLinks(true);
     filesLayout->addWidget(viewButton);
+
+    auto verticalSpacer = new QLabel();
+    verticalSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     layout->addWidget(label);
     layout->addWidget(path);
     layout->addLayout(filesLayout);
-    layout->addStretch();
+    layout->addWidget(verticalSpacer);
     layout->addWidget(wikiLink);
     return options;
 }

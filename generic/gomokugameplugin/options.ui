@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>338</width>
-    <height>318</height>
+    <width>612</width>
+    <height>482</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -244,19 +244,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label_6">
-     <property name="toolTip">
-      <string notr="true">https://psi-plus.com/wiki/en:plugins#gomoku_game_plugin</string>
-     </property>
-     <property name="text">
-      <string>&lt;a href=&quot;https://psi-plus.com/wiki/en:plugins#gomoku_game_plugin&quot;&gt;Wiki (online)&lt;/a&gt;</string>
-     </property>
-     <property name="openExternalLinks">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -268,6 +255,19 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_6">
+     <property name="toolTip">
+      <string notr="true">https://psi-plus.com/wiki/en:plugins#gomoku_game_plugin</string>
+     </property>
+     <property name="text">
+      <string>&lt;a href=&quot;https://psi-plus.com/wiki/en:plugins#gomoku_game_plugin&quot;&gt;Wiki (online)&lt;/a&gt;</string>
+     </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

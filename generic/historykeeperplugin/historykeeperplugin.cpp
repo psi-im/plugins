@@ -165,7 +165,6 @@ QWidget *HistoryKeeperPlugin::options()
     for (auto contact : contacts) {
         text += contact + "\n";
     }
-    contactsWidget->setMaximumWidth(300);
     contactsWidget->setText(text);
 
     QLabel *wikiLink
@@ -174,6 +173,7 @@ QWidget *HistoryKeeperPlugin::options()
 
     layout->addWidget(new QLabel(tr("Remove history for contacts:")));
     layout->addWidget(contactsWidget);
+    layout->addWidget(new QLabel());
     layout->addWidget(wikiLink);
 
     return options;

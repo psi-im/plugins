@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>379</width>
-    <height>339</height>
+    <width>876</width>
+    <height>689</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,29 +30,23 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QPushButton" name="pb_del">
+          <widget class="QPushButton" name="pb_add">
            <property name="text">
-            <string>Delete selected</string>
+            <string>Add row</string>
            </property>
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+          <widget class="QLabel" name="horSpacer">
+           <property name="text">
+            <string/>
            </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
+          </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pb_add">
+          <widget class="QPushButton" name="pb_del">
            <property name="text">
-            <string>Add row</string>
+            <string>Delete selected</string>
            </property>
           </widget>
          </item>

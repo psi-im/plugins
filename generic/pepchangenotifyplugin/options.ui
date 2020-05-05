@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>339</width>
-    <height>367</height>
+    <width>642</width>
+    <height>260</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -73,7 +73,7 @@
      <property name="title">
       <string>Enable notifications for:</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
        <widget class="QCheckBox" name="cb_tune">
         <property name="text">

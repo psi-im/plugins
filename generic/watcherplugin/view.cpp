@@ -26,6 +26,11 @@
 #include "delegate.h"
 #include "iconfactoryaccessinghost.h"
 
+Viewer::Viewer(QWidget *parent) : QTableView(parent)
+{
+     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+}
+
 void Viewer::init(IconFactoryAccessingHost *iconHost)
 {
     iconHost_ = iconHost;
@@ -40,10 +45,6 @@ void Viewer::init(IconFactoryAccessingHost *iconHost)
     verticalHeader()->setDefaultAlignment(Qt::AlignHCenter);
 
     resizeColumnsToContents();
-
-    setFixedSize(header->sectionSize(0) + header->sectionSize(1) + header->sectionSize(2) + header->sectionSize(3)
-                     + header->sectionSize(4) + verticalHeader()->width() + 5,
-                 300); //не очень красиво, но по-другому не получилось %)
 
     connect(this, &Viewer::clicked, this, &Viewer::itemClicked);
 }

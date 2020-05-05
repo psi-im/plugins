@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>338</width>
-    <height>254</height>
+    <width>755</width>
+    <height>389</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -223,13 +223,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="wiki">
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -241,6 +234,13 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="wiki">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

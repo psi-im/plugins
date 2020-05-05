@@ -99,9 +99,12 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost *optionHost, OtrMessaging *
     policyLayout->addWidget(polRequire);
     policyGroup->setLayout(policyLayout);
 
+    auto verticalSpacer = new QLabel(this);
+    verticalSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     layout->addWidget(policyGroup);
     layout->addWidget(m_endWhenOffline);
-    layout->addStretch();
+    layout->addWidget(verticalSpacer);
 
     setLayout(layout);
 

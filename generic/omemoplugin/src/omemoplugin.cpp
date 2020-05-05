@@ -39,7 +39,7 @@ QString OMEMOPlugin::name() const { return "OMEMO Plugin"; }
 
 QString OMEMOPlugin::shortName() const { return "omemo"; }
 
-QString OMEMOPlugin::version() const { return "0.6"; }
+QString OMEMOPlugin::version() const { return "0.8"; }
 
 QWidget *OMEMOPlugin::options() { return new ConfigWidget(&m_omemo, m_accountInfo); }
 

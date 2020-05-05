@@ -29,7 +29,7 @@ class Viewer : public QTableView {
     Q_OBJECT
 
 public:
-    Viewer(QWidget *parent = nullptr) : QTableView(parent) {};
+    Viewer(QWidget *parent = nullptr);
     void init(IconFactoryAccessingHost *iconHost);
     void deleteSelected();
 

@@ -455,17 +455,23 @@ QWidget *AutoReply::options()
     if (!enabled) {
         return nullptr;
     }
-    QWidget *optionsWid = new QWidget();
-    messageWidget       = new QTextEdit();
-    messageWidget->setMaximumHeight(60);
+    QWidget *out = new QWidget();
+
+    messageWidget = new QTextEdit();
+    messageWidget->setMinimumHeight(120);
+    messageWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     messageWidget->setText(Message);
+
     disableforWidget = new QTextEdit();
+    disableforWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     disableforWidget->setText(DisableFor);
     enabledisableWidget = new QComboBox();
     enabledisableWidget->addItem(tr("Enable"));
     enabledisableWidget->addItem(tr("Disable"));
     enabledisableWidget->setCurrentIndex(EnableDisable);
+
     DisableForAccWidget = new QTextEdit();
+    DisableForAccWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     DisableForAccWidget->setText(DisableForAcc);
     spinWidget = new QSpinBox();
     spinWidget->setMinimum(-1);
@@ -494,6 +500,7 @@ QWidget *AutoReply::options()
 
     QGroupBox *  groupBox     = new QGroupBox(tr("Enable if status is:"));
     QHBoxLayout *statusLayout = new QHBoxLayout;
+    statusLayout->setSizeConstraint(QLayout::SetMaximumSize);
     statusLayout->addWidget(sonlineWidget);
     if (psiOptions->getGlobalOption("options.ui.menu.status.chat").toBool()) {
         statusLayout->addWidget(schatWidget);
@@ -506,14 +513,16 @@ QWidget *AutoReply::options()
     if (psiOptions->getGlobalOption("options.ui.menu.status.invisible").toBool()) {
         statusLayout->addWidget(sinvisWidget);
     }
-    statusLayout->addStretch();
     groupBox->setLayout(statusLayout);
 
     QVBoxLayout *Layout = new QVBoxLayout;
+    Layout->setSizeConstraint(QLayout::SetMinimumSize);
     Layout->addWidget(new QLabel(tr("Auto Reply Message:")));
     Layout->addWidget(messageWidget);
     QVBoxLayout *disableLayout = new QVBoxLayout;
+    disableLayout->setSizeConstraint(QLayout::SetMaximumSize);
     QHBoxLayout *EnDis         = new QHBoxLayout;
+    EnDis->setSizeConstraint(QLayout::SetMaximumSize);
     EnDis->addWidget(enabledisableWidget);
     EnDis->addWidget(new QLabel(tr("for JIDs and conferences:")));
     QLabel *Label = new QLabel(tr("You can also specify a part of JID\n(without any additional symbols)"));
@@ -530,15 +539,15 @@ QWidget *AutoReply::options()
     resetLayout->addWidget(new QLabel(tr("Timeout to reset counter:")));
     resetLayout->addWidget(resetWidget);
     resetLayout->addWidget(new QLabel(tr("min.")));
-    resetLayout->addStretch();
+
     QHBoxLayout *timesLayout = new QHBoxLayout;
     timesLayout->addWidget(new QLabel(tr("Send maximum")));
     timesLayout->addWidget(spinWidget);
     timesLayout->addWidget(new QLabel(tr("times (-1=infinite)")));
-    timesLayout->addStretch();
+
     QVBoxLayout *flags = new QVBoxLayout;
     flags->addLayout(AccLayout);
-    flags->addStretch();
+
     flags->addLayout(timesLayout);
     flags->addLayout(resetLayout);
     flags->addWidget(activetabWidget);
@@ -552,9 +561,9 @@ QWidget *AutoReply::options()
     QLabel *wikiLink
         = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/en:plugins#autoreply_plugin\">Wiki (Online)</a>"));
     wikiLink->setOpenExternalLinks(true);
-    QVBoxLayout *tab1Layout = new QVBoxLayout(optionsWid);
+    QVBoxLayout *tab1Layout = new QVBoxLayout(out);
     tab1Layout->addLayout(Layout);
-    tab1Layout->addStretch();
+
     tab1Layout->addLayout(hLayout);
     tab1Layout->addWidget(groupBox);
     tab1Layout->addWidget(wikiLink);
@@ -562,7 +571,7 @@ QWidget *AutoReply::options()
     // TODO: update after stopping support of Ubuntu Xenial:
     connect(enabledisableWidget, SIGNAL(currentIndexChanged(int)), SLOT(setEnableDisableText(int)));
 
-    return optionsWid;
+    return out;
 }
 
 void AutoReply::setOptionAccessingHost(OptionAccessingHost *host) { psiOptions = host; }
