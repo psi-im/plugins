@@ -22,6 +22,7 @@
 #define PSIOMEMO_SIGNAL_H
 
 #include "storage.h"
+#include <QMap>
 #include <QObject>
 #include <utility>
 
@@ -80,6 +81,7 @@ public:
 
     QString            getOwnFingerprint();
     QSet<uint32_t>     getDeviceList(const QString &user);
+    QMap<uint32_t, QString> getFingerprintsMap(const QString &user);
     QList<Fingerprint> getKnownFingerprints();
 
     void askDeviceTrust(const QString &user, uint32_t deviceId, bool skipNewDevicePart, bool ownJid = false);

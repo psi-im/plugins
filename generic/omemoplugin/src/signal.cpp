@@ -347,7 +347,7 @@ void Signal::askDeviceTrust(const QString &user, uint32_t deviceId, bool skipNew
 
     QMessageBox messageBox(QMessageBox::Question, QObject::tr("Managing of OMEMO keys"), message);
     messageBox.addButton(QObject::tr("Trust"), QMessageBox::AcceptRole);
-    messageBox.addButton(QObject::tr("Do Not Trust"), QMessageBox::RejectRole);
+    messageBox.addButton(QObject::tr("Do not trust"), QMessageBox::RejectRole);
 
     if (messageBox.exec() == 0) {
         confirmDeviceTrust(user, deviceId);
@@ -400,6 +400,16 @@ void Signal::setEnabledForUser(const QString &user, bool enabled) { m_storage.se
 QString Signal::getOwnFingerprint() { return getFingerprint(getIdentityPublicKey()); }
 
 QSet<uint32_t> Signal::getDeviceList(const QString &user) { return m_storage.getDeviceList(user, false); }
+
+QMap<uint32_t, QString> Signal::getFingerprintsMap(const QString &user)
+{
+    auto keysMap = m_storage.getKeysMap(user);
+    QMap<uint32_t, QString> out;
+    for (const int id : keysMap.keys()) {
+        out.insert(id, getFingerprint(keysMap[id]));
+    }
+    return out;
+}
 
 QByteArray Signal::getIdentityPublicKey() const
 {

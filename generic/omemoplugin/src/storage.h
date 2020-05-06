@@ -1,6 +1,7 @@
 /*
  * OMEMO Plugin for Psi
  * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2020 Boris Pek
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,6 +21,7 @@
 #ifndef PSIOMEMO_STORAGE_H
 #define PSIOMEMO_STORAGE_H
 
+#include <QMap>
 #include <QtSql>
 
 extern "C" {
@@ -34,6 +36,7 @@ public:
     void init(signal_context *ctx, const QString &dataPath, const QString &accountId);
     void deinit();
 
+    QMap<uint32_t, QByteArray> getKeysMap(const QString &user);
     QSet<uint32_t> getDeviceList(const QString &user, bool onlyTrusted = true);
     QSet<uint32_t> getUndecidedDeviceList(const QString &user);
     void           updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds);

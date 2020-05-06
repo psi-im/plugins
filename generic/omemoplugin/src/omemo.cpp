@@ -232,8 +232,7 @@ bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml,
         }
     }
 
-    signal->processUndecidedDevices(recipient, false);
-    signal->processUndecidedDevices(ownJid, true);
+    processUndecidedDevices(account, ownJid, recipient);
 
     QDomElement encrypted = xml.ownerDocument().createElementNS(OMEMO_XMLNS, "encrypted");
     QDomElement header    = xml.ownerDocument().createElement("header");
@@ -357,6 +356,13 @@ bool OMEMO::processDeviceList(const QString &ownJid, int account, const QDomElem
     emit deviceListUpdated(account);
 
     return true;
+}
+
+void OMEMO::processUndecidedDevices(int account, const QString &ownJid, const QString &user)
+{
+    std::shared_ptr<Signal> signal = getSignal(account);
+    signal->processUndecidedDevices(user, false);
+    signal->processUndecidedDevices(ownJid, true);
 }
 
 void OMEMO::publishDeviceList(int account, const QSet<uint32_t> &devices) const
@@ -584,7 +590,12 @@ uint32_t OMEMO::getDeviceId(int account) { return getSignal(account)->getDeviceI
 
 QString OMEMO::getOwnFingerprint(int account) { return getSignal(account)->getOwnFingerprint(); }
 
-QSet<uint32_t> OMEMO::getOwnDeviceList(int account)
+QMap<uint32_t, QString> OMEMO::getOwnFingerprintsMap(int account)
+{
+    return getSignal(account)->getFingerprintsMap(m_accountInfoAccessor->getJid(account));
+}
+
+QSet<uint32_t> OMEMO::getOwnDevicesList(int account)
 {
     return getSignal(account)->getDeviceList(m_accountInfoAccessor->getJid(account));
 }
@@ -615,7 +626,7 @@ void OMEMO::unpublishDevice(int account, uint32_t deviceId)
 {
     pepUnpublish(account, bundleNodeName(deviceId));
 
-    QSet<uint32_t> devices = getOwnDeviceList(account);
+    QSet<uint32_t> devices = getOwnDevicesList(account);
     devices.remove(deviceId);
     publishDeviceList(account, devices);
 }

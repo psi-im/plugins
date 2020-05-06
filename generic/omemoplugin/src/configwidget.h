@@ -88,7 +88,6 @@ protected:
     void updateData() override;
 
 private:
-    QLabel      *m_deviceLabel;
     QLabel      *m_fingerprintLabel;
     uint32_t     m_ourDeviceId;
     QPushButton *m_deleteButton;

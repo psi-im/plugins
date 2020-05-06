@@ -26,6 +26,8 @@
 #include "psiaccountcontrollinghost.h"
 #include "signal.h"
 #include "stanzasendinghost.h"
+#include <QMap>
+#include <QSet>
 #include <QtXml>
 #include <memory>
 
@@ -45,6 +47,7 @@ public:
     bool encryptMessage(const QString &ownJid, int account, QDomElement &xml, bool buildSessions = true,
                         const uint32_t *toDeviceId = nullptr);
     bool processDeviceList(const QString &ownJid, int account, const QDomElement &xml);
+    void processUndecidedDevices(int account, const QString &ownJid, const QString &user);
     void deinit();
     bool processBundle(const QString &ownJid, int account, const QDomElement &xml);
 
@@ -58,7 +61,8 @@ public:
     uint32_t           getDeviceId(int account);
     QString            getOwnFingerprint(int account);
     QList<Fingerprint> getKnownFingerprints(int account);
-    QSet<uint32_t>     getOwnDeviceList(int account);
+    QMap<uint32_t, QString> getOwnFingerprintsMap(int account);
+    QSet<uint32_t>     getOwnDevicesList(int account);
     void               askDeviceTrust(int account, const QString &user, uint32_t deviceId);
     void               removeDevice(int account, const QString &user, uint32_t deviceId);
     void               confirmDeviceTrust(int account, const QString &user, uint32_t deviceId);

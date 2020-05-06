@@ -39,7 +39,7 @@ QString OMEMOPlugin::name() const { return "OMEMO Plugin"; }
 
 QString OMEMOPlugin::shortName() const { return "omemo"; }
 
-QString OMEMOPlugin::version() const { return "0.8"; }
+QString OMEMOPlugin::version() const { return "0.9"; }
 
 QWidget *OMEMOPlugin::options() { return new ConfigWidget(&m_omemo, m_accountInfo); }
 
@@ -289,6 +289,9 @@ void OMEMOPlugin::onEnableOMEMOAction(bool checked)
     if (act == actEnableOmemo) {
         m_omemo.setEnabledForUser(account, jid, checked);
         updateAction(account, jid);
+        if (!action->property("isGroup").toBool()) {
+            m_omemo.processUndecidedDevices(account, m_accountInfo->getJid(account), jid);
+        }
     } else if (act == actDisableOmemo) {
         m_omemo.setEnabledForUser(account, jid, checked);
         updateAction(account, jid);

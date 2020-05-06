@@ -98,13 +98,13 @@ KnownFingerprints::KnownFingerprints(int account, OMEMO *omemo, QWidget *parent)
     mainLayout->addWidget(m_table);
 
     auto buttonsLayout = new QHBoxLayout(this);
-    auto removeButton  = new QPushButton(tr("Delete"), this);
     auto trustButton   = new QPushButton(tr("Trust"), this);
-    auto revokeButton  = new QPushButton(tr("Revoke"), this);
+    auto revokeButton  = new QPushButton(tr("Do not trust"), this);
+    auto removeButton  = new QPushButton(tr("Delete"), this);
 
-    connect(removeButton, &QPushButton::clicked, this, &KnownFingerprints::removeFingerprint);
     connect(trustButton, &QPushButton::clicked, this, &KnownFingerprints::trustFingerprint);
     connect(revokeButton, &QPushButton::clicked, this, &KnownFingerprints::revokeFingerprint);
+    connect(removeButton, &QPushButton::clicked, this, &KnownFingerprints::removeFingerprint);
 
     buttonsLayout->addWidget(trustButton);
     buttonsLayout->addWidget(revokeButton);
@@ -191,39 +191,47 @@ ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
 {
     m_ourDeviceId = m_omemo->getDeviceId(account);
 
-    auto groupBox = new QGroupBox(tr("Current device"), this);
-    auto groupBoxLayout = new QVBoxLayout(this);
-    m_deviceLabel   = new QLabel(this);
-    m_deviceLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    groupBoxLayout->addWidget(m_deviceLabel);
-    m_fingerprintLabel = new QLabel(this);
+    auto currentDevice = new QGroupBox(tr("Current device"), this);
+    auto currentDeviceLayout = new QHBoxLayout(currentDevice);
+    auto infoLabel = new QLabel(tr("Fingerprint: "), currentDevice);
+    infoLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    m_fingerprintLabel = new QLabel(currentDevice);
+    m_fingerprintLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     m_fingerprintLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
     m_fingerprintLabel->setWordWrap(true);
-    groupBoxLayout->addWidget(m_fingerprintLabel);
-    groupBox->setLayout(groupBoxLayout);
-    groupBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    currentDeviceLayout->addWidget(infoLabel);
+    currentDeviceLayout->addWidget(m_fingerprintLabel);
+    currentDevice->setLayout(currentDeviceLayout);
+    currentDevice->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
+    auto otherDevices = new QGroupBox(tr("Other devices"), this);
+    auto buttonsLayout = new QHBoxLayout();
+    m_deleteButton = new QPushButton(tr("Delete"), this);
+    m_deleteButton->setEnabled(false);
+    connect(m_deleteButton, &QPushButton::clicked, this, &ManageDevices::deleteDevice);
+    buttonsLayout->addWidget(m_deleteButton);
+    buttonsLayout->addWidget(new QLabel(this));
+    buttonsLayout->addWidget(new QLabel(this));
+
+    auto otherDevicesLayout = new QVBoxLayout(otherDevices);
+    otherDevicesLayout->addWidget(m_table);
+    otherDevicesLayout->addLayout(buttonsLayout);
+    otherDevices->setLayout(otherDevicesLayout);
 
     auto mainLayout = new QVBoxLayout(this);
-    mainLayout->addWidget(groupBox);
-    mainLayout->addWidget(m_table);
+    mainLayout->addWidget(currentDevice);
+    mainLayout->addWidget(otherDevices);
+    setLayout(mainLayout);
 
     connect(m_table->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ManageDevices::selectionChanged);
     connect(m_omemo, &OMEMO::deviceListUpdated, this, &ManageDevices::deviceListUpdated);
 
-    m_deleteButton = new QPushButton(tr("Delete"), this);
-    m_deleteButton->setEnabled(false);
-    connect(m_deleteButton, &QPushButton::clicked, this, &ManageDevices::deleteDevice);
-    mainLayout->addWidget(m_deleteButton);
-
-    setLayout(mainLayout);
     updateData();
 }
 
 void ManageDevices::updateData()
 {
-    m_deviceLabel->setText(tr("Device ID: ") + QString::number(m_omemo->getDeviceId(m_account)));
-    m_fingerprintLabel->setText(tr("Fingerprint: ")
-                                + QString("<code>%1</code>").arg(m_omemo->getOwnFingerprint(m_account)));
+    m_fingerprintLabel->setText(QString("<code>%1</code>").arg(m_omemo->getOwnFingerprint(m_account)));
 
     ConfigWidgetTabWithTable::updateData();
 }
@@ -244,11 +252,22 @@ uint32_t ManageDevices::selectedDeviceId(const QModelIndexList &selection) const
 void ManageDevices::doUpdateData()
 {
     m_tableModel->setColumnCount(1);
-    m_tableModel->setHorizontalHeaderLabels({ tr("Device ID") });
-    for (auto deviceId : m_omemo->getOwnDeviceList(m_account)) {
-        QStandardItem *item = new QStandardItem(QString::number(deviceId));
+    m_tableModel->setHorizontalHeaderLabels({ tr("Device ID"), tr("Fingerprint") });
+    auto fingerprintsMap = m_omemo->getOwnFingerprintsMap(m_account);
+    for (auto deviceId : m_omemo->getOwnDevicesList(m_account)) {
+        if (deviceId == m_ourDeviceId)
+            continue;
+
+        QList<QStandardItem *> row;
+        auto item = new QStandardItem(QString::number(deviceId));
         item->setData(deviceId);
-        m_tableModel->appendRow(item);
+        row.append(item);
+        if (fingerprintsMap.contains(deviceId)) {
+            row.append(new QStandardItem(fingerprintsMap[deviceId]));
+        } else {
+            row.append(new QStandardItem());
+        }
+        m_tableModel->appendRow(row);
     }
 }
 

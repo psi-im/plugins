@@ -1,6 +1,7 @@
 /*
  * OMEMO Plugin for Psi
  * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2020 Boris Pek
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -98,7 +99,7 @@ void Storage::initializeDB(signal_context *signalContext)
     if (!_db.exec("PRAGMA table_info(simple_store)").next()) {
         _db.exec("CREATE TABLE IF NOT EXISTS enabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
         _db.exec("CREATE TABLE IF NOT EXISTS devices (jid TEXT NOT NULL, device_id INTEGER NOT NULL, trust INTEGER NOT "
-                 "NULL, PRIMARY KEY(jid, device_id))");
+                 "NULL, label TEXT, PRIMARY KEY(jid, device_id))");
         _db.exec("CREATE TABLE IF NOT EXISTS identity_key_store (jid TEXT NOT NULL, device_id INTEGER NOT NULL, key "
                  "BLOB NOT NULL, PRIMARY KEY(jid, device_id))");
         _db.exec("CREATE TABLE IF NOT EXISTS pre_key_store (id INTEGER NOT NULL PRIMARY KEY, pre_key BLOB NOT NULL)");
@@ -185,6 +186,20 @@ void Storage::migrateDatabase()
 
 QSqlDatabase Storage::db() const { return QSqlDatabase::database(m_databaseConnectionName); }
 
+QMap<uint32_t, QByteArray> Storage::getKeysMap(const QString &user)
+{
+    QSqlQuery q(db());
+    q.prepare("SELECT device_id, key FROM identity_key_store WHERE jid IS ?");
+    q.bindValue(0, user);
+    q.exec();
+
+    QMap<uint32_t, QByteArray> out;
+    while (q.next()) {
+        out.insert(q.value(0).toUInt(), q.value(1).toByteArray());
+    }
+    return out;
+}
+
 QSet<uint32_t> Storage::getDeviceList(const QString &user, bool onlyTrusted)
 {
     QSqlQuery q(db());
@@ -231,7 +246,7 @@ void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actual
     if (!added.isEmpty()) {
         q.prepare("INSERT INTO devices (jid, device_id, trust) VALUES (?, ?, ?)");
         q.bindValue(0, user);
-        q.bindValue(2, knownIds.isEmpty() ? TRUSTED : UNDECIDED);
+        q.bindValue(2, UNDECIDED);
         for (auto id : added) {
             q.bindValue(1, id);
             q.exec();
