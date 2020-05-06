@@ -20,6 +20,7 @@
 
 #include "omemo.h"
 #include "crypto.h"
+#include <QMessageBox>
 #include <QtXml>
 
 #define OMEMO_XMLNS "eu.siacs.conversations.axolotl"
@@ -321,6 +322,7 @@ bool OMEMO::processDeviceList(const QString &ownJid, int account, const QDomElem
     }
 
     QSet<uint32_t> actualIds;
+    QMap<uint32_t, QString> deviceLabels;
 
     if (xml.nodeName() == "message" && xml.attribute("type") == "headline") {
         QDomElement event = xml.firstChildElement("event");
@@ -336,7 +338,11 @@ bool OMEMO::processDeviceList(const QString &ownJid, int account, const QDomElem
         QDomElement deviceElement
             = items.firstChildElement("item").firstChildElement("list").firstChildElement("device");
         while (!deviceElement.isNull()) {
-            actualIds.insert(deviceElement.attribute("id").toUInt());
+            const uint32_t id = deviceElement.attribute("id").toUInt();
+            actualIds.insert(id);
+            if (!deviceElement.attribute("label").isEmpty()) {
+                deviceLabels[id] = deviceElement.attribute("label");
+            }
             deviceElement = deviceElement.nextSiblingElement("device");
         }
     } else if (xml.nodeName() != "iq" || xml.attribute("type") != "error" || !expectedOwnList) {
@@ -352,7 +358,7 @@ bool OMEMO::processDeviceList(const QString &ownJid, int account, const QDomElem
         }
     }
 
-    signal->updateDeviceList(from, actualIds);
+    signal->updateDeviceList(from, actualIds, deviceLabels);
     emit deviceListUpdated(account);
 
     return true;
@@ -624,6 +630,21 @@ void OMEMO::revokeDeviceTrust(int account, const QString &user, uint32_t deviceI
 
 void OMEMO::unpublishDevice(int account, uint32_t deviceId)
 {
+    const QString &message =
+            tr("After deleting of device from list of available devices "
+               "it stops receiving offline messages from your contacts "
+               "until it will become online and your contacts mark it "
+               "as trusted.")
+            + "\n\n"
+            + tr("Delete selected device?");
+
+    QMessageBox messageBox(QMessageBox::Question, QObject::tr("Confirm action"), message);
+    messageBox.addButton(QObject::tr("Delete"), QMessageBox::AcceptRole);
+    messageBox.addButton(QObject::tr("Cancel"), QMessageBox::RejectRole);
+
+    if (messageBox.exec() != 0)
+        return;
+
     pepUnpublish(account, bundleNodeName(deviceId));
 
     QSet<uint32_t> devices = getOwnDevicesList(account);

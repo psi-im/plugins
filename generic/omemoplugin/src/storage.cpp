@@ -44,6 +44,21 @@ void Storage::init(signal_context *ctx, const QString &dataPath, const QString &
     initializeDB(ctx);
     db().exec("VACUUM");
 
+    {   // Update old tables without "label" column
+        QSqlQuery q(db());
+        q.exec("PRAGMA table_info(devices)");
+        bool labelColumnExist = false;
+        while (q.next()) {
+            if (q.value(1).toString() == QStringLiteral("label")) {
+                labelColumnExist = true;
+                break;
+            }
+        }
+        if (!labelColumnExist) {
+            q.exec("ALTER TABLE devices ADD COLUMN label TEXT");
+        }
+    }
+
     signal_protocol_session_store        session_store        = { /*.load_session_func =*/&loadSession,
                                                     /*.get_sub_device_sessions_func =*/nullptr,
                                                     /*.store_session_func =*/&storeSession,
@@ -234,13 +249,15 @@ QSet<uint32_t> Storage::getUndecidedDeviceList(const QString &user)
     return ids;
 }
 
-void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds)
+void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds, QMap<uint32_t, QString> &deviceLabels)
 {
     QSet<uint32_t> knownIds = getDeviceList(user, false);
 
     auto         added   = QSet<uint32_t>(actualIds).subtract(knownIds);
     auto         removed = QSet<uint32_t>(knownIds).subtract(actualIds);
-    QSqlDatabase _db     = db();
+    auto       intersect = QSet<uint32_t>(knownIds).intersect(actualIds);
+
+    QSqlDatabase _db(db());
     QSqlQuery    q(_db);
 
     if (!added.isEmpty()) {
@@ -270,11 +287,26 @@ void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actual
             q.bindValue(1, id);
             q.exec();
 
-            q2.bindValue(1, id);
-            q2.exec();
+            // q2.bindValue(1, id);
+            // q2.exec();
+            //
+            // q3.bindValue(1, id);
+            // q3.exec();
+        }
+        _db.commit();
+    }
 
-            q3.bindValue(1, id);
-            q3.exec();
+    if (!deviceLabels.isEmpty() &&!intersect.isEmpty()) {
+        q.prepare("UPDATE devices SET label = ? WHERE jid IS ? AND device_id IS ?");
+        q.bindValue(1, user);
+
+        _db.transaction();
+        for (auto id : intersect) {
+            if (deviceLabels.contains(id)) {
+                q.bindValue(0, deviceLabels[id]);
+                q.bindValue(2, id);
+                q.exec();
+            }
         }
         _db.commit();
     }
@@ -535,11 +567,27 @@ QByteArray Storage::loadDeviceIdentity(const QString &user, uint32_t deviceId)
 
 void Storage::removeDevice(const QString &user, uint32_t deviceId)
 {
-    QSqlQuery q(db());
-    q.prepare("DELETE FROM devices WHERE jid IS ? AND device_id IS ?");
-    q.addBindValue(user);
-    q.addBindValue(deviceId);
-    q.exec();
+    QSqlDatabase _db(db());
+    QSqlQuery    q(_db);
+
+    _db.transaction();
+    {
+        q.prepare("DELETE FROM devices WHERE jid IS ? AND device_id IS ?");
+        q.addBindValue(user);
+        q.addBindValue(deviceId);
+        q.exec();
+
+        // q.prepare("DELETE FROM identity_key_store WHERE jid IS ? AND device_id IS ?");
+        // q.addBindValue(user);
+        // q.addBindValue(deviceId);
+        // q.exec();
+        //
+        // q.prepare("DELETE FROM session_store WHERE jid IS ? AND device_id IS ?");
+        // q.addBindValue(user);
+        // q.addBindValue(deviceId);
+        // q.exec();
+    }
+    _db.commit();
 }
 
 void Storage::setDeviceTrust(const QString &user, uint32_t deviceId, bool trusted)

@@ -1,4 +1,11 @@
 2020-05-06
+v1.0 tehnick
+  * save labels for contact devices to database if they are available
+  * do not remove session keys during deleting of contact's devices,
+    because it breaks sessions with other xmmp clients
+  * add confirmation dialog before deleting of own device
+
+2020-05-06
 v0.9 tehnick
   * rewrite plugin settings dialog
   * ask trust to new own and contact devices immediately after enabling of

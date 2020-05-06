@@ -39,7 +39,7 @@ public:
     QMap<uint32_t, QByteArray> getKeysMap(const QString &user);
     QSet<uint32_t> getDeviceList(const QString &user, bool onlyTrusted = true);
     QSet<uint32_t> getUndecidedDeviceList(const QString &user);
-    void           updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds);
+    void           updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds, QMap<uint32_t, QString> &deviceLabels);
 
     QVector<QPair<uint32_t, QByteArray>> loadAllPreKeys(int limit = 100);
     uint32_t                             preKeyCount();

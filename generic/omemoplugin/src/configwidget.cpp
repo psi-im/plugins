@@ -133,7 +133,7 @@ void KnownFingerprints::doUpdateData()
         row.append(contact);
         TRUST_STATE state = fingerprint.trust;
         row.append(
-            new QStandardItem(state == TRUSTED ? tr("trusted") : state == UNTRUSTED ? tr("untrusted") : QString()));
+            new QStandardItem(state == TRUSTED ? tr("trusted") : state == UNTRUSTED ? tr("untrusted") : tr("not decided")));
         auto fpItem = new QStandardItem(fingerprint.fingerprint);
         fpItem->setData(QColor(state == TRUSTED ? Qt::darkGreen : state == UNTRUSTED ? Qt::darkRed : Qt::darkYellow),
                         Qt::ForegroundRole);

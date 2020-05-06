@@ -68,7 +68,7 @@ public:
     Bundle                  collectBundle();
     void                    processBundle(const QString &from, uint32_t deviceId, const Bundle &bundle);
     uint32_t                getDeviceId();
-    void                    updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds);
+    void                    updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds, QMap<uint32_t, QString> &deviceLabels);
     QList<EncryptedKey>     encryptKey(const QString &ownJid, const QString &recipient, const QByteArray &key);
     QPair<QByteArray, bool> decryptKey(const QString &sender, const EncryptedKey &encryptedKey);
     QVector<uint32_t>       invalidSessions(const QString &recipient);

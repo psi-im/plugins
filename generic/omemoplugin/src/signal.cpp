@@ -187,9 +187,9 @@ QByteArray Signal::getPublicKey(const ec_key_pair *key_pair) const
     return result;
 }
 
-void Signal::updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds)
+void Signal::updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds, QMap<uint32_t, QString> &deviceLabels)
 {
-    m_storage.updateDeviceList(user, actualIds);
+    m_storage.updateDeviceList(user, actualIds, deviceLabels);
 }
 
 QVector<uint32_t> Signal::invalidSessions(const QString &recipient)
@@ -360,7 +360,7 @@ void Signal::removeDevice(const QString &user, uint32_t deviceId)
 {
     const QString publicKey = getFingerprint(m_storage.loadDeviceIdentity(user, deviceId));
     const QString message   = QObject::tr("Delete selected device from list of known devices of user \"%1\"?").arg(user)
-        + "<br/><br/>" + QObject::tr("Device public key:") + QString("<br/><code>%1</code>").arg(publicKey);
+            + "<br/><br/>" + QObject::tr("Device public key:") + QString("<br/><code>%1</code>").arg(publicKey);
 
     QMessageBox messageBox(QMessageBox::Question, QObject::tr("Confirm action"), message);
     messageBox.addButton(QObject::tr("Delete"), QMessageBox::AcceptRole);
