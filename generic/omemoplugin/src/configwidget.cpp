@@ -23,6 +23,7 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
+#include <QMessageBox>
 #include <QVBoxLayout>
 
 namespace psiomemo {
@@ -189,20 +190,33 @@ void KnownFingerprints::revokeFingerprint()
 ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
     ConfigWidgetTabWithTable(account, omemo, parent)
 {
-    m_ourDeviceId = m_omemo->getDeviceId(account);
+    m_currentDeviceId = m_omemo->getDeviceId(account);
 
     auto currentDevice = new QGroupBox(tr("Current device"), this);
-    auto currentDeviceLayout = new QHBoxLayout(currentDevice);
     auto infoLabel = new QLabel(tr("Fingerprint: "), currentDevice);
     infoLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     m_fingerprintLabel = new QLabel(currentDevice);
     m_fingerprintLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     m_fingerprintLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
     m_fingerprintLabel->setWordWrap(true);
-    currentDeviceLayout->addWidget(infoLabel);
-    currentDeviceLayout->addWidget(m_fingerprintLabel);
+
+    auto deviceInfoLayout = new QHBoxLayout();
+    deviceInfoLayout->addWidget(infoLabel);
+    deviceInfoLayout->addWidget(m_fingerprintLabel);
+
+    auto deleteCurrentDeviceButton = new QPushButton(tr("Delete all OMEMO data for current device"), currentDevice);
+    connect(deleteCurrentDeviceButton, &QPushButton::clicked, this, &ManageDevices::deleteCurrentDevice);
+
+    auto deleteCurrentDeviceLayout = new QHBoxLayout();
+    deleteCurrentDeviceLayout->addWidget(deleteCurrentDeviceButton);
+    deleteCurrentDeviceLayout->addWidget(new QLabel(currentDevice));
+
+    auto currentDeviceLayout = new QVBoxLayout(currentDevice);
+    currentDeviceLayout->addLayout(deviceInfoLayout);
+    currentDeviceLayout->addLayout(deleteCurrentDeviceLayout);
     currentDevice->setLayout(currentDeviceLayout);
     currentDevice->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
 
     auto otherDevices = new QGroupBox(tr("Other devices"), this);
     auto buttonsLayout = new QHBoxLayout();
@@ -231,6 +245,7 @@ ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
 
 void ManageDevices::updateData()
 {
+    m_currentDeviceId = m_omemo->getDeviceId(m_account);
     m_fingerprintLabel->setText(QString("<code>%1</code>").arg(m_omemo->getOwnFingerprint(m_account)));
 
     ConfigWidgetTabWithTable::updateData();
@@ -240,7 +255,7 @@ void ManageDevices::selectionChanged(const QItemSelection &selected, const QItem
 {
     QModelIndexList selection = selected.indexes();
     if (!selection.isEmpty()) {
-        m_deleteButton->setEnabled(selectedDeviceId(selection) != m_ourDeviceId);
+        m_deleteButton->setEnabled(selectedDeviceId(selection) != m_currentDeviceId);
     }
 }
 
@@ -255,7 +270,7 @@ void ManageDevices::doUpdateData()
     m_tableModel->setHorizontalHeaderLabels({ tr("Device ID"), tr("Fingerprint") });
     auto fingerprintsMap = m_omemo->getOwnFingerprintsMap(m_account);
     for (auto deviceId : m_omemo->getOwnDevicesList(m_account)) {
-        if (deviceId == m_ourDeviceId)
+        if (deviceId == m_currentDeviceId)
             continue;
 
         QList<QStandardItem *> row;
@@ -271,10 +286,53 @@ void ManageDevices::doUpdateData()
     }
 }
 
+void ManageDevices::deleteCurrentDevice()
+{
+    const QString &message =
+            tr("Deleting of all OMEMO data for current device will cause "
+               "to a number of consequences:\n"
+               "1) All started OMEMO sessions will be forgotten.\n"
+               "2) You will lose access to encrypted history stored for "
+               "current device on server side.\n"
+               "3) New device ID and keys pair will be generated.\n"
+               "4) You will need to verify keys for all devices of your "
+               "contacts again.\n"
+               "5) Your contacts will need to verify new device before "
+               "you start receive messages from them.\n")
+            + "\n"
+            + tr("Delete current device?");
+
+    QMessageBox messageBox(QMessageBox::Question, QObject::tr("Confirm action"), message);
+    messageBox.addButton(QObject::tr("Delete"), QMessageBox::AcceptRole);
+    messageBox.addButton(QObject::tr("Cancel"), QMessageBox::RejectRole);
+
+    if (messageBox.exec() != 0)
+        return;
+
+    m_omemo->deleteCurrentDevice(m_account, m_currentDeviceId);
+    m_omemo->accountConnected(m_account, m_jid);
+    updateData();
+}
+
 void ManageDevices::deleteDevice()
 {
     QModelIndexList selection = m_table->selectionModel()->selectedIndexes();
     if (!selection.isEmpty()) {
+        const QString &message =
+                tr("After deleting of device from list of available devices "
+                   "it stops receiving offline messages from your contacts "
+                   "until it will become online and your contacts mark it "
+                   "as trusted.")
+                + "\n\n"
+                + tr("Delete selected device?");
+
+        QMessageBox messageBox(QMessageBox::Question, QObject::tr("Confirm action"), message);
+        messageBox.addButton(QObject::tr("Delete"), QMessageBox::AcceptRole);
+        messageBox.addButton(QObject::tr("Cancel"), QMessageBox::RejectRole);
+
+        if (messageBox.exec() != 0)
+            return;
+
         m_omemo->unpublishDevice(m_account, selectedDeviceId(selection));
     }
 }

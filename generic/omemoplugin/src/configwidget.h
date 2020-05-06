@@ -89,7 +89,7 @@ protected:
 
 private:
     QLabel      *m_fingerprintLabel;
-    uint32_t     m_ourDeviceId;
+    uint32_t     m_currentDeviceId;
     QPushButton *m_deleteButton;
     uint32_t     selectedDeviceId(const QModelIndexList &selection) const;
 
@@ -98,6 +98,7 @@ protected:
 
 private slots:
     void selectionChanged(const QItemSelection &, const QItemSelection &);
+    void deleteCurrentDevice();
     void deleteDevice();
     void deviceListUpdated(int account);
 };

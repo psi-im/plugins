@@ -44,21 +44,6 @@ void Storage::init(signal_context *ctx, const QString &dataPath, const QString &
     initializeDB(ctx);
     db().exec("VACUUM");
 
-    {   // Update old tables without "label" column
-        QSqlQuery q(db());
-        q.exec("PRAGMA table_info(devices)");
-        bool labelColumnExist = false;
-        while (q.next()) {
-            if (q.value(1).toString() == QStringLiteral("label")) {
-                labelColumnExist = true;
-                break;
-            }
-        }
-        if (!labelColumnExist) {
-            q.exec("ALTER TABLE devices ADD COLUMN label TEXT");
-        }
-    }
-
     signal_protocol_session_store        session_store        = { /*.load_session_func =*/&loadSession,
                                                     /*.get_sub_device_sessions_func =*/nullptr,
                                                     /*.store_session_func =*/&storeSession,
@@ -179,7 +164,7 @@ void Storage::initializeDB(signal_context *signalContext)
         } else {
             error = "Could not generate registration ID";
         }
-    } else if (lookupValue(this, "db_ver").toInt() != 2) {
+    } else if (lookupValue(this, "db_ver").toInt() != 3) {
         migrateDatabase();
     }
 
@@ -196,7 +181,22 @@ void Storage::migrateDatabase()
     QSqlDatabase _db = db();
     _db.exec("CREATE TABLE IF NOT EXISTS enabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
     _db.exec("DROP TABLE disabled_buddies");
-    storeValue("db_ver", 2);
+
+    {   // Update old tables without "label" column
+        QSqlQuery q(db());
+        q.exec("PRAGMA table_info(devices)");
+        bool labelColumnExist = false;
+        while (q.next()) {
+            if (q.value(1).toString() == QStringLiteral("label")) {
+                labelColumnExist = true;
+                break;
+            }
+        }
+        if (!labelColumnExist) {
+            q.exec("ALTER TABLE devices ADD COLUMN label TEXT");
+        }
+    }
+    storeValue("db_ver", 3);
 }
 
 QSqlDatabase Storage::db() const { return QSqlDatabase::database(m_databaseConnectionName); }
@@ -598,6 +598,23 @@ void Storage::setDeviceTrust(const QString &user, uint32_t deviceId, bool truste
     q.addBindValue(user);
     q.addBindValue(deviceId);
     q.exec();
+}
+
+void Storage::removeCurrentDevice()
+{
+    QSqlDatabase _db(db());
+    QSqlQuery    q(_db);
+
+    _db.transaction();
+    {
+        q.exec("DROP TABLE devices");
+        q.exec("DROP TABLE enabled_buddies");
+        q.exec("DROP TABLE identity_key_store");
+        q.exec("DROP TABLE pre_key_store");
+        q.exec("DROP TABLE session_store");
+        q.exec("DROP TABLE simple_store");
+    }
+    _db.commit();
 }
 
 bool Storage::isEnabledForUser(const QString &user)

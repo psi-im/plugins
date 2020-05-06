@@ -1,3 +1,8 @@
+2020-05-07
+v1.1 tehnick
+  * add button "Delete all OMEMO data for current device" to plugin settings
+    dialog
+
 2020-05-06
 v1.0 tehnick
   * save labels for contact devices to database if they are available

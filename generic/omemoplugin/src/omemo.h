@@ -68,6 +68,7 @@ public:
     void               confirmDeviceTrust(int account, const QString &user, uint32_t deviceId);
     void               revokeDeviceTrust(int account, const QString &user, uint32_t deviceId);
     void               unpublishDevice(int account, uint32_t deviceId);
+    void               deleteCurrentDevice(int account, uint32_t deviceId);
 
 private:
     class MessageWaitingForBundles {

@@ -48,6 +48,7 @@ public:
     QByteArray                           loadDeviceIdentity(const QString &user, uint32_t deviceId);
     void                                 removeDevice(const QString &user, uint32_t deviceId);
     void                                 setDeviceTrust(const QString &user, uint32_t deviceId, bool trusted);
+    void                                 removeCurrentDevice();
     QVector<std::tuple<QString, QByteArray, uint32_t, TRUST_STATE>> getKnownFingerprints();
 
     uint32_t                       maxPreKeyId();

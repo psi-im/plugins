@@ -381,6 +381,11 @@ void Signal::revokeDeviceTrust(const QString &user, uint32_t deviceId)
     m_storage.setDeviceTrust(user, deviceId, false);
 }
 
+void Signal::removeCurrentDevice()
+{
+    m_storage.removeCurrentDevice();
+}
+
 QString Signal::getFingerprint(const QByteArray &publicKeyBytes) const
 {
     QByteArray bytes     = publicKeyBytes.right(publicKeyBytes.size() - 1); // the first byte is DJB_TYPE

@@ -20,7 +20,6 @@
 
 #include "omemo.h"
 #include "crypto.h"
-#include <QMessageBox>
 #include <QtXml>
 
 #define OMEMO_XMLNS "eu.siacs.conversations.axolotl"
@@ -630,25 +629,26 @@ void OMEMO::revokeDeviceTrust(int account, const QString &user, uint32_t deviceI
 
 void OMEMO::unpublishDevice(int account, uint32_t deviceId)
 {
-    const QString &message =
-            tr("After deleting of device from list of available devices "
-               "it stops receiving offline messages from your contacts "
-               "until it will become online and your contacts mark it "
-               "as trusted.")
-            + "\n\n"
-            + tr("Delete selected device?");
-
-    QMessageBox messageBox(QMessageBox::Question, QObject::tr("Confirm action"), message);
-    messageBox.addButton(QObject::tr("Delete"), QMessageBox::AcceptRole);
-    messageBox.addButton(QObject::tr("Cancel"), QMessageBox::RejectRole);
-
-    if (messageBox.exec() != 0)
-        return;
-
     pepUnpublish(account, bundleNodeName(deviceId));
 
     QSet<uint32_t> devices = getOwnDevicesList(account);
     devices.remove(deviceId);
+    publishDeviceList(account, devices);
+}
+
+void OMEMO::deleteCurrentDevice(int account, uint32_t deviceId)
+{
+    QSet<uint32_t> devices = getOwnDevicesList(account);
+    devices.remove(deviceId);
+
+    getSignal(account)->removeCurrentDevice();
+    m_accountToSignal.remove(account);
+
+    uint32_t newDeviceId = getSignal(account)->getDeviceId();
+    devices.insert(newDeviceId);
+
+    pepUnpublish(account, bundleNodeName(deviceId));
+    publishOwnBundle(account);
     publishDeviceList(account, devices);
 }
 
