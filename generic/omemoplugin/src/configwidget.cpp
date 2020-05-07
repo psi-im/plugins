@@ -41,11 +41,16 @@ ConfigWidget::ConfigWidget(OMEMO *omemo, AccountInfoAccessingHost *accountInfo) 
 
     int account = accountBox->itemData(accountBox->currentIndex()).toInt();
 
+    auto knownFingerprintsTab = new KnownFingerprints(account, omemo, this);
+    auto manageDevicesTab     = new ManageDevices(account, omemo, this);
+
     m_tabWidget = new QTabWidget(this);
-    m_tabWidget->addTab(new KnownFingerprints(account, omemo, this), tr("Fingerprints"));
-    m_tabWidget->addTab(new ManageDevices(account, omemo, this), tr("Manage Devices"));
+    m_tabWidget->addTab(knownFingerprintsTab, tr("Fingerprints"));
+    m_tabWidget->addTab(manageDevicesTab, tr("Manage Devices"));
     mainLayout->addWidget(m_tabWidget);
     setLayout(mainLayout);
+
+    connect(manageDevicesTab, &ManageDevices::updateKnownFingerprints, knownFingerprintsTab, &KnownFingerprints::updateData);
 
     // TODO: update after stopping support of Ubuntu Xenial:
     connect(accountBox, SIGNAL(currentIndexChanged(int)), SLOT(currentAccountChanged(int)));
@@ -312,6 +317,7 @@ void ManageDevices::deleteCurrentDevice()
     m_omemo->deleteCurrentDevice(m_account, m_currentDeviceId);
     m_omemo->accountConnected(m_account, m_jid);
     updateData();
+    emit updateKnownFingerprints();
 }
 
 void ManageDevices::deleteDevice()

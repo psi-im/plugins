@@ -55,9 +55,9 @@ class ConfigWidgetTabWithTable : public ConfigWidgetTab {
 public:
     ConfigWidgetTabWithTable(int account, OMEMO *omemo, QWidget *parent);
     void filterContacts(const QString &jid);
+    void updateData() override;
 
 protected:
-    void                updateData() override;
     virtual void        doUpdateData() = 0;
     QTableView *        m_table;
     QStandardItemModel *m_tableModel;
@@ -83,6 +83,9 @@ class ManageDevices : public ConfigWidgetTabWithTable {
 
 public:
     ManageDevices(int account, OMEMO *omemo, QWidget *parent);
+
+signals:
+    void updateKnownFingerprints();
 
 protected:
     void updateData() override;
