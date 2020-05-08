@@ -2,7 +2,6 @@ cmake_minimum_required( VERSION 3.1.0 )
 
 set( plugins_list 
     battleshipgameplugin
-    ripperccplugin
 )
 
 message(STATUS "Plugins from dev subdirectory")
