@@ -26,10 +26,7 @@
 #include "delegate.h"
 #include "iconfactoryaccessinghost.h"
 
-Viewer::Viewer(QWidget *parent) : QTableView(parent)
-{
-     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-}
+Viewer::Viewer(QWidget *parent) : QTableView(parent) { setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); }
 
 void Viewer::init(IconFactoryAccessingHost *iconHost)
 {

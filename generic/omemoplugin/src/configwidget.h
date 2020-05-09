@@ -36,8 +36,7 @@ class ConfigWidgetTab : public QWidget {
 
 public:
     ConfigWidgetTab(int account, OMEMO *omemo, QWidget *parent) :
-        QWidget(parent), m_account(account), m_omemo(omemo)
-    { }
+        QWidget(parent), m_account(account), m_omemo(omemo) { }
 
     void setAccount(int account)
     {
@@ -95,7 +94,7 @@ protected:
     void updateData() override;
 
 private:
-    QLabel      *m_fingerprintLabel;
+    QLabel *     m_fingerprintLabel;
     uint32_t     m_currentDeviceId;
     QPushButton *m_deleteButton;
     uint32_t     selectedDeviceId(const QModelIndexList &selection) const;
@@ -110,7 +109,7 @@ private slots:
     void deviceListUpdated(int account);
 };
 
-class OmemoConfiguration  : public ConfigWidgetTab {
+class OmemoConfiguration : public ConfigWidgetTab {
     Q_OBJECT
 
 public:
@@ -124,8 +123,8 @@ private:
     QRadioButton *m_alwaysEnabled;
     QRadioButton *m_enabledByDefault;
     QRadioButton *m_disabledByDefault;
-    QCheckBox    *m_trustOwnDevices;
-    QCheckBox    *m_trustContactDevices;
+    QCheckBox *   m_trustOwnDevices;
+    QCheckBox *   m_trustContactDevices;
 };
 
 class ConfigWidget : public QWidget {

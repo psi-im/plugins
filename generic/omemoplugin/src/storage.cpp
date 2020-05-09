@@ -183,7 +183,7 @@ void Storage::migrateDatabase()
     _db.exec("CREATE TABLE IF NOT EXISTS enabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
     _db.exec("CREATE TABLE IF NOT EXISTS disabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
 
-    {   // Update old tables without "label" column
+    { // Update old tables without "label" column
         QSqlQuery q(db());
         q.exec("PRAGMA table_info(devices)");
         bool labelColumnExist = false;
@@ -250,13 +250,14 @@ QSet<uint32_t> Storage::getUndecidedDeviceList(const QString &user)
     return ids;
 }
 
-void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds, QMap<uint32_t, QString> &deviceLabels)
+void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds,
+                               QMap<uint32_t, QString> &deviceLabels)
 {
     QSet<uint32_t> knownIds = getDeviceList(user, false);
 
-    auto         added   = QSet<uint32_t>(actualIds).subtract(knownIds);
-    auto         removed = QSet<uint32_t>(knownIds).subtract(actualIds);
-    auto       intersect = QSet<uint32_t>(knownIds).intersect(actualIds);
+    auto added     = QSet<uint32_t>(actualIds).subtract(knownIds);
+    auto removed   = QSet<uint32_t>(knownIds).subtract(actualIds);
+    auto intersect = QSet<uint32_t>(knownIds).intersect(actualIds);
 
     QSqlDatabase _db(db());
     QSqlQuery    q(_db);
@@ -297,7 +298,7 @@ void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actual
         _db.commit();
     }
 
-    if (!deviceLabels.isEmpty() &&!intersect.isEmpty()) {
+    if (!deviceLabels.isEmpty() && !intersect.isEmpty()) {
         q.prepare("UPDATE devices SET label = ? WHERE jid IS ? AND device_id IS ?");
         q.bindValue(1, user);
 

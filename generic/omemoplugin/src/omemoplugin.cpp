@@ -266,7 +266,7 @@ void OMEMOPlugin::setContactInfoAccessingHost(ContactInfoAccessingHost *host)
 void OMEMOPlugin::setOptionAccessingHost(OptionAccessingHost *host)
 {
     bool firstCall = (m_optionHost == nullptr);
-    m_optionHost = host;
+    m_optionHost   = host;
 
     if (firstCall)
         optionChanged(QString());
@@ -280,9 +280,12 @@ void OMEMOPlugin::optionChanged(const QString &)
         return;
 
     m_omemo.setAlwaysEnabled(m_optionHost->getPluginOption("always-enabled", m_omemo.isAlwaysEnabled()).toBool());
-    m_omemo.setEnabledByDefault(m_optionHost->getPluginOption("enabled-by-default", m_omemo.isEnabledByDefault()).toBool());
-    m_omemo.setTrustNewOwnDevices(m_optionHost->getPluginOption("trust-new-own-devices", m_omemo.trustNewOwnDevices()).toBool());
-    m_omemo.setTrustNewContactDevices(m_optionHost->getPluginOption("trust-new-contact-devices", m_omemo.trustNewContactDevices()).toBool());
+    m_omemo.setEnabledByDefault(
+        m_optionHost->getPluginOption("enabled-by-default", m_omemo.isEnabledByDefault()).toBool());
+    m_omemo.setTrustNewOwnDevices(
+        m_optionHost->getPluginOption("trust-new-own-devices", m_omemo.trustNewOwnDevices()).toBool());
+    m_omemo.setTrustNewContactDevices(
+        m_optionHost->getPluginOption("trust-new-contact-devices", m_omemo.trustNewContactDevices()).toBool());
 }
 
 void OMEMOPlugin::savePluginOptions()

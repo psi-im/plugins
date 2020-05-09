@@ -187,7 +187,8 @@ QByteArray Signal::getPublicKey(const ec_key_pair *key_pair) const
     return result;
 }
 
-void Signal::updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds, QMap<uint32_t, QString> &deviceLabels)
+void Signal::updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds,
+                              QMap<uint32_t, QString> &deviceLabels)
 {
     m_storage.updateDeviceList(user, actualIds, deviceLabels);
 }
@@ -363,7 +364,7 @@ void Signal::removeDevice(const QString &user, uint32_t deviceId)
 {
     const QString publicKey = getFingerprint(m_storage.loadDeviceIdentity(user, deviceId));
     const QString message   = QObject::tr("Delete selected device from list of known devices of user \"%1\"?").arg(user)
-            + "<br/><br/>" + QObject::tr("Device public key:") + QString("<br/><code>%1</code>").arg(publicKey);
+        + "<br/><br/>" + QObject::tr("Device public key:") + QString("<br/><code>%1</code>").arg(publicKey);
 
     QMessageBox messageBox(QMessageBox::Question, QObject::tr("Confirm action"), message);
     messageBox.addButton(QObject::tr("Delete"), QMessageBox::AcceptRole);
@@ -384,10 +385,7 @@ void Signal::revokeDeviceTrust(const QString &user, uint32_t deviceId)
     m_storage.setDeviceTrust(user, deviceId, false);
 }
 
-void Signal::removeCurrentDevice()
-{
-    m_storage.removeCurrentDevice();
-}
+void Signal::removeCurrentDevice() { m_storage.removeCurrentDevice(); }
 
 QString Signal::getFingerprint(const QByteArray &publicKeyBytes) const
 {
@@ -399,44 +397,23 @@ QString Signal::getFingerprint(const QByteArray &publicKeyBytes) const
     return publicKey;
 }
 
-bool Signal::isAvailableForUser(const QString &user)
-{
-    return !m_storage.getDeviceList(user, false).isEmpty();
-}
+bool Signal::isAvailableForUser(const QString &user) { return !m_storage.getDeviceList(user, false).isEmpty(); }
 
-bool Signal::isEnabledForUser(const QString &user)
-{
-    return m_storage.isEnabledForUser(user);
-}
+bool Signal::isEnabledForUser(const QString &user) { return m_storage.isEnabledForUser(user); }
 
-bool Signal::isDisabledForUser(const QString &user)
-{
-    return m_storage.isDisabledForUser(user);
-}
+bool Signal::isDisabledForUser(const QString &user) { return m_storage.isDisabledForUser(user); }
 
-void Signal::setEnabledForUser(const QString &user, bool value)
-{
-    m_storage.setEnabledForUser(user, value);
-}
+void Signal::setEnabledForUser(const QString &user, bool value) { m_storage.setEnabledForUser(user, value); }
 
-void Signal::setDisabledForUser(const QString &user, bool value)
-{
-     m_storage.setDisabledForUser(user, value);
-}
+void Signal::setDisabledForUser(const QString &user, bool value) { m_storage.setDisabledForUser(user, value); }
 
-QString Signal::getOwnFingerprint()
-{
-    return getFingerprint(getIdentityPublicKey());
-}
+QString Signal::getOwnFingerprint() { return getFingerprint(getIdentityPublicKey()); }
 
-QSet<uint32_t> Signal::getDeviceList(const QString &user)
-{
-    return m_storage.getDeviceList(user, false);
-}
+QSet<uint32_t> Signal::getDeviceList(const QString &user) { return m_storage.getDeviceList(user, false); }
 
 QMap<uint32_t, QString> Signal::getFingerprintsMap(const QString &user)
 {
-    auto keysMap = m_storage.getKeysMap(user);
+    auto                    keysMap = m_storage.getKeysMap(user);
     QMap<uint32_t, QString> out;
     for (const int id : keysMap.keys()) {
         out.insert(id, getFingerprint(keysMap[id]));

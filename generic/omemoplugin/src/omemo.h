@@ -53,40 +53,40 @@ public:
 
     void accountConnected(int account, const QString &ownJid);
 
-    const QString      deviceListNodeName() const;
-    bool               isAvailableForUser(int account, const QString &user);
-    bool               isAvailableForGroup(int account, const QString &ownJid, const QString &bareJid);
-    bool               isEnabledForUser(int account, const QString &user);
-    void               setEnabledForUser(int account, const QString &user, bool value);
-    uint32_t           getDeviceId(int account);
-    QString            getOwnFingerprint(int account);
-    QList<Fingerprint> getKnownFingerprints(int account);
+    const QString           deviceListNodeName() const;
+    bool                    isAvailableForUser(int account, const QString &user);
+    bool                    isAvailableForGroup(int account, const QString &ownJid, const QString &bareJid);
+    bool                    isEnabledForUser(int account, const QString &user);
+    void                    setEnabledForUser(int account, const QString &user, bool value);
+    uint32_t                getDeviceId(int account);
+    QString                 getOwnFingerprint(int account);
+    QList<Fingerprint>      getKnownFingerprints(int account);
     QMap<uint32_t, QString> getOwnFingerprintsMap(int account);
-    QSet<uint32_t>     getOwnDevicesList(int account);
-    void               askDeviceTrust(int account, const QString &user, uint32_t deviceId);
-    void               removeDevice(int account, const QString &user, uint32_t deviceId);
-    void               confirmDeviceTrust(int account, const QString &user, uint32_t deviceId);
-    void               revokeDeviceTrust(int account, const QString &user, uint32_t deviceId);
-    void               unpublishDevice(int account, uint32_t deviceId);
-    void               deleteCurrentDevice(int account, uint32_t deviceId);
+    QSet<uint32_t>          getOwnDevicesList(int account);
+    void                    askDeviceTrust(int account, const QString &user, uint32_t deviceId);
+    void                    removeDevice(int account, const QString &user, uint32_t deviceId);
+    void                    confirmDeviceTrust(int account, const QString &user, uint32_t deviceId);
+    void                    revokeDeviceTrust(int account, const QString &user, uint32_t deviceId);
+    void                    unpublishDevice(int account, uint32_t deviceId);
+    void                    deleteCurrentDevice(int account, uint32_t deviceId);
 
-    void               setAlwaysEnabled(const bool value);
-    void               setEnabledByDefault(const bool value);
-    void               setTrustNewOwnDevices(const bool value);
-    void               setTrustNewContactDevices(const bool value);
-    bool               isAlwaysEnabled() const;
-    bool               isEnabledByDefault() const;
-    bool               trustNewOwnDevices() const;
-    bool               trustNewContactDevices() const;
+    void setAlwaysEnabled(const bool value);
+    void setEnabledByDefault(const bool value);
+    void setTrustNewOwnDevices(const bool value);
+    void setTrustNewContactDevices(const bool value);
+    bool isAlwaysEnabled() const;
+    bool isEnabledByDefault() const;
+    bool trustNewOwnDevices() const;
+    bool trustNewContactDevices() const;
 
 signals:
     void deviceListUpdated(int account);
     void saveSettings();
 
 private:
-    void          pepPublish(int account, const QString &dl_xml) const;
-    void          pepUnpublish(int account, const QString &dl_xml) const;
-    void          publishOwnBundle(int account);
+    void pepPublish(int account, const QString &dl_xml) const;
+    void pepUnpublish(int account, const QString &dl_xml) const;
+    void publishOwnBundle(int account);
 
     void          setNodeText(QDomElement &node, const QByteArray &byteArray) const;
     void          buildSessionsFromBundle(const QMap<QString, QVector<uint32_t>> &recipientInvalidSessions,
@@ -99,7 +99,7 @@ private:
     template <typename T>
     bool forEachMucParticipant(int account, const QString &ownJid, const QString &conferenceJid, T &&lambda);
 
-    std::shared_ptr<Signal>                            getSignal(int account);
+    std::shared_ptr<Signal> getSignal(int account);
 
 private:
     class MessageWaitingForBundles {
@@ -118,9 +118,9 @@ private:
     QSet<QString>                                      m_ownDeviceListRequests;
     QHash<QString, QString>                            m_encryptedGroupMessages;
 
-    bool m_alwaysEnabled = false;
-    bool m_enabledByDefault = false;
-    bool m_trustNewOwnDevices = false;
+    bool m_alwaysEnabled          = false;
+    bool m_enabledByDefault       = false;
+    bool m_trustNewOwnDevices     = false;
     bool m_trustNewContactDevices = false;
 };
 }

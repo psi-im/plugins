@@ -521,7 +521,7 @@ QWidget *AutoReply::options()
     Layout->addWidget(messageWidget);
     QVBoxLayout *disableLayout = new QVBoxLayout;
     disableLayout->setSizeConstraint(QLayout::SetMaximumSize);
-    QHBoxLayout *EnDis         = new QHBoxLayout;
+    QHBoxLayout *EnDis = new QHBoxLayout;
     EnDis->setSizeConstraint(QLayout::SetMaximumSize);
     EnDis->addWidget(enabledisableWidget);
     EnDis->addWidget(new QLabel(tr("for JIDs and conferences:")));

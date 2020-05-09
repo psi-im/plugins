@@ -63,7 +63,7 @@ class OMEMOPlugin : public QObject,
     Q_PLUGIN_METADATA(IID "com.psi.OmemoPlugin")
     Q_INTERFACES(PsiPlugin StanzaFilter StanzaSender EventCreator AccountInfoAccessor ApplicationInfoAccessor
                      PsiAccountController PluginInfoProvider ToolbarIconAccessor GCToolbarIconAccessor EncryptionSupport
-                     OptionAccessor CommandExecutor ContactInfoAccessor)
+                         OptionAccessor CommandExecutor ContactInfoAccessor)
 public:
     OMEMOPlugin() = default;
 
@@ -121,11 +121,11 @@ private:
     OMEMO                         m_omemo;
     QNetworkAccessManager         m_networkManager;
 
-    AccountInfoAccessingHost     *m_accountInfo = nullptr;
-    ContactInfoAccessingHost     *m_contactInfo = nullptr;
+    AccountInfoAccessingHost *    m_accountInfo     = nullptr;
+    ContactInfoAccessingHost *    m_contactInfo     = nullptr;
     ApplicationInfoAccessingHost *m_applicationInfo = nullptr;
-    EventCreatingHost            *m_eventCreator = nullptr;
-    OptionAccessingHost          *m_optionHost = nullptr;
+    EventCreatingHost *           m_eventCreator    = nullptr;
+    OptionAccessingHost *         m_optionHost      = nullptr;
 };
 }
 #endif // PSIOMEMO_OMEMOPLUGIN_H

@@ -71,7 +71,7 @@ SelectFigure::SelectFigure(const QString &player, QWidget *parent) : QWidget(par
     layout->addWidget(tb_knight, 0, 1);
     layout->addWidget(tb_bishop, 1, 1);
 
-    connect(tb_queen,  &QPushButton::clicked, this, &SelectFigure::figureSelected);
+    connect(tb_queen, &QPushButton::clicked, this, &SelectFigure::figureSelected);
     connect(tb_castle, &QPushButton::clicked, this, &SelectFigure::figureSelected);
     connect(tb_knight, &QPushButton::clicked, this, &SelectFigure::figureSelected);
     connect(tb_bishop, &QPushButton::clicked, this, &SelectFigure::figureSelected);
