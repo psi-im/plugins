@@ -152,7 +152,7 @@
                     <client-version comment="Display client version information" type="bool">true</client-version>
                     <geolocation comment="Display geolocation information" type="bool">true</geolocation>
                     <last-status comment="Display the last status" type="bool">true</last-status>
-                    <pgp comment="Display PGP information" type="bool">true</pgp>
+                    <pgp comment="Display PGP information in tooltip" type="bool">true</pgp>
                 </tooltip>
                 <temp-no-roster-animation comment="Disable animated icons. This option will be removed as soon as the contactlist code is optimized enough" type="bool">false</temp-no-roster-animation>
                 <account-sort-style type="QString">alpha</account-sort-style>
