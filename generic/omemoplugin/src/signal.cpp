@@ -320,11 +320,14 @@ signal_protocol_address Signal::getAddress(uint32_t deviceId, const QByteArray &
 
 uint32_t Signal::preKeyCount() { return m_storage.preKeyCount(); }
 
-void Signal::processUndecidedDevices(const QString &user, bool ownJid)
+void Signal::processUndecidedDevices(const QString &user, const bool ownJid, const bool trusted)
 {
     QSet<uint32_t> devices = m_storage.getUndecidedDeviceList(user);
     for (auto deviceId : devices) {
-        askDeviceTrust(user, deviceId, false, ownJid);
+        if (trusted)
+            confirmDeviceTrust(user, deviceId);
+        else
+            askDeviceTrust(user, deviceId, false, ownJid);
     }
 }
 
@@ -396,15 +399,40 @@ QString Signal::getFingerprint(const QByteArray &publicKeyBytes) const
     return publicKey;
 }
 
-bool Signal::isAvailableForUser(const QString &user) { return !m_storage.getDeviceList(user, false).isEmpty(); };
+bool Signal::isAvailableForUser(const QString &user)
+{
+    return !m_storage.getDeviceList(user, false).isEmpty();
+}
 
-bool Signal::isEnabledForUser(const QString &user) { return m_storage.isEnabledForUser(user); }
+bool Signal::isEnabledForUser(const QString &user)
+{
+    return m_storage.isEnabledForUser(user);
+}
 
-void Signal::setEnabledForUser(const QString &user, bool enabled) { m_storage.setEnabledForUser(user, enabled); }
+bool Signal::isDisabledForUser(const QString &user)
+{
+    return m_storage.isDisabledForUser(user);
+}
 
-QString Signal::getOwnFingerprint() { return getFingerprint(getIdentityPublicKey()); }
+void Signal::setEnabledForUser(const QString &user, bool value)
+{
+    m_storage.setEnabledForUser(user, value);
+}
 
-QSet<uint32_t> Signal::getDeviceList(const QString &user) { return m_storage.getDeviceList(user, false); }
+void Signal::setDisabledForUser(const QString &user, bool value)
+{
+     m_storage.setDisabledForUser(user, value);
+}
+
+QString Signal::getOwnFingerprint()
+{
+    return getFingerprint(getIdentityPublicKey());
+}
+
+QSet<uint32_t> Signal::getDeviceList(const QString &user)
+{
+    return m_storage.getDeviceList(user, false);
+}
 
 QMap<uint32_t, QString> Signal::getFingerprintsMap(const QString &user)
 {

@@ -74,10 +74,12 @@ public:
     QVector<uint32_t>       invalidSessions(const QString &recipient);
     uint32_t                preKeyCount();
     bool                    isTrusted(const QString &user, uint32_t deviceId);
-    void                    processUndecidedDevices(const QString &user, bool ownJid);
+    void                    processUndecidedDevices(const QString &user, const bool ownJid, const bool trusted);
     bool                    isAvailableForUser(const QString &user);
     bool                    isEnabledForUser(const QString &user);
-    void                    setEnabledForUser(const QString &user, bool enabled);
+    bool                    isDisabledForUser(const QString &user);
+    void                    setEnabledForUser(const QString &user, bool value);
+    void                    setDisabledForUser(const QString &user, bool value);
 
     QString            getOwnFingerprint();
     QSet<uint32_t>     getDeviceList(const QString &user);

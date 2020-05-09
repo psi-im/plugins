@@ -33,6 +33,8 @@
 #include "eventcreator.h"
 #include "gctoolbariconaccessor.h"
 #include "omemo.h"
+#include "optionaccessinghost.h"
+#include "optionaccessor.h"
 #include "plugininfoprovider.h"
 #include "psiaccountcontroller.h"
 #include "psiplugin.h"
@@ -44,6 +46,7 @@
 namespace psiomemo {
 class OMEMOPlugin : public QObject,
                     public PsiPlugin,
+                    public OptionAccessor,
                     public StanzaFilter,
                     public StanzaSender,
                     public EventCreator,
@@ -60,8 +63,10 @@ class OMEMOPlugin : public QObject,
     Q_PLUGIN_METADATA(IID "com.psi.OmemoPlugin")
     Q_INTERFACES(PsiPlugin StanzaFilter StanzaSender EventCreator AccountInfoAccessor ApplicationInfoAccessor
                      PsiAccountController PluginInfoProvider ToolbarIconAccessor GCToolbarIconAccessor EncryptionSupport
-                         CommandExecutor ContactInfoAccessor)
+                     OptionAccessor CommandExecutor ContactInfoAccessor)
 public:
+    OMEMOPlugin() = default;
+
     QString  name() const override;
     QString  shortName() const override;
     QString  version() const override;
@@ -71,8 +76,7 @@ public:
     QPixmap  icon() const override;
     void     applyOptions() override;
     void     restoreOptions() override;
-
-    QString pluginInfo() override;
+    QString  pluginInfo() override;
 
     bool        incomingStanza(int account, const QDomElement &xml) override;
     bool        outgoingStanza(int account, QDomElement &xml) override;
@@ -84,6 +88,8 @@ public:
     void        setEventCreatingHost(EventCreatingHost *host) override;
     void        setPsiAccountControllingHost(PsiAccountControllingHost *host) override;
     void        setContactInfoAccessingHost(ContactInfoAccessingHost *host) override;
+    void        setOptionAccessingHost(OptionAccessingHost *host) override;
+    void        optionChanged(const QString &option) override;
     QStringList pluginFeatures() override;
 
     QList<QVariantHash> getButtonParam() override;
@@ -93,27 +99,33 @@ public:
 
     bool execute(int account, const QHash<QString, QVariant> &args, QHash<QString, QVariant> *result) override;
 
+signals:
+    void applyPluginSettings();
+
+private slots:
+    void savePluginOptions();
+    void enableOMEMOAction(bool);
+    void fileDownloadFinished();
+    void actionDestroyed(QObject *action);
+
 private:
-    bool                          m_enabled;
-    QMultiMap<QString, QAction *> m_actions;
-    OMEMO                         m_omemo;
-    QNetworkAccessManager         m_networkManager;
-
-    AccountInfoAccessingHost *    m_accountInfo;
-    ContactInfoAccessingHost *    m_contactInfo;
-    ApplicationInfoAccessingHost *m_applicationInfo;
-    EventCreatingHost *           m_eventCreator;
-
     QPixmap  getIcon() const;
     QAction *createAction(QObject *parent, int account, const QString &contact, bool isGroup);
     void     updateAction(int account, const QString &user);
     void     processEncryptedFile(int account, QDomElement &xml);
     void     showOwnFingerprint(int account, const QString &jid);
 
-private slots:
-    void onEnableOMEMOAction(bool);
-    void onFileDownloadFinished();
-    void onActionDestroyed(QObject *action);
+private:
+    bool                          m_enabled;
+    QMultiMap<QString, QAction *> m_actions;
+    OMEMO                         m_omemo;
+    QNetworkAccessManager         m_networkManager;
+
+    AccountInfoAccessingHost     *m_accountInfo = nullptr;
+    ContactInfoAccessingHost     *m_contactInfo = nullptr;
+    ApplicationInfoAccessingHost *m_applicationInfo = nullptr;
+    EventCreatingHost            *m_eventCreator = nullptr;
+    OptionAccessingHost          *m_optionHost = nullptr;
 };
 }
 #endif // PSIOMEMO_OMEMOPLUGIN_H

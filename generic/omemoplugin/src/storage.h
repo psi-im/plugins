@@ -56,7 +56,9 @@ public:
     bool                           identityExists(const signal_protocol_address *addr_p) const;
     uint32_t                       signedPreKeyid();
     bool                           isEnabledForUser(const QString &user);
-    void                           setEnabledForUser(const QString &user, bool enabled);
+    bool                           isDisabledForUser(const QString &user);
+    void                           setEnabledForUser(const QString &user, bool value);
+    void                           setDisabledForUser(const QString &user, bool value);
 
 private:
     QString m_databaseConnectionName;

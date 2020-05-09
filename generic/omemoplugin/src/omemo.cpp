@@ -366,8 +366,8 @@ bool OMEMO::processDeviceList(const QString &ownJid, int account, const QDomElem
 void OMEMO::processUndecidedDevices(int account, const QString &ownJid, const QString &user)
 {
     std::shared_ptr<Signal> signal = getSignal(account);
-    signal->processUndecidedDevices(user, false);
-    signal->processUndecidedDevices(ownJid, true);
+    signal->processUndecidedDevices(user, false, m_trustNewContactDevices);
+    signal->processUndecidedDevices(ownJid, true, m_trustNewOwnDevices);
 }
 
 void OMEMO::publishDeviceList(int account, const QSet<uint32_t> &devices) const
@@ -530,7 +530,10 @@ void OMEMO::setNodeText(QDomElement &node, const QByteArray &byteArray) const
     node.appendChild(node.ownerDocument().createTextNode(array));
 }
 
-void OMEMO::setStanzaSender(StanzaSendingHost *stanzaSender) { m_stanzaSender = stanzaSender; }
+void OMEMO::setStanzaSender(StanzaSendingHost *stanzaSender)
+{
+    m_stanzaSender = stanzaSender;
+}
 
 void OMEMO::setAccountController(PsiAccountControllingHost *accountController)
 {
@@ -584,16 +587,36 @@ bool OMEMO::isAvailableForGroup(int account, const QString &ownJid, const QStrin
     return any && result;
 }
 
-bool OMEMO::isEnabledForUser(int account, const QString &user) { return getSignal(account)->isEnabledForUser(user); }
-
-void OMEMO::setEnabledForUser(int account, const QString &user, bool enabled)
+bool OMEMO::isEnabledForUser(int account, const QString &user)
 {
-    getSignal(account)->setEnabledForUser(user, enabled);
+    if (m_alwaysEnabled)
+        return true;
+
+    if (m_enabledByDefault)
+        return !getSignal(account)->isDisabledForUser(user);
+
+    return getSignal(account)->isEnabledForUser(user);
 }
 
-uint32_t OMEMO::getDeviceId(int account) { return getSignal(account)->getDeviceId(); }
+void OMEMO::setEnabledForUser(int account, const QString &user, bool value)
+{
+    if (m_enabledByDefault) {
+        getSignal(account)->setDisabledForUser(user, !value);
+    }
+    else {
+        getSignal(account)->setEnabledForUser(user, value);
+    }
+}
 
-QString OMEMO::getOwnFingerprint(int account) { return getSignal(account)->getOwnFingerprint(); }
+uint32_t OMEMO::getDeviceId(int account)
+{
+    return getSignal(account)->getDeviceId();
+}
+
+QString OMEMO::getOwnFingerprint(int account)
+{
+    return getSignal(account)->getOwnFingerprint();
+}
 
 QMap<uint32_t, QString> OMEMO::getOwnFingerprintsMap(int account)
 {
@@ -605,7 +628,10 @@ QSet<uint32_t> OMEMO::getOwnDevicesList(int account)
     return getSignal(account)->getDeviceList(m_accountInfoAccessor->getJid(account));
 }
 
-QList<Fingerprint> OMEMO::getKnownFingerprints(int account) { return getSignal(account)->getKnownFingerprints(); }
+QList<Fingerprint> OMEMO::getKnownFingerprints(int account)
+{
+    return getSignal(account)->getKnownFingerprints();
+}
 
 void OMEMO::askDeviceTrust(int account, const QString &user, uint32_t deviceId)
 {
@@ -650,6 +676,46 @@ void OMEMO::deleteCurrentDevice(int account, uint32_t deviceId)
     pepUnpublish(account, bundleNodeName(deviceId));
     publishOwnBundle(account);
     publishDeviceList(account, devices);
+}
+
+void OMEMO::setAlwaysEnabled(const bool value)
+{
+    m_alwaysEnabled = value;
+}
+
+void OMEMO::setEnabledByDefault(const bool value)
+{
+    m_enabledByDefault = value;
+}
+
+void OMEMO::setTrustNewOwnDevices(const bool value)
+{
+    m_trustNewOwnDevices = value;
+}
+
+void OMEMO::setTrustNewContactDevices(const bool value)
+{
+    m_trustNewContactDevices = value;
+}
+
+bool OMEMO::isAlwaysEnabled() const
+{
+    return m_alwaysEnabled;
+}
+
+bool OMEMO::isEnabledByDefault() const
+{
+    return m_enabledByDefault;
+}
+
+bool OMEMO::trustNewOwnDevices() const
+{
+    return m_trustNewOwnDevices;
+}
+
+bool OMEMO::trustNewContactDevices() const
+{
+    return m_trustNewContactDevices;
 }
 
 std::shared_ptr<Signal> OMEMO::getSignal(int account)

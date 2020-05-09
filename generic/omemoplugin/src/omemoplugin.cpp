@@ -41,7 +41,12 @@ QString OMEMOPlugin::shortName() const { return "omemo"; }
 
 QString OMEMOPlugin::version() const { return "1.1"; }
 
-QWidget *OMEMOPlugin::options() { return new ConfigWidget(&m_omemo, m_accountInfo); }
+QWidget *OMEMOPlugin::options()
+{
+    auto configWidget = new ConfigWidget(&m_omemo, m_accountInfo);
+    connect(this, &OMEMOPlugin::applyPluginSettings, configWidget, &ConfigWidget::applySettings);
+    return configWidget;
+}
 
 QStringList OMEMOPlugin::pluginFeatures() { return QStringList(m_omemo.deviceListNodeName() + "+notify"); }
 
@@ -75,7 +80,7 @@ QPixmap OMEMOPlugin::getIcon() const
     return QPixmap(":/omemoplugin/omemo.png");
 }
 
-void OMEMOPlugin::applyOptions() { }
+void OMEMOPlugin::applyOptions() { applyPluginSettings(); }
 
 void OMEMOPlugin::restoreOptions() { }
 
@@ -164,7 +169,7 @@ void OMEMOPlugin::processEncryptedFile(int account, QDomElement &xml)
 
     QNetworkReply *reply = m_networkManager.get(QNetworkRequest(url));
 
-    connect(reply, &QNetworkReply::finished, this, &OMEMOPlugin::onFileDownloadFinished);
+    connect(reply, &QNetworkReply::finished, this, &OMEMOPlugin::fileDownloadFinished);
     reply->setProperty("keyData", keyData);
     reply->setProperty("account", account);
     reply->setProperty("filePath", f.fileName());
@@ -185,7 +190,7 @@ void OMEMOPlugin::showOwnFingerprint(int account, const QString &jid)
     m_omemo.appendSysMsg(account, jid, msg);
 }
 
-void OMEMOPlugin::onFileDownloadFinished()
+void OMEMOPlugin::fileDownloadFinished()
 {
     auto reply = dynamic_cast<QNetworkReply *>(sender());
     reply->deleteLater();
@@ -258,7 +263,40 @@ void OMEMOPlugin::setContactInfoAccessingHost(ContactInfoAccessingHost *host)
     m_omemo.setContactInfoAccessor(host);
 }
 
-void OMEMOPlugin::onEnableOMEMOAction(bool checked)
+void OMEMOPlugin::setOptionAccessingHost(OptionAccessingHost *host)
+{
+    bool firstCall = (m_optionHost == nullptr);
+    m_optionHost = host;
+
+    if (firstCall)
+        optionChanged(QString());
+
+    connect(&m_omemo, &OMEMO::saveSettings, this, &OMEMOPlugin::savePluginOptions);
+}
+
+void OMEMOPlugin::optionChanged(const QString &)
+{
+    if (!m_optionHost)
+        return;
+
+    m_omemo.setAlwaysEnabled(m_optionHost->getPluginOption("always-enabled", m_omemo.isAlwaysEnabled()).toBool());
+    m_omemo.setEnabledByDefault(m_optionHost->getPluginOption("enabled-by-default", m_omemo.isEnabledByDefault()).toBool());
+    m_omemo.setTrustNewOwnDevices(m_optionHost->getPluginOption("trust-new-own-devices", m_omemo.trustNewOwnDevices()).toBool());
+    m_omemo.setTrustNewContactDevices(m_optionHost->getPluginOption("trust-new-contact-devices", m_omemo.trustNewContactDevices()).toBool());
+}
+
+void OMEMOPlugin::savePluginOptions()
+{
+    if (!m_optionHost)
+        return;
+
+    m_optionHost->setPluginOption("always-enabled", QVariant(m_omemo.isAlwaysEnabled()));
+    m_optionHost->setPluginOption("enabled-by-default", QVariant(m_omemo.isEnabledByDefault()));
+    m_optionHost->setPluginOption("trust-new-own-devices", QVariant(m_omemo.trustNewOwnDevices()));
+    m_optionHost->setPluginOption("trust-new-contact-devices", QVariant(m_omemo.trustNewContactDevices()));
+}
+
+void OMEMOPlugin::enableOMEMOAction(bool checked)
 {
     QAction *action = dynamic_cast<QAction *>(sender());
     if (!action)
@@ -287,13 +325,13 @@ void OMEMOPlugin::onEnableOMEMOAction(bool checked)
 
     QAction *act = menu->exec(QCursor::pos());
     if (act == actEnableOmemo) {
-        m_omemo.setEnabledForUser(account, jid, checked);
+        m_omemo.setEnabledForUser(account, jid, true);
         updateAction(account, jid);
         if (!action->property("isGroup").toBool()) {
             m_omemo.processUndecidedDevices(account, m_accountInfo->getJid(account), jid);
         }
     } else if (act == actDisableOmemo) {
-        m_omemo.setEnabledForUser(account, jid, checked);
+        m_omemo.setEnabledForUser(account, jid, false);
         updateAction(account, jid);
     } else if (act == actManageFingerprints) {
         auto screen = QGuiApplication::primaryScreen();
@@ -324,8 +362,8 @@ QAction *OMEMOPlugin::createAction(QObject *parent, int account, const QString &
     QAction *action  = new QAction(getIcon(), tr("OMEMO encryption"), parent);
     action->setCheckable(true);
     action->setProperty("isGroup", QVariant(isGroup));
-    connect(action, &QAction::triggered, this, &OMEMOPlugin::onEnableOMEMOAction);
-    connect(action, &QAction::destroyed, this, &OMEMOPlugin::onActionDestroyed);
+    connect(action, &QAction::triggered, this, &OMEMOPlugin::enableOMEMOAction);
+    connect(action, &QAction::destroyed, this, &OMEMOPlugin::actionDestroyed);
     m_actions.insert(bareJid, action);
     updateAction(account, bareJid);
     return action;
@@ -338,7 +376,7 @@ QAction *OMEMOPlugin::getGCAction(QObject *parent, int account, const QString &c
     return createAction(parent, account, contact, true);
 }
 
-void OMEMOPlugin::onActionDestroyed(QObject *action)
+void OMEMOPlugin::actionDestroyed(QObject *action)
 {
     m_actions.remove(action->property("jid").toString(), reinterpret_cast<QAction *>(action));
 }

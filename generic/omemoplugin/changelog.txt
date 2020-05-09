@@ -1,4 +1,15 @@
 2020-05-07
+v2.0 tehnick
+  * Add plugin options:
+    * OMEMO encryption policy:
+      * Always enabled
+      * Enabled by default
+      * Disabled by default
+    * Automatically mark new own devices as trusted
+    * Automatically mark new interlocutors devices as trusted
+  * Add above options to settings dialog
+
+2020-05-07
 v1.1 tehnick
   * add button "Delete all OMEMO data for current device" to plugin settings
     dialog

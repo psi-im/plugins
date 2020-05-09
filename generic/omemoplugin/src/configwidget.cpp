@@ -43,14 +43,17 @@ ConfigWidget::ConfigWidget(OMEMO *omemo, AccountInfoAccessingHost *accountInfo) 
 
     auto knownFingerprintsTab = new KnownFingerprints(account, omemo, this);
     auto manageDevicesTab     = new ManageDevices(account, omemo, this);
+    auto omemoConfigurationTab = new OmemoConfiguration(account, omemo, this);
 
     m_tabWidget = new QTabWidget(this);
     m_tabWidget->addTab(knownFingerprintsTab, tr("Fingerprints"));
     m_tabWidget->addTab(manageDevicesTab, tr("Manage Devices"));
+    m_tabWidget->addTab(omemoConfigurationTab, tr("Configuration"));
     mainLayout->addWidget(m_tabWidget);
     setLayout(mainLayout);
 
     connect(manageDevicesTab, &ManageDevices::updateKnownFingerprints, knownFingerprintsTab, &KnownFingerprints::updateData);
+    connect(this, &ConfigWidget::applySettings, omemoConfigurationTab, &OmemoConfiguration::saveSettings);
 
     // TODO: update after stopping support of Ubuntu Xenial:
     connect(accountBox, SIGNAL(currentIndexChanged(int)), SLOT(currentAccountChanged(int)));
@@ -349,4 +352,63 @@ void ManageDevices::deviceListUpdated(int account)
         updateData();
     }
 }
+
+OmemoConfiguration::OmemoConfiguration(int account, OMEMO *omemo, QWidget *parent) :
+    ConfigWidgetTab(account, omemo, parent)
+{
+    auto omemoPolicy = new QGroupBox(tr("OMEMO encryption policy"), this);
+    m_alwaysEnabled = new QRadioButton(tr("Always enabled"), omemoPolicy);
+    m_enabledByDefault = new QRadioButton(tr("Enabled by default"), omemoPolicy);
+    m_disabledByDefault = new QRadioButton(tr("Disabled by default"), omemoPolicy);
+
+    auto omemoPolicyLayout = new QVBoxLayout(omemoPolicy);
+    omemoPolicyLayout->addWidget(m_alwaysEnabled);
+    omemoPolicyLayout->addWidget(m_enabledByDefault);
+    omemoPolicyLayout->addWidget(m_disabledByDefault);
+    omemoPolicy->setLayout(omemoPolicyLayout);
+    omemoPolicy->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
+    m_trustOwnDevices = new QCheckBox(tr("Automatically mark new own devices as trusted"), this);
+    m_trustContactDevices = new QCheckBox(tr("Automatically mark new interlocutors devices as trusted"), this);
+
+    auto spacerLabel = new QLabel(this);
+    spacerLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    auto mainLayout = new QVBoxLayout(this);
+    mainLayout->addWidget(omemoPolicy);
+    mainLayout->addWidget(m_trustOwnDevices);
+    mainLayout->addWidget(m_trustContactDevices);
+    mainLayout->addWidget(spacerLabel);
+    setLayout(mainLayout);
+
+    loadSettings();
+}
+
+void OmemoConfiguration::updateData()
+{
+    ; // Nothing to do...
+}
+
+void OmemoConfiguration::loadSettings()
+{
+    if (m_omemo->isAlwaysEnabled())
+        m_alwaysEnabled->setChecked(true);
+    else if (m_omemo->isEnabledByDefault())
+        m_enabledByDefault->setChecked(true);
+    else
+        m_disabledByDefault->setChecked(true);
+
+    m_trustOwnDevices->setChecked(m_omemo->trustNewOwnDevices());
+    m_trustContactDevices->setChecked(m_omemo->trustNewContactDevices());
+}
+
+void OmemoConfiguration::saveSettings()
+{
+    m_omemo->setAlwaysEnabled(m_alwaysEnabled->isChecked());
+    m_omemo->setEnabledByDefault(m_enabledByDefault->isChecked());
+    m_omemo->setTrustNewOwnDevices(m_trustOwnDevices->isChecked());
+    m_omemo->setTrustNewContactDevices(m_trustContactDevices->isChecked());
+    m_omemo->saveSettings();
+}
+
 }

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * OMEMO Plugin for Psi
  * Copyright (C) 2018 Vyacheslav Karpukhin
  * Copyright (C) 2020 Boris Pek
@@ -57,7 +57,7 @@ public:
     bool               isAvailableForUser(int account, const QString &user);
     bool               isAvailableForGroup(int account, const QString &ownJid, const QString &bareJid);
     bool               isEnabledForUser(int account, const QString &user);
-    void               setEnabledForUser(int account, const QString &user, bool enabled);
+    void               setEnabledForUser(int account, const QString &user, bool value);
     uint32_t           getDeviceId(int account);
     QString            getOwnFingerprint(int account);
     QList<Fingerprint> getKnownFingerprints(int account);
@@ -69,6 +69,37 @@ public:
     void               revokeDeviceTrust(int account, const QString &user, uint32_t deviceId);
     void               unpublishDevice(int account, uint32_t deviceId);
     void               deleteCurrentDevice(int account, uint32_t deviceId);
+
+    void               setAlwaysEnabled(const bool value);
+    void               setEnabledByDefault(const bool value);
+    void               setTrustNewOwnDevices(const bool value);
+    void               setTrustNewContactDevices(const bool value);
+    bool               isAlwaysEnabled() const;
+    bool               isEnabledByDefault() const;
+    bool               trustNewOwnDevices() const;
+    bool               trustNewContactDevices() const;
+
+signals:
+    void deviceListUpdated(int account);
+    void saveSettings();
+
+private:
+    void          pepPublish(int account, const QString &dl_xml) const;
+    void          pepUnpublish(int account, const QString &dl_xml) const;
+    void          publishOwnBundle(int account);
+
+    void          setNodeText(QDomElement &node, const QByteArray &byteArray) const;
+    void          buildSessionsFromBundle(const QMap<QString, QVector<uint32_t>> &recipientInvalidSessions,
+                                          const QVector<uint32_t> &ownInvalidSessions, const QString &ownJid, int account,
+                                          const QDomElement &messageToResend);
+    QString       pepRequest(int account, const QString &ownJid, const QString &recipient, const QString &node) const;
+    void          publishDeviceList(int account, const QSet<uint32_t> &devices) const;
+    const QString bundleNodeName(uint32_t deviceId) const;
+
+    template <typename T>
+    bool forEachMucParticipant(int account, const QString &ownJid, const QString &conferenceJid, T &&lambda);
+
+    std::shared_ptr<Signal>                            getSignal(int account);
 
 private:
     class MessageWaitingForBundles {
@@ -86,23 +117,11 @@ private:
     QHash<int, std::shared_ptr<Signal>>                m_accountToSignal;
     QSet<QString>                                      m_ownDeviceListRequests;
     QHash<QString, QString>                            m_encryptedGroupMessages;
-    std::shared_ptr<Signal>                            getSignal(int account);
-    void                                               pepPublish(int account, const QString &dl_xml) const;
-    void                                               pepUnpublish(int account, const QString &dl_xml) const;
-    void                                               publishOwnBundle(int account);
 
-    void          setNodeText(QDomElement &node, const QByteArray &byteArray) const;
-    void          buildSessionsFromBundle(const QMap<QString, QVector<uint32_t>> &recipientInvalidSessions,
-                                          const QVector<uint32_t> &ownInvalidSessions, const QString &ownJid, int account,
-                                          const QDomElement &messageToResend);
-    QString       pepRequest(int account, const QString &ownJid, const QString &recipient, const QString &node) const;
-    void          publishDeviceList(int account, const QSet<uint32_t> &devices) const;
-    const QString bundleNodeName(uint32_t deviceId) const;
-
-    template <typename T>
-    bool forEachMucParticipant(int account, const QString &ownJid, const QString &conferenceJid, T &&lambda);
-signals:
-    void deviceListUpdated(int account);
+    bool m_alwaysEnabled = false;
+    bool m_enabledByDefault = false;
+    bool m_trustNewOwnDevices = false;
+    bool m_trustNewContactDevices = false;
 };
 }
 

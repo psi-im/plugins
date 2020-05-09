@@ -98,6 +98,7 @@ void Storage::initializeDB(signal_context *signalContext)
     QString error;
     if (!_db.exec("PRAGMA table_info(simple_store)").next()) {
         _db.exec("CREATE TABLE IF NOT EXISTS enabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
+        _db.exec("CREATE TABLE IF NOT EXISTS disabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
         _db.exec("CREATE TABLE IF NOT EXISTS devices (jid TEXT NOT NULL, device_id INTEGER NOT NULL, trust INTEGER NOT "
                  "NULL, label TEXT, PRIMARY KEY(jid, device_id))");
         _db.exec("CREATE TABLE IF NOT EXISTS identity_key_store (jid TEXT NOT NULL, device_id INTEGER NOT NULL, key "
@@ -164,7 +165,7 @@ void Storage::initializeDB(signal_context *signalContext)
         } else {
             error = "Could not generate registration ID";
         }
-    } else if (lookupValue(this, "db_ver").toInt() != 3) {
+    } else if (lookupValue(this, "db_ver").toInt() != 4) {
         migrateDatabase();
     }
 
@@ -180,7 +181,7 @@ void Storage::migrateDatabase()
 {
     QSqlDatabase _db = db();
     _db.exec("CREATE TABLE IF NOT EXISTS enabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
-    _db.exec("DROP TABLE disabled_buddies");
+    _db.exec("CREATE TABLE IF NOT EXISTS disabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
 
     {   // Update old tables without "label" column
         QSqlQuery q(db());
@@ -196,7 +197,7 @@ void Storage::migrateDatabase()
             q.exec("ALTER TABLE devices ADD COLUMN label TEXT");
         }
     }
-    storeValue("db_ver", 3);
+    storeValue("db_ver", 4);
 }
 
 QSqlDatabase Storage::db() const { return QSqlDatabase::database(m_databaseConnectionName); }
@@ -626,11 +627,29 @@ bool Storage::isEnabledForUser(const QString &user)
     return q.next();
 }
 
-void Storage::setEnabledForUser(const QString &user, bool enabled)
+bool Storage::isDisabledForUser(const QString &user)
 {
     QSqlQuery q(db());
-    q.prepare(enabled ? "INSERT OR REPLACE INTO enabled_buddies (jid) VALUES (?)"
-                      : "DELETE FROM enabled_buddies WHERE jid IS ?");
+    q.prepare("SELECT jid FROM disabled_buddies WHERE jid IS ?");
+    q.addBindValue(user);
+    q.exec();
+    return q.next();
+}
+
+void Storage::setEnabledForUser(const QString &user, bool value)
+{
+    QSqlQuery q(db());
+    q.prepare(value ? "INSERT OR REPLACE INTO enabled_buddies (jid) VALUES (?)"
+                    : "DELETE FROM enabled_buddies WHERE jid IS ?");
+    q.addBindValue(user);
+    q.exec();
+}
+
+void Storage::setDisabledForUser(const QString &user, bool value)
+{
+    QSqlQuery q(db());
+    q.prepare(value ? "INSERT OR REPLACE INTO disabled_buddies (jid) VALUES (?)"
+                    : "DELETE FROM disabled_buddies WHERE jid IS ?");
     q.addBindValue(user);
     q.exec();
 }
