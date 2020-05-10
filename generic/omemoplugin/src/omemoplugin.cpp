@@ -39,7 +39,7 @@ QString OMEMOPlugin::name() const { return "OMEMO Plugin"; }
 
 QString OMEMOPlugin::shortName() const { return "omemo"; }
 
-QString OMEMOPlugin::version() const { return "1.1"; }
+QString OMEMOPlugin::version() const { return "2.0"; }
 
 QWidget *OMEMOPlugin::options()
 {
@@ -86,8 +86,13 @@ void OMEMOPlugin::restoreOptions() { }
 
 QString OMEMOPlugin::pluginInfo()
 {
-    return "<strong>" + name() + "</strong><br/><br/>" + tr("Author: ") + "Vyacheslav Karpukhin<br/>" + tr("Email: ")
-        + "vyacheslav@karpukhin.com<br/><br/>" + tr("Credits: ")
+    return "<strong>" + name() + "</strong><br/><br/>"
+        + tr("Authors: ")
+        + "Vyacheslav Karpukhin"
+        + ", "
+        + "Boris Pek"
+          "<br/><br/>"
+        + tr("Credits: ")
         + "<dl>"
           "<dt>libsignal-protocol-c</dt><dd>Copyright 2015-2016 Open Whisper Systems</dd>"
           "<dt>OMEMO logo</dt><dd>fiaxh (https://github.com/fiaxh)</dd>"
