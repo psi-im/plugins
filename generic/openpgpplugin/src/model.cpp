@@ -143,10 +143,13 @@ void Model::listKeys()
     setHorizontalHeaderLabels(headerLabels);
 
     QStringList arguments;
-    arguments << "--with-fingerprint"
-              << "--list-secret-keys"
-              << "--with-colons"
-              << "--fixed-list-mode";
+
+    arguments = QStringList{
+        "--with-fingerprint",
+        "--list-secret-keys",
+        "--with-colons",
+        "--fixed-list-mode"
+    };
 
     GpgProcess process;
     process.start(arguments);
@@ -154,10 +157,12 @@ void Model::listKeys()
     QString keysRaw = QString::fromUtf8(process.readAll());
 
     arguments.clear();
-    arguments << "--with-fingerprint"
-              << "--list-public-keys"
-              << "--with-colons"
-              << "--fixed-list-mode";
+    arguments = QStringList{
+        "--with-fingerprint",
+        "--list-public-keys",
+        "--with-colons",
+        "--fixed-list-mode"
+    };
 
     process.start(arguments);
     process.waitForFinished();

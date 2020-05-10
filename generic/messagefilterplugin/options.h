@@ -2,6 +2,7 @@
  * options.h - plugin widget
  *
  * Copyright (C) 2015  Ivan Romanov <drizt@land.ru>
+ * Copyright (C) 2020  Boris Pek <tehnick-8@yandex.ru>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -53,7 +54,7 @@ public:
     ~Options();
 
     void update();
-    void setOptionAccessingHost(OptionAccessingHost *host) { _optionHost = host; }
+    void setOptionAccessingHost(OptionAccessingHost *host) { m_optionHost = host; }
 
     void saveSettings();
 
@@ -80,10 +81,11 @@ private:
     void fillCondition(int row);
     void saveCondition(int rule, int row);
 
-    Ui::Options *        ui;
-    OptionAccessingHost *_optionHost;
-    QList<Rule>          _rules;
-    int                  _currentRule;
+private:
+    Ui::Options *        m_ui;
+    OptionAccessingHost *m_optionHost;
+    QList<Rule>          m_rules;
+    int                  m_currentRule;
 };
 
 #endif // OPTIONS_H

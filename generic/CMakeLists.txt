@@ -12,7 +12,6 @@ set( plugins_list
     enummessagesplugin
     extendedmenuplugin
     extendedoptionsplugin
-    gnupgplugin
     gomokugameplugin
     historykeeperplugin
     imageplugin
@@ -21,6 +20,7 @@ set( plugins_list
     juickplugin
     messagefilterplugin
     omemoplugin
+    openpgpplugin
     otrplugin
     pepchangenotifyplugin
     qipxstatusesplugin

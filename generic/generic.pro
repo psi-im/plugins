@@ -11,7 +11,6 @@ contentdownloaderplugin \
 enummessagesplugin \
 extendedmenuplugin \
 extendedoptionsplugin \
-gnupgplugin \
 gomokugameplugin \
 historykeeperplugin \
 imageplugin \
@@ -20,6 +19,7 @@ jabberdiskplugin \
 juickplugin \
 messagefilterplugin \
 omemoplugin \
+openpgpplugin \
 otrplugin \
 pepchangenotifyplugin \
 qipxstatusesplugin \

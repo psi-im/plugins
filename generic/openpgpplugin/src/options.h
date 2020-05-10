@@ -2,6 +2,7 @@
  * options.h - plugin widget
  *
  * Copyright (C) 2013  Ivan Romanov <drizt@land.ru>
+ * Copyright (C) 2020  Boris Pek <tehnick-8@yandex.ru>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,6 +22,7 @@
 #define OPTIONS_H
 
 #include <QWidget>
+#include <QStandardItemModel>
 
 class GPGProc;
 class OptionAccessingHost;
@@ -36,15 +38,14 @@ public:
     explicit Options(QWidget *parent = nullptr);
     ~Options();
 
-    void update();
-    void setOptionAccessingHost(OptionAccessingHost *host) { _optionHost = host; }
+    void setOptionAccessingHost(OptionAccessingHost *host);
 
     void loadSettings();
     void saveSettings();
 
 public slots:
     void addKey();
-    void removeKey();
+    void deleteKey();
 
     void importKeyFromFile();
     void importKeyFromClipboard();
@@ -53,13 +54,19 @@ public slots:
     void exportKeyToClipboard();
 
     void showInfo();
+    void updateAllKeys();
+    void updateOwnKeys();
 
-    void updateKeys();
+private slots:
+    void deleteOwnKey();
+    void copyOwnFingerprint();
+    void contextMenu(const QPoint &pos);
 
 private:
-    Ui::Options *        ui;
-    GPGProc *            _gpgProc;
-    OptionAccessingHost *_optionHost;
+    Ui::Options         *m_ui = nullptr;
+    GPGProc             *m_gpgProc = nullptr;
+    OptionAccessingHost *m_optionHost = nullptr;
+    QStandardItemModel  *m_ownKeysTableModel = nullptr;
 };
 
 #endif // OPTIONS_H

@@ -2,6 +2,7 @@
  * options.cpp - plugin widget
  *
  * Copyright (C) 2013  Ivan Romanov <drizt@land.ru>
+ * Copyright (C) 2020  Boris Pek <tehnick-8@yandex.ru>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,54 +37,96 @@
 #include <QProgressDialog>
 #include <QStandardItem>
 #include <QStandardItemModel>
+#include <QTimer>
 
-Options::Options(QWidget *parent) : QWidget(parent), ui(new Ui::Options)
+Options::Options(QWidget *parent) : QWidget(parent), m_ui(new Ui::Options)
 {
-    ui->setupUi(this);
+    m_ui->setupUi(this);
 
-    Model *model = new Model(this);
-    ui->keys->setModel(model);
-    updateKeys();
+    {
+        Model *model = new Model(this);
+        m_ui->keys->setModel(model);
 
-    // Import key
-    QAction *action;
-    QMenu *  menu = new QMenu(this);
+        // Delayed init
+        QTimer::singleShot(500, this, &Options::updateAllKeys);
 
-    action = menu->addAction(tr("from file"));
-    connect(action, &QAction::triggered, this, &Options::importKeyFromFile);
+        // Import key
+        QAction *action;
+        QMenu *  menu = new QMenu(this);
 
-    action = menu->addAction(tr("from clipboard"));
-    connect(action, &QAction::triggered, this, &Options::importKeyFromClipboard);
+        action = menu->addAction(tr("from file"));
+        connect(action, &QAction::triggered, this, &Options::importKeyFromFile);
 
-    ui->btnImport->setMenu(menu);
+        action = menu->addAction(tr("from clipboard"));
+        connect(action, &QAction::triggered, this, &Options::importKeyFromClipboard);
 
-    // Export key
+        m_ui->btnImport->setMenu(menu);
 
-    menu   = new QMenu(this);
-    action = menu->addAction(tr("to file"));
-    connect(action, &QAction::triggered, this, &Options::exportKeyToFile);
-    ui->btnExport->addAction(action);
+        // Export key
 
-    action = menu->addAction(tr("to clipboard"));
-    connect(action, &QAction::triggered, this, &Options::exportKeyToClipboard);
+        menu   = new QMenu(this);
+        action = menu->addAction(tr("to file"));
+        connect(action, &QAction::triggered, this, &Options::exportKeyToFile);
+        m_ui->btnExport->addAction(action);
 
-    ui->btnExport->setMenu(menu);
+        action = menu->addAction(tr("to clipboard"));
+        connect(action, &QAction::triggered, this, &Options::exportKeyToClipboard);
+
+        m_ui->btnExport->setMenu(menu);
+    }
+    {
+        m_ui->ownKeysTable->setShowGrid(true);
+        m_ui->ownKeysTable->setEditTriggers(nullptr);
+        m_ui->ownKeysTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+        m_ui->ownKeysTable->setSortingEnabled(true);
+
+        m_ui->ownKeysTable->setContextMenuPolicy(Qt::CustomContextMenu);
+        connect(m_ui->ownKeysTable, &QTableView::customContextMenuRequested, this, &Options::contextMenu);
+
+        m_ownKeysTableModel = new QStandardItemModel(this);
+        m_ui->ownKeysTable->setModel(m_ownKeysTableModel);
+
+        updateOwnKeys();
+    }
+
+    m_ui->tabWidget->removeTab(1); // Temporary!!!
 }
 
-Options::~Options() { delete ui; }
+Options::~Options()
+{
+    delete m_ui;
+}
 
-void Options::update() { }
+void Options::updateOwnKeys()
+{
+    ; // TODO
+}
+
+void Options::setOptionAccessingHost(OptionAccessingHost *host) { m_optionHost = host; }
 
 void Options::loadSettings()
 {
-    ui->chkAutoImport->setChecked(_optionHost->getPluginOption("auto-import", true).toBool());
-    ui->chkHideKeyMessage->setChecked(_optionHost->getPluginOption("hide-key-message", true).toBool());
+    {   // Encryption policy
+        m_ui->alwaysEnabled->setChecked(m_optionHost->getGlobalOption("options.pgp.always-enabled").toBool());
+        m_ui->enabledByDefault->setChecked(m_optionHost->getGlobalOption("options.pgp.enabled-by-default").toBool());
+        m_ui->disabledByDefault->setChecked(!m_ui->enabledByDefault->isChecked());
+    }
+    m_ui->autoAssign->setChecked(m_optionHost->getGlobalOption("options.pgp.auto-assign").toBool());
+    m_ui->showPgpInfoInTooltips->setChecked(m_optionHost->getGlobalOption("options.ui.contactlist.tooltip.pgp").toBool());
+    m_ui->autoImportPgpKeyFromMessage->setChecked(m_optionHost->getPluginOption("auto-import", true).toBool());
+    m_ui->hideMessagesWithPgpKeys->setChecked(m_optionHost->getPluginOption("hide-key-message", true).toBool());
 }
 
 void Options::saveSettings()
 {
-    _optionHost->setPluginOption("auto-import", ui->chkAutoImport->isChecked());
-    _optionHost->setPluginOption("hide-key-message", ui->chkHideKeyMessage->isChecked());
+    {   // Encryption policy
+        m_optionHost->setGlobalOption("options.pgp.always-enabled", m_ui->alwaysEnabled->isChecked());
+        m_optionHost->setGlobalOption("options.pgp.enabled-by-default", m_ui->enabledByDefault->isChecked());
+    }
+    m_optionHost->setGlobalOption("options.pgp.auto-assign", m_ui->autoAssign->isChecked());
+    m_optionHost->setGlobalOption("options.ui.contactlist.tooltip.pgp", m_ui->showPgpInfoInTooltips->isChecked());
+    m_optionHost->setPluginOption("auto-import", m_ui->autoImportPgpKeyFromMessage->isChecked());
+    m_optionHost->setPluginOption("hide-key-message", m_ui->hideMessagesWithPgpKeys->isChecked());
 }
 
 void Options::addKey()
@@ -169,11 +212,9 @@ void Options::addKey()
     waitingDlg.setWindowTitle(tr("Key pair generating"));
     waitingDlg.show();
 
-    GpgProcess  gpg;
-    QStringList arguments;
-    arguments << "--batch"
-              << "--gen-key";
+    const QStringList &&arguments = { "--batch", "--gen-key" };
 
+    GpgProcess gpg;
     gpg.start(arguments);
     gpg.waitForStarted();
     gpg.write(key.toUtf8());
@@ -187,12 +228,12 @@ void Options::addKey()
         qApp->processEvents();
     }
 
-    updateKeys();
+    updateAllKeys();
 }
 
-void Options::removeKey()
+void Options::deleteKey()
 {
-    QItemSelectionModel *selModel = ui->keys->selectionModel();
+    QItemSelectionModel *selModel = m_ui->keys->selectionModel();
 
     if (!selModel->hasSelection()) {
         return;
@@ -227,18 +268,19 @@ void Options::removeKey()
 
     // Remove primary keys
     for (auto key : pkeys) {
-        GpgProcess  gpg;
-        QStringList arguments;
-        arguments << "--yes"
-                  << "--batch"
-                  << "--delete-secret-and-public-key"
-                  << "0x" + key.sibling(key.row(), Model::Fingerprint).data().toString();
+        const QStringList &&arguments = {
+            "--yes",
+            "--batch",
+            "--delete-secret-and-public-key",
+            "0x" + key.sibling(key.row(), Model::Fingerprint).data().toString()
+        };
 
+        GpgProcess gpg;
         gpg.start(arguments);
         gpg.waitForFinished();
     }
 
-    updateKeys();
+    updateAllKeys();
 }
 
 void Options::importKeyFromFile()
@@ -254,20 +296,19 @@ void Options::importKeyFromFile()
 
     QStringList allFiles = dlg.selectedFiles();
     for (auto filename : allFiles) {
-        GpgProcess  gpg;
-        QStringList arguments;
-        arguments << "--batch"
-                  << "--import" << filename;
+        const QStringList &&arguments = { "--batch", "--import", filename };
+
+        GpgProcess gpg;
         gpg.start(arguments);
         gpg.waitForFinished();
     }
 
-    updateKeys();
+    updateAllKeys();
 }
 
 void Options::exportKeyToFile()
 {
-    QItemSelectionModel *selModel = ui->keys->selectionModel();
+    QItemSelectionModel *selModel = m_ui->keys->selectionModel();
 
     if (!selModel->hasSelection()) {
         return;
@@ -312,12 +353,17 @@ void Options::exportKeyToFile()
             filename += ".asc";
         }
 
-        GpgProcess  gpg;
-        QStringList arguments;
-        QString     fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
-        arguments << "--output" << filename << "--armor"
-                  << "--export" << fingerprint;
 
+        const QString &&fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
+        const QStringList &&arguments = {
+            "--output",
+            filename,
+            "--armor",
+            "--export",
+            fingerprint
+        };
+
+        GpgProcess gpg;
         gpg.start(arguments);
         gpg.waitForFinished();
     }
@@ -333,22 +379,21 @@ void Options::importKeyFromClipboard()
         return;
     }
 
-    GpgProcess  gpg;
-    QStringList arguments;
-    arguments << "--batch"
-              << "--import";
+    const QStringList &&arguments = { "--batch", "--import" };
+
+    GpgProcess gpg;
     gpg.start(arguments);
     gpg.waitForStarted();
     gpg.write(key.toUtf8());
     gpg.closeWriteChannel();
     gpg.waitForFinished();
 
-    updateKeys();
+    updateAllKeys();
 }
 
 void Options::exportKeyToClipboard()
 {
-    QItemSelectionModel *selModel = ui->keys->selectionModel();
+    QItemSelectionModel *selModel = m_ui->keys->selectionModel();
 
     if (!selModel->hasSelection()) {
         return;
@@ -376,12 +421,14 @@ void Options::exportKeyToClipboard()
     // Remove primary keys
     QString strKey = "";
     for (auto key : pkeys) {
-        GpgProcess  gpg;
-        QStringList arguments;
-        QString     fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
-        arguments << "--armor"
-                  << "--export" << fingerprint;
+        const QString &&fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
+        const QStringList &&arguments = {
+            "--armor",
+            "--export",
+            fingerprint
+        };
 
+        GpgProcess gpg;
         gpg.start(arguments);
         gpg.waitForFinished();
 
@@ -394,9 +441,9 @@ void Options::exportKeyToClipboard()
 
 void Options::showInfo()
 {
-    GpgProcess        gpg;
-    QString           info;
     QMessageBox::Icon icon;
+    QString info;
+    GpgProcess gpg;
     if (gpg.info(info)) {
         icon = QMessageBox::Information;
     } else {
@@ -406,12 +453,53 @@ void Options::showInfo()
     box.exec();
 }
 
-void Options::updateKeys()
+void Options::updateAllKeys()
 {
-    qobject_cast<Model *>(ui->keys->model())->listKeys();
+    qobject_cast<Model *>(m_ui->keys->model())->listKeys();
 
-    int columns = ui->keys->model()->columnCount();
+    int columns = m_ui->keys->model()->columnCount();
     for (int i = 0; i < columns; i++) {
-        ui->keys->resizeColumnToContents(i);
+        m_ui->keys->resizeColumnToContents(i);
     }
 }
+
+void Options::deleteOwnKey()
+{
+    if (!m_ui->ownKeysTable->selectionModel()->hasSelection())
+        return;
+
+    ; // TODO
+
+    updateOwnKeys();
+}
+
+void Options::copyOwnFingerprint()
+{
+    if (!m_ui->ownKeysTable->selectionModel()->hasSelection())
+        return;
+
+    QString text;
+    for (auto selectIndex : m_ui->ownKeysTable->selectionModel()->selectedRows(1)) {
+        if (!text.isEmpty()) {
+            text += "\n";
+        }
+        text += m_ownKeysTableModel->item(selectIndex.row(), 1)->text();
+    }
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(text);
+}
+
+void Options::contextMenu(const QPoint &pos)
+{
+    QModelIndex index = m_ui->ownKeysTable->indexAt(pos);
+    if (!index.isValid())
+        return;
+
+    QMenu *menu = new QMenu(this);
+
+    menu->addAction(QIcon::fromTheme("edit-delete"), tr("Delete"), this, &Options::deleteOwnKey);
+    menu->addAction(QIcon::fromTheme("edit-copy"), tr("Copy fingerprint"), this, &Options::copyOwnFingerprint);
+
+    menu->exec(QCursor::pos());
+}
+

@@ -162,7 +162,7 @@
   <customwidget>
    <class>DateWidget</class>
    <extends>QLineEdit</extends>
-   <header>datewidget.h</header>
+   <header>src/datewidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

@@ -1,3 +1,11 @@
+2020-05-12 - v1.0 - tehnick
+    * Change short name of plugin from "gnupg" to "openpgp"
+    * Change full name of plugin from "GnuPG Key Manager Plugin" to
+      "OpenPGP Plugin"
+    * Add all available OpenPGP related options to plugin options dialog
+    * Preparation of plugin to moving OpenPGP related code from Psi core
+    * Code refactoring
+
 2020-04-29 - v0.4.0 - tehnick
     * Improve status messages
 

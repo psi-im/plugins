@@ -4,7 +4,7 @@ unset(_SRCS)
 unset(_RSCS)
 unset(PLUGIN)
 
-set( PLUGIN gnupgplugin )
+set( PLUGIN openpgpplugin )
 project(${PLUGIN} LANGUAGES CXX)
 cmake_minimum_required(VERSION 3.1.0)
 if(POLICY CMP0071)
@@ -21,7 +21,7 @@ set( CMAKE_MODULE_PATH
 find_package(PsiPluginsApi REQUIRED)
 include(${PsiPluginsApi_DIR}/variables.cmake)
 include_directories(
-    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_LIST_DIR}
     ${PsiPluginsApi_INCLUDE_DIR}
@@ -31,29 +31,29 @@ if(NOT PLUGINS_INSTALL_PATH)
 endif()
 
 set( _HDRS
-    options.h
-    model.h
-    gpgprocess.h
-    addkeydlg.h
-    gnupg.h
-    lineeditwidget.h
-    datewidget.h
+    src/options.h
+    src/model.h
+    src/gpgprocess.h
+    src/addkeydlg.h
+    src/openpgp.h
+    src/lineeditwidget.h
+    src/datewidget.h
 )
 set( _SRCS
-    options.cpp
-    model.cpp
-    gpgprocess.cpp
-    addkeydlg.cpp
-    gnupg.cpp
-    lineeditwidget.cpp
-    datewidget.cpp
+    src/options.cpp
+    src/model.cpp
+    src/gpgprocess.cpp
+    src/addkeydlg.cpp
+    src/openpgp.cpp
+    src/lineeditwidget.cpp
+    src/datewidget.cpp
 )
 set( _UIS
-    options.ui
-    addkeydlg.ui
+    src/options.ui
+    src/addkeydlg.ui
 )
 set( _RSCS
-    resources.qrc
+    resources/resources.qrc
 )
 
 find_package( Qt5 COMPONENTS Widgets Xml REQUIRED )

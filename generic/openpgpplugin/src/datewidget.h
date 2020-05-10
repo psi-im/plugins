@@ -1,6 +1,4 @@
 /*
- * gpgprocess.h - QProcess wrapper makes it easy to handle gpg
- *
  * Copyright (C) 2013  Ivan Romanov <drizt@land.ru>
  * Copyright (C) 2020  Boris Pek <tehnick-8@yandex.ru>
  *
@@ -18,28 +16,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef GPGPROCESS_H
-#define GPGPROCESS_H
+#ifndef DATEWIDGET_H
+#define DATEWIDGET_H
 
-#include <QProcess>
+#include "lineeditwidget.h"
+#include <QDate>
 
-class GpgProcess : public QProcess {
+class QToolButton;
+class QCalendarWidget;
+
+class DateWidget : public LineEditWidget {
     Q_OBJECT
 
-public:
-    GpgProcess(QObject *parent = nullptr);
-    inline void start(const QStringList &arguments, OpenMode mode = ReadWrite)
-    {
-        QProcess::start(_bin, arguments, mode);
-    }
-    inline void start(OpenMode mode = ReadWrite) { QProcess::start(_bin, mode); }
+    Q_PROPERTY(QDate date READ date WRITE setDate)
 
-    bool success() const;
-    bool info(QString &message);
+public:
+    explicit DateWidget(QWidget *parent = nullptr);
+
+    // get/set date
+    void  setDate(const QDate &date);
+    QDate date() const;
+
+protected slots:
+    void closeCalendar(const QDate &text);
+    void calendarSetDate();
+    void disableExpiration();
+    void keyPressEvent(QKeyEvent *event);
 
 private:
-    QString findBin() const;
-    QString _bin;
+    // Inner widgets
+    QToolButton *    m_tbCalendar;
+    QToolButton *    m_tbClean;
+    QCalendarWidget *m_calendar;
 };
 
-#endif // GPGPROCESS_H
+#endif // DATEWIDGETs_H

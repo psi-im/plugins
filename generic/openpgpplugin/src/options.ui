@@ -6,15 +6,24 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>490</width>
-    <height>451</height>
+    <width>737</width>
+    <height>565</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -22,9 +31,9 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="keysManagerTab">
       <attribute name="title">
-       <string>Manager</string>
+       <string>Keys Manager</string>
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
@@ -97,22 +106,115 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2">
+     <widget class="QWidget" name="ownKeysTab">
       <attribute name="title">
-       <string>Settings</string>
+       <string>Own Keys</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
-        <widget class="QCheckBox" name="chkAutoImport">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QComboBox" name="allAccounts"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pb_key">
+           <property name="text">
+            <string>Select &amp;Key...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTableView" name="ownKeysTable"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QPushButton" name="pb_keyclear">
+           <property name="text">
+            <string>Delete</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="spacerLabel">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="spacerLabel_1">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="configurationTab">
+      <attribute name="title">
+       <string>Configuration</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QGroupBox" name="encryptionPolicy">
+         <property name="title">
+          <string>OpenPGP encryption policy</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QRadioButton" name="alwaysEnabled">
+            <property name="text">
+             <string>Always enabled</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="enabledByDefault">
+            <property name="text">
+             <string>Enabled by default</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="disabledByDefault">
+            <property name="text">
+             <string>Disabled by default</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="autoAssign">
          <property name="text">
-          <string>Auto import a key from the message body</string>
+          <string>Automatically assign known keys to contacts with signed presences and no assigned keys</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="chkHideKeyMessage">
+        <widget class="QCheckBox" name="showPgpInfoInTooltips">
          <property name="text">
-          <string>Filter the message with a key</string>
+          <string>Show PGP info in tooltips for contacts in roster</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="autoImportPgpKeyFromMessage">
+         <property name="text">
+          <string>Automatically import PGP key from the message body</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="hideMessagesWithPgpKeys">
+         <property name="text">
+          <string>Do not show messages with PGP keys</string>
          </property>
         </widget>
        </item>
@@ -124,7 +226,7 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>40</height>
+           <height>20</height>
           </size>
          </property>
         </spacer>
