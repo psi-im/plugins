@@ -2,6 +2,7 @@
  * gpgprocess.h - QProcess wrapper makes it easy to handle gpg
  *
  * Copyright (C) 2013  Ivan Romanov <drizt@land.ru>
+ * Copyright (C) 2020  Boris Pek <tehnick-8@yandex.ru>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -33,6 +34,7 @@ public:
     }
     inline void start(OpenMode mode = ReadWrite) { QProcess::start(_bin, mode); }
 
+    bool success() const;
     bool info(QString &message);
 
 private:

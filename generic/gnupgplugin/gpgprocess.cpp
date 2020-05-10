@@ -1,7 +1,8 @@
 /*
  * gpgprocess.cpp - QProcess wrapper makes it easy to handle gpg
  *
- * Copyright (C) 2013  Ivan Romanov <drizt@land.ru>
+ * Copyright (C) 2013 Ivan Romanov <drizt@land.ru>
+ * Copyright (C) 2020 Boris Pek <tehnick-8@yandex.ru>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -10,11 +11,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.     See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 #include "gpgprocess.h"
@@ -25,7 +27,9 @@
 #include <windows.h>
 #endif
 
-GpgProcess::GpgProcess(QObject *parent) : QProcess(parent), _bin("") { _bin = findBin(); }
+GpgProcess::GpgProcess(QObject *parent) : QProcess(parent) { _bin = findBin(); }
+
+bool GpgProcess::success() const { return (exitCode() == 0); }
 
 inline bool checkBin(const QString &bin)
 {
@@ -54,9 +58,7 @@ static bool getRegKey(HKEY root, const char *path, QString &value)
 
 static QString findRegGpgProgram()
 {
-    QStringList bins;
-    bins << "gpg.exe"
-         << "gpg2.exe";
+    QStringList bins { "gpg.exe", "gpg2.exe" };
 
     const char *path  = "Software\\GNU\\GnuPG";
     const char *path2 = "Software\\Wow6432Node\\GNU\\GnuPG";
@@ -80,13 +82,10 @@ QString GpgProcess::findBin() const
 {
     // gpg and gpg2 has identical semantics
     // so any from them can be used
-    QStringList bins;
 #ifdef Q_OS_WIN
-    bins << "gpg.exe"
-         << "gpg2.exe";
+    QStringList bins { "gpg.exe", "gpg2.exe" };
 #else
-    bins << "gpg"
-         << "gpg2";
+    QStringList bins { "gpg", "gpg2" };
 #endif
 
     // Prefer bundled gpg
@@ -107,7 +106,7 @@ QString GpgProcess::findBin() const
 #ifdef Q_OS_WIN
     QString pathSep = ";";
 #else
-    QString pathSep = ":";
+    QString     pathSep = ":";
 #endif
 
     QStringList paths = QString::fromLocal8Bit(qgetenv("PATH")).split(pathSep, QString::SkipEmptyParts);
@@ -137,9 +136,7 @@ QString GpgProcess::findBin() const
 
 bool GpgProcess::info(QString &message)
 {
-    QStringList arguments;
-    arguments << "--version"
-              << "--no-tty";
+    QStringList arguments { "--version", "--no-tty" };
     start(arguments);
     waitForFinished();
 
