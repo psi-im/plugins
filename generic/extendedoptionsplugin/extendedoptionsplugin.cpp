@@ -143,7 +143,6 @@ private:
     QCheckBox *avatarTip        = nullptr;
     QCheckBox *statusTip        = nullptr;
     QCheckBox *geoTip           = nullptr;
-    QCheckBox *pgpTip           = nullptr;
     QCheckBox *clientTip        = nullptr;
     QComboBox *sortContacts     = nullptr;
     // QComboBox *sortGroups = nullptr;
@@ -157,7 +156,6 @@ private:
     // Menu------
     QCheckBox *admin          = nullptr;
     QCheckBox *activeChats    = nullptr;
-    QCheckBox *pgpKey         = nullptr;
     QCheckBox *picture        = nullptr;
     QCheckBox *changeProfile  = nullptr;
     QCheckBox *chat           = nullptr;
@@ -419,13 +417,11 @@ QWidget *ExtendedOptions::options()
 
     avatarTip = new QCheckBox(tr("Show avatar"));
     statusTip = new QCheckBox(tr("Show last status"));
-    pgpTip    = new QCheckBox(tr("Show PGP"));
     clientTip = new QCheckBox(tr("Show client version"));
     geoTip    = new QCheckBox(tr("Show geolocation"));
 
     boxLayout->addWidget(avatarTip);
     boxLayout->addWidget(statusTip);
-    boxLayout->addWidget(pgpTip);
     boxLayout->addWidget(clientTip);
     boxLayout->addWidget(geoTip);
 
@@ -454,7 +450,6 @@ QWidget *ExtendedOptions::options()
     // Menu------
     admin          = new QCheckBox(tr("Show \"Admin\" option in account menu"));
     activeChats    = new QCheckBox(tr("Show \"Active Chats\" option in contact menu"));
-    pgpKey         = new QCheckBox(tr("Show \"Assign OpenPGP Key\" option in contact menu"));
     picture        = new QCheckBox(tr("Show \"Picture\" option in contact menu"));
     changeProfile  = new QCheckBox(tr("Show \"Change Profile\" option in main menu"));
     chat           = new QCheckBox(tr("Show \"Chat\" option in status menu"));
@@ -465,7 +460,6 @@ QWidget *ExtendedOptions::options()
     tab4Layout->addWidget(enableMessages);
     tab4Layout->addWidget(admin);
     tab4Layout->addWidget(activeChats);
-    tab4Layout->addWidget(pgpKey);
     tab4Layout->addWidget(picture);
     tab4Layout->addWidget(changeProfile);
     tab4Layout->addWidget(chat);
@@ -766,7 +760,6 @@ void ExtendedOptions::applyOptions()
                                 QVariant(singleLineStatus->isChecked()));
     psiOptions->setGlobalOption("options.ui.contactlist.tooltip.avatar", QVariant(avatarTip->isChecked()));
     psiOptions->setGlobalOption("options.ui.contactlist.tooltip.last-status", QVariant(statusTip->isChecked()));
-    psiOptions->setGlobalOption("options.ui.contactlist.tooltip.pgp", QVariant(pgpTip->isChecked()));
     psiOptions->setGlobalOption("options.ui.contactlist.tooltip.geolocation", QVariant(geoTip->isChecked()));
     psiOptions->setGlobalOption("options.ui.contactlist.tooltip.client-version", QVariant(clientTip->isChecked()));
     psiOptions->setGlobalOption("options.ui.contactlist.contact-sort-style", QVariant(sortContacts->currentText()));
@@ -784,7 +777,6 @@ void ExtendedOptions::applyOptions()
     // Menu------
     psiOptions->setGlobalOption("options.ui.menu.account.admin", QVariant(admin->isChecked()));
     psiOptions->setGlobalOption("options.ui.menu.contact.active-chats", QVariant(activeChats->isChecked()));
-    psiOptions->setGlobalOption("options.ui.menu.contact.custom-pgp-key", QVariant(pgpKey->isChecked()));
     psiOptions->setGlobalOption("options.ui.menu.contact.custom-picture", QVariant(picture->isChecked()));
     psiOptions->setGlobalOption("options.ui.menu.main.change-profile", QVariant(changeProfile->isChecked()));
     psiOptions->setGlobalOption("options.ui.menu.status.chat", QVariant(chat->isChecked()));
@@ -922,7 +914,6 @@ void ExtendedOptions::restoreOptions()
     avatarTip->setChecked(psiOptions->getGlobalOption("options.ui.contactlist.tooltip.avatar").toBool());
     statusTip->setChecked(psiOptions->getGlobalOption("options.ui.contactlist.tooltip.last-status").toBool());
     geoTip->setChecked(psiOptions->getGlobalOption("options.ui.contactlist.tooltip.geolocation").toBool());
-    pgpTip->setChecked(psiOptions->getGlobalOption("options.ui.contactlist.tooltip.pgp").toBool());
     clientTip->setChecked(psiOptions->getGlobalOption("options.ui.contactlist.tooltip.client-version").toBool());
     sortContacts->setCurrentIndex(
         sortContacts->findText(psiOptions->getGlobalOption("options.ui.contactlist.contact-sort-style").toString()));
@@ -938,7 +929,6 @@ void ExtendedOptions::restoreOptions()
     // Menu------
     admin->setChecked(psiOptions->getGlobalOption("options.ui.menu.account.admin").toBool());
     activeChats->setChecked(psiOptions->getGlobalOption("options.ui.menu.contact.active-chats").toBool());
-    pgpKey->setChecked(psiOptions->getGlobalOption("options.ui.menu.contact.custom-pgp-key").toBool());
     picture->setChecked(psiOptions->getGlobalOption("options.ui.menu.contact.custom-picture").toBool());
     changeProfile->setChecked(psiOptions->getGlobalOption("options.ui.menu.main.change-profile").toBool());
     chat->setChecked(psiOptions->getGlobalOption("options.ui.menu.status.chat").toBool());
@@ -1121,7 +1111,6 @@ void ExtendedOptions::setWhatThis()
     avatarTip->setWhatsThis("options.ui.contactlist.tooltip.avatar");
     statusTip->setWhatsThis("options.ui.contactlist.tooltip.last-status");
     geoTip->setWhatsThis("options.ui.contactlist.tooltip.geolocation");
-    pgpTip->setWhatsThis("options.ui.contactlist.tooltip.pgp");
     clientTip->setWhatsThis("options.ui.contactlist.tooltip.client-version");
     sortContacts->setWhatsThis("options.ui.contactlist.contact-sort-style");
     leftAvatars->setWhatsThis("options.ui.contactlist.avatars.avatars-at-left");
@@ -1133,7 +1122,6 @@ void ExtendedOptions::setWhatThis()
     // Menu------
     admin->setWhatsThis("options.ui.menu.account.admin");
     activeChats->setWhatsThis("options.ui.menu.contact.active-chats");
-    pgpKey->setWhatsThis("options.ui.menu.contact.custom-pgp-key");
     picture->setWhatsThis("options.ui.menu.contact.custom-picture");
     changeProfile->setWhatsThis("options.ui.menu.main.change-profile");
     chat->setWhatsThis("options.ui.menu.status.chat");
