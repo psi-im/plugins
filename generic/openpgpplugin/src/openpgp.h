@@ -96,6 +96,7 @@ public:
 private slots:
     void actionActivated();
     void sendPublicKey();
+    void actionDestroyed(QObject *action);
 
 private:
     bool isEnabled() const;

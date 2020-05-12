@@ -162,6 +162,7 @@ QAction *OpenPGP::getAction(QObject *parent, int, const QString &)
     m_action = new QAction(QPixmap(":/icons/key.png"), tr("Send GnuPG Public Key"), parent);
     m_action->setCheckable(false);
     connect(m_action, &QAction::triggered, this, &OpenPGP::actionActivated);
+    connect(m_action, &QAction::destroyed, this, &OpenPGP::actionDestroyed);
     return m_action;
 }
 
@@ -254,6 +255,11 @@ void OpenPGP::sendPublicKey()
     res.replace("&lt;", "<");
     res.replace("&gt;", ">");
     m_accountHost->appendSysMsg(account, jidToSend, res);
+}
+
+void OpenPGP::actionDestroyed(QObject *)
+{
+    m_action = nullptr;
 }
 
 bool OpenPGP::isEnabled() const
