@@ -47,7 +47,7 @@ QSize LineEditWidget::sizeHint() const
 
     if (m_optimalLength) {
 #if QT_VERSION < QT_VERSION_CHECK(5, 11, 0)
-        width += fontMetrics().width("0") * _optimalLength;
+        width += fontMetrics().width("0") * m_optimalLength;
 #else
         width += fontMetrics().horizontalAdvance("0") * m_optimalLength;
 #endif

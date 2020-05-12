@@ -497,8 +497,9 @@ void Options::contextMenu(const QPoint &pos)
 
     QMenu *menu = new QMenu(this);
 
-    menu->addAction(QIcon::fromTheme("edit-delete"), tr("Delete"), this, &Options::deleteOwnKey);
-    menu->addAction(QIcon::fromTheme("edit-copy"), tr("Copy fingerprint"), this, &Options::copyOwnFingerprint);
+    // TODO: update after stopping support of Ubuntu Xenial:
+    menu->addAction(QIcon::fromTheme("edit-delete"), tr("Delete"), this, SLOT(deleteOwnKey()));
+    menu->addAction(QIcon::fromTheme("edit-copy"), tr("Copy fingerprint"), this, SLOT(copyOwnFingerprint()));
 
     menu->exec(QCursor::pos());
 }
