@@ -30,7 +30,7 @@
 #include "psiplugin.h"
 #include "stanzafilter.h"
 #include "stanzasender.h"
-#include "toolbariconaccessor.h"
+#include <QAction>
 
 class Options;
 class QMenu;
@@ -41,13 +41,12 @@ class OpenPGP : public QObject,
               public StanzaFilter,
               public PsiAccountController,
               public OptionAccessor,
-              public ToolbarIconAccessor,
               public StanzaSender,
               public ActiveTabAccessor,
               public AccountInfoAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.OpenPGP")
-    Q_INTERFACES(PsiPlugin PluginInfoProvider StanzaFilter PsiAccountController OptionAccessor ToolbarIconAccessor
+    Q_INTERFACES(PsiPlugin PluginInfoProvider StanzaFilter PsiAccountController OptionAccessor
                      StanzaSender ActiveTabAccessor AccountInfoAccessor)
 
 public:
@@ -55,7 +54,7 @@ public:
     ~OpenPGP();
 
     // from PsiPlugin
-    QString version() const { return "1.0"; }
+    QString version() const { return "1.1"; }
     QString shortName() const { return "openpgp"; }
     QString name() const { return "OpenPGP Plugin"; }
 
@@ -84,8 +83,8 @@ public:
     void optionChanged(const QString & /*option*/) { }
 
     // from ToolbarIconAccessor
-    QList<QVariantHash> getButtonParam() override;
-    QAction            *getAction(QObject *parent, int account, const QString &contact) override;
+    QList<QVariantHash> getButtonParam();
+    QAction            *getAction(QObject *parent, int account, const QString &contact);
 
     // from ActiveTabAccessor
     void setActiveTabAccessingHost(ActiveTabAccessingHost *host) { m_activeTab = host; }

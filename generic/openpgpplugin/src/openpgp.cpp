@@ -100,9 +100,6 @@ QString OpenPGP::pluginInfo()
 
 bool OpenPGP::incomingStanza(int account, const QDomElement &stanza)
 {
-    if (!isEnabled())
-        return false;
-
     if (!m_optionHost->getPluginOption("auto-import", true).toBool())
         return false;
 
@@ -159,7 +156,9 @@ QList<QVariantHash> OpenPGP::getButtonParam()
 
 QAction *OpenPGP::getAction(QObject *parent, int, const QString &)
 {
-    m_action = new QAction(QPixmap(":/icons/key.png"), tr("Send GnuPG Public Key"), parent);
+    return nullptr; // This is temporary, until code is moved from Psi core
+
+    m_action = new QAction(icon(), tr("Send GnuPG Public Key"), parent);
     m_action->setCheckable(false);
     connect(m_action, &QAction::triggered, this, &OpenPGP::actionActivated);
     connect(m_action, &QAction::destroyed, this, &OpenPGP::actionDestroyed);

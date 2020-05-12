@@ -1,3 +1,8 @@
+2020-05-13 - v1.1 - tehnick
+    * Fix automatic import of PGP key from the message body
+    * Remove plugin button from chat toolbar: OpenPGP button from Psi core now
+      have special menu items for sending of public keys
+
 2020-05-12 - v1.0 - tehnick
     * Change short name of plugin from "gnupg" to "openpgp"
     * Change full name of plugin from "GnuPG Key Manager Plugin" to
