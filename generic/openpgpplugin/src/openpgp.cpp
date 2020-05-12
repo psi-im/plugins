@@ -51,13 +51,11 @@ QWidget *OpenPGP::options()
 
 bool OpenPGP::enable()
 {
-    m_optionHost->setGlobalOption("options.pgp.enabled", true);
     return true;
 }
 
 bool OpenPGP::disable()
 {
-    m_optionHost->setGlobalOption("options.pgp.enabled", false);
     return true;
 }
 
