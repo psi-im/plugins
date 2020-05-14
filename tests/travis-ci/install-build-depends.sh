@@ -14,6 +14,7 @@ then
 
     sudo apt-get update  -qq
     sudo apt-get install -qq cmake \
+                             libhttp-parser-dev \
                              libhunspell-dev \
                              libidn11-dev \
                              libminizip-dev \
