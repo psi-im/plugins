@@ -44,6 +44,12 @@ if(NOT APPLE AND (NOT HAIKU))
     )
 endif()
 
+if(BUILD_PSIMEDIA AND (EXISTS "${CMAKE_CURRENT_LIST_DIR}/psimedia"))
+    list(APPEND plugins_list
+        psimedia
+    )
+endif()
+
 message(STATUS "Plugins from generic subdirectory")
 # If BUILD_PLUGINS variable was set as "-plugin1;-plugin2"
 # We proceed all plugins with plugin1 and plugin2 excluded

@@ -60,7 +60,7 @@ class OMEMOPlugin : public QObject,
                     public CommandExecutor,
                     public ContactInfoAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi.OmemoPlugin")
+    Q_PLUGIN_METADATA(IID "com.psi.OmemoPlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin StanzaFilter StanzaSender EventCreator AccountInfoAccessor ApplicationInfoAccessor
                      PsiAccountController PluginInfoProvider ToolbarIconAccessor GCToolbarIconAccessor EncryptionSupport
                          OptionAccessor CommandExecutor ContactInfoAccessor)

@@ -1,0 +1,8 @@
+{
+    "name": "Video Status Changer Plugin",
+    "name:ru": "Видеостатус",
+    "shortname": "videostatus",
+    "version": "0.3.0",
+    "priority": 2,
+    "icon": "base64:iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAFhJREFUeNpi/P//PwMlgImBQkCxASwwRkZGBk6/zJgxg5GgAVCATSHeQGJMT08nqAif4UxEasZmyX9KAvE/JbHwf8DTASM1XMCIbAAjOTbD+IxDPzMBBBgAKKMTUOYF1usAAAAASUVORK5CYII="
+}

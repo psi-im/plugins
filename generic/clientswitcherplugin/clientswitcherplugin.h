@@ -68,7 +68,7 @@ class ClientSwitcherPlugin : public QObject,
 
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.ClientSwitcherPlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.ClientSwitcherPlugin" FILE "psiplugin.json")
     Q_INTERFACES(
         PsiPlugin OptionAccessor StanzaSender StanzaFilter PluginInfoProvider PopupAccessor ApplicationInfoAccessor
             AccountInfoAccessor PsiAccountController ContactInfoAccessor IconFactoryAccessor)

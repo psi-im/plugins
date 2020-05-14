@@ -38,7 +38,7 @@ class CleanerPlugin : public QObject,
                       public OptionAccessor,
                       public PluginInfoProvider {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.CleanerPlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.CleanerPlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin ApplicationInfoAccessor IconFactoryAccessor OptionAccessor PluginInfoProvider)
 
 public:

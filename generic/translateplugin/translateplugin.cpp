@@ -57,7 +57,7 @@ class TranslatePlugin : public QObject,
                         public PluginInfoProvider,
                         public ChatTabAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.TranslatePlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.TranslatePlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin OptionAccessor ShortcutAccessor ActiveTabAccessor PluginInfoProvider ChatTabAccessor)
 
 public:

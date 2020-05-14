@@ -61,7 +61,7 @@ class ImagePlugin : public QObject,
                     public PsiAccountController,
                     public OptionAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.ImagePlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.ImagePlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin ToolbarIconAccessor GCToolbarIconAccessor StanzaSender ActiveTabAccessor PsiAccountController
                      OptionAccessor IconFactoryAccessor AccountInfoAccessor PluginInfoProvider)
 public:

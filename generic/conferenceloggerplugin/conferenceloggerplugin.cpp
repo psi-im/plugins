@@ -59,7 +59,7 @@ class ConferenceLogger : public QObject,
                          public IconFactoryAccessor,
                          public PluginInfoProvider {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.ConferenceLogger")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.ConferenceLogger" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor ApplicationInfoAccessor OptionAccessor ActiveTabAccessor
                      GCToolbarIconAccessor IconFactoryAccessor PluginInfoProvider)
 

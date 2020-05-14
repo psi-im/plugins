@@ -46,7 +46,7 @@ class ScreenshotPlugin : public QObject,
                          public MenuAccessor,
                          public ApplicationInfoAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.ScreenshotPlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.ScreenshotPlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin OptionAccessor ShortcutAccessor PluginInfoProvider IconFactoryAccessor MenuAccessor
                      ApplicationInfoAccessor)
 

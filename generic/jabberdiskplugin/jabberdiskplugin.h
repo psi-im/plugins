@@ -54,7 +54,7 @@ class JabberDiskPlugin : public QObject,
 /*, public PopupAccessor,*/
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.JabberDiskPlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.JabberDiskPlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin StanzaFilter StanzaSender IconFactoryAccessor AccountInfoAccessor //  PopupAccessor
                      MenuAccessor PluginInfoProvider OptionAccessor)
 public:

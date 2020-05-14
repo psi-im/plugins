@@ -39,7 +39,7 @@ class SkinsPlugin : public QObject,
                     public OptionAccessor,
                     public PluginInfoProvider {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.SkinsPlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.SkinsPlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin OptionAccessor ApplicationInfoAccessor PluginInfoProvider)
 
 public:

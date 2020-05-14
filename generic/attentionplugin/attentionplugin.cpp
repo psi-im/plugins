@@ -68,7 +68,7 @@ class AttentionPlugin : public QObject,
                         public PluginInfoProvider,
                         public SoundAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.AttentionPlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.AttentionPlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor OptionAccessor ActiveTabAccessor ApplicationInfoAccessor
                      ToolbarIconAccessor IconFactoryAccessor PopupAccessor StanzaSender MenuAccessor PluginInfoProvider
                          SoundAccessor)

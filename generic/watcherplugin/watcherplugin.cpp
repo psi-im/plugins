@@ -80,7 +80,7 @@ class Watcher : public QObject,
                 public SoundAccessor,
                 public ToolbarIconAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.Watcher")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.Watcher" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin PopupAccessor OptionAccessor StanzaFilter IconFactoryAccessor AccountInfoAccessor
                      PluginInfoProvider MenuAccessor ApplicationInfoAccessor ActiveTabAccessor ContactInfoAccessor
                          SoundAccessor ToolbarIconAccessor)

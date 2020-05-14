@@ -101,7 +101,7 @@ class VideoStatusChanger : public QObject,
                            public PsiAccountController,
                            public AccountInfoAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.VideoStatusChanger")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.VideoStatusChanger" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin PluginInfoProvider OptionAccessor PsiAccountController AccountInfoAccessor)
 public:
     VideoStatusChanger();

@@ -45,7 +45,7 @@ class OpenPGP : public QObject,
               public ActiveTabAccessor,
               public AccountInfoAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.OpenPGP")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.OpenPGP" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin PluginInfoProvider StanzaFilter PsiAccountController OptionAccessor
                      StanzaSender ActiveTabAccessor AccountInfoAccessor)
 

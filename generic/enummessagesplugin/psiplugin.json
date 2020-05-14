@@ -1,0 +1,7 @@
+{
+    "name": "Enum Messages Plugin",
+    "shortname": "enummessages",
+    "version": "0.0.03",
+    "priority": 2,
+    "icon": "base64:iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABGUlEQVR4XqVQPU6GUBBcfloL7mDlASigJIaDCA3N1xL+EyEQeq0IZ6A3ERruwCFoqfUtxYYVfGqcZPL+dmfnjQIAD4JPgr7gHfweWP+OAsE4ji+maQJCURQg0Pm8TtMErusGePrYtg3WdcVHRlVVpXeGYYB+nIRs2xbCMNwLm6Y5TqZ9mqa01780sylRFEndCDAHOJlEkHVdH4tpzbIMBU8CeMnsxnEsy4ELcNvkgATFv1nzZQbLssAwDOA4DliWBUmSnCZLM8Bmz/Og73uwbRuqqsKnUw5FUVw6oGbf969tczdcQNM0bN73XdftSZdlic808bsMjkGxwjzPf8wAfTzP83xVKL3DHoEbytwLPgq+wt8QCL7Bf/EJcE5QIxlKjUUAAAAASUVORK5CYII="
+}

@@ -65,7 +65,7 @@ class AutoReply : public QObject,
                   public AccountInfoAccessor,
                   public PluginInfoProvider {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.AutoReplyPlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.AutoReplyPlugin" FILE "psiplugin.json")
     Q_INTERFACES(
         PsiPlugin OptionAccessor StanzaSender StanzaFilter ActiveTabAccessor AccountInfoAccessor PluginInfoProvider)
 

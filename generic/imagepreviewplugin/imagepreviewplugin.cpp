@@ -82,7 +82,7 @@ class ImagePreviewPlugin : public QObject,
                            public ChatTabAccessor,
                            public ApplicationInfoAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.ImagePreviewPlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.ImagePreviewPlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin PluginInfoProvider OptionAccessor ChatTabAccessor ApplicationInfoAccessor)
 public:
     ImagePreviewPlugin();

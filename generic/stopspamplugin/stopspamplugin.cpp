@@ -89,7 +89,7 @@ class StopSpam : public QObject,
                  public EventFilter,
                  public ContactInfoAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.StopSpam")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.StopSpam" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter AccountInfoAccessor ApplicationInfoAccessor
                      PopupAccessor IconFactoryAccessor PluginInfoProvider EventFilter ContactInfoAccessor)
 

@@ -66,7 +66,7 @@ class PepPlugin : public QObject,
                   public ContactInfoAccessor,
                   public IconFactoryAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.PepPlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.PepPlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor OptionAccessor PopupAccessor SoundAccessor
                      PluginInfoProvider ApplicationInfoAccessor ContactInfoAccessor IconFactoryAccessor)
 

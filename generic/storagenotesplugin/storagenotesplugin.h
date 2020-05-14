@@ -52,7 +52,7 @@ class StorageNotesPlugin : public QObject,
                            public PopupAccessor,
                            public MenuAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.StorageNotesPlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.StorageNotesPlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin StanzaSender IconFactoryAccessor AccountInfoAccessor StanzaFilter PopupAccessor MenuAccessor
                      PluginInfoProvider)
 public:

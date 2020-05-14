@@ -46,7 +46,7 @@ class JuickPlugin : public QObject,
                     public ChatTabAccessor,
                     public WebkitAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.JuickPlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.JuickPlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin OptionAccessor ActiveTabAccessor StanzaFilter ApplicationInfoAccessor PluginInfoProvider
                      ChatTabAccessor WebkitAccessor)
 

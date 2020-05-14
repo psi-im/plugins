@@ -81,7 +81,7 @@ class ChessPlugin : public QObject,
                     public PopupAccessor,
                     public SoundAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.ChessPlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.ChessPlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin AccountInfoAccessor OptionAccessor ActiveTabAccessor MenuAccessor StanzaFilter
                      ContactInfoAccessor SoundAccessor ToolbarIconAccessor IconFactoryAccessor StanzaSender
                          ApplicationInfoAccessor PluginInfoProvider EventCreator PopupAccessor)

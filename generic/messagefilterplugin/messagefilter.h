@@ -46,7 +46,7 @@ class MessageFilter : public QObject,
                       public StanzaSender,
                       public AccountInfoAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.MessageFilter")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.MessageFilter" FILE "psiplugin.json")
     Q_INTERFACES(
         PsiPlugin PluginInfoProvider StanzaFilter PsiAccountController OptionAccessor StanzaSender AccountInfoAccessor)
 

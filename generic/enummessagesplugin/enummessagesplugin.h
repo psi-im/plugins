@@ -49,7 +49,7 @@ class EnumMessagesPlugin : public QObject,
                            public PsiAccountController,
                            public ToolbarIconAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.EnumMessagesPlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.EnumMessagesPlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin OptionAccessor ActiveTabAccessor StanzaFilter ApplicationInfoAccessor PluginInfoProvider
                      ChatTabAccessor PsiAccountController ToolbarIconAccessor)
 

@@ -73,7 +73,7 @@ class ExtendedMenuPlugin : public QObject,
                            public ToolbarIconAccessor,
                            public PsiAccountController {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.ExtendedMenuPlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.ExtendedMenuPlugin" FILE "psiplugin.json")
     Q_INTERFACES(
         PsiPlugin AccountInfoAccessor OptionAccessor IconFactoryAccessor PopupAccessor MenuAccessor ContactInfoAccessor
             PluginInfoProvider StanzaFilter StanzaSender ToolbarIconAccessor PsiAccountController)

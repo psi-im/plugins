@@ -38,7 +38,7 @@ class QipXStatuses : public QObject,
                      public ContactStateAccessor,
                      public PluginInfoProvider {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.QipXStatuses")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.QipXStatuses" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin StanzaFilter ContactStateAccessor PluginInfoProvider)
 
 public:

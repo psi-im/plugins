@@ -71,7 +71,7 @@ class Reminder : public QObject,
                  public SoundAccessor,
                  public ContactInfoAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.Reminder")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.Reminder" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor ApplicationInfoAccessor StanzaSender OptionAccessor
                      PopupAccessor IconFactoryAccessor PluginInfoProvider SoundAccessor ContactInfoAccessor)
 

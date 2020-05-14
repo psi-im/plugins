@@ -82,7 +82,7 @@ class PsiOtrPlugin : public QObject,
                      public OtrCallback,
                      public EncryptionSupport {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.PsiOtrPlugin")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.PsiOtrPlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin PluginInfoProvider EventCreator OptionAccessor StanzaSender ApplicationInfoAccessor
                      PsiAccountController StanzaFilter ToolbarIconAccessor AccountInfoAccessor ContactInfoAccessor
                          IconFactoryAccessor EncryptionSupport)
