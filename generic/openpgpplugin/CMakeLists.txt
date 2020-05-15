@@ -38,6 +38,7 @@ set( _HDRS
     src/openpgp.h
     src/lineeditwidget.h
     src/datewidget.h
+    src/showtextdlg.h
 )
 set( _SRCS
     src/options.cpp
@@ -47,6 +48,7 @@ set( _SRCS
     src/openpgp.cpp
     src/lineeditwidget.cpp
     src/datewidget.cpp
+    src/showtextdlg.cpp
 )
 set( _UIS
     src/options.ui

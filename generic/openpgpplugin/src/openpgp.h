@@ -54,7 +54,7 @@ public:
     ~OpenPGP();
 
     // from PsiPlugin
-    QString version() const { return "1.1"; }
+    QString version() const { return "1.2"; }
     QString shortName() const { return "openpgp"; }
     QString name() const { return "OpenPGP Plugin"; }
 

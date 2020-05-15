@@ -23,6 +23,7 @@
 #include "gpgprocess.h"
 #include "model.h"
 #include "optionaccessinghost.h"
+#include "showtextdlg.h"
 #include "ui_options.h"
 #include <QAction>
 #include <QApplication>
@@ -441,16 +442,14 @@ void Options::exportKeyToClipboard()
 
 void Options::showInfo()
 {
-    QMessageBox::Icon icon;
-    QString info;
     GpgProcess gpg;
-    if (gpg.info(info)) {
-        icon = QMessageBox::Information;
-    } else {
-        icon = QMessageBox::Critical;
-    }
-    QMessageBox box(icon, tr("GnuPG info"), info, QMessageBox::Ok, this);
-    box.exec();
+    QString    info;
+
+    gpg.info(info);
+    ShowTextDlg *w = new ShowTextDlg(info, true, false, this);
+    w->setWindowTitle(tr("GnuPG info"));
+    w->resize(560, 240);
+    w->show();
 }
 
 void Options::updateAllKeys()

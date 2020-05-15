@@ -1,3 +1,7 @@
+2020-05-15 - v1.2 - tehnick
+    * Cosmetic changes in plugin options dialog
+    * Improve performance of usage of gpg tool a bit
+
 2020-05-13 - v1.1 - tehnick
     * Fix automatic import of PGP key from the message body
     * Remove plugin button from chat toolbar: OpenPGP button from Psi core now

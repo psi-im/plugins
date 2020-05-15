@@ -98,7 +98,7 @@
          <item>
           <widget class="QPushButton" name="btnInfo">
            <property name="text">
-            <string>Info</string>
+            <string>&amp;Diagnostics</string>
            </property>
           </widget>
          </item>

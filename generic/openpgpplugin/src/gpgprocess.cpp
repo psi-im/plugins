@@ -27,9 +27,23 @@
 #include <windows.h>
 #endif
 
+QString GpgProcess::m_bin = QString();
+
 GpgProcess::GpgProcess(QObject *parent) : QProcess(parent)
 {
-    m_bin = findBin();
+    if (m_bin.isEmpty()) {
+        m_bin = findBin();
+    }
+}
+
+void GpgProcess::start(const QStringList &arguments, QIODevice::OpenMode mode)
+{
+    QProcess::start(m_bin, arguments, mode);
+}
+
+void GpgProcess::start(QIODevice::OpenMode mode)
+{
+    QProcess::start(m_bin, mode);
 }
 
 bool GpgProcess::success() const
