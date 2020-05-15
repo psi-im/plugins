@@ -107,7 +107,7 @@ else()
     add_definitions( -Wall )
 endif()
 
-if(IS_PSIPLUS)
+if(PSI_PLUS)
     set(MAIN_PROGRAM_NAME "psi-plus")
 endif()
 
