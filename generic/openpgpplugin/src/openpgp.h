@@ -18,8 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef OPENPGP_H
-#define OPENPGP_H
+#pragma once
 
 #include "accountinfoaccessor.h"
 #include "activetabaccessor.h"
@@ -54,7 +53,7 @@ public:
     ~OpenPGP();
 
     // from PsiPlugin
-    QString version() const { return "1.2"; }
+    QString version() const { return "1.3"; }
     QString shortName() const { return "openpgp"; }
     QString name() const { return "OpenPGP Plugin"; }
 
@@ -110,5 +109,3 @@ private:
     ActiveTabAccessingHost *   m_activeTab = nullptr;
     AccountInfoAccessingHost * m_accountInfo = nullptr;
 };
-
-#endif // OPENPGP_H

@@ -16,8 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LINEEDITWIDGET_H
-#define LINEEDITWIDGET_H
+#pragma once
 
 #include <QLineEdit>
 #include <QList>
@@ -64,5 +63,3 @@ private:
     int     m_optimalLength;
     QString m_rxValidator;
 };
-
-#endif // LINEEDITWIDGET_H

@@ -2,6 +2,7 @@
  * model.h - key view model
  *
  * Copyright (C) 2013  Ivan Romanov <drizt@land.ru>
+ * Copyright (C) 2020  Boris Pek <tehnick-8@yandex.ru>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,8 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MODEL_H
-#define MODEL_H
+#pragma once
 
 #include <QStandardItemModel>
 
@@ -45,10 +45,11 @@ public:
     Model(QObject *parent = nullptr);
 
 public slots:
-    void listKeys();
+    void updateAllKeys();
+
+signals:
+    void updated();
 
 private:
     void showKeys(const QString &keysRaw);
 };
-
-#endif // MODEL_H

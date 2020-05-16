@@ -45,6 +45,8 @@ QWidget *OpenPGP::options()
 {
     m_optionsForm = new Options();
     m_optionsForm->setOptionAccessingHost(m_optionHost);
+    m_optionsForm->setAccountInfoAccessingHost(m_accountInfo);
+    m_optionsForm->setPsiAccountControllingHost(m_accountHost);
     m_optionsForm->loadSettings();
     return qobject_cast<QWidget *>(m_optionsForm);
 }
@@ -167,58 +169,13 @@ QAction *OpenPGP::getAction(QObject *parent, int, const QString &)
 
 void OpenPGP::actionActivated()
 {
-    if (m_menu) {
-        delete m_menu;
-    }
-
-    m_menu = new QMenu();
-
-    Model *model = new Model(m_menu);
-    model->listKeys();
-
-    for (int i = 0; i < model->rowCount(); i++) {
-        if (model->item(i, Model::Type)->text() != "sec") {
-            continue;
-        }
-
-        QString str;
-        // User name
-        if (!model->item(i, Model::Name)->text().isEmpty()) {
-            str += model->item(i, Model::Name)->text();
-        }
-
-        // Comment
-        if (!model->item(i, Model::Comment)->text().isEmpty()) {
-            if (!str.isEmpty()) {
-                str += " ";
-            }
-            str += QString("(%1)").arg(model->item(i, Model::Comment)->text());
-        }
-
-        // Email
-        if (!model->item(i, Model::Email)->text().isEmpty()) {
-            if (!str.isEmpty()) {
-                str += " ";
-            }
-            str += QString("<%1>").arg(model->item(i, Model::Email)->text());
-        }
-
-        // Short ID
-        if (!str.isEmpty()) {
-            str += " ";
-        }
-        str += model->item(i, Model::ShortId)->text();
-
-        QAction *action = m_menu->addAction(str);
-        action->setData(model->item(i, Model::Fingerprint)->text());
-        connect(action, &QAction::triggered, this, &OpenPGP::sendPublicKey);
-    }
-
-    m_menu->popup(QCursor::pos());
+    ; // This is temporary, until code is moved from Psi core
 }
 
 void OpenPGP::sendPublicKey()
 {
+    return; // This is temporary, until code is moved from Psi core
+
     QAction *action      = qobject_cast<QAction *>(sender());
     QString  fingerprint = "0x" + action->data().toString();
 

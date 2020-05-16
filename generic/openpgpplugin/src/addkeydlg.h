@@ -17,8 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef ADDKEYDLG_H
-#define ADDKEYDLG_H
+#pragma once
 
 #include <QDate>
 #include <QDialog>
@@ -49,5 +48,3 @@ private slots:
 private:
     Ui::AddKeyDlg *ui;
 };
-
-#endif // ADDKEYDLG_H

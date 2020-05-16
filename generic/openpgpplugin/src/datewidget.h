@@ -16,8 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef DATEWIDGET_H
-#define DATEWIDGET_H
+#pragma once
 
 #include "lineeditwidget.h"
 #include <QDate>
@@ -49,5 +48,3 @@ private:
     QToolButton *    m_tbClean;
     QCalendarWidget *m_calendar;
 };
-
-#endif // DATEWIDGETs_H

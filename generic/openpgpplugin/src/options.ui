@@ -29,7 +29,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="keysManagerTab">
       <attribute name="title">
@@ -37,7 +37,7 @@
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <widget class="QTreeView" name="keys">
+        <widget class="QTreeView" name="allKeysTable">
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
@@ -106,6 +106,41 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="knownKeysTab">
+      <attribute name="title">
+       <string>Known Keys</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QTableView" name="knownKeysTable"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QPushButton" name="deleteKnownKey">
+           <property name="text">
+            <string>Delete</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="spacerLabel_2">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="spacerLabel_3">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="ownKeysTab">
       <attribute name="title">
        <string>Own Keys</string>
@@ -114,10 +149,10 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QComboBox" name="allAccounts"/>
+          <widget class="QComboBox" name="accounts"/>
          </item>
          <item>
-          <widget class="QPushButton" name="pb_key">
+          <widget class="QPushButton" name="chooseKey">
            <property name="text">
             <string>Select &amp;Key...</string>
            </property>
@@ -131,7 +166,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <widget class="QPushButton" name="pb_keyclear">
+          <widget class="QPushButton" name="deleteOwnKey">
            <property name="text">
             <string>Delete</string>
            </property>
@@ -259,7 +294,7 @@
    <sender>btnRemove</sender>
    <signal>clicked()</signal>
    <receiver>Options</receiver>
-   <slot>removeKey()</slot>
+   <slot>deleteKey()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>421</x>
@@ -290,7 +325,7 @@
  </connections>
  <slots>
   <slot>addKey()</slot>
-  <slot>removeKey()</slot>
+  <slot>deleteKey()</slot>
   <slot>showInfo()</slot>
  </slots>
 </ui>

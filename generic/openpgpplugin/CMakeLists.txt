@@ -34,8 +34,11 @@ set( _HDRS
     src/options.h
     src/model.h
     src/gpgprocess.h
+    src/gpgtransaction.h
     src/addkeydlg.h
     src/openpgp.h
+    src/pgpkeydlg.h
+    src/pgputil.h
     src/lineeditwidget.h
     src/datewidget.h
     src/showtextdlg.h
@@ -44,15 +47,19 @@ set( _SRCS
     src/options.cpp
     src/model.cpp
     src/gpgprocess.cpp
+    src/gpgtransaction.cpp
     src/addkeydlg.cpp
     src/openpgp.cpp
+    src/pgpkeydlg.cpp
+    src/pgputil.cpp
     src/lineeditwidget.cpp
     src/datewidget.cpp
     src/showtextdlg.cpp
 )
 set( _UIS
-    src/options.ui
     src/addkeydlg.ui
+    src/pgpkey.ui
+    src/options.ui
 )
 set( _RSCS
     resources/resources.qrc

@@ -18,14 +18,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef OPTIONS_H
-#define OPTIONS_H
+#pragma once
 
 #include <QWidget>
 #include <QStandardItemModel>
 
+class Model;
 class GPGProc;
 class OptionAccessingHost;
+class AccountInfoAccessingHost;
+class PsiAccountControllingHost;
 
 namespace Ui {
 class Options;
@@ -39,6 +41,8 @@ public:
     ~Options();
 
     void setOptionAccessingHost(OptionAccessingHost *host);
+    void setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
+    void setPsiAccountControllingHost(PsiAccountControllingHost *host);
 
     void loadSettings();
     void saveSettings();
@@ -55,18 +59,32 @@ public slots:
 
     void showInfo();
     void updateAllKeys();
-    void updateOwnKeys();
+    void allKeysTableModelUpdated();
 
 private slots:
+    void updateAccountsList();
+    void updateKnownKeys();
+    void updateOwnKeys();
+    void deleteKnownKey();
     void deleteOwnKey();
+    void chooseKey();
+    void copyKnownFingerprint();
     void copyOwnFingerprint();
-    void contextMenu(const QPoint &pos);
+    void contextMenuKnownKeys(const QPoint &pos);
+    void contextMenuOwnKeys(const QPoint &pos);
 
 private:
-    Ui::Options         *m_ui = nullptr;
-    GPGProc             *m_gpgProc = nullptr;
-    OptionAccessingHost *m_optionHost = nullptr;
-    QStandardItemModel  *m_ownKeysTableModel = nullptr;
-};
+    void copyFingerprintFromTable(QStandardItemModel *tableModel,
+                                  const QModelIndexList &indexesList,
+                                  const int column);
 
-#endif // OPTIONS_H
+private:
+    Ui::Options               *m_ui = nullptr;
+    GPGProc                   *m_gpgProc = nullptr;
+    OptionAccessingHost       *m_optionHost = nullptr;
+    AccountInfoAccessingHost  *m_accountInfo = nullptr;
+    PsiAccountControllingHost *m_accountHost = nullptr;
+    Model                     *m_allKeysTableModel = nullptr;
+    QStandardItemModel        *m_knownKeysTableModel = nullptr;
+    QStandardItemModel        *m_ownKeysTableModel = nullptr;
+};
