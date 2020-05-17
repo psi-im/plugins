@@ -34,6 +34,8 @@
 #include <QStringList>
 #include <QtCore>
 
+using OpenPgpPluginNamespace::GpgProcess;
+
 PGPUtil *PGPUtil::m_instance = nullptr;
 
 PGPUtil::PGPUtil() { connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()), SLOT(deleteLater())); }

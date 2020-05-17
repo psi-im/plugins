@@ -18,7 +18,6 @@
 
 #include <QApplication>
 #include <QCalendarWidget>
-#include <QDebug>
 #include <QDesktopWidget>
 #include <QHBoxLayout>
 #include <QIcon>

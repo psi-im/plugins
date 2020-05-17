@@ -22,6 +22,8 @@
 
 #include <QProcess>
 
+namespace OpenPgpPluginNamespace {
+
 class GpgProcess : public QProcess {
     Q_OBJECT
 
@@ -38,3 +40,5 @@ private:
     QString findBin() const;
     static QString m_bin;
 };
+
+} // namespace OpenPgpPluginNamespace

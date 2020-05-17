@@ -36,6 +36,8 @@
 #include <QStandardItemModel>
 #include <QString>
 
+namespace OpenPgpPluginNamespace {
+
 class KeyViewItem : public QStandardItem {
 public:
     KeyViewItem(const QString &id, const QString &name) : QStandardItem(), keyId_(id) { setText(name); }
@@ -220,3 +222,5 @@ void PGPKeyDlg::showInfo()
 {
     showInfoDialog(this);
 }
+
+} // namespace OpenPgpPluginNamespace

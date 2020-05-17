@@ -26,10 +26,12 @@
 #include <QDir>
 #include <QFile>
 
+namespace OpenPgpPluginNamespace {
+
 int GpgTransaction::m_idCounter = 0;
 
 GpgTransaction::GpgTransaction(const Type type, const QString &keyID, QObject *parent) :
-    GpgProcess(parent), m_type(type)
+    GpgProcess(parent), m_type(type), m_startCounter(0)
 {
     m_id = m_idCounter;
     ++m_idCounter;
@@ -59,6 +61,13 @@ GpgTransaction::GpgTransaction(const Type type, const QString &keyID, QObject *p
                                     "--decrypt", "--recipient",
                                     "0x" + keyID };
     } break;
+    case Type::ListAllKeys: {
+        m_arguments = QStringList {
+                "--with-fingerprint",
+                "--list-secret-keys",
+                "--with-colons",
+                "--fixed-list-mode" };
+    } break;
     }
 
     connect(this, &QProcess::started, this, &GpgTransaction::processStarted);
@@ -78,6 +87,7 @@ void GpgTransaction::start()
         }
     }
 
+    ++m_startCounter;
     GpgProcess::start(m_arguments);
 }
 
@@ -111,14 +121,30 @@ QByteArray GpgTransaction::data() const { return m_data; }
 
 void GpgTransaction::processStarted()
 {
-    write(m_stdInString.toUtf8());
-    closeWriteChannel();
+    if (!m_stdInString.isEmpty()) {
+        write(m_stdInString.toUtf8());
+        closeWriteChannel();
+    }
 }
 
 void GpgTransaction::processFinished()
 {
-    m_stdOutString = QString::fromUtf8(readAllStandardOutput());
-    m_stdErrString = QString::fromUtf8(readAllStandardError());
+    m_stdOutString.append(QString::fromUtf8(readAllStandardOutput()));
+    m_stdErrString.append(QString::fromUtf8(readAllStandardError()));
+
+    if (m_type == Type::ListAllKeys) {
+        if (m_startCounter < 2) {
+            setGpgArguments(QStringList{
+                                "--with-fingerprint",
+                                "--list-public-keys",
+                                "--with-colons",
+                                "--fixed-list-mode"}
+                            );
+            start();
+            return;
+        }
+    }
+
 #ifdef Q_OS_WIN
     m_stdOutString.replace("\r", "");
     m_stdErrString.replace("\r", "");
@@ -129,3 +155,5 @@ void GpgTransaction::processFinished()
     }
     emit transactionFinished();
 }
+
+} // namespace OpenPgpPluginNamespace

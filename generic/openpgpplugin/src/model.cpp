@@ -18,11 +18,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <QDebug>
-
 #include "model.h"
-#include "gpgprocess.h"
+#include "gpgtransaction.h"
 #include <QDateTime>
+
+using OpenPgpPluginNamespace::GpgTransaction;
 
 inline QString epochToHuman(const QString &seconds)
 {
@@ -125,55 +125,27 @@ Model::Model(QObject *parent) : QStandardItemModel(parent)
 
 void Model::updateAllKeys()
 {
-    qDebug() << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-             << __PRETTY_FUNCTION__;
+    GpgTransaction *transaction = new GpgTransaction(GpgTransaction::Type::ListAllKeys, QString());
+    connect(transaction, &GpgTransaction::transactionFinished, this, &Model::transactionFinished);
+    transaction->start();
+}
 
-    qDebug() << "    p1:" << QDateTime::currentMSecsSinceEpoch();
+void Model::transactionFinished()
+{
+    GpgTransaction *transaction = dynamic_cast<GpgTransaction *>(sender());
+    if (!transaction)
+        return;
 
-    clear();
+    showKeys(transaction->stdOutString());
+    emit keysListUpdated();
 
-    qDebug() << "    p2:" << QDateTime::currentMSecsSinceEpoch();
-
-
-    QStringList arguments;
-
-    arguments = QStringList{
-        "--with-fingerprint",
-        "--list-secret-keys",
-        "--with-colons",
-        "--fixed-list-mode"
-    };
-
-    qDebug() << "    p3:" << QDateTime::currentMSecsSinceEpoch();
-
-    GpgProcess process;
-    process.start(arguments);
-    process.waitForFinished();
-    QString keysRaw = QString::fromUtf8(process.readAll());
-
-    qDebug() << "    p4:" << QDateTime::currentMSecsSinceEpoch();
-
-    arguments.clear();
-    arguments = QStringList{
-        "--with-fingerprint",
-        "--list-public-keys",
-        "--with-colons",
-        "--fixed-list-mode"
-    };
-
-    process.start(arguments);
-    process.waitForFinished();
-    keysRaw += QString::fromUtf8(process.readAll());
-
-    qDebug() << "    p5:" << QDateTime::currentMSecsSinceEpoch();
-
-    showKeys(keysRaw);
-
-    qDebug() << "    p6:" << QDateTime::currentMSecsSinceEpoch();
+    transaction->deleteLater();
 }
 
 void Model::showKeys(const QString &keysRaw)
 {
+    clear();
+
     static QStringList headerLabels;
     if (headerLabels.isEmpty()) {
         for (int i = 0; i < Model::Count; ++i) {
@@ -193,11 +165,18 @@ void Model::showKeys(const QString &keysRaw)
     }
     setHorizontalHeaderLabels(headerLabels);
 
-    QStringList            list = keysRaw.split("\n");
+    if (keysRaw.isEmpty())
+        return;
+
+    QStringList            list = keysRaw.split("\n", QString::SkipEmptyParts);
     QList<QStandardItem *> lastRow;
     QList<QStandardItem *> row;
     QStringList            secretKeys;
+
     for (auto line : list) {
+        if (line.count(':') < 1)
+            continue;
+
         QString type = line.section(':', 0, 0);
         if (type == "pub" || type == "sec") {
             row = parseLine(line);
@@ -221,7 +200,9 @@ void Model::showKeys(const QString &keysRaw)
                 lastRow.at(Comment)->setText(row.at(Comment)->text());
             }
         } else if (type == "fpr") {
-            row.at(Fingerprint)->setText(line.section(':', Fingerprint, Fingerprint));
+            if (!row.isEmpty()) {
+                row.at(Fingerprint)->setText(line.section(':', Fingerprint, Fingerprint));
+            }
         }
     }
 }

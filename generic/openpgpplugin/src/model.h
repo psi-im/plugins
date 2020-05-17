@@ -48,7 +48,10 @@ public slots:
     void updateAllKeys();
 
 signals:
-    void updated();
+    void keysListUpdated();
+
+private slots:
+    void transactionFinished();
 
 private:
     void showKeys(const QString &keysRaw);

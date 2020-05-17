@@ -31,6 +31,8 @@
 #include <QSet>
 #include <QString>
 
+using OpenPgpPluginNamespace::PGPKeyDlg;
+
 class PGPUtil : public QObject {
     Q_OBJECT
 

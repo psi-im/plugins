@@ -27,6 +27,8 @@
 #include <windows.h>
 #endif
 
+namespace OpenPgpPluginNamespace {
+
 QString GpgProcess::m_bin = QString();
 
 GpgProcess::GpgProcess(QObject *parent) : QProcess(parent)
@@ -178,3 +180,5 @@ bool GpgProcess::info(QString &message)
 
     return res;
 }
+
+} // namespace OpenPgpPluginNamespace

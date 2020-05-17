@@ -28,11 +28,13 @@
 #include <QByteArray>
 #include <QStringList>
 
+namespace OpenPgpPluginNamespace {
+
 class GpgTransaction : public GpgProcess {
     Q_OBJECT
 
 public:
-    enum class Type { Sign, Verify, Encrypt, Decrypt };
+    enum class Type { Sign, Verify, Encrypt, Decrypt, ListAllKeys };
 
     explicit GpgTransaction(const Type type, const QString &keyID, QObject *parent = nullptr);
     ~GpgTransaction() = default;
@@ -64,6 +66,7 @@ private:
     static int m_idCounter;
     int        m_id;
     Type       m_type;
+    uint16_t   m_startCounter;
 
     QStringList   m_arguments;
     QString       m_stdInString;
@@ -74,3 +77,5 @@ private:
     QByteArray    m_data;
     QString       m_tempFile;
 };
+
+} // namespace OpenPgpPluginNamespace

@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef PGPKEYDLG_H
-#define PGPKEYDLG_H
+#pragma once
 
 #include "ui_pgpkey.h"
 
@@ -32,6 +31,8 @@
 
 class QSortFilterProxyModel;
 class QStandardItemModel;
+
+namespace OpenPgpPluginNamespace {
 
 class PGPKeyDlg : public QDialog {
     Q_OBJECT
@@ -62,4 +63,4 @@ private:
     QSortFilterProxyModel *m_proxy;
 };
 
-#endif // PGPKEYDLG_H
+} // namespace OpenPgpPluginNamespace

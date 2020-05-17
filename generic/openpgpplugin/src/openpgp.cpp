@@ -33,6 +33,8 @@
 #include <QMenu>
 #include <QMessageBox>
 
+using OpenPgpPluginNamespace::GpgProcess;
+
 OpenPGP::OpenPGP() :
     m_optionsForm(nullptr), m_accountHost(nullptr), m_optionHost(nullptr),
     m_menu(nullptr), m_stanzaSending(nullptr), m_activeTab(nullptr), m_accountInfo(nullptr)

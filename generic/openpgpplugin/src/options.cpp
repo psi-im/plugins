@@ -44,6 +44,8 @@
 #include <QStandardItemModel>
 #include <QTimer>
 
+using OpenPgpPluginNamespace::GpgProcess;
+
 Options::Options(QWidget *parent) : QWidget(parent), m_ui(new Ui::Options)
 {
     m_ui->setupUi(this);
@@ -51,10 +53,10 @@ Options::Options(QWidget *parent) : QWidget(parent), m_ui(new Ui::Options)
     {
         m_allKeysTableModel = new Model(this);
         m_ui->allKeysTable->setModel(m_allKeysTableModel);
-        connect(m_allKeysTableModel, &Model::updated, this, &Options::allKeysTableModelUpdated);
+        connect(m_allKeysTableModel, &Model::keysListUpdated, this, &Options::allKeysTableModelUpdated);
 
         // Delayed init
-        QTimer::singleShot(1500, this, &Options::updateAllKeys);
+        QTimer::singleShot(500, this, &Options::updateAllKeys);
 
         // Import key
         QAction *action;
@@ -482,7 +484,6 @@ void Options::showInfo()
 void Options::updateAllKeys()
 {
     m_allKeysTableModel->updateAllKeys();
-
 }
 
 void Options::allKeysTableModelUpdated()
