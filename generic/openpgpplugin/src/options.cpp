@@ -296,9 +296,9 @@ void Options::deleteKey()
     }
 
     if (!pkeys.isEmpty()) {
-        if (QMessageBox::question(this, tr("Delete"), tr("Do you want to delete the selected keys?"),
-                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
-            == QMessageBox::No) {
+        const auto result = QMessageBox::question(this, tr("Delete"), tr("Do you want to delete the selected keys?"),
+                                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        if (result == QMessageBox::No) {
             return;
         }
     }
@@ -601,6 +601,7 @@ void Options::deleteKnownKey()
     if (!m_ui->knownKeysTable->selectionModel()->hasSelection())
         return;
 
+    bool keyRemoved = false;
     for (auto selectIndex : m_ui->knownKeysTable->selectionModel()->selectedRows(0)) {
         const QVariant &accountId = m_knownKeysTableModel->item(selectIndex.row(), 0)->data();
         if (accountId.isNull())
@@ -610,10 +611,24 @@ void Options::deleteKnownKey()
         if (jid.isEmpty())
             continue;
 
-        m_accountHost->removeKnownPgpKey(accountId.toInt(), jid);
+        const QString &accountName  = m_knownKeysTableModel->item(selectIndex.row(), 0)->text();
+        const QString &userName     = m_knownKeysTableModel->item(selectIndex.row(), 1)->text();
+        const QString &fingerprint  = m_knownKeysTableModel->item(selectIndex.row(), 3)->text();
+
+        const QString msg(tr("Are you sure you want to delete the following key?") + "\n\n" + tr("Account: ")
+                          + accountName + "\n" + tr("User: ") + userName + "\n"
+                          + tr("Fingerprint: ") + fingerprint);
+
+        QMessageBox mb(QMessageBox::Question, tr("Confirm action"), msg,
+                       QMessageBox::Yes | QMessageBox::No, this);
+        if (mb.exec() == QMessageBox::Yes) {
+            m_accountHost->removeKnownPgpKey(accountId.toInt(), jid);
+            keyRemoved = true;
+        }
     }
 
-    updateKnownKeys();
+    if (keyRemoved)
+        updateKnownKeys();
 }
 
 void Options::deleteOwnKey()
@@ -624,15 +639,28 @@ void Options::deleteOwnKey()
     if (!m_ui->ownKeysTable->selectionModel()->hasSelection())
         return;
 
+    bool keyRemoved = false;
     for (auto selectIndex : m_ui->ownKeysTable->selectionModel()->selectedRows(0)) {
         const QVariant &accountId  = m_ownKeysTableModel->item(selectIndex.row(), 0)->data().toString();
         if (accountId.isNull())
             continue;
 
-        m_accountHost->setPgpKey(accountId.toInt(), QString());
+        const QString &accountName  = m_ownKeysTableModel->item(selectIndex.row(), 0)->text();
+        const QString &fingerprint  = m_ownKeysTableModel->item(selectIndex.row(), 2)->text();
+
+        const QString msg(tr("Are you sure you want to delete the following key?") + "\n\n" + tr("Account: ")
+                          + accountName + "\n" + tr("Fingerprint: ") + fingerprint);
+
+        QMessageBox mb(QMessageBox::Question, tr("Confirm action"), msg,
+                       QMessageBox::Yes | QMessageBox::No, this);
+        if (mb.exec() == QMessageBox::Yes) {
+            m_accountHost->setPgpKey(accountId.toInt(), QString());
+            keyRemoved = true;
+        }
     }
 
-    updateOwnKeys();
+    if (keyRemoved)
+        updateOwnKeys();
 }
 
 void Options::chooseKey()
