@@ -118,7 +118,7 @@ QString PsiOtrPlugin::shortName() const { return "otr"; }
 
 // ---------------------------------------------------------------------------
 
-QString PsiOtrPlugin::version() const { return "1.1.1"; }
+QString PsiOtrPlugin::version() const { return "1.2"; }
 
 // ---------------------------------------------------------------------------
 
@@ -526,7 +526,7 @@ void PsiOtrPlugin::notifyUser(const QString &account, const QString &contact, co
         messageBoxIcon = QMessageBox::Information;
     }
 
-    QMessageBox *messageBox = new QMessageBox(messageBoxIcon, tr("Psi OTR"), message, QMessageBox::Ok, nullptr,
+    QMessageBox *messageBox = new QMessageBox(messageBoxIcon, tr("Confirm action"), message, QMessageBox::Ok, nullptr,
                                               Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     m_messageBoxList.enqueue(messageBox);
 

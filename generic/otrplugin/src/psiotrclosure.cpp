@@ -321,7 +321,7 @@ void AuthenticationDialog::startAuthentication()
                         + tr("Fingerprint: ") + m_fpr.fingerprintHuman + "\n\n"
                         + tr("Have you verified that this is in fact the correct fingerprint?"));
 
-            QMessageBox mb(QMessageBox::Information, tr("Psi OTR"), msg, QMessageBox::Yes | QMessageBox::No, this,
+            QMessageBox mb(QMessageBox::Information, tr("Confirm action"), msg, QMessageBox::Yes | QMessageBox::No, this,
                            Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
             m_otr->verifyFingerprint(m_fpr, mb.exec() == QMessageBox::Yes);
@@ -385,7 +385,7 @@ void AuthenticationDialog::updateSMP(int progress)
 
 void AuthenticationDialog::notify(const QMessageBox::Icon icon, const QString &message)
 {
-    QMessageBox mb(icon, tr("Psi OTR"), message, QMessageBox::Ok, this, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+    QMessageBox mb(icon, tr("Confirm action"), message, QMessageBox::Ok, this, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     mb.exec();
 }
 

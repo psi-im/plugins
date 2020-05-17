@@ -56,16 +56,13 @@ ConfigDialog::ConfigDialog(OtrMessaging *otr, OptionAccessingHost *optionHost, A
     m_otr(otr), m_optionHost(optionHost), m_accountInfo(accountInfo)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    QTabWidget * tabWidget  = new QTabWidget(this);
+    QTabWidget  *tabWidget  = new QTabWidget(this);
 
-    tabWidget->addTab(new FingerprintWidget(m_otr, tabWidget), tr("Known fingerprints"));
-
-    tabWidget->addTab(new PrivKeyWidget(m_accountInfo, m_otr, tabWidget), tr("My private keys"));
-
+    tabWidget->addTab(new FingerprintWidget(m_otr, tabWidget), tr("Known Keys"));
+    tabWidget->addTab(new PrivKeyWidget(m_accountInfo, m_otr, tabWidget), tr("Own Keys"));
     tabWidget->addTab(new ConfigOtrWidget(m_optionHost, m_otr, tabWidget), tr("Configuration"));
 
     mainLayout->addWidget(tabWidget);
-
     setLayout(mainLayout);
 }
 
@@ -76,7 +73,7 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost *optionHost, OtrMessaging *
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
 
-    QGroupBox *  policyGroup  = new QGroupBox(tr("OTR Policy"), this);
+    QGroupBox *  policyGroup  = new QGroupBox(tr("OTR encryption policy"), this);
     QVBoxLayout *policyLayout = new QVBoxLayout(policyGroup);
 
     m_policy = new QButtonGroup(policyGroup);
@@ -157,18 +154,21 @@ FingerprintWidget::FingerprintWidget(OtrMessaging *otr, QWidget *parent) :
 
     mainLayout->addWidget(m_table);
 
-    QPushButton *deleteButton = new QPushButton(tr("Delete fingerprint"), this);
-    QPushButton *verifyButton = new QPushButton(tr("Verify fingerprint"), this);
-    connect(deleteButton, &QPushButton::clicked, this, &FingerprintWidget::deleteFingerprint);
-    connect(verifyButton, &QPushButton::clicked, this, &FingerprintWidget::verifyFingerprint);
+    auto trustButton  = new QPushButton(tr("Trust"), this);
+    auto revokeButton = new QPushButton(tr("Do not trust"), this);
+    auto deleteButton = new QPushButton(tr("Delete"), this);
+    connect(trustButton,  &QPushButton::clicked, this, &FingerprintWidget::verifyKnownKey);
+    connect(revokeButton, &QPushButton::clicked, this, &FingerprintWidget::revokeKnownKey);
+    connect(deleteButton, &QPushButton::clicked, this, &FingerprintWidget::deleteKnownKey);
+
     QHBoxLayout *buttonLayout = new QHBoxLayout();
+    buttonLayout->addWidget(trustButton);
+    buttonLayout->addWidget(revokeButton);
+    buttonLayout->addWidget(new QLabel(this));
     buttonLayout->addWidget(deleteButton);
-    buttonLayout->addWidget(verifyButton);
 
     mainLayout->addLayout(buttonLayout);
-
     setLayout(mainLayout);
-
     updateData();
 }
 
@@ -217,7 +217,7 @@ void FingerprintWidget::updateData()
 //-----------------------------------------------------------------------------
 //** slots **
 
-void FingerprintWidget::deleteFingerprint()
+void FingerprintWidget::deleteKnownKey()
 {
     if (!m_table->selectionModel()->hasSelection()) {
         return;
@@ -225,12 +225,12 @@ void FingerprintWidget::deleteFingerprint()
     for (auto selectIndex : m_table->selectionModel()->selectedRows()) {
         int fpIndex = m_tableModel->item(selectIndex.row(), 0)->data().toInt();
 
-        QString msg(tr("Are you sure you want to delete the following fingerprint?") + "\n\n" + tr("Account: ")
+        QString msg(tr("Are you sure you want to delete the following key?") + "\n\n" + tr("Account: ")
                     + m_otr->humanAccount(m_fingerprints[fpIndex].account) + "\n" + tr("User: ")
                     + m_fingerprints[fpIndex].username + "\n" + tr("Fingerprint: ")
                     + m_fingerprints[fpIndex].fingerprintHuman);
 
-        QMessageBox mb(QMessageBox::Question, tr("Psi OTR"), msg, QMessageBox::Yes | QMessageBox::No, this,
+        QMessageBox mb(QMessageBox::Question, tr("Confirm action"), msg, QMessageBox::Yes | QMessageBox::No, this,
                        Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
         if (mb.exec() == QMessageBox::Yes) {
@@ -242,23 +242,43 @@ void FingerprintWidget::deleteFingerprint()
 
 //-----------------------------------------------------------------------------
 
-void FingerprintWidget::verifyFingerprint()
+void FingerprintWidget::verifyKnownKey()
 {
     if (!m_table->selectionModel()->hasSelection()) {
         return;
     }
+
+    bool itemChanged = false;
     for (auto selectIndex : m_table->selectionModel()->selectedRows()) {
-        int fpIndex = m_tableModel->item(selectIndex.row(), 0)->data().toInt();
+        const int fpIndex = m_tableModel->item(selectIndex.row(), 0)->data().toInt();
 
         QString msg(tr("Have you verified that this is in fact the correct fingerprint?") + "\n\n" + tr("Account: ")
                     + m_otr->humanAccount(m_fingerprints[fpIndex].account) + "\n" + tr("User: ")
                     + m_fingerprints[fpIndex].username + "\n" + tr("Fingerprint: ")
                     + m_fingerprints[fpIndex].fingerprintHuman);
 
-        QMessageBox mb(QMessageBox::Question, tr("Psi OTR"), msg, QMessageBox::Yes | QMessageBox::No, this,
+        QMessageBox mb(QMessageBox::Question, tr("Confirm action"), msg, QMessageBox::Yes | QMessageBox::No, this,
                        Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
-        m_otr->verifyFingerprint(m_fingerprints[fpIndex], (mb.exec() == QMessageBox::Yes));
+        if (mb.exec() == QMessageBox::Yes) {
+            m_otr->verifyFingerprint(m_fingerprints[fpIndex], true);
+            itemChanged = true;
+        }
+    }
+
+    if (itemChanged)
+        updateData();
+}
+
+void FingerprintWidget::revokeKnownKey()
+{
+    if (!m_table->selectionModel()->hasSelection()) {
+        return;
+    }
+
+    for (auto selectIndex : m_table->selectionModel()->selectedRows()) {
+        const int fpIndex = m_tableModel->item(selectIndex.row(), 0)->data().toInt();
+        m_otr->verifyFingerprint(m_fingerprints[fpIndex], false);
     }
     updateData();
 }
@@ -294,8 +314,8 @@ void FingerprintWidget::contextMenu(const QPoint &pos)
 
     QMenu *menu = new QMenu(this);
 
-    menu->addAction(QIcon::fromTheme("edit-delete"), tr("Delete"), this, SLOT(deleteFingerprint()));
-    menu->addAction(QIcon(":/otrplugin/otr_unverified.png"), tr("Verify fingerprint"), this, SLOT(verifyFingerprint()));
+    menu->addAction(QIcon::fromTheme("edit-delete"), tr("Delete"), this, SLOT(deleteKnownKey()));
+    menu->addAction(QIcon(":/otrplugin/otr_unverified.png"), tr("Verify fingerprint"), this, SLOT(verifyKnownKey()));
     menu->addAction(QIcon::fromTheme("edit-copy"), tr("Copy fingerprint"), this, SLOT(copyFingerprint()));
 
     menu->exec(QCursor::pos());
@@ -319,7 +339,7 @@ PrivKeyWidget::PrivKeyWidget(AccountInfoAccessingHost *accountInfo, OtrMessaging
     }
 
     QPushButton *generateButton = new QPushButton(tr("Generate new key"), this);
-    connect(generateButton, &QPushButton::clicked, this, &PrivKeyWidget::generateKey);
+    connect(generateButton, &QPushButton::clicked, this, &PrivKeyWidget::generateNewKey);
 
     QHBoxLayout *generateLayout = new QHBoxLayout();
     generateLayout->addWidget(m_accountBox);
@@ -328,11 +348,13 @@ PrivKeyWidget::PrivKeyWidget(AccountInfoAccessingHost *accountInfo, OtrMessaging
     mainLayout->addLayout(generateLayout);
     mainLayout->addWidget(m_table);
 
-    QPushButton *deleteButton = new QPushButton(tr("Delete key"), this);
-    connect(deleteButton, &QPushButton::clicked, this, &PrivKeyWidget::deleteKey);
+    QPushButton *deleteButton = new QPushButton(tr("Delete"), this);
+    connect(deleteButton, &QPushButton::clicked, this, &PrivKeyWidget::deleteOwnKey);
 
     QHBoxLayout *buttonLayout = new QHBoxLayout();
     buttonLayout->addWidget(deleteButton);
+    buttonLayout->addWidget(new QLabel(this));
+    buttonLayout->addWidget(new QLabel(this));
 
     mainLayout->addLayout(buttonLayout);
     setLayout(mainLayout);
@@ -384,31 +406,36 @@ void PrivKeyWidget::updateData()
 
 //-----------------------------------------------------------------------------
 
-void PrivKeyWidget::deleteKey()
+void PrivKeyWidget::deleteOwnKey()
 {
     if (!m_table->selectionModel()->hasSelection()) {
         return;
     }
+
+    bool keyRemoved = false;
     for (auto selectIndex : m_table->selectionModel()->selectedRows(1)) {
-        QString fpr(m_tableModel->item(selectIndex.row(), 1)->text());
-        QString account(m_tableModel->item(selectIndex.row(), 0)->data().toString());
+        const QString fpr(m_tableModel->item(selectIndex.row(), 1)->text());
+        const QString account(m_tableModel->item(selectIndex.row(), 0)->data().toString());
 
         QString msg(tr("Are you sure you want to delete the following key?") + "\n\n" + tr("Account: ")
                     + m_otr->humanAccount(account) + "\n" + tr("Fingerprint: ") + fpr);
 
-        QMessageBox mb(QMessageBox::Question, tr("Psi OTR"), msg, QMessageBox::Yes | QMessageBox::No, this,
+        QMessageBox mb(QMessageBox::Question, tr("Confirm action"), msg, QMessageBox::Yes | QMessageBox::No, this,
                        Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
         if (mb.exec() == QMessageBox::Yes) {
             m_otr->deleteKey(account);
+            keyRemoved = true;
         }
     }
-    updateData();
+
+    if (keyRemoved)
+        updateData();
 }
 
 //-----------------------------------------------------------------------------
 
-void PrivKeyWidget::generateKey()
+void PrivKeyWidget::generateNewKey()
 {
     int accountIndex = m_accountBox->currentIndex();
 
@@ -423,7 +450,7 @@ void PrivKeyWidget::generateKey()
         QString msg(tr("Are you sure you want to overwrite the following key?") + "\n\n" + tr("Account: ") + accountName
                     + "\n" + tr("Fingerprint: ") + m_keys.value(accountId));
 
-        QMessageBox mb(QMessageBox::Question, tr("Psi OTR"), msg, QMessageBox::Yes | QMessageBox::No, this,
+        QMessageBox mb(QMessageBox::Question, tr("Confirm action"), msg, QMessageBox::Yes | QMessageBox::No, this,
                        Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
         if (mb.exec() == QMessageBox::No) {
@@ -465,7 +492,7 @@ void PrivKeyWidget::contextMenu(const QPoint &pos)
 
     QMenu *menu = new QMenu(this);
 
-    menu->addAction(QIcon::fromTheme("edit-delete"), tr("Delete"), this, SLOT(deleteKey()));
+    menu->addAction(QIcon::fromTheme("edit-delete"), tr("Delete"), this, SLOT(deleteOwnKey()));
     menu->addAction(QIcon::fromTheme("edit-copy"), tr("Copy fingerprint"), this, SLOT(copyFingerprint()));
 
     menu->exec(QCursor::pos());

@@ -670,7 +670,7 @@ void OtrInternal::create_privkey(const char *accountname, const char *protocol)
         return;
     }
 
-    QMessageBox qMB(QMessageBox::Question, QObject::tr("Psi OTR"),
+    QMessageBox qMB(QMessageBox::Question, QObject::tr("Confirm action"),
                     QObject::tr("Private keys for account \"%1\" need to be generated. "
                                 "This takes quite some time (from a few seconds to a "
                                 "couple of minutes), and while you can use Psi in the "
@@ -713,7 +713,7 @@ void OtrInternal::create_privkey(const char *accountname, const char *protocol)
 
     char fingerprint[OTRL_PRIVKEY_FPRINT_HUMAN_LEN];
     if (otrl_privkey_fingerprint(m_userstate, fingerprint, accountname, protocol)) {
-        QMessageBox infoMb(QMessageBox::Information, QObject::tr("Psi OTR"),
+        QMessageBox infoMb(QMessageBox::Information, QObject::tr("Confirm action"),
                            QObject::tr("Keys have been generated. "
                                        "Fingerprint for account \"%1\":\n"
                                        "%2\n"
@@ -723,7 +723,7 @@ void OtrInternal::create_privkey(const char *accountname, const char *protocol)
                                .arg(QString(fingerprint)));
         infoMb.exec();
     } else {
-        QMessageBox failMb(QMessageBox::Critical, QObject::tr("Psi OTR"),
+        QMessageBox failMb(QMessageBox::Critical, QObject::tr("Confirm action"),
                            QObject::tr("Failed to generate keys for account \"%1\"."
                                        "\nThe OTR Plugin will not work.")
                                .arg(m_callback->humanAccount(QString::fromUtf8(accountname))),
