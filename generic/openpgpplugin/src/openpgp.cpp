@@ -36,8 +36,8 @@
 using OpenPgpPluginNamespace::GpgProcess;
 
 OpenPGP::OpenPGP() :
-    m_optionsForm(nullptr), m_accountHost(nullptr), m_optionHost(nullptr),
-    m_menu(nullptr), m_stanzaSending(nullptr), m_activeTab(nullptr), m_accountInfo(nullptr)
+    m_optionsForm(nullptr), m_accountHost(nullptr), m_optionHost(nullptr), m_menu(nullptr), m_stanzaSending(nullptr),
+    m_activeTab(nullptr), m_accountInfo(nullptr)
 {
 }
 
@@ -53,33 +53,19 @@ QWidget *OpenPGP::options()
     return qobject_cast<QWidget *>(m_optionsForm);
 }
 
-bool OpenPGP::enable()
-{
-    return true;
-}
+bool OpenPGP::enable() { return true; }
 
-bool OpenPGP::disable()
-{
-    return true;
-}
+bool OpenPGP::disable() { return true; }
 
-void OpenPGP::applyOptions()
-{
-    m_optionsForm->saveSettings();
-}
+void OpenPGP::applyOptions() { m_optionsForm->saveSettings(); }
 
 void OpenPGP::restoreOptions() { }
 
-QPixmap OpenPGP::icon() const
-{
-    return QPixmap(":/icons/openpgp.png");
-}
+QPixmap OpenPGP::icon() const { return QPixmap(":/icons/openpgp.png"); }
 
 QString OpenPGP::pluginInfo()
 {
-    return name() + "\n\n"
-        + tr("Authors: ")
-        + "Boris Pek, Ivan Romanov\n\n"
+    return name() + "\n\n" + tr("Authors: ") + "Boris Pek, Ivan Romanov\n\n"
         + tr("OpenPGP is the most widely used encryption standard. "
              "It is extremely simple in usage:\n"
              "* Generate a key pair (public key + secret key) or "
@@ -124,7 +110,7 @@ bool OpenPGP::incomingStanza(int account, const QDomElement &stanza)
 
     QString key = body.mid(start, end - start);
 
-    GpgProcess  gpg;
+    GpgProcess        gpg;
     const QStringList arguments { "--batch", "--import" };
     gpg.start(arguments);
     gpg.waitForStarted();
@@ -153,10 +139,7 @@ bool OpenPGP::incomingStanza(int account, const QDomElement &stanza)
     }
 }
 
-QList<QVariantHash> OpenPGP::getButtonParam()
-{
-    return QList<QVariantHash>();
-}
+QList<QVariantHash> OpenPGP::getButtonParam() { return QList<QVariantHash>(); }
 
 QAction *OpenPGP::getAction(QObject *parent, int, const QString &)
 {
@@ -215,10 +198,7 @@ void OpenPGP::sendPublicKey()
     m_accountHost->appendSysMsg(account, jidToSend, res);
 }
 
-void OpenPGP::actionDestroyed(QObject *)
-{
-    m_action = nullptr;
-}
+void OpenPGP::actionDestroyed(QObject *) { m_action = nullptr; }
 
 bool OpenPGP::isEnabled() const
 {
@@ -227,4 +207,3 @@ bool OpenPGP::isEnabled() const
 
     return m_action->isChecked();
 }
-

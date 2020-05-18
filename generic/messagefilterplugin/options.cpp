@@ -327,7 +327,8 @@ void Options::fillCondition(int row)
         ->setCurrentIndex(m_rules.at(rule).conditions.at(row).type);
     qobject_cast<QComboBox *>(m_ui->twConditions->cellWidget(row, 1))
         ->setCurrentIndex(m_rules.at(rule).conditions.at(row).comparison);
-    qobject_cast<QLineEdit *>(m_ui->twConditions->cellWidget(row, 2))->setText(m_rules.at(rule).conditions.at(row).text);
+    qobject_cast<QLineEdit *>(m_ui->twConditions->cellWidget(row, 2))
+        ->setText(m_rules.at(rule).conditions.at(row).text);
 }
 
 void Options::saveCondition(int rule, int row)

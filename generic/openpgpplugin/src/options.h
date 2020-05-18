@@ -20,8 +20,8 @@
 
 #pragma once
 
-#include <QWidget>
 #include <QStandardItemModel>
+#include <QWidget>
 
 class Model;
 class GPGProc;
@@ -74,17 +74,15 @@ private slots:
     void contextMenuOwnKeys(const QPoint &pos);
 
 private:
-    void copyFingerprintFromTable(QStandardItemModel *tableModel,
-                                  const QModelIndexList &indexesList,
-                                  const int column);
+    void copyFingerprintFromTable(QStandardItemModel *tableModel, const QModelIndexList &indexesList, const int column);
 
 private:
-    Ui::Options               *m_ui = nullptr;
-    GPGProc                   *m_gpgProc = nullptr;
-    OptionAccessingHost       *m_optionHost = nullptr;
-    AccountInfoAccessingHost  *m_accountInfo = nullptr;
-    PsiAccountControllingHost *m_accountHost = nullptr;
-    Model                     *m_allKeysTableModel = nullptr;
-    QStandardItemModel        *m_knownKeysTableModel = nullptr;
-    QStandardItemModel        *m_ownKeysTableModel = nullptr;
+    Ui::Options *              m_ui                  = nullptr;
+    GPGProc *                  m_gpgProc             = nullptr;
+    OptionAccessingHost *      m_optionHost          = nullptr;
+    AccountInfoAccessingHost * m_accountInfo         = nullptr;
+    PsiAccountControllingHost *m_accountHost         = nullptr;
+    Model *                    m_allKeysTableModel   = nullptr;
+    QStandardItemModel *       m_knownKeysTableModel = nullptr;
+    QStandardItemModel *       m_ownKeysTableModel   = nullptr;
 };

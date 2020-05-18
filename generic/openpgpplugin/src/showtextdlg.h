@@ -28,4 +28,3 @@ public:
     ShowTextDlg(const QString &fname, bool rich = false, QWidget *parent = nullptr);
     ShowTextDlg(const QString &text, bool nonfile, bool rich, QWidget *parent);
 };
-

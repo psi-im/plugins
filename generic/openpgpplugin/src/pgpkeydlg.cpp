@@ -162,10 +162,7 @@ PGPKeyDlg::PGPKeyDlg(Type t, const QString &defaultKeyID, QWidget *parent) : QDi
     // adjustSize();
 }
 
-const QString &PGPKeyDlg::keyId() const
-{
-    return m_keyId;
-}
+const QString &PGPKeyDlg::keyId() const { return m_keyId; }
 
 void PGPKeyDlg::showInfoDialog(QWidget *parent)
 {
@@ -192,10 +189,7 @@ bool PGPKeyDlg::eventFilter(QObject *watched, QEvent *event)
     return QDialog::eventFilter(watched, event);
 }
 
-void PGPKeyDlg::filterTextChanged()
-{
-    m_proxy->setFilterWildcard(m_ui.le_filter->text());
-}
+void PGPKeyDlg::filterTextChanged() { m_proxy->setFilterWildcard(m_ui.le_filter->text()); }
 
 void PGPKeyDlg::doubleClicked(const QModelIndex &index)
 {
@@ -218,9 +212,6 @@ void PGPKeyDlg::do_accept()
     accept();
 }
 
-void PGPKeyDlg::showInfo()
-{
-    showInfoDialog(this);
-}
+void PGPKeyDlg::showInfo() { showInfoDialog(this); }
 
 } // namespace OpenPgpPluginNamespace

@@ -48,12 +48,12 @@ public:
     void setJid(const QString &jid);
     void setData(const QByteArray &data);
 
-    QString       stdInString() const;
-    QString       stdOutString() const;
-    QString       stdErrString() const;
-    QString       origMessage() const;
-    QString       jid() const;
-    QByteArray    data() const;
+    QString    stdInString() const;
+    QString    stdOutString() const;
+    QString    stdErrString() const;
+    QString    origMessage() const;
+    QString    jid() const;
+    QByteArray data() const;
 
 signals:
     void transactionFinished();
@@ -68,14 +68,14 @@ private:
     Type       m_type;
     uint16_t   m_startCounter;
 
-    QStringList   m_arguments;
-    QString       m_stdInString;
-    QString       m_stdOutString;
-    QString       m_stdErrString;
-    QString       m_origMessage;
-    QString       m_jid;
-    QByteArray    m_data;
-    QString       m_tempFile;
+    QStringList m_arguments;
+    QString     m_stdInString;
+    QString     m_stdOutString;
+    QString     m_stdErrString;
+    QString     m_origMessage;
+    QString     m_jid;
+    QByteArray  m_data;
+    QString     m_tempFile;
 };
 
 } // namespace OpenPgpPluginNamespace

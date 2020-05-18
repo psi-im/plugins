@@ -118,10 +118,7 @@ QList<QStandardItem *> parseLine(const QString &line)
     return rows;
 }
 
-Model::Model(QObject *parent) : QStandardItemModel(parent)
-{
-    ;
-}
+Model::Model(QObject *parent) : QStandardItemModel(parent) { ; }
 
 void Model::updateAllKeys()
 {

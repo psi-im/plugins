@@ -56,7 +56,7 @@ ConfigDialog::ConfigDialog(OtrMessaging *otr, OptionAccessingHost *optionHost, A
     m_otr(otr), m_optionHost(optionHost), m_accountInfo(accountInfo)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    QTabWidget  *tabWidget  = new QTabWidget(this);
+    QTabWidget * tabWidget  = new QTabWidget(this);
 
     tabWidget->addTab(new FingerprintWidget(m_otr, tabWidget), tr("Known Keys"));
     tabWidget->addTab(new PrivKeyWidget(m_accountInfo, m_otr, tabWidget), tr("Own Keys"));
@@ -157,7 +157,7 @@ FingerprintWidget::FingerprintWidget(OtrMessaging *otr, QWidget *parent) :
     auto trustButton  = new QPushButton(tr("Trust"), this);
     auto revokeButton = new QPushButton(tr("Do not trust"), this);
     auto deleteButton = new QPushButton(tr("Delete"), this);
-    connect(trustButton,  &QPushButton::clicked, this, &FingerprintWidget::verifyKnownKey);
+    connect(trustButton, &QPushButton::clicked, this, &FingerprintWidget::verifyKnownKey);
     connect(revokeButton, &QPushButton::clicked, this, &FingerprintWidget::revokeKnownKey);
     connect(deleteButton, &QPushButton::clicked, this, &FingerprintWidget::deleteKnownKey);
 

@@ -62,11 +62,7 @@ GpgTransaction::GpgTransaction(const Type type, const QString &keyID, QObject *p
                                     "0x" + keyID };
     } break;
     case Type::ListAllKeys: {
-        m_arguments = QStringList {
-                "--with-fingerprint",
-                "--list-secret-keys",
-                "--with-colons",
-                "--fixed-list-mode" };
+        m_arguments = QStringList { "--with-fingerprint", "--list-secret-keys", "--with-colons", "--fixed-list-mode" };
     } break;
     }
 
@@ -134,12 +130,8 @@ void GpgTransaction::processFinished()
 
     if (m_type == Type::ListAllKeys) {
         if (m_startCounter < 2) {
-            setGpgArguments(QStringList{
-                                "--with-fingerprint",
-                                "--list-public-keys",
-                                "--with-colons",
-                                "--fixed-list-mode"}
-                            );
+            setGpgArguments(
+                QStringList { "--with-fingerprint", "--list-public-keys", "--with-colons", "--fixed-list-mode" });
             start();
             return;
         }
