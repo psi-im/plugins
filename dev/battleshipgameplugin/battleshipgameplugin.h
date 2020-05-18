@@ -72,7 +72,7 @@ class BattleshipGamePlugin : public QObject,
                              public MenuAccessor,
                              public PopupAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.BattleshipGame")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.BattleshipGame" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin PluginInfoProvider OptionAccessor IconFactoryAccessor ToolbarIconAccessor ActiveTabAccessor
                      AccountInfoAccessor ContactInfoAccessor StanzaSender StanzaFilter EventCreator SoundAccessor
                          MenuAccessor PopupAccessor)
