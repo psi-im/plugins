@@ -838,7 +838,7 @@ void JuickPlugin::elementFromString(QDomElement *body, QDomDocument *e, const QS
         QString seg = regx.cap(2);
         switch (seg.at(0).toLatin1()) {
         case '#': {
-            idRx.indexIn(seg);
+            Q_UNUSED(idRx.indexIn(seg));
             if (!idRx.cap(2).isEmpty()) {
                 //для #1234/12 - +ненужен
                 messageLinkPattern = chatAction;
@@ -849,7 +849,7 @@ void JuickPlugin::elementFromString(QDomElement *body, QDomDocument *e, const QS
             break;
         }
         case '@': {
-            nickRx.indexIn(seg);
+            Q_UNUSED(nickRx.indexIn(seg));
             addUserLink(body, e, nickRx.cap(1), altTextUser, userLinkPattern, jid);
             body->appendChild(e->createTextNode(nickRx.cap(2)));
             // tag
@@ -898,7 +898,7 @@ void JuickPlugin::elementFromString(QDomElement *body, QDomDocument *e, const QS
         }
         case '[': {
             QDomElement ahref = e->createElement("a");
-            linkRx.indexIn(seg);
+            Q_UNUSED(linkRx.indexIn(seg));
             ahref.setAttribute("style", "color:" + commonLinkColor + ";");
             ahref.setAttribute("href", linkRx.cap(2));
             ahref.appendChild(e->createTextNode(linkRx.cap(1)));
