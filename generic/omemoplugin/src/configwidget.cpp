@@ -46,8 +46,8 @@ ConfigWidget::ConfigWidget(OMEMO *omemo, AccountInfoAccessingHost *accountInfo) 
     auto omemoConfigurationTab = new OmemoConfiguration(account, omemo, this);
 
     m_tabWidget = new QTabWidget(this);
-    m_tabWidget->addTab(knownFingerprintsTab, tr("Fingerprints"));
-    m_tabWidget->addTab(manageDevicesTab, tr("Manage Devices"));
+    m_tabWidget->addTab(knownFingerprintsTab, tr("Known Keys"));
+    m_tabWidget->addTab(manageDevicesTab, tr("Own Keys"));
     m_tabWidget->addTab(omemoConfigurationTab, tr("Configuration"));
     mainLayout->addWidget(m_tabWidget);
     setLayout(mainLayout);
@@ -129,7 +129,7 @@ KnownFingerprints::KnownFingerprints(int account, OMEMO *omemo, QWidget *parent)
 void KnownFingerprints::doUpdateData()
 {
     m_tableModel->setColumnCount(3);
-    m_tableModel->setHorizontalHeaderLabels({ tr("Contact"), tr("Trust"), tr("Fingerprint") });
+    m_tableModel->setHorizontalHeaderLabels({ tr("User"), tr("Trust"), tr("Fingerprint") });
     for (auto fingerprint : m_omemo->getKnownFingerprints(m_account)) {
         if (!m_jid.isEmpty()) {
             if (fingerprint.contact != m_jid) {
@@ -218,6 +218,7 @@ ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
 
     auto deleteCurrentDeviceLayout = new QHBoxLayout();
     deleteCurrentDeviceLayout->addWidget(deleteCurrentDeviceButton);
+    deleteCurrentDeviceLayout->addWidget(new QLabel(currentDevice));
     deleteCurrentDeviceLayout->addWidget(new QLabel(currentDevice));
 
     auto currentDeviceLayout = new QVBoxLayout(currentDevice);
