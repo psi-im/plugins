@@ -40,7 +40,7 @@ public:
 
 class EncryptedKey {
 public:
-    EncryptedKey(uint32_t deviceId_, bool isPreKey_, QByteArray key_) :
+    EncryptedKey(uint32_t deviceId_, bool isPreKey_, const QByteArray &key_) :
         deviceId(deviceId_), isPreKey(isPreKey_), key(qMove(key_))
     {
     }
