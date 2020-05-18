@@ -249,7 +249,7 @@ ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
     connect(m_table->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ManageDevices::selectionChanged);
     connect(m_omemo, &OMEMO::deviceListUpdated, this, &ManageDevices::deviceListUpdated);
 
-    updateData();
+    ManageDevices::updateData();
 }
 
 void ManageDevices::updateData()
