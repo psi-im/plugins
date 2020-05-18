@@ -36,7 +36,8 @@ set( _HDRS
     src/gpgprocess.h
     src/gpgtransaction.h
     src/addkeydlg.h
-    src/openpgp.h
+    src/openpgpmessaging.h
+    src/openpgpplugin.h
     src/pgpkeydlg.h
     src/pgputil.h
     src/lineeditwidget.h
@@ -49,7 +50,8 @@ set( _SRCS
     src/gpgprocess.cpp
     src/gpgtransaction.cpp
     src/addkeydlg.cpp
-    src/openpgp.cpp
+    src/openpgpmessaging.cpp
+    src/openpgpplugin.cpp
     src/pgpkeydlg.cpp
     src/pgputil.cpp
     src/lineeditwidget.cpp

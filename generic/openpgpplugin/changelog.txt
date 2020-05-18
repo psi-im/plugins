@@ -1,3 +1,8 @@
+2020-05-18 - v1.4 - tehnick
+    * Add "User ID" columns to "Known Keys" and "Own Keys" tabs in
+      plugin options dialog
+    * Small code refactoring
+
 2020-05-18 - v1.3 - tehnick
     * Add "Known Keys" and "Own Keys" tabs to plugin options dialog
     * Improve performance of usage of gpg tool in plugin options dialog

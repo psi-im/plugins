@@ -49,6 +49,7 @@ using OpenPgpPluginNamespace::GpgProcess;
 Options::Options(QWidget *parent) : QWidget(parent), m_ui(new Ui::Options)
 {
     m_ui->setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
 
     {
         m_allKeysTableModel = new Model(this);
@@ -494,10 +495,10 @@ void Options::updateKnownKeys()
     const Qt::SortOrder sortOrder   = m_ui->knownKeysTable->horizontalHeader()->sortIndicatorOrder();
 
     {
-        const QStringList &&headerLabels = { tr("Account"), tr("User"), tr("Key ID"), tr("Fingerprint") };
+        const QStringList &&headerLabels = { tr("Account"), tr("User"), tr("Key ID"), tr("User ID"), tr("Fingerprint") };
 
         m_knownKeysTableModel->clear();
-        m_knownKeysTableModel->setColumnCount(4);
+        m_knownKeysTableModel->setColumnCount(5);
         m_knownKeysTableModel->setHorizontalHeaderLabels(headerLabels);
     }
 
@@ -513,10 +514,13 @@ void Options::updateKnownKeys()
             QStandardItem *userItem = new QStandardItem(user);
             QStandardItem *keyItem  = new QStandardItem(knownKeysMap[user]);
 
+            const QString &&userId     = PGPUtil::getUserId(knownKeysMap[user]);
+            QStandardItem * userIdItem = new QStandardItem(userId);
+
             const QString &&fingerprint     = PGPUtil::getFingerprint(knownKeysMap[user]);
             QStandardItem * fingerprintItem = new QStandardItem(fingerprint);
 
-            const QList<QStandardItem *> &&row = { accItem, userItem, keyItem, fingerprintItem };
+            const QList<QStandardItem *> &&row = { accItem, userItem, keyItem, userIdItem, fingerprintItem };
             m_knownKeysTableModel->appendRow(row);
         }
     }
@@ -534,10 +538,10 @@ void Options::updateOwnKeys()
     const Qt::SortOrder sortOrder   = m_ui->ownKeysTable->horizontalHeader()->sortIndicatorOrder();
 
     {
-        const QStringList &&headerLabels = { tr("Account"), tr("Key ID"), tr("Fingerprint") };
+        const QStringList &&headerLabels = { tr("Account"), tr("Key ID"), tr("User ID"), tr("Fingerprint") };
 
         m_ownKeysTableModel->clear();
-        m_ownKeysTableModel->setColumnCount(3);
+        m_ownKeysTableModel->setColumnCount(4);
         m_ownKeysTableModel->setHorizontalHeaderLabels(headerLabels);
     }
 
@@ -551,10 +555,13 @@ void Options::updateOwnKeys()
 
         QStandardItem *keyItem = new QStandardItem(keyId);
 
+        const QString &&userId     = PGPUtil::getUserId(keyId);
+        QStandardItem * userIdItem = new QStandardItem(userId);
+
         const QString &&fingerprint     = PGPUtil::getFingerprint(keyId);
         QStandardItem * fingerprintItem = new QStandardItem(fingerprint);
 
-        const QList<QStandardItem *> &&row = { accItem, keyItem, fingerprintItem };
+        const QList<QStandardItem *> &&row = { accItem, keyItem, userIdItem, fingerprintItem };
         m_ownKeysTableModel->appendRow(row);
     }
 
@@ -582,7 +589,7 @@ void Options::deleteKnownKey()
 
         const QString &accountName = m_knownKeysTableModel->item(selectIndex.row(), 0)->text();
         const QString &userName    = m_knownKeysTableModel->item(selectIndex.row(), 1)->text();
-        const QString &fingerprint = m_knownKeysTableModel->item(selectIndex.row(), 3)->text();
+        const QString &fingerprint = m_knownKeysTableModel->item(selectIndex.row(), 4)->text();
 
         const QString msg(tr("Are you sure you want to delete the following key?") + "\n\n" + tr("Account: ")
                           + accountName + "\n" + tr("User: ") + userName + "\n" + tr("Fingerprint: ") + fingerprint);
@@ -613,7 +620,7 @@ void Options::deleteOwnKey()
             continue;
 
         const QString &accountName = m_ownKeysTableModel->item(selectIndex.row(), 0)->text();
-        const QString &fingerprint = m_ownKeysTableModel->item(selectIndex.row(), 2)->text();
+        const QString &fingerprint = m_ownKeysTableModel->item(selectIndex.row(), 3)->text();
 
         const QString msg(tr("Are you sure you want to delete the following key?") + "\n\n" + tr("Account: ")
                           + accountName + "\n" + tr("Fingerprint: ") + fingerprint);
@@ -657,7 +664,7 @@ void Options::copyKnownFingerprint()
     if (!m_ui->knownKeysTable->selectionModel()->hasSelection())
         return;
 
-    copyFingerprintFromTable(m_knownKeysTableModel, m_ui->knownKeysTable->selectionModel()->selectedRows(3), 3);
+    copyFingerprintFromTable(m_knownKeysTableModel, m_ui->knownKeysTable->selectionModel()->selectedRows(4), 4);
 }
 
 void Options::copyOwnFingerprint()
@@ -665,7 +672,7 @@ void Options::copyOwnFingerprint()
     if (!m_ui->ownKeysTable->selectionModel()->hasSelection())
         return;
 
-    copyFingerprintFromTable(m_ownKeysTableModel, m_ui->ownKeysTable->selectionModel()->selectedRows(2), 2);
+    copyFingerprintFromTable(m_ownKeysTableModel, m_ui->ownKeysTable->selectionModel()->selectedRows(3), 3);
 }
 
 void Options::contextMenuKnownKeys(const QPoint &pos)

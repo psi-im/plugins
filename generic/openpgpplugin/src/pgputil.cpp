@@ -123,7 +123,7 @@ bool PGPUtil::equals(const QString &k1, const QString &k2)
     }
 }
 
-QString PGPUtil::getKeyOwnerName(const QString &key)
+QString PGPUtil::getUserId(const QString &key)
 {
     if (key.isEmpty())
         return QString();

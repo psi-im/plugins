@@ -48,7 +48,7 @@ public:
 
     bool equals(const QString &, const QString &);
 
-    static QString getKeyOwnerName(const QString &key);
+    static QString getUserId(const QString &key);
     static QString getPublicKeyData(const QString &key);
     static QString getFingerprint(const QString &key);
     static QString chooseKey(PGPKeyDlg::Type type, const QString &key, const QString &title);
