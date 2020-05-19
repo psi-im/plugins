@@ -35,11 +35,11 @@
 #include "omemoplugin.h"
 
 namespace psiomemo {
-QString OMEMOPlugin::name() const { return "OMEMO Plugin"; }
+QString OMEMOPlugin::version() const { return "2.1"; }
 
 QString OMEMOPlugin::shortName() const { return "omemo"; }
 
-QString OMEMOPlugin::version() const { return "2.1"; }
+QString OMEMOPlugin::name() const { return "OMEMO Plugin"; }
 
 QWidget *OMEMOPlugin::options()
 {
