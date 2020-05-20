@@ -1,5 +1,7 @@
 cmake_minimum_required( VERSION 3.1.0 )
-if(NOT PROJECT_NAME)
+get_directory_property(IS_SUBPROJECT PARENT_DIRECTORY)
+
+if(NOT IS_SUBPROJECT)
     project(psi-plugins)
     find_program(CLF_BIN clang-format DOC "Path to clang-format binary")
     if(CLF_BIN)
@@ -42,7 +44,7 @@ if(PsiPluginsApi_DIR)
     message(STATUS "PsiPluginsApi_INCLUDE_DIR: ${PsiPluginsApi_INCLUDE_DIR}")
 endif()
 
-if(PROJECT_NAME AND MAIN_PROGRAM_NAME)
+if((NOT IS_SUBPROJECT) AND MAIN_PROGRAM_NAME)
     message(STATUS "Main Program: ${MAIN_PROGRAM_NAME}")
     if(PLUGINS_INSTALL_PATH)
         message(STATUS "Plugins Install Path: ${PLUGINS_INSTALL_PATH}")
@@ -80,24 +82,15 @@ if(BUILD_DEV_PLUGINS)
 endif()
 
 if( NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY )
-    if( ${PROJECT_SOURCE_DIR} )
+    if( NOT IS_SUBPROJECT )
         set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/psi")
     else()
         set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
     endif()
 endif()
-# Use the same path for shared and static plugins
-if(WIN32)
-    #Store old runtime output path
-    set(OLD_RUNTIME_TARGETS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-    #Set runtime output path for plugins dll-files
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/")
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/")
-else()
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
-endif()
+
+#Set library output path for plugins
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins")
 
 set(BUILD_PLUGINS "ALL" CACHE STRING "List of plugins to build")
 
@@ -130,7 +123,3 @@ endif()
 
 unset(BUILD_PLUGINS CACHE)
 unset(PLUGINS_PATH CACHE)
-#Restore default psi runtime output path
-if(WIN32)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${OLD_RUNTIME_TARGETS}")
-endif()
