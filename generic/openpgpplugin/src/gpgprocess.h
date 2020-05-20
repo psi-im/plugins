@@ -35,10 +35,15 @@ public:
 
     bool success() const;
     bool info(QString &message);
+    bool reloadGpgAgentConfig();
+
+    QString binPath() const;
+    QString gpgAgentConfig() const;
 
 private:
     QString        findBin() const;
-    static QString m_bin;
+    static QString m_gpgBin;
+    static QString m_gpgAgentConfig;
 };
 
 } // namespace OpenPgpPluginNamespace

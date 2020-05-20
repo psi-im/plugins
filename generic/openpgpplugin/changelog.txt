@@ -1,3 +1,10 @@
+2020-05-21 - v1.5 - tehnick
+    * Update plugin description: added info about installation and configuring
+      of gpg-agent tool in user's operating system
+    * Create default configuration file gpg-agent.conf during plugin load if it
+      does not exist yet. "default-cache-ttl" is set to 34560000
+    * Add gpg-agent configuration options to plugin options dialog
+
 2020-05-18 - v1.4 - tehnick
     * Add "User ID" columns to "Known Keys" and "Own Keys" tabs in
       plugin options dialog

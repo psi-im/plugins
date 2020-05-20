@@ -32,6 +32,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QClipboard>
+#include <QDesktopServices>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QItemSelectionModel>
@@ -42,7 +43,9 @@
 #include <QProgressDialog>
 #include <QStandardItem>
 #include <QStandardItemModel>
+#include <QStringList>
 #include <QTimer>
+#include <QUrl>
 
 using OpenPgpPluginNamespace::GpgProcess;
 
@@ -112,6 +115,9 @@ Options::Options(QWidget *parent) : QWidget(parent), m_ui(new Ui::Options)
         connect(m_ui->chooseKey, &QPushButton::clicked, this, &Options::chooseKey);
         connect(m_ui->deleteOwnKey, &QPushButton::clicked, this, &Options::deleteOwnKey);
     }
+    {
+        connect(m_ui->openGpgAgentConfig, &QPushButton::clicked, this, &Options::openGpgAgentConfig);
+    }
 
     m_ui->tabWidget->setCurrentWidget(m_ui->knownKeysTab);
 }
@@ -143,6 +149,8 @@ void Options::loadSettings()
         m_optionHost->getGlobalOption("options.ui.contactlist.tooltip.pgp").toBool());
     m_ui->autoImportPgpKeyFromMessage->setChecked(m_optionHost->getPluginOption("auto-import", true).toBool());
     m_ui->hideMessagesWithPgpKeys->setChecked(m_optionHost->getPluginOption("hide-key-message", true).toBool());
+
+    loadGpgAgentConfigData();
 }
 
 void Options::saveSettings()
@@ -155,6 +163,8 @@ void Options::saveSettings()
     m_optionHost->setGlobalOption("options.ui.contactlist.tooltip.pgp", m_ui->showPgpInfoInTooltips->isChecked());
     m_optionHost->setPluginOption("auto-import", m_ui->autoImportPgpKeyFromMessage->isChecked());
     m_optionHost->setPluginOption("hide-key-message", m_ui->hideMessagesWithPgpKeys->isChecked());
+
+    updateGpgAgentConfig(m_ui->pwdExpirationTime->value());
 }
 
 void Options::addKey()
@@ -705,7 +715,68 @@ void Options::contextMenuOwnKeys(const QPoint &pos)
     menu->exec(QCursor::pos());
 }
 
-void Options::copyFingerprintFromTable(QStandardItemModel *tableModel, const QModelIndexList &indexesList,
+void Options::openGpgAgentConfig()
+{
+    QDesktopServices::openUrl(QUrl::fromLocalFile(GpgProcess().gpgAgentConfig()));
+}
+
+void Options::loadGpgAgentConfigData()
+{
+    const QString &&configText = PGPUtil::readGpgAgentConfig();
+    if (configText.isEmpty())
+        return;
+
+    for (const QString &line : configText.split("\n", QString::SkipEmptyParts)) {
+        if (line.contains("default-cache-ttl")) {
+            QString str(line);
+            str.replace("default-cache-ttl", "");
+            str.replace(" ", "");
+            str.replace("\t", "");
+            str.replace("\r", "");
+            const int value = str.toInt();
+            if (value >= 60) {
+                m_ui->pwdExpirationTime->setValue(value);
+            }
+            return;
+        }
+    }
+}
+
+void Options::updateGpgAgentConfig(const int pwdExpirationTime)
+{
+    QString configText = PGPUtil::readGpgAgentConfig();
+    if (!configText.contains("default-cache-ttl")) {
+        configText = PGPUtil::readGpgAgentConfig(true);
+    }
+
+    QStringList &&lines = configText.split("\n");
+    for (QString &line : lines)  {
+        if (line.contains("default-cache-ttl")) {
+            line = QString("default-cache-ttl ") + QString::number(pwdExpirationTime);
+        } else if (line.contains("max-cache-ttl")) {
+            line = QString("max-cache-ttl ") + QString::number(pwdExpirationTime);
+        }
+    }
+    if (PGPUtil::saveGpgAgentConfig(lines.join("\n"))) {
+        if (!GpgProcess().reloadGpgAgentConfig()) {
+            const QString &&message = tr("Attempt to reload gpg-agent config is failed. "
+                                         "You need to restart your system to see changes "
+                                         "in gpg-agent settings.");
+            QMessageBox msgbox(QMessageBox::Warning, tr("Warning"), message, QMessageBox::Ok, nullptr);
+            msgbox.exec();
+        }
+    } else {
+        const QString &&message =
+                tr("Attempt to save gpg-agent config is failed! "
+                   "Check that you have write permission for file:\n%1")
+                .arg(GpgProcess().gpgAgentConfig());
+        QMessageBox msgbox(QMessageBox::Warning, tr("Warning"), message, QMessageBox::Ok, nullptr);
+        msgbox.exec();
+    }
+}
+
+void Options::copyFingerprintFromTable(QStandardItemModel *tableModel,
+                                       const QModelIndexList &indexesList,
                                        const int column)
 {
     QString text;

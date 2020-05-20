@@ -26,14 +26,20 @@
 #include "openpgpmessaging.h"
 #include "optionaccessinghost.h"
 #include "options.h"
+#include "pgputil.h"
 #include "psiaccountcontrollinghost.h"
 #include "stanzasendinghost.h"
+#include <QDir>
 #include <QDomElement>
 
 using OpenPgpPluginNamespace::GpgProcess;
 
 OpenPgpPlugin::OpenPgpPlugin() : m_pgpMessaging(new OpenPgpMessaging())
 {
+    // Create default gpg-agent config if it does not exist yet:
+    if (!QDir().exists(GpgProcess().gpgAgentConfig())) {
+        PGPUtil::saveGpgAgentConfig(PGPUtil::readGpgAgentConfig(true));
+    }
 }
 
 OpenPgpPlugin::~OpenPgpPlugin()
@@ -65,27 +71,48 @@ QPixmap OpenPgpPlugin::icon() const { return QPixmap(":/icons/openpgp.png"); }
 
 QString OpenPgpPlugin::pluginInfo()
 {
-    return name() + "\n\n" + tr("Authors: ") + "Boris Pek, Ivan Romanov\n\n"
-        + tr("OpenPGP is the most widely used encryption standard. "
-             "It is extremely simple in usage:\n"
-             "* Generate a key pair (public key + secret key) or "
-             "choose existing one and set it in program settings.\n"
-             "* Protect your secret key with a strong password and never "
-             "give it to anyone.\n"
-             "* Share your public key with buddies and get their public "
-             "keys using any communication channel which you trust "
-             "(xmpp, email, PGP keys server).\n"
-             "* Enable PGP encryption in chat with you buddy and have fun "
-             "the protected conversation.")
-        + "\n\n"
-        + tr("This plugin uses standard command-line tool GnuPG, so "
+    QString out = "<strong>" + name() + "</strong><br/><br/>";
+
+    out += tr("Authors: ") + "Boris Pek, Ivan Romanov<br/><br/>";
+    out += tr("OpenPGP is the most widely used encryption standard. "
+              "It is extremely simple in usage:<br/>"
+              "* Generate a key pair (public key + secret key) or "
+              "choose existing one and set it in program settings.<br/>"
+              "* Protect your secret key with a strong password and never "
+              "give it to anyone.<br/>"
+              "* Share your public key with buddies and get their public "
+              "keys using any communication channel which you trust "
+              "(xmpp, email, PGP keys server).<br/>"
+              "* Enable PGP encryption in chat with you buddy and have fun "
+              "the protected conversation.");
+    out += "<br/><br/>";
+    out += tr("Embedded Keys Manager can do only basic operations like "
+              "creating, removing, exporting and importing PGP keys. "
+              "This should be enough to most of users needs. For more "
+              "complicated cases use special software.");
+    out += "<br/><br/>";
+    out += tr("OpenPGP plugin uses standard command-line tool GnuPG, so "
              "attentively check that you properly installed and configured "
-             "gpg and gpg-agent.")
-        + "\n\n"
-        + tr("Embedded Keys Manager can do only basic operations like "
-             "creating, removing, exporting and importing PGP keys. "
-             "This should be enough to most of users needs. For more "
-             "complicated cases use special software.");
+             "gpg and gpg-agent. For example, in your system:") + "<br/>";
+#if defined(Q_OS_WIN)
+    out += tr("1) Download and install \"%1\" from official website:")
+            .arg("Simple installer for the current GnuPG") + " ";
+    out += QString("<a href=\"https://gnupg.org/download/#binary\">"
+                   "https://gnupg.org/download/#binary</a><br/>");
+#elif defined(Q_OS_MAC)
+    out += tr("1) Install gpg and gpg-agent using Homebrew:") + "<br/><br/>";
+    out += QString("brew install gnupg pinentry-mac") + "<br/><br/>";
+#else
+    out += tr("1) Install gpg and gpg-agent using system packaging tool.") + "<br/>";
+#endif
+    out += tr("2) Edit configuration file %1 if necessary.")
+#if defined(Q_OS_WIN)
+            .arg(QDir::toNativeSeparators(GpgProcess().gpgAgentConfig())) + "<br/><br/>";
+#else
+            .arg(GpgProcess().gpgAgentConfig()) + "<br/><br/>";
+#endif
+
+    return out;
 }
 
 void OpenPgpPlugin::setStanzaSendingHost(StanzaSendingHost *host)

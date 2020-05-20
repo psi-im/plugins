@@ -28,7 +28,10 @@
 #include "gpgprocess.h"
 #include "showtextdlg.h"
 
+#include <QDir>
 #include <QDialog>
+#include <QFile>
+#include <QFileInfo>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QStringList>
@@ -217,6 +220,45 @@ QString PGPUtil::chooseKey(PGPKeyDlg::Type type, const QString &key, const QStri
         return d.keyId();
     }
     return QString();
+}
+
+QString PGPUtil::readGpgAgentConfig(const bool rewrite)
+{
+    static QString defaultText;
+    if (defaultText.isEmpty()) {
+#if defined(Q_OS_MAC)
+        defaultText += "pinentry-program /usr/local/bin/pinentry-mac\n";
+#endif
+        defaultText += "max-cache-ttl 34560000\n"
+                       "default-cache-ttl 34560000\n";
+    }
+
+    if (rewrite)
+        return defaultText;
+
+    QString out = defaultText;
+    QFile file(GpgProcess().gpgAgentConfig());
+    if (!file.exists())
+        return out;
+
+    if (file.open(QIODevice::ReadOnly)) {
+        out = QString::fromUtf8(file.readAll());
+        file.close();
+    }
+    return out;
+}
+
+bool PGPUtil::saveGpgAgentConfig(const QString &text)
+{
+    QFile file(GpgProcess().gpgAgentConfig());
+    QDir().mkpath(QFileInfo(file).absolutePath());
+    if (file.open(QIODevice::WriteOnly))
+    {
+        file.write(text.toUtf8());
+        file.close();
+        return true;
+    }
+    return false;
 }
 
 PGPUtil::SecureMessageSignature PGPUtil::parseSecureMessageSignature(const QString &stdOutString)

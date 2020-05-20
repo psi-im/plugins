@@ -72,6 +72,9 @@ private slots:
     void copyOwnFingerprint();
     void contextMenuKnownKeys(const QPoint &pos);
     void contextMenuOwnKeys(const QPoint &pos);
+    void openGpgAgentConfig();
+    void loadGpgAgentConfigData();
+    void updateGpgAgentConfig(const int pwdExpirationTime);
 
 private:
     void copyFingerprintFromTable(QStandardItemModel *tableModel, const QModelIndexList &indexesList, const int column);

@@ -86,9 +86,8 @@ void OMEMOPlugin::restoreOptions() { }
 
 QString OMEMOPlugin::pluginInfo()
 {
-    return "<strong>" + name() + "</strong><br/><br/>" + tr("Authors: ") + "Vyacheslav Karpukhin" + ", "
-        + "Boris Pek"
-          "<br/><br/>"
+    return "<strong>" + name() + "</strong><br/><br/>"
+        + tr("Authors: ") + "Vyacheslav Karpukhin, Boris Pek<br/><br/>"
         + tr("Credits: ")
         + "<dl>"
           "<dt>libsignal-protocol-c</dt><dd>Copyright 2015-2016 Open Whisper Systems</dd>"

@@ -55,43 +55,43 @@ public:
     ~OpenPgpPlugin();
 
     // from PsiPlugin
-    QString version() const { return "1.4"; }
+    QString version() const { return "1.5"; }
     QString shortName() const { return "openpgp"; }
     QString name() const { return "OpenPGP Plugin"; }
 
-    QWidget *options();
-    bool     enable();
-    bool     disable();
-    void     applyOptions();
-    void     restoreOptions();
+    QWidget *options() override;
+    bool     enable() override;
+    bool     disable() override;
+    void     applyOptions() override;
+    void     restoreOptions() override;
     QPixmap  icon() const;
 
     // from PluginInfoProvider
-    QString pluginInfo();
+    QString pluginInfo() override;
 
     // from StanzaSender
-    void setStanzaSendingHost(StanzaSendingHost *host);
+    void setStanzaSendingHost(StanzaSendingHost *host) override;
 
     // from StanzaFilter
-    bool incomingStanza(int account, const QDomElement &stanza);
-    bool outgoingStanza(int account, QDomElement &stanza);
+    bool incomingStanza(int account, const QDomElement &stanza) override;
+    bool outgoingStanza(int account, QDomElement &stanza) override;
 
     // from PsiAccountController
-    void setPsiAccountControllingHost(PsiAccountControllingHost *host);
+    void setPsiAccountControllingHost(PsiAccountControllingHost *host) override;
 
     // from OptionAccessor
-    void setOptionAccessingHost(OptionAccessingHost *host);
-    void optionChanged(const QString &option);
+    void setOptionAccessingHost(OptionAccessingHost *host) override;
+    void optionChanged(const QString &option) override;
 
     // from ToolbarIconAccessor
     QList<QVariantHash> getButtonParam();
     QAction *           getAction(QObject *parent, int account, const QString &contact);
 
     // from ActiveTabAccessor
-    void setActiveTabAccessingHost(ActiveTabAccessingHost *host);
+    void setActiveTabAccessingHost(ActiveTabAccessingHost *host) override;
 
     // from AccountInfoAccessor
-    void setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
+    void setAccountInfoAccessingHost(AccountInfoAccessingHost *host) override;
 
 private slots:
     void actionActivated();

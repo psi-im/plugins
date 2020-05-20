@@ -53,6 +53,9 @@ public:
     static QString getFingerprint(const QString &key);
     static QString chooseKey(PGPKeyDlg::Type type, const QString &key, const QString &title);
 
+    static QString readGpgAgentConfig(const bool rewrite = false);
+    static bool saveGpgAgentConfig(const QString &text);
+
     struct SecureMessageSignature {
         enum {
             Valid = 0,        //< indentity is verified, matches signature

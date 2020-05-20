@@ -29,21 +29,34 @@
 
 namespace OpenPgpPluginNamespace {
 
-QString GpgProcess::m_bin = QString();
+QString GpgProcess::m_gpgBin = QString();
+QString GpgProcess::m_gpgAgentConfig = QString();
 
 GpgProcess::GpgProcess(QObject *parent) : QProcess(parent)
 {
-    if (m_bin.isEmpty()) {
-        m_bin = findBin();
+    if (m_gpgBin.isEmpty()) {
+        m_gpgBin = findBin();
+    }
+    if (m_gpgAgentConfig.isEmpty()) {
+#if defined(Q_OS_WIN)
+        // "C:\\Users\\<UserName>\\AppData\\Roaming\\gnupg\\gpg-agent.conf"
+        m_gpgAgentConfig = QDir::homePath() + "/AppData/Roaming/gnupg/gpg-agent.conf";
+#elif defined(Q_OS_HAIKU)
+        // TODO: check "/boot/home/config/gnupg/gpg-agent.conf" too
+        m_gpgAgentConfig = "/boot/home/config/settings/gnupg/gpg-agent.conf";
+#else
+        // "~/.gnupg/gpg-agent.conf"
+        m_gpgAgentConfig = QDir::homePath() + "/.gnupg/gpg-agent.conf";
+#endif
     }
 }
 
 void GpgProcess::start(const QStringList &arguments, QIODevice::OpenMode mode)
 {
-    QProcess::start(m_bin, arguments, mode);
+    QProcess::start(m_gpgBin, arguments, mode);
 }
 
-void GpgProcess::start(QIODevice::OpenMode mode) { QProcess::start(m_bin, mode); }
+void GpgProcess::start(QIODevice::OpenMode mode) { QProcess::start(m_gpgBin, mode); }
 
 bool GpgProcess::success() const { return (exitCode() == 0); }
 
@@ -158,12 +171,12 @@ bool GpgProcess::info(QString &message)
 
     bool res = false;
 
-    if (!m_bin.isEmpty()) {
+    if (!m_gpgBin.isEmpty()) {
         if (error() == FailedToStart) {
-            message = tr("Can't start ") + m_bin;
+            message = tr("Can't start ") + m_gpgBin;
         } else {
             message = QString("%1 %2\n%3")
-                          .arg(QDir::toNativeSeparators(m_bin))
+                          .arg(QDir::toNativeSeparators(m_gpgBin))
                           .arg(arguments.join(" "))
                           .arg(QString::fromLocal8Bit(readAll()));
             res = true;
@@ -173,6 +186,28 @@ bool GpgProcess::info(QString &message)
     }
 
     return res;
+}
+
+bool GpgProcess::reloadGpgAgentConfig()
+{
+#if defined(Q_OS_WIN)
+    const QString &&gpgAgentBin = binPath() + "/gpgconf.exe";
+#else
+    const QString &&gpgAgentBin = binPath() + "/gpgconf";
+#endif
+    const QStringList &&arguments = { "--reload", "gpg-agent" };
+    QProcess::start(gpgAgentBin, arguments, ReadWrite);
+    return success();
+}
+
+QString GpgProcess::binPath() const
+{
+    return QDir(m_gpgBin).absolutePath();
+}
+
+QString GpgProcess::gpgAgentConfig() const
+{
+    return m_gpgAgentConfig;
 }
 
 } // namespace OpenPgpPluginNamespace
