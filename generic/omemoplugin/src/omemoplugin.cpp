@@ -89,9 +89,9 @@ QString OMEMOPlugin::pluginInfo()
     QString out = "<strong>" + name() + "</strong><br/><br/>";
     out += tr("Authors: ") + "Vyacheslav Karpukhin, Boris Pek<br/><br/>";
     out += tr("Credits: ") + "<br/>";
-    out += "  <a href=\"https://github.com/signalapp/libsignal-protocol-c\">"
+    out += "* <a href=\"https://github.com/signalapp/libsignal-protocol-c\">"
            "libsignal-protocol-c</a> -- Open Whisper Systems<br/>";
-    out += "  OMEMO logo -- <a href=\"https://github.com/fiaxh\">fiaxh</a><br/>";
+    out += "* OMEMO logo -- <a href=\"https://github.com/fiaxh\">fiaxh</a><br/>";
     out += "<br/>";
     out += tr("OMEMO is an end-to-end encryption protocol that leverages the "
               "Double Ratchet encryption scheme to provide multi-end to "
@@ -106,22 +106,22 @@ QString OMEMOPlugin::pluginInfo()
     out += "<br/>";
     out += tr("OMEMO provides the following guarantees:");
     out += "<dl>";
-    out += "<dt>" + tr("* Confidentiality") + "</dt>";
+    out += "<dt>" + tr("Confidentiality") + "</dt>";
     out += "<dd>" + tr("Nobody else except sender and receiver is able to read "
               "the content of a message.") + "</dd>";
-    out += "<dt>" + tr("* Perfect forward secrecy") + "</dt>";
+    out += "<dt>" + tr("Perfect forward secrecy") + "</dt>";
     out += "<dd>" + tr("Compromised key material does not compromise previous or "
               "future message exchanges.") + "</dd>";
-    out += "<dt>" + tr("* Authentication") + "</dt>";
+    out += "<dt>" + tr("Authentication") + "</dt>";
     out += "<dd>" + tr("Every peer is able to authenticate the sender or "
               "receiver of a message.") + "</dd>";
-    out += "<dt>" + tr("* Immutability") + "</dt>";
+    out += "<dt>" + tr("Immutability") + "</dt>";
     out += "<dd>" + tr("Every peer can ensure that a message was not changed by "
               "any intermediate node.") + "</dd>";
-    out += "<dt>" + tr("* Plausible deniabilit") + "</dt>";
+    out += "<dt>" + tr("Plausible deniabilit") + "</dt>";
     out += "<dd>" + tr("No participant can prove who created a specific message.")
             + "</dd>";
-    out += "<dt>" + tr("* Asynchronicity") + "</dt>";
+    out += "<dt>" + tr("Asynchronicity") + "</dt>";
     out += "<dd>" + tr("The usability of the protocol does not depend on the "
               "online status of any participant.") + "</dd>";
     out += "</dl>";

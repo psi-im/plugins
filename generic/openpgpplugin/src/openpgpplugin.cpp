@@ -86,6 +86,18 @@ QString OpenPgpPlugin::pluginInfo()
               "* Enable PGP encryption in chat with you buddy and have fun "
               "the protected conversation.");
     out += "<br/><br/>";
+    out += tr("OpenPGP features:<br/>"
+              "* Offline messages.<br/>"
+              "* File transfer. (Not supported by plugin yet.)");
+    out += "<br/><br/>";
+    out += tr("OpenPGP limitations:<br/>"
+              "* No support of message copies to multiple devices.<br/>"
+              "* No support of multi-user chats.");
+    out += "<br/><br/>";
+    out += tr("In comparison with OTR and OMEMO, OpenPGP allows to keep "
+              "encrypted messages history on server side but lucks support "
+              "of forward secrecy (they are mutually exclusive).");
+    out += "<br/><br/>";
     out += tr("Embedded Keys Manager can do only basic operations like "
               "creating, removing, exporting and importing PGP keys. "
               "This should be enough to most of users needs. For more "
