@@ -55,16 +55,16 @@ public:
     ~OpenPgpPlugin();
 
     // from PsiPlugin
-    QString version() const { return "1.5"; }
-    QString shortName() const { return "openpgp"; }
-    QString name() const { return "OpenPGP Plugin"; }
+    QString version() const override { return "1.5"; }
+    QString shortName() const override { return "openpgp"; }
+    QString name() const override { return "OpenPGP Plugin"; }
 
     QWidget *options() override;
     bool     enable() override;
     bool     disable() override;
     void     applyOptions() override;
     void     restoreOptions() override;
-    QPixmap  icon() const;
+    QPixmap  icon() const override;
 
     // from PluginInfoProvider
     QString pluginInfo() override;
