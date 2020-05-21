@@ -42,7 +42,7 @@ void BaseModel::selectAll(const QModelIndexList &list)
     emit layoutAboutToBeChanged();
     selected_.clear();
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-    selected_ = QSet<QString>(list.begin(), list.end());
+    selected_ = QSet<QModelIndex>(list.begin(), list.end());
 #else
     selected_ = list.toSet();
 #endif
