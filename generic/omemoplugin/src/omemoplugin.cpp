@@ -118,7 +118,7 @@ QString OMEMOPlugin::pluginInfo()
     out += "<dt>" + tr("Immutability") + "</dt>";
     out += "<dd>" + tr("Every peer can ensure that a message was not changed by "
               "any intermediate node.") + "</dd>";
-    out += "<dt>" + tr("Plausible deniabilit") + "</dt>";
+    out += "<dt>" + tr("Plausible deniability") + "</dt>";
     out += "<dd>" + tr("No participant can prove who created a specific message.")
             + "</dd>";
     out += "<dt>" + tr("Asynchronicity") + "</dt>";
