@@ -35,7 +35,7 @@
 #include "omemoplugin.h"
 
 namespace psiomemo {
-QString OMEMOPlugin::version() const { return "2.1"; }
+QString OMEMOPlugin::version() const { return "2.2"; }
 
 QString OMEMOPlugin::shortName() const { return "omemo"; }
 
@@ -86,13 +86,57 @@ void OMEMOPlugin::restoreOptions() { }
 
 QString OMEMOPlugin::pluginInfo()
 {
-    return "<strong>" + name() + "</strong><br/><br/>"
-        + tr("Authors: ") + "Vyacheslav Karpukhin, Boris Pek<br/><br/>"
-        + tr("Credits: ")
-        + "<dl>"
-          "<dt>libsignal-protocol-c</dt><dd>Copyright 2015-2016 Open Whisper Systems</dd>"
-          "<dt>OMEMO logo</dt><dd>fiaxh (https://github.com/fiaxh)</dd>"
-          "</dl>";
+    QString out = "<strong>" + name() + "</strong><br/><br/>";
+    out += tr("Authors: ") + "Vyacheslav Karpukhin, Boris Pek<br/><br/>";
+    out += tr("Credits: ") + "<br/>";
+    out += "  <a href=\"https://github.com/signalapp/libsignal-protocol-c\">"
+           "libsignal-protocol-c</a> -- Open Whisper Systems<br/>";
+    out += "  OMEMO logo -- <a href=\"https://github.com/fiaxh\">fiaxh</a><br/>";
+    out += "<br/>";
+    out += tr("OMEMO is an end-to-end encryption protocol that leverages the "
+              "Double Ratchet encryption scheme to provide multi-end to "
+              "multi-end encryption, allowing messages to be synchronized "
+              "securely across multiple clients, even if some of them are "
+              "offline.") + "<br/>";
+    out += "<br/>";
+    out += tr("In comparison with OTR, the OMEMO protocol offers multi-users "
+              "encrypted chat, safe message synchronization between user's "
+              "devices, offline messages queuing, forward secrecy and file "
+              "transfer.") + "<br/>";
+    out += "<br/>";
+    out += tr("OMEMO provides the following guarantees:");
+    out += "<dl>";
+    out += "<dt>" + tr("* Confidentiality") + "</dt>";
+    out += "<dd>" + tr("Nobody else except sender and receiver is able to read "
+              "the content of a message.") + "</dd>";
+    out += "<dt>" + tr("* Perfect forward secrecy") + "</dt>";
+    out += "<dd>" + tr("Compromised key material does not compromise previous or "
+              "future message exchanges.") + "</dd>";
+    out += "<dt>" + tr("* Authentication") + "</dt>";
+    out += "<dd>" + tr("Every peer is able to authenticate the sender or "
+              "receiver of a message.") + "</dd>";
+    out += "<dt>" + tr("* Immutability") + "</dt>";
+    out += "<dd>" + tr("Every peer can ensure that a message was not changed by "
+              "any intermediate node.") + "</dd>";
+    out += "<dt>" + tr("* Plausible deniabilit") + "</dt>";
+    out += "<dd>" + tr("No participant can prove who created a specific message.")
+            + "</dd>";
+    out += "<dt>" + tr("* Asynchronicity") + "</dt>";
+    out += "<dd>" + tr("The usability of the protocol does not depend on the "
+              "online status of any participant.") + "</dd>";
+    out += "</dl>";
+    out += "<br/>";
+    out += tr("OMEMO is not intended to protect against the following use "
+              "cases:");
+    out += "<dl>";
+    out += "<dt>" + tr("* An attacker has permanent access to your device. (Temporary "
+              "access is covered by perfect forward secrecy.)") + "</dt>";
+    out += "<dt>" + tr("* You lost your device and an attacker can read messages on your "
+              "notification screen.") + "</dt>";
+    out += "<dt>" + tr("* Any kind of denial-of-service attack.") + "</dt>";
+    out += "<dt>" + tr("* etc.");
+    out += "</dl>";
+    return out;
 }
 
 bool OMEMOPlugin::incomingStanza(int account, const QDomElement &xml)

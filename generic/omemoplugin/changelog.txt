@@ -1,3 +1,7 @@
+2020-05-21
+v2.2 tehnick
+  * Improve plugin description in "About plugin" dialog
+
 2020-05-18
 v2.1 tehnick
   * Improve plugin options dialog
