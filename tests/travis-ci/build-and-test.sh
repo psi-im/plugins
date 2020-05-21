@@ -21,6 +21,12 @@ then
     ./tests/travis-ci/build-in-macos.sh
 fi
 
-ls -alp ./builddir/plugins/*
-du -shc ./builddir/plugins/*
+cd ./builddir/psi/plugins/
+ls -alp *
+du -shc *
+
+file libextendedoptionsplugin.* \
+     libomemoplugin.* \
+     libopenpgpplugin.* \
+     libotrplugin.*
 
