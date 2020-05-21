@@ -118,7 +118,7 @@ QString PsiOtrPlugin::shortName() const { return "otr"; }
 
 // ---------------------------------------------------------------------------
 
-QString PsiOtrPlugin::version() const { return "1.2"; }
+QString PsiOtrPlugin::version() const { return "1.3"; }
 
 // ---------------------------------------------------------------------------
 
@@ -208,7 +208,7 @@ QString PsiOtrPlugin::pluginInfo()
                    "</dl>"
                    "%12")
         .arg(name())
-        .arg(tr("Authors: %1").arg("Timo Engel, Florian Fieber"))
+        .arg(tr("Authors: ") + "Timo Engel, Florian Fieber, Boris Pek")
         .arg(tr("Off-the-Record (OTR) Messaging allows you to have private "
                 "conversations over instant messaging by providing:"))
         .arg(tr("Encryption"))
@@ -225,7 +225,8 @@ QString PsiOtrPlugin::pluginInfo()
         .arg(tr("If you lose control of your private keys, no previous "
                 "conversation is compromised."))
         .arg(tr("For further information, see "
-                "&lt;http://www.cypherpunks.ca/otr/&gt;."));
+                "&lt;<a href=\"https://otr.cypherpunks.ca/\">"
+                "https://otr.cypherpunks.ca/</a>&gt;."));
 }
 
 //-----------------------------------------------------------------------------

@@ -1,10 +1,15 @@
+2020-05-21
+v1.3 tehnick
+  * Update plugin description in "About plugin" dialog
+
 2020-05-18
 v1.2 tehnick
   * Improve plugin settings dialog
+  * Small code refactoring
 
 2020-04-29
 v1.1.1 tehnick
-  * Improve plugin description
+  * Improve plugin description in "About plugin" dialog
 
 2019-05-12
 v1.1.0 rion
