@@ -19,6 +19,7 @@
 
 #include <QDomElement>
 #include <QFileDialog>
+#include <QSet>
 
 #include "accountinfoaccessinghost.h"
 #include "accountinfoaccessor.h"
@@ -384,7 +385,11 @@ QString Reminder::checkBirthdays()
                 if (Jids.first() == "-1") {
                     break;
                 } else {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+                    Roster_ += QSet<QString>(Jids.begin(), Jids.end());
+#else
                     Roster_ += Jids.toSet();
+#endif
                 }
             }
         }
