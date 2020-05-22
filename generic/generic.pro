@@ -24,7 +24,6 @@ otrplugin \
 pepchangenotifyplugin \
 qipxstatusesplugin \
 screenshotplugin \
-skinsplugin \
 stopspamplugin \
 storagenotesplugin \
 translateplugin \

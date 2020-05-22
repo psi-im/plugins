@@ -24,7 +24,6 @@ set( plugins_list
     otrplugin
     pepchangenotifyplugin
     qipxstatusesplugin
-    skinsplugin
     stopspamplugin
     storagenotesplugin
     translateplugin
