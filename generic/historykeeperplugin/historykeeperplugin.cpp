@@ -141,9 +141,7 @@ QString HistoryKeeperPlugin::nameToFilename(const QString &jid)
             jid2.append('.');
         } else if (!jid.at(n).isLetterOrNumber()) {
             // hex encode
-            QString hex;
-            hex.asprintf("%%%02X", jid.at(n).toLatin1());
-            jid2.append(hex);
+            jid2.append(QString::asprintf("%%%02X", jid.at(n).toLatin1()));
         } else {
             jid2.append(jid.at(n));
         }
