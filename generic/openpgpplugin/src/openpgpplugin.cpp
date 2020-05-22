@@ -94,7 +94,7 @@ QString OpenPgpPlugin::pluginInfo()
               "* No support of message copies to multiple devices.<br/>"
               "* No support of multi-user chats.");
     out += "<br/><br/>";
-    out += tr("In comparison with OTR and OMEMO, OpenPGP allows to keep "
+    out += tr("In comparison with OTR and OMEMO, OpenPGP allows one to keep "
               "encrypted messages history on server side but lucks support "
               "of forward secrecy (they are mutually exclusive).");
     out += "<br/><br/>";
