@@ -23,6 +23,9 @@
 
 void Viewer::init()
 {
+    setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint |
+                   Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
+
     setSelectionBehavior(QAbstractItemView::SelectRows);
     resizeColumnsToContents();
     horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
