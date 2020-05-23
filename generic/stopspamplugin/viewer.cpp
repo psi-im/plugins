@@ -18,7 +18,7 @@
  */
 
 #include "viewer.h"
-
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QHBoxLayout>
@@ -30,7 +30,13 @@ ViewLog::ViewLog(const QString &filename, IconFactoryAccessingHost *IcoHost, QWi
     QDialog(parent), icoHost_(IcoHost), fileName_(filename)
 {
     setAttribute(Qt::WA_DeleteOnClose);
+#ifdef Q_OS_WIN
+    setWindowTitle(QDir::toNativeSeparators(fileName_));
+#else
     setWindowTitle(fileName_);
+#endif
+    setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint |
+                   Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
     QVBoxLayout *layout = new QVBoxLayout(this);
     textWid             = new QTextEdit();
     layout->addWidget(textWid);

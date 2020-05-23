@@ -1,3 +1,7 @@
+2020-05-23
+v0.5.8 - tehnick
+  * Improve Log View dialog
+
 2013-09-02
 v0.5.7 - taurus
   * Использовать слово Groupchat вместо Conference и MUC

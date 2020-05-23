@@ -44,7 +44,10 @@
 #include "view.h"
 #include "viewer.h"
 
-#define cVer "0.5.7"
+
+#define cVer "0.5.8" // Plugin version
+
+
 #define constQuestion "qstn"
 #define constAnswer "answr"
 #define constUnblocked "UnblockedList"
@@ -668,7 +671,7 @@ void StopSpam::updateCounter(const QDomElement &stanza, bool b)
     ++Counter;
     psiOptions->setPluginOption(constCounter, QVariant(Counter));
     QString path = appInfoHost->appProfilesDir(ApplicationInfoAccessingHost::DataLocation);
-    QFile   file(path + QDir::separator() + "Blockedstanzas.log");
+    QFile   file(path + "/Blockedstanzas.log");
     if (file.open(QIODevice::WriteOnly | QIODevice::Append)) {
         QString     date = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
         QTextStream out(&file);
@@ -713,8 +716,8 @@ void StopSpam::view()
     if (viewer)
         viewer->raise();
     else {
-        QString path = appInfoHost->appProfilesDir(ApplicationInfoAccessingHost::DataLocation) + QDir::separator()
-            + "Blockedstanzas.log";
+        const QString &&path = appInfoHost->appProfilesDir(ApplicationInfoAccessingHost::DataLocation)
+                + "/Blockedstanzas.log";
         viewer = new ViewLog(path, icoHost);
         connect(viewer, &ViewLog::onClose, this, &StopSpam::close);
         if (!viewer->init())
@@ -740,7 +743,7 @@ void StopSpam::logHistory(const QDomElement &stanza)
     filename.replace("_", "%5f");
     filename.replace("-", "%2d");
     filename.replace("@", "_at_");
-    QFile file(folder + QDir::separator() + filename);
+    QFile file(folder + "/" + filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Append))
         return;
 
