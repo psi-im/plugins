@@ -63,8 +63,7 @@ public:
     QList<Fingerprint>      getKnownFingerprints(int account);
     QMap<uint32_t, QString> getOwnFingerprintsMap(int account);
     QSet<uint32_t>          getOwnDevicesList(int account);
-    void                    askDeviceTrust(int account, const QString &user, uint32_t deviceId);
-    void                    removeDevice(int account, const QString &user, uint32_t deviceId);
+    bool                    removeDevice(int account, const QString &user, uint32_t deviceId);
     void                    confirmDeviceTrust(int account, const QString &user, uint32_t deviceId);
     void                    revokeDeviceTrust(int account, const QString &user, uint32_t deviceId);
     void                    unpublishDevice(int account, uint32_t deviceId);

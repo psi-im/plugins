@@ -87,7 +87,7 @@ public:
     QList<Fingerprint>      getKnownFingerprints();
 
     void askDeviceTrust(const QString &user, uint32_t deviceId, bool skipNewDevicePart, bool ownJid = false);
-    void removeDevice(const QString &user, uint32_t deviceId);
+    bool removeDevice(const QString &user, uint32_t deviceId);
     void confirmDeviceTrust(const QString &user, uint32_t deviceId);
     void revokeDeviceTrust(const QString &user, uint32_t deviceId);
     void removeCurrentDevice();

@@ -128,17 +128,21 @@ bool OMEMO::decryptMessage(int account, QDomElement &xml)
 
     QByteArray encryptedKey = QByteArray::fromBase64(keyElement.firstChild().nodeValue().toUtf8());
 
-    uint                    deviceId = header.attribute("sid").toUInt();
     QString                 from     = message.attribute("from");
+    QString                 to       = message.attribute("to");
+    uint                    deviceId = header.attribute("sid").toUInt();
+    if (!signal->getDeviceList(from).contains(deviceId)) {
+        pepRequest(account, to.split("/").first(), from.split("/").first(), deviceListNodeName());
+    }
+
     QString                 sender   = m_contactInfoAccessor->realJid(account, from).split("/").first();
     QPair<QByteArray, bool> decryptionResult
-        = signal->decryptKey(sender, EncryptedKey(deviceId, isPreKey, encryptedKey));
+            = signal->decryptKey(sender, EncryptedKey(deviceId, isPreKey, encryptedKey));
     QByteArray decryptedKey           = decryptionResult.first;
     bool       buildSessionWithPreKey = decryptionResult.second;
     if (buildSessionWithPreKey) {
         // remote has an invalid session, let's recover by overwriting it with a fresh one
         QDomElement emptyMessage = message.cloneNode(false).toElement();
-        QString     to           = message.attribute("to");
         emptyMessage.setAttribute("from", to);
         emptyMessage.setAttribute("to", from);
 
@@ -305,6 +309,13 @@ bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml,
         encryption.setAttribute("name", "OMEMO");
         xml.appendChild(encryption);
     }
+
+
+    qDebug() << "????????????????????????????????????????"
+             << __PRETTY_FUNCTION__;
+    QTextStream lTS(stderr);
+    lTS << xml;
+
 
     return true;
 }
@@ -620,14 +631,9 @@ QSet<uint32_t> OMEMO::getOwnDevicesList(int account)
 
 QList<Fingerprint> OMEMO::getKnownFingerprints(int account) { return getSignal(account)->getKnownFingerprints(); }
 
-void OMEMO::askDeviceTrust(int account, const QString &user, uint32_t deviceId)
+bool OMEMO::removeDevice(int account, const QString &user, uint32_t deviceId)
 {
-    getSignal(account)->askDeviceTrust(user, deviceId, true);
-}
-
-void OMEMO::removeDevice(int account, const QString &user, uint32_t deviceId)
-{
-    getSignal(account)->removeDevice(user, deviceId);
+    return getSignal(account)->removeDevice(user, deviceId);
 }
 
 void OMEMO::confirmDeviceTrust(int account, const QString &user, uint32_t deviceId)

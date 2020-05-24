@@ -334,7 +334,10 @@ void Signal::processUndecidedDevices(const QString &user, const bool ownJid, con
 
 void Signal::askDeviceTrust(const QString &user, uint32_t deviceId, bool skipNewDevicePart, bool ownJid)
 {
-    QString publicKey = getFingerprint(m_storage.loadDeviceIdentity(user, deviceId));
+    const QString &&fingerprint = getFingerprint(m_storage.loadDeviceIdentity(user, deviceId));
+    if (fingerprint.isEmpty())
+        return;
+
     QString message;
     if (!skipNewDevicePart) {
         message += QObject::tr("New OMEMO device has been discovered for \"%1\".").arg(user) + "<br/><br/>";
@@ -347,7 +350,7 @@ void Signal::askDeviceTrust(const QString &user, uint32_t deviceId, bool skipNew
             += QObject::tr("Do you want to trust this device and allow it to receive the encrypted messages from you?")
             + "<br/><br/>";
     }
-    message += QObject::tr("Device public key:") + QString("<br/><code>%1</code>").arg(publicKey);
+    message += QObject::tr("Device public key:") + QString("<br/><code>%1</code>").arg(fingerprint);
 
     QMessageBox messageBox(QMessageBox::Question, QObject::tr("Managing of OMEMO keys"), message);
     messageBox.addButton(QObject::tr("Trust"), QMessageBox::AcceptRole);
@@ -360,11 +363,11 @@ void Signal::askDeviceTrust(const QString &user, uint32_t deviceId, bool skipNew
     }
 }
 
-void Signal::removeDevice(const QString &user, uint32_t deviceId)
+bool Signal::removeDevice(const QString &user, uint32_t deviceId)
 {
-    const QString publicKey = getFingerprint(m_storage.loadDeviceIdentity(user, deviceId));
-    const QString message   = QObject::tr("Delete selected device from list of known devices of user \"%1\"?").arg(user)
-        + "<br/><br/>" + QObject::tr("Device public key:") + QString("<br/><code>%1</code>").arg(publicKey);
+    const QString &&fingerprint = getFingerprint(m_storage.loadDeviceIdentity(user, deviceId));
+    const QString &&message     = QObject::tr("Delete selected device from list of known devices of user \"%1\"?").arg(user)
+        + "<br/><br/>" + QObject::tr("Device public key:") + QString("<br/><code>%1</code>").arg(fingerprint);
 
     QMessageBox messageBox(QMessageBox::Question, QObject::tr("Confirm action"), message);
     messageBox.addButton(QObject::tr("Delete"), QMessageBox::AcceptRole);
@@ -372,7 +375,10 @@ void Signal::removeDevice(const QString &user, uint32_t deviceId)
 
     if (messageBox.exec() == 0) {
         m_storage.removeDevice(user, deviceId);
+        return true;
     }
+
+    return false;
 }
 
 void Signal::confirmDeviceTrust(const QString &user, uint32_t deviceId)

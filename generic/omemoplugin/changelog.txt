@@ -1,3 +1,13 @@
+2020-05-25
+v2.3 tehnick
+  * Improve plugin options dialog:
+    - add "Device ID" column to Known Keys tab
+    - add ability to copy fingerprints from all tables
+    - add support of selecting of multiple rows in all tables
+  * Do not show trust confirmation dialog for devices with unknown keys
+  * Update list of interlocutor's devices after receiving of encrypted message
+    from unknown device. [Thanks to taurus]
+
 2020-05-21
 v2.2 tehnick
   * Improve plugin description in "About plugin" dialog

@@ -59,6 +59,9 @@ public:
     ConfigWidgetTabWithTable(int account, OMEMO *omemo, QWidget *parent);
     void filterContacts(const QString &jid);
     void updateData() override;
+    void copyFingerprintFromTable(QStandardItemModel *tableModel,
+                                  const QModelIndexList &indexesList,
+                                  const int column);
 
 protected:
     virtual void        doUpdateData() = 0;
@@ -76,9 +79,11 @@ protected:
     void doUpdateData() override;
 
 private slots:
-    void removeFingerprint();
-    void trustFingerprint();
-    void revokeFingerprint();
+    void removeKnownKey();
+    void trustKnownKey();
+    void revokeKnownKey();
+    void contextMenuKnownKeys(const QPoint &pos);
+    void copyKnownFingerprint();
 };
 
 class ManageDevices : public ConfigWidgetTabWithTable {
@@ -95,18 +100,19 @@ protected:
 
 private:
     QLabel *     m_fingerprintLabel;
+    QLabel *     m_deviceIdLabel;
     uint32_t     m_currentDeviceId;
     QPushButton *m_deleteButton;
-    uint32_t     selectedDeviceId(const QModelIndexList &selection) const;
 
 protected:
     void doUpdateData() override;
 
 private slots:
-    void selectionChanged(const QItemSelection &, const QItemSelection &);
     void deleteCurrentDevice();
     void deleteDevice();
     void deviceListUpdated(int account);
+    void contextMenuOwnDevices(const QPoint &pos);
+    void copyOwnFingerprint();
 };
 
 class OmemoConfiguration : public ConfigWidgetTab {

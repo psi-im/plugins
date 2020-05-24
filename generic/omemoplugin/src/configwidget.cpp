@@ -1,4 +1,4 @@
-/*
+﻿/*
  * OMEMO Plugin for Psi
  * Copyright (C) 2018 Vyacheslav Karpukhin
  * Copyright (C) 2020 Boris Pek
@@ -19,10 +19,13 @@
  */
 
 #include "configwidget.h"
+#include <QApplication>
+#include <QClipboard>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
+#include <QMenu>
 #include <QMessageBox>
 #include <QVBoxLayout>
 
@@ -65,9 +68,9 @@ ConfigWidgetTabWithTable::ConfigWidgetTabWithTable(int account, OMEMO *omemo, QW
 {
     m_table = new QTableView(this);
     m_table->setShowGrid(true);
-    m_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_table->setEditTriggers(nullptr);
     m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
-    m_table->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_table->setContextMenuPolicy(Qt::CustomContextMenu);
     m_table->setSortingEnabled(true);
     m_table->horizontalHeader()->setSortIndicator(0, Qt::AscendingOrder);
 
@@ -93,6 +96,21 @@ void ConfigWidgetTabWithTable::updateData()
     m_table->resizeColumnsToContents();
 }
 
+void ConfigWidgetTabWithTable::copyFingerprintFromTable(QStandardItemModel *tableModel,
+                                                        const QModelIndexList &indexesList,
+                                                        const int column)
+{
+    QString text;
+    for (auto selectIndex : indexesList) {
+        if (!text.isEmpty()) {
+            text += "\n";
+        }
+        text += tableModel->item(selectIndex.row(), column)->text();
+    }
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(text);
+}
+
 void ConfigWidget::currentAccountChanged(int index)
 {
     int account = dynamic_cast<QComboBox *>(sender())->itemData(index).toInt();
@@ -112,9 +130,9 @@ KnownFingerprints::KnownFingerprints(int account, OMEMO *omemo, QWidget *parent)
     auto revokeButton  = new QPushButton(tr("Do not trust"), this);
     auto removeButton  = new QPushButton(tr("Delete"), this);
 
-    connect(trustButton, &QPushButton::clicked, this, &KnownFingerprints::trustFingerprint);
-    connect(revokeButton, &QPushButton::clicked, this, &KnownFingerprints::revokeFingerprint);
-    connect(removeButton, &QPushButton::clicked, this, &KnownFingerprints::removeFingerprint);
+    connect(trustButton, &QPushButton::clicked, this, &KnownFingerprints::trustKnownKey);
+    connect(revokeButton, &QPushButton::clicked, this, &KnownFingerprints::revokeKnownKey);
+    connect(removeButton, &QPushButton::clicked, this, &KnownFingerprints::removeKnownKey);
 
     buttonsLayout->addWidget(trustButton);
     buttonsLayout->addWidget(revokeButton);
@@ -124,12 +142,15 @@ KnownFingerprints::KnownFingerprints(int account, OMEMO *omemo, QWidget *parent)
 
     setLayout(mainLayout);
     updateData();
+
+    connect(m_table, &QTableView::customContextMenuRequested,
+            this, &KnownFingerprints::contextMenuKnownKeys);
 }
 
 void KnownFingerprints::doUpdateData()
 {
-    m_tableModel->setColumnCount(3);
-    m_tableModel->setHorizontalHeaderLabels({ tr("User"), tr("Trust"), tr("Fingerprint") });
+    m_tableModel->setColumnCount(4);
+    m_tableModel->setHorizontalHeaderLabels({ tr("User"), tr("Device ID"), tr("Trust"), tr("Fingerprint") });
     for (auto fingerprint : m_omemo->getKnownFingerprints(m_account)) {
         if (!m_jid.isEmpty()) {
             if (fingerprint.contact != m_jid) {
@@ -141,6 +162,7 @@ void KnownFingerprints::doUpdateData()
         auto                   contact = new QStandardItem(fingerprint.contact);
         contact->setData(QVariant(fingerprint.deviceId));
         row.append(contact);
+        row.append(new QStandardItem(QString::number(fingerprint.deviceId)));
         TRUST_STATE state = fingerprint.trust;
         row.append(new QStandardItem(state == TRUSTED ? tr("trusted")
                                                       : state == UNTRUSTED ? tr("untrusted") : tr("not decided")));
@@ -153,47 +175,82 @@ void KnownFingerprints::doUpdateData()
     }
 }
 
-void KnownFingerprints::removeFingerprint()
+void KnownFingerprints::removeKnownKey()
 {
     if (!m_table->selectionModel()->hasSelection())
         return;
 
-    QStandardItem *item = m_tableModel->item(m_table->selectionModel()->selectedRows(0).at(0).row(), 0);
-    m_omemo->removeDevice(m_account, item->text(), item->data().toUInt());
+    bool keyRemoved = false;
+    for (auto selectIndex : m_table->selectionModel()->selectedRows(0)) {
+        QStandardItem *item = m_tableModel->item(selectIndex.row(), 0);
+        if (m_omemo->removeDevice(m_account, item->text(), item->data().toUInt())) {
+            keyRemoved = true;
+        }
+    }
 
-    updateData();
+    if (keyRemoved)
+        updateData();
 }
 
-void KnownFingerprints::trustFingerprint()
+void KnownFingerprints::trustKnownKey()
 {
     if (!m_table->selectionModel()->hasSelection())
         return;
 
-    QStandardItem *item = m_tableModel->item(m_table->selectionModel()->selectedRows(0).at(0).row(), 0);
-    m_omemo->confirmDeviceTrust(m_account, item->text(), item->data().toUInt());
+    const auto &&selection = m_table->selectionModel()->selectedRows(0);
+    for (auto selectIndex : selection) {
+        QStandardItem *item = m_tableModel->item(selectIndex.row(), 0);
+        m_omemo->confirmDeviceTrust(m_account, item->text(), item->data().toUInt());
+    }
 
-    const int index    = item->row();
     const int rowCount = m_tableModel->rowCount();
     updateData();
 
-    if (rowCount == m_tableModel->rowCount())
-        m_table->selectRow(index);
+    if (rowCount == m_tableModel->rowCount() && selection.size() == 1) {
+        m_table->selectRow(selection.first().row());
+    }
 }
 
-void KnownFingerprints::revokeFingerprint()
+void KnownFingerprints::revokeKnownKey()
 {
     if (!m_table->selectionModel()->hasSelection())
         return;
 
-    QStandardItem *item = m_tableModel->item(m_table->selectionModel()->selectedRows(0).at(0).row(), 0);
-    m_omemo->revokeDeviceTrust(m_account, item->text(), item->data().toUInt());
+    const auto &&selection = m_table->selectionModel()->selectedRows(0);
+    for (auto selectIndex : selection) {
+        QStandardItem *item = m_tableModel->item(selectIndex.row(), 0);
+        m_omemo->revokeDeviceTrust(m_account, item->text(), item->data().toUInt());
+    }
 
-    const int index    = item->row();
     const int rowCount = m_tableModel->rowCount();
     updateData();
 
-    if (rowCount == m_tableModel->rowCount())
-        m_table->selectRow(index);
+    if (rowCount == m_tableModel->rowCount() && selection.size() == 1) {
+        m_table->selectRow(selection.first().row());
+    }
+}
+
+void KnownFingerprints::contextMenuKnownKeys(const QPoint &pos)
+{
+    QModelIndex index = m_table->indexAt(pos);
+    if (!index.isValid())
+        return;
+
+    QMenu *menu = new QMenu(this);
+
+    // TODO: update after stopping support of Ubuntu Xenial:
+    menu->addAction(QIcon::fromTheme("edit-copy"), tr("Copy fingerprint"),
+                    this, SLOT(copyKnownFingerprint()));
+
+    menu->exec(QCursor::pos());
+}
+
+void KnownFingerprints::copyKnownFingerprint()
+{
+    if (!m_table->selectionModel()->hasSelection())
+        return;
+
+    copyFingerprintFromTable(m_tableModel, m_table->selectionModel()->selectedRows(0), 3);
 }
 
 ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
@@ -213,13 +270,14 @@ ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
     deviceInfoLayout->addWidget(infoLabel);
     deviceInfoLayout->addWidget(m_fingerprintLabel);
 
+    m_deviceIdLabel = new QLabel(currentDevice);
     auto deleteCurrentDeviceButton = new QPushButton(tr("Delete all OMEMO data for current device"), currentDevice);
     connect(deleteCurrentDeviceButton, &QPushButton::clicked, this, &ManageDevices::deleteCurrentDevice);
 
     auto deleteCurrentDeviceLayout = new QHBoxLayout();
+    deleteCurrentDeviceLayout->addWidget(m_deviceIdLabel);
+    deleteCurrentDeviceLayout->addWidget(new QLabel(currentDevice));
     deleteCurrentDeviceLayout->addWidget(deleteCurrentDeviceButton);
-    deleteCurrentDeviceLayout->addWidget(new QLabel(currentDevice));
-    deleteCurrentDeviceLayout->addWidget(new QLabel(currentDevice));
 
     auto currentDeviceLayout = new QVBoxLayout(currentDevice);
     currentDeviceLayout->addLayout(deviceInfoLayout);
@@ -230,7 +288,6 @@ ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
     auto otherDevices  = new QGroupBox(tr("Other devices"), this);
     auto buttonsLayout = new QHBoxLayout();
     m_deleteButton     = new QPushButton(tr("Delete"), this);
-    m_deleteButton->setEnabled(false);
     connect(m_deleteButton, &QPushButton::clicked, this, &ManageDevices::deleteDevice);
     buttonsLayout->addWidget(m_deleteButton);
     buttonsLayout->addWidget(new QLabel(this));
@@ -246,8 +303,9 @@ ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
     mainLayout->addWidget(otherDevices);
     setLayout(mainLayout);
 
-    connect(m_table->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ManageDevices::selectionChanged);
     connect(m_omemo, &OMEMO::deviceListUpdated, this, &ManageDevices::deviceListUpdated);
+    connect(m_table, &QTableView::customContextMenuRequested,
+            this, &ManageDevices::contextMenuOwnDevices);
 
     ManageDevices::updateData();
 }
@@ -255,22 +313,10 @@ ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
 void ManageDevices::updateData()
 {
     m_currentDeviceId = m_omemo->getDeviceId(m_account);
+    m_deviceIdLabel->setText(tr("Device ID") + QString(": %1").arg(QString::number(m_currentDeviceId)));
     m_fingerprintLabel->setText(QString("<code>%1</code>").arg(m_omemo->getOwnFingerprint(m_account)));
 
     ConfigWidgetTabWithTable::updateData();
-}
-
-void ManageDevices::selectionChanged(const QItemSelection &selected, const QItemSelection &)
-{
-    QModelIndexList selection = selected.indexes();
-    if (!selection.isEmpty()) {
-        m_deleteButton->setEnabled(selectedDeviceId(selection) != m_currentDeviceId);
-    }
-}
-
-uint32_t ManageDevices::selectedDeviceId(const QModelIndexList &selection) const
-{
-    return m_tableModel->itemFromIndex(selection.first())->data().toUInt();
 }
 
 void ManageDevices::doUpdateData()
@@ -324,22 +370,32 @@ void ManageDevices::deleteCurrentDevice()
 
 void ManageDevices::deleteDevice()
 {
-    QModelIndexList selection = m_table->selectionModel()->selectedIndexes();
-    if (!selection.isEmpty()) {
-        const QString &message = tr("After deleting of device from list of available devices "
+    const QModelIndexList &&selection = m_table->selectionModel()->selectedRows(0);
+    if (selection.isEmpty())
+        return;
+
+    for (auto selectIndex : selection) {
+        const QString &&deviceId = m_tableModel->item(selectIndex.row(), 0)->data().toString();
+        const QString &&fingerprint = m_tableModel->item(selectIndex.row(), 1)->text();
+        const QString &&message = tr("After deleting of device from list of available devices "
                                     "it stops receiving offline messages from your contacts "
                                     "until it will become online and your contacts mark it "
                                     "as trusted.")
-            + "\n\n" + tr("Delete selected device?");
+                + "\n\n"
+                + tr("Device ID") + QString(": %1").arg(deviceId)
+                + "\n"
+                + tr("Fingerprint") + QString(": %1").arg(fingerprint)
+                + "\n\n"
+                + tr("Delete selected device?");
 
         QMessageBox messageBox(QMessageBox::Question, QObject::tr("Confirm action"), message);
         messageBox.addButton(QObject::tr("Delete"), QMessageBox::AcceptRole);
         messageBox.addButton(QObject::tr("Cancel"), QMessageBox::RejectRole);
 
         if (messageBox.exec() != 0)
-            return;
+            continue;
 
-        m_omemo->unpublishDevice(m_account, selectedDeviceId(selection));
+        m_omemo->unpublishDevice(m_account, deviceId.toUInt());
     }
 }
 
@@ -348,6 +404,29 @@ void ManageDevices::deviceListUpdated(int account)
     if (account == m_account) {
         updateData();
     }
+}
+
+void ManageDevices::contextMenuOwnDevices(const QPoint &pos)
+{
+    QModelIndex index = m_table->indexAt(pos);
+    if (!index.isValid())
+        return;
+
+    QMenu *menu = new QMenu(this);
+
+    // TODO: update after stopping support of Ubuntu Xenial:
+    menu->addAction(QIcon::fromTheme("edit-copy"), tr("Copy fingerprint"),
+                    this, SLOT(copyOwnFingerprint()));
+
+    menu->exec(QCursor::pos());
+}
+
+void ManageDevices::copyOwnFingerprint()
+{
+    if (!m_table->selectionModel()->hasSelection())
+        return;
+
+    copyFingerprintFromTable(m_tableModel, m_table->selectionModel()->selectedRows(0), 1);
 }
 
 OmemoConfiguration::OmemoConfiguration(int account, OMEMO *omemo, QWidget *parent) :
