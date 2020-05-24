@@ -1,8 +1,10 @@
 {
-    "name": "Auto Reply Plugin",
-    "name:ru": "Автоответчик",
-    "shortname": "replyer",
-    "version": "0.3.2",
-    "priority": 2,
-    "icon": "base64:iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAiRJREFUeNqcUk1oE0EU/mZ/OrsJoeLRQ44eYhO9GonGCiqtjT/nSrB4Vjx5rQgi1KsIpUggF69WhBTxouKlgluzEfTgoUrBv1PFn83ujO/NbpKqPaizzO7szPu++b73nmi329eTJLmstYYQAo5jX5mdPTuPvxgG02q1dKNxksC8ASwv30UURRBpyDYwYS6yLOvpubm5Aw6zcPS9+yuYnjqKJIkxefgILMS0rQ2RyKh4Ki0QK+Dxk0dVpnP4pZRCLpcjBcpEvX71Er18DeHGF1hidLeis9KuPI6Pv0nlDggY5HkSjOcfKSU+9h2M78j/oeBT5OAHWczwKQHb8KSX3aJR2jOBkvpMNjQGAvQWFcoqIlh7sUUBFKQvUws01t9tGIjI4IMEa3pUkqBYLA4JUwWE80m2oSeQ7+ew+mwVvV4PlUoF3W4XE+Uy1oIAzWaTKzDMy9CCJAssP7UjcahWw2S9boLqtOb9g9Uqon6fCGzzPyKgaSxkbnm98uChUbC3UiYFoVEQBM9x6eIFCHsbBWyBv+zClT6mGqdw4vQZOORvhhotppQem56Bir7Bse1fy2hRsf0xH3E/MjmQXg47F3YD713c2n8VYRjiZuEO8Fbhw40uXNcdJZHb0tSBOtBskLxC3sPX+XWT/fM6rcJ3XKOGAwpUBTlmDxPJrbzZ6XQK3I1Zj+P20uKwUX7vA15Zadzm4HwfTRv/PhK6PBCDcvzv+CnAAN9h7jN9ij3UAAAAAElFTkSuQmCC"
+  "name": "Auto Reply",
+  "name:ru": "Автоответчик",
+  "shortname": "replyer",
+  "version": "0.3.2",
+  "priority": 2,
+  "icon": "base64:iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAiRJREFUeNqcUk1oE0EU/mZ/OrsJoeLRQ44eYhO9GonGCiqtjT/nSrB4Vjx5rQgi1KsIpUggF69WhBTxouKlgluzEfTgoUrBv1PFn83ujO/NbpKqPaizzO7szPu++b73nmi329eTJLmstYYQAo5jX5mdPTuPvxgG02q1dKNxksC8ASwv30UURRBpyDYwYS6yLOvpubm5Aw6zcPS9+yuYnjqKJIkxefgILMS0rQ2RyKh4Ki0QK+Dxk0dVpnP4pZRCLpcjBcpEvX71Er18DeHGF1hidLeis9KuPI6Pv0nlDggY5HkSjOcfKSU+9h2M78j/oeBT5OAHWczwKQHb8KSX3aJR2jOBkvpMNjQGAvQWFcoqIlh7sUUBFKQvUws01t9tGIjI4IMEa3pUkqBYLA4JUwWE80m2oSeQ7+ew+mwVvV4PlUoF3W4XE+Uy1oIAzWaTKzDMy9CCJAssP7UjcahWw2S9boLqtOb9g9Uqon6fCGzzPyKgaSxkbnm98uChUbC3UiYFoVEQBM9x6eIFCHsbBWyBv+zClT6mGqdw4vQZOORvhhotppQem56Bir7Bse1fy2hRsf0xH3E/MjmQXg47F3YD713c2n8VYRjiZuEO8Fbhw40uXNcdJZHb0tSBOtBskLxC3sPX+XWT/fM6rcJ3XKOGAwpUBTlmDxPJrbzZ6XQK3I1Zj+P20uKwUX7vA15Zadzm4HwfTRv/PhK6PBCDcvzv+CnAAN9h7jN9ij3UAAAAAElFTkSuQmCC",
+  "description": "A flexible auto-answering machine",
+  "vendor": "Dealer_WeARE <wadealer@gmail.com>"
 }

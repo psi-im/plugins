@@ -1,8 +1,10 @@
 {
-    "name": "Cleaner Plugin",
-    "name:ru": "Уборщик",
-    "shortname": "cleaner",
-    "version": "0.3.2",
-    "priority": 2,
-    "icon": "base64:iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACQUlEQVR42mNkgALxEq5ZQMoMiJWBmIcBO3gHxDeA+NTLnm+FIAFGEMGXwb6enZ0p4P/v/wz/fjMw/P/3H0ig6mRkAmJmRgZGFhBmYPj159+Bj1N/OjJaTZZ7L8zNKvDzx0+GX7/+Mfz5/Zfh75//DP//o5rAxMTIwAQ0gJWVmYGVjQmImRlefPn8gdF1ttJ/T0t5BnLAygNnGRjNuuX/65mKkWXAocM3GBh5Ezne80swCZBjwJvnPz+AA3HpolX/ldQUSdJ879Z9hui4MEawATOmzv/v5G6HoahstwqY7nK9gyG3b+chhozsRIgB9dXNP/KKc9mRFdTvN2aQYnUEs+9+38jQYH+agYsN4dNJvZPfN7bWCoENSE3IeTBz3mSUqEjayMOQY74CzJ5yMoJhnv8XFBekJ+VemL1giiHYgJiw5K1dE1q9hEVFGL7/+sjAycYPp0Hg7beHDFwsAgzf/nxiEOaSZXj7+g1DWUH1/CWr5ibBDOjMzk8rU9NUZzj0YgrDlkuLGBocdgOdDDHgG9Cwst1mDGHGuQx2EjkMt67fZJg6cVYW0IDpYAPKi2qLVTVVery83RliVskwGEi4MGSbz0BNNJdbGPbcW8CwJOwJw7atOxluX7/j2tnXvIcRHmjVzf89vNwY8nebM8jwqYNtD9YqZvj2+xPDxOOpcIMmup5k2LFtFwMwAMF64QYAA/Ktg7+ZEDFp4MDGU6+BASiGYoCxrkWDoYlBDjsnpzA+zT+/f/90/syF/rOXTzSA+ABfn868m3DYaQAAAABJRU5ErkJggg=="
+  "name": "Cleaner",
+  "name:ru": "Уборщик",
+  "shortname": "cleaner",
+  "version": "0.3.2",
+  "priority": 2,
+  "icon": "base64:iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACQUlEQVR42mNkgALxEq5ZQMoMiJWBmIcBO3gHxDeA+NTLnm+FIAFGEMGXwb6enZ0p4P/v/wz/fjMw/P/3H0ig6mRkAmJmRgZGFhBmYPj159+Bj1N/OjJaTZZ7L8zNKvDzx0+GX7/+Mfz5/Zfh75//DP//o5rAxMTIwAQ0gJWVmYGVjQmImRlefPn8gdF1ttJ/T0t5BnLAygNnGRjNuuX/65mKkWXAocM3GBh5Ezne80swCZBjwJvnPz+AA3HpolX/ldQUSdJ879Z9hui4MEawATOmzv/v5G6HoahstwqY7nK9gyG3b+chhozsRIgB9dXNP/KKc9mRFdTvN2aQYnUEs+9+38jQYH+agYsN4dNJvZPfN7bWCoENSE3IeTBz3mSUqEjayMOQY74CzJ5yMoJhnv8XFBekJ+VemL1giiHYgJiw5K1dE1q9hEVFGL7/+sjAycYPp0Hg7beHDFwsAgzf/nxiEOaSZXj7+g1DWUH1/CWr5ibBDOjMzk8rU9NUZzj0YgrDlkuLGBocdgOdDDHgG9Cwst1mDGHGuQx2EjkMt67fZJg6cVYW0IDpYAPKi2qLVTVVery83RliVskwGEi4MGSbz0BNNJdbGPbcW8CwJOwJw7atOxluX7/j2tnXvIcRHmjVzf89vNwY8nebM8jwqYNtD9YqZvj2+xPDxOOpcIMmup5k2LFtFwMwAMF64QYAA/Ktg7+ZEDFp4MDGU6+BASiGYoCxrkWDoYlBDjsnpzA+zT+/f/90/syF/rOXTzSA+ABfn868m3DYaQAAAABJRU5ErkJggg==",
+  "description": "Clean up disk caches from avatars, vCards and conversation history.",
+  "vendor": "Dealer_WeARE <wadealer@gmail.com>"
 }

@@ -1,8 +1,10 @@
 {
-    "name": "Image Plugin",
-    "name:ru": "Отправка изображений",
-    "shortname": "image",
-    "version": "0.1.2",
-    "priority": 2,
-    "icon": "base64:R0lGODlhFAAUAMQAAGSXPcHcvpSr0Onw916Ri7HA2oa/VcTTrn+0qHmpTdOeU4Cj2qDMkqG006V/OnyhxO3v8ZnMZpLBh3qqao2t4HWBXYm8ZPL192mYpIWNQ5q35afSc5qv0MnT5NGubf///yH5BAEHAB8ALAAAAAAUABQAAAWH4CeOZGmeaKqiXcMJcBxzndlAV67vEGdyF40AwShKMI/FwFcSBImbiPSoZJKcGmLEwLUQqiYsYsPtfpfhp8RSnmDAzSAHMbFYJoQHBd0caIQVGRkVentWIwIDCYsOCgoOAJF8VwMBlgcHHpaWk4iVm6CchyI3O6YXPSYdBRytrq80K7KztLMhADs="
+  "name": "Image",
+  "name:ru": "Отправка изображений",
+  "shortname": "image",
+  "version": "0.1.2",
+  "priority": 2,
+  "icon": "base64:R0lGODlhFAAUAMQAAGSXPcHcvpSr0Onw916Ri7HA2oa/VcTTrn+0qHmpTdOeU4Cj2qDMkqG006V/OnyhxO3v8ZnMZpLBh3qqao2t4HWBXYm8ZPL192mYpIWNQ5q35afSc5qv0MnT5NGubf///yH5BAEHAB8ALAAAAAAUABQAAAWH4CeOZGmeaKqiXcMJcBxzndlAV67vEGdyF40AwShKMI/FwFcSBImbiPSoZJKcGmLEwLUQqiYsYsPtfpfhp8RSnmDAzSAHMbFYJoQHBd0caIQVGRkVentWIwIDCYsOCgoOAJF8VwMBlgcHHpaWk4iVm6CchyI3O6YXPSYdBRytrq80K7KztLMhADs=",
+  "description": "Send small images right over XMPP connection with help of XHTML-IM (XEP-0071)",
+  "vendor": "VampiRUS, Dealer_WeARE"
 }
