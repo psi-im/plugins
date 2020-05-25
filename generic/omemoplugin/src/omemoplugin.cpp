@@ -86,9 +86,7 @@ void OMEMOPlugin::restoreOptions() { }
 
 QString OMEMOPlugin::pluginInfo()
 {
-    QString out = "<strong>" + name() + "</strong><br/><br/>";
-    out += tr("Authors: ") + "Vyacheslav Karpukhin, Boris Pek<br/><br/>";
-    out += tr("Credits: ") + "<br/>";
+    QString out = tr("Credits: ") + "<br/>";
     out += "* <a href=\"https://github.com/signalapp/libsignal-protocol-c\">"
            "libsignal-protocol-c</a> -- Open Whisper Systems<br/>";
     out += "* OMEMO logo -- <a href=\"https://github.com/fiaxh\">fiaxh</a><br/>";
