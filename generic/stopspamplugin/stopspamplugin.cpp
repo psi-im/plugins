@@ -970,8 +970,8 @@ void StopSpam::onOptionsClose() { model_->reset(); }
 
 QString StopSpam::pluginInfo()
 {
-    return name() + "\n\n" + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
-        + tr("This plugin is designed to block spam messages and other unwanted information from Psi users."
+    return
+        tr("This plugin is designed to block spam messages and other unwanted information from Psi users."
              "The functionality of the plugin is based on the principle of \"question - answer\".\n"
              "With the plugin settings you can:\n"
              "* Define a security question and the answer\n"

@@ -137,8 +137,8 @@ QList<QVariantHash> StorageNotesPlugin::getContactMenuParam() { return QList<QVa
 
 QString StorageNotesPlugin::pluginInfo()
 {
-    return name() + "\n\n" + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
-        + tr("This plugin is an implementation of XEP-0049: Private XML Storage.\n"
+    return
+        tr("This plugin is an implementation of XEP-0049: Private XML Storage.\n"
              "The plugin is fully compatible with notes saved using Miranda IM.\n"
              "The plugin is designed to keep notes on the jabber server with the ability to access them from anywhere "
              "using Psi or Miranda IM.");

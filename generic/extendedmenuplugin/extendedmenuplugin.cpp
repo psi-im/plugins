@@ -586,8 +586,8 @@ void ExtendedMenuPlugin::addRequest(int account, const Request &r)
 
 QString ExtendedMenuPlugin::pluginInfo()
 {
-    return name() + "\n\n" + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
-        + tr("This plugin adds several additional commands into contacts context menu.");
+    return
+        tr("This plugin adds several additional commands into contacts context menu.");
 }
 
 QPixmap ExtendedMenuPlugin::icon() const { return QPixmap(":/icons/extendedmenu.png"); }

@@ -758,8 +758,8 @@ void AutoReply::setEnableDisableText(int Arg)
 
 QString AutoReply::pluginInfo()
 {
-    return name() + "\n\n" + tr("Author: ") + "Dealer_WeARE\n" + tr("Email: ") + "wadealer@gmail.com\n\n"
-        + tr("This plugin acts as an auto-answering machine. It has a number of simple configuration options, which "
+    return
+        tr("This plugin acts as an auto-answering machine. It has a number of simple configuration options, which "
              "you can use to:\n"
              "* set a text message for auto-answer\n"
              "* exclude specified jids, including conferences, from the objects for auto-answer (if a jid conference "
