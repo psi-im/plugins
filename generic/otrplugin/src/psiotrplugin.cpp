@@ -197,18 +197,14 @@ QPixmap PsiOtrPlugin::icon() const { return QPixmap(":/otrplugin/otr_yes.png"); 
 
 QString PsiOtrPlugin::pluginInfo()
 {
-    return QString("<b>%1</b><br><br>"
-                   "%2<br><br>"
-                   "%3"
+    return QString("%1"
                    "<dl>"
+                   "<dt>%2</dt><dd>%3</dd>"
                    "<dt>%4</dt><dd>%5</dd>"
                    "<dt>%6</dt><dd>%7</dd>"
                    "<dt>%8</dt><dd>%9</dd>"
-                   "<dt>%10</dt><dd>%11</dd>"
                    "</dl>"
-                   "%12")
-        .arg(name())
-        .arg(tr("Authors: ") + "Timo Engel, Florian Fieber, Boris Pek")
+                   "%10")
         .arg(tr("Off-the-Record (OTR) Messaging allows you to have private "
                 "conversations over instant messaging by providing:"))
         .arg(tr("Encryption"))
