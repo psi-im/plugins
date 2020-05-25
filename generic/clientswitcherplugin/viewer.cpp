@@ -31,8 +31,8 @@ Viewer::Viewer(QString filename, IconFactoryAccessingHost *IcoHost, QWidget *par
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(filename);
-    setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint |
-                   Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
+    setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint
+                   | Qt::CustomizeWindowHint);
     QVBoxLayout *layout = new QVBoxLayout(this);
     textWid             = new QTextEdit();
     QPalette pal        = textWid->palette();

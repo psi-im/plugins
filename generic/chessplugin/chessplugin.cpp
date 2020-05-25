@@ -861,13 +861,13 @@ void ChessPlugin::toggleEnableSound(bool enable) { enableSound = enable; }
 
 QString ChessPlugin::pluginInfo()
 {
-    return
-        tr("This plugin allows you to play chess with your friends.\n"
-             "The plugin is compatible with a similar plugin for Tkabber.\n"
-             "For sending commands, normal messages are used, so this plugin will always work wherever you are able to "
-             "log in."
-             "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat "
-             "window.");
+    return tr(
+        "This plugin allows you to play chess with your friends.\n"
+        "The plugin is compatible with a similar plugin for Tkabber.\n"
+        "For sending commands, normal messages are used, so this plugin will always work wherever you are able to "
+        "log in."
+        "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat "
+        "window.");
 }
 
 QPixmap ChessPlugin::icon() const { return QPixmap(":/chessplugin/chess.png"); }

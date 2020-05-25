@@ -192,8 +192,7 @@ void ImagePreviewPlugin::setOptionAccessingHost(OptionAccessingHost *host) { psi
 
 QString ImagePreviewPlugin::pluginInfo()
 {
-    return
-        tr("This plugin shows images URLs' previews in chats for non-webkit Psi version.\n");
+    return tr("This plugin shows images URLs' previews in chats for non-webkit Psi version.\n");
 }
 
 QPixmap ImagePreviewPlugin::icon() const { return QPixmap(":/imagepreviewplugin/imagepreviewplugin.png"); }

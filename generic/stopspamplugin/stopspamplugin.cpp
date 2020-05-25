@@ -44,9 +44,7 @@
 #include "view.h"
 #include "viewer.h"
 
-
 #define cVer "0.5.8" // Plugin version
-
 
 #define constQuestion "qstn"
 #define constAnswer "answr"
@@ -716,8 +714,8 @@ void StopSpam::view()
     if (viewer)
         viewer->raise();
     else {
-        const QString &&path = appInfoHost->appProfilesDir(ApplicationInfoAccessingHost::DataLocation)
-                + "/Blockedstanzas.log";
+        const QString &&path
+            = appInfoHost->appProfilesDir(ApplicationInfoAccessingHost::DataLocation) + "/Blockedstanzas.log";
         viewer = new ViewLog(path, icoHost);
         connect(viewer, &ViewLog::onClose, this, &StopSpam::close);
         if (!viewer->init())
@@ -970,40 +968,40 @@ void StopSpam::onOptionsClose() { model_->reset(); }
 
 QString StopSpam::pluginInfo()
 {
-    return
-        tr("This plugin is designed to block spam messages and other unwanted information from Psi users."
-             "The functionality of the plugin is based on the principle of \"question - answer\".\n"
-             "With the plugin settings you can:\n"
-             "* Define a security question and the answer\n"
-             "* Define the set of rules that define whether to the trigger plugin for a contact\n"
-             "* Define the text messages sent in the case of the correct answer\n"
-             "* Enable notification through popups\n"
-             "* Enable the saving of blocked messages in the history of the contact\n"
-             "* Define the number of subject parcels\n"
-             "* Set the time interval after which to reset the number of how many questions will be sent\n"
-             "* Enable blocking of private messages in groupchats\n"
-             "* Choose for which ranks and roles of groupchat participants blocking messages will be disabled\n"
-             "* Enable deadlocks in private messages to participants who do not fall into the exceptions list for the "
-             "roles and ranks which include blocking.\n\n"
+    return tr(
+        "This plugin is designed to block spam messages and other unwanted information from Psi users."
+        "The functionality of the plugin is based on the principle of \"question - answer\".\n"
+        "With the plugin settings you can:\n"
+        "* Define a security question and the answer\n"
+        "* Define the set of rules that define whether to the trigger plugin for a contact\n"
+        "* Define the text messages sent in the case of the correct answer\n"
+        "* Enable notification through popups\n"
+        "* Enable the saving of blocked messages in the history of the contact\n"
+        "* Define the number of subject parcels\n"
+        "* Set the time interval after which to reset the number of how many questions will be sent\n"
+        "* Enable blocking of private messages in groupchats\n"
+        "* Choose for which ranks and roles of groupchat participants blocking messages will be disabled\n"
+        "* Enable deadlocks in private messages to participants who do not fall into the exceptions list for the "
+        "roles and ranks which include blocking.\n\n"
 
-             "The rules are checked from top to bottom. If the rule is Enabled - stopspam is triggered, otherwise - "
-             "stopspam is not triggered."
-             " In the case where none of the rules triggered stopspam for roster messages, you can specify whether the "
-             "plugin will activate or not."
-             " For private messages from the same groupchat, it will always work.\n"
-             "Question and answer as well as a list of rules is common for ordinary messages and for private messages "
-             "in groupchats.\n"
-             "When a user has passed, the test will send a re-authorization request. It should be noted in the "
-             "messages that are sent back"
-             " the security question was correctly answered.\n"
-             "The plugin keeps a log of blocked messages, which you can view through the plugin settings. The "
-             "\"Reset\" button deletes the log"
-             " and resets the counter of blocked messages.\n\n"
-             "WARNING!!! Before registering a new transport, it is recommended to add its jid to transport exceptions. "
-             "This is due to the fact"
-             " that after the transport registration, authorization requests for all contacts will be sent and if the "
-             "transport was not added to"
-             " as an exception, the plugin will block all the requests.");
+        "The rules are checked from top to bottom. If the rule is Enabled - stopspam is triggered, otherwise - "
+        "stopspam is not triggered."
+        " In the case where none of the rules triggered stopspam for roster messages, you can specify whether the "
+        "plugin will activate or not."
+        " For private messages from the same groupchat, it will always work.\n"
+        "Question and answer as well as a list of rules is common for ordinary messages and for private messages "
+        "in groupchats.\n"
+        "When a user has passed, the test will send a re-authorization request. It should be noted in the "
+        "messages that are sent back"
+        " the security question was correctly answered.\n"
+        "The plugin keeps a log of blocked messages, which you can view through the plugin settings. The "
+        "\"Reset\" button deletes the log"
+        " and resets the counter of blocked messages.\n\n"
+        "WARNING!!! Before registering a new transport, it is recommended to add its jid to transport exceptions. "
+        "This is due to the fact"
+        " that after the transport registration, authorization requests for all contacts will be sent and if the "
+        "transport was not added to"
+        " as an exception, the plugin will block all the requests.");
 }
 
 #include "stopspamplugin.moc"

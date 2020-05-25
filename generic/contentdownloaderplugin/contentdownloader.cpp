@@ -93,6 +93,5 @@ void ContentDownloader::setApplicationInfoAccessingHost(ApplicationInfoAccessing
 
 QString ContentDownloader::pluginInfo()
 {
-    return
-        tr("This plugin is designed to make it easy to download and install iconsets and other resources for Psi.");
+    return tr("This plugin is designed to make it easy to download and install iconsets and other resources for Psi.");
 }

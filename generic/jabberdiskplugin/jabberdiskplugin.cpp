@@ -181,9 +181,6 @@ QAction *JabberDiskPlugin::getContactAction(QObject *p, int acc, const QString &
     return nullptr;
 }
 
-QString JabberDiskPlugin::pluginInfo()
-{
-    return;
-}
+QString JabberDiskPlugin::pluginInfo() { return; }
 
 QPixmap JabberDiskPlugin::icon() const { return QPixmap(":/icons/jabberdisk.png"); }

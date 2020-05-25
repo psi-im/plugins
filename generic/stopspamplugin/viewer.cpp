@@ -35,8 +35,8 @@ ViewLog::ViewLog(const QString &filename, IconFactoryAccessingHost *IcoHost, QWi
 #else
     setWindowTitle(fileName_);
 #endif
-    setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint |
-                   Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
+    setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint
+                   | Qt::CustomizeWindowHint);
     QVBoxLayout *layout = new QVBoxLayout(this);
     textWid             = new QTextEdit();
     layout->addWidget(textWid);

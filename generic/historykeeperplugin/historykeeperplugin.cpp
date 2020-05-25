@@ -248,10 +248,9 @@ QAction *HistoryKeeperPlugin::getContactAction(QObject *p, int /*acc*/, const QS
 
 QString HistoryKeeperPlugin::pluginInfo()
 {
-    return
-        tr("This plugin is designed to remove the history of selected contacts when the Psi is closed.\n"
-             "You can select or deselect a contact for history removal from the context menu of a contact or via the "
-             "plugin options.");
+    return tr("This plugin is designed to remove the history of selected contacts when the Psi is closed.\n"
+              "You can select or deselect a contact for history removal from the context menu of a contact or via the "
+              "plugin options.");
 }
 
 QPixmap HistoryKeeperPlugin::icon() const { return QPixmap(":/icons/historykeeper.png"); }

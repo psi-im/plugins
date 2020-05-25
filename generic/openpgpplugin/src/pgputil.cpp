@@ -28,8 +28,8 @@
 #include "gpgprocess.h"
 #include "showtextdlg.h"
 
-#include <QDir>
 #include <QDialog>
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -237,7 +237,7 @@ QString PGPUtil::readGpgAgentConfig(const bool rewrite)
         return defaultText;
 
     QString out = defaultText;
-    QFile file(GpgProcess().gpgAgentConfig());
+    QFile   file(GpgProcess().gpgAgentConfig());
     if (!file.exists())
         return out;
 
@@ -252,8 +252,7 @@ bool PGPUtil::saveGpgAgentConfig(const QString &text)
 {
     QFile file(GpgProcess().gpgAgentConfig());
     QDir().mkpath(QFileInfo(file).absolutePath());
-    if (file.open(QIODevice::WriteOnly))
-    {
+    if (file.open(QIODevice::WriteOnly)) {
         file.write(text.toUtf8());
         file.close();
         return true;

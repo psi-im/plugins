@@ -506,10 +506,10 @@ void AttentionPlugin::nudgeTimerTimeout()
 
 QString AttentionPlugin::pluginInfo()
 {
-    return
-        tr("This plugin is designed to send and receive special messages such as Attentions.\n"
-             "To work correctly, the plugin requires that the client of the other part supports XEP-0224 (for example: "
-             "Pidgin, Miranda IM with Nudge plugin).");
+    return tr(
+        "This plugin is designed to send and receive special messages such as Attentions.\n"
+        "To work correctly, the plugin requires that the client of the other part supports XEP-0224 (for example: "
+        "Pidgin, Miranda IM with Nudge plugin).");
 }
 
 QPixmap AttentionPlugin::icon() const { return QPixmap(":/attentionplugin/attention.png"); }

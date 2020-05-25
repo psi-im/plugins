@@ -506,8 +506,8 @@ QDomElement PepPlugin::getFirstChildElement(const QDomElement &elem)
 
 QString PepPlugin::pluginInfo()
 {
-    return
-        tr("This plugin shows popup notifications when users from your roster changes their mood, tune or activity.");
+    return tr(
+        "This plugin shows popup notifications when users from your roster changes their mood, tune or activity.");
 }
 
 QPixmap PepPlugin::icon() const { return QPixmap(":/icons/pepchangenotify.png"); }

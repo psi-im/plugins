@@ -367,20 +367,22 @@ QWidget *VideoStatusChanger::options()
 
 QString VideoStatusChanger::pluginInfo()
 {
-    return name() + "\n\n" + tr("Authors: ") + "Dealer_WeARE, KukuRuzo\n\n"
-        tr("This plugin is designed to set the custom status when you watching the video in selected video players. "
-             "\n"
-             "Note: This plugin is designed to work in Linux family operating systems and in Windows OS. \n\n"
-             "In Linux plugin uses DBUS to work with video players and X11 functions to detect fullscreen "
-             "applications. \n"
-             "In Windows plugin uses WinAPI functions to detect fullscreen applications. \n\n"
-             "To work with Totem player you need to enable appropriate plugin in this player "
-             "(Edit\\Plugins\\D-Bus);\n\n"
-             "To work with VLC player you need to enable the option \"Control Interface D-Bus\" in the Advanced "
-             "Settings tab on \"Interface\\Control Interface\" section of the player settings; \n\n"
-             "To work with Kaffeine player you must have player version (>= 1.0), additional configuration is not "
-             "needed; \n\n"
-             "To work with GNOME MPlayer additional configuration is not needed.");
+    return name() + "\n\n" + tr("Authors: ")
+        + "Dealer_WeARE, KukuRuzo\n\n" tr(
+               "This plugin is designed to set the custom status when you watching the video in selected video "
+               "players. "
+               "\n"
+               "Note: This plugin is designed to work in Linux family operating systems and in Windows OS. \n\n"
+               "In Linux plugin uses DBUS to work with video players and X11 functions to detect fullscreen "
+               "applications. \n"
+               "In Windows plugin uses WinAPI functions to detect fullscreen applications. \n\n"
+               "To work with Totem player you need to enable appropriate plugin in this player "
+               "(Edit\\Plugins\\D-Bus);\n\n"
+               "To work with VLC player you need to enable the option \"Control Interface D-Bus\" in the Advanced "
+               "Settings tab on \"Interface\\Control Interface\" section of the player settings; \n\n"
+               "To work with Kaffeine player you must have player version (>= 1.0), additional configuration is not "
+               "needed; \n\n"
+               "To work with GNOME MPlayer additional configuration is not needed.");
 }
 
 QPixmap VideoStatusChanger::icon() const { return QPixmap(":/icons/videostatus.png"); }

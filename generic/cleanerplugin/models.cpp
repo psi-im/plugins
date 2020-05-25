@@ -166,7 +166,7 @@ QString BaseFileModel::fileDate(const QModelIndex &index) const
 #if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
     result = QFileInfo(filePass(index)).created().toString("yyyy-MM-dd");
 #else
-    result = QFileInfo(filePass(index)).birthTime().toString("yyyy-MM-dd");
+    result    = QFileInfo(filePass(index)).birthTime().toString("yyyy-MM-dd");
 #endif
     return result;
 }

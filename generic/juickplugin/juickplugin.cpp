@@ -1109,12 +1109,13 @@ void JuickPlugin::updateWidgets(const QList<QByteArray> &urls)
 
 QString JuickPlugin::pluginInfo()
 {
-    return name() + "\n\n" + tr("Authors: ") + "VampiRUS, Dealer_WeARE\n\n"
-        tr("This plugin is designed to work efficiently and comfortably with the Juick microblogging service.\n"
-             "Currently, the plugin is able to: \n"
-             "* Coloring @nick, *tag and #message_id in messages from the juick@juick.com bot\n"
-             "* Detect >quotes in messages\n"
-             "* Enable clickable @nick, *tag, #message_id and other control elements to insert them into the typing "
-             "area\n\n"
-             "Note: To work correctly, the option options.html.chat.render    must be set to true. ");
+    return name() + "\n\n" + tr("Authors: ")
+        + "VampiRUS, Dealer_WeARE\n\n" tr(
+               "This plugin is designed to work efficiently and comfortably with the Juick microblogging service.\n"
+               "Currently, the plugin is able to: \n"
+               "* Coloring @nick, *tag and #message_id in messages from the juick@juick.com bot\n"
+               "* Detect >quotes in messages\n"
+               "* Enable clickable @nick, *tag, #message_id and other control elements to insert them into the typing "
+               "area\n\n"
+               "Note: To work correctly, the option options.html.chat.render    must be set to true. ");
 }

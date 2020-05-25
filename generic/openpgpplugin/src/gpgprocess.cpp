@@ -29,7 +29,7 @@
 
 namespace OpenPgpPluginNamespace {
 
-QString GpgProcess::m_gpgBin = QString();
+QString GpgProcess::m_gpgBin         = QString();
 QString GpgProcess::m_gpgAgentConfig = QString();
 
 GpgProcess::GpgProcess(QObject *parent) : QProcess(parent)
@@ -135,7 +135,7 @@ QString GpgProcess::findBin() const
 #ifdef Q_OS_WIN
     QString pathSep = ";";
 #else
-    QString     pathSep = ":";
+    QString pathSep = ":";
 #endif
 
     QStringList paths = QString::fromLocal8Bit(qgetenv("PATH")).split(pathSep, QString::SkipEmptyParts);
@@ -200,14 +200,8 @@ bool GpgProcess::reloadGpgAgentConfig()
     return success();
 }
 
-QString GpgProcess::binPath() const
-{
-    return QDir(m_gpgBin).absolutePath();
-}
+QString GpgProcess::binPath() const { return QDir(m_gpgBin).absolutePath(); }
 
-QString GpgProcess::gpgAgentConfig() const
-{
-    return m_gpgAgentConfig;
-}
+QString GpgProcess::gpgAgentConfig() const { return m_gpgAgentConfig; }
 
 } // namespace OpenPgpPluginNamespace

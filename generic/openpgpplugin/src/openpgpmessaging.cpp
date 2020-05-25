@@ -24,7 +24,7 @@
 
 using OpenPgpPluginNamespace::GpgProcess;
 
-void OpenPgpMessaging::setStanzaSendingHost(StanzaSendingHost *host)  { m_stanzaSending = host; }
+void OpenPgpMessaging::setStanzaSendingHost(StanzaSendingHost *host) { m_stanzaSending = host; }
 
 void OpenPgpMessaging::setOptionAccessingHost(OptionAccessingHost *host) { m_optionHost = host; }
 
@@ -81,13 +81,9 @@ bool OpenPgpMessaging::incomingStanza(int account, const QDomElement &stanza)
     }
 }
 
-bool OpenPgpMessaging::outgoingStanza(int, QDomElement &)
-{
-    return false;
-}
+bool OpenPgpMessaging::outgoingStanza(int, QDomElement &) { return false; }
 
-void OpenPgpMessaging::sendPublicKey(int account, const QString &toJid,
-                                     const QString &keyId, const QString &userId)
+void OpenPgpMessaging::sendPublicKey(int account, const QString &toJid, const QString &keyId, const QString &userId)
 {
     const QStringList arguments { "--armor", "--export", "0x" + keyId };
 

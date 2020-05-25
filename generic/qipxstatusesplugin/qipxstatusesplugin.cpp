@@ -335,8 +335,7 @@ QDomElement QipXStatuses::MoodToXml(QString type, QString text)
 
 QString QipXStatuses::pluginInfo()
 {
-    return
-        tr("This plugin is designed to display x-statuses of contacts using the QIP Infium jabber client.");
+    return tr("This plugin is designed to display x-statuses of contacts using the QIP Infium jabber client.");
 }
 
 QPixmap QipXStatuses::icon() const { return QPixmap(":/icons/qipxstatuses.png"); }

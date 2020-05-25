@@ -693,23 +693,22 @@ void Watcher::editCurrentItem(const QString &settings)
 
 QString Watcher::pluginInfo()
 {
-    return
-        tr("This plugin is designed to monitor the status of specific roster "
-             "contacts, as well as for substitution of standard sounds of "
-             "incoming messages.\n"
-             "On the first tab set up a list of contacts for the status of "
-             "which is monitored. When the status of such contacts changes a "
-             "popup window will be shown"
-             " and when the status changes to online a custom sound can be "
-             "played."
-             "On the second tab is configured list of items, the messages are "
-             "being monitored. Each element can contain a regular expression"
-             " to check for matches with JID, from which the message arrives, a "
-             "list of regular expressions to check for matches with the text"
-             " of an incoming message, the path to sound file which will be "
-             "played in case of coincidence, as well as the setting, whether "
-             "the sound"
-             " is played always, even if the global sounds off. ");
+    return tr("This plugin is designed to monitor the status of specific roster "
+              "contacts, as well as for substitution of standard sounds of "
+              "incoming messages.\n"
+              "On the first tab set up a list of contacts for the status of "
+              "which is monitored. When the status of such contacts changes a "
+              "popup window will be shown"
+              " and when the status changes to online a custom sound can be "
+              "played."
+              "On the second tab is configured list of items, the messages are "
+              "being monitored. Each element can contain a regular expression"
+              " to check for matches with JID, from which the message arrives, a "
+              "list of regular expressions to check for matches with the text"
+              " of an incoming message, the path to sound file which will be "
+              "played in case of coincidence, as well as the setting, whether "
+              "the sound"
+              " is played always, even if the global sounds off. ");
 }
 
 #include "watcherplugin.moc"

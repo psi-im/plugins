@@ -586,8 +586,7 @@ void ExtendedMenuPlugin::addRequest(int account, const Request &r)
 
 QString ExtendedMenuPlugin::pluginInfo()
 {
-    return
-        tr("This plugin adds several additional commands into contacts context menu.");
+    return tr("This plugin adds several additional commands into contacts context menu.");
 }
 
 QPixmap ExtendedMenuPlugin::icon() const { return QPixmap(":/icons/extendedmenu.png"); }

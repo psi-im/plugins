@@ -505,7 +505,8 @@ void Options::updateKnownKeys()
     const Qt::SortOrder sortOrder   = m_ui->knownKeysTable->horizontalHeader()->sortIndicatorOrder();
 
     {
-        const QStringList &&headerLabels = { tr("Account"), tr("User"), tr("Key ID"), tr("User ID"), tr("Fingerprint") };
+        const QStringList &&headerLabels
+            = { tr("Account"), tr("User"), tr("Key ID"), tr("User ID"), tr("Fingerprint") };
 
         m_knownKeysTableModel->clear();
         m_knownKeysTableModel->setColumnCount(5);
@@ -715,10 +716,7 @@ void Options::contextMenuOwnKeys(const QPoint &pos)
     menu->exec(QCursor::pos());
 }
 
-void Options::openGpgAgentConfig()
-{
-    QDesktopServices::openUrl(QUrl::fromLocalFile(GpgProcess().gpgAgentConfig()));
-}
+void Options::openGpgAgentConfig() { QDesktopServices::openUrl(QUrl::fromLocalFile(GpgProcess().gpgAgentConfig())); }
 
 void Options::loadGpgAgentConfigData()
 {
@@ -750,7 +748,7 @@ void Options::updateGpgAgentConfig(const int pwdExpirationTime)
     }
 
     QStringList &&lines = configText.split("\n");
-    for (QString &line : lines)  {
+    for (QString &line : lines) {
         if (line.contains("default-cache-ttl")) {
             line = QString("default-cache-ttl ") + QString::number(pwdExpirationTime);
         } else if (line.contains("max-cache-ttl")) {
@@ -762,21 +760,19 @@ void Options::updateGpgAgentConfig(const int pwdExpirationTime)
             const QString &&message = tr("Attempt to reload gpg-agent config is failed. "
                                          "You need to restart your system to see changes "
                                          "in gpg-agent settings.");
-            QMessageBox msgbox(QMessageBox::Warning, tr("Warning"), message, QMessageBox::Ok, nullptr);
+            QMessageBox     msgbox(QMessageBox::Warning, tr("Warning"), message, QMessageBox::Ok, nullptr);
             msgbox.exec();
         }
     } else {
-        const QString &&message =
-                tr("Attempt to save gpg-agent config is failed! "
-                   "Check that you have write permission for file:\n%1")
-                .arg(GpgProcess().gpgAgentConfig());
+        const QString &&message = tr("Attempt to save gpg-agent config is failed! "
+                                     "Check that you have write permission for file:\n%1")
+                                      .arg(GpgProcess().gpgAgentConfig());
         QMessageBox msgbox(QMessageBox::Warning, tr("Warning"), message, QMessageBox::Ok, nullptr);
         msgbox.exec();
     }
 }
 
-void Options::copyFingerprintFromTable(QStandardItemModel *tableModel,
-                                       const QModelIndexList &indexesList,
+void Options::copyFingerprintFromTable(QStandardItemModel *tableModel, const QModelIndexList &indexesList,
                                        const int column)
 {
     QString text;

@@ -78,10 +78,7 @@ void MessageFilter::restoreOptions() { }
 
 QPixmap MessageFilter::icon() const { return QPixmap(":/icons/messagefilter.png"); }
 
-QString MessageFilter::pluginInfo()
-{
-    return;
-}
+QString MessageFilter::pluginInfo() { return; }
 
 bool MessageFilter::incomingStanza(int account, const QDomElement &stanza)
 {
