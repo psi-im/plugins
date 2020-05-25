@@ -250,6 +250,22 @@ QSet<uint32_t> Storage::getUndecidedDeviceList(const QString &user)
     return ids;
 }
 
+QSet<uint32_t> Storage::getUnknownDeviceList(const QString &user)
+{
+    QSet<uint32_t> knownIds = getDeviceList(user, false);
+
+    QSqlQuery q(db());
+    q.prepare("SELECT device_id FROM identity_key_store WHERE jid IS ?");
+    q.bindValue(0, user);
+    q.exec();
+
+    QSet<uint32_t> knownKeyIds;
+    while (q.next()) {
+        knownKeyIds.insert(q.value(0).toUInt());
+    }
+    return QSet<uint32_t>(knownIds).subtract(knownKeyIds);
+}
+
 void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actualIds,
                                QMap<uint32_t, QString> &deviceLabels)
 {

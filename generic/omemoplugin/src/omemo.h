@@ -48,10 +48,12 @@ public:
                         const uint32_t *toDeviceId = nullptr);
     bool processDeviceList(const QString &ownJid, int account, const QDomElement &xml);
     void processUndecidedDevices(int account, const QString &ownJid, const QString &user);
+    void processUnknownDevices(int account, const QString &ownJid, const QString &user);
     void deinit();
     bool processBundle(const QString &ownJid, int account, const QDomElement &xml);
 
     void accountConnected(int account, const QString &ownJid);
+    void askUserDevicesList(int account, const QString &ownJid, const QString &user);
 
     const QString           deviceListNodeName() const;
     bool                    isAvailableForUser(int account, const QString &user);

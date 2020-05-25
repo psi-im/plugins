@@ -35,7 +35,7 @@
 #include "omemoplugin.h"
 
 namespace psiomemo {
-QString OMEMOPlugin::version() const { return "2.3"; }
+QString OMEMOPlugin::version() const { return "2.4"; }
 
 QString OMEMOPlugin::shortName() const { return "omemo"; }
 
@@ -158,21 +158,23 @@ bool OMEMOPlugin::incomingStanza(int account, const QDomElement &xml)
         return false;
     }
 
-    if (m_omemo.processBundle(m_accountInfo->getJid(account), account, xml)) {
+    const auto ownJid = m_accountInfo->getJid(account).split("/").first();
+
+    if (m_omemo.processBundle(ownJid, account, xml)) {
         return true;
     }
 
-    if (m_omemo.processDeviceList(m_accountInfo->getJid(account), account, xml)) {
+    if (m_omemo.processDeviceList(ownJid, account, xml)) {
         updateAction(account, xml.attribute("from"));
         return true;
     }
 
     if (xml.nodeName() == "presence") {
         QDomNodeList nodes = xml.childNodes();
-        for (int i = 0; i < nodes.length(); i++) {
+        for (int i = 0; i < nodes.size(); ++i) {
             QDomNode node = nodes.item(i);
             if (node.nodeName() == "x" && node.toElement().namespaceURI() == "http://jabber.org/protocol/muc#user") {
-                QString bareJid = xml.attribute("from").split("/").first();
+                const auto bareJid = xml.attribute("from").split("/").first();
                 QTimer::singleShot(0, [=]() { updateAction(account, bareJid); });
                 break;
             }
@@ -384,12 +386,18 @@ void OMEMOPlugin::enableOMEMOAction(bool checked)
     const QString jid     = action->property("jid").toString();
     const int     account = action->property("account").toInt();
 
+    if (!action->property("isGroup").toBool()) {
+        const auto ownJid = m_accountInfo->getJid(account).split("/").first();
+        m_omemo.processUnknownDevices(account, ownJid, jid);
+    }
+
     QAction *act = menu->exec(QCursor::pos());
     if (act == actEnableOmemo) {
         m_omemo.setEnabledForUser(account, jid, true);
         updateAction(account, jid);
         if (!action->property("isGroup").toBool()) {
-            m_omemo.processUndecidedDevices(account, m_accountInfo->getJid(account), jid);
+            const auto ownJid = m_accountInfo->getJid(account).split("/").first();
+            m_omemo.processUndecidedDevices(account, ownJid, jid);
         }
     } else if (act == actDisableOmemo) {
         m_omemo.setEnabledForUser(account, jid, false);
@@ -427,6 +435,10 @@ QAction *OMEMOPlugin::createAction(QObject *parent, int account, const QString &
     connect(action, &QAction::destroyed, this, &OMEMOPlugin::actionDestroyed);
     m_actions.insert(bareJid, action);
     updateAction(account, bareJid);
+    if (!isGroup) {
+        const auto ownJid = m_accountInfo->getJid(account).split("/").first();
+        m_omemo.askUserDevicesList(account, ownJid, bareJid);
+    }
     return action;
 }
 
@@ -446,9 +458,10 @@ void OMEMOPlugin::updateAction(int account, const QString &user)
 {
     QString bareJid = m_contactInfo->realJid(account, user).split("/").first();
     for (QAction *action : m_actions.values(bareJid)) {
+        const auto ownJid = m_accountInfo->getJid(account).split("/").first();
         bool isGroup   = action->property("isGroup").toBool();
         bool available = isGroup
-            ? m_omemo.isAvailableForGroup(account, m_accountInfo->getJid(account).split("/").first(), bareJid)
+            ? m_omemo.isAvailableForGroup(account, ownJid, bareJid)
             : m_omemo.isAvailableForUser(account, bareJid);
         bool enabled = available && m_omemo.isEnabledForUser(account, bareJid);
         action->setEnabled(available);

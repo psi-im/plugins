@@ -75,6 +75,7 @@ public:
     uint32_t                preKeyCount();
     bool                    isTrusted(const QString &user, uint32_t deviceId);
     void                    processUndecidedDevices(const QString &user, const bool ownJid, const bool trusted);
+    QSet<uint32_t>          getUnknownDevices(const QString &user);
     bool                    isAvailableForUser(const QString &user);
     bool                    isEnabledForUser(const QString &user);
     bool                    isDisabledForUser(const QString &user);

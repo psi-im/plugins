@@ -332,6 +332,11 @@ void Signal::processUndecidedDevices(const QString &user, const bool ownJid, con
     }
 }
 
+QSet<uint32_t> Signal::getUnknownDevices(const QString &user)
+{
+    return m_storage.getUnknownDeviceList(user);
+}
+
 void Signal::askDeviceTrust(const QString &user, uint32_t deviceId, bool skipNewDevicePart, bool ownJid)
 {
     const QString &&fingerprint = getFingerprint(m_storage.loadDeviceIdentity(user, deviceId));
@@ -395,6 +400,9 @@ void Signal::removeCurrentDevice() { m_storage.removeCurrentDevice(); }
 
 QString Signal::getFingerprint(const QByteArray &publicKeyBytes) const
 {
+    if (publicKeyBytes.isEmpty())
+        return QString();
+
     QByteArray bytes     = publicKeyBytes.right(publicKeyBytes.size() - 1); // the first byte is DJB_TYPE
     QString    publicKey = bytes.toHex().toUpper();
     for (int pos = 8, groups = 0; pos < publicKey.length(); pos += 9, groups++) {

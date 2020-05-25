@@ -22,7 +22,7 @@
 #include "crypto.h"
 #include <QtXml>
 
-#define OMEMO_XMLNS "eu.siacs.conversations.axolotl"
+static const QString k_omemoXmlns("eu.siacs.conversations.axolotl");
 
 namespace psiomemo {
 void OMEMO::init(const QString &dataPath) { m_dataPath = dataPath; }
@@ -40,6 +40,11 @@ void OMEMO::accountConnected(int account, const QString &ownJid)
     m_ownDeviceListRequests.insert(QString::number(account) + "-" + stanzaId);
 }
 
+void OMEMO::askUserDevicesList(int account, const QString &ownJid, const QString &user)
+{
+    Q_UNUSED(pepRequest(account, ownJid, user, deviceListNodeName()));
+}
+
 void OMEMO::publishOwnBundle(int account)
 {
     Bundle b = getSignal(account)->collectBundle();
@@ -53,7 +58,7 @@ void OMEMO::publishOwnBundle(int account)
     QDomElement item = doc.createElement("item");
     publish.appendChild(item);
 
-    QDomElement bundle = doc.createElementNS(OMEMO_XMLNS, "bundle");
+    QDomElement bundle = doc.createElementNS(k_omemoXmlns, "bundle");
     item.appendChild(bundle);
 
     publish.setAttribute("node", bundleNodeName(getSignal(account)->getDeviceId()));
@@ -97,7 +102,7 @@ bool OMEMO::decryptMessage(int account, QDomElement &xml)
     }
 
     QDomElement encrypted = message.firstChildElement("encrypted");
-    if (encrypted.isNull() || encrypted.namespaceURI() != OMEMO_XMLNS) {
+    if (encrypted.isNull() || encrypted.namespaceURI() != k_omemoXmlns) {
         return false;
     }
 
@@ -238,7 +243,7 @@ bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml,
 
     processUndecidedDevices(account, ownJid, recipient);
 
-    QDomElement encrypted = xml.ownerDocument().createElementNS(OMEMO_XMLNS, "encrypted");
+    QDomElement encrypted = xml.ownerDocument().createElementNS(k_omemoXmlns, "encrypted");
     QDomElement header    = xml.ownerDocument().createElement("header");
     header.setAttribute("sid", signal->getDeviceId());
     encrypted.appendChild(header);
@@ -305,17 +310,10 @@ bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml,
         xml.appendChild(xml.ownerDocument().createElementNS("urn:xmpp:hints", "store"));
 
         QDomElement encryption = xml.ownerDocument().createElementNS("urn:xmpp:eme:0", "encryption");
-        encryption.setAttribute("namespace", OMEMO_XMLNS);
+        encryption.setAttribute("namespace", k_omemoXmlns);
         encryption.setAttribute("name", "OMEMO");
         xml.appendChild(encryption);
     }
-
-
-    qDebug() << "????????????????????????????????????????"
-             << __PRETTY_FUNCTION__;
-    QTextStream lTS(stderr);
-    lTS << xml;
-
 
     return true;
 }
@@ -371,6 +369,8 @@ bool OMEMO::processDeviceList(const QString &ownJid, int account, const QDomElem
     signal->updateDeviceList(from, actualIds, deviceLabels);
     emit deviceListUpdated(account);
 
+    processUnknownDevices(account, ownJid, from);
+
     return true;
 }
 
@@ -379,6 +379,14 @@ void OMEMO::processUndecidedDevices(int account, const QString &ownJid, const QS
     std::shared_ptr<Signal> signal = getSignal(account);
     signal->processUndecidedDevices(user, false, m_trustNewContactDevices);
     signal->processUndecidedDevices(ownJid, true, m_trustNewOwnDevices);
+}
+
+void OMEMO::processUnknownDevices(int account, const QString &ownJid, const QString &user)
+{
+    const QSet<uint32_t> devices = getSignal(account)->getUnknownDevices(user);
+    for (auto deviceId : devices) {
+        Q_UNUSED(pepRequest(account, ownJid, user, bundleNodeName(deviceId)));
+    }
 }
 
 void OMEMO::publishDeviceList(int account, const QSet<uint32_t> &devices) const
@@ -390,7 +398,7 @@ void OMEMO::publishDeviceList(int account, const QSet<uint32_t> &devices) const
     QDomElement item = doc.createElement("item");
     publish.appendChild(item);
 
-    QDomElement list = doc.createElementNS(OMEMO_XMLNS, "list");
+    QDomElement list = doc.createElementNS(k_omemoXmlns, "list");
     item.appendChild(list);
 
     publish.setAttribute("node", deviceListNodeName());
@@ -494,16 +502,18 @@ bool OMEMO::processBundle(const QString &ownJid, int account, const QDomElement 
 
 QString OMEMO::pepRequest(int account, const QString &ownJid, const QString &recipient, const QString &node) const
 {
-    QString stanzaId = m_stanzaSender->uniqueId(account);
-    QString stanza   = QString("<iq id='%1' from='%2' to='%3' type='get'>"
-                             "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                             "<items node='%4'/>"
-                             "</pubsub>"
-                             "</iq>")
-                         .arg(stanzaId)
-                         .arg(ownJid)
-                         .arg(recipient)
-                         .arg(node);
+    const QString &&item = QString("<items node='%1'/>").arg(node);
+    const QString &&stanzaId = m_stanzaSender->uniqueId(account);
+    const QString &&stanza   =
+            QString("<iq id='%1' from='%2' to='%3' type='get'>\n"
+                    "<pubsub xmlns='http://jabber.org/protocol/pubsub'>\n"
+                    "%4\n"
+                    "</pubsub>\n"
+                    "</iq>\n")
+            .arg(stanzaId)
+            .arg(ownJid)
+            .arg(recipient)
+            .arg(item);
 
     m_stanzaSender->sendStanza(account, stanza);
     return stanzaId;
@@ -511,11 +521,11 @@ QString OMEMO::pepRequest(int account, const QString &ownJid, const QString &rec
 
 void OMEMO::pepPublish(int account, const QString &dl_xml) const
 {
-    QString stanza = QString("<iq id='%1' type='set'>"
-                             "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                             "%2"
-                             "</pubsub>"
-                             "</iq>")
+    QString stanza = QString("<iq id='%1' type='set'>\n"
+                             "<pubsub xmlns='http://jabber.org/protocol/pubsub'>\n"
+                             "%2\n"
+                             "</pubsub>\n"
+                             "</iq>\n")
                          .arg(m_stanzaSender->uniqueId(account))
                          .arg(dl_xml);
 
@@ -565,10 +575,15 @@ bool OMEMO::appendSysMsg(int account, const QString &jid, const QString &message
 
 const QString OMEMO::bundleNodeName(uint32_t deviceId) const
 {
-    return QString("%1.bundles:%2").arg(OMEMO_XMLNS).arg(deviceId);
+    static const QString substr = k_omemoXmlns + ".bundles:";
+    return substr + QString::number(deviceId);
 }
 
-const QString OMEMO::deviceListNodeName() const { return QString(OMEMO_XMLNS) + ".devicelist"; }
+const QString OMEMO::deviceListNodeName() const
+{
+    static const QString out = k_omemoXmlns + ".devicelist";
+    return out;
+}
 
 bool OMEMO::isAvailableForUser(int account, const QString &user)
 {

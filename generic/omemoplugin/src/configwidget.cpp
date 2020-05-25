@@ -374,6 +374,7 @@ void ManageDevices::deleteDevice()
     if (selection.isEmpty())
         return;
 
+    QList<uint32_t> unpublishDevices;
     for (auto selectIndex : selection) {
         const QString &&deviceId = m_tableModel->item(selectIndex.row(), 0)->data().toString();
         const QString &&fingerprint = m_tableModel->item(selectIndex.row(), 1)->text();
@@ -395,7 +396,10 @@ void ManageDevices::deleteDevice()
         if (messageBox.exec() != 0)
             continue;
 
-        m_omemo->unpublishDevice(m_account, deviceId.toUInt());
+        unpublishDevices.append(deviceId.toUInt());
+    }
+    for (auto deviceId : unpublishDevices) {
+        m_omemo->unpublishDevice(m_account, deviceId);
     }
 }
 
