@@ -71,10 +71,7 @@ QPixmap OpenPgpPlugin::icon() const { return QPixmap(":/icons/openpgp.png"); }
 
 QString OpenPgpPlugin::pluginInfo()
 {
-    QString out = "<strong>" + name() + "</strong><br/><br/>";
-
-    out += tr("Authors: ") + "Boris Pek, Ivan Romanov<br/><br/>";
-    out += tr("OpenPGP is the most widely used encryption standard. "
+    QString out = tr("OpenPGP is the most widely used encryption standard. "
               "It is extremely simple in usage:<br/>"
               "* Generate a key pair (public key + secret key) or "
               "choose existing one and set it in program settings.<br/>"
@@ -120,11 +117,9 @@ QString OpenPgpPlugin::pluginInfo()
 #endif
     out += tr("2) Edit configuration file %1 if necessary.")
 #if defined(Q_OS_WIN)
-               .arg(QDir::toNativeSeparators(GpgProcess().gpgAgentConfig()))
-        + "<br/><br/>";
+               .arg(QDir::toNativeSeparators(GpgProcess().gpgAgentConfig()));
 #else
-               .arg(GpgProcess().gpgAgentConfig())
-        + "<br/><br/>";
+               .arg(GpgProcess().gpgAgentConfig());
 #endif
 
     return out;
