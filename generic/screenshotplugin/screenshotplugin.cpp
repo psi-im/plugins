@@ -201,8 +201,7 @@ void ScreenshotPlugin::restoreOptions() { optionsWid->restoreOptions(); }
 
 QString ScreenshotPlugin::pluginInfo()
 {
-    return name() + "\n\n" + tr("Authors: ")
-        + "C.H., Dealer_WeARE\n\n" tr(
+    return tr(
                "This plugin allows you to make screenshots and save them to your hard drive or upload them to an FTP "
                "or "
                "HTTP server.\n"

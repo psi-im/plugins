@@ -649,8 +649,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement &stanza)
 
 QString ClientSwitcherPlugin::pluginInfo()
 {
-    return name() + "\n\n" + tr("Authors: ") + "Liuch\n\n"
-        + tr("The plugin is intended for substitution of the client version, his name and operating system type.\n"
+    return tr("The plugin is intended for substitution of the client version, his name and operating system type.\n"
              "You can specify the version of the client and OS or to select them from the preset list.\n");
 }
 
