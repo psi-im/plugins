@@ -383,8 +383,11 @@ void OMEMO::processUndecidedDevices(int account, const QString &ownJid, const QS
 
 void OMEMO::processUnknownDevices(int account, const QString &ownJid, const QString &user)
 {
-    std::shared_ptr<MessageWaitingForBundles> message(new MessageWaitingForBundles);
     const QSet<uint32_t> devices = getSignal(account)->getUnknownDevices(user);
+    if (devices.isEmpty())
+        return;
+
+    std::shared_ptr<MessageWaitingForBundles> message(new MessageWaitingForBundles);
     for (auto deviceId : devices) {
         QString stanza = pepRequest(account, ownJid, user, bundleNodeName(deviceId));
         message->sentStanzas.insert(stanza, deviceId);
