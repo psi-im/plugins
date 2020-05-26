@@ -35,7 +35,7 @@
 #include "omemoplugin.h"
 
 namespace psiomemo {
-QString OMEMOPlugin::version() const { return "2.4"; }
+QString OMEMOPlugin::version() const { return "2.5"; }
 
 QString OMEMOPlugin::shortName() const { return "omemo"; }
 

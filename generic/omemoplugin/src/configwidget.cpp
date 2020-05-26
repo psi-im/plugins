@@ -125,7 +125,7 @@ KnownFingerprints::KnownFingerprints(int account, OMEMO *omemo, QWidget *parent)
     auto mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(m_table);
 
-    auto buttonsLayout = new QHBoxLayout(this);
+    auto buttonsLayout = new QHBoxLayout();
     auto trustButton   = new QPushButton(tr("Trust"), this);
     auto revokeButton  = new QPushButton(tr("Do not trust"), this);
     auto removeButton  = new QPushButton(tr("Delete"), this);
