@@ -1,3 +1,7 @@
+2020-05-27 - v1.6 - tehnick
+    * Update plugin icon
+    * Cosmetic fix in GnuPG info dialog for MS Windows
+
 2020-05-21 - v1.5 - tehnick
     * Update plugin description: added info about installation and configuring
       of gpg-agent tool in user's operating system

@@ -179,6 +179,9 @@ bool GpgProcess::info(QString &message)
                           .arg(QDir::toNativeSeparators(m_gpgBin))
                           .arg(arguments.join(" "))
                           .arg(QString::fromLocal8Bit(readAll()));
+#if defined(Q_OS_WIN)
+            message.replace("\r", "");
+#endif
             res = true;
         }
     } else {
