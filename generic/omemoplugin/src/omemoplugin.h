@@ -67,36 +67,58 @@ class OMEMOPlugin : public QObject,
 public:
     OMEMOPlugin() = default;
 
-    QString  name() const override;
-    QString  shortName() const override;
-    QString  version() const override;
-    QWidget *options() override;
-    bool     enable() override;
-    bool     disable() override;
-    QPixmap  icon() const override;
-    void     applyOptions() override;
-    void     restoreOptions() override;
-    QString  pluginInfo() override;
-
-    bool        incomingStanza(int account, const QDomElement &xml) override;
-    bool        outgoingStanza(int account, QDomElement &xml) override;
-    bool        decryptMessageElement(int account, QDomElement &message) override;
-    bool        encryptMessageElement(int account, QDomElement &message) override;
-    void        setAccountInfoAccessingHost(AccountInfoAccessingHost *host) override;
-    void        setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) override;
-    void        setStanzaSendingHost(StanzaSendingHost *host) override;
-    void        setEventCreatingHost(EventCreatingHost *host) override;
-    void        setPsiAccountControllingHost(PsiAccountControllingHost *host) override;
-    void        setContactInfoAccessingHost(ContactInfoAccessingHost *host) override;
-    void        setOptionAccessingHost(OptionAccessingHost *host) override;
-    void        optionChanged(const QString &option) override;
+    // PsiPlugin interface
+    QString     name() const override;
+    QString     shortName() const override;
+    QString     version() const override;
+    QWidget *   options() override;
+    bool        enable() override;
+    bool        disable() override;
+    QPixmap     icon() const override;
+    void        applyOptions() override;
+    void        restoreOptions() override;
+    QString     pluginInfo() override;
     QStringList pluginFeatures() override;
 
+    // StanzaFilter interface
+    bool incomingStanza(int account, const QDomElement &xml) override;
+    bool outgoingStanza(int account, QDomElement &xml) override;
+
+    // EncryptionSupport interface
+    bool decryptMessageElement(int account, QDomElement &message) override;
+    bool encryptMessageElement(int account, QDomElement &message) override;
+
+    // ApplicationInfoAccessor interface
+    void setAccountInfoAccessingHost(AccountInfoAccessingHost *host) override;
+
+    // ApplicationInfoAccessor interface
+    void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) override;
+
+    // StanzaSender interface
+    void setStanzaSendingHost(StanzaSendingHost *host) override;
+
+    // EventCreator interface
+    void setEventCreatingHost(EventCreatingHost *host) override;
+
+    // PsiAccountController interface
+    void setPsiAccountControllingHost(PsiAccountControllingHost *host) override;
+
+    // ContactInfoAccessor interface
+    void setContactInfoAccessingHost(ContactInfoAccessingHost *host) override;
+
+    // OptionAccessor interface
+    void setOptionAccessingHost(OptionAccessingHost *host) override;
+    void optionChanged(const QString &option) override;
+
+    // ToolbarIconAccessor interface
     QList<QVariantHash> getButtonParam() override;
     QAction *           getAction(QObject *parent, int account, const QString &contact) override;
+
+    // GCToolbarIconAccessor interface
     QList<QVariantHash> getGCButtonParam() override;
     QAction *           getGCAction(QObject *parent, int account, const QString &contact) override;
 
+    // CommandExecutor interface
     bool execute(int account, const QHash<QString, QVariant> &args, QHash<QString, QVariant> *result) override;
 
 signals:
@@ -116,16 +138,18 @@ private:
     void     showOwnFingerprint(int account, const QString &jid);
 
 private:
-    bool                          m_enabled;
+    bool                          m_enabled = false;
     QMultiMap<QString, QAction *> m_actions;
-    OMEMO                         m_omemo;
+    OMEMO *                       m_omemo = nullptr;
     QNetworkAccessManager         m_networkManager;
 
-    AccountInfoAccessingHost *    m_accountInfo     = nullptr;
-    ContactInfoAccessingHost *    m_contactInfo     = nullptr;
-    ApplicationInfoAccessingHost *m_applicationInfo = nullptr;
-    EventCreatingHost *           m_eventCreator    = nullptr;
-    OptionAccessingHost *         m_optionHost      = nullptr;
+    AccountInfoAccessingHost *    m_accountInfo       = nullptr;
+    ContactInfoAccessingHost *    m_contactInfo       = nullptr;
+    ApplicationInfoAccessingHost *m_applicationInfo   = nullptr;
+    StanzaSendingHost *           m_stanzaSender      = nullptr;
+    EventCreatingHost *           m_eventCreator      = nullptr;
+    PsiAccountControllingHost *   m_accountController = nullptr;
+    OptionAccessingHost *         m_optionHost        = nullptr;
 };
 }
 #endif // PSIOMEMO_OMEMOPLUGIN_H

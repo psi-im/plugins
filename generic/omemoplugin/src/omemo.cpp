@@ -25,7 +25,17 @@
 static const QString k_omemoXmlns("eu.siacs.conversations.axolotl");
 
 namespace psiomemo {
-void OMEMO::init(const QString &dataPath) { m_dataPath = dataPath; }
+void OMEMO::init(const QString &dataPath)
+{
+    m_dataPath = dataPath;
+    m_accountController->subscribeLogout(this, [this](int account) {
+        auto signal = m_accountToSignal.take(account);
+        if (signal) {
+            signal->deinit();
+        }
+        // TODO cleanup m_pendingMessages for this account as well. They all have null xml.
+    });
+}
 
 void OMEMO::deinit()
 {
@@ -133,16 +143,16 @@ bool OMEMO::decryptMessage(int account, QDomElement &xml)
 
     QByteArray encryptedKey = QByteArray::fromBase64(keyElement.firstChild().nodeValue().toUtf8());
 
-    QString                 from     = message.attribute("from");
-    QString                 to       = message.attribute("to");
-    uint                    deviceId = header.attribute("sid").toUInt();
+    QString from     = message.attribute("from");
+    QString to       = message.attribute("to");
+    uint    deviceId = header.attribute("sid").toUInt();
     if (!signal->getDeviceList(from).contains(deviceId)) {
         pepRequest(account, to.split("/").first(), from.split("/").first(), deviceListNodeName());
     }
 
-    QString                 sender   = m_contactInfoAccessor->realJid(account, from).split("/").first();
+    QString                 sender = m_contactInfoAccessor->realJid(account, from).split("/").first();
     QPair<QByteArray, bool> decryptionResult
-            = signal->decryptKey(sender, EncryptedKey(deviceId, isPreKey, encryptedKey));
+        = signal->decryptKey(sender, EncryptedKey(deviceId, isPreKey, encryptedKey));
     QByteArray decryptedKey           = decryptionResult.first;
     bool       buildSessionWithPreKey = decryptionResult.second;
     if (buildSessionWithPreKey) {
@@ -208,6 +218,7 @@ bool OMEMO::decryptMessage(int account, QDomElement &xml)
 bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml, bool buildSessions,
                            const uint32_t *toDeviceId)
 {
+    Q_ASSERT(!xml.isNull());
     std::shared_ptr<Signal> signal    = getSignal(account);
     QString                 recipient = m_contactInfoAccessor->realJid(account, xml.attribute("to")).split("/").first();
     bool                    isGroup   = xml.attribute("type") == "groupchat";
@@ -494,12 +505,14 @@ bool OMEMO::processBundle(const QString &ownJid, int account, const QDomElement 
 
     if (message->sentStanzas.isEmpty()) {
         QDomElement messageXml = message->xml;
-        if (!messageXml.hasAttribute("id")) {
-            messageXml.setAttribute("id", m_stanzaSender->uniqueId(account));
+        if (!messageXml.isNull()) { // it's null is account was disconnected in the middle
+            if (!messageXml.hasAttribute("id")) {
+                messageXml.setAttribute("id", m_stanzaSender->uniqueId(account));
+            }
+            encryptMessage(ownJid, account, messageXml, false,
+                           messageXml.firstChildElement("body").isNull() ? &deviceId : nullptr);
+            m_stanzaSender->sendStanza(account, messageXml);
         }
-        encryptMessage(ownJid, account, messageXml, false,
-                       messageXml.firstChildElement("body").isNull() ? &deviceId : nullptr);
-        m_stanzaSender->sendStanza(account, messageXml);
         m_pendingMessages.removeOne(message);
     }
 
@@ -508,18 +521,17 @@ bool OMEMO::processBundle(const QString &ownJid, int account, const QDomElement 
 
 QString OMEMO::pepRequest(int account, const QString &ownJid, const QString &recipient, const QString &node) const
 {
-    const QString &&item = QString("<items node='%1'/>").arg(node);
+    const QString &&item     = QString("<items node='%1'/>").arg(node);
     const QString &&stanzaId = m_stanzaSender->uniqueId(account);
-    const QString &&stanza   =
-            QString("<iq id='%1' from='%2' to='%3' type='get'>\n"
-                    "<pubsub xmlns='http://jabber.org/protocol/pubsub'>\n"
-                    "%4\n"
-                    "</pubsub>\n"
-                    "</iq>\n")
-            .arg(stanzaId)
-            .arg(ownJid)
-            .arg(recipient)
-            .arg(item);
+    const QString &&stanza   = QString("<iq id='%1' from='%2' to='%3' type='get'>\n"
+                                     "<pubsub xmlns='http://jabber.org/protocol/pubsub'>\n"
+                                     "%4\n"
+                                     "</pubsub>\n"
+                                     "</iq>\n")
+                                 .arg(stanzaId)
+                                 .arg(ownJid)
+                                 .arg(recipient)
+                                 .arg(item);
 
     m_stanzaSender->sendStanza(account, stanza);
     return stanzaId;
