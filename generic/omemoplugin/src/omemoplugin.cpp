@@ -35,7 +35,7 @@
 #include "omemoplugin.h"
 
 namespace psiomemo {
-QString OMEMOPlugin::version() const { return "2.5"; }
+QString OMEMOPlugin::version() const { return "9.1.1"; }
 
 QString OMEMOPlugin::shortName() const { return "omemo"; }
 
@@ -120,11 +120,7 @@ void OMEMOPlugin::restoreOptions() { }
 
 QString OMEMOPlugin::pluginInfo()
 {
-    QString out = tr("Credits: ") + "<br/>";
-    out += "* <a href=\"https://github.com/signalapp/libsignal-protocol-c\">"
-           "libsignal-protocol-c</a> -- Open Whisper Systems<br/>";
-    out += "* OMEMO logo -- <a href=\"https://github.com/fiaxh\">fiaxh</a><br/>";
-    out += "<br/>";
+    QString out;
     out += tr("OMEMO is an end-to-end encryption protocol that leverages the "
               "Double Ratchet encryption scheme to provide multi-end to "
               "multi-end encryption, allowing messages to be synchronized "
@@ -183,6 +179,11 @@ QString OMEMOPlugin::pluginInfo()
     out += "<dt>" + tr("* Any kind of denial-of-service attack.") + "</dt>";
     out += "<dt>" + tr("* etc.");
     out += "</dl>";
+    out += "<br/>";
+    out += tr("Credits: ") + "<br/>";
+    out += "* <a href=\"https://github.com/signalapp/libsignal-protocol-c\">"
+           "libsignal-protocol-c</a> -- Open Whisper Systems<br/>";
+    out += "* OMEMO logo -- <a href=\"https://github.com/fiaxh\">fiaxh</a><br/>";
     return out;
 }
 
