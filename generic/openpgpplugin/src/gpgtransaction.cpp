@@ -67,7 +67,6 @@ GpgTransaction::GpgTransaction(const Type type, const QString &keyID, QObject *p
     }
 
     connect(this, &QProcess::started, this, &GpgTransaction::processStarted);
-
     // TODO: update after stopping support of Ubuntu Xenial and WinXP:
     connect(this, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished()));
 }
@@ -85,6 +84,30 @@ void GpgTransaction::start()
 
     ++m_startCounter;
     GpgProcess::start(m_arguments);
+}
+
+bool GpgTransaction::executeNow()
+{
+    disconnect(this, &QProcess::started, this, &GpgTransaction::processStarted);
+    // TODO: update after stopping support of Ubuntu Xenial and WinXP:
+    disconnect(this, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished()));
+
+    start();
+    waitForStarted();
+    processStarted();
+    waitForFinished();
+    processFinished();
+
+    if (m_type == Type::ListAllKeys) {
+        if (m_startCounter < 2) {
+            waitForStarted();
+            processStarted();
+            waitForFinished();
+            processFinished();
+        }
+    }
+
+    return success();
 }
 
 int GpgTransaction::id() const { return m_id; }

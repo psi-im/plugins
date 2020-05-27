@@ -40,6 +40,7 @@ public:
     ~GpgTransaction() = default;
 
     void start();
+    bool executeNow();
     int  id() const;
 
     void setGpgArguments(const QStringList &arguments);
