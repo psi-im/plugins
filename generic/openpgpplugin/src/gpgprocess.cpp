@@ -53,10 +53,19 @@ GpgProcess::GpgProcess(QObject *parent) : QProcess(parent)
 
 void GpgProcess::start(const QStringList &arguments, QIODevice::OpenMode mode)
 {
+#if defined(Q_OS_WIN)
+    setEnvironment(systemEnvironment() << QString("LC_ALL=C"));
+#endif
     QProcess::start(m_gpgBin, arguments, mode);
 }
 
-void GpgProcess::start(QIODevice::OpenMode mode) { QProcess::start(m_gpgBin, mode); }
+void GpgProcess::start(QIODevice::OpenMode mode)
+{
+#if defined(Q_OS_WIN)
+    setEnvironment(systemEnvironment() << QString("LC_ALL=C"));
+#endif
+    QProcess::start(m_gpgBin, mode);
+}
 
 bool GpgProcess::success() const { return (exitCode() == 0); }
 
@@ -170,7 +179,6 @@ bool GpgProcess::info(QString &message)
     waitForFinished();
 
     bool res = false;
-
     if (!m_gpgBin.isEmpty()) {
         if (error() == FailedToStart) {
             message = tr("Can't start ") + m_gpgBin;
