@@ -142,8 +142,9 @@ void GpgTransaction::processStarted()
 {
     if (!m_stdInString.isEmpty()) {
         write(m_stdInString.toUtf8());
-        closeWriteChannel();
+        waitForBytesWritten();
     }
+    closeWriteChannel();
 }
 
 void GpgTransaction::processFinished()

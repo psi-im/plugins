@@ -149,6 +149,7 @@ void Options::loadSettings()
         m_optionHost->getGlobalOption("options.ui.contactlist.tooltip.pgp").toBool());
     m_ui->autoImportPgpKeyFromMessage->setChecked(m_optionHost->getPluginOption("auto-import", true).toBool());
     m_ui->hideMessagesWithPgpKeys->setChecked(m_optionHost->getPluginOption("hide-key-message", true).toBool());
+    m_ui->doNotSignPresence->setChecked(!m_optionHost->getPluginOption("sign-presence", true).toBool());
 
     loadGpgAgentConfigData();
 }
@@ -163,6 +164,7 @@ void Options::saveSettings()
     m_optionHost->setGlobalOption("options.ui.contactlist.tooltip.pgp", m_ui->showPgpInfoInTooltips->isChecked());
     m_optionHost->setPluginOption("auto-import", m_ui->autoImportPgpKeyFromMessage->isChecked());
     m_optionHost->setPluginOption("hide-key-message", m_ui->hideMessagesWithPgpKeys->isChecked());
+    m_optionHost->setPluginOption("sign-presence", !m_ui->doNotSignPresence->isChecked());
 
     updateGpgAgentConfig(m_ui->pwdExpirationTime->value());
 }

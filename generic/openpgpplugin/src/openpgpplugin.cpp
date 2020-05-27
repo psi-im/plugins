@@ -167,7 +167,11 @@ QAction *OpenPgpPlugin::getAction(QObject *parent, int, const QString &)
 
 void OpenPgpPlugin::setActiveTabAccessingHost(ActiveTabAccessingHost *host) { m_activeTab = host; }
 
-void OpenPgpPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost *host) { m_accountInfo = host; }
+void OpenPgpPlugin::setAccountInfoAccessingHost(AccountInfoAccessingHost *host)
+{
+    m_accountInfo = host;
+    m_pgpMessaging->setAccountInfoAccessingHost(host);
+}
 
 void OpenPgpPlugin::actionActivated()
 {

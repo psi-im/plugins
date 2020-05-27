@@ -20,6 +20,7 @@
 #include <QObject>
 
 class OptionAccessingHost;
+class AccountInfoAccessingHost;
 class PsiAccountControllingHost;
 class QDomElement;
 class StanzaSendingHost;
@@ -33,6 +34,7 @@ public:
 
     void setStanzaSendingHost(StanzaSendingHost *host);
     void setOptionAccessingHost(OptionAccessingHost *host);
+    void setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
     void setPsiAccountControllingHost(PsiAccountControllingHost *host);
 
     bool incomingStanza(int account, const QDomElement &stanza);
@@ -42,7 +44,11 @@ public:
                        const QString &keyId, const QString &userId);
 
 private:
+    bool processOutgoingPresence(int account, QDomElement &stanza);
+
+private:
     OptionAccessingHost       *m_optionHost    = nullptr;
+    AccountInfoAccessingHost * m_accountInfo   = nullptr;
     PsiAccountControllingHost *m_accountHost   = nullptr;
     StanzaSendingHost      *   m_stanzaSending = nullptr;
 };

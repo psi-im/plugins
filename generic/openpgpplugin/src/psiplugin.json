@@ -1,7 +1,7 @@
 {
   "name": "OpenPGP",
   "shortname": "openpgp",
-  "version": "1.6",
+  "version": "1.7",
   "priority": 2,
   "icon": "base64:iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAClklEQVQ4y6VTTU8TURS9r9NWkilSoB2sNXwkgEHQEBQVCBshujMk7NwTdhpNWJEoCyExJCxN4A/AAhPjThPFsDARqEkjorHVfkKZmU6n09aZzufzDZW0BHdMcnJz7zvnzHl3MgBnfFBtMzU1j7ze8z6GaZoIBJqnGabxik0RhHwkleJe8rz4SpIKwsrKLD7WOE64IfAT4cORkWsL4+OD13t725w9PUFqdLTv6vBw3/OWlqZHGGP/fxNMTs64urpa74+NDS52d7d2hMM/E9Fo+gOApTFMw53+/sudiQQf39gIzcTj+2/W1xf1EwlKskr7mcYBv78huLsbKW58DC1vbe892dr68XhzM7y0vfON93jcQT/jHbC5p66gy6LT5aRo3cSuRJI94LPSe6kgS2trC4pUlD9lDgWurGqEgmhdzjtPGdz2fQe3mkYCx4JLSWpB6ld56eYq/XUu4LnkigFtZHBBFKFOTVNDvj10YgefZ4MN2HluDje3TdQ1B9rVUq7oMbkvbsos2+eqSdUVwDfgpr31RoFNIiH1Gunqs1vz+/kjg7dPe9ob2+pjNx5cBFxOA3IgwEAB4OprEDJJTwY6BTureRDTase9F/H40RVSrAJ8VgQoRgHlBYCcACjHARKrsGdwwAOEIsBHspBK/qnugOUtyGUNAI4k5lQAvgZ2f0jmMSIISwC/ZcK1gM3hqoFctkAtkYgCIQpaRcjaQgVgX6mIIyWADDlXTFBVC2S1xgBM0hjEQDaOCFAkNU+MslolFU9qQa+clQksXMGxAUYOArI0UsEiYpNAt0HImg2jUu1esQATL2zVfMbpoWCgnkbvOi5YnQ6D5LO3bULlK1iEaf1LSeaWCY6Y5IoWNcfd5RCfOevfDH8B5vVg4SplxM4AAAAASUVORK5CYII=",
   "description": "Have an end-to-end encrypted conversation with your contacts with help of OpenPGP.",

@@ -628,17 +628,17 @@ bool StopSpam::incomingStanza(int account, const QDomElement &stanza)
 
 bool StopSpam::findMucNS(const QDomElement &stanza)
 {
-    bool         find     = false;
+    bool         found    = false;
     QDomNodeList nodeList = stanza.elementsByTagName("x");
-    for (int i = 0; i < nodeList.size(); i++) {
+    for (int i = 0; i < nodeList.size(); ++i) {
         QDomElement item = nodeList.at(i).toElement();
         if (!item.isNull() && item.namespaceURI().contains("http://jabber.org/protocol/muc")) {
-            find = true;
+            found = true;
             break;
         }
     }
 
-    return find;
+    return found;
 }
 
 bool StopSpam::outgoingStanza(int /*account*/, QDomElement & /*xml*/) { return false; }
