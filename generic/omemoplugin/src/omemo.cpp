@@ -322,7 +322,6 @@ bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml,
 
         QDomElement encryption = xml.ownerDocument().createElementNS("urn:xmpp:eme:0", "encryption");
         encryption.setAttribute("namespace", k_omemoXmlns);
-        encryption.setAttribute("name", "OMEMO");
         xml.appendChild(encryption);
     }
 
