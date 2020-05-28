@@ -1,3 +1,9 @@
+2020-05-28
+v1.4 tehnick
+  * Rename "Off-the-Record Messaging Plugin" to "OTR Plugin"
+    (detailed info user may find in plugin description)
+  * Add necessary changes for support of Explicit Message Encryption (XEP-0380)
+
 2020-05-21
 v1.3 tehnick
   * Update plugin description in "About plugin" dialog

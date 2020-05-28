@@ -110,7 +110,7 @@ PsiOtrPlugin::~PsiOtrPlugin() { }
 
 // ---------------------------------------------------------------------------
 
-QString PsiOtrPlugin::name() const { return "Off-the-Record Messaging Plugin"; }
+QString PsiOtrPlugin::name() const { return "OTR Plugin"; }
 
 // ---------------------------------------------------------------------------
 
@@ -118,7 +118,7 @@ QString PsiOtrPlugin::shortName() const { return "otr"; }
 
 // ---------------------------------------------------------------------------
 
-QString PsiOtrPlugin::version() const { return "1.3"; }
+QString PsiOtrPlugin::version() const { return "9.1.1"; }
 
 // ---------------------------------------------------------------------------
 
@@ -205,7 +205,7 @@ QString PsiOtrPlugin::pluginInfo()
                    "<dt>%8</dt><dd>%9</dd>"
                    "</dl>"
                    "%10")
-        .arg(tr("Off-the-Record (OTR) Messaging allows you to have private "
+        .arg(tr("OTR (Off-the-Record Messaging) allows you to have private "
                 "conversations over instant messaging by providing:"))
         .arg(tr("Encryption"))
         .arg(tr("No one else can read your instant messages."))
@@ -443,6 +443,10 @@ bool PsiOtrPlugin::outgoingStanza(int accountIndex, QDomElement &xml)
     }
 
     if (m_onlineUsers[account][contact]->encrypted()) {
+        htmlElement = xml.ownerDocument().createElementNS("urn:xmpp:eme:0", "encryption");
+        htmlElement.setAttribute("namespace", "urn:xmpp:otr:0");
+        xml.appendChild(htmlElement);
+
         if (xml.attribute("to").contains("/")) {
             // if not a bare jid
             htmlElement = xml.ownerDocument().createElementNS("urn:xmpp:hints", "no-copy");
