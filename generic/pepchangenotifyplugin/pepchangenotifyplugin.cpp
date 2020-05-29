@@ -169,7 +169,7 @@ bool PepPlugin::enable()
 
         int interval = psiOptions->getPluginOption(constInterval, QVariant(5000)).toInt() / 1000;
         popupId      = popup->registerOption(POPUP_OPTION_NAME, interval,
-                                        "plugins.options." + shortName() + "." + constInterval);
+                                        "plugins.options.pepplugin." + constInterval);
     }
     return enabled;
 }

@@ -182,7 +182,7 @@ bool Watcher::enable()
 
         int interval = psiOptions->getPluginOption(constInterval, QVariant(3000)).toInt() / 1000;
         popupId      = popup->registerOption(POPUP_OPTION_NAME, interval,
-                                        "plugins.options." + shortName() + "." + constInterval);
+                                        "plugins.options.watcher." + constInterval);
 
         QStringList jids        = psiOptions->getPluginOption(constJids, QVariant(QStringList())).toStringList();
         QStringList soundFiles  = psiOptions->getPluginOption(constSndFiles, QVariant(QStringList())).toStringList();

@@ -95,7 +95,7 @@ bool ClientSwitcherPlugin::enable()
     // Get and register popup option
     int popup_duration = psiOptions->getPluginOption(constPopupDuration, QVariant(5000)).toInt() / 1000;
     popupId            = psiPopup->registerOption(constPluginName, popup_duration,
-                                       "plugins.options." + shortName() + "." + constPopupDuration);
+                                       "plugins.options.clientswitcher." + constPopupDuration);
     // Формируем структуры
     int cnt = sett_list.size();
     for (int i = 0; i < cnt; i++) {

@@ -248,7 +248,7 @@ bool StopSpam::enable()
 
         // register popup option
         int interval = psiOptions->getPluginOption(constInterval, QVariant(5000)).toInt() / 1000;
-        popupId = popup->registerOption(POPUP_OPTION, interval, "plugins.options." + shortName() + "." + constInterval);
+        popupId = popup->registerOption(POPUP_OPTION, interval, "plugins.options.stopspam." + constInterval);
     }
     return enabled;
 }

@@ -162,7 +162,7 @@ bool ExtendedMenuPlugin::enable()
     enableAction = psiOptions->getPluginOption(constAction, enableAction).toBool();
     int interval = psiOptions->getPluginOption(constInterval, QVariant(5000)).toInt() / 1000;
     popupId
-        = popup->registerOption(POPUP_OPTION_NAME, interval, "plugins.options." + shortName() + "." + constInterval);
+        = popup->registerOption(POPUP_OPTION_NAME, interval, "plugins.options.extmenu." + constInterval);
 
     QFile f(":/icons/icons/ping.png");
     f.open(QIODevice::ReadOnly);

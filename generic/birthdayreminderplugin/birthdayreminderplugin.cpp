@@ -165,7 +165,7 @@ bool Reminder::enable()
     soundFile       = psiOptions->getPluginOption(constSoundFile, QVariant(soundFile)).toString();
 
     int timeout = psiOptions->getPluginOption(constTimeout, QVariant(15000)).toInt() / 1000;
-    popupId = popup->registerOption(POPUP_OPTION_NAME, timeout, "plugins.options." + shortName() + "." + constTimeout);
+    popupId = popup->registerOption(POPUP_OPTION_NAME, timeout, "plugins.options.reminder." + constTimeout);
 
     QDir dir(bdaysDir());
     if (!dir.exists()) {
