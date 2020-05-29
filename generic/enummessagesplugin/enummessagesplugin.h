@@ -48,7 +48,7 @@ class EnumMessagesPlugin : public QObject,
                            public PluginInfoProvider,
                            public ChatTabAccessor,
                            public PsiAccountController,
-                           public ToolbarIconAccessor
+                           public ToolbarIconAccessor,
 			   public PluginAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.EnumMessagesPlugin" FILE "psiplugin.json")
