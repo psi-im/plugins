@@ -31,6 +31,7 @@
 #include "menuaccessor.h"
 #include "optionaccessinghost.h"
 #include "optionaccessor.h"
+#include "pluginaccessor.h"
 #include "plugininfoprovider.h"
 #include "popupaccessinghost.h"
 #include "popupaccessor.h"
