@@ -36,18 +36,17 @@ class Options;
 class QMenu;
 
 class OpenPgpPlugin : public QObject,
-                public PsiPlugin,
-                public PluginInfoProvider,
-                public StanzaFilter,
-                public PsiAccountController,
-                public OptionAccessor,
-                public StanzaSender,
-                public ActiveTabAccessor,
-                public AccountInfoAccessor {
+                      public PsiPlugin,
+                      public PluginInfoProvider,
+                      public StanzaFilter,
+                      public PsiAccountController,
+                      public OptionAccessor,
+                      public StanzaSender,
+                      public ActiveTabAccessor,
+                      public AccountInfoAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.OpenPGP" FILE "psiplugin.json")
-    Q_INTERFACES(PsiPlugin PluginInfoProvider StanzaFilter PsiAccountController
-                     OptionAccessor StanzaSender
+    Q_INTERFACES(PsiPlugin PluginInfoProvider StanzaFilter PsiAccountController OptionAccessor StanzaSender
                      ActiveTabAccessor AccountInfoAccessor)
 
 public:
@@ -55,8 +54,6 @@ public:
     ~OpenPgpPlugin();
 
     // from PsiPlugin
-    QString version() const override { return "1.5"; }
-    QString shortName() const override { return "openpgp"; }
     QString name() const override { return "OpenPGP Plugin"; }
 
     QWidget *options() override;
@@ -103,7 +100,7 @@ private:
     bool isEnabled() const;
 
 private:
-    OpenPgpMessaging          *m_pgpMessaging  = nullptr;
+    OpenPgpMessaging *         m_pgpMessaging  = nullptr;
     QAction *                  m_action        = nullptr;
     Options *                  m_optionsDialog = nullptr;
     PsiAccountControllingHost *m_accountHost   = nullptr;

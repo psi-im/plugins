@@ -45,8 +45,6 @@
 
 #include "ui_options.h"
 
-#define cVer "0.1.3"
-
 #define constInterval "intrvl"
 #define constAction "action"
 #define constMenu "menu"
@@ -81,10 +79,7 @@ class ExtendedMenuPlugin : public QObject,
 public:
     ExtendedMenuPlugin();
     virtual QString             name() const;
-    virtual QString             shortName() const;
-    virtual QString             version() const;
     virtual QWidget *           options();
-    virtual Priority            priority();
     virtual bool                enable();
     virtual bool                disable();
     virtual void                applyOptions();
@@ -158,12 +153,6 @@ ExtendedMenuPlugin::ExtendedMenuPlugin() :
 }
 
 QString ExtendedMenuPlugin::name() const { return "Extended Menu Plugin"; }
-
-QString ExtendedMenuPlugin::shortName() const { return "extmenu"; }
-
-QString ExtendedMenuPlugin::version() const { return cVer; }
-
-PsiPlugin::Priority ExtendedMenuPlugin::priority() { return PsiPlugin::PriorityLow; }
 
 bool ExtendedMenuPlugin::enable()
 {

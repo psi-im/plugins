@@ -43,7 +43,6 @@
 
 #include "ui_options.h"
 
-#define cVer "0.4.1"
 #define constLastCheck "lstchck"
 #define constDays "days"
 #define constInterval "intrvl"
@@ -79,8 +78,6 @@ class Reminder : public QObject,
 public:
     Reminder() = default;
     virtual QString  name() const;
-    virtual QString  shortName() const;
-    virtual QString  version() const;
     virtual QWidget *options();
     virtual bool     enable();
     virtual bool     disable();
@@ -141,10 +138,6 @@ private:
 };
 
 QString Reminder::name() const { return "Birthday Reminder Plugin"; }
-
-QString Reminder::shortName() const { return "reminder"; }
-
-QString Reminder::version() const { return cVer; }
 
 bool Reminder::enable()
 {

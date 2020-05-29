@@ -59,9 +59,7 @@ public:
     ConfigWidgetTabWithTable(int account, OMEMO *omemo, QWidget *parent);
     void filterContacts(const QString &jid);
     void updateData() override;
-    void copyFingerprintFromTable(QStandardItemModel *tableModel,
-                                  const QModelIndexList &indexesList,
-                                  const int column);
+    void copyFingerprintFromTable(QStandardItemModel *tableModel, const QModelIndexList &indexesList, const int column);
 
 protected:
     virtual void        doUpdateData() = 0;

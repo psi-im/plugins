@@ -77,8 +77,6 @@ public:
     ClientSwitcherPlugin();
     ~ClientSwitcherPlugin();
     virtual QString  name() const;
-    virtual QString  shortName() const;
-    virtual QString  version() const;
     virtual bool     enable();
     virtual bool     disable();
     virtual QWidget *options();

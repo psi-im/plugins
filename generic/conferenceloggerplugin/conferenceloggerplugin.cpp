@@ -42,7 +42,6 @@
 
 #include "viewer.h"
 
-#define cVer "0.2.3"
 #define constHeight "Height"
 #define constWidth "Width"
 #define constlastItem "lastItem"
@@ -66,8 +65,6 @@ class ConferenceLogger : public QObject,
 public:
     ConferenceLogger() = default;
     virtual QString             name() const;
-    virtual QString             shortName() const;
-    virtual QString             version() const;
     virtual QWidget *           options();
     virtual bool                enable();
     virtual bool                disable();
@@ -112,10 +109,6 @@ private slots:
 };
 
 QString ConferenceLogger::name() const { return "Conference Logger Plugin"; }
-
-QString ConferenceLogger::shortName() const { return "logger"; }
-
-QString ConferenceLogger::version() const { return cVer; }
 
 bool ConferenceLogger::enable()
 {

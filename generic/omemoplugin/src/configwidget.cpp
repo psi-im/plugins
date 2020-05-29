@@ -96,9 +96,8 @@ void ConfigWidgetTabWithTable::updateData()
     m_table->resizeColumnsToContents();
 }
 
-void ConfigWidgetTabWithTable::copyFingerprintFromTable(QStandardItemModel *tableModel,
-                                                        const QModelIndexList &indexesList,
-                                                        const int column)
+void ConfigWidgetTabWithTable::copyFingerprintFromTable(QStandardItemModel *   tableModel,
+                                                        const QModelIndexList &indexesList, const int column)
 {
     QString text;
     for (auto selectIndex : indexesList) {
@@ -143,8 +142,7 @@ KnownFingerprints::KnownFingerprints(int account, OMEMO *omemo, QWidget *parent)
     setLayout(mainLayout);
     updateData();
 
-    connect(m_table, &QTableView::customContextMenuRequested,
-            this, &KnownFingerprints::contextMenuKnownKeys);
+    connect(m_table, &QTableView::customContextMenuRequested, this, &KnownFingerprints::contextMenuKnownKeys);
 }
 
 void KnownFingerprints::doUpdateData()
@@ -239,8 +237,7 @@ void KnownFingerprints::contextMenuKnownKeys(const QPoint &pos)
     QMenu *menu = new QMenu(this);
 
     // TODO: update after stopping support of Ubuntu Xenial:
-    menu->addAction(QIcon::fromTheme("edit-copy"), tr("Copy fingerprint"),
-                    this, SLOT(copyKnownFingerprint()));
+    menu->addAction(QIcon::fromTheme("edit-copy"), tr("Copy fingerprint"), this, SLOT(copyKnownFingerprint()));
 
     menu->exec(QCursor::pos());
 }
@@ -270,7 +267,7 @@ ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
     deviceInfoLayout->addWidget(infoLabel);
     deviceInfoLayout->addWidget(m_fingerprintLabel);
 
-    m_deviceIdLabel = new QLabel(currentDevice);
+    m_deviceIdLabel                = new QLabel(currentDevice);
     auto deleteCurrentDeviceButton = new QPushButton(tr("Delete all OMEMO data for current device"), currentDevice);
     connect(deleteCurrentDeviceButton, &QPushButton::clicked, this, &ManageDevices::deleteCurrentDevice);
 
@@ -304,8 +301,7 @@ ManageDevices::ManageDevices(int account, OMEMO *omemo, QWidget *parent) :
     setLayout(mainLayout);
 
     connect(m_omemo, &OMEMO::deviceListUpdated, this, &ManageDevices::deviceListUpdated);
-    connect(m_table, &QTableView::customContextMenuRequested,
-            this, &ManageDevices::contextMenuOwnDevices);
+    connect(m_table, &QTableView::customContextMenuRequested, this, &ManageDevices::contextMenuOwnDevices);
 
     ManageDevices::updateData();
 }
@@ -376,18 +372,14 @@ void ManageDevices::deleteDevice()
 
     QList<uint32_t> unpublishDevices;
     for (auto selectIndex : selection) {
-        const QString &&deviceId = m_tableModel->item(selectIndex.row(), 0)->data().toString();
+        const QString &&deviceId    = m_tableModel->item(selectIndex.row(), 0)->data().toString();
         const QString &&fingerprint = m_tableModel->item(selectIndex.row(), 1)->text();
-        const QString &&message = tr("After deleting of device from list of available devices "
-                                    "it stops receiving offline messages from your contacts "
-                                    "until it will become online and your contacts mark it "
-                                    "as trusted.")
-                + "\n\n"
-                + tr("Device ID") + QString(": %1").arg(deviceId)
-                + "\n"
-                + tr("Fingerprint") + QString(": %1").arg(fingerprint)
-                + "\n\n"
-                + tr("Delete selected device?");
+        const QString &&message     = tr("After deleting of device from list of available devices "
+                                     "it stops receiving offline messages from your contacts "
+                                     "until it will become online and your contacts mark it "
+                                     "as trusted.")
+            + "\n\n" + tr("Device ID") + QString(": %1").arg(deviceId) + "\n" + tr("Fingerprint")
+            + QString(": %1").arg(fingerprint) + "\n\n" + tr("Delete selected device?");
 
         QMessageBox messageBox(QMessageBox::Question, QObject::tr("Confirm action"), message);
         messageBox.addButton(QObject::tr("Delete"), QMessageBox::AcceptRole);
@@ -419,8 +411,7 @@ void ManageDevices::contextMenuOwnDevices(const QPoint &pos)
     QMenu *menu = new QMenu(this);
 
     // TODO: update after stopping support of Ubuntu Xenial:
-    menu->addAction(QIcon::fromTheme("edit-copy"), tr("Copy fingerprint"),
-                    this, SLOT(copyOwnFingerprint()));
+    menu->addAction(QIcon::fromTheme("edit-copy"), tr("Copy fingerprint"), this, SLOT(copyOwnFingerprint()));
 
     menu->exec(QCursor::pos());
 }

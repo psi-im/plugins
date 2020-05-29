@@ -29,7 +29,6 @@
 #include "clientswitcherplugin.h"
 #include "viewer.h"
 
-#define cVer "0.0.18"
 #define constPluginShortName "clientswitcher"
 #define constPluginName "Client Switcher Plugin"
 #define constForAllAcc "for_all_acc"
@@ -57,10 +56,6 @@ ClientSwitcherPlugin::~ClientSwitcherPlugin()
 }
 
 QString ClientSwitcherPlugin::name() const { return constPluginName; }
-
-QString ClientSwitcherPlugin::shortName() const { return constPluginShortName; }
-
-QString ClientSwitcherPlugin::version() const { return cVer; }
 
 bool ClientSwitcherPlugin::enable()
 {
@@ -650,7 +645,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement &stanza)
 QString ClientSwitcherPlugin::pluginInfo()
 {
     return tr("The plugin is intended for substitution of the client version, his name and operating system type.\n"
-             "You can specify the version of the client and OS or to select them from the preset list.\n");
+              "You can specify the version of the client and OS or to select them from the preset list.\n");
 }
 
 void ClientSwitcherPlugin::setPopupAccessingHost(PopupAccessingHost *host) { psiPopup = host; }

@@ -32,10 +32,6 @@ CleanerPlugin::CleanerPlugin() :
 
 QString CleanerPlugin::name() const { return "Cleaner Plugin"; }
 
-QString CleanerPlugin::shortName() const { return "cleaner"; }
-
-QString CleanerPlugin::version() const { return constVersion; }
-
 bool CleanerPlugin::enable()
 {
     if (psiOptions) {

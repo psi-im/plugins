@@ -49,10 +49,6 @@ EnumMessagesPlugin::EnumMessagesPlugin() :
 
 QString EnumMessagesPlugin::name() const { return constPluginName; }
 
-QString EnumMessagesPlugin::shortName() const { return "enummessages"; }
-
-QString EnumMessagesPlugin::version() const { return constVersion; }
-
 QWidget *EnumMessagesPlugin::options()
 {
     if (!enabled) {
@@ -420,6 +416,6 @@ bool EnumMessagesPlugin::isEnabledFor(int account, const QString &jid) const
 QString EnumMessagesPlugin::pluginInfo()
 {
     return tr("The plugin is designed to enumerate messages, adding the messages numbers in chat logs "
-             "and notification of missed messages. \n"
-             "Supports per contact on / off message enumeration via the buttons on the chats toolbar.");
+              "and notification of missed messages. \n"
+              "Supports per contact on / off message enumeration via the buttons on the chats toolbar.");
 }

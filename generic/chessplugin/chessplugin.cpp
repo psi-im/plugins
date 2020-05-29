@@ -53,8 +53,6 @@
 #include "request.h"
 #include "ui_options.h"
 
-#define cVer "0.2.9"
-
 #define soundStartConst "soundstart"
 #define soundFinishConst "soundfinish"
 #define soundMoveConst "soundmove"
@@ -89,8 +87,6 @@ class ChessPlugin : public QObject,
 public:
     ChessPlugin();
     virtual QString             name() const;
-    virtual QString             shortName() const;
-    virtual QString             version() const;
     virtual QWidget *           options();
     virtual bool                enable();
     virtual bool                disable();
@@ -190,10 +186,6 @@ ChessPlugin::ChessPlugin() :
 }
 
 QString ChessPlugin::name() const { return "Chess Plugin"; }
-
-QString ChessPlugin::shortName() const { return "chessplugin"; }
-
-QString ChessPlugin::version() const { return cVer; }
 
 bool ChessPlugin::enable()
 {

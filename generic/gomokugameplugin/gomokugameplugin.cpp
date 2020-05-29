@@ -40,10 +40,6 @@ GomokuGamePlugin::GomokuGamePlugin(QObject *parent) :
 
 QString GomokuGamePlugin::name() const { return constPluginName; }
 
-QString GomokuGamePlugin::shortName() const { return constShortPluginName; }
-
-QString GomokuGamePlugin::version() const { return constVersion; }
-
 QWidget *GomokuGamePlugin::options()
 {
     QWidget *options = new QWidget;

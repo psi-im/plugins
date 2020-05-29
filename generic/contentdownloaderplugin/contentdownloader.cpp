@@ -30,10 +30,6 @@ ContentDownloader::~ContentDownloader() { }
 // PsiPlugin
 QString ContentDownloader::name() const { return "Content Downloader Plugin"; }
 
-QString ContentDownloader::shortName() const { return "cdownloader"; }
-
-QString ContentDownloader::version() const { return "0.2.6"; }
-
 QWidget *ContentDownloader::options()
 {
     if (!enabled) {

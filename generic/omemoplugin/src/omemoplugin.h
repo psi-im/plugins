@@ -69,8 +69,6 @@ public:
 
     // PsiPlugin interface
     QString     name() const override;
-    QString     shortName() const override;
-    QString     version() const override;
     QWidget *   options() override;
     bool        enable() override;
     bool        disable() override;

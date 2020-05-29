@@ -39,7 +39,6 @@
 #include "stanzasender.h"
 #include "stanzasendinghost.h"
 
-#define cVer "0.3.2"
 #define constMessage "mssg"
 #define constDisableFor "dsblfr"
 #define constEnableFor "enblfr"
@@ -72,8 +71,6 @@ class AutoReply : public QObject,
 public:
     AutoReply();
     virtual QString  name() const;
-    virtual QString  shortName() const;
-    virtual QString  version() const;
     virtual QWidget *options();
     virtual bool     enable();
     virtual bool     disable();
@@ -178,10 +175,6 @@ AutoReply::AutoReply()
 }
 
 QString AutoReply::name() const { return "Auto Reply Plugin"; }
-
-QString AutoReply::shortName() const { return "replyer"; }
-
-QString AutoReply::version() const { return cVer; }
 
 bool AutoReply::enable()
 {

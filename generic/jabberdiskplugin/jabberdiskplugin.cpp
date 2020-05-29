@@ -32,10 +32,6 @@ JabberDiskPlugin::JabberDiskPlugin() :
 
 QString JabberDiskPlugin::name() const { return "Jabber Disk Plugin"; }
 
-QString JabberDiskPlugin::shortName() const { return "jabberdisk"; }
-
-QString JabberDiskPlugin::version() const { return constVersion; }
-
 bool JabberDiskPlugin::enable()
 {
     enabled = true;
@@ -181,6 +177,9 @@ QAction *JabberDiskPlugin::getContactAction(QObject *p, int acc, const QString &
     return nullptr;
 }
 
-QString JabberDiskPlugin::pluginInfo() { return tr("Treat some jids as services implementing Jabber Disk protocol and handle your files with them."); }
+QString JabberDiskPlugin::pluginInfo()
+{
+    return tr("Treat some jids as services implementing Jabber Disk protocol and handle your files with them.");
+}
 
 QPixmap JabberDiskPlugin::icon() const { return QPixmap(":/icons/jabberdisk.png"); }

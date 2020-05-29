@@ -72,16 +72,16 @@ QPixmap OpenPgpPlugin::icon() const { return QPixmap(":/icons/openpgp.png"); }
 QString OpenPgpPlugin::pluginInfo()
 {
     QString out = tr("OpenPGP is the most widely used encryption standard. "
-              "It is extremely simple in usage:<br/>"
-              "* Generate a key pair (public key + secret key) or "
-              "choose existing one and set it in program settings.<br/>"
-              "* Protect your secret key with a strong password and never "
-              "give it to anyone.<br/>"
-              "* Share your public key with buddies and get their public "
-              "keys using any communication channel which you trust "
-              "(xmpp, email, PGP keys server).<br/>"
-              "* Enable PGP encryption in chat with you buddy and have fun "
-              "the protected conversation.");
+                     "It is extremely simple in usage:<br/>"
+                     "* Generate a key pair (public key + secret key) or "
+                     "choose existing one and set it in program settings.<br/>"
+                     "* Protect your secret key with a strong password and never "
+                     "give it to anyone.<br/>"
+                     "* Share your public key with buddies and get their public "
+                     "keys using any communication channel which you trust "
+                     "(xmpp, email, PGP keys server).<br/>"
+                     "* Enable PGP encryption in chat with you buddy and have fun "
+                     "the protected conversation.");
     out += "<br/><br/>";
     out += tr("OpenPGP features:<br/>"
               "* Offline messages.<br/>"

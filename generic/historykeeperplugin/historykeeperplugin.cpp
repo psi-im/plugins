@@ -33,7 +33,6 @@
 #include "plugininfoprovider.h"
 #include "psiplugin.h"
 
-#define cVer "0.0.7"
 #define constClearHistoryFor "clear-history-for"
 
 class HistoryKeeperPlugin : public QObject,
@@ -50,8 +49,6 @@ class HistoryKeeperPlugin : public QObject,
 public:
     HistoryKeeperPlugin();
     virtual QString             name() const;
-    virtual QString             shortName() const;
-    virtual QString             version() const;
     virtual QWidget *           options();
     virtual bool                enable();
     virtual bool                disable();
@@ -92,10 +89,6 @@ HistoryKeeperPlugin::HistoryKeeperPlugin() :
 }
 
 QString HistoryKeeperPlugin::name() const { return "History Keeper Plugin"; }
-
-QString HistoryKeeperPlugin::shortName() const { return "historykeeper"; }
-
-QString HistoryKeeperPlugin::version() const { return cVer; }
 
 bool HistoryKeeperPlugin::enable()
 {

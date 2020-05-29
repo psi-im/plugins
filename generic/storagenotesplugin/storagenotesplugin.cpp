@@ -32,10 +32,6 @@ StorageNotesPlugin::StorageNotesPlugin() :
 
 QString StorageNotesPlugin::name() const { return "Storage Notes Plugin"; }
 
-QString StorageNotesPlugin::shortName() const { return "storagenotes"; }
-
-QString StorageNotesPlugin::version() const { return constVersion; }
-
 bool StorageNotesPlugin::enable()
 {
     enabled = true;

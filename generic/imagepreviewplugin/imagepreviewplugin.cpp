@@ -87,8 +87,6 @@ class ImagePreviewPlugin : public QObject,
 public:
     ImagePreviewPlugin();
     virtual QString  name() const;
-    virtual QString  shortName() const;
-    virtual QString  version() const;
     virtual QWidget *options();
     virtual bool     enable();
     virtual bool     disable();
@@ -141,9 +139,6 @@ ImagePreviewPlugin::ImagePreviewPlugin() :
 }
 
 QString ImagePreviewPlugin::name() const { return "Image Preview Plugin"; }
-
-QString ImagePreviewPlugin::shortName() const { return "imgpreview"; }
-QString ImagePreviewPlugin::version() const { return constVersion; }
 
 bool ImagePreviewPlugin::enable()
 {

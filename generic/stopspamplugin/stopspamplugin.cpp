@@ -44,8 +44,6 @@
 #include "view.h"
 #include "viewer.h"
 
-#define cVer "0.5.8" // Plugin version
-
 #define constQuestion "qstn"
 #define constAnswer "answr"
 #define constUnblocked "UnblockedList"
@@ -96,27 +94,24 @@ class StopSpam : public QObject,
 
 public:
     StopSpam();
-    virtual QString             name() const;
-    virtual QString             shortName() const;
-    virtual QString             version() const;
-    virtual PsiPlugin::Priority priority();
-    virtual QWidget *           options();
-    virtual bool                enable();
-    virtual bool                disable();
-    virtual void                applyOptions();
-    virtual void                restoreOptions();
-    virtual QPixmap             icon() const;
-    virtual void                setOptionAccessingHost(OptionAccessingHost *host);
-    virtual void                optionChanged(const QString &) { }
-    virtual void                setStanzaSendingHost(StanzaSendingHost *host);
-    virtual bool                incomingStanza(int account, const QDomElement &xml);
-    virtual bool                outgoingStanza(int account, QDomElement &xml);
-    virtual void                setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
-    virtual void                setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
-    virtual void                setPopupAccessingHost(PopupAccessingHost *host);
-    virtual void                setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
-    virtual void                setContactInfoAccessingHost(ContactInfoAccessingHost *host);
-    virtual QString             pluginInfo();
+    virtual QString  name() const;
+    virtual QWidget *options();
+    virtual bool     enable();
+    virtual bool     disable();
+    virtual void     applyOptions();
+    virtual void     restoreOptions();
+    virtual QPixmap  icon() const;
+    virtual void     setOptionAccessingHost(OptionAccessingHost *host);
+    virtual void     optionChanged(const QString &) { }
+    virtual void     setStanzaSendingHost(StanzaSendingHost *host);
+    virtual bool     incomingStanza(int account, const QDomElement &xml);
+    virtual bool     outgoingStanza(int account, QDomElement &xml);
+    virtual void     setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
+    virtual void     setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
+    virtual void     setPopupAccessingHost(PopupAccessingHost *host);
+    virtual void     setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
+    virtual void     setContactInfoAccessingHost(ContactInfoAccessingHost *host);
+    virtual QString  pluginInfo();
 
     virtual bool processEvent(int, QDomElement &) { return false; }
     virtual bool processMessage(int, const QString &, const QString &, const QString &) { return false; }
@@ -204,12 +199,6 @@ StopSpam::StopSpam() :
 }
 
 QString StopSpam::name() const { return "Stop Spam Plugin"; }
-
-QString StopSpam::shortName() const { return "stopspam"; }
-
-QString StopSpam::version() const { return cVer; }
-
-PsiPlugin::Priority StopSpam::priority() { return PriorityHighest; }
 
 bool StopSpam::enable()
 {

@@ -53,8 +53,6 @@ class JuickPlugin : public QObject,
 public:
     JuickPlugin();
     virtual QString  name() const;
-    virtual QString  shortName() const;
-    virtual QString  version() const;
     virtual QWidget *options();
     virtual bool     enable();
     virtual bool     disable();

@@ -56,8 +56,6 @@ public:
 
     // from PsiPlugin
     QString name() const { return "Message Filter Plugin"; }
-    QString shortName() const { return "messagefilter"; }
-    QString version() const { return "0.0.2"; }
 
     QWidget *options();
     bool     enable();

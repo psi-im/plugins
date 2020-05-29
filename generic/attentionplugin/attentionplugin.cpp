@@ -44,7 +44,6 @@
 
 #include "ui_options.h"
 
-#define cVer "0.2.0"
 #define constSoundFile "sndfl"
 #define constInterval "intrvl"
 #define constInfPopup "infPopup"
@@ -76,8 +75,6 @@ class AttentionPlugin : public QObject,
 public:
     AttentionPlugin();
     virtual QString             name() const;
-    virtual QString             shortName() const;
-    virtual QString             version() const;
     virtual QWidget *           options();
     virtual bool                enable();
     virtual bool                disable();
@@ -155,10 +152,6 @@ AttentionPlugin::AttentionPlugin() :
 }
 
 QString AttentionPlugin::name() const { return "Attention Plugin"; }
-
-QString AttentionPlugin::shortName() const { return "attention"; }
-
-QString AttentionPlugin::version() const { return cVer; }
 
 bool AttentionPlugin::enable()
 {

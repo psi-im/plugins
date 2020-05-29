@@ -87,8 +87,6 @@ class Watcher : public QObject,
 public:
     Watcher();
     virtual QString  name() const;
-    virtual QString  shortName() const;
-    virtual QString  version() const;
     virtual QWidget *options();
     virtual bool     enable();
     virtual bool     disable();
@@ -173,10 +171,6 @@ Watcher::Watcher() :
 }
 
 QString Watcher::name() const { return "Watcher Plugin"; }
-
-QString Watcher::shortName() const { return "watcher"; }
-
-QString Watcher::version() const { return constVersion; }
 
 bool Watcher::enable()
 {

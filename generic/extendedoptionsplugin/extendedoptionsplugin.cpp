@@ -58,8 +58,6 @@ class ExtendedOptions : public QObject,
 public:
     ExtendedOptions() = default;
     virtual QString  name() const;
-    virtual QString  shortName() const;
-    virtual QString  version() const;
     virtual QWidget *options();
     virtual bool     enable();
     virtual bool     disable();
@@ -206,10 +204,6 @@ private:
 };
 
 QString ExtendedOptions::name() const { return "Extended Options Plugin"; }
-
-QString ExtendedOptions::shortName() const { return "extopt"; }
-
-QString ExtendedOptions::version() const { return constVersion; }
 
 bool ExtendedOptions::enable()
 {

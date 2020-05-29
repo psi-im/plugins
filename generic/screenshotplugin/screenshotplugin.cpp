@@ -54,8 +54,6 @@ public:
     ScreenshotPlugin();
 
     virtual QString             name() const;
-    virtual QString             shortName() const;
-    virtual QString             version() const;
     virtual QWidget *           options();
     virtual bool                enable();
     virtual bool                disable();
@@ -100,10 +98,6 @@ ScreenshotPlugin::ScreenshotPlugin() :
 }
 
 QString ScreenshotPlugin::name() const { return constName; }
-
-QString ScreenshotPlugin::shortName() const { return "Screenshot"; }
-
-QString ScreenshotPlugin::version() const { return cVersion; }
 
 QWidget *ScreenshotPlugin::options()
 {
@@ -201,17 +195,16 @@ void ScreenshotPlugin::restoreOptions() { optionsWid->restoreOptions(); }
 
 QString ScreenshotPlugin::pluginInfo()
 {
-    return tr(
-               "This plugin allows you to make screenshots and save them to your hard drive or upload them to an FTP "
-               "or "
-               "HTTP server.\n"
-               "The plugin has the following settings:\n"
-               "* Shortcut -- hotkey to make the screenshot (by default, Ctrl+Alt+P)\n"
-               "* Format -- the file format in which the screenshot will be stored (default: .jpg)\n"
-               "* File Name -- format of the filename (default: pic-yyyyMMdd-hhmmss, where yyyyMMdd=YYYYMMDD, and "
-               "hhmmss "
-               "are current date in the format yearmonthday-hourminutesecond)\n"
-               "The address of FTP server is specified as ftp://ftp.domain.tld/path1/path2")
+    return tr("This plugin allows you to make screenshots and save them to your hard drive or upload them to an FTP "
+              "or "
+              "HTTP server.\n"
+              "The plugin has the following settings:\n"
+              "* Shortcut -- hotkey to make the screenshot (by default, Ctrl+Alt+P)\n"
+              "* Format -- the file format in which the screenshot will be stored (default: .jpg)\n"
+              "* File Name -- format of the filename (default: pic-yyyyMMdd-hhmmss, where yyyyMMdd=YYYYMMDD, and "
+              "hhmmss "
+              "are current date in the format yearmonthday-hourminutesecond)\n"
+              "The address of FTP server is specified as ftp://ftp.domain.tld/path1/path2")
         + tr("\n\nSettings for authorization on some hostings can be found here: "
              "http://code.google.com/p/qscreenshot/wiki/Authorization");
 }

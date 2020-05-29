@@ -332,10 +332,7 @@ void Signal::processUndecidedDevices(const QString &user, const bool ownJid, con
     }
 }
 
-QSet<uint32_t> Signal::getUnknownDevices(const QString &user)
-{
-    return m_storage.getUnknownDeviceList(user);
-}
+QSet<uint32_t> Signal::getUnknownDevices(const QString &user) { return m_storage.getUnknownDeviceList(user); }
 
 void Signal::askDeviceTrust(const QString &user, uint32_t deviceId, bool skipNewDevicePart, bool ownJid)
 {
@@ -371,7 +368,7 @@ void Signal::askDeviceTrust(const QString &user, uint32_t deviceId, bool skipNew
 bool Signal::removeDevice(const QString &user, uint32_t deviceId)
 {
     const QString &&fingerprint = getFingerprint(m_storage.loadDeviceIdentity(user, deviceId));
-    const QString &&message     = QObject::tr("Delete selected device from list of known devices of user \"%1\"?").arg(user)
+    const QString &&message = QObject::tr("Delete selected device from list of known devices of user \"%1\"?").arg(user)
         + "<br/><br/>" + QObject::tr("Device public key:") + QString("<br/><code>%1</code>").arg(fingerprint);
 
     QMessageBox messageBox(QMessageBox::Question, QObject::tr("Confirm action"), message);

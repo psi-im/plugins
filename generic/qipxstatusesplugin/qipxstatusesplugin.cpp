@@ -30,8 +30,6 @@
 #include "psiplugin.h"
 #include "stanzafilter.h"
 
-#define cVer "0.0.8"
-
 class QipXStatuses : public QObject,
                      public PsiPlugin,
                      public StanzaFilter,
@@ -44,8 +42,6 @@ class QipXStatuses : public QObject,
 public:
     QipXStatuses();
     virtual QString  name() const;
-    virtual QString  shortName() const;
-    virtual QString  version() const;
     virtual QWidget *options();
     virtual bool     enable();
     virtual bool     disable();
@@ -72,10 +68,6 @@ QipXStatuses::QipXStatuses()
 }
 
 QString QipXStatuses::name() const { return "Qip X-Statuses Plugin"; }
-
-QString QipXStatuses::shortName() const { return "qipxstatuses"; }
-
-QString QipXStatuses::version() const { return cVer; }
 
 bool QipXStatuses::enable()
 {

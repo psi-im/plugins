@@ -30,7 +30,7 @@ class OpenPgpMessaging : public QObject {
 
 public:
     explicit OpenPgpMessaging() = default;
-    ~OpenPgpMessaging() = default;
+    ~OpenPgpMessaging()         = default;
 
     void setStanzaSendingHost(StanzaSendingHost *host);
     void setOptionAccessingHost(OptionAccessingHost *host);
@@ -40,15 +40,14 @@ public:
     bool incomingStanza(int account, const QDomElement &stanza);
     bool outgoingStanza(int account, QDomElement &stanza);
 
-    void sendPublicKey(int account, const QString &toJid,
-                       const QString &keyId, const QString &userId);
+    void sendPublicKey(int account, const QString &toJid, const QString &keyId, const QString &userId);
 
 private:
     bool processOutgoingPresence(int account, QDomElement &stanza);
 
 private:
-    OptionAccessingHost       *m_optionHost    = nullptr;
+    OptionAccessingHost *      m_optionHost    = nullptr;
     AccountInfoAccessingHost * m_accountInfo   = nullptr;
     PsiAccountControllingHost *m_accountHost   = nullptr;
-    StanzaSendingHost      *   m_stanzaSending = nullptr;
+    StanzaSendingHost *        m_stanzaSending = nullptr;
 };

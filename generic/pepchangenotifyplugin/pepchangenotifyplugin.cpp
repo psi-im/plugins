@@ -39,7 +39,6 @@
 
 #include "ui_options.h"
 
-#define cVer "0.1.0"
 #define constSoundFile "sndfl"
 #define constInterval "intrvl"
 #define constTune "tune"
@@ -73,8 +72,6 @@ class PepPlugin : public QObject,
 public:
     PepPlugin();
     virtual QString  name() const;
-    virtual QString  shortName() const;
-    virtual QString  version() const;
     virtual QWidget *options();
     virtual bool     enable();
     virtual bool     disable();
@@ -154,10 +151,6 @@ PepPlugin::PepPlugin() :
 }
 
 QString PepPlugin::name() const { return "PEP Change Notify Plugin"; }
-
-QString PepPlugin::shortName() const { return "pepplugin"; }
-
-QString PepPlugin::version() const { return cVer; }
 
 bool PepPlugin::enable()
 {

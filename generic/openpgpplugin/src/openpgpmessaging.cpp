@@ -18,9 +18,9 @@
 #include <QDebug>
 
 #include "accountinfoaccessinghost.h"
-#include "openpgpmessaging.h"
 #include "gpgprocess.h"
 #include "gpgtransaction.h"
+#include "openpgpmessaging.h"
 #include "optionaccessinghost.h"
 #include "pgputil.h"
 #include "psiaccountcontrollinghost.h"
@@ -131,7 +131,7 @@ bool OpenPgpMessaging::processOutgoingPresence(int account, QDomElement &stanza)
     if (!m_optionHost->getPluginOption("sign-presence", true).toBool())
         return false;
 
-    QString status;
+    QString      status;
     QDomNodeList statusList = stanza.elementsByTagName("status");
     if (!statusList.isEmpty()) {
         status = statusList.at(0).toElement().text();
@@ -146,16 +146,16 @@ bool OpenPgpMessaging::processOutgoingPresence(int account, QDomElement &stanza)
             return false;
 
         QDomDocument doc;
-        QDomElement xItem = doc.createElementNS("jabber:x:signed", "x");
-        QDomText    xText = doc.createTextNode(signedStatus);
+        QDomElement  xItem = doc.createElementNS("jabber:x:signed", "x");
+        QDomText     xText = doc.createTextNode(signedStatus);
         xItem.appendChild(xText);
         stanza.appendChild(xItem);
 
         return true;
     } else {
         PGPUtil::showDiagnosticText(
-                    tr("There was an error trying to sign your status.\nReason: %1.")
-                    .arg(transaction.stdErrString()), transaction.errorString());
+            tr("There was an error trying to sign your status.\nReason: %1.").arg(transaction.stdErrString()),
+            transaction.errorString());
         return false;
     }
 }

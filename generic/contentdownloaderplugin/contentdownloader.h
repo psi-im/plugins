@@ -44,8 +44,6 @@ public:
 
     // from PsiPlugin
     QString  name() const;
-    QString  shortName() const;
-    QString  version() const;
     QWidget *options();
     bool     enable();
     bool     disable();

@@ -60,13 +60,9 @@ class JabberDiskPlugin : public QObject,
 public:
     JabberDiskPlugin();
     virtual QString  name() const;
-    virtual QString  shortName() const;
-    virtual QString  version() const;
     virtual QWidget *options();
     virtual bool     enable();
     virtual bool     disable();
-
-    virtual Priority priority() { return PsiPlugin::PriorityHigh; }
 
     virtual void applyOptions();
     virtual void restoreOptions();

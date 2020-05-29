@@ -67,8 +67,6 @@ class ImagePlugin : public QObject,
 public:
     ImagePlugin();
     virtual QString  name() const;
-    virtual QString  shortName() const;
-    virtual QString  version() const;
     virtual QWidget *options();
     virtual bool     enable();
     virtual bool     disable();
@@ -110,9 +108,6 @@ ImagePlugin::ImagePlugin() :
 }
 
 QString ImagePlugin::name() const { return "Image Plugin"; }
-
-QString ImagePlugin::shortName() const { return "image"; }
-QString ImagePlugin::version() const { return constVersion; }
 
 bool ImagePlugin::enable()
 {
@@ -267,10 +262,9 @@ void ImagePlugin::actionActivated()
 
 QString ImagePlugin::pluginInfo()
 {
-    return tr(
-               "This plugin is designed to send images to roster contacts.\n"
-               "Your contact's client must be support XEP-0071: XHTML-IM and support the data:URI scheme.\n"
-               "Note: To work correctly, the option options.ui.chat.central-toolbar  must be set to true.");
+    return tr("This plugin is designed to send images to roster contacts.\n"
+              "Your contact's client must be support XEP-0071: XHTML-IM and support the data:URI scheme.\n"
+              "Note: To work correctly, the option options.ui.chat.central-toolbar  must be set to true.");
 }
 
 QPixmap ImagePlugin::icon() const { return QPixmap(":/imageplugin/imageplugin.gif"); }

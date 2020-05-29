@@ -114,13 +114,6 @@ QString PsiOtrPlugin::name() const { return "OTR Plugin"; }
 
 // ---------------------------------------------------------------------------
 
-QString PsiOtrPlugin::shortName() const { return "otr"; }
-
-// ---------------------------------------------------------------------------
-
-QString PsiOtrPlugin::version() const { return "9.1.1"; }
-
-// ---------------------------------------------------------------------------
 
 QWidget *PsiOtrPlugin::options()
 {

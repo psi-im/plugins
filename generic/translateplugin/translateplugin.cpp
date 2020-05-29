@@ -63,8 +63,6 @@ class TranslatePlugin : public QObject,
 public:
     TranslatePlugin();
     virtual QString  name() const;
-    virtual QString  shortName() const;
-    virtual QString  version() const;
     virtual QWidget *options();
     virtual bool     enable();
     virtual bool     disable();
@@ -277,10 +275,6 @@ TranslatePlugin::TranslatePlugin() :
 }
 
 QString TranslatePlugin::name() const { return "Translate Plugin"; }
-
-QString TranslatePlugin::shortName() const { return "Translate"; }
-
-QString TranslatePlugin::version() const { return constVersion; }
 
 QWidget *TranslatePlugin::options()
 {
