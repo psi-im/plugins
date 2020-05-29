@@ -41,10 +41,6 @@ set( _HDRS
     ScrollKeeper.h
 )
 
-set( _RSCS
-    ${PLUGIN}.qrc
-)
-
 find_package(Qt5 COMPONENTS Widgets Xml Network REQUIRED)
 set(QT_DEPLIBS
     Qt5::Widgets

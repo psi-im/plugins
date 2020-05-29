@@ -30,6 +30,7 @@
 #include "activetabaccessinghost.h"
 #include "applicationinfoaccessinghost.h"
 #include "optionaccessinghost.h"
+#include "pluginaccessinghost.h"
 #include "psiaccountcontrollinghost.h"
 
 #include "defines.h"
