@@ -39,6 +39,7 @@ set( _SRCS
     typeaheadfind.cpp
     viewer.cpp
 )
+find_package( Qt5 COMPONENTS Widgets Xml REQUIRED )
 set(QT_DEPLIBS
     Qt5::Widgets
     Qt5::Xml
