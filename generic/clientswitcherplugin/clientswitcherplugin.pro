@@ -11,5 +11,4 @@ SOURCES += clientswitcherplugin.cpp \
     accountsettings.cpp \
     viewer.cpp \
     typeaheadfind.cpp
-RESOURCES += resources.qrc
 FORMS += options.ui

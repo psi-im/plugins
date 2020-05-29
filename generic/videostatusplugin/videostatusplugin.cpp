@@ -116,7 +116,6 @@ public:
     virtual void     setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
     virtual void     setPsiAccountControllingHost(PsiAccountControllingHost *host);
     virtual QString  pluginInfo();
-    virtual QPixmap  icon() const;
 
 private:
     bool                       enabled;
@@ -377,7 +376,6 @@ QString VideoStatusChanger::pluginInfo()
               "To work with GNOME MPlayer additional configuration is not needed.");
 }
 
-QPixmap VideoStatusChanger::icon() const { return QPixmap(":/icons/videostatus.png"); }
 
 #ifdef HAVE_DBUS
 bool VideoStatusChanger::isPlayerValid(const QString &service) //проверка является ли плеер разрешенным

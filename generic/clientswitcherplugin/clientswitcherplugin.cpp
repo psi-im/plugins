@@ -320,7 +320,6 @@ void ClientSwitcherPlugin::restoreOptions()
     restoreOptionsAcc(acc_idx);
 }
 
-QPixmap ClientSwitcherPlugin::icon() const { return QPixmap(":/icons/clientswitcher.png"); }
 
 //-- OptionAccessor -------------------------------------------------
 

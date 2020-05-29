@@ -4,4 +4,3 @@ isEmpty(PSISDK) {
     include($$PSISDK/plugins/psiplugin.pri)
 }
 SOURCES += extendedoptionsplugin.cpp
-RESOURCES += resources.qrc

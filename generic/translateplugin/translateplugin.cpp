@@ -86,7 +86,6 @@ public:
                                       bool local);
 
     virtual QString pluginInfo();
-    virtual QPixmap icon() const;
 
 private slots:
     void trans();
@@ -620,6 +619,5 @@ QString TranslatePlugin::pluginInfo()
     return tr("This plugin allows you to convert selected text into another language.\n");
 }
 
-QPixmap TranslatePlugin::icon() const { return QPixmap(":/icons/translate.png"); }
 
 #include "translateplugin.moc"

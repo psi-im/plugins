@@ -5,4 +5,3 @@ isEmpty(PSISDK) {
 }
 SOURCES += pepchangenotifyplugin.cpp
 FORMS += options.ui
-RESOURCES += resources.qrc

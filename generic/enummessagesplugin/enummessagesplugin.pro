@@ -12,7 +12,6 @@ HEADERS += \
     enummessagesplugin.h
 
 
-RESOURCES += resources.qrc
 
 OTHER_FILES += \
     changelog.txt

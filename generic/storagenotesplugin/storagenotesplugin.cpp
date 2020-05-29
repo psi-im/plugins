@@ -139,4 +139,3 @@ QString StorageNotesPlugin::pluginInfo()
               "using Psi or Miranda IM.");
 }
 
-QPixmap StorageNotesPlugin::icon() const { return QPixmap(":/storagenotes/storagenotes.png"); }

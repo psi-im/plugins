@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/reminder" >
-        <file>birthday.png</file>
-    </qresource>
-</RCC>

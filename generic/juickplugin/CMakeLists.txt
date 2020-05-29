@@ -47,10 +47,6 @@ set( _UIS
     juickjidlist.ui
     settings.ui
 )
-set( _RSCS
-    resources.qrc
-)
-
 find_package(Qt5 COMPONENTS Widgets Xml Network REQUIRED)
 set(QT_DEPLIBS
     Qt5::Widgets
@@ -59,7 +55,6 @@ set(QT_DEPLIBS
 )
 
 qt5_wrap_ui(UIS ${_UIS})
-qt5_add_resources(RSCS ${_RSCS})
 
 if(WIN32)
     set(LIB_TYPE "MODULE")

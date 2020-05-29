@@ -67,7 +67,6 @@ public:
     virtual void     setOptionAccessingHost(OptionAccessingHost *host);
     virtual void     setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
     virtual QString  pluginInfo();
-    virtual QPixmap  icon() const;
 
 private slots:
     void chooseColor(QAbstractButton *);
@@ -1172,6 +1171,5 @@ QString ExtendedOptions::pluginInfo()
               "understanding of the results when changing the option.");
 }
 
-QPixmap ExtendedOptions::icon() const { return QPixmap(":/icons/extendedoptions.png"); }
 
 #include "extendedoptionsplugin.moc"

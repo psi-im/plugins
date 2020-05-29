@@ -49,7 +49,6 @@ public:
     bool     disable();
     void     applyOptions();
     void     restoreOptions();
-    QPixmap  icon() const;
 
     // from OptionAccessor
     void setOptionAccessingHost(OptionAccessingHost *host);

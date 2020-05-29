@@ -14,7 +14,6 @@ HEADERS += contentdownloader.h \
     cditemmodel.h \
     form.h \
     contentitem.h
-RESOURCES += resources.qrc
 FORMS += form.ui 
 OBJECTS_DIR = build
 MOC_DIR = build

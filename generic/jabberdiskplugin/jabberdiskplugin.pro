@@ -21,4 +21,3 @@ HEADERS += jabberdiskplugin.h \
     jd_item.h \
     jd_mainwin.h \
     jd_view.h
-RESOURCES += resources.qrc

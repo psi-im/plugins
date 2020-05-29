@@ -4,4 +4,3 @@ isEmpty(PSISDK) {
     include($$PSISDK/plugins/psiplugin.pri)
 }
 SOURCES += qipxstatusesplugin.cpp
-RESOURCES += resources.qrc

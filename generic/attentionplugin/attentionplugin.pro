@@ -4,7 +4,6 @@ isEmpty(PSISDK) {
     include($$PSISDK/plugins/psiplugin.pri)
 }
 
-RESOURCES = attentionplugin.qrc
 
 SOURCES += attentionplugin.cpp
 FORMS += options.ui

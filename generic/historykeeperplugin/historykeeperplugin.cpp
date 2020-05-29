@@ -63,7 +63,6 @@ public:
     virtual QAction *           getContactAction(QObject *p, int acc, const QString &jid);
     virtual QAction *           getAccountAction(QObject *, int) { return nullptr; };
     virtual QString             pluginInfo();
-    virtual QPixmap             icon() const;
 
 private:
     void           removeHistory();
@@ -246,6 +245,5 @@ QString HistoryKeeperPlugin::pluginInfo()
               "plugin options.");
 }
 
-QPixmap HistoryKeeperPlugin::icon() const { return QPixmap(":/icons/historykeeper.png"); }
 
 #include "historykeeperplugin.moc"

@@ -23,4 +23,3 @@ FORMS += \
     juickjidlist.ui \
     settings.ui
 
-RESOURCES += resources.qrc

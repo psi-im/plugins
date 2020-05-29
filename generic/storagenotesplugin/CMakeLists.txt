@@ -50,17 +50,12 @@ set( _UIS
     notes.ui
     editnote.ui
 )
-set( _RSCS
-    ${PLUGIN}.qrc
-)
-
 find_package( Qt5 COMPONENTS Widgets Xml REQUIRED )
 set(QT_DEPLIBS
     Qt5::Widgets
     Qt5::Xml
 )
 qt5_wrap_ui(UIS ${_UIS})
-qt5_add_resources(RSCS ${_RSCS})
 
 if(WIN32)
     set(LIB_TYPE "MODULE")

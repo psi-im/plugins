@@ -6,7 +6,6 @@ isEmpty(PSISDK) {
 
 !mac {
 
-RESOURCES += resources.qrc
 
 SOURCES += videostatusplugin.cpp
 

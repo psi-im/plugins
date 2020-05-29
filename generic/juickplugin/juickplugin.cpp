@@ -310,7 +310,6 @@ void JuickPlugin::restoreOptions()
     ui_.cb_conference->setChecked(workInGroupChat);
 }
 
-QPixmap JuickPlugin::icon() const { return QPixmap(":/icons/juick.png"); }
 
 void JuickPlugin::requestJidList()
 {

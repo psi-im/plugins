@@ -4,7 +4,6 @@ isEmpty(PSISDK) {
     include($$PSISDK/plugins/psiplugin.pri)
 }
 
-RESOURCES = conferenceloggerplugin.qrc
 
 SOURCES += conferenceloggerplugin.cpp \
     typeaheadfind.cpp \

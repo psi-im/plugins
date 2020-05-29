@@ -98,7 +98,6 @@ public:
     virtual void                setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
     virtual void                setSoundAccessingHost(SoundAccessingHost *host);
     virtual QString             pluginInfo();
-    virtual QPixmap             icon() const;
 
 private:
     bool                          enabled;
@@ -505,6 +504,5 @@ QString AttentionPlugin::pluginInfo()
         "Pidgin, Miranda IM with Nudge plugin).");
 }
 
-QPixmap AttentionPlugin::icon() const { return QPixmap(":/attentionplugin/attention.png"); }
 
 #include "attentionplugin.moc"

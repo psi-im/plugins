@@ -122,7 +122,6 @@ void EnumMessagesPlugin::restoreOptions()
     _ui.tb_outColor->setProperty("psi_color", _outColor);
 }
 
-QPixmap EnumMessagesPlugin::icon() const { return QPixmap(":/icons/em.png"); }
 
 void EnumMessagesPlugin::setOptionAccessingHost(OptionAccessingHost *host) { _psiOptions = host; }
 
@@ -134,6 +133,8 @@ void EnumMessagesPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessin
 }
 
 void EnumMessagesPlugin::setPsiAccountControllingHost(PsiAccountControllingHost *host) { _accContrller = host; }
+
+void EnumMessagesPlugin::setPluginAccessingHost(PluginAccessingHost *host) { _pluginHost = host; }
 
 bool EnumMessagesPlugin::incomingStanza(int account, const QDomElement &stanza)
 {
@@ -230,7 +231,11 @@ bool EnumMessagesPlugin::outgoingStanza(int account, QDomElement &stanza)
 
 QAction *EnumMessagesPlugin::getAction(QObject *parent, int account, const QString &contact)
 {
-    QAction *act = new QAction(icon(), tr("Enum Messages"), parent);
+    if (!enabled)
+        return nullptr;
+    auto iconv = _pluginHost->selfMetadata().value("icon");
+    QIcon icon = iconv.isValid()? iconv.value<QIcon>() : QIcon();
+    QAction *act = new QAction(icon, tr("Enum Messages"), parent);
     act->setCheckable(true);
     const QString jid = contact.split("/").first();
     act->setProperty("account", account);

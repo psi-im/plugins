@@ -39,15 +39,10 @@ set( _SRCS
     typeaheadfind.cpp
     viewer.cpp
 )
-set( _RSCS
-    ${PLUGIN}.qrc
-)
-find_package( Qt5 COMPONENTS Widgets Xml REQUIRED )
 set(QT_DEPLIBS
     Qt5::Widgets
     Qt5::Xml
 )
-qt5_add_resources(RSCS ${_RSCS})
 
 if(WIN32)
     set(LIB_TYPE "MODULE")

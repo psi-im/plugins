@@ -51,7 +51,6 @@ public:
     virtual bool     outgoingStanza(int account, QDomElement &xml);
     virtual void     setContactStateAccessingHost(ContactStateAccessingHost *host);
     virtual QString  pluginInfo();
-    virtual QPixmap  icon() const;
 
 private:
     bool                       enabled;
@@ -330,6 +329,5 @@ QString QipXStatuses::pluginInfo()
     return tr("This plugin is designed to display x-statuses of contacts using the QIP Infium jabber client.");
 }
 
-QPixmap QipXStatuses::icon() const { return QPixmap(":/icons/qipxstatuses.png"); }
 
 #include "qipxstatusesplugin.moc"

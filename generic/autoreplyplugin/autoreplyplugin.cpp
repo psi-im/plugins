@@ -84,7 +84,6 @@ public:
     virtual void     setActiveTabAccessingHost(ActiveTabAccessingHost *host);
     virtual void     setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
     virtual QString  pluginInfo();
-    virtual QPixmap  icon() const;
 
 private:
     bool                      enabled;
@@ -768,6 +767,5 @@ QString AutoReply::pluginInfo()
               "mode) ");
 }
 
-QPixmap AutoReply::icon() const { return QPixmap(":/icons/autoreply.png"); }
 
 #include "autoreplyplugin.moc"

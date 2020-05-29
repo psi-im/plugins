@@ -81,7 +81,6 @@ public:
     virtual QList<QVariantHash> getGCButtonParam();
     virtual QAction *           getGCAction(QObject *, int, const QString &) { return nullptr; }
     virtual QString             pluginInfo();
-    virtual QPixmap             icon() const;
 
 private:
     void Logger(QString room, const QString &from, const QString &myJid, const QString &text, QString stamp);
@@ -327,6 +326,5 @@ QString ConferenceLogger::pluginInfo()
               "Note: To work correctly, the the Groupchat Toolbar must be enabled.");
 }
 
-QPixmap ConferenceLogger::icon() const { return QPixmap(":/conferenceloggerplugin/conferencelogger.png"); }
 
 #include "conferenceloggerplugin.moc"

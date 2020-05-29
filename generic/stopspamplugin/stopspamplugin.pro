@@ -18,4 +18,3 @@ HEADERS += view.h \
     typeaheadfind.h \
     deferredstanzasender.h
 FORMS += options.ui
-RESOURCES += resources.qrc

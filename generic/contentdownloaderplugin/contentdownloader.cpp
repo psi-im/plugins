@@ -79,7 +79,6 @@ void ContentDownloader::applyOptions() { }
 
 void ContentDownloader::restoreOptions() { }
 
-QPixmap ContentDownloader::icon() const { return QPixmap(":/icons/download.png"); }
 
 void ContentDownloader::setOptionAccessingHost(OptionAccessingHost *host) { psiOptions = host; }
 
