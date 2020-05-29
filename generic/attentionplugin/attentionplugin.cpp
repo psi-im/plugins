@@ -172,7 +172,7 @@ bool AttentionPlugin::enable()
         disableDnd = psiOptions->getPluginOption(constDisableDnd, QVariant(disableDnd)).toBool();
         popupId    = popup->registerOption(POPUP_OPTION,
                                         psiOptions->getPluginOption(constInterval, QVariant(4000)).toInt() / 1000,
-                                        "plugins.options.attention." + constInterval);
+                                        QLatin1String("plugins.options.attention.") + constInterval);
 
         QWidgetList wl = qApp->allWidgets();
         for (QWidget *w : wl) {
