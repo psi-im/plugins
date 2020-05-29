@@ -61,7 +61,6 @@ public:
     bool     disable() override;
     void     applyOptions() override;
     void     restoreOptions() override;
-    QPixmap  icon() const override;
 
     // from PluginInfoProvider
     QString pluginInfo() override;

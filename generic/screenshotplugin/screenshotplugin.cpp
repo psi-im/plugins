@@ -72,7 +72,6 @@ public:
     virtual void restoreOptions();
 
     virtual QString pluginInfo();
-    virtual QPixmap icon() const;
 
 private slots:
     void openImage();
@@ -208,7 +207,5 @@ QString ScreenshotPlugin::pluginInfo()
         + tr("\n\nSettings for authorization on some hostings can be found here: "
              "http://code.google.com/p/qscreenshot/wiki/Authorization");
 }
-
-QPixmap ScreenshotPlugin::icon() const { return QPixmap(":/screenshotplugin/screenshot"); }
 
 #include "screenshotplugin.moc"

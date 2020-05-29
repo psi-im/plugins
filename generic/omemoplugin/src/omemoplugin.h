@@ -72,7 +72,6 @@ public:
     QWidget *   options() override;
     bool        enable() override;
     bool        disable() override;
-    QPixmap     icon() const override;
     void        applyOptions() override;
     void        restoreOptions() override;
     QString     pluginInfo() override;

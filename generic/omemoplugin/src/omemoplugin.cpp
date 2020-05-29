@@ -95,8 +95,6 @@ bool OMEMOPlugin::disable()
     return true;
 }
 
-QPixmap OMEMOPlugin::icon() const { return getIcon(); }
-
 QPixmap OMEMOPlugin::getIcon() const
 {
     if (QGuiApplication::primaryScreen()->devicePixelRatio() >= 2)

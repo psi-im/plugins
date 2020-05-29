@@ -112,7 +112,6 @@ public:
     virtual QString             pluginInfo();
     virtual void                setPopupAccessingHost(PopupAccessingHost *host);
     virtual void                setSoundAccessingHost(SoundAccessingHost *host);
-    virtual QPixmap             icon() const;
 
 public slots:
     void closeBoardEvent();
@@ -317,7 +316,7 @@ QList<QVariantHash> ChessPlugin::getButtonParam() { return QList<QVariantHash>()
 
 QAction *ChessPlugin::getAction(QObject *parent, int, const QString &)
 {
-    QAction *action = new QAction(icon(), tr("Chess!"), parent);
+    QAction *action = new QAction(QIcon(":/chessplugin/chess.png"), tr("Chess!"), parent);
     connect(action, &QAction::triggered, this, &ChessPlugin::toolButtonPressed);
     return action;
 }
@@ -861,7 +860,5 @@ QString ChessPlugin::pluginInfo()
         "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat "
         "window.");
 }
-
-QPixmap ChessPlugin::icon() const { return QPixmap(":/chessplugin/chess.png"); }
 
 #include "chessplugin.moc"

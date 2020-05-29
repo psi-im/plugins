@@ -67,8 +67,6 @@ void OpenPgpPlugin::applyOptions() { m_optionsDialog->saveSettings(); }
 
 void OpenPgpPlugin::restoreOptions() { }
 
-QPixmap OpenPgpPlugin::icon() const { return QPixmap(":/icons/openpgp.png"); }
-
 QString OpenPgpPlugin::pluginInfo()
 {
     QString out = tr("OpenPGP is the most widely used encryption standard. "
@@ -158,7 +156,7 @@ QAction *OpenPgpPlugin::getAction(QObject *parent, int, const QString &)
     return nullptr; // This is temporary, until code is moved from Psi core
 
     // tr("OpenPGP key is not set in your account settings!")
-    m_action = new QAction(icon(), tr("OpenPGP encryption"), parent);
+    m_action = new QAction(QPixmap(":/icons/openpgp.png"), tr("OpenPGP encryption"), parent);
     m_action->setCheckable(false);
     connect(m_action, &QAction::triggered, this, &OpenPgpPlugin::actionActivated);
     connect(m_action, &QAction::destroyed, this, &OpenPgpPlugin::actionDestroyed);
