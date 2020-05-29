@@ -126,8 +126,6 @@ void GomokuGamePlugin::restoreOptions()
     ui_.cb_save_w_h->setChecked(options->getOption(constSaveWndWidthHeight).toBool());
 }
 
-QPixmap GomokuGamePlugin::icon() const { return QPixmap(":/gomokugameplugin/img/gomoku_16.png"); }
-
 /**
  * Получение списка ресурсов и вызов формы для отправки приглашения
  */

@@ -101,7 +101,6 @@ public:
     virtual bool                incomingStanza(int account, const QDomElement &xml);
     virtual bool                outgoingStanza(int, QDomElement &) { return false; }
     virtual QString             pluginInfo();
-    virtual QPixmap             icon() const;
 
 private slots:
     void menuActivated();
@@ -577,7 +576,5 @@ QString ExtendedMenuPlugin::pluginInfo()
 {
     return tr("This plugin adds several additional commands into contacts context menu.");
 }
-
-QPixmap ExtendedMenuPlugin::icon() const { return QPixmap(":/icons/extendedmenu.png"); }
 
 #include "extendedmenuplugin.moc"

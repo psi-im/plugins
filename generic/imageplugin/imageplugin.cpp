@@ -85,7 +85,6 @@ public:
     virtual void                setOptionAccessingHost(OptionAccessingHost *host);
     virtual void                optionChanged(const QString &) { }
     virtual QString             pluginInfo();
-    virtual QPixmap             icon() const;
 
 private slots:
     void actionActivated();
@@ -266,7 +265,5 @@ QString ImagePlugin::pluginInfo()
               "Your contact's client must be support XEP-0071: XHTML-IM and support the data:URI scheme.\n"
               "Note: To work correctly, the option options.ui.chat.central-toolbar  must be set to true.");
 }
-
-QPixmap ImagePlugin::icon() const { return QPixmap(":/imageplugin/imageplugin.gif"); }
 
 #include "imageplugin.moc"

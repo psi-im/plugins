@@ -96,7 +96,6 @@ public:
     virtual void    setOptionAccessingHost(OptionAccessingHost *host);
     virtual void    optionChanged(const QString &) { }
     virtual QString pluginInfo();
-    virtual QPixmap icon() const;
     virtual void    setupChatTab(QWidget *widget, int, const QString &)
     {
         connect(widget, SIGNAL(messageAppended(const QString &, QWidget *)),
@@ -189,8 +188,6 @@ QString ImagePreviewPlugin::pluginInfo()
 {
     return tr("This plugin shows images URLs' previews in chats for non-webkit Psi version.\n");
 }
-
-QPixmap ImagePreviewPlugin::icon() const { return QPixmap(":/imagepreviewplugin/imagepreviewplugin.png"); }
 
 void ImagePreviewPlugin::queueUrl(const QString &url, Origin *origin)
 {

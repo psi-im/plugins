@@ -93,7 +93,6 @@ public:
     virtual void     optionChanged(const QString &option);
     virtual void     applyOptions();
     virtual void     restoreOptions();
-    virtual QPixmap  icon() const;
 
     virtual void        setPopupAccessingHost(PopupAccessingHost *host);
     virtual void        setOptionAccessingHost(OptionAccessingHost *host);
@@ -351,8 +350,6 @@ void Watcher::restoreOptions()
         ui_.listWidget->addItem(wi->copy());
     }
 }
-
-QPixmap Watcher::icon() const { return QPixmap(":/icons/watcher.png"); }
 
 bool Watcher::incomingStanza(int acc, const QDomElement &stanza)
 {

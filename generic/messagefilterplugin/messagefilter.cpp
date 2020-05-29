@@ -76,8 +76,6 @@ void MessageFilter::applyOptions()
 
 void MessageFilter::restoreOptions() { }
 
-QPixmap MessageFilter::icon() const { return QPixmap(":/icons/messagefilter.png"); }
-
 QString MessageFilter::pluginInfo()
 {
     return tr("Can drop incoming stanzas according to various filters like source/destination address or specific "

@@ -2,6 +2,5 @@
     <qresource prefix="/icons">
         <file>list-add.png</file>
         <file>list-remove.png</file>
-        <file>messagefilter.png</file>
     </qresource>
 </RCC>

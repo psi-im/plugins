@@ -55,7 +55,6 @@ public:
     virtual void    setOptionAccessingHost(OptionAccessingHost *host);
     virtual void    optionChanged(const QString &) {};
     virtual QString pluginInfo();
-    virtual QPixmap icon() const;
 
 private:
     bool                          enabled;

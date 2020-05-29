@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/cleanerplugin" >
         <file>default.xml</file>
-        <file>cleaner.png</file>
     </qresource>
 </RCC>
