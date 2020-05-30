@@ -143,7 +143,7 @@ bool Reminder::enable()
     if (!psiOptions)
         return enabled;
 
-    QFile file(":/reminder/birthday.png");
+    QFile file(":/reminder/birthdayreminderplugin.png");
     if (file.open(QIODevice::ReadOnly)) {
         QByteArray image = file.readAll();
         icoHost->addIcon("reminder/birthdayicon", image);

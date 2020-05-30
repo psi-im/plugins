@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/conferenceloggerplugin">
+        <file>conferenceloggerplugin.png</file>
+    </qresource>
+</RCC>

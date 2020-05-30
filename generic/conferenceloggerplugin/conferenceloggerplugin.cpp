@@ -111,7 +111,7 @@ QString ConferenceLogger::name() const { return "Conference Logger Plugin"; }
 
 bool ConferenceLogger::enable()
 {
-    QFile file(":/conferenceloggerplugin/conferencelogger.png");
+    QFile file(":/conferenceloggerplugin/conferenceloggerplugin.png");
     if (file.open(QIODevice::ReadOnly)) {
         QByteArray image = file.readAll();
         IcoHost->addIcon("loggerplugin/openlog", image);
