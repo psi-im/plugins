@@ -220,7 +220,8 @@ QString PsiOtrPlugin::pluginInfo()
 
 bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageElement)
 {
-    bool ignore = false;
+    bool ignore              = false;
+    bool decryptedOtrMassage = false;
 
     if (m_enabled && !messageElement.isNull() && messageElement.attribute("type") != "error"
         && messageElement.attribute("type") != "groupchat"
@@ -249,6 +250,7 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
             ignore = true;
             break;
         case OTR_MESSAGETYPE_OTR:
+            decryptedOtrMassage = true;
             QString bodyText;
 
             bool isHTML = !htmlElement.isNull() || Qt::mightBeRichText(decrypted);
@@ -291,7 +293,7 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
     if (ignore) {
         messageElement = QDomElement();
     }
-    return false;
+    return decryptedOtrMassage;
 }
 
 //-----------------------------------------------------------------------------
@@ -322,7 +324,7 @@ bool PsiOtrPlugin::encryptMessageElement(int accountIndex, QDomElement &message)
 
     body.setNodeValue(unescape(encrypted));
 
-    return false;
+    return true;
 }
 
 //-----------------------------------------------------------------------------
