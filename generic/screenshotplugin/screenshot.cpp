@@ -28,6 +28,7 @@
 #include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QPainter>
+#include <QPainterPath>
 #include <QPrintDialog>
 #include <QPrinter>
 #include <QScreen>
