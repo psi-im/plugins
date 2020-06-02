@@ -1,4 +1,8 @@
 2020-06-03
+v1.7 tehnick
+  * Improve compatibility with XMPP clients which do not support of XEP-0380
+
+2020-06-03
 v1.6 tehnick
   * Improve plugin description
   * Stop support of libotr versions older than 4.0

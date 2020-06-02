@@ -300,22 +300,27 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
             QDomDocument document;
             int          errorLine = 0, errorColumn = 0;
             QString      errorText;
-            if (false) { // Debug mode!!!
-                if (document.setContent(decrypted, true, &errorText, &errorLine, &errorColumn)) {
-                    htmlElement.appendChild(document.documentElement());
-                } else {
-                    qWarning() << "---- parsing error:\n"
-                               << decrypted << "\n----\n"
-                               << errorText << " line:" << errorLine << " column:" << errorColumn;
-                    messageElement.removeChild(htmlElement);
-                }
+            if (document.setContent(decrypted, true, &errorText, &errorLine, &errorColumn)) {
+                htmlElement.appendChild(document.documentElement());
+            } else {
+                qWarning() << "---- parsing error:\n"
+                           << decrypted << "\n----\n"
+                           << errorText << " line:" << errorLine << " column:" << errorColumn;
+                messageElement.removeChild(htmlElement);
             }
-
-            // replace plaintext body
-            plainBody.removeChild(plainBody.firstChild());
-            plainBody.appendChild(messageElement.ownerDocument().createTextNode(unescape(bodyText)));
-            break;
         }
+
+        // replace plaintext body
+        plainBody.removeChild(plainBody.firstChild());
+        plainBody.appendChild(messageElement.ownerDocument().createTextNode(unescape(bodyText)));
+
+        // for compatibility with XMPP clients which do not support of XEP-0380
+        if (messageElement.elementsByTagNameNS("urn:xmpp:eme:0", "encryption").isEmpty()) {
+            QDomElement encElement = messageElement.ownerDocument().createElementNS("urn:xmpp:eme:0", "encryption");
+            encElement.setAttribute("namespace", "urn:xmpp:otr:0");
+            // messageElement.appendChild(encElement);
+        }
+        break;
     }
     if (ignore) {
         messageElement = QDomElement();

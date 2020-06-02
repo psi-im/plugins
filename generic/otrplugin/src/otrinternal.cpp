@@ -146,7 +146,7 @@ psiotr::OtrMessageType OtrInternal::decryptMessage(const QString &account, const
     // Magic hack to force it work similar to libotr < 4.0.0.
     // If user received unencrypted message he (she) should be notified.
     // See OTRL_MSGEVENT_RCVDMSG_UNENCRYPTED as well.
-    if (ignoreMessage && !newMessage && !cryptedMessage.startsWith("?OTR:")) {
+    if (ignoreMessage && !newMessage && !cryptedMessage.startsWith("?OTR")) {
         ignoreMessage = 0;
     }
 
