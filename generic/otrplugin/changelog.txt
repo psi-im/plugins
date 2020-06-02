@@ -1,3 +1,10 @@
+2020-06-03
+v1.6 tehnick
+  * Improve plugin description
+  * Stop support of libotr versions older than 4.0
+  * Better indication of broken messages in chat window
+  * Small code refactoring
+
 2020-05-31
 v1.5 tehnick
   * Fix usage of plugins API for proper indication of messages status
