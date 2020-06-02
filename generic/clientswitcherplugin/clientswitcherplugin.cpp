@@ -320,7 +320,6 @@ void ClientSwitcherPlugin::restoreOptions()
     restoreOptionsAcc(acc_idx);
 }
 
-
 //-- OptionAccessor -------------------------------------------------
 
 void ClientSwitcherPlugin::setOptionAccessingHost(OptionAccessingHost *host) { psiOptions = host; }

@@ -181,4 +181,3 @@ QString JabberDiskPlugin::pluginInfo()
 {
     return tr("Treat some jids as services implementing Jabber Disk protocol and handle your files with them.");
 }
-

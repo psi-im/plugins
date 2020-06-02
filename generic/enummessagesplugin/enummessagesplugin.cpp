@@ -123,7 +123,6 @@ void EnumMessagesPlugin::restoreOptions()
     _ui.tb_outColor->setProperty("psi_color", _outColor);
 }
 
-
 void EnumMessagesPlugin::setOptionAccessingHost(OptionAccessingHost *host) { _psiOptions = host; }
 
 void EnumMessagesPlugin::setActiveTabAccessingHost(ActiveTabAccessingHost *host) { _activeTab = host; }
@@ -234,9 +233,9 @@ QAction *EnumMessagesPlugin::getAction(QObject *parent, int account, const QStri
 {
     if (!enabled)
         return nullptr;
-    auto iconv = _pluginHost->selfMetadata().value("icon");
-    QIcon icon = iconv.isValid()? iconv.value<QIcon>() : QIcon();
-    QAction *act = new QAction(icon, tr("Enum Messages"), parent);
+    auto     iconv = _pluginHost->selfMetadata().value("icon");
+    QIcon    icon  = iconv.isValid() ? iconv.value<QIcon>() : QIcon();
+    QAction *act   = new QAction(icon, tr("Enum Messages"), parent);
     act->setCheckable(true);
     const QString jid = contact.split("/").first();
     act->setProperty("account", account);

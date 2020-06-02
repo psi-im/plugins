@@ -310,7 +310,6 @@ void JuickPlugin::restoreOptions()
     ui_.cb_conference->setChecked(workInGroupChat);
 }
 
-
 void JuickPlugin::requestJidList()
 {
     JuickJidList *jjl = new JuickJidList(jidList_, optionsWid);

@@ -114,7 +114,6 @@ QString PsiOtrPlugin::name() const { return "OTR Plugin"; }
 
 // ---------------------------------------------------------------------------
 
-
 QWidget *PsiOtrPlugin::options()
 {
     if (!m_enabled) {
@@ -192,18 +191,21 @@ QString PsiOtrPlugin::pluginInfo()
     out += tr("Off-the-Record Messaging (OTR) is a cryptographic protocol "
               "that provides encryption for instant messaging conversations. "
               "In addition to authentication and encryption, OTR provides "
-              "forward secrecy and malleable encryption.") + "<br/>";
+              "forward secrecy and malleable encryption.")
+        + "<br/>";
     out += "<br/>";
     out += tr("In comparison with OpenPGP and OMEMO, the OTR protocol does "
               "not depend on XMPP specific structures which allows to use it "
               "for protecting conversations via XMPP transports (to ICQ, "
-              "Skype, Telegram, QQ, vkontakte and other networks).") + "<br/>";
+              "Skype, Telegram, QQ, vkontakte and other networks).")
+        + "<br/>";
     out += "<br/>";
     out += tr("OTR features:") + "<br/>";
     out += tr("* Fast and easy update of encryption keys.") + "<br/>";
     out += tr("* Simple and convenient authentication of interlocutor "
               "without necessity of comparing public key fingerprints "
-              "through an outside communication channel.") + "<br/>";
+              "through an outside communication channel.")
+        + "<br/>";
     out += "<br/>";
     out += tr("OTR limitations:") + "<br/>";
     out += tr("* No support of offline messages.") + "<br/>";
@@ -218,15 +220,18 @@ QString PsiOtrPlugin::pluginInfo()
     out += "<dt>" + tr("Authentication") + "</dt>";
     out += "<dd>" + tr("You are assured the correspondent is who you think it is.") + "</dd>";
     out += "<dt>" + tr("Deniability") + "</dt>";
-    out += "<dd>" + tr("The messages you send do not have digital signatures that "
-                       "are checkable by a third party. Anyone can forge messages "
-                       "after a conversation to make them look like they came from "
-                       "you. However, during a conversation, your correspondent is "
-                       "assured the messages (s)he sees are authentic and unmodified.")
-            + "</dd>";
+    out += "<dd>"
+        + tr("The messages you send do not have digital signatures that "
+             "are checkable by a third party. Anyone can forge messages "
+             "after a conversation to make them look like they came from "
+             "you. However, during a conversation, your correspondent is "
+             "assured the messages (s)he sees are authentic and unmodified.")
+        + "</dd>";
     out += "<dt>" + tr("Perfect forward secrecy") + "</dt>";
-    out += "<dd>" + tr("If you lose control of your private keys, no previous "
-                       "conversation is compromised.") + "</dd>";
+    out += "<dd>"
+        + tr("If you lose control of your private keys, no previous "
+             "conversation is compromised.")
+        + "</dd>";
     out += "</dl>";
     out += tr("For further information, see "
               "&lt;<a href=\"https://otr.cypherpunks.ca/\">"
@@ -238,11 +243,9 @@ QString PsiOtrPlugin::pluginInfo()
 
 bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageElement)
 {
-    if (!m_enabled
-            || messageElement.isNull()
-            || messageElement.attribute("type") == "error"
-            || messageElement.attribute("type") == "groupchat"
-            || messageElement.firstChild().toElement().namespaceURI() == "urn:xmpp:carbons:2") {
+    if (!m_enabled || messageElement.isNull() || messageElement.attribute("type") == "error"
+        || messageElement.attribute("type") == "groupchat"
+        || messageElement.firstChild().toElement().namespaceURI() == "urn:xmpp:carbons:2") {
         return false;
     }
 
@@ -288,7 +291,7 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
             // replace html body
             if (htmlElement.isNull()) {
                 htmlElement
-                        = messageElement.ownerDocument().createElementNS("http://jabber.org/protocol/xhtml-im", "html");
+                    = messageElement.ownerDocument().createElementNS("http://jabber.org/protocol/xhtml-im", "html");
                 messageElement.appendChild(htmlElement);
             } else {
                 htmlElement.removeChild(htmlElement.firstChildElement("body"));
@@ -298,21 +301,21 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
             int          errorLine = 0, errorColumn = 0;
             QString      errorText;
             if (false) { // Debug mode!!!
-            if (document.setContent(decrypted, true, &errorText, &errorLine, &errorColumn)) {
-                htmlElement.appendChild(document.documentElement());
-            } else {
-                qWarning() << "---- parsing error:\n"
-                           << decrypted << "\n----\n"
-                           << errorText << " line:" << errorLine << " column:" << errorColumn;
-                messageElement.removeChild(htmlElement);
+                if (document.setContent(decrypted, true, &errorText, &errorLine, &errorColumn)) {
+                    htmlElement.appendChild(document.documentElement());
+                } else {
+                    qWarning() << "---- parsing error:\n"
+                               << decrypted << "\n----\n"
+                               << errorText << " line:" << errorLine << " column:" << errorColumn;
+                    messageElement.removeChild(htmlElement);
+                }
             }
-        }
 
-        // replace plaintext body
-        plainBody.removeChild(plainBody.firstChild());
-        plainBody.appendChild(messageElement.ownerDocument().createTextNode(unescape(bodyText)));
-        break;
-    }
+            // replace plaintext body
+            plainBody.removeChild(plainBody.firstChild());
+            plainBody.appendChild(messageElement.ownerDocument().createTextNode(unescape(bodyText)));
+            break;
+        }
     }
     if (ignore) {
         messageElement = QDomElement();

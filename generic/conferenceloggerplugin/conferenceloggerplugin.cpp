@@ -326,5 +326,4 @@ QString ConferenceLogger::pluginInfo()
               "Note: To work correctly, the the Groupchat Toolbar must be enabled.");
 }
 
-
 #include "conferenceloggerplugin.moc"

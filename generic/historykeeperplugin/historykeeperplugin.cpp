@@ -245,5 +245,4 @@ QString HistoryKeeperPlugin::pluginInfo()
               "plugin options.");
 }
 
-
 #include "historykeeperplugin.moc"

@@ -1171,5 +1171,4 @@ QString ExtendedOptions::pluginInfo()
               "understanding of the results when changing the option.");
 }
 
-
 #include "extendedoptionsplugin.moc"

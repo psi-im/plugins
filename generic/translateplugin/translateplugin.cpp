@@ -619,5 +619,4 @@ QString TranslatePlugin::pluginInfo()
     return tr("This plugin allows you to convert selected text into another language.\n");
 }
 
-
 #include "translateplugin.moc"

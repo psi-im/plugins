@@ -49,7 +49,7 @@ class EnumMessagesPlugin : public QObject,
                            public ChatTabAccessor,
                            public PsiAccountController,
                            public ToolbarIconAccessor,
-			   public PluginAccessor {
+                           public PluginAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.EnumMessagesPlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin OptionAccessor ActiveTabAccessor StanzaFilter ApplicationInfoAccessor PluginInfoProvider
@@ -70,7 +70,7 @@ public:
     virtual void setActiveTabAccessingHost(ActiveTabAccessingHost *host);
     virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
     virtual void setPsiAccountControllingHost(PsiAccountControllingHost *host);
-    void setPluginAccessingHost(PluginAccessingHost *host) override;
+    void         setPluginAccessingHost(PluginAccessingHost *host) override;
 
     virtual QString pluginInfo();
 
@@ -103,11 +103,11 @@ private:
 
 private:
     bool                          enabled;
-    OptionAccessingHost *         _psiOptions = nullptr;
-    ActiveTabAccessingHost *      _activeTab = nullptr;
+    OptionAccessingHost *         _psiOptions      = nullptr;
+    ActiveTabAccessingHost *      _activeTab       = nullptr;
     ApplicationInfoAccessingHost *_applicationInfo = nullptr;
-    PsiAccountControllingHost *   _accContrller = nullptr;
-    PluginAccessingHost *         _pluginHost = nullptr;
+    PsiAccountControllingHost *   _accContrller    = nullptr;
+    PluginAccessingHost *         _pluginHost      = nullptr;
 
     typedef QMap<QString, quint16> JidEnums;
     QMap<int, JidEnums>            _enumsIncomming, _enumsOutgoing;

@@ -376,7 +376,6 @@ QString VideoStatusChanger::pluginInfo()
               "To work with GNOME MPlayer additional configuration is not needed.");
 }
 
-
 #ifdef HAVE_DBUS
 bool VideoStatusChanger::isPlayerValid(const QString &service) //проверка является ли плеер разрешенным
 {

@@ -329,5 +329,4 @@ QString QipXStatuses::pluginInfo()
     return tr("This plugin is designed to display x-statuses of contacts using the QIP Infium jabber client.");
 }
 
-
 #include "qipxstatusesplugin.moc"

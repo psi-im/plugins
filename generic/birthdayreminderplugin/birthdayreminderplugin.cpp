@@ -164,7 +164,8 @@ bool Reminder::enable()
     soundFile       = psiOptions->getPluginOption(constSoundFile, QVariant(soundFile)).toString();
 
     int timeout = psiOptions->getPluginOption(constTimeout, QVariant(15000)).toInt() / 1000;
-    popupId = popup->registerOption(POPUP_OPTION_NAME, timeout, QLatin1String("plugins.options.reminder.") + constTimeout);
+    popupId
+        = popup->registerOption(POPUP_OPTION_NAME, timeout, QLatin1String("plugins.options.reminder.") + constTimeout);
 
     QDir dir(bdaysDir());
     if (!dir.exists()) {
@@ -496,6 +497,5 @@ QString Reminder::pluginInfo()
               "when the 'Use vCards cache' option is"
               "selected, the users' vCards that are cached on your hard disk will be used. ");
 }
-
 
 #include "birthdayreminderplugin.moc"

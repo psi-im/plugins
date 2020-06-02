@@ -767,5 +767,4 @@ QString AutoReply::pluginInfo()
               "mode) ");
 }
 
-
 #include "autoreplyplugin.moc"

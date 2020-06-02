@@ -247,7 +247,8 @@ bool StopSpam::enable()
 
         // register popup option
         int interval = psiOptions->getPluginOption(constInterval, QVariant(5000)).toInt() / 1000;
-        popupId = popup->registerOption(POPUP_OPTION, interval, QLatin1String("plugins.options.stopspam.") + constInterval);
+        popupId
+            = popup->registerOption(POPUP_OPTION, interval, QLatin1String("plugins.options.stopspam.") + constInterval);
     }
     return enabled;
 }
@@ -359,7 +360,6 @@ void StopSpam::restoreOptions()
 
     model_->reset();
 }
-
 
 QWidget *StopSpam::options()
 {

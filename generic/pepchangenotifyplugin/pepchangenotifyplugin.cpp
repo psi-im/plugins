@@ -502,5 +502,4 @@ QString PepPlugin::pluginInfo()
         "This plugin shows popup notifications when users from your roster changes their mood, tune or activity.");
 }
 
-
 #include "pepchangenotifyplugin.moc"

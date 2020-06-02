@@ -99,11 +99,8 @@ QString OtrInternal::encryptMessage(const QString &account, const QString &conta
     gcry_error_t err;
 
     err = otrl_message_sending(m_userstate, &m_uiOps, this, account.toUtf8().constData(), OTR_PROTOCOL_STRING,
-                               contact.toUtf8().constData(),
-                               OTRL_INSTAG_BEST,
-                               message.toUtf8().constData(), nullptr, &encMessage,
-                               OTRL_FRAGMENT_SEND_SKIP, nullptr,
-                               nullptr, nullptr);
+                               contact.toUtf8().constData(), OTRL_INSTAG_BEST, message.toUtf8().constData(), nullptr,
+                               &encMessage, OTRL_FRAGMENT_SEND_SKIP, nullptr, nullptr, nullptr);
     if (err) {
         QString err_message = QObject::tr("Encrypting message to %1 "
                                           "failed.\nThe message was not sent.")
@@ -138,9 +135,9 @@ psiotr::OtrMessageType OtrInternal::decryptMessage(const QString &account, const
     OtrlTLV *tlvs          = nullptr;
     OtrlTLV *tlv           = nullptr;
 
-    ignoreMessage = otrl_message_receiving(m_userstate, &m_uiOps, this, accountName, OTR_PROTOCOL_STRING, userName,
-                                           cryptedMessage.toUtf8().constData(), &newMessage, &tlvs, nullptr,
-                                           nullptr, nullptr);
+    ignoreMessage
+        = otrl_message_receiving(m_userstate, &m_uiOps, this, accountName, OTR_PROTOCOL_STRING, userName,
+                                 cryptedMessage.toUtf8().constData(), &newMessage, &tlvs, nullptr, nullptr, nullptr);
     tlv = otrl_tlv_find(tlvs, OTRL_TLV_DISCONNECTED);
     if (tlv) {
         m_callback->stateChange(accountName, userName, psiotr::OTR_STATECHANGE_REMOTECLOSE);
@@ -195,9 +192,8 @@ QList<psiotr::Fingerprint> OtrInternal::getFingerprints()
 void OtrInternal::verifyFingerprint(const psiotr::Fingerprint &fingerprint, bool verified)
 {
     ConnContext *context = otrl_context_find(m_userstate, fingerprint.username.toUtf8().constData(),
-                                             fingerprint.account.toUtf8().constData(),
-                                             OTR_PROTOCOL_STRING, OTRL_INSTAG_BEST,
-                                             false, nullptr, nullptr, nullptr);
+                                             fingerprint.account.toUtf8().constData(), OTR_PROTOCOL_STRING,
+                                             OTRL_INSTAG_BEST, false, nullptr, nullptr, nullptr);
     if (context) {
         ::Fingerprint *fp = otrl_context_find_fingerprint(context, fingerprint.fingerprint, 0, nullptr);
         if (fp) {
@@ -217,9 +213,8 @@ void OtrInternal::verifyFingerprint(const psiotr::Fingerprint &fingerprint, bool
 void OtrInternal::deleteFingerprint(const psiotr::Fingerprint &fingerprint)
 {
     ConnContext *context = otrl_context_find(m_userstate, fingerprint.username.toUtf8().constData(),
-                                             fingerprint.account.toUtf8().constData(),
-                                             OTR_PROTOCOL_STRING, OTRL_INSTAG_BEST,
-                                             false, nullptr, nullptr, nullptr);
+                                             fingerprint.account.toUtf8().constData(), OTR_PROTOCOL_STRING,
+                                             OTRL_INSTAG_BEST, false, nullptr, nullptr, nullptr);
     if (context) {
         ::Fingerprint *fp = otrl_context_find_fingerprint(context, fingerprint.fingerprint, 0, nullptr);
         if (fp) {
@@ -286,8 +281,7 @@ void OtrInternal::startSession(const QString &account, const QString &contact)
 void OtrInternal::endSession(const QString &account, const QString &contact)
 {
     ConnContext *context = otrl_context_find(m_userstate, contact.toUtf8().constData(), account.toUtf8().constData(),
-                                             OTR_PROTOCOL_STRING, OTRL_INSTAG_BEST,
-                                             false, nullptr, nullptr, nullptr);
+                                             OTR_PROTOCOL_STRING, OTRL_INSTAG_BEST, false, nullptr, nullptr, nullptr);
     if (context && (context->msgstate != OTRL_MSGSTATE_PLAINTEXT)) {
         m_callback->stateChange(account, contact, psiotr::OTR_STATECHANGE_CLOSE);
     }
@@ -300,9 +294,7 @@ void OtrInternal::endSession(const QString &account, const QString &contact)
 void OtrInternal::expireSession(const QString &account, const QString &contact)
 {
     ConnContext *context = otrl_context_find(m_userstate, contact.toUtf8().constData(), account.toUtf8().constData(),
-                                             OTR_PROTOCOL_STRING,
-                                             OTRL_INSTAG_BEST,
-                                             false, nullptr, nullptr, nullptr);
+                                             OTR_PROTOCOL_STRING, OTRL_INSTAG_BEST, false, nullptr, nullptr, nullptr);
     if (context && (context->msgstate == OTRL_MSGSTATE_ENCRYPTED)) {
         otrl_context_force_finished(context);
         m_callback->stateChange(account, contact, psiotr::OTR_STATECHANGE_GONEINSECURE);
@@ -315,9 +307,7 @@ void OtrInternal::startSMP(const QString &account, const QString &contact, const
                            const QString &secret)
 {
     ConnContext *context = otrl_context_find(m_userstate, contact.toUtf8().constData(), account.toUtf8().constData(),
-                                             OTR_PROTOCOL_STRING,
-                                             OTRL_INSTAG_BEST,
-                                             false, nullptr, nullptr, nullptr);
+                                             OTR_PROTOCOL_STRING, OTRL_INSTAG_BEST, false, nullptr, nullptr, nullptr);
     if (context) {
         QByteArray  secretArray   = secret.toUtf8();
         const char *secretPointer = secretArray.constData();
@@ -338,9 +328,7 @@ void OtrInternal::startSMP(const QString &account, const QString &contact, const
 void OtrInternal::continueSMP(const QString &account, const QString &contact, const QString &secret)
 {
     ConnContext *context = otrl_context_find(m_userstate, contact.toUtf8().constData(), account.toUtf8().constData(),
-                                             OTR_PROTOCOL_STRING,
-                                             OTRL_INSTAG_BEST,
-                                             false, nullptr, nullptr, nullptr);
+                                             OTR_PROTOCOL_STRING, OTRL_INSTAG_BEST, false, nullptr, nullptr, nullptr);
     if (context) {
         QByteArray  secretArray   = secret.toUtf8();
         const char *secretPointer = secretArray.constData();
@@ -354,9 +342,7 @@ void OtrInternal::continueSMP(const QString &account, const QString &contact, co
 void OtrInternal::abortSMP(const QString &account, const QString &contact)
 {
     ConnContext *context = otrl_context_find(m_userstate, contact.toUtf8().constData(), account.toUtf8().constData(),
-                                             OTR_PROTOCOL_STRING,
-                                             OTRL_INSTAG_BEST,
-                                             false, nullptr, nullptr, nullptr);
+                                             OTR_PROTOCOL_STRING, OTRL_INSTAG_BEST, false, nullptr, nullptr, nullptr);
     if (context) {
         abortSMP(context);
     }
@@ -369,9 +355,7 @@ void OtrInternal::abortSMP(ConnContext *context) { otrl_message_abort_smp(m_user
 psiotr::OtrMessageState OtrInternal::getMessageState(const QString &account, const QString &contact)
 {
     ConnContext *context = otrl_context_find(m_userstate, contact.toUtf8().constData(), account.toUtf8().constData(),
-                                             OTR_PROTOCOL_STRING,
-                                             OTRL_INSTAG_BEST,
-                                             false, nullptr, nullptr, nullptr);
+                                             OTR_PROTOCOL_STRING, OTRL_INSTAG_BEST, false, nullptr, nullptr, nullptr);
     if (context) {
         if (context->msgstate == OTRL_MSGSTATE_PLAINTEXT) {
             return psiotr::OTR_MESSAGESTATE_PLAINTEXT;
@@ -408,9 +392,7 @@ QString OtrInternal::getSessionId(const QString &account, const QString &contact
 {
     ConnContext *context;
     context = otrl_context_find(m_userstate, contact.toUtf8().constData(), account.toUtf8().constData(),
-                                OTR_PROTOCOL_STRING,
-                                OTRL_INSTAG_BEST,
-                                false, nullptr, nullptr, nullptr);
+                                OTR_PROTOCOL_STRING, OTRL_INSTAG_BEST, false, nullptr, nullptr, nullptr);
     if (context && (context->sessionid_len > 0)) {
         QString firstHalf;
         QString secondHalf;
@@ -444,9 +426,7 @@ psiotr::Fingerprint OtrInternal::getActiveFingerprint(const QString &account, co
 {
     ConnContext *context;
     context = otrl_context_find(m_userstate, contact.toUtf8().constData(), account.toUtf8().constData(),
-                                OTR_PROTOCOL_STRING,
-                                OTRL_INSTAG_BEST,
-                                false, nullptr, nullptr, nullptr);
+                                OTR_PROTOCOL_STRING, OTRL_INSTAG_BEST, false, nullptr, nullptr, nullptr);
 
     if (context && context->active_fingerprint) {
         return psiotr::Fingerprint(context->active_fingerprint->fingerprint, QString::fromUtf8(context->accountname),
@@ -463,9 +443,7 @@ bool OtrInternal::isVerified(const QString &account, const QString &contact)
 {
     ConnContext *context;
     context = otrl_context_find(m_userstate, contact.toUtf8().constData(), account.toUtf8().constData(),
-                                OTR_PROTOCOL_STRING,
-                                OTRL_INSTAG_BEST,
-                                false, nullptr, nullptr, nullptr);
+                                OTR_PROTOCOL_STRING, OTRL_INSTAG_BEST, false, nullptr, nullptr, nullptr);
 
     return isVerified(context);
 }
@@ -488,9 +466,7 @@ bool OtrInternal::smpSucceeded(const QString &account, const QString &contact)
 {
     ConnContext *context;
     context = otrl_context_find(m_userstate, contact.toUtf8().constData(), account.toUtf8().constData(),
-                                OTR_PROTOCOL_STRING,
-                                OTRL_INSTAG_BEST,
-                                false, nullptr, nullptr, nullptr);
+                                OTR_PROTOCOL_STRING, OTRL_INSTAG_BEST, false, nullptr, nullptr, nullptr);
 
     if (context) {
         return context->smstate->sm_prog_state == OTRL_SMP_PROG_SUCCEEDED;

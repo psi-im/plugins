@@ -79,7 +79,6 @@ void ContentDownloader::applyOptions() { }
 
 void ContentDownloader::restoreOptions() { }
 
-
 void ContentDownloader::setOptionAccessingHost(OptionAccessingHost *host) { psiOptions = host; }
 
 void ContentDownloader::optionChanged(const QString &option) { Q_UNUSED(option); }
