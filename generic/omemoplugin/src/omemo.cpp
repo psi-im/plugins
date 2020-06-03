@@ -207,6 +207,13 @@ bool OMEMO::decryptMessage(int account, QDomElement &xml)
                 message.removeChild(message.firstChildElement("body"));
                 message.appendChild(body);
 
+                // for compatibility with XMPP clients which do not support of XEP-0380
+                if (message.elementsByTagNameNS("urn:xmpp:eme:0", "encryption").isEmpty()) {
+                    QDomElement encryption = message.ownerDocument().createElementNS("urn:xmpp:eme:0", "encryption");
+                    encryption.setAttribute("namespace", k_omemoXmlns);
+                    message.appendChild(encryption);
+                }
+
                 return true;
             }
         }

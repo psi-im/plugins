@@ -318,7 +318,7 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
         if (messageElement.elementsByTagNameNS("urn:xmpp:eme:0", "encryption").isEmpty()) {
             QDomElement encElement = messageElement.ownerDocument().createElementNS("urn:xmpp:eme:0", "encryption");
             encElement.setAttribute("namespace", "urn:xmpp:otr:0");
-            // messageElement.appendChild(encElement);
+            messageElement.appendChild(encElement);
         }
         break;
     }

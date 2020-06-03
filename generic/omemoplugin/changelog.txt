@@ -1,3 +1,7 @@
+2020-06-03
+v2.6 tehnick
+  * Improve compatibility with XMPP clients which do not support of XEP-0380
+
 2020-05-26
 v2.5 tehnick
   * Forcibly ask server for keys:
