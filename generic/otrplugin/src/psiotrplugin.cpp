@@ -252,8 +252,8 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
     bool decryptedOtrMassage = false;
     bool ignore              = false;
 
-    QString contact = getCorrectJid(accountIndex, messageElement.attribute("from"));
-    QString account = m_accountInfo->getId(accountIndex);
+    const QString &&contact = getCorrectJid(accountIndex, messageElement.attribute("from"));
+    const QString &&account = m_accountInfo->getId(accountIndex);
 
     QDomElement htmlElement = messageElement.firstChildElement("html");
     QDomElement plainBody   = messageElement.firstChildElement("body");
@@ -336,7 +336,8 @@ bool PsiOtrPlugin::encryptMessageElement(int accountIndex, QDomElement &message)
         return false;
     }
 
-    QString     account     = m_accountInfo->getId(accountIndex);
+    const QString &&account = m_accountInfo->getId(accountIndex);
+    const QString &&contact = getCorrectJid(accountIndex, message.attribute("to"));
     QDomElement bodyElement = message.firstChildElement("body");
 
     if (bodyElement.isNull()) {
@@ -345,8 +346,7 @@ bool PsiOtrPlugin::encryptMessageElement(int accountIndex, QDomElement &message)
 
     QDomNode body = bodyElement.firstChild();
 
-    QString encrypted = m_otrConnection->encryptMessage(account, getCorrectJid(accountIndex, message.attribute("to")),
-                                                        body.nodeValue().toHtmlEscaped());
+    QString encrypted = m_otrConnection->encryptMessage(account, contact, body.nodeValue().toHtmlEscaped());
 
     // if there has been an error, drop the message
     if (encrypted.isEmpty()) {
@@ -355,6 +355,33 @@ bool PsiOtrPlugin::encryptMessageElement(int accountIndex, QDomElement &message)
     }
 
     body.setNodeValue(unescape(encrypted));
+
+    if (!m_onlineUsers.value(account).contains(contact)) {
+        m_onlineUsers[account][contact] = new PsiOtrClosure(account, contact, m_otrConnection);
+    }
+
+    QDomElement htmlElement = message.firstChildElement("html");
+    if (m_onlineUsers[account][contact]->encrypted() && !htmlElement.isNull()) {
+        message.removeChild(htmlElement);
+    }
+
+    if (m_onlineUsers[account][contact]->encrypted()) {
+        htmlElement = message.ownerDocument().createElementNS("urn:xmpp:eme:0", "encryption");
+        htmlElement.setAttribute("namespace", "urn:xmpp:otr:0");
+        message.appendChild(htmlElement);
+
+        if (message.attribute("to").contains("/")) {
+            // if not a bare jid
+            htmlElement = message.ownerDocument().createElementNS("urn:xmpp:hints", "no-copy");
+            message.appendChild(htmlElement);
+        }
+
+        htmlElement = message.ownerDocument().createElementNS("urn:xmpp:hints", "no-permanent-store");
+        message.appendChild(htmlElement);
+
+        htmlElement = message.ownerDocument().createElementNS("urn:xmpp:carbons:2", "private");
+        message.appendChild(htmlElement);
+    }
 
     return true;
 }
@@ -451,40 +478,6 @@ bool PsiOtrPlugin::incomingStanza(int accountIndex, const QDomElement &xml)
 
 bool PsiOtrPlugin::outgoingStanza(int accountIndex, QDomElement &xml)
 {
-    if (!m_enabled || xml.nodeName() != "message") {
-        return false;
-    }
-
-    QString account = m_accountInfo->getId(accountIndex);
-    QString contact = getCorrectJid(accountIndex, xml.attribute("to"));
-
-    if (!m_onlineUsers.value(account).contains(contact)) {
-        m_onlineUsers[account][contact] = new PsiOtrClosure(account, contact, m_otrConnection);
-    }
-
-    QDomElement htmlElement = xml.firstChildElement("html");
-    if (m_onlineUsers[account][contact]->encrypted() && !htmlElement.isNull()) {
-        xml.removeChild(htmlElement);
-    }
-
-    if (m_onlineUsers[account][contact]->encrypted()) {
-        htmlElement = xml.ownerDocument().createElementNS("urn:xmpp:eme:0", "encryption");
-        htmlElement.setAttribute("namespace", "urn:xmpp:otr:0");
-        xml.appendChild(htmlElement);
-
-        if (xml.attribute("to").contains("/")) {
-            // if not a bare jid
-            htmlElement = xml.ownerDocument().createElementNS("urn:xmpp:hints", "no-copy");
-            xml.appendChild(htmlElement);
-        }
-
-        htmlElement = xml.ownerDocument().createElementNS("urn:xmpp:hints", "no-permanent-store");
-        xml.appendChild(htmlElement);
-
-        htmlElement = xml.ownerDocument().createElementNS("urn:xmpp:carbons:2", "private");
-        xml.appendChild(htmlElement);
-    }
-
     return false;
 }
 
