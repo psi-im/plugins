@@ -36,7 +36,7 @@ bool StorageNotesPlugin::enable()
 {
     enabled = true;
 
-    QFile file(":/storagenotes/storagenotes.png");
+    QFile file(":/storagenotesplugin/storagenotesplugin.png");
     file.open(QIODevice::ReadOnly);
     QByteArray image = file.readAll();
     iconHost->addIcon("storagenotes/storagenotes", image);

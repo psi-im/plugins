@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/storagenotesplugin">
+        <file>storagenotesplugin.png</file>
+    </qresource>
+</RCC>
