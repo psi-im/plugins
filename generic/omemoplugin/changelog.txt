@@ -1,3 +1,7 @@
+2020-06-24
+v2.7 tehnick
+  * Small fix in stanza for beginning of OMEMO session.
+
 2020-06-03
 v2.6 tehnick
   * Improve compatibility with XMPP clients which do not support of XEP-0380

@@ -303,7 +303,7 @@ bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml,
             QDomElement keyElement = xml.ownerDocument().createElement("key");
             keyElement.setAttribute("rid", encKey.deviceId);
             if (encKey.isPreKey) {
-                keyElement.setAttribute("prekey", 1);
+                keyElement.setAttribute("prekey", "true");
             }
             setNodeText(keyElement, encKey.key);
             header.appendChild(keyElement);
