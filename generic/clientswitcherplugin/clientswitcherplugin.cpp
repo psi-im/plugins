@@ -974,7 +974,11 @@ void ClientSwitcherPlugin::saveToLog(const int account, const QString &to_jid, c
         QTextStream out(&file);
         out.setCodec("UTF-8");
         out.setGenerateByteOrderMark(false);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+        out << time_str << "  " << to_jid << " <-- " << ver_str << Qt::endl;
+#else
         out << time_str << "  " << to_jid << " <-- " << ver_str << endl;
+#endif
     }
 }
 
