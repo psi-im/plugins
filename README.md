@@ -2,7 +2,7 @@
 
 ## Description
 
-This repository contains all Psi plugins which their developers prefer to maintain them together with upstream.
+This repository contains all Psi plugins which their developers prefer to maintain together with Psi developers.
 
 * generic/	- plugins for all platforms (Linux, Windows, macOS, *BSD, Haiku, etc.)
 * unix/		- plugins for unix-based systems (Linux, *BSD)
