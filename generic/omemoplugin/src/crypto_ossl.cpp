@@ -18,6 +18,9 @@
  */
 
 #include <QVector>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+# include <QRandomGenerator>
+#endif
 
 #include "crypto.h"
 extern "C" {
@@ -34,11 +37,18 @@ void Crypto::doInit()
 {
     OpenSSL_add_all_algorithms();
     if (RAND_status() == 0) {
-        qsrand(static_cast<uint>(time(nullptr)));
         char buf[128];
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+        auto rg = QRandomGenerator::global();
+        for (char &n : buf) {
+            n = static_cast<char>(rg->bounded(256));
+        }
+#else
+        qsrand(static_cast<uint>(time(nullptr)));
         for (char &n : buf) {
             n = static_cast<char>(qrand());
         }
+#endif
         RAND_seed(buf, 128);
     }
 }
