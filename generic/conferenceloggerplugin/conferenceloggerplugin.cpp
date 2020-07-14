@@ -111,11 +111,9 @@ QString ConferenceLogger::name() const { return "Conference Logger Plugin"; }
 
 bool ConferenceLogger::enable()
 {
-    QFile file(":/conferenceloggerplugin/conferenceloggerplugin.png");
-    if (file.open(QIODevice::ReadOnly)) {
-        QByteArray image = file.readAll();
+    QByteArray image = PSI_PLUGIN_MD("rawIcon").toByteArray();
+    if (!image.isEmpty()) {
         IcoHost->addIcon("loggerplugin/openlog", image);
-        file.close();
     } else {
         enabled = false;
         return enabled;
@@ -235,7 +233,11 @@ void ConferenceLogger::Logger(QString room, const QString &from, const QString &
         // out.seek(file.size());
         out.setCodec("UTF-8");
         out.setGenerateByteOrderMark(false);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+        out << stamp << "  " << from << ": " << text << Qt::endl;
+#else
         out << stamp << "  " << from << ": " << text << endl;
+#endif
     }
 }
 

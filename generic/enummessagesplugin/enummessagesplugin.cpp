@@ -134,8 +134,6 @@ void EnumMessagesPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessin
 
 void EnumMessagesPlugin::setPsiAccountControllingHost(PsiAccountControllingHost *host) { _accContrller = host; }
 
-void EnumMessagesPlugin::setPluginAccessingHost(PluginAccessingHost *host) { _pluginHost = host; }
-
 bool EnumMessagesPlugin::incomingStanza(int account, const QDomElement &stanza)
 {
     if (!enabled)
@@ -233,8 +231,7 @@ QAction *EnumMessagesPlugin::getAction(QObject *parent, int account, const QStri
 {
     if (!enabled)
         return nullptr;
-    auto     iconv = _pluginHost->selfMetadata().value("icon");
-    QIcon    icon  = iconv.isValid() ? iconv.value<QIcon>() : QIcon();
+    QIcon icon = PSI_PLUGIN_MD("icon").value<QIcon>();
     QAction *act   = new QAction(icon, tr("Enum Messages"), parent);
     act->setCheckable(true);
     const QString jid = contact.split("/").first();

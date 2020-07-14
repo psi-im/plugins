@@ -67,13 +67,12 @@ class AttentionPlugin : public QObject,
                         public StanzaSender,
                         public MenuAccessor,
                         public PluginInfoProvider,
-                        public SoundAccessor,
-                        public PluginAccessor {
+                        public SoundAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.AttentionPlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin StanzaFilter AccountInfoAccessor OptionAccessor ActiveTabAccessor ApplicationInfoAccessor
                      ToolbarIconAccessor IconFactoryAccessor PopupAccessor StanzaSender MenuAccessor PluginInfoProvider
-                         SoundAccessor PluginAccessor)
+                         SoundAccessor)
 
 public:
     AttentionPlugin();
@@ -92,7 +91,6 @@ public:
     void                setIconFactoryAccessingHost(IconFactoryAccessingHost *host) override;
     void                setPopupAccessingHost(PopupAccessingHost *host) override;
     void                setStanzaSendingHost(StanzaSendingHost *host) override;
-    void                setPluginAccessingHost(PluginAccessingHost *host) override;
     QList<QVariantHash> getButtonParam() override;
     QAction *           getAction(QObject *, int, const QString &) override { return nullptr; };
     QList<QVariantHash> getAccountMenuParam() override;
@@ -121,7 +119,6 @@ private:
     QPoint                        oldPoint_;
     QPointer<QWidget>             options_;
     int                           popupId;
-    QIcon                         pluginIcon;
 
     struct Blocked {
         int       Acc;
@@ -159,13 +156,9 @@ QString AttentionPlugin::name() const { return "Attention Plugin"; }
 
 bool AttentionPlugin::enable()
 {
-    QPixmap    pixmap = pluginIcon.pixmap(32);
-    QByteArray bytes;
-    QBuffer    buffer(&bytes);
-    buffer.open(QIODevice::WriteOnly);
-    pixmap.save(&buffer, "PNG");
+    QByteArray bytes = PSI_PLUGIN_MD("rawIcon").toByteArray();
     if (!bytes.isEmpty()) {
-        icoHost->addIcon("attentionplugin/attention", bytes); // FIXME better pass icon as is
+        icoHost->addIcon("attentionplugin/attention", bytes);
     } else {
         enabled = false;
         return enabled;
@@ -373,11 +366,6 @@ void AttentionPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHo
 
 void AttentionPlugin::setSoundAccessingHost(SoundAccessingHost *host) { sound_ = host; }
 
-void AttentionPlugin::setPluginAccessingHost(PluginAccessingHost *host)
-{
-    pluginIcon = host->selfMetadata().value("icon").value<QIcon>();
-}
-
 QList<QVariantHash> AttentionPlugin::getButtonParam()
 {
     QList<QVariantHash> l;
@@ -497,7 +485,11 @@ void AttentionPlugin::nudgeTimerTimeout()
         return;
     }
     if (count < 40) {
-        int    rH = qrand() % 10, rW = qrand() % 10;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+        int rH = QRandomGenerator::global()->generate() % 10, rW = QRandomGenerator::global()->generate() % 10;
+#else
+        int rH = qrand() % 10, rW = qrand() % 10;
+#endif
         QPoint newPoint(oldPoint_.x() + rH, oldPoint_.y() + rW);
         nudgeWindow_->move(newPoint);
         count++;
