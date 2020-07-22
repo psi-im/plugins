@@ -13,57 +13,109 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_5">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QTabWidget" name="tabWidget">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>1</verstretch>
-      </sizepolicy>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Account:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cb_accounts">
+       <property name="minimumSize">
+        <size>
+         <width>141</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cb_allaccounts">
+       <property name="text">
+        <string>For all accounts</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="widgetResizable">
+      <bool>true</bool>
      </property>
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="tab1">
-      <attribute name="title">
-       <string>General</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>942</width>
+        <height>664</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="label_4">
            <property name="text">
-            <string>Account:</string>
+            <string>Response mode</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="cb_accounts">
-           <property name="minimumSize">
-            <size>
-             <width>141</width>
-             <height>0</height>
-            </size>
-           </property>
+          <widget class="QComboBox" name="cmb_lockrequ">
+           <item>
+            <property name="text">
+             <string>allow</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>not implemented</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>ignore</string>
+            </property>
+           </item>
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="cb_allaccounts">
+          <widget class="QCheckBox" name="cb_locktimerequ">
            <property name="text">
-            <string>For all accounts</string>
+            <string>Deny iq time request</string>
            </property>
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer">
+          <spacer name="spacer_2">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Expanding</enum>
+           </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>40</width>
+             <width>18</width>
              <height>20</height>
             </size>
            </property>
@@ -72,363 +124,139 @@
         </layout>
        </item>
        <item>
-        <widget class="QScrollArea" name="scrollArea">
-         <property name="widgetResizable">
+        <widget class="QGroupBox" name="gb_os">
+         <property name="enabled">
           <bool>true</bool>
          </property>
-         <widget class="QWidget" name="scrollAreaWidgetContents">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>930</width>
-            <height>573</height>
-           </rect>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_4">
-             <item>
-              <widget class="QLabel" name="label_4">
-               <property name="text">
-                <string>Response mode</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QComboBox" name="cmb_lockrequ">
-               <item>
-                <property name="text">
-                 <string>allow</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>not implemented</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>ignore</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="cb_locktimerequ">
-               <property name="text">
-                <string>Deny iq time request</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="spacer_2">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Expanding</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>18</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="gb_os">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="title">
-              <string>OS</string>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_2">
-              <item>
-               <layout class="QGridLayout" name="gridLayout">
-                <item row="0" column="0">
-                 <widget class="QLabel" name="lb_ospreset">
-                  <property name="text">
-                   <string>Template</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QComboBox" name="cb_ospreset"/>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="lb_osname">
-                  <property name="text">
-                   <string>OS name</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QLineEdit" name="le_osname"/>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="gb_client">
-             <property name="title">
-              <string>Client</string>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout">
-              <item>
-               <layout class="QGridLayout" name="gridLayout_2">
-                <item row="0" column="0">
-                 <widget class="QLabel" name="lb_clientpreset">
-                  <property name="text">
-                   <string>Template</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QComboBox" name="cb_clientpreset"/>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="lb_clientname">
-                  <property name="text">
-                   <string>Client name</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QLineEdit" name="le_clientname"/>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="lb_clientversion">
-                  <property name="text">
-                   <string>Client version</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLineEdit" name="le_clientversion"/>
-                </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="lb_capsnode">
-                  <property name="text">
-                   <string>Caps node</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="1">
-                 <widget class="QLineEdit" name="le_capsnode"/>
-                </item>
-                <item row="4" column="0">
-                 <widget class="QLabel" name="lb_capsversion">
-                  <property name="text">
-                   <string>Caps version</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="1">
-                 <widget class="QLineEdit" name="le_capsversion"/>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="gb_enablefor">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="title">
-              <string>Enable for:</string>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout">
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_5">
-                <item>
-                 <widget class="QCheckBox" name="cb_contactsenable">
-                  <property name="text">
-                   <string>Contacts</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="spacer_3">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::Maximum</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>30</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="cb_conferencesenable">
-                  <property name="text">
-                   <string>Groupchats</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="spacer_4">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::Expanding</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>18</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <layout class="QGridLayout" name="gridLayout_3">
-             <item row="0" column="1">
-              <widget class="QLabel" name="label_2">
-               <property name="text">
-                <string>Show popup at version iq</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
-              <widget class="QComboBox" name="cmb_showrequ">
-               <item>
-                <property name="text">
-                 <string>never</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>if iq replaced</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>always</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="label_3">
-               <property name="text">
-                <string>Save queries to log</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="2">
-              <widget class="QComboBox" name="cmb_savetolog">
-               <item>
-                <property name="text">
-                 <string>never</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>if iq replaced</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>always</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
+         <property name="title">
+          <string>OS</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="1" column="0">
+             <widget class="QLabel" name="lb_osname">
+              <property name="text">
+               <string>OS name</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="lb_ospreset">
+              <property name="text">
+               <string>Template</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="cb_ospreset"/>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="le_osname"/>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="lb_osversion">
+              <property name="text">
+               <string>OS version</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLineEdit" name="le_osversion"/>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
        </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab2">
-      <attribute name="title">
-       <string>Logs</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_7">
-         <item>
-          <widget class="QComboBox" name="cb_logslist">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>1</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="bt_viewlog">
-           <property name="text">
-            <string>View log</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QGroupBox" name="gb_client">
+         <property name="title">
+          <string>Client</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="0" column="0">
+             <widget class="QLabel" name="lb_clientpreset">
+              <property name="text">
+               <string>Template</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="cb_clientpreset"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="lb_clientname">
+              <property name="text">
+               <string>Client name</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="le_clientname"/>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="lb_clientversion">
+              <property name="text">
+               <string>Client version</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLineEdit" name="le_clientversion"/>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="lb_capsnode">
+              <property name="text">
+               <string>Caps node</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLineEdit" name="le_capsnode"/>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="lb_capsversion">
+              <property name="text">
+               <string>Caps version</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QLineEdit" name="le_capsversion"/>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer_3">
+        <widget class="QLabel" name="warningLabel">
+         <property name="text">
+          <string>&lt;b&gt;Attention!&lt;/b&gt; Thoughtless usage of Client Switcher Plugin may cause to inability of using OMEMO and OpenPGP encryption. Use functions of this plugin very carefully...</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>471</height>
+           <height>40</height>
           </size>
          </property>
         </spacer>
        </item>
       </layout>
      </widget>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="warningLabel">
-     <property name="text">
-      <string>&lt;b&gt;Attention!&lt;/b&gt; Thoughtless usage of Client Switcher Plugin may cause to inability of using OMEMO and OpenPGP encryption. Use functions of this plugin very carefully...</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
     </widget>
    </item>
    <item>
@@ -443,27 +271,6 @@
    </item>
   </layout>
  </widget>
- <tabstops>
-  <tabstop>tabWidget</tabstop>
-  <tabstop>cb_accounts</tabstop>
-  <tabstop>cb_allaccounts</tabstop>
-  <tabstop>scrollArea</tabstop>
-  <tabstop>cmb_lockrequ</tabstop>
-  <tabstop>cb_locktimerequ</tabstop>
-  <tabstop>cb_ospreset</tabstop>
-  <tabstop>le_osname</tabstop>
-  <tabstop>cb_clientpreset</tabstop>
-  <tabstop>le_clientname</tabstop>
-  <tabstop>le_clientversion</tabstop>
-  <tabstop>le_capsnode</tabstop>
-  <tabstop>le_capsversion</tabstop>
-  <tabstop>cb_contactsenable</tabstop>
-  <tabstop>cb_conferencesenable</tabstop>
-  <tabstop>cmb_showrequ</tabstop>
-  <tabstop>cmb_savetolog</tabstop>
-  <tabstop>cb_logslist</tabstop>
-  <tabstop>bt_viewlog</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>

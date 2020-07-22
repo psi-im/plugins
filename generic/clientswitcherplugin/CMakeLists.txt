@@ -33,14 +33,10 @@ endif()
 set( _HDRS
     ${PLUGIN}.h
     accountsettings.h
-    viewer.h
-    typeaheadfind.h
 )
 set( _SRCS
     ${PLUGIN}.cpp
     accountsettings.cpp
-    viewer.cpp
-    typeaheadfind.cpp
 )
 set( _UIS
     options.ui

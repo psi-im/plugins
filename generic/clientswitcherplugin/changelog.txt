@@ -1,3 +1,7 @@
+2020-07-22
+v0.1
+  * The plugin was rewritten to reuse caps generation of iris
+
 2013-09-02
 v0.0.18 - taurus
   * Использовать слово Groupchat вместо Conference
