@@ -128,15 +128,16 @@ private:
     int              getAccountById(const QString &);
     AccountSettings *getAccountSetting(const QString &);
 
+private:
+    bool updateInfo(int account);
+
 private slots:
     void enableAccountsList(int);
     void restoreOptionsAcc(int);
     void enableMainParams(int);
     void enableOsParams(int);
     void enableClientParams(int);
-    bool updateInfo(int account);
     void setNewCaps(int);
-    void onCloseView(int, int);
 };
 
 #endif
