@@ -119,11 +119,22 @@ bool ClientSwitcherPlugin::enable()
 
 bool ClientSwitcherPlugin::disable()
 {
+    if (!enabled)
+        return true;
+
     while (settingsList.size() != 0) {
         AccountSettings *as = settingsList.takeLast();
         if (as)
             delete as;
     }
+
+    for (int i = 0;; i++) {
+        QString id = psiAccount->getId(i);
+        if (id == "-1")
+            break;
+        psiAccountCtl->setClientVersionInfo(i, {});
+    }
+
     enabled = false;
     return true;
 }
