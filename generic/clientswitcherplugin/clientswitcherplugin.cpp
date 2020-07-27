@@ -210,11 +210,15 @@ void ClientSwitcherPlugin::applyOptions()
     }
     // Наименование ОС
     if (ui_options.cb_ospreset->currentIndex() == 0) {
+        caps_updated   = !(as->os_name.isEmpty() && as->os_version.isEmpty());
         as->os_name    = QString();
         as->os_version = QString();
     } else {
-        as->os_name    = ui_options.le_osname->text().trimmed();
-        as->os_version = ui_options.le_osversion->text().trimmed();
+        auto name      = ui_options.le_osname->text().trimmed();
+        auto version   = ui_options.le_osversion->text().trimmed();
+        caps_updated   = !(name == as->os_name && version == as->os_version);
+        as->os_name    = name;
+        as->os_version = version;
     }
     // Клиент
     if (ui_options.cb_clientpreset->currentIndex() == 0) {
