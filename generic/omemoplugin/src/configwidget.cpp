@@ -68,7 +68,7 @@ ConfigWidgetTabWithTable::ConfigWidgetTabWithTable(int account, OMEMO *omemo, QW
 {
     m_table = new QTableView(this);
     m_table->setShowGrid(true);
-    m_table->setEditTriggers(nullptr);
+    m_table->setEditTriggers({});
     m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_table->setContextMenuPolicy(Qt::CustomContextMenu);
     m_table->setSortingEnabled(true);
