@@ -36,19 +36,17 @@ fi
 if [ "${TARGET}" = "macos64" ]
 then
     export HOMEBREW_NO_AUTO_UPDATE=1
-    PACKAGES="ccache \
-              libidn \
-              qtkeychain \
-              qca \
-              minizip \
-              hunspell \
-              tidy-html5 \
-              libgpg-error \
-              libotr \
-              libsignal-protocol-c"
-    for PKG in ${PACKAGES}
-    do
-        brew ls --versions "${PKG}" > /dev/null || brew install "${PKG}"
-    done
+    export PACKAGES="ccache \
+                     libidn \
+                     qtkeychain \
+                     qca \
+                     minizip \
+                     hunspell \
+                     tidy-html5 \
+                     libgpg-error \
+                     libotr \
+                     libsignal-protocol-c \
+                    "
+    brew install "${PACKAGES}"
 fi
 
