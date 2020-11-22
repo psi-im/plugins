@@ -47,6 +47,6 @@ then
                      libotr \
                      libsignal-protocol-c \
                     "
-    brew install "${PACKAGES}"
+    brew install ${PACKAGES}
 fi
 
