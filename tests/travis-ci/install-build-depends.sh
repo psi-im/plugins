@@ -35,7 +35,7 @@ fi
 
 if [ "${TARGET}" = "macos64" ]
 then
-    HOMEBREW_NO_AUTO_UPDATE=1
+    export HOMEBREW_NO_AUTO_UPDATE=1
     PACKAGES="ccache \
               libidn \
               qtkeychain \
