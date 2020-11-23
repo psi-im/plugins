@@ -749,7 +749,7 @@ void Options::updateGpgAgentConfig(const int pwdExpirationTime)
         configText = PGPUtil::readGpgAgentConfig(true);
     }
 
-    QStringList &&lines = configText.split("\n");
+    QStringList lines = configText.split("\n");
     for (QString &line : lines) {
         if (line.contains("default-cache-ttl")) {
             line = QString("default-cache-ttl ") + QString::number(pwdExpirationTime);
