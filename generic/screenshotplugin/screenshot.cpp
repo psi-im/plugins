@@ -582,8 +582,9 @@ void Screenshot::uploadScreenshot()
         uploadFtp();
     } else if (scheme.toLower() == QLatin1String(PROTOCOL_HTTP)) {
         uploadHttp();
-    } else
+    } else {
         cancelUpload();
+    }
 }
 
 void Screenshot::uploadFtp()
@@ -599,8 +600,10 @@ void Screenshot::uploadFtp()
     fileName = fi.fileName();
 
     Server *s = servers.at(ui_.cb_servers->currentIndex());
-    if (!s)
+    if (!s) {
         cancelUpload();
+        return;
+    }
 
     QUrl u;
     u.setPort(21);
@@ -647,8 +650,10 @@ void Screenshot::uploadHttp()
     QString filename = tr("%1.").arg(QDateTime::currentDateTime().toString(fileNameFormat)) + format;
 
     Server *s = servers.at(ui_.cb_servers->currentIndex());
-    if (!s)
+    if (!s) {
         cancelUpload();
+        return;
+    }
 
     if (s->servPostdata().length() > 0) {
         for (auto poststr : s->servPostdata().split("&")) {
