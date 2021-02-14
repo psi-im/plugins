@@ -52,7 +52,7 @@
 #define AUTOREDIRECTS
 #endif
 
-#define IMGPREVIEW_DEBUG
+//#define IMGPREVIEW_DEBUG
 #define constVersion "0.1.2"
 #define sizeLimitName "imgpreview-size-limit"
 #define previewSizeName "imgpreview-preview-size"
