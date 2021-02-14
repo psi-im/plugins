@@ -42,10 +42,16 @@ endif()
 set( _SRCS
     ${PLUGIN}.cpp
     ScrollKeeper.cpp
+    options.cpp
 )
 
 set( _HDRS
     ScrollKeeper.h
+    options.h
+)
+
+set( _UIS
+    options.ui
 )
 
 find_package(Qt5 COMPONENTS Widgets Xml Network REQUIRED)
@@ -68,6 +74,7 @@ add_library(
     ${LIB_TYPE}
     ${_SRCS}
     ${RSCS}
+    ${UIS}
 )
 target_link_libraries(
     ${PLUGIN}

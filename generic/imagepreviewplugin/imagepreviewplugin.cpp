@@ -23,8 +23,10 @@
 #include "chattabaccessor.h"
 #include "optionaccessinghost.h"
 #include "optionaccessor.h"
+#include "options.h"
 #include "plugininfoprovider.h"
 #include "psiplugin.h"
+
 #include <QApplication>
 #include <QByteArray>
 #include <QCheckBox>
@@ -50,11 +52,12 @@
 #define AUTOREDIRECTS
 #endif
 
-//#define IMGPREVIEW_DEBUG
+#define IMGPREVIEW_DEBUG
 #define constVersion "0.1.2"
 #define sizeLimitName "imgpreview-size-limit"
 #define previewSizeName "imgpreview-preview-size"
 #define allowUpscaleName "imgpreview-allow-upscale"
+#define exceptionsName "imgpreview-exceptions"
 #define MAX_REDIRECTS 2
 
 class Origin : public QObject {
@@ -116,18 +119,18 @@ private slots:
     void imageReply(QNetworkReply *reply);
 
 private:
-    OptionAccessingHost *         psiOptions;
-    bool                          enabled;
-    QNetworkAccessManager *       manager;
+    OptionAccessingHost *         psiOptions = nullptr;
+    bool                          enabled    = false;
+    QNetworkAccessManager *       manager    = nullptr;
     QSet<QString>                 pending, failed;
-    int                           previewSize;
-    QPointer<QSpinBox>            sb_previewSize;
-    int                           sizeLimit;
-    QPointer<QComboBox>           cb_sizeLimit;
-    bool                          allowUpscale;
-    QPointer<QCheckBox>           cb_allowUpscale;
-    ApplicationInfoAccessingHost *appInfoHost;
+    int                           previewSize = 256;
+    QPointer<ImagePreviewOptions> optionsDlg;
+    int                           sizeLimit    = 10000000;
+    bool                          allowUpscale = false;
+    QList<QRegularExpression>     exceptions;
+    ApplicationInfoAccessingHost *appInfoHost = nullptr;
     void                          queueUrl(const QString &url, Origin *origin);
+    void                          parseExceptions(const QString &str);
 };
 
 ImagePreviewPlugin::ImagePreviewPlugin() :
@@ -145,6 +148,7 @@ bool ImagePreviewPlugin::enable()
     sizeLimit    = psiOptions->getPluginOption(sizeLimitName, 1024 * 1024).toInt();
     previewSize  = psiOptions->getPluginOption(previewSizeName, 150).toInt();
     allowUpscale = psiOptions->getPluginOption(allowUpscaleName, true).toBool();
+    parseExceptions(psiOptions->getPluginOption(exceptionsName, QString()).toString());
     updateProxy();
     return enabled;
 }
@@ -160,26 +164,11 @@ QWidget *ImagePreviewPlugin::options()
     if (!enabled) {
         return nullptr;
     }
-    QWidget *    optionsWid = new QWidget();
-    QVBoxLayout *vbox       = new QVBoxLayout(optionsWid);
-    cb_sizeLimit            = new QComboBox(optionsWid);
-    cb_sizeLimit->addItem(tr("512 Kb"), 512 * 1024);
-    cb_sizeLimit->addItem(tr("1 Mb"), 1024 * 1024);
-    cb_sizeLimit->addItem(tr("2 Mb"), 2 * 1024 * 1024);
-    cb_sizeLimit->addItem(tr("5 Mb"), 5 * 1024 * 1024);
-    cb_sizeLimit->addItem(tr("10 Mb"), 10 * 1024 * 1024);
-    vbox->addWidget(new QLabel(tr("Maximum image size")));
-    vbox->addWidget(cb_sizeLimit);
-    sb_previewSize = new QSpinBox(optionsWid);
-    sb_previewSize->setMinimum(1);
-    sb_previewSize->setMaximum(65535);
-    vbox->addWidget(new QLabel(tr("Image preview size in pixels")));
-    vbox->addWidget(sb_previewSize);
-    cb_allowUpscale = new QCheckBox(tr("Allow upscale"));
-    vbox->addWidget(cb_allowUpscale);
-    vbox->addStretch();
+
+    if (!optionsDlg)
+        optionsDlg = new ImagePreviewOptions(psiOptions);
     updateProxy();
-    return optionsWid;
+    return optionsDlg;
 }
 
 void ImagePreviewPlugin::setOptionAccessingHost(OptionAccessingHost *host) { psiOptions = host; }
@@ -216,22 +205,29 @@ void ImagePreviewPlugin::messageAppended(const QString &, QWidget *logWidget)
     if (!enabled) {
         return;
     }
+    QTextEdit *te_log = qobject_cast<QTextEdit *>(logWidget);
+    if (!te_log)
+        return;
+
     ScrollKeeper sk(logWidget);
-    QTextEdit *  te_log = qobject_cast<QTextEdit *>(logWidget);
-    if (te_log) {
-        QTextCursor cur = te_log->textCursor();
-        te_log->moveCursor(QTextCursor::End, QTextCursor::MoveAnchor);
-        te_log->moveCursor(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
-        QTextCursor found = te_log->textCursor();
-        while (!(found = te_log->document()->find(QRegExp("https?://\\S*"), found)).isNull()) {
-            QString url = found.selectedText();
+    QTextCursor  cur = te_log->textCursor();
+    te_log->moveCursor(QTextCursor::End, QTextCursor::MoveAnchor);
+    te_log->moveCursor(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
+    QTextCursor found = te_log->textCursor();
+    while (!(found = te_log->document()->find(QRegExp("https?://\\S*"), found)).isNull()) {
+        QString url = found.selectedText();
+        if (std::any_of(exceptions.begin(), exceptions.end(), [&url](auto &r) { return r.match(url).hasMatch(); })) {
 #ifdef IMGPREVIEW_DEBUG
-            qDebug() << "URL FOUND:" << url;
+            qDebug() << "imagepreview: url ignored:" << url;
 #endif
-            queueUrl(url, new Origin(te_log));
-        };
-        te_log->setTextCursor(cur);
-    }
+            continue;
+        }
+#ifdef IMGPREVIEW_DEBUG
+        qDebug() << "imagepreview: url found:" << url;
+#endif
+        queueUrl(url, new Origin(te_log));
+    };
+    te_log->setTextCursor(cur);
 }
 
 void ImagePreviewPlugin::imageReply(QNetworkReply *reply)
@@ -342,20 +338,37 @@ void ImagePreviewPlugin::imageReply(QNetworkReply *reply)
 
 void ImagePreviewPlugin::applyOptions()
 {
-    psiOptions->setPluginOption(previewSizeName, previewSize = sb_previewSize->value());
-    psiOptions->setPluginOption(sizeLimitName,
-                                sizeLimit = cb_sizeLimit->itemData(cb_sizeLimit->currentIndex()).toInt());
-    psiOptions->setPluginOption(allowUpscaleName, allowUpscale = cb_allowUpscale->checkState() == Qt::Checked);
+    if (optionsDlg) {
+        QString exceptions;
+        std::tie(previewSize, sizeLimit, allowUpscale, exceptions) = optionsDlg->applyOptions();
+        parseExceptions(exceptions);
+    }
 }
 
 void ImagePreviewPlugin::restoreOptions()
 {
-    sb_previewSize->setValue(previewSize);
-    cb_sizeLimit->setCurrentIndex(cb_sizeLimit->findData(sizeLimit));
-    cb_allowUpscale->setCheckState(allowUpscale ? Qt::Checked : Qt::Unchecked);
+    if (optionsDlg) {
+        optionsDlg->restoreOptions();
+    }
 }
 
 void ImagePreviewPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) { appInfoHost = host; }
+
+void ImagePreviewPlugin::parseExceptions(const QString &str)
+{
+    const auto &lines = str.trimmed().split("\n");
+    exceptions.clear();
+    for (auto const &l : lines) {
+        auto trimmed = l.trimmed();
+        if (trimmed.isEmpty() || trimmed.startsWith('#'))
+            continue;
+        QRegularExpression r(l.trimmed(),
+                             QRegularExpression::ExtendedPatternSyntaxOption | QRegularExpression::CaseInsensitiveOption
+                                 | QRegularExpression::DontCaptureOption);
+        if (r.isValid())
+            exceptions.append(r);
+    }
+}
 
 void ImagePreviewPlugin::updateProxy()
 {
