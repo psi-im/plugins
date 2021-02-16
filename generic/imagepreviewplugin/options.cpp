@@ -38,7 +38,7 @@ std::tuple<int, int, bool, QString> ImagePreviewOptions::applyOptions()
     optHost->setPluginOption(allowUpscaleName, allowUpscale = ui->cb_allowUpscale->checkState() == Qt::Checked);
     optHost->setPluginOption(exceptionsName, exceptions = ui->te_exceptions->toPlainText());
 
-    return { previewSize, sizeLimit, allowUpscale, exceptions };
+    return std::tuple<int, int, bool, QString> { previewSize, sizeLimit, allowUpscale, exceptions };
 }
 
 void ImagePreviewOptions::restoreOptions()
