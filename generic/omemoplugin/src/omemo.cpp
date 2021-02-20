@@ -144,13 +144,14 @@ bool OMEMO::decryptMessage(int account, QDomElement &xml)
     QByteArray encryptedKey = QByteArray::fromBase64(keyElement.firstChild().nodeValue().toUtf8());
 
     QString from     = message.attribute("from");
+    QString sender   = m_contactInfoAccessor->realJid(account, from).split("/").first();
     QString to       = message.attribute("to");
     uint    deviceId = header.attribute("sid").toUInt();
-    if (!signal->getDeviceList(from).contains(deviceId)) {
-        pepRequest(account, to.split("/").first(), from.split("/").first(), deviceListNodeName());
+    if (!signal->getDeviceList(sender).contains(deviceId)) {
+        const auto ownJid = m_accountInfoAccessor->getJid(account).split("/").first();
+        pepRequest(account, ownJid, sender, deviceListNodeName());
     }
 
-    QString                 sender = m_contactInfoAccessor->realJid(account, from).split("/").first();
     QPair<QByteArray, bool> decryptionResult
         = signal->decryptKey(sender, EncryptedKey(deviceId, isPreKey, encryptedKey));
     QByteArray decryptedKey           = decryptionResult.first;
