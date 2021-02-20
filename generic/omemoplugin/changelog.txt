@@ -1,4 +1,10 @@
 2020-06-24
+v2.8 stigger
+  * Fix sending incorrect PEP requests from somebody else's JID when
+    decrypting a carbon copy.
+  * Fix incorrect device ID lookup using a full JID instead of a bare JID.
+
+2020-06-24
 v2.7 tehnick
   * Small fix in stanza for beginning of OMEMO session.
 
