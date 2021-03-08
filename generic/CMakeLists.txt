@@ -52,7 +52,7 @@ endif()
 message(STATUS "Plugins from generic subdirectory")
 # If BUILD_PLUGINS variable was set as "-plugin1;-plugin2"
 # We proceed all plugins with plugin1 and plugin2 excluded
-string(REGEX MATCH ".*[-]*" DISABLED_PLUGINS "${BUILD_PLUGINS}")
+string(REGEX MATCH ".*[-]+" DISABLED_PLUGINS "${BUILD_PLUGINS}")
 if(NOT "${DISABLED_PLUGINS}" STREQUAL "")
     set(plugins ${plugins_list})
     foreach(mp ${BUILD_PLUGINS})
