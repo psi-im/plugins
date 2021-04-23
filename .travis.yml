@@ -7,18 +7,12 @@ if: tag IS blank
 
 jobs:
   include:
-    - env: TARGET=linux64 BUILD_DEV_PLUGINS=ON DIST=xenial
-      os: linux
-      dist: xenial
     - env: TARGET=linux64 BUILD_DEV_PLUGINS=ON DIST=bionic
       os: linux
       dist: bionic
     - env: TARGET=linux64 BUILD_DEV_PLUGINS=ON DIST=focal
       os: linux
       dist: focal
-    - env: TARGET=linux64 BUILD_DEV_PLUGINS=OFF DIST=xenial
-      os: linux
-      dist: xenial
     - env: TARGET=linux64 BUILD_DEV_PLUGINS=OFF DIST=bionic
       os: linux
       dist: bionic
