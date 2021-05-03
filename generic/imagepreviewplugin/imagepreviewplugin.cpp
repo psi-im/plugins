@@ -47,13 +47,8 @@
 #include <QVBoxLayout>
 #include <stdexcept>
 
-#undef AUTOREDIRECTS
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
-#define AUTOREDIRECTS
-#endif
-
 //#define IMGPREVIEW_DEBUG
-#define constVersion "0.1.2"
+
 #define sizeLimitName "imgpreview-size-limit"
 #define previewSizeName "imgpreview-preview-size"
 #define allowUpscaleName "imgpreview-allow-upscale"
@@ -65,17 +60,10 @@ class Origin : public QObject {
 public:
     Origin(QWidget *chat) :
         QObject(chat), originalUrl_(""), chat_(chat)
-#ifndef AUTOREDIRECTS
-        ,
-        redirectsLeft_(0)
-#endif
     {
     }
     QString  originalUrl_;
     QWidget *chat_;
-#ifndef AUTOREDIRECTS
-    int redirectsLeft_;
-#endif
 };
 
 class ImagePreviewPlugin : public QObject,
@@ -184,18 +172,15 @@ void ImagePreviewPlugin::queueUrl(const QString &url, Origin *origin)
         pending.insert(url);
         QNetworkRequest req;
         origin->originalUrl_ = url;
-#ifndef AUTOREDIRECTS
-        origin->redirectsLeft_ = MAX_REDIRECTS;
-#endif
+
         req.setUrl(QUrl::fromUserInput(url));
         req.setOriginatingObject(origin);
         req.setRawHeader("User-Agent",
                          "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 "
                          "Safari/537.36");
-#ifdef AUTOREDIRECTS
-        req.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+
+        req.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
         req.setMaximumRedirectsAllowed(MAX_REDIRECTS);
-#endif
         manager->head(req);
     }
 }
@@ -247,28 +232,6 @@ void ImagePreviewPlugin::imageReply(QNetworkReply *reply)
 #endif
     switch (reply->operation()) {
     case QNetworkAccessManager::HeadOperation: {
-#ifndef AUTOREDIRECTS
-        int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt(&ok);
-        if (ok && (status == 301 || status == 302 || status == 303)) {
-            if (origin->redirectsLeft_ == 0) {
-                qWarning() << "Redirect count exceeded for" << urlStr;
-                origin->deleteLater();
-                pending.remove(urlStr);
-                break;
-            }
-            origin->redirectsLeft_--;
-            QUrl location = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
-            if (location.isRelative()) {
-                location = location.resolved(reply->request().url());
-            }
-#ifdef IMGPREVIEW_DEBUG
-            qDebug() << "Redirected to" << location;
-#endif
-            QNetworkRequest req = reply->request();
-            req.setUrl(location);
-            manager->head(req);
-        } else
-#endif
         {
             size = reply->header(QNetworkRequest::ContentLengthHeader).toInt(&ok);
             if (reply->error() == QNetworkReply::NoError) {
