@@ -33,7 +33,6 @@ set( CMAKE_MODULE_PATH
 find_package(PsiPluginsApi REQUIRED)
 include(${PsiPluginsApi_DIR}/variables.cmake)
 include_directories(
-    ${CMAKE_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_LIST_DIR}
     ${PsiPluginsApi_INCLUDE_DIR}
@@ -47,7 +46,6 @@ find_package(OpenSSL COMPONENTS Crypto REQUIRED)
 find_package(SignalProtocolC REQUIRED)
 
 include_directories(
-    ${CMAKE_SOURCE_DIR}
     ${OPENSSL_INCLUDE_DIR}
     ${SIGNAL_PROTOCOL_C_INCLUDE_DIR}
     ${PLUGINS_ROOT_DIR}/include

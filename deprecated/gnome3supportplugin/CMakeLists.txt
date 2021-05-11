@@ -13,7 +13,6 @@ ENDIF( NOT WIN32 )
 
 add_definitions( -Wall -Ddbus -DQT_PLUGIN -DHAVE_QT5 )
 include_directories(
-    ${CMAKE_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ../../include
     .

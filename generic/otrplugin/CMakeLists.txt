@@ -29,7 +29,6 @@ set( CMAKE_MODULE_PATH
 find_package(PsiPluginsApi REQUIRED)
 include(${PsiPluginsApi_DIR}/variables.cmake)
 include_directories(
-    ${CMAKE_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_LIST_DIR}
     ${PsiPluginsApi_INCLUDE_DIR}
@@ -72,7 +71,6 @@ if( WIN32 )
 endif()
 #
 include_directories(
-        ${CMAKE_SOURCE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}
         ${LIBOTR_INCLUDE_DIR}
         ${LIBTIDY_INCLUDE_DIR}
