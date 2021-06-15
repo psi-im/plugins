@@ -331,6 +331,12 @@ bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml,
         QDomElement encryption = xml.ownerDocument().createElementNS("urn:xmpp:eme:0", "encryption");
         encryption.setAttribute("namespace", k_omemoXmlns);
         xml.appendChild(encryption);
+
+        QDomElement fallbackBody = xml.ownerDocument().createElement("body");
+        fallbackBody.appendChild(xml.ownerDocument().createTextNode(
+            tr("You received a message encrypted with OMEMO but your client doesn't support OMEMO.")
+        ));
+        xml.appendChild(fallbackBody);
     }
 
     return true;
