@@ -7,6 +7,8 @@
 set -e
 set -x
 
+PATH="/usr/lib/mxe/usr/bin:${PATH}"
+
 [ -z "${BUILD_DEV_PLUGINS}" ] && BUILD_DEV_PLUGINS="OFF"
 
 BUILD_OPTIONS="-DCMAKE_BUILD_TYPE=Release \
