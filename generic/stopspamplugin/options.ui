@@ -372,14 +372,7 @@
         </widget>
        </item>
        <item>
-        <widget class="Viewer" name="tv_rules">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
+        <layout class="QVBoxLayout" name="tvRulesLayout"/>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -430,13 +423,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>Viewer</class>
-   <extends>QTableView</extends>
-   <header>view.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

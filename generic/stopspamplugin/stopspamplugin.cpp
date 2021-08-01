@@ -179,6 +179,7 @@ private:
     };
     QVector<Blocked>  BlockedJids;
     QPointer<ViewLog> viewer;
+    QPointer<Viewer>  tv_rules;
     Model *           model_;
     QVector<MucUser>  mucUsers_;
     QPointer<QWidget> options_;
@@ -261,6 +262,7 @@ bool StopSpam::disable()
     model_ = nullptr;
     delete stanzaHost;
     stanzaHost = nullptr;
+    delete tv_rules;
 
     popup->unregisterOption(POPUP_OPTION);
     enabled = false;
@@ -370,8 +372,11 @@ QWidget *StopSpam::options()
     ui_.setupUi(options_);
     connect(options_, &QWidget::destroyed, this, &StopSpam::onOptionsClose);
 
-    ui_.tv_rules->setModel(model_);
-    ui_.tv_rules->init();
+    if(!tv_rules)
+        tv_rules = new Viewer(options_);
+    tv_rules->setModel(model_);
+    tv_rules->init();
+    ui_.tvRulesLayout->addWidget(tv_rules);
 
     connect(ui_.cb_send_block_all_mes, &QCheckBox::stateChanged, this, &StopSpam::changeWidgetsState);
     connect(ui_.cb_enable_muc, &QCheckBox::stateChanged, this, &StopSpam::changeWidgetsState);
@@ -663,7 +668,11 @@ void StopSpam::updateCounter(const QDomElement &stanza, bool b)
         out.setCodec("UTF-8");
         // out.seek(file.size());
         out.setGenerateByteOrderMark(false);
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
         out << date << endl << stanza << endl;
+#else
+        out << date << Qt::endl << stanza << Qt::endl;
+#endif
     }
 
     if (!popup->popupDuration(POPUP_OPTION))
@@ -746,7 +755,11 @@ void StopSpam::logHistory(const QDomElement &stanza)
     out.setCodec("UTF-8");
     // out.seek(file.size());
     out.setGenerateByteOrderMark(false);
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
     out << outText << endl;
+#else
+    out << outText << Qt::endl;
+#endif
 }
 
 bool StopSpam::processMuc(int account, const QDomElement &stanza)
@@ -926,7 +939,7 @@ void StopSpam::addRow()
 void StopSpam::removeRow()
 {
     if (model_->rowCount() > 1) {
-        QModelIndex index = ui_.tv_rules->currentIndex();
+        QModelIndex index = tv_rules->currentIndex();
         if (index.isValid()) {
             model_->deleteRow(index.row());
             hack();
