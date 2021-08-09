@@ -235,6 +235,24 @@ bool OMEMOPlugin::decryptMessageElement(int account, QDomElement &message)
         processEncryptedFile(account, message);
     }
 
+    if (message.attribute("type") == "groupchat" && message.attribute("from") != m_accountInfo->getJid(account)) {
+      QString     from = message.attribute("from");
+      QStringList List = from.split("/");
+      QString     room = List.takeFirst();
+      if (!List.isEmpty()) {
+        from = List.join("/");
+      }
+      QString Stamp    = "";
+      Stamp            = message.firstChildElement("x").attribute("stamp");
+      QDomElement body = message.firstChildElement("body");
+      if (!body.isNull()) {
+        QString Text  = body.text();
+        QString MyJid = m_accountInfo->getJid(account);
+        MyJid         = MyJid.replace("@", "_at_");
+        logMuc(room, from, MyJid, Text, Stamp);
+      }
+    }
+
     return true;
 }
 
@@ -328,6 +346,24 @@ bool OMEMOPlugin::encryptMessageElement(int account, QDomElement &message)
 
     if (message.firstChildElement("body").isNull() || !message.firstChildElement("encrypted").isNull()) {
         return false;
+    }
+
+    if (message.attribute("type") == "groupchat") {
+      QString     from = message.attribute("from");
+      QStringList List = from.split("/");
+      QString     room = List.takeFirst();
+      if (!List.isEmpty()) {
+        from = List.join("/");
+      }
+      QString Stamp    = "";
+      Stamp            = message.firstChildElement("x").attribute("stamp");
+      QDomElement body = message.firstChildElement("body");
+      if (!body.isNull()) {
+        QString Text  = body.text();
+        QString MyJid = m_accountInfo->getJid(account);
+        MyJid         = MyJid.replace("@", "_at_");
+        logMuc(room, from, MyJid, Text, Stamp);
+      }
     }
 
     return m_omemo->encryptMessage(m_accountInfo->getJid(account), account, message);
@@ -543,5 +579,32 @@ bool OMEMOPlugin::execute(int account, const QHash<QString, QVariant> &args, QHa
     }
 
     return false;
+}
+
+void OMEMOPlugin::logMuc(QString room, const QString &from, const QString &myJid,
+                         const QString &text, QString stamp)
+{
+  room = room.replace("@", "_at_");
+  room = "_in_" + room;
+  if (stamp.isEmpty()) {
+    stamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+  } else {
+    stamp.insert(4, "-");
+    stamp.insert(7, "-");
+    stamp.replace("T", " ");
+  }
+  QFile file(m_applicationInfo->appHistoryDir() + QDir::separator() + myJid + room + ".conferencehistory");
+  if (file.open(QIODevice::WriteOnly | QIODevice::Append)) {
+    QTextStream out(&file);
+    // out.seek(file.size());
+    out.setCodec("UTF-8");
+    out.setGenerateByteOrderMark(false);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    out << stamp << "  " << from << ": " << text << Qt::endl;
+#else
+    out << stamp << "  " << from << ": " << text << endl;
+#endif
+  }
+  qDebug() << "OMEMO MUC logger: logged";
 }
 }
