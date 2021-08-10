@@ -236,21 +236,21 @@ bool OMEMOPlugin::decryptMessageElement(int account, QDomElement &message)
     }
 
     if (message.attribute("type") == "groupchat" && message.attribute("from") != m_accountInfo->getJid(account)) {
-      QString     from = message.attribute("from");
-      QStringList List = from.split("/");
-      QString     room = List.takeFirst();
-      if (!List.isEmpty()) {
-        from = List.join("/");
-      }
-      QString Stamp    = "";
-      Stamp            = message.firstChildElement("x").attribute("stamp");
-      QDomElement body = message.firstChildElement("body");
-      if (!body.isNull()) {
-        QString Text  = body.text();
-        QString MyJid = m_accountInfo->getJid(account);
-        MyJid         = MyJid.replace("@", "_at_");
-        logMuc(room, from, MyJid, Text, Stamp);
-      }
+        QString     from = message.attribute("from");
+        QStringList List = from.split("/");
+        QString     room = List.takeFirst();
+        if (!List.isEmpty()) {
+            from = List.join("/");
+        }
+        QString Stamp    = "";
+        Stamp            = message.firstChildElement("x").attribute("stamp");
+        QDomElement body = message.firstChildElement("body");
+        if (!body.isNull()) {
+            QString Text  = body.text();
+            QString MyJid = m_accountInfo->getJid(account);
+            MyJid         = MyJid.replace("@", "_at_");
+            logMuc(room, from, MyJid, Text, Stamp);
+        }
     }
 
     return true;
@@ -349,21 +349,16 @@ bool OMEMOPlugin::encryptMessageElement(int account, QDomElement &message)
     }
 
     if (message.attribute("type") == "groupchat") {
-      QString     from = message.attribute("from");
-      QStringList List = from.split("/");
-      QString     room = List.takeFirst();
-      if (!List.isEmpty()) {
-        from = List.join("/");
-      }
-      QString Stamp    = "";
-      Stamp            = message.firstChildElement("x").attribute("stamp");
-      QDomElement body = message.firstChildElement("body");
-      if (!body.isNull()) {
-        QString Text  = body.text();
-        QString MyJid = m_accountInfo->getJid(account);
-        MyJid         = MyJid.replace("@", "_at_");
-        logMuc(room, from, MyJid, Text, Stamp);
-      }
+        QString     from = m_accountInfo->getName(account);
+        QString     room = message.attribute("to");
+        QString    Stamp = message.firstChildElement("x").attribute("stamp");
+        QDomElement body = message.firstChildElement("body");
+        if (!body.isNull()) {
+            QString Text  = body.text();
+            QString MyJid = m_accountInfo->getJid(account);
+            MyJid         = MyJid.replace("@", "_at_");
+            logMuc(room, from, MyJid, Text, Stamp);
+        }
     }
 
     return m_omemo->encryptMessage(m_accountInfo->getJid(account), account, message);
