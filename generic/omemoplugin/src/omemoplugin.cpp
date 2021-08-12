@@ -360,13 +360,15 @@ bool OMEMOPlugin::encryptMessageElement(int account, QDomElement &message)
     if (message.attribute("type") == "groupchat") {
         QString     room = message.attribute("to");
         QString     from = m_mucNicks[room];
-        QString    Stamp = message.firstChildElement("x").attribute("stamp");
-        QDomElement body = message.firstChildElement("body");
-        if (!body.isNull()) {
-            QString Text  = body.text();
-            QString MyJid = m_accountInfo->getJid(account);
-            MyJid         = MyJid.replace("@", "_at_");
-            logMuc(room, from, MyJid, Text, Stamp);
+        if (m_omemo->isEnabledForUser(account, room)) {
+            QString    Stamp = message.firstChildElement("x").attribute("stamp");
+            QDomElement body = message.firstChildElement("body");
+            if (!body.isNull()) {
+                QString Text  = body.text();
+                QString MyJid = m_accountInfo->getJid(account);
+                MyJid         = MyJid.replace("@", "_at_");
+                logMuc(room, from, MyJid, Text, Stamp);
+            }
         }
     }
 
