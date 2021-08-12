@@ -243,8 +243,7 @@ bool OMEMOPlugin::decryptMessageElement(int account, QDomElement &message)
             from = List.join("/");
         }
         if (from != m_mucNicks[room]) {
-            QString Stamp    = "";
-            Stamp            = message.firstChildElement("x").attribute("stamp");
+            QString Stamp    = message.firstChildElement("x").attribute("stamp");
             QDomElement body = message.firstChildElement("body");
             if (!body.isNull()) {
                 QString Text  = body.text();
@@ -590,26 +589,26 @@ bool OMEMOPlugin::execute(int account, const QHash<QString, QVariant> &args, QHa
 void OMEMOPlugin::logMuc(QString room, const QString &from, const QString &myJid,
                          const QString &text, QString stamp)
 {
-  room = room.replace("@", "_at_");
-  room = "_in_" + room;
-  if (stamp.isEmpty()) {
-    stamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-  } else {
-    stamp.insert(4, "-");
-    stamp.insert(7, "-");
-    stamp.replace("T", " ");
-  }
-  QFile file(m_applicationInfo->appHistoryDir() + QDir::separator() + myJid + room + ".conferencehistory");
-  if (file.open(QIODevice::WriteOnly | QIODevice::Append)) {
-    QTextStream out(&file);
-    out.setCodec("UTF-8");
-    out.setGenerateByteOrderMark(false);
+    room = room.replace("@", "_at_");
+    room = "_in_" + room;
+    if (stamp.isEmpty()) {
+        stamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    } else {
+        stamp.insert(4, "-");
+        stamp.insert(7, "-");
+        stamp.replace("T", " ");
+    }
+    QFile file(m_applicationInfo->appHistoryDir() + QDir::separator() + myJid + room + ".conferencehistory");
+    if (file.open(QIODevice::WriteOnly | QIODevice::Append)) {
+        QTextStream out(&file);
+        out.setCodec("UTF-8");
+        out.setGenerateByteOrderMark(false);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-    out << stamp << "  " << from << ": " << text << Qt::endl;
+        out << stamp << "  " << from << ": " << text << Qt::endl;
 #else
-    out << stamp << "  " << from << ": " << text << endl;
+        out << stamp << "  " << from << ": " << text << endl;
 #endif
-  }
-  qDebug() << "OMEMO MUC logger: logged";
+    }
+    qDebug() << "OMEMO MUC logger: logged";
 }
 }
