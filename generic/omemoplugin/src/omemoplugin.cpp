@@ -235,6 +235,7 @@ bool OMEMOPlugin::decryptMessageElement(int account, QDomElement &message)
         processEncryptedFile(account, message);
     }
 
+    // logging functionality for OMEMO-encrypted groupchats
     if (message.attribute("type") == "groupchat") {
         QString     from = message.attribute("from");
         QStringList List = from.split("/");
@@ -335,8 +336,9 @@ bool OMEMOPlugin::outgoingStanza(int account, QDomElement &xml)
     if (xml.nodeName() == "presence") {
         if (!xml.hasAttributes())
             m_omemo->accountConnected(account, m_accountInfo->getJid(account));
-        else
-        {
+        // get all MUC nicks of the current account for groupchat logging
+        // functionality
+        else {
             QStringList room_nick = xml.attribute("to").split("/");
             m_mucNicks.insert(room_nick[0], room_nick[1]);
         }
@@ -356,10 +358,11 @@ bool OMEMOPlugin::encryptMessageElement(int account, QDomElement &message)
         return false;
     }
 
+    // logging functionality for OMEMO-encrypted groupchats
     if (message.attribute("type") == "groupchat") {
         QString     room = message.attribute("to");
         QString     from = m_mucNicks[room];
-        if (m_omemo->isEnabledForUser(account, room)) {
+        if (m_omemo->isEnabledForUser(account, room)) { // only log if encryption is enabled
             QString    Stamp = message.firstChildElement("x").attribute("stamp");
             QDomElement body = message.firstChildElement("body");
             if (!body.isNull()) {
@@ -586,6 +589,7 @@ bool OMEMOPlugin::execute(int account, const QHash<QString, QVariant> &args, QHa
     return false;
 }
 
+// the code partly taken from the Conference Logger plugin
 void OMEMOPlugin::logMuc(QString room, const QString &from, const QString &myJid,
                          const QString &text, QString stamp)
 {
