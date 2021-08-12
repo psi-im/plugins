@@ -609,6 +609,5 @@ void OMEMOPlugin::logMuc(QString room, const QString &from, const QString &myJid
         out << stamp << "  " << from << ": " << text << endl;
 #endif
     }
-    qDebug() << "OMEMO MUC logger: logged";
 }
 }
