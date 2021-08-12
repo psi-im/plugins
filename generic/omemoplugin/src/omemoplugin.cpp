@@ -235,21 +235,23 @@ bool OMEMOPlugin::decryptMessageElement(int account, QDomElement &message)
         processEncryptedFile(account, message);
     }
 
-    if (message.attribute("type") == "groupchat" && message.attribute("from") != m_accountInfo->getJid(account)) {
+    if (message.attribute("type") == "groupchat") {
         QString     from = message.attribute("from");
         QStringList List = from.split("/");
         QString     room = List.takeFirst();
         if (!List.isEmpty()) {
             from = List.join("/");
         }
-        QString Stamp    = "";
-        Stamp            = message.firstChildElement("x").attribute("stamp");
-        QDomElement body = message.firstChildElement("body");
-        if (!body.isNull()) {
-            QString Text  = body.text();
-            QString MyJid = m_accountInfo->getJid(account);
-            MyJid         = MyJid.replace("@", "_at_");
-            logMuc(room, from, MyJid, Text, Stamp);
+        if (from != m_mucNicks[room]) {
+            QString Stamp    = "";
+            Stamp            = message.firstChildElement("x").attribute("stamp");
+            QDomElement body = message.firstChildElement("body");
+            if (!body.isNull()) {
+                QString Text  = body.text();
+                QString MyJid = m_accountInfo->getJid(account);
+                MyJid         = MyJid.replace("@", "_at_");
+                logMuc(room, from, MyJid, Text, Stamp);
+            }
         }
     }
 
@@ -331,8 +333,15 @@ bool OMEMOPlugin::outgoingStanza(int account, QDomElement &xml)
         return false;
     }
 
-    if (xml.nodeName() == "presence" && !xml.hasAttributes()) {
-        m_omemo->accountConnected(account, m_accountInfo->getJid(account));
+    if (xml.nodeName() == "presence") {
+        if (!xml.hasAttributes())
+            m_omemo->accountConnected(account, m_accountInfo->getJid(account));
+        else
+        {
+            QStringList room_nick = xml.attribute("to").split("/");
+            m_mucNicks.insert(room_nick[0], room_nick[1]);
+        }
+
     }
 
     return false;
@@ -349,8 +358,8 @@ bool OMEMOPlugin::encryptMessageElement(int account, QDomElement &message)
     }
 
     if (message.attribute("type") == "groupchat") {
-        QString     from = m_accountInfo->getName(account);
         QString     room = message.attribute("to");
+        QString     from = m_mucNicks[room];
         QString    Stamp = message.firstChildElement("x").attribute("stamp");
         QDomElement body = message.firstChildElement("body");
         if (!body.isNull()) {
@@ -591,7 +600,6 @@ void OMEMOPlugin::logMuc(QString room, const QString &from, const QString &myJid
   QFile file(m_applicationInfo->appHistoryDir() + QDir::separator() + myJid + room + ".conferencehistory");
   if (file.open(QIODevice::WriteOnly | QIODevice::Append)) {
     QTextStream out(&file);
-    // out.seek(file.size());
     out.setCodec("UTF-8");
     out.setGenerateByteOrderMark(false);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)

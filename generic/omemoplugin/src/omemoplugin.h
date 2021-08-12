@@ -148,6 +148,7 @@ private:
     EventCreatingHost *           m_eventCreator      = nullptr;
     PsiAccountControllingHost *   m_accountController = nullptr;
     OptionAccessingHost *         m_optionHost        = nullptr;
+    QMap<QString, QString>        m_mucNicks;
 };
 }
 #endif // PSIOMEMO_OMEMOPLUGIN_H
