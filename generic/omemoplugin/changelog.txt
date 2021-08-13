@@ -1,3 +1,7 @@
+2021-08-14
+v2.9 kssytsrk
+  * Add OMEMO-encrypted MUC logging functionality
+
 2021-02-20
 v2.8 stigger
   * Fix sending incorrect PEP requests from somebody else's JID when
