@@ -236,21 +236,18 @@ bool OMEMOPlugin::decryptMessageElement(int account, QDomElement &message)
     }
 
     // logging functionality for OMEMO-encrypted groupchats
-    if (message.attribute("type") == "groupchat") {
-        QString     from = message.attribute("from");
-        QStringList List = from.split("/");
-        QString     room = List.takeFirst();
-        if (!List.isEmpty()) {
-            from = List.join("/");
-        }
-        if (from != m_mucNicks[room]) {
+    if (message.attribute("type") == QLatin1String("groupchat")) {
+        QString from = message.attribute("from");
+        QString room = from.section('/', 0, 0);
+        QString nickname = from.section('/', 1);
+        if (nickname != m_mucNicks.value(room)) {
             QString Stamp    = message.firstChildElement("x").attribute("stamp");
             QDomElement body = message.firstChildElement("body");
             if (!body.isNull()) {
                 QString Text  = body.text();
                 QString MyJid = m_accountInfo->getJid(account);
                 MyJid         = MyJid.replace("@", "_at_");
-                logMuc(room, from, MyJid, Text, Stamp);
+                logMuc(room, nickname, MyJid, Text, Stamp);
             }
         }
     }
@@ -333,14 +330,17 @@ bool OMEMOPlugin::outgoingStanza(int account, QDomElement &xml)
         return false;
     }
 
-    if (xml.nodeName() == "presence") {
+    if (xml.nodeName() == QLatin1String("presence")) {
         if (!xml.hasAttributes())
             m_omemo->accountConnected(account, m_accountInfo->getJid(account));
         // get all MUC nicks of the current account for groupchat logging
         // functionality
         else {
-            QStringList room_nick = xml.attribute("to").split("/");
-            m_mucNicks.insert(room_nick[0], room_nick[1]);
+            QString room = xml.attribute("to").section('/', 0, 0);
+            QString nick = xml.attribute("to").section('/', 1);
+            if (m_contactInfo->isConference(account, room)) {
+                m_mucNicks.insert(room, nick);
+            }
         }
 
     }
@@ -359,9 +359,11 @@ bool OMEMOPlugin::encryptMessageElement(int account, QDomElement &message)
     }
 
     // logging functionality for OMEMO-encrypted groupchats
-    if (message.attribute("type") == "groupchat") {
+    if (message.attribute("type") == QLatin1String("groupchat")) {
         QString     room = message.attribute("to");
-        QString     from = m_mucNicks[room];
+        QString     from = m_mucNicks.value(room, m_accountInfo->getJid(account));
+        if (from==QLatin1String(""))
+            from = m_accountInfo->getJid(account);
         if (m_omemo->isEnabledForUser(account, room)) { // only log if encryption is enabled
             QString    Stamp = message.firstChildElement("x").attribute("stamp");
             QDomElement body = message.firstChildElement("body");
