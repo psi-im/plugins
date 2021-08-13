@@ -186,7 +186,7 @@ bool ConferenceLogger::incomingStanza(int account, const QDomElement &stanza)
 {
     if (enabled) {
         if (stanza.tagName() == "message") {
-            if (stanza.attribute("type") == "groupchat") {
+            if (stanza.attribute("type") == "groupchat" && stanza.firstChildElement("encrypted").isNull()) {
                 QString     from = stanza.attribute("from");
                 QStringList List = from.split("/");
                 QString     room = List.takeFirst();

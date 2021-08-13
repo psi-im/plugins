@@ -235,6 +235,23 @@ bool OMEMOPlugin::decryptMessageElement(int account, QDomElement &message)
         processEncryptedFile(account, message);
     }
 
+    // logging functionality for OMEMO-encrypted groupchats
+    if (message.attribute("type") == QLatin1String("groupchat")) {
+        QString from = message.attribute("from");
+        QString room = from.section('/', 0, 0);
+        QString nickname = from.section('/', 1);
+        if (nickname != m_mucNicks.value(room)) {
+            QString Stamp    = message.firstChildElement("x").attribute("stamp");
+            QDomElement body = message.firstChildElement("body");
+            if (!body.isNull()) {
+                QString Text  = body.text();
+                QString MyJid = m_accountInfo->getJid(account);
+                MyJid         = MyJid.replace("@", "_at_");
+                logMuc(room, nickname, MyJid, Text, Stamp);
+            }
+        }
+    }
+
     return true;
 }
 
@@ -313,8 +330,19 @@ bool OMEMOPlugin::outgoingStanza(int account, QDomElement &xml)
         return false;
     }
 
-    if (xml.nodeName() == "presence" && !xml.hasAttributes()) {
-        m_omemo->accountConnected(account, m_accountInfo->getJid(account));
+    if (xml.nodeName() == QLatin1String("presence")) {
+        if (!xml.hasAttributes())
+            m_omemo->accountConnected(account, m_accountInfo->getJid(account));
+        // get all MUC nicks of the current account for groupchat logging
+        // functionality
+        else {
+            QString room = xml.attribute("to").section('/', 0, 0);
+            QString nick = xml.attribute("to").section('/', 1);
+            if (m_contactInfo->isConference(account, room)) {
+                m_mucNicks.insert(room, nick);
+            }
+        }
+
     }
 
     return false;
@@ -328,6 +356,24 @@ bool OMEMOPlugin::encryptMessageElement(int account, QDomElement &message)
 
     if (message.firstChildElement("body").isNull() || !message.firstChildElement("encrypted").isNull()) {
         return false;
+    }
+
+    // logging functionality for OMEMO-encrypted groupchats
+    if (message.attribute("type") == QLatin1String("groupchat")) {
+        QString     room = message.attribute("to");
+        QString     from = m_mucNicks.value(room, m_accountInfo->getJid(account));
+        if (from==QLatin1String(""))
+            from = m_accountInfo->getJid(account);
+        if (m_omemo->isEnabledForUser(account, room)) { // only log if encryption is enabled
+            QString    Stamp = message.firstChildElement("x").attribute("stamp");
+            QDomElement body = message.firstChildElement("body");
+            if (!body.isNull()) {
+                QString Text  = body.text();
+                QString MyJid = m_accountInfo->getJid(account);
+                MyJid         = MyJid.replace("@", "_at_");
+                logMuc(room, from, MyJid, Text, Stamp);
+            }
+        }
     }
 
     return m_omemo->encryptMessage(m_accountInfo->getJid(account), account, message);
@@ -543,5 +589,31 @@ bool OMEMOPlugin::execute(int account, const QHash<QString, QVariant> &args, QHa
     }
 
     return false;
+}
+
+// the code partly taken from the Conference Logger plugin
+void OMEMOPlugin::logMuc(QString room, const QString &from, const QString &myJid,
+                         const QString &text, QString stamp)
+{
+    room = room.replace("@", "_at_");
+    room = "_in_" + room;
+    if (stamp.isEmpty()) {
+        stamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    } else {
+        stamp.insert(4, "-");
+        stamp.insert(7, "-");
+        stamp.replace("T", " ");
+    }
+    QFile file(m_applicationInfo->appHistoryDir() + QDir::separator() + myJid + room + ".conferencehistory");
+    if (file.open(QIODevice::WriteOnly | QIODevice::Append)) {
+        QTextStream out(&file);
+        out.setCodec("UTF-8");
+        out.setGenerateByteOrderMark(false);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+        out << stamp << "  " << from << ": " << text << Qt::endl;
+#else
+        out << stamp << "  " << from << ": " << text << endl;
+#endif
+    }
 }
 }

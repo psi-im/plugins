@@ -133,6 +133,7 @@ private:
     void     updateAction(int account, const QString &user);
     void     processEncryptedFile(int account, QDomElement &xml);
     void     showOwnFingerprint(int account, const QString &jid);
+    void     logMuc(QString room, const QString &from, const QString &myJid, const QString &text, QString stamp);
 
 private:
     bool                          m_enabled = false;
@@ -147,6 +148,7 @@ private:
     EventCreatingHost *           m_eventCreator      = nullptr;
     PsiAccountControllingHost *   m_accountController = nullptr;
     OptionAccessingHost *         m_optionHost        = nullptr;
+    QMap<QString, QString>        m_mucNicks;
 };
 }
 #endif // PSIOMEMO_OMEMOPLUGIN_H
