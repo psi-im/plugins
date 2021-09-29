@@ -263,7 +263,7 @@ void OMEMOPlugin::processEncryptedFile(int account, QDomElement &xml)
     QByteArray keyData = QByteArray::fromHex(url.fragment().toLatin1());
     url.setFragment(QString());
 
-    QDir cacheDir(m_applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation) + "/aesgcm_files");
+    QDir cacheDir(m_applicationInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation) + "/aesgcm_files");
     if (!cacheDir.exists()) {
         cacheDir.mkpath(".");
     }
