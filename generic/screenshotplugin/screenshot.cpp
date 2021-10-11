@@ -648,7 +648,6 @@ void Screenshot::uploadHttp()
 
     QString boundary  = "AaB03x";
     QString filename  = tr("%1.").arg(QDateTime::currentDateTime().toString(fileNameFormat)) + format;
-    QString byteArray = QString();
 
     Server *s = servers.at(ui_.cb_servers->currentIndex());
     if (!s) {
@@ -661,29 +660,27 @@ void Screenshot::uploadHttp()
             QStringList postpair = poststr.split("=");
             if (postpair.count() < 2)
                 continue;
-            byteArray.append("--" + boundary + "\r\n");
-            byteArray.append("--" + boundary + "\r\n");
-            byteArray.append("Content-Disposition: form-data; name=\"" + postpair[0] + "\"\r\n");
-            byteArray.append("\r\n" + postpair[1] + "\r\n");
+            ba.append(QString("--%1\r\n--%1\r\n").arg(boundary).toLatin1());
+            ba.append(QString("Content-Disposition: form-data; name=\"%1\"\r\n").arg(postpair[0]).toLatin1());
+            ba.append(QString("\r\n%1\r\n").arg(postpair[1]).toLatin1());
         }
     }
 
-    byteArray.append("--" + boundary + "\r\n");
-    byteArray.append("Content-Disposition: form-data; name=\"" + s->servFileinput() + "\"; filename=\""
-                     + filename.toUtf8() + "\"\r\n");
-    byteArray.append("Content-Transfer-Encoding: binary\r\n");
-    byteArray.append(QString("Content-Type: image/%1\r\n")
+    ba.append(QString("--%1\r\n").arg(boundary).toLatin1());
+    ba.append(QString("Content-Disposition: form-data; name=\"%1\"; filename=\"%2\"\r\n").arg(s->servFileinput(), filename.toUtf8()).toLatin1());
+    ba.append(QString("Content-Transfer-Encoding: binary\r\n").toLatin1());
+    ba.append(QString("Content-Type: image/%1\r\n")
                          .arg(format == "jpg" ? "jpeg" : format) // FIXME!!!!! жуткий костыль, но что поделаешь
-                         .toUtf8());
-    byteArray.append("\r\n");
+                         .toLatin1());
+    ba.append(QString("\r\n").toLatin1());
 
     QByteArray a;
     QBuffer    buffer(&a);
     buffer.open(QBuffer::ReadWrite);
     originalPixmap.save(&buffer, format.toLatin1());
-    byteArray.append(a);
+    ba.append(a);
 
-    byteArray.append("\r\n--" + boundary + "--\r\n");
+    ba.append(QString("\r\n--%1--\r\n").arg(boundary).toLatin1());
 
     if (manager) {
         delete manager;
@@ -712,7 +709,6 @@ void Screenshot::uploadHttp()
     ui_.progressBar->show();
     ui_.urlFrame->setVisible(false);
 
-    ba                   = byteArray.toLatin1();
     QNetworkReply *reply = manager->post(netreq, ba);
     connect(reply, SIGNAL(uploadProgress(qint64, qint64)), this, SLOT(dataTransferProgress(qint64, qint64)));
     connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(httpReplyFinished(QNetworkReply *)));
