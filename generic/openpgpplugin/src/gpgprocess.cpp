@@ -64,7 +64,7 @@ void GpgProcess::start(QIODevice::OpenMode mode)
 #if defined(Q_OS_WIN)
     setEnvironment(systemEnvironment() << QString("LC_ALL=C"));
 #endif
-    QProcess::start(m_gpgBin, mode);
+    QProcess::start(m_gpgBin, QStringList(), mode);
 }
 
 bool GpgProcess::success() const { return (exitCode() == 0); }
@@ -147,7 +147,11 @@ QString GpgProcess::findBin() const
     QString pathSep = ":";
 #endif
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    QStringList paths = QString::fromLocal8Bit(qgetenv("PATH")).split(pathSep, Qt::SkipEmptyParts);
+#else
     QStringList paths = QString::fromLocal8Bit(qgetenv("PATH")).split(pathSep, QString::SkipEmptyParts);
+#endif
 
 #ifdef Q_OS_MAC
     // On Mac OS bundled always uses system default PATH

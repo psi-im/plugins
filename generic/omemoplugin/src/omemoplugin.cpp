@@ -237,12 +237,12 @@ bool OMEMOPlugin::decryptMessageElement(int account, QDomElement &message)
 
     // logging functionality for OMEMO-encrypted groupchats
     if (message.attribute("type") == QLatin1String("groupchat")) {
-        QString from = message.attribute("from");
-        QString room = from.section('/', 0, 0);
+        QString from     = message.attribute("from");
+        QString room     = from.section('/', 0, 0);
         QString nickname = from.section('/', 1);
         if (nickname != m_contactInfo->mucNick(account, room)) {
-            QString Stamp    = message.firstChildElement("x").attribute("stamp");
-            QDomElement body = message.firstChildElement("body");
+            QString     Stamp = message.firstChildElement("x").attribute("stamp");
+            QDomElement body  = message.firstChildElement("body");
             if (!body.isNull()) {
                 QString Text  = body.text();
                 QString MyJid = m_accountInfo->getJid(account);
@@ -349,13 +349,13 @@ bool OMEMOPlugin::encryptMessageElement(int account, QDomElement &message)
 
     // logging functionality for OMEMO-encrypted groupchats
     if (message.attribute("type") == QLatin1String("groupchat")) {
-        QString     room = message.attribute("to");
-        QString     from = m_contactInfo->mucNick(account, room);
-        if (from==QLatin1String(""))
+        QString room = message.attribute("to");
+        QString from = m_contactInfo->mucNick(account, room);
+        if (from == QLatin1String(""))
             from = m_accountInfo->getJid(account);
         if (m_omemo->isEnabledForUser(account, room)) { // only log if encryption is enabled
-            QString    Stamp = message.firstChildElement("x").attribute("stamp");
-            QDomElement body = message.firstChildElement("body");
+            QString     Stamp = message.firstChildElement("x").attribute("stamp");
+            QDomElement body  = message.firstChildElement("body");
             if (!body.isNull()) {
                 QString Text  = body.text();
                 QString MyJid = m_accountInfo->getJid(account);
@@ -518,8 +518,8 @@ void OMEMOPlugin::updateAction(int account, const QString &user)
         const auto ownJid    = m_accountInfo->getJid(account).split("/").first();
         bool       isGroup   = action->property("isGroup").toBool();
         bool       available = isGroup ? m_omemo->isAvailableForGroup(account, ownJid, bareJid)
-                                 : m_omemo->isAvailableForUser(account, bareJid);
-        bool enabled = available && m_omemo->isEnabledForUser(account, bareJid);
+                                       : m_omemo->isAvailableForUser(account, bareJid);
+        bool       enabled   = available && m_omemo->isEnabledForUser(account, bareJid);
         action->setEnabled(available);
         action->setChecked(enabled);
         action->setProperty("jid", bareJid);
@@ -581,8 +581,7 @@ bool OMEMOPlugin::execute(int account, const QHash<QString, QVariant> &args, QHa
 }
 
 // the code partly taken from the Conference Logger plugin
-void OMEMOPlugin::logMuc(QString room, const QString &from, const QString &myJid,
-                         const QString &text, QString stamp)
+void OMEMOPlugin::logMuc(QString room, const QString &from, const QString &myJid, const QString &text, QString stamp)
 {
     room = room.replace("@", "_at_");
     room = "_in_" + room;

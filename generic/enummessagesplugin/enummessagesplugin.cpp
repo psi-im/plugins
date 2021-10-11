@@ -231,8 +231,8 @@ QAction *EnumMessagesPlugin::getAction(QObject *parent, int account, const QStri
 {
     if (!enabled)
         return nullptr;
-    QIcon icon = PSI_PLUGIN_MD("icon").value<QIcon>();
-    QAction *act   = new QAction(icon, tr("Enum Messages"), parent);
+    QIcon    icon = PSI_PLUGIN_MD("icon").value<QIcon>();
+    QAction *act  = new QAction(icon, tr("Enum Messages"), parent);
     act->setCheckable(true);
     const QString jid = contact.split("/").first();
     act->setProperty("account", account);

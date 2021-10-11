@@ -42,8 +42,8 @@ extern "C" {
 #ifndef OTRL_PRIVKEY_FPRINT_HUMAN_LEN
 #define OTRL_PRIVKEY_FPRINT_HUMAN_LEN 45
 #endif
-#include <libotr/instag.h>
 #include "otrlextensions.h"
+#include <libotr/instag.h>
 }
 
 class QString;

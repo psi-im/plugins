@@ -153,7 +153,7 @@ bool PsiOtrPlugin::enable()
 
 bool PsiOtrPlugin::disable()
 {
-    for (const QString account : m_onlineUsers.keys()) {
+    for (const QString &account : m_onlineUsers.keys()) {
         for (const QString &contact : m_onlineUsers.value(account).keys()) {
             if (m_onlineUsers[account][contact]->encrypted()) {
                 m_otrConnection->endSession(account, contact);
@@ -336,9 +336,9 @@ bool PsiOtrPlugin::encryptMessageElement(int accountIndex, QDomElement &message)
         return false;
     }
 
-    const QString &&account = m_accountInfo->getId(accountIndex);
-    const QString &&contact = getCorrectJid(accountIndex, message.attribute("to"));
-    QDomElement bodyElement = message.firstChildElement("body");
+    const QString &&account     = m_accountInfo->getId(accountIndex);
+    const QString &&contact     = getCorrectJid(accountIndex, message.attribute("to"));
+    QDomElement     bodyElement = message.firstChildElement("body");
 
     if (bodyElement.isNull()) {
         return false;
@@ -476,10 +476,7 @@ bool PsiOtrPlugin::incomingStanza(int accountIndex, const QDomElement &xml)
 
 //-----------------------------------------------------------------------------
 
-bool PsiOtrPlugin::outgoingStanza(int accountIndex, QDomElement &xml)
-{
-    return false;
-}
+bool PsiOtrPlugin::outgoingStanza(int accountIndex, QDomElement &xml) { return false; }
 
 //-----------------------------------------------------------------------------
 

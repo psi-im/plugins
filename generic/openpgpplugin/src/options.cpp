@@ -88,7 +88,7 @@ Options::Options(QWidget *parent) : QWidget(parent), m_ui(new Ui::Options)
     }
     {
         m_ui->knownKeysTable->setShowGrid(true);
-        m_ui->knownKeysTable->setEditTriggers(nullptr);
+        m_ui->knownKeysTable->setEditTriggers(QAbstractItemView::EditTriggers());
         m_ui->knownKeysTable->setSelectionBehavior(QAbstractItemView::SelectRows);
         m_ui->knownKeysTable->setSortingEnabled(true);
 
@@ -102,7 +102,7 @@ Options::Options(QWidget *parent) : QWidget(parent), m_ui(new Ui::Options)
     }
     {
         m_ui->ownKeysTable->setShowGrid(true);
-        m_ui->ownKeysTable->setEditTriggers(nullptr);
+        m_ui->ownKeysTable->setEditTriggers(QAbstractItemView::EditTriggers());
         m_ui->ownKeysTable->setSelectionBehavior(QAbstractItemView::SelectRows);
         m_ui->ownKeysTable->setSortingEnabled(true);
 
@@ -726,7 +726,11 @@ void Options::loadGpgAgentConfigData()
     if (configText.isEmpty())
         return;
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    for (const QString &line : configText.split("\n", Qt::SkipEmptyParts)) {
+#else
     for (const QString &line : configText.split("\n", QString::SkipEmptyParts)) {
+#endif
         if (line.contains("default-cache-ttl")) {
             QString str(line);
             str.replace("default-cache-ttl", "");

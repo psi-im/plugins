@@ -693,9 +693,15 @@ void ExtendedOptions::applyOptions()
     psiOptions->setGlobalOption("options.ui.chat.auto-scroll-to-bottom", QVariant(auto_scroll_to_bottom->isChecked()));
     psiOptions->setGlobalOption("options.ui.chat.caption", QVariant(chat_caption->text()));
     psiOptions->setGlobalOption("options.ui.chat.default-jid-mode", QVariant(default_jid_mode->currentText()));
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    psiOptions->setGlobalOption(
+        "options.ui.chat.default-jid-mode-ignorelist",
+        QVariant(default_jid_mode_ignorelist->toPlainText().split(QRegExp("\\s+"), Qt::SkipEmptyParts).join(",")));
+#else
     psiOptions->setGlobalOption(
         "options.ui.chat.default-jid-mode-ignorelist",
         QVariant(default_jid_mode_ignorelist->toPlainText().split(QRegExp("\\s+"), QString::SkipEmptyParts).join(",")));
+#endif
     psiOptions->setGlobalOption("options.ui.chat.show-status-changes", QVariant(show_status_changes->isChecked()));
     psiOptions->setGlobalOption("options.ui.chat.status-with-priority",
                                 QVariant(chat_status_with_priority->isChecked()));
@@ -1027,7 +1033,11 @@ void ExtendedOptions::saveFile(const QString &text)
         QTextStream out(&file);
         out.setCodec("UTF-8");
         out.setGenerateByteOrderMark(false);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+        out << text << Qt::endl;
+#else
         out << text << endl;
+#endif
     }
 }
 

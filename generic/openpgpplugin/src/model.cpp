@@ -165,7 +165,11 @@ void Model::showKeys(const QString &keysRaw)
     if (keysRaw.isEmpty())
         return;
 
-    QStringList            list = keysRaw.split("\n", QString::SkipEmptyParts);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    QStringList list = keysRaw.split("\n", Qt::SkipEmptyParts);
+#else
+    QStringList list = keysRaw.split("\n", QString::SkipEmptyParts);
+#endif
     QList<QStandardItem *> lastRow;
     QList<QStandardItem *> row;
     QStringList            secretKeys;

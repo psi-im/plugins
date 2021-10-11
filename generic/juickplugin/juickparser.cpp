@@ -80,7 +80,11 @@ JuickParser::JuickParser(QDomElement *elem) : elem_(elem)
         type_     = JM_Recomendation;
         infoText_ = QObject::tr("Recommended by @%1").arg(d->recomendRx.cap(1));
         JuickMessage m(d->recomendRx.cap(2), d->recomendRx.cap(5),
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+                       d->recomendRx.cap(3).trimmed().split(" ", Qt::SkipEmptyParts), d->recomendRx.cap(4),
+#else
                        d->recomendRx.cap(3).trimmed().split(" ", QString::SkipEmptyParts), d->recomendRx.cap(4),
+#endif
                        d->recomendRx.cap(7), d->recomendRx.cap(6));
         messages_.append(m);
     } else if (d->pmRx.indexIn(msg) != -1) {
@@ -93,7 +97,11 @@ JuickParser::JuickParser(QDomElement *elem) : elem_(elem)
         QString mes = d->lastMsgRx.cap(2);
         while (d->singleMsgRx.indexIn(mes) != -1) {
             JuickMessage m(d->singleMsgRx.cap(1), d->singleMsgRx.cap(4),
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+                           d->singleMsgRx.cap(2).trimmed().split(" ", Qt::SkipEmptyParts), d->singleMsgRx.cap(3),
+#else
                            d->singleMsgRx.cap(2).trimmed().split(" ", QString::SkipEmptyParts), d->singleMsgRx.cap(3),
+#endif
                            d->singleMsgRx.cap(6), d->singleMsgRx.cap(5));
             messages_.append(m);
             mes = mes.right(mes.size() - d->singleMsgRx.matchedLength());
@@ -113,7 +121,11 @@ JuickParser::JuickParser(QDomElement *elem) : elem_(elem)
         type_     = JM_Message;
         infoText_ = QString();
         JuickMessage m(d->postRx.cap(1), d->postRx.cap(4),
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+                       d->postRx.cap(2).trimmed().split(" ", Qt::SkipEmptyParts), d->postRx.cap(3),
+#else
                        d->postRx.cap(2).trimmed().split(" ", QString::SkipEmptyParts), d->postRx.cap(3),
+#endif
                        d->postRx.cap(5), QString());
         messages_.append(m);
     } else if (d->replyRx.indexIn(msg) != -1) {
@@ -136,7 +148,11 @@ JuickParser::JuickParser(QDomElement *elem) : elem_(elem)
         type_     = JM_All_Messages;
         infoText_ = QString();
         JuickMessage m(d->threadRx.cap(1), d->threadRx.cap(4),
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+                       d->threadRx.cap(2).trimmed().split(" ", Qt::SkipEmptyParts), d->threadRx.cap(3),
+#else
                        d->threadRx.cap(2).trimmed().split(" ", QString::SkipEmptyParts), d->threadRx.cap(3),
+#endif
                        d->threadRx.cap(5),
                        msg.right(msg.size() - d->threadRx.matchedLength() + d->threadRx.cap(6).length()));
         messages_.append(m);
@@ -144,13 +160,21 @@ JuickParser::JuickParser(QDomElement *elem) : elem_(elem)
         type_     = JM_Post_View;
         infoText_ = QString();
         JuickMessage m(d->singleMsgRx.cap(1), d->singleMsgRx.cap(4),
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+                       d->singleMsgRx.cap(2).trimmed().split(" ", Qt::SkipEmptyParts), d->singleMsgRx.cap(3),
+#else
                        d->singleMsgRx.cap(2).trimmed().split(" ", QString::SkipEmptyParts), d->singleMsgRx.cap(3),
+#endif
                        d->singleMsgRx.cap(6), d->singleMsgRx.cap(5));
         messages_.append(m);
     } else if (d->juboRx.indexIn(msg) != -1) {
         type_ = JM_Jubo;
         JuickMessage m(d->juboRx.cap(2), d->juboRx.cap(5),
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+                       d->juboRx.cap(3).trimmed().split(" ", Qt::SkipEmptyParts), d->juboRx.cap(4),
+#else
                        d->juboRx.cap(3).trimmed().split(" ", QString::SkipEmptyParts), d->juboRx.cap(4),
+#endif
                        d->juboRx.cap(6), QString());
         messages_.append(m);
         infoText_ = d->juboRx.cap(1);

@@ -21,6 +21,9 @@
 #include <QDomElement>
 #include <QMessageBox>
 #include <QTextEdit>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+#include <QRandomGenerator>
+#endif
 
 #include "activetabaccessinghost.h"
 #include "applicationinfoaccessinghost.h"
@@ -1086,7 +1089,11 @@ void JuickPlugin::updateWidgets(const QList<QByteArray> &urls)
             }
             te->setLineWrapColumnOrWidth(te->lineWrapColumnOrWidth());
         } else {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+            int t = QRandomGenerator::global()->generate() % (QTime::currentTime().msec() + 1);
+#else
             int t = qrand() % (QTime::currentTime().msec() + 1);
+#endif
             if (webkit->chatLogRenderType() == WebkitAccessingHost::RT_WebKit
                 || webkit->chatLogRenderType() == WebkitAccessingHost::RT_WebEngine) {
                 for (const QByteArray &url : urls) {

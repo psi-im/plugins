@@ -9,19 +9,18 @@ class ImagePreviewOptions;
 }
 
 class OptionAccessingHost;
-class ImagePreviewOptions : public QWidget
-{
+class ImagePreviewOptions : public QWidget {
     Q_OBJECT
 
 public:
     explicit ImagePreviewOptions(OptionAccessingHost *optHost, QWidget *parent = nullptr);
     ~ImagePreviewOptions();
     std::tuple<int, int, bool, QString> applyOptions();
-    void restoreOptions();
+    void                                restoreOptions();
 
 private:
     Ui::ImagePreviewOptions *ui;
-    OptionAccessingHost *optHost;
+    OptionAccessingHost *    optHost;
 };
 
 #endif // OPTIONS_H

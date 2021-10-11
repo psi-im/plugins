@@ -98,11 +98,7 @@ bool CDItemModel::setData(const QModelIndex &index, const QVariant &value, int r
 
 Qt::ItemFlags CDItemModel::flags(const QModelIndex &index) const
 {
-    if (!index.isValid()) {
-        return nullptr;
-    }
-
-    return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
+    return (!index.isValid()) ? Qt::ItemFlags() : (Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
 }
 
 QVariant CDItemModel::headerData(int section, Qt::Orientation orientation, int role) const

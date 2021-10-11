@@ -150,7 +150,11 @@ void Form::parseContentList(const QString &text)
         QString html;
 
         group = rx.cap(1);
-        list  = rx.cap(2).split("\n", QString::SkipEmptyParts);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+        list = rx.cap(2).split("\n", Qt::SkipEmptyParts);
+#else
+        list = rx.cap(2).split("\n", QString::SkipEmptyParts);
+#endif
         for (int i = list.size() - 1; i >= 0; i--) {
             QString left, right;
             left  = list[i].section("=", 0, 0).trimmed();

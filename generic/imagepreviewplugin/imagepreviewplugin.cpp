@@ -58,10 +58,7 @@
 class Origin : public QObject {
     Q_OBJECT
 public:
-    Origin(QWidget *chat) :
-        QObject(chat), originalUrl_(""), chat_(chat)
-    {
-    }
+    Origin(QWidget *chat) : QObject(chat), originalUrl_(""), chat_(chat) { }
     QString  originalUrl_;
     QWidget *chat_;
 };

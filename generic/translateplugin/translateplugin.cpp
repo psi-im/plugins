@@ -418,7 +418,7 @@ void TranslatePlugin::trans()
     while (index != -1 && !isSelect) {
         QString newStr;
         QString oldStr = toReverse.left(index);
-        for (const QString &symbol : oldStr) {
+        for (const QChar &symbol : oldStr) {
             newStr.append(map.value(symbol, symbol));
         }
         newStrings << newStr << link.cap();
@@ -427,7 +427,7 @@ void TranslatePlugin::trans()
     }
 
     QString newStr;
-    for (const QString &symbol : toReverse) {
+    for (const QChar &symbol : toReverse) {
         newStr.append(map.value(symbol, symbol));
     }
     newStrings << newStr;

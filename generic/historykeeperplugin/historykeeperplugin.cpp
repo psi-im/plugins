@@ -201,7 +201,11 @@ void HistoryKeeperPlugin::applyOptions()
     if (!contactsWidget)
         return;
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    contacts = contactsWidget->toPlainText().split(QRegExp("\\s+"), Qt::SkipEmptyParts);
+#else
     contacts = contactsWidget->toPlainText().split(QRegExp("\\s+"), QString::SkipEmptyParts);
+#endif
     psiOptions->setPluginOption(constClearHistoryFor, QVariant(contacts));
 }
 

@@ -28,8 +28,8 @@ void BoardDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
     BoardModel *model = (BoardModel *)index.model();
     QRect       r     = option.rect;
     QColor      color = ((option.state & QStyle::State_Selected) && model->myMove && !model->gameState_)
-        ? QColor("#b5e3ff")
-        : index.data(Qt::BackgroundColorRole).value<QColor>();
+             ? QColor("#b5e3ff")
+             : index.data(Qt::BackgroundRole).value<QColor>();
     painter->fillRect(r, color);
 
     QPixmap pix = index.data(Qt::DisplayRole).value<QPixmap>();

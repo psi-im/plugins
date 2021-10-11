@@ -133,7 +133,11 @@ QString BaseFileModel::fileName(const QModelIndex &index) const
         return QString();
 
     QString name = files_.at(i);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    return name.split("/", Qt::SkipEmptyParts).last();
+#else
     return name.split("/", QString::SkipEmptyParts).last();
+#endif
 }
 
 QString BaseFileModel::filePass(const QModelIndex &index) const
@@ -166,7 +170,7 @@ QString BaseFileModel::fileDate(const QModelIndex &index) const
 #if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
     result = QFileInfo(filePass(index)).created().toString("yyyy-MM-dd");
 #else
-    result    = QFileInfo(filePass(index)).birthTime().toString("yyyy-MM-dd");
+    result = QFileInfo(filePass(index)).birthTime().toString("yyyy-MM-dd");
 #endif
     return result;
 }

@@ -372,7 +372,7 @@ QWidget *StopSpam::options()
     ui_.setupUi(options_);
     connect(options_, &QWidget::destroyed, this, &StopSpam::onOptionsClose);
 
-    if(!tv_rules)
+    if (!tv_rules)
         tv_rules = new Viewer(options_);
     tv_rules->setModel(model_);
     tv_rules->init();

@@ -23,6 +23,9 @@
  */
 
 #include <QTextDocument>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+#include <QRandomGenerator>
+#endif
 
 #include "common.h"
 #include "gamesessions.h"
@@ -30,7 +33,11 @@
 #include "options.h"
 
 GameSessions::GameSessions(QObject *parent) :
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+    QObject(parent), stanzaId(QRandomGenerator::global()->generate() % 10000), // Получаем псевдослучайный стартовый id
+#else
     QObject(parent), stanzaId(qrand() % 10000), // Получаем псевдослучайный стартовый id
+#endif
     errorStr("")
 {
     gameSessions.clear();
@@ -857,9 +864,15 @@ QString GameSessions::newId(const bool big_add)
 {
     stanzaId += 1;
     if (big_add) {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+        stanzaId += (QRandomGenerator::global()->generate() % 50) + 4;
+    } else {
+        stanzaId += (QRandomGenerator::global()->generate() % 5) + 1;
+#else
         stanzaId += (qrand() % 50) + 4;
     } else {
         stanzaId += (qrand() % 5) + 1;
+#endif
     }
     return "gg_" + QString::number(stanzaId);
 }

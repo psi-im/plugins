@@ -145,7 +145,7 @@ FingerprintWidget::FingerprintWidget(OtrMessaging *otr, QWidget *parent) :
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     m_table->setShowGrid(true);
-    m_table->setEditTriggers(nullptr);
+    m_table->setEditTriggers(QAbstractItemView::EditTriggers());
     m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_table->setContextMenuPolicy(Qt::CustomContextMenu);
     m_table->setSortingEnabled(true);
@@ -360,7 +360,7 @@ PrivKeyWidget::PrivKeyWidget(AccountInfoAccessingHost *accountInfo, OtrMessaging
     setLayout(mainLayout);
 
     m_table->setShowGrid(true);
-    m_table->setEditTriggers(nullptr);
+    m_table->setEditTriggers(QAbstractItemView::EditTriggers());
     m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_table->setSortingEnabled(true);
 

@@ -236,7 +236,11 @@ bool Reminder::incomingStanza(int account, const QDomElement &stanza)
                         QTextStream out(&file);
                         out.setCodec("UTF-8");
                         out.setGenerateByteOrderMark(false);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+                        out << Date << "__" << Nick << Qt::endl;
+#else
                         out << Date << "__" << Nick << endl;
+#endif
                     }
                 }
             }
@@ -335,7 +339,11 @@ void Reminder::updateVCard()
                             QTextStream out(&file);
                             out.setCodec("UTF-8");
                             out.setGenerateByteOrderMark(false);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+                            out << Date << "__" << Nick << Qt::endl;
+#else
                             out << Date << "__" << Nick << endl;
+#endif
                         }
                     }
                 }

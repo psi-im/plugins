@@ -55,7 +55,11 @@ GameModel::GameModel(const QString &load_str, const bool local, QObject *parent)
         QString str1 = loadList.takeFirst().trimmed();
         if (str1.isEmpty())
             continue;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+        QStringList setStrList = str1.split(":", Qt::SkipEmptyParts);
+#else
         QStringList setStrList = str1.split(":", QString::SkipEmptyParts);
+#endif
         if (setStrList.size() != 2) {
             res = false;
             break;

@@ -584,8 +584,8 @@ void HttpUploadPlugin::uploadComplete(QNetworkReply *reply)
         QString  id = getId(currentUpload.account);
         QString  receipt(currentUpload.type == "chat"
                                 && psiOptions->getGlobalOption("options.ui.notifications.request-receipts").toBool()
-                            ? "<request xmlns='urn:xmpp:receipts'/>"
-                            : "");
+                             ? "<request xmlns='urn:xmpp:receipts'/>"
+                             : "");
         QString &url            = currentUpload.getUrl;
         bool     omemoEncrypted = !currentUpload.aesgcmAnchor.isNull();
         if (omemoEncrypted) {

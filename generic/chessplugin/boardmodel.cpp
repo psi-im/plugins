@@ -112,7 +112,7 @@ QVariant BoardModel::data(const QModelIndex &i, int role) const
     if (gameType_ == Figure::BlackPlayer)
         index = invert(index);
 
-    if (role == Qt::BackgroundColorRole) {
+    if (role == Qt::BackgroundRole) {
         if (index == kingIndex() && isCheck())
             return QVariant(QColor("#9a0000"));
         int i = index.column() + index.row();

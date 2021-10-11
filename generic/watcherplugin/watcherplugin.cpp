@@ -457,7 +457,11 @@ bool Watcher::checkWatchedItem(const QString &from, const QString &body, Watched
         }
     }
     if (!wi->watchedText().isEmpty()) {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+        for (auto txt : wi->watchedText().split(QRegExp("\\s+"), Qt::SkipEmptyParts)) {
+#else
         for (auto txt : wi->watchedText().split(QRegExp("\\s+"), QString::SkipEmptyParts)) {
+#endif
             if (body.contains(QRegExp(txt, Qt::CaseInsensitive, QRegExp::Wildcard))) {
                 psiOptions->setGlobalOption("options.ui.notifications.sounds.enable", QVariant(false));
                 playSound(wi->sFile());

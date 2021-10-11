@@ -220,7 +220,11 @@ QStringList NoteModel::getAllTags() const
 {
     QStringList tagsList;
     for (const QDomElement &note : notesList) {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+        QStringList tags = note.attribute("tags").split(" ", Qt::SkipEmptyParts);
+#else
         QStringList tags = note.attribute("tags").split(" ", QString::SkipEmptyParts);
+#endif
         tagsList += tags;
     }
     return tagsList;

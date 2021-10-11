@@ -327,7 +327,7 @@ void Screenshot::setServersList(const QStringList &l)
     servers.clear();
     ui_.cb_servers->setEnabled(false);
     ui_.pb_upload->setEnabled(false);
-    for (auto settings : l) {
+    for (auto &settings : l) {
         if (settings.isEmpty()) {
             continue;
         }
@@ -400,7 +400,7 @@ void Screenshot::printScreenshot()
         QPainter painter;
         painter.begin(&p);
         QPixmap     pix  = ui_.lb_pixmap->getPixmap();
-        const QSize size = p.pageRect().size();
+        const QSize size = p.pageLayout().paintRectPixels(QPrinter().resolution()).size();
         if (pix.size().height() > size.height() || pix.size().width() > size.width()) {
             pix = pix.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         }
@@ -528,8 +528,8 @@ void Screenshot::saveScreenshot()
     originalPixmap      = ui_.lb_pixmap->getPixmap();
     QString initialPath = lastFolder + tr("/%1.").arg(QDateTime::currentDateTime().toString(fileNameFormat)) + format;
 
-    QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Save As"), initialPath, tr("%1 Files (*.%2);;All Files (*)").arg(format.toUpper()).arg(format));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), initialPath,
+                                                    tr("%1 Files (*.%2);;All Files (*)").arg(format.toUpper(), format));
     if (!fileName.isEmpty()) {
         originalPixmap.save(fileName, format.toLatin1());
         QFileInfo fi(fileName);
@@ -646,8 +646,9 @@ void Screenshot::uploadHttp()
 {
     ba.clear();
 
-    QString boundary = "AaB03x";
-    QString filename = tr("%1.").arg(QDateTime::currentDateTime().toString(fileNameFormat)) + format;
+    QString boundary  = "AaB03x";
+    QString filename  = tr("%1.").arg(QDateTime::currentDateTime().toString(fileNameFormat)) + format;
+    QString byteArray = QString();
 
     Server *s = servers.at(ui_.cb_servers->currentIndex());
     if (!s) {
@@ -656,32 +657,33 @@ void Screenshot::uploadHttp()
     }
 
     if (s->servPostdata().length() > 0) {
-        for (auto poststr : s->servPostdata().split("&")) {
+        for (auto &poststr : s->servPostdata().split("&")) {
             QStringList postpair = poststr.split("=");
             if (postpair.count() < 2)
                 continue;
-            ba.append("--" + boundary + "\r\n");
-            ba.append("Content-Disposition: form-data; name=\"" + postpair[0] + "\"\r\n");
-            ba.append("\r\n" + postpair[1] + "\r\n");
+            byteArray.append("--" + boundary + "\r\n");
+            byteArray.append("--" + boundary + "\r\n");
+            byteArray.append("Content-Disposition: form-data; name=\"" + postpair[0] + "\"\r\n");
+            byteArray.append("\r\n" + postpair[1] + "\r\n");
         }
     }
 
-    ba.append("--" + boundary + "\r\n");
-    ba.append("Content-Disposition: form-data; name=\"" + s->servFileinput() + "\"; filename=\"" + filename.toUtf8()
-              + "\"\r\n");
-    ba.append("Content-Transfer-Encoding: binary\r\n");
-    ba.append(QString("Content-Type: image/%1\r\n")
-                  .arg(format == "jpg" ? "jpeg" : format) // FIXME!!!!! жуткий костыль, но что поделаешь
-                  .toUtf8());
-    ba.append("\r\n");
+    byteArray.append("--" + boundary + "\r\n");
+    byteArray.append("Content-Disposition: form-data; name=\"" + s->servFileinput() + "\"; filename=\""
+                     + filename.toUtf8() + "\"\r\n");
+    byteArray.append("Content-Transfer-Encoding: binary\r\n");
+    byteArray.append(QString("Content-Type: image/%1\r\n")
+                         .arg(format == "jpg" ? "jpeg" : format) // FIXME!!!!! жуткий костыль, но что поделаешь
+                         .toUtf8());
+    byteArray.append("\r\n");
 
     QByteArray a;
     QBuffer    buffer(&a);
     buffer.open(QBuffer::ReadWrite);
     originalPixmap.save(&buffer, format.toLatin1());
-    ba.append(a);
+    byteArray.append(a);
 
-    ba.append("\r\n--" + boundary + "--\r\n");
+    byteArray.append("\r\n--" + boundary + "--\r\n");
 
     if (manager) {
         delete manager;
@@ -710,6 +712,7 @@ void Screenshot::uploadHttp()
     ui_.progressBar->show();
     ui_.urlFrame->setVisible(false);
 
+    ba                   = byteArray.toLatin1();
     QNetworkReply *reply = manager->post(netreq, ba);
     connect(reply, SIGNAL(uploadProgress(qint64, qint64)), this, SLOT(dataTransferProgress(qint64, qint64)));
     connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(httpReplyFinished(QNetworkReply *)));
