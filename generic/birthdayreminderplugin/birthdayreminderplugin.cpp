@@ -314,10 +314,11 @@ void Reminder::setStanzaSendingHost(StanzaSendingHost *host) { stanzaHost = host
 void Reminder::updateVCard()
 {
     if (enabled && !updateInProgress) {
-        updateInProgress   = true;
-        const QString path = appInfoHost->appVCardDir();
-        QDir          dir(path);
-        for (auto filename : dir.entryList(QDir::Files)) {
+        updateInProgress       = true;
+        const QString     path = appInfoHost->appVCardDir();
+        QDir              dir(path);
+        const QStringList files = dir.entryList(QDir::Files);
+        for (auto filename : files) {
             QFile file(path + QDir::separator() + filename);
             if (file.open(QIODevice::ReadOnly)) {
                 QTextStream in(&file);
@@ -396,8 +397,9 @@ QString Reminder::checkBirthdays()
         }
     }
 
-    QString CheckResult;
-    for (auto jid : QDir(bdaysDir()).entryList(QDir::Files)) {
+    QString           CheckResult;
+    const QStringList jids = QDir(bdaysDir()).entryList(QDir::Files);
+    for (auto jid : jids) {
         if (jid.contains("_at_")) {
             QFile file(bdaysDir() + QDir::separator() + jid);
             if (file.open(QIODevice::ReadOnly)) {
@@ -471,8 +473,9 @@ bool Reminder::check()
 
 void Reminder::clearCache()
 {
-    QDir dir(bdaysDir());
-    for (const QString &file : dir.entryList(QDir::Files)) {
+    QDir              dir(bdaysDir());
+    const QStringList files = dir.entryList(QDir::Files);
+    for (const QString &file : files) {
         QFile File(bdaysDir() + QDir::separator() + file);
         if (File.open(QIODevice::ReadWrite)) {
             File.remove();

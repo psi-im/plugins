@@ -244,10 +244,10 @@ void CDItemModel::update()
                 ContentItem *item     = static_cast<ContentItem *>(index.internalPointer());
                 QString      filename = item->url().section("/", -1);
                 QString      fullFileNameH
-                    = QDir::toNativeSeparators(QString("%1/%2/%3").arg(dataDir_).arg(item->group()).arg(filename));
+                    = QDir::toNativeSeparators(QString("%1/%2/%3").arg(dataDir_, item->group(), filename));
 
                 QString fullFileNameR
-                    = QDir::toNativeSeparators(QString("%1/%2/%3").arg(resourcesDir_).arg(item->group()).arg(filename));
+                    = QDir::toNativeSeparators(QString("%1/%2/%3").arg(resourcesDir_, item->group(), filename));
 
                 if (QFile::exists(fullFileNameH) || QFile::exists(fullFileNameR)) {
                     item->setToInstall(false);

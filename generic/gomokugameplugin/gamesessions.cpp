@@ -98,7 +98,7 @@ bool GameSessions::processIncomingIqStanza(int account, const QDomElement &xml, 
                 return true;
             }
             if (incomingInvitation(account, from, childElem.attribute("color"), id)) {
-                emit doInviteEvent(account, from, tr("%1: Invitation from %2").arg(constPluginName).arg(from), this,
+                emit doInviteEvent(account, from, tr("%1: Invitation from %2").arg(constPluginName, from), this,
                                    SLOT(showInvitation(QString)));
             }
             return true;
@@ -189,11 +189,7 @@ void GameSessions::sendInvite(const int account, const QString &full_jid, const 
     emit sendStanza(account,
                     QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><create xmlns=\"games:board\" id=\"%3\" type=\"%4\" "
                             "color=\"%5\"></create></iq>")
-                        .arg(XML::escapeString(full_jid))
-                        .arg(new_id)
-                        .arg(constProtoId)
-                        .arg(constProtoType)
-                        .arg(element));
+                        .arg(XML::escapeString(full_jid), new_id, constProtoId, constProtoType, element));
 }
 
 /**
@@ -265,10 +261,8 @@ void GameSessions::acceptInvite(const int account, const QString &id)
             startGame(idx);
             QString stanza = QString("<iq type=\"result\" to=\"%1\" id=\"%2\"><create xmlns=\"games:board\" "
                                      "type=\"%3\" id=\"%4\"/></iq>")
-                                 .arg(XML::escapeString(gameSessions.at(idx).full_jid))
-                                 .arg(XML::escapeString(id))
-                                 .arg(constProtoType)
-                                 .arg(constProtoId);
+                                 .arg(XML::escapeString(gameSessions.at(idx).full_jid), XML::escapeString(id),
+                                      constProtoType, constProtoId);
             emit sendStanza(account, stanza);
         } else {
             sendErrorIq(account, gameSessions.at(idx).full_jid, id, getLastError());
@@ -454,10 +448,7 @@ bool GameSessions::youWin(const int account, const QString &from, const QString 
     // Отправляем подтверждение получения станзы
     QString stanza
         = QString("<iq type=\"result\" to=\"%1\" id=\"%2\"><turn type=\"%3\" id=\"%4\" xmlns=\"games:board\"/></iq>")
-              .arg(XML::escapeString(from))
-              .arg(XML::escapeString(iq_id))
-              .arg(constProtoType)
-              .arg(constProtoId);
+              .arg(XML::escapeString(from), XML::escapeString(iq_id), constProtoType, constProtoId);
     emit sendStanza(account, stanza);
     // Отправляем окну уведомление о выигрыше
     QMetaObject::invokeMethod(sess->wnd.data(), "setWin", Qt::QueuedConnection);
@@ -477,10 +468,7 @@ bool GameSessions::setDraw(const int account, const QString &from, const QString
         QString stanza
             = QString(
                   "<iq type=\"result\" to=\"%1\" id=\"%2\"><turn type=\"%3\" id=\"%4\" xmlns=\"games:board\"/></iq>")
-                  .arg(XML::escapeString(from))
-                  .arg(XML::escapeString(iq_id))
-                  .arg(constProtoType)
-                  .arg(constProtoId);
+                  .arg(XML::escapeString(from), XML::escapeString(iq_id), constProtoType, constProtoId);
         emit sendStanza(account, stanza);
         // Уведомляем окно
         QMetaObject::invokeMethod(sess->wnd.data(), "opponentDraw", Qt::QueuedConnection);
@@ -503,10 +491,7 @@ bool GameSessions::closeRemoteGameBoard(const int account, const QString &from, 
     sess->last_iq_id = iq_id;
     QString stanza
         = QString("<iq type=\"result\" to=\"%1\" id=\"%2\"><turn type=\"%3\" id=\"%4\" xmlns=\"games:board\"/></iq>")
-              .arg(XML::escapeString(from))
-              .arg(XML::escapeString(iq_id))
-              .arg(constProtoType)
-              .arg(constProtoId);
+              .arg(XML::escapeString(from), XML::escapeString(iq_id), constProtoType, constProtoId);
     emit sendStanza(account, stanza);
     // Отправляем окну уведомление о закрытии окна
     QMetaObject::invokeMethod(gameSessions.at(idx).wnd.data(), "setClose", Qt::QueuedConnection);
@@ -581,10 +566,7 @@ void GameSessions::closeGameWindow(bool send_for_opponent, int top, int left, in
             gameSessions.at(idx).my_acc,
             QString(
                 "<iq type=\"set\" to=\"%1\" id=\"%2\"><close xmlns=\"games:board\" id=\"%3\" type=\"%4\"></close></iq>")
-                .arg(XML::escapeString(gameSessions.at(idx).full_jid))
-                .arg(id_str)
-                .arg(constProtoId)
-                .arg(constProtoType));
+                .arg(XML::escapeString(gameSessions.at(idx).full_jid), id_str, constProtoId, constProtoType));
     }
     gameSessions.removeAt(idx);
     Options *options = Options::instance();
@@ -606,12 +588,8 @@ void GameSessions::sendMove(const int x, const int y)
     gameSessions[idx].last_iq_id = id_str;
     QString stanza = QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><turn xmlns=\"games:board\" type=\"%3\" "
                              "id=\"%4\"><move pos=\"%5,%6\"></move></turn></iq>")
-                         .arg(XML::escapeString(gameSessions.at(idx).full_jid))
-                         .arg(id_str)
-                         .arg(constProtoType)
-                         .arg(constProtoId)
-                         .arg(x)
-                         .arg(y);
+                         .arg(XML::escapeString(gameSessions.at(idx).full_jid), id_str, constProtoType, constProtoId)
+                         .arg(x, y);
     emit sendStanza(gameSessions.at(idx).my_acc, stanza);
 }
 
@@ -627,10 +605,7 @@ void GameSessions::switchColor()
     gameSessions[idx].last_iq_id = id_str;
     QString stanza = QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><turn xmlns=\"games:board\" type=\"%3\" "
                              "id=\"%4\"><move pos=\"switch-color\"></move></turn></iq>")
-                         .arg(XML::escapeString(gameSessions.at(idx).full_jid))
-                         .arg(id_str)
-                         .arg(constProtoType)
-                         .arg(constProtoId);
+                         .arg(XML::escapeString(gameSessions.at(idx).full_jid), id_str, constProtoType, constProtoId);
     emit sendStanza(gameSessions.at(idx).my_acc, stanza);
 }
 
@@ -647,10 +622,8 @@ void GameSessions::sendAccept()
         return;
     QString stanza
         = QString("<iq type=\"result\" to=\"%1\" id=\"%2\"><turn type=\"%3\" id=\"%4\" xmlns=\"games:board\"/></iq>")
-              .arg(XML::escapeString(to_jid))
-              .arg(XML::escapeString(gameSessions.at(idx).last_iq_id))
-              .arg(constProtoType)
-              .arg(constProtoId);
+              .arg(XML::escapeString(to_jid), XML::escapeString(gameSessions.at(idx).last_iq_id), constProtoType,
+                   constProtoId);
     emit sendStanza(gameSessions.at(idx).my_acc, stanza);
 }
 
@@ -682,10 +655,7 @@ void GameSessions::sendDraw()
         sess->last_iq_id    = new_id;
         QString stanza      = QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><turn xmlns=\"games:board\" type=\"%3\" "
                                  "id=\"%4\"><draw/></turn></iq>")
-                             .arg(XML::escapeString(sess->full_jid))
-                             .arg(new_id)
-                             .arg(constProtoType)
-                             .arg(constProtoId);
+                             .arg(XML::escapeString(sess->full_jid), new_id, constProtoType, constProtoId);
         emit sendStanza(sess->my_acc, stanza);
     }
 }
@@ -702,10 +672,7 @@ void GameSessions::youLose()
     gameSessions[idx].last_iq_id = id_str;
     QString stanza = QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><turn xmlns=\"games:board\" type=\"%3\" "
                              "id=\"%4\"><resign/></turn></iq>")
-                         .arg(XML::escapeString(to_str))
-                         .arg(id_str)
-                         .arg(constProtoType)
-                         .arg(constProtoId);
+                         .arg(XML::escapeString(to_str), id_str, constProtoType, constProtoId);
     emit sendStanza(gameSessions.at(idx).my_acc, stanza);
 }
 
@@ -725,11 +692,7 @@ void GameSessions::sendLoad(const QString &save_str)
     QString stanza
         = QString(
               "<iq type=\"set\" to=\"%1\" id=\"%2\"><load xmlns=\"games:board\" id=\"%3\" type=\"%4\">%5</load></iq>")
-              .arg(XML::escapeString(to_str))
-              .arg(new_id)
-              .arg(constProtoId)
-              .arg(constProtoType)
-              .arg(save_str);
+              .arg(XML::escapeString(to_str), new_id, constProtoId, constProtoType, save_str);
     emit sendStanza(gameSessions.at(idx).my_acc, stanza);
 }
 
@@ -855,8 +818,7 @@ QString XML::escapeString(const QString &str) { return str.toHtmlEscaped().repla
 QString XML::iqErrorString(const QString &jid, const QString &id)
 {
     QString stanza = QString("<iq type=\"error\" to=\"%1\" id=\"%2\"><error type=\"cancel\" code=\"403\"/></iq>")
-                         .arg(XML::escapeString(jid))
-                         .arg(XML::escapeString(id));
+                         .arg(XML::escapeString(jid), XML::escapeString(id));
     return stanza;
 }
 

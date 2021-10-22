@@ -112,7 +112,8 @@ Bundle Signal::collectBundle()
         bundle.signedPreKeyPublic = signedPreKeyPublicKey;
         bundle.identityKeyPublic  = getIdentityPublicKey();
 
-        for (auto preKey : m_storage.loadAllPreKeys()) {
+        auto const preKeys = m_storage.loadAllPreKeys();
+        for (const auto &preKey : preKeys) {
             session_pre_key *pre_key = nullptr;
             if (session_pre_key_deserialize(&pre_key, reinterpret_cast<const uint8_t *>(preKey.second.data()),
                                             static_cast<size_t>(preKey.second.size()), m_signalContext)
@@ -233,7 +234,7 @@ QList<EncryptedKey> Signal::encryptKey(const QString &ownJid, const QString &rec
         if (!sessionIsValid(addr))
             continue;
 
-        bool       isPreKey;
+        bool       isPreKey = false;
         QByteArray encKey;
         doWithCipher(&addr, key, [&](session_cipher *cipher, const uint8_t *keyData, size_t keyLen) {
             ciphertext_message *cipher_msg = nullptr;
@@ -426,7 +427,8 @@ QMap<uint32_t, QString> Signal::getFingerprintsMap(const QString &user)
 {
     auto                    keysMap = m_storage.getKeysMap(user);
     QMap<uint32_t, QString> out;
-    for (const int id : keysMap.keys()) {
+    const auto              ids = keysMap.keys();
+    for (const int id : ids) {
         out.insert(id, getFingerprint(keysMap[id]));
     }
     return out;
@@ -451,7 +453,8 @@ QByteArray Signal::getIdentityPublicKey() const
 QList<Fingerprint> Signal::getKnownFingerprints()
 {
     QList<Fingerprint> res;
-    for (auto item : m_storage.getKnownFingerprints()) {
+    const auto         items = m_storage.getKnownFingerprints();
+    for (auto item : items) {
         Fingerprint fp(std::get<0>(item), getFingerprint(std::get<1>(item)), std::get<2>(item), std::get<3>(item));
         res.append(fp);
     }

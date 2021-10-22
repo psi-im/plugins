@@ -56,9 +56,9 @@ void EditNote::ok()
     doc.appendChild(noteElem);
 
     if (!text.isEmpty() || !title.isEmpty() || !tags.isEmpty())
-        newNote(doc.documentElement());
+        emit newNote(doc.documentElement());
 
-    editNote(doc.documentElement(), index_);
+    emit editNote(doc.documentElement(), index_);
 
     close();
 }

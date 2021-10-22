@@ -174,7 +174,7 @@ void Model::showKeys(const QString &keysRaw)
     QList<QStandardItem *> row;
     QStringList            secretKeys;
 
-    for (auto line : list) {
+    for (const auto &line : list) {
         if (line.count(':') < 1)
             continue;
 

@@ -114,7 +114,7 @@ private:
     bool                          allowUpscale = false;
     QList<QRegularExpression>     exceptions;
     ApplicationInfoAccessingHost *appInfoHost = nullptr;
-    void                          queueUrl(const QString &url, Origin *origin);
+    void                          queueUrl(const QString &url, QTextEdit *textEdit);
     void                          parseExceptions(const QString &str);
 };
 
@@ -163,12 +163,13 @@ QString ImagePreviewPlugin::pluginInfo()
     return tr("This plugin shows images URLs' previews in chats for non-webkit Psi version.\n");
 }
 
-void ImagePreviewPlugin::queueUrl(const QString &url, Origin *origin)
+void ImagePreviewPlugin::queueUrl(const QString &url, QTextEdit *textEdit)
 {
     if (!pending.contains(url) && !failed.contains(url)) {
         pending.insert(url);
         QNetworkRequest req;
-        origin->originalUrl_ = url;
+        auto            origin = new Origin(textEdit);
+        origin->originalUrl_   = url;
 
         req.setUrl(QUrl::fromUserInput(url));
         req.setOriginatingObject(origin);
@@ -207,7 +208,7 @@ void ImagePreviewPlugin::messageAppended(const QString &, QWidget *logWidget)
 #ifdef IMGPREVIEW_DEBUG
         qDebug() << "imagepreview: url found:" << url;
 #endif
-        queueUrl(url, new Origin(te_log));
+        queueUrl(url, te_log);
     };
     te_log->setTextCursor(cur);
 }
@@ -316,7 +317,7 @@ void ImagePreviewPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessin
 
 void ImagePreviewPlugin::parseExceptions(const QString &str)
 {
-    const auto &lines = str.trimmed().split("\n");
+    const auto lines = str.trimmed().split("\n");
     exceptions.clear();
     for (auto const &l : lines) {
         auto trimmed = l.trimmed();

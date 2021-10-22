@@ -153,8 +153,10 @@ bool PsiOtrPlugin::enable()
 
 bool PsiOtrPlugin::disable()
 {
-    for (const QString &account : m_onlineUsers.keys()) {
-        for (const QString &contact : m_onlineUsers.value(account).keys()) {
+    const QStringList accounts = m_onlineUsers.keys();
+    for (const QString &account : accounts) {
+        const QStringList contacts = m_onlineUsers.value(account).keys();
+        for (const QString &contact : contacts) {
             if (m_onlineUsers[account][contact]->encrypted()) {
                 m_otrConnection->endSession(account, contact);
             }
@@ -419,7 +421,8 @@ void PsiOtrPlugin::setPsiAccountControllingHost(PsiAccountControllingHost *host)
         QString account = m_accountInfo->getId(accountIndex);
 
         if (m_onlineUsers.contains(account)) {
-            for (const QString &contact : m_onlineUsers.value(account).keys()) {
+            const QStringList contacts = m_onlineUsers.value(account).keys();
+            for (const QString &contact : contacts) {
                 m_otrConnection->endSession(account, contact);
                 m_onlineUsers[account][contact]->setIsLoggedIn(false);
                 m_onlineUsers[account][contact]->updateMessageState();

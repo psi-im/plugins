@@ -73,8 +73,7 @@ InvitationDialog::InvitationDialog(const QString &jid, QString color, QWidget *p
     else
         color = tr("black");
 
-    ui_.lbl_text->setText(
-        tr("Player %1 invites you \nto play chess. He wants to play %2.").arg(unescape(jid)).arg(color));
+    ui_.lbl_text->setText(tr("Player %1 invites you \nto play chess. He wants to play %2.").arg(unescape(jid), color));
 
     connect(ui_.pb_accept, &QPushButton::pressed, this, &InvitationDialog::buttonPressed);
     connect(ui_.pb_reject, &QPushButton::pressed, this, &InvitationDialog::close);

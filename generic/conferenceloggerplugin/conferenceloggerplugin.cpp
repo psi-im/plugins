@@ -148,8 +148,9 @@ QWidget *ConferenceLogger::options()
     FilesBox = new QComboBox();
     FilesBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-    QDir dir(HistoryDir);
-    for (auto file : dir.entryList(QDir::Files)) {
+    QDir              dir(HistoryDir);
+    const QStringList files = dir.entryList(QDir::Files);
+    for (auto const &file : files) {
         if (file.contains("_in_")) {
             FilesBox->addItem(file);
         }
@@ -269,13 +270,14 @@ void ConferenceLogger::view()
     if (Jid == "" || YourJid == "") {
         return;
     }
-    Jid              = Jid.replace("@", "_at_");
-    QStringList List = YourJid.split("/");
-    YourJid          = List.takeFirst();
-    YourJid          = YourJid.replace("@", "_at_");
-    QString FName    = YourJid + "_in_" + Jid + ".conferencehistory";
-    QDir    dir(HistoryDir);
-    for (auto file : dir.entryList(QDir::Files)) {
+    Jid                     = Jid.replace("@", "_at_");
+    QStringList List        = YourJid.split("/");
+    YourJid                 = List.takeFirst();
+    YourJid                 = YourJid.replace("@", "_at_");
+    QString           FName = YourJid + "_in_" + Jid + ".conferencehistory";
+    QDir              dir(HistoryDir);
+    const QStringList files = dir.entryList(QDir::Files);
+    for (auto const &file : files) {
         if (file == FName) {
             showLog(file);
             break;

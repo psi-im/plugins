@@ -198,7 +198,7 @@ void PixmapWidget::buttonClicked(ToolBar::ButtonType t)
 void PixmapWidget::newWidth(int w)
 {
     pen.setWidth(w);
-    settingsChanged(constPenWidth, QVariant(w));
+    emit settingsChanged(constPenWidth, QVariant(w));
 }
 
 void PixmapWidget::setPixmap(const QPixmap &pix)
@@ -526,7 +526,7 @@ void PixmapWidget::selectColor()
         color_ = cd.currentColor();
         pen.setColor(color_);
         bar_->setColorForColorButton(color_);
-        settingsChanged(constColor, QVariant(color_.name()));
+        emit settingsChanged(constColor, QVariant(color_.name()));
     }
 }
 
@@ -534,7 +534,7 @@ void PixmapWidget::selectFont()
 {
     bool *ok = nullptr;
     font_    = QFontDialog::getFont(ok, font_, this);
-    settingsChanged(constFont, QVariant(font_.toString()));
+    emit settingsChanged(constFont, QVariant(font_.toString()));
 }
 
 void PixmapWidget::undo()
@@ -562,7 +562,7 @@ void PixmapWidget::checkedButtonChanged(ToolBar::ButtonType type)
     switch (type) {
     case (ToolBar::ButtonPen): {
         QIcon ico     = ScreenshotIconset::instance()->getIcon("psi/draw");
-        currentCursor = QCursor(ico.pixmap(ico.availableSizes().first()), 2, 15);
+        currentCursor = QCursor(ico.pixmap(ico.availableSizes().constFirst()), 2, 15);
         break;
     }
     case (ToolBar::ButtonSelect):

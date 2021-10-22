@@ -222,7 +222,8 @@ void FingerprintWidget::deleteKnownKey()
     if (!m_table->selectionModel()->hasSelection()) {
         return;
     }
-    for (auto selectIndex : m_table->selectionModel()->selectedRows()) {
+    const auto indexes = m_table->selectionModel()->selectedRows();
+    for (auto selectIndex : indexes) {
         int fpIndex = m_tableModel->item(selectIndex.row(), 0)->data().toInt();
 
         QString msg(tr("Are you sure you want to delete the following key?") + "\n\n" + tr("Account: ")
@@ -248,8 +249,9 @@ void FingerprintWidget::verifyKnownKey()
         return;
     }
 
-    bool itemChanged = false;
-    for (auto selectIndex : m_table->selectionModel()->selectedRows()) {
+    bool       itemChanged = false;
+    const auto indexes     = m_table->selectionModel()->selectedRows();
+    for (auto selectIndex : indexes) {
         const int fpIndex = m_tableModel->item(selectIndex.row(), 0)->data().toInt();
 
         QString msg(tr("Have you verified that this is in fact the correct fingerprint?") + "\n\n" + tr("Account: ")
@@ -276,7 +278,8 @@ void FingerprintWidget::revokeKnownKey()
         return;
     }
 
-    for (auto selectIndex : m_table->selectionModel()->selectedRows()) {
+    const auto indexes = m_table->selectionModel()->selectedRows();
+    for (auto selectIndex : indexes) {
         const int fpIndex = m_tableModel->item(selectIndex.row(), 0)->data().toInt();
         m_otr->verifyFingerprint(m_fingerprints[fpIndex], false);
     }
@@ -290,8 +293,9 @@ void FingerprintWidget::copyFingerprint()
     if (!m_table->selectionModel()->hasSelection()) {
         return;
     }
-    QString text;
-    for (auto selectIndex : m_table->selectionModel()->selectedRows(1)) {
+    QString    text;
+    const auto indexes = m_table->selectionModel()->selectedRows(1);
+    for (auto selectIndex : indexes) {
         int fpIndex = m_tableModel->item(selectIndex.row(), 0)->data().toInt();
 
         if (!text.isEmpty()) {
@@ -412,8 +416,9 @@ void PrivKeyWidget::deleteOwnKey()
         return;
     }
 
-    bool keyRemoved = false;
-    for (auto selectIndex : m_table->selectionModel()->selectedRows(1)) {
+    bool       keyRemoved = false;
+    const auto indexes    = m_table->selectionModel()->selectedRows(1);
+    for (auto selectIndex : indexes) {
         const QString fpr(m_tableModel->item(selectIndex.row(), 1)->text());
         const QString account(m_tableModel->item(selectIndex.row(), 0)->data().toString());
 
@@ -470,8 +475,9 @@ void PrivKeyWidget::copyFingerprint()
     if (!m_table->selectionModel()->hasSelection()) {
         return;
     }
-    QString text;
-    for (auto selectIndex : m_table->selectionModel()->selectedRows(1)) {
+    QString    text;
+    const auto indexes = m_table->selectionModel()->selectedRows(1);
+    for (auto selectIndex : indexes) {
         if (!text.isEmpty()) {
             text += "\n";
         }

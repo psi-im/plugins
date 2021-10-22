@@ -149,7 +149,8 @@ void KnownFingerprints::doUpdateData()
 {
     m_tableModel->setColumnCount(4);
     m_tableModel->setHorizontalHeaderLabels({ tr("User"), tr("Device ID"), tr("Trust"), tr("Fingerprint") });
-    for (auto fingerprint : m_omemo->getKnownFingerprints(m_account)) {
+    const QList<psiomemo::Fingerprint> fingerprints = m_omemo->getKnownFingerprints(m_account);
+    for (auto &fingerprint : fingerprints) {
         if (!m_jid.isEmpty()) {
             if (fingerprint.contact != m_jid) {
                 continue;
@@ -181,8 +182,9 @@ void KnownFingerprints::removeKnownKey()
     if (!m_table->selectionModel()->hasSelection())
         return;
 
-    bool keyRemoved = false;
-    for (auto selectIndex : m_table->selectionModel()->selectedRows(0)) {
+    bool                  keyRemoved = false;
+    const QModelIndexList indexes    = m_table->selectionModel()->selectedRows(0);
+    for (auto selectIndex : indexes) {
         QStandardItem *item = m_tableModel->item(selectIndex.row(), 0);
         if (m_omemo->removeDevice(m_account, item->text(), item->data().toUInt())) {
             keyRemoved = true;
@@ -322,8 +324,9 @@ void ManageDevices::doUpdateData()
 {
     m_tableModel->setColumnCount(1);
     m_tableModel->setHorizontalHeaderLabels({ tr("Device ID"), tr("Fingerprint") });
-    auto fingerprintsMap = m_omemo->getOwnFingerprintsMap(m_account);
-    for (auto deviceId : m_omemo->getOwnDevicesList(m_account)) {
+    auto       fingerprintsMap = m_omemo->getOwnFingerprintsMap(m_account);
+    auto const devIds          = m_omemo->getOwnDevicesList(m_account);
+    for (auto deviceId : devIds) {
         if (deviceId == m_currentDeviceId)
             continue;
 
@@ -482,7 +485,7 @@ void OmemoConfiguration::saveSettings()
     m_omemo->setEnabledByDefault(m_enabledByDefault->isChecked());
     m_omemo->setTrustNewOwnDevices(m_trustOwnDevices->isChecked());
     m_omemo->setTrustNewContactDevices(m_trustContactDevices->isChecked());
-    m_omemo->saveSettings();
+    emit m_omemo->saveSettings();
 }
 
 }

@@ -80,7 +80,7 @@ SelectFigure::SelectFigure(const QString &player, QWidget *parent) : QWidget(par
 void SelectFigure::figureSelected()
 {
     QString objectName = sender()->objectName();
-    newFigure(objectName);
+    emit    newFigure(objectName);
     close();
 }
 

@@ -28,7 +28,7 @@ void BoardDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
     BoardModel *model = (BoardModel *)index.model();
     QRect       r     = option.rect;
     QColor      color = ((option.state & QStyle::State_Selected) && model->myMove && !model->gameState_)
-             ? QColor("#b5e3ff")
+             ? QColor(0xb5, 0xe3, 0xff)
              : index.data(Qt::BackgroundRole).value<QColor>();
     painter->fillRect(r, color);
 

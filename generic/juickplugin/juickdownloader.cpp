@@ -36,7 +36,7 @@ static void save(const QString &path, const QByteArray &img)
         file.write(img);
     } else
         QMessageBox::warning(nullptr, QObject::tr("Warning"),
-                             QObject::tr("Cannot write to file %1:\n%2.").arg(file.fileName()).arg(file.errorString()));
+                             QObject::tr("Cannot write to file %1:\n%2.").arg(file.fileName(), file.errorString()));
 }
 
 JuickDownloader::JuickDownloader(ApplicationInfoAccessingHost *host, QObject *p) :

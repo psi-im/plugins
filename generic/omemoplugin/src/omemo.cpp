@@ -39,7 +39,8 @@ void OMEMO::init(const QString &dataPath)
 
 void OMEMO::deinit()
 {
-    for (auto signal : m_accountToSignal.values()) {
+    auto const signals_ = m_accountToSignal.values();
+    for (auto signal : signals_) {
         signal->deinit();
     }
 }
@@ -89,7 +90,7 @@ void OMEMO::publishOwnBundle(int account)
     QDomElement preKeys = doc.createElement("prekeys");
     bundle.appendChild(preKeys);
 
-    for (auto preKey : b.preKeys) {
+    for (auto &preKey : qAsConst(b.preKeys)) {
         QDomElement preKeyPublic = doc.createElement("preKeyPublic");
         preKeyPublic.setAttribute("preKeyId", preKey.first);
         setNodeText(preKeyPublic, preKey.second);
@@ -297,7 +298,7 @@ bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml,
                      "[OMEMO] " + tr("Unable to build any sessions, the message was not sent"));
         xml = QDomElement();
     } else {
-        for (auto encKey : encryptedKeys) {
+        for (auto &encKey : qAsConst(encryptedKeys)) {
             if (toDeviceId != nullptr && *toDeviceId != encKey.deviceId) {
                 continue;
             }
@@ -454,7 +455,8 @@ void OMEMO::buildSessionsFromBundle(const QMap<QString, QVector<uint32_t>> &reci
         message->sentStanzas.insert(stanza, deviceId);
     };
 
-    for (auto recipient : recipientInvalidSessions.keys()) {
+    auto const recipients = recipientInvalidSessions.keys();
+    for (auto &recipient : recipients) {
         QString bareRecipient = recipient.split("/").first();
         for (auto deviceId : recipientInvalidSessions.value(recipient)) {
             requestBundle(deviceId, bareRecipient);
@@ -474,7 +476,7 @@ bool OMEMO::processBundle(const QString &ownJid, int account, const QDomElement 
         return false;
 
     std::shared_ptr<MessageWaitingForBundles> message;
-    for (auto msg : m_pendingMessages) {
+    for (auto &msg : qAsConst(m_pendingMessages)) {
         if (msg->sentStanzas.contains(stanzaId)) {
             message = msg;
             break;
@@ -541,10 +543,7 @@ QString OMEMO::pepRequest(int account, const QString &ownJid, const QString &rec
                                      "%4\n"
                                      "</pubsub>\n"
                                      "</iq>\n")
-                                 .arg(stanzaId)
-                                 .arg(ownJid)
-                                 .arg(recipient)
-                                 .arg(item);
+                                 .arg(stanzaId, ownJid, recipient, item);
 
     m_stanzaSender->sendStanza(account, stanza);
     return stanzaId;
@@ -557,8 +556,7 @@ void OMEMO::pepPublish(int account, const QString &dl_xml) const
                              "%2\n"
                              "</pubsub>\n"
                              "</iq>\n")
-                         .arg(m_stanzaSender->uniqueId(account))
-                         .arg(dl_xml);
+                         .arg(m_stanzaSender->uniqueId(account), dl_xml);
 
     m_stanzaSender->sendStanza(account, stanza);
 }
@@ -570,8 +568,7 @@ void OMEMO::pepUnpublish(int account, const QString &node) const
                              "<delete node='%2'/>"
                              "</pubsub>"
                              "</iq>")
-                         .arg(m_stanzaSender->uniqueId(account))
-                         .arg(node);
+                         .arg(m_stanzaSender->uniqueId(account), node);
 
     m_stanzaSender->sendStanza(account, stanza);
 }
@@ -749,7 +746,8 @@ bool OMEMO::forEachMucParticipant(int account, const QString &ownJid, const QStr
 {
     QStringList list;
 
-    for (auto nick : m_contactInfoAccessor->mucNicks(account, conferenceJid)) {
+    const QStringList nicks = m_contactInfoAccessor->mucNicks(account, conferenceJid);
+    for (auto &nick : nicks) {
         QString contactMucJid = conferenceJid + "/" + nick;
         QString realJid       = m_contactInfoAccessor->realJid(account, contactMucJid);
         if (realJid == contactMucJid) {
@@ -762,7 +760,7 @@ bool OMEMO::forEachMucParticipant(int account, const QString &ownJid, const QStr
         }
     }
 
-    for (auto jid : list) {
+    for (auto const &jid : list) {
         if (!lambda(jid)) {
             return false;
         }

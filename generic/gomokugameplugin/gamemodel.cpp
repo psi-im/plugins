@@ -502,10 +502,11 @@ QString GameModel::toString() const
     for (GameElement *el : elementsList) {
         if (el == lastEl && !accepted_)
             continue; // Не сохраняем не подтвержденное
-        res_str.append(QString("Element:%1,%2,%3;\n")
-                           .arg(el->x())
-                           .arg(el->y())
-                           .arg((el->type() == GameElement::TypeBlack) ? "black" : "white"));
+        if (el != nullptr)
+            res_str.append(QString("Element:%1,%2,%3;\n")
+                               .arg(el->x())
+                               .arg(el->y())
+                               .arg((el->type() == GameElement::TypeBlack) ? "black" : "white"));
     }
     res_str.append(QString("SwitchColor:%1;\n").arg((switchColor) ? "yes" : "no"));
     res_str.append(QString("Color:%1;\n").arg((my_el == GameElement::TypeBlack) ? "black" : "white"));

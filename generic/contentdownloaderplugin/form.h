@@ -47,8 +47,8 @@ public:
     void setProxy(const QNetworkProxy &proxy);
 
 public slots:
-    void on_btnInstall_clicked();
-    void on_btnLoadList_clicked();
+    void onBtnInstallClicked();
+    void onBtnLoadListClicked();
 
 protected:
     void changeEvent(QEvent *e);

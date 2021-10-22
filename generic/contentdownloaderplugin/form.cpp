@@ -95,9 +95,9 @@ void Form::setProxy(const QNetworkProxy &proxy)
     }
 }
 
-void Form::on_btnInstall_clicked() { startDownload(); }
+void Form::onBtnInstallClicked() { startDownload(); }
 
-void Form::on_btnLoadList_clicked()
+void Form::onBtnLoadListClicked()
 {
     ui->btnLoadList->setEnabled(false);
     toDownload_.clear();
@@ -233,13 +233,13 @@ void Form::downloadContentFinished()
     QString      filename = item->url().section("/", -1);
     toDownload_.removeFirst();
     if (filename.endsWith(".jisp", Qt::CaseInsensitive)) {
-        QDir dir(QDir::toNativeSeparators(QString("%1/%2").arg(dataDir_).arg(item->group())));
+        QDir dir(QDir::toNativeSeparators(QString("%1/%2").arg(dataDir_, item->group())));
 
         if (!dir.exists()) {
             dir.mkpath(".");
         }
 
-        QString fullFileName = QDir::toNativeSeparators(QString("%1/%2").arg(dir.absolutePath()).arg(filename));
+        QString fullFileName = QDir::toNativeSeparators(QString("%1/%2").arg(dir.absolutePath(), filename));
 
         QFile fd(fullFileName);
 
@@ -283,14 +283,15 @@ void Form::downloadHtmlFinished()
             delete model;
             dir.mkpath(".");
 
-            QDomNodeList         imgs = doc.elementsByTagName("img");
-            QDomNode             node;
-            QVector<QStringList> text;
+            QDomNodeList imgs = doc.elementsByTagName("img");
+            // QDomNode             node;
+            // QVector<QStringList> text;
 
             for (int i = 0; i < imgs.size(); i++) {
-                QDomElement el = imgs.at(i).toElement();
-                QString     urlStr(el.attribute("src"));
-                for (const QString &protocol : QStringList({ "https://", "http://" })) {
+                QDomElement       el = imgs.at(i).toElement();
+                QString           urlStr(el.attribute("src"));
+                const QStringList protocols({ "https://", "http://" });
+                for (const QString &protocol : protocols) {
                     if (!urlStr.isEmpty() && !(urlStr.startsWith(protocol) || urlStr.startsWith(protocol))) {
                         urlStr = reply->url().toString().section('/', 0, -2) + '/' + urlStr;
                         break;
@@ -335,7 +336,7 @@ void Form::downloadImgFinished()
     }
 
     QString filename     = reply->url().toString().section("/", -1);
-    QString fullFileName = QDir::toNativeSeparators(QString("%1/imgs/%2").arg(tmpDir_).arg(filename));
+    QString fullFileName = QDir::toNativeSeparators(QString("%1/imgs/%2").arg(tmpDir_, filename));
 
     QFile fd(fullFileName);
     if (!fd.open(QIODevice::WriteOnly) || fd.write(reply->readAll()) == -1) {

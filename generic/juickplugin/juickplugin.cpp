@@ -62,7 +62,8 @@ static const int avatarsUpdateInterval = 10;
 
 static void nl2br(QDomElement *body, QDomDocument *e, const QString &msg)
 {
-    for (const QString &str : msg.split("\n")) {
+    const QStringList strings = msg.split("\n");
+    for (const QString &str : strings) {
         body->appendChild(e->createTextNode(str));
         body->appendChild(e->createElement("br"));
     }
@@ -116,11 +117,13 @@ bool JuickPlugin::enable()
 
     //Проверяем, обновился ли плагин
     if (!v.isValid() || v.toString() != constVersion) {
-        QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation) + "/avatars");
-        for (const QString &f : QDir(dir.path() + "/juick/per").entryList(QDir::Files)) {
+        QDir              dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation) + "/avatars");
+        const QStringList perFiles = QDir(dir.path() + "/juick/per").entryList(QDir::Files);
+        for (const QString &f : perFiles) {
             QFile::remove(dir.path() + "/juick/per/" + f);
         }
-        for (const QString &f : QDir(dir.path() + "/juick").entryList(QDir::Files)) {
+        const QStringList files = QDir(dir.path() + "/juick/per").entryList(QDir::Files);
+        for (const QString &f : files) {
             QFile::remove(dir.path() + "/juick/" + f);
         }
         dir.rmdir("juick/per");
@@ -178,7 +181,8 @@ bool JuickPlugin::disable()
     enabled = false;
     logs_.clear();
     QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation) + "/avatars/juick/photos");
-    for (const QString &file : dir.entryList(QDir::Files)) {
+    const QStringList files = dir.entryList(QDir::Files);
+    for (const QString &file : files) {
         QFile::remove(dir.absolutePath() + "/" + file);
     }
     JuickParser::reset();
@@ -402,8 +406,9 @@ void JuickPlugin::chooseColor(QWidget *w)
 
 void JuickPlugin::clearCache()
 {
-    QDir dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation) + "/avatars/juick");
-    for (const QString &file : dir.entryList(QDir::Files)) {
+    QDir              dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation) + "/avatars/juick");
+    const QStringList files = dir.entryList(QDir::Files);
+    for (const QString &file : files) {
         QFile::remove(dir.absolutePath() + "/" + file);
     }
 }
@@ -476,7 +481,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                     if (!dir.exists()) {
                         getAv = false;
                     } else {
-                        QFile file(QString("%1/%2").arg(dir.absolutePath()).arg(unick));
+                        QFile file(QString("%1/%2").arg(dir.absolutePath(), unick));
                         if (file.exists()) {
                             if (QFileInfo(file).lastModified().daysTo(QDateTime::currentDateTime())
                                     > avatarsUpdateInterval
@@ -491,7 +496,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                     if (getAv) {
                         QDir              dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)
                                  + "/avatars/juick");
-                        const QString     path(QString("%1/%2").arg(dir.absolutePath()).arg(unick));
+                        const QString     path(QString("%1/%2").arg(dir.absolutePath(), unick));
                         JuickDownloadItem it(path, avatarUrl);
                         downloader_->get(it);
                     }
@@ -558,7 +563,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                 body.appendChild(doc.createTextNode(jp.infoText()));
                 body.appendChild(doc.createElement("br"));
                 JuickMessage m = jm.first();
-                for (const QString &tag : m.tags) {
+                for (const QString &tag : qAsConst(m.tags)) {
                     addTagLink(&body, &doc, tag, jidToSend);
                     body.appendChild(doc.createElement("br"));
                 }
@@ -596,7 +601,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                 addUserLink(&body, &doc, "@" + m.unick, altTextUser, chatPlusAction, jidToSend);
                 body.appendChild(doc.createTextNode(": "));
                 //добавляем теги
-                for (const QString &tag : m.tags) {
+                for (const QString &tag : qAsConst(m.tags)) {
                     addTagLink(&body, &doc, tag, jidToSend);
                 }
                 msg = " " + m.body + " ";
@@ -786,13 +791,12 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                     } else {
                         const QDir    dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)
                                        + "/avatars/juick/photos");
-                        const QString path(
-                            QString("%1/%2").arg(dir.absolutePath()).arg(photoUrl.path().replace("/", "%")));
-                        QString imgdata = photoUrl.path().replace("/", "%");
+                        const QString path(QString("%1/%2").arg(dir.absolutePath(), photoUrl.path().replace("/", "%")));
+                        QString       imgdata = photoUrl.path().replace("/", "%");
                         img.setAttribute(
                             "src",
-                            QString(QUrl::fromLocalFile(QString("%1/%2").arg(dir.absolutePath()).arg(imgdata))
-                                        .toEncoded()));
+                            QString(
+                                QUrl::fromLocalFile(QString("%1/%2").arg(dir.absolutePath(), imgdata)).toEncoded()));
                         JuickDownloadItem it(path, dlUrl);
                         downloader_->get(it);
                     }
@@ -905,8 +909,8 @@ void JuickPlugin::elementFromString(QDomElement *body, QDomDocument *e, const QS
         default: {
         }
         }
-        pos     = new_pos + regx.matchedLength() - regx.cap(3).size();
-        new_pos = pos;
+        pos = new_pos + regx.matchedLength() - regx.cap(3).size();
+        // new_pos = pos;
     }
     nl2br(body, e, msg.right(msg.size() - pos));
     body->appendChild(e->createElement("br"));
@@ -930,8 +934,8 @@ void JuickPlugin::addAvatar(QDomElement *body, QDomDocument *doc, const QString 
         if (isWebkit) {
             img.setAttribute("src", avatarUrl);
         } else {
-            img.setAttribute(
-                "src", QString(QUrl::fromLocalFile(QString("%1/@%2").arg(dir.absolutePath()).arg(ujid)).toEncoded()));
+            img.setAttribute("src",
+                             QString(QUrl::fromLocalFile(QString("%1/@%2").arg(dir.absolutePath(), ujid)).toEncoded()));
         }
         td1.appendChild(img);
     }
@@ -950,8 +954,8 @@ void JuickPlugin::addPlus(QDomElement *body, QDomDocument *e, const QString &msg
     QDomElement plus = e->createElement("a");
     plus.setAttribute("style", idStyle);
     plus.setAttribute("title", showAllmsgString);
-    plus.setAttribute(
-        "href", QString("xmpp:%1%3?message;type=chat;body=%2+").arg(jid).arg(msg.replace("#", "%23")).arg(resource));
+    plus.setAttribute("href",
+                      QString("xmpp:%1%3?message;type=chat;body=%2+").arg(jid, msg.replace("#", "%23"), resource));
     plus.appendChild(e->createTextNode("+"));
     body->appendChild(plus);
 }
@@ -964,7 +968,7 @@ void JuickPlugin::addSubscribe(QDomElement *body, QDomDocument *e, const QString
     subscribe.setAttribute("style", idStyle);
     subscribe.setAttribute("title", subscribeString);
     subscribe.setAttribute(
-        "href", QString("xmpp:%1%3?message;type=chat;body=S %2").arg(jid).arg(msg.replace("#", "%23")).arg(resource));
+        "href", QString("xmpp:%1%3?message;type=chat;body=S %2").arg(jid, msg.replace("#", "%23"), resource));
     subscribe.appendChild(e->createTextNode("S"));
     body->appendChild(subscribe);
 }
@@ -983,7 +987,7 @@ void JuickPlugin::addTagLink(QDomElement *body, QDomDocument *e, const QString &
     QDomElement taglink = e->createElement("a");
     taglink.setAttribute("style", tagStyle);
     taglink.setAttribute("title", showLastTenString.arg(tag));
-    taglink.setAttribute("href", QString("xmpp:%1?message;type=chat;body=%2").arg(jid).arg(tag));
+    taglink.setAttribute("href", QString("xmpp:%1?message;type=chat;body=%2").arg(jid, tag));
     taglink.appendChild(e->createTextNode(tag));
     body->appendChild(taglink);
     body->appendChild(e->createTextNode(" "));
@@ -995,7 +999,7 @@ void JuickPlugin::addUserLink(QDomElement *body, QDomDocument *e, const QString 
     QDomElement ahref = e->createElement("a");
     ahref.setAttribute("style", userStyle);
     ahref.setAttribute("title", altText.arg(nick));
-    ahref.setAttribute("href", pattern.arg(jid).arg(nick));
+    ahref.setAttribute("href", pattern.arg(jid, nick));
     ahref.appendChild(e->createTextNode(nick));
     body->appendChild(ahref);
 }
@@ -1007,7 +1011,7 @@ void JuickPlugin::addMessageId(QDomElement *body, QDomDocument *e, const QString
     QDomElement ahref = e->createElement("a");
     ahref.setAttribute("style", idStyle);
     ahref.setAttribute("title", altText);
-    ahref.setAttribute("href", QString(pattern).arg(jid).arg(mId.replace("#", "%23")).arg(resource));
+    ahref.setAttribute("href", QString(pattern).arg(jid, mId.replace("#", "%23"), resource));
     ahref.appendChild(e->createTextNode(mId.replace("%23", "#")));
     body->appendChild(ahref);
 }
@@ -1021,9 +1025,7 @@ void JuickPlugin::addUnsubscribe(QDomElement *body, QDomDocument *e, const QStri
     unsubscribe.setAttribute("title", unsubscribeString);
     unsubscribe.setAttribute("href",
                              QString("xmpp:%1%3?message;type=chat;body=U %2")
-                                 .arg(jid)
-                                 .arg(msg.left(msg.indexOf("/")).replace("#", "%23"))
-                                 .arg(resource));
+                                 .arg(jid, msg.left(msg.indexOf("/")).replace("#", "%23"), resource));
     unsubscribe.appendChild(e->createTextNode("U"));
     body->appendChild(unsubscribe);
 }
@@ -1036,7 +1038,7 @@ void JuickPlugin::addDelete(QDomElement *body, QDomDocument *e, const QString &m
     unsubscribe.setAttribute("style", idStyle);
     unsubscribe.setAttribute("title", tr("Delete"));
     unsubscribe.setAttribute(
-        "href", QString("xmpp:%1%3?message;type=chat;body=D %2").arg(jid).arg(msg.replace("#", "%23")).arg(resource));
+        "href", QString("xmpp:%1%3?message;type=chat;body=D %2").arg(jid, msg.replace("#", "%23"), resource));
     unsubscribe.appendChild(e->createTextNode("D"));
     body->appendChild(unsubscribe);
 }
@@ -1049,7 +1051,7 @@ void JuickPlugin::addFavorite(QDomElement *body, QDomDocument *e, const QString 
     unsubscribe.setAttribute("style", idStyle);
     unsubscribe.setAttribute("title", tr("Add to favorites"));
     unsubscribe.setAttribute(
-        "href", QString("xmpp:%1%3?message;type=chat;body=! %2").arg(jid).arg(msg.replace("#", "%23")).arg(resource));
+        "href", QString("xmpp:%1%3?message;type=chat;body=! %2").arg(jid, msg.replace("#", "%23"), resource));
     unsubscribe.appendChild(e->createTextNode("!"));
     body->appendChild(unsubscribe);
 }
@@ -1079,7 +1081,7 @@ void JuickPlugin::removeWidget()
 // картинки с диска.
 void JuickPlugin::updateWidgets(const QList<QByteArray> &urls)
 {
-    for (QWidget *w : logs_) {
+    for (QWidget *w : qAsConst(logs_)) {
         QTextEdit *te = qobject_cast<QTextEdit *>(w);
         if (te) {
             QTextDocument *td = te->document();

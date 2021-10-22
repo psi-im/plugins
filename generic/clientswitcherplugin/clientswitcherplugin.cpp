@@ -175,13 +175,11 @@ QWidget *ClientSwitcherPlugin::options()
 
 void ClientSwitcherPlugin::applyOptions()
 {
-    bool caps_updated = false;
     // Аккаунт
     bool for_all_acc_old = for_all_acc;
     for_all_acc          = ui_options.cb_allaccounts->isChecked();
-    if (for_all_acc != for_all_acc_old) {
-        caps_updated = true;
-    }
+    bool caps_updated    = (for_all_acc != for_all_acc_old);
+
     int acc_index = ui_options.cb_accounts->currentIndex();
     if (acc_index == -1 && !for_all_acc)
         return;
@@ -198,8 +196,7 @@ void ClientSwitcherPlugin::applyOptions()
     // Блокировка запроса версии
     int respMode = ui_options.cmb_lockrequ->currentIndex();
     if (as->response_mode != respMode) {
-        if (as->response_mode == AccountSettings::RespAllow || respMode == AccountSettings::RespAllow)
-            caps_updated = true;
+        caps_updated      = (as->response_mode == AccountSettings::RespAllow || respMode == AccountSettings::RespAllow);
         as->response_mode = respMode;
     }
     // Блокировка запроса времени
@@ -283,7 +280,7 @@ void ClientSwitcherPlugin::restoreOptions()
             QString name = psiAccount->getName(i);
             if (name.isEmpty())
                 name = "?";
-            ui_options.cb_accounts->addItem(QString("%1 (%2)").arg(name).arg(psiAccount->getJid(i)), QVariant(id));
+            ui_options.cb_accounts->addItem(QString("%1 (%2)").arg(name, psiAccount->getJid(i)), QVariant(id));
             cnt++;
         }
     }
@@ -316,7 +313,7 @@ bool ClientSwitcherPlugin::outgoingStanza(int account, QDomElement &stanza)
         return false;
 
     if (stanza.tagName() == "iq" && stanza.attribute("type") == "result") {
-        QString     s_to = stanza.attribute("to");
+        // QString     s_to = stanza.attribute("to");
         QStringList send_ver_list;
         auto        s_child = stanza.firstChildElement();
         while (!s_child.isNull()) {

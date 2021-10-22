@@ -108,7 +108,7 @@ void OMEMOPlugin::applyOptions()
     if (!m_enabled)
         return;
 
-    applyPluginSettings();
+    emit applyPluginSettings();
 }
 
 void OMEMOPlugin::restoreOptions() { }
@@ -205,7 +205,7 @@ bool OMEMOPlugin::incomingStanza(int account, const QDomElement &xml)
             QDomNode node = nodes.item(i);
             if (node.nodeName() == "x" && node.toElement().namespaceURI() == "http://jabber.org/protocol/muc#user") {
                 const auto bareJid = xml.attribute("from").split("/").first();
-                QTimer::singleShot(0, [=]() { updateAction(account, bareJid); });
+                QTimer::singleShot(0, this, [=]() { updateAction(account, bareJid); });
                 break;
             }
         }
@@ -292,8 +292,7 @@ void OMEMOPlugin::processEncryptedFile(int account, QDomElement &xml)
 void OMEMOPlugin::showOwnFingerprint(int account, const QString &jid)
 {
     const QString &&msg = tr("Fingerprint for account \"%1\": %2")
-                              .arg(m_accountInfo->getName(account))
-                              .arg(m_omemo->getOwnFingerprint(account));
+                              .arg(m_accountInfo->getName(account), m_omemo->getOwnFingerprint(account));
     m_omemo->appendSysMsg(account, jid, msg);
 }
 
@@ -513,8 +512,9 @@ void OMEMOPlugin::actionDestroyed(QObject *action)
 
 void OMEMOPlugin::updateAction(int account, const QString &user)
 {
-    QString bareJid = m_contactInfo->realJid(account, user).split("/").first();
-    for (QAction *action : m_actions.values(bareJid)) {
+    QString    bareJid = m_contactInfo->realJid(account, user).split("/").first();
+    auto const actions = m_actions.values(bareJid);
+    for (QAction *action : actions) {
         const auto ownJid    = m_accountInfo->getJid(account).split("/").first();
         bool       isGroup   = action->property("isGroup").toBool();
         bool       available = isGroup ? m_omemo->isAvailableForGroup(account, ownJid, bareJid)

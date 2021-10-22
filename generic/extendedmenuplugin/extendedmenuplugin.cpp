@@ -266,7 +266,7 @@ static const QString secondsToString(ulong seconds)
 static int stringToInt(const QString &str)
 {
     int sign   = (str.at(0) == '-') ? -1 : 1;
-    int result = str.mid(1, 2).toInt() * sign;
+    int result = str.midRef(1, 2).toInt() * sign;
     return result;
 }
 
@@ -307,10 +307,9 @@ bool ExtendedMenuPlugin::incomingStanza(int account, const QDomElement &xml)
                             const QString title = tr("Ping %1").arg(name);
                             if (xml.attribute("type") == "result") {
                                 double msecs = ((double)r.time.msecsTo(QTime::currentTime())) / 1000;
-                                showMessage(
-                                    account, jid,
-                                    tr("Pong from %1 after %2 secs").arg(jid).arg(QString::number(msecs, 'f', 3)),
-                                    title);
+                                showMessage(account, jid,
+                                            tr("Pong from %1 after %2 secs").arg(jid, QString::number(msecs, 'f', 3)),
+                                            title);
                             } else {
                                 showMessage(account, jid, tr("Feature not implemented"), title);
                             }

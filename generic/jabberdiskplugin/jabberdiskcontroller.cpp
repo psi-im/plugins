@@ -95,10 +95,7 @@ void JabberDiskController::sendStanza(int account, const QString &to, const QStr
     *id         = stanzaSender->uniqueId(account);
     QString txt = QString("<message from=\"%1\" id=\"%3\" type=\"chat\" to=\"%2\">"
                           "<body>%4</body></message>")
-                      .arg(accInfo->getJid(account))
-                      .arg(to)
-                      .arg(*id)
-                      .arg(message.toHtmlEscaped());
+                      .arg(accInfo->getJid(account), to, *id, message.toHtmlEscaped());
     stanzaSender->sendStanza(account, txt);
 }
 

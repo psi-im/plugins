@@ -101,18 +101,18 @@ void TypeAheadFindBar::init()
     d->but_prev->setFixedSize(25, 25);
     d->but_prev->setIcon(icoHost_->getIcon("psi/arrowUp"));
     d->but_prev->setEnabled(false);
-    connect(d->but_prev, &QPushButton::released, [this] { d->doFind(true); });
+    connect(d->but_prev, &QPushButton::released, this, [this] { d->doFind(true); });
     addWidget(d->but_prev);
 
     d->but_next = new QPushButton(this);
     d->but_next->setFixedSize(25, 25);
     d->but_next->setIcon(icoHost_->getIcon("psi/arrowDown"));
     d->but_next->setEnabled(false);
-    connect(d->but_next, &QPushButton::released, [this] { d->doFind(); });
+    connect(d->but_next, &QPushButton::released, this, [this] { d->doFind(); });
     addWidget(d->but_next);
 
     d->cb_case = new QCheckBox(tr("&Case sensitive"), this);
-    connect(d->cb_case, &QCheckBox::clicked, [this] { d->caseSensitive = d->cb_case->checkState(); });
+    connect(d->cb_case, &QCheckBox::clicked, this, [this] { d->caseSensitive = d->cb_case->checkState(); });
     addWidget(d->cb_case);
 
     addSeparator();

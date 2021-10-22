@@ -29,7 +29,7 @@ Model::Model(const QStringList &watchedJids_, const QStringList &Sounds_, const 
     tmpWatchedJids_ = watchedJids;
     tmpSounds_      = sounds;
 
-    for (auto enabledJid : enabledJids_) {
+    for (const auto &enabledJid : enabledJids_) {
         tmpEnabledJids_ << (enabledJid == "true" ? true : false);
     }
 }
@@ -175,7 +175,7 @@ void Model::deleteRows(const QModelIndexList &indexList)
     }
 
     QStringList tmpJids, tmpSounds;
-    QList<bool> tmpEnabledJids;
+    // QList<bool> tmpEnabledJids;
     for (int i = tmpWatchedJids_.size() - 1; i >= 0; i--) {
         if (selected.at(i)) {
             removeRow(i);
@@ -201,7 +201,7 @@ void Model::reset()
     tmpSounds_      = sounds;
 
     tmpEnabledJids_.clear();
-    for (auto enabledJid : enabledJids) {
+    for (const auto &enabledJid : qAsConst(enabledJids)) {
         tmpEnabledJids_ << (enabledJid == "true" ? true : false);
     }
 }
@@ -241,7 +241,7 @@ void Model::apply()
     watchedJids = tmpWatchedJids_;
     sounds      = tmpSounds_;
     enabledJids.clear();
-    for (auto enabledJid : tmpEnabledJids_) {
+    for (auto enabledJid : qAsConst(tmpEnabledJids_)) {
         enabledJids << (enabledJid ? "true" : "false");
     }
 }

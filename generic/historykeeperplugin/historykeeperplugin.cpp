@@ -111,7 +111,7 @@ void HistoryKeeperPlugin::removeHistory()
         return;
 
     QString historyDir(appInfo->appHistoryDir());
-    for (auto jid : contacts) {
+    for (auto jid : qAsConst(contacts)) {
         jid              = nameToFilename(jid);
         QString fileName = historyDir + QDir::separator() + jid;
         QFile   file(fileName);
@@ -152,7 +152,7 @@ QWidget *HistoryKeeperPlugin::options()
 
     contactsWidget = new QTextEdit();
     QString text;
-    for (auto contact : contacts) {
+    for (auto const &contact : qAsConst(contacts)) {
         text += contact + "\n";
     }
     contactsWidget->setText(text);
@@ -215,7 +215,7 @@ void HistoryKeeperPlugin::restoreOptions()
         return;
 
     QString text;
-    for (const QString &contact : contacts) {
+    for (const QString &contact : qAsConst(contacts)) {
         text += contact + "\n";
     }
     contactsWidget->setText(text);

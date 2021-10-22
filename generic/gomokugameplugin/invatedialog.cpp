@@ -74,7 +74,7 @@ InvitationDialog::InvitationDialog(const int account, const QString &jid, QStrin
     else
         color = tr("black");
 
-    ui_.lbl_text->setText(tr("Player %1 invites you \nto play gomoku. He wants to play %2.").arg(jid).arg(color));
+    ui_.lbl_text->setText(tr("Player %1 invites you \nto play gomoku. He wants to play %2.").arg(jid, color));
 
     connect(ui_.pb_accept, &QPushButton::clicked, this, &InvitationDialog::buttonPressed);
     connect(ui_.pb_reject, &QPushButton::clicked, this, &InvitationDialog::close);

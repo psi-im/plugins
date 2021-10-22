@@ -423,10 +423,7 @@ void ChessPlugin::sendInvite(const Request &req, const QString &resource, const 
     stanzaSender->sendStanza(r.account,
                              QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><create xmlns=\"games:board\" id=\"%4\" "
                                      "type=\"chess\" color=\"%3\"></create></iq>")
-                                 .arg(r.jid)
-                                 .arg(r.requestId)
-                                 .arg(color)
-                                 .arg(r.chessId));
+                                 .arg(r.jid, r.requestId, color, r.chessId));
     if (color == "white")
         r.type = Figure::WhitePlayer;
     else
@@ -442,9 +439,7 @@ void ChessPlugin::accept()
     stanzaSender->sendStanza(
         currentGame_.account,
         QString("<iq type=\"result\" to=\"%1\" id=\"%2\"><create xmlns=\"games:board\" type=\"chess\" id=\"%3\"/></iq>")
-            .arg(currentGame_.jid)
-            .arg(currentGame_.requestId)
-            .arg(currentGame_.chessId));
+            .arg(currentGame_.jid, currentGame_.requestId, currentGame_.chessId));
     acceptGame();
 }
 
@@ -453,7 +448,7 @@ void ChessPlugin::reject()
 {
     stanzaSender->sendStanza(
         currentGame_.account,
-        QString("<iq type=\"error\" to=\"%1\" id=\"%2\"></iq>").arg(currentGame_.jid).arg(currentGame_.requestId));
+        QString("<iq type=\"error\" to=\"%1\" id=\"%2\"></iq>").arg(currentGame_.jid, currentGame_.requestId));
     rejectGame();
 }
 
@@ -464,9 +459,7 @@ void ChessPlugin::closeBoardEvent()
         currentGame_.account,
         QString(
             "<iq type=\"set\" to=\"%1\" id=\"%2\"><close xmlns=\"games:board\" id=\"%3\" type=\"chess\"></close></iq>")
-            .arg(currentGame_.jid)
-            .arg(newId())
-            .arg(currentGame_.chessId));
+            .arg(currentGame_.jid, newId(), currentGame_.chessId));
 
     if ((DefSoundSettings || psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool())
         && enableSound)
@@ -537,10 +530,7 @@ void ChessPlugin::load(const QString &settings)
         currentGame_.account,
         QString(
             "<iq type=\"set\" to=\"%1\" id=\"%2\"><load xmlns=\"games:board\" id=\"%3\" type=\"chess\">%4</load></iq>")
-            .arg(currentGame_.jid)
-            .arg(newId())
-            .arg(currentGame_.chessId)
-            .arg(settings));
+            .arg(currentGame_.jid, newId(), currentGame_.chessId, settings));
 }
 
 // Вы походили
@@ -548,13 +538,8 @@ void ChessPlugin::move(int oldX, int oldY, int newX, int newY, const QString &fi
 {
     QString stanza = QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><turn xmlns=\"games:board\" type=\"chess\" "
                              "id=\"%7\"><move pos=\"%3,%4;%5,%6\">")
-                         .arg(currentGame_.jid)
-                         .arg(newId())
-                         .arg(QString::number(oldX))
-                         .arg(QString::number(oldY))
-                         .arg(QString::number(newX))
-                         .arg(QString::number(newY))
-                         .arg(currentGame_.chessId);
+                         .arg(currentGame_.jid, newId(), QString::number(oldX), QString::number(oldY),
+                              QString::number(newX), QString::number(newY), currentGame_.chessId);
     if (!figure.isEmpty())
         stanza += QString("<promotion>%1</promotion>").arg(figure);
     stanza += "</move></turn></iq>";
@@ -570,9 +555,7 @@ void ChessPlugin::moveAccepted()
     stanzaSender->sendStanza(
         currentGame_.account,
         QString("<iq type=\"result\" to=\"%1\" id=\"%2\"><turn type=\"chess\" id=\"%3\" xmlns=\"games:board\"/></iq>")
-            .arg(currentGame_.jid)
-            .arg(tmpId)
-            .arg(currentGame_.chessId));
+            .arg(currentGame_.jid, tmpId, currentGame_.chessId));
 }
 
 void ChessPlugin::youLose()
@@ -582,9 +565,7 @@ void ChessPlugin::youLose()
     stanzaSender->sendStanza(currentGame_.account,
                              QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><turn xmlns=\"games:board\" type=\"chess\" "
                                      "id=\"%3\"><resign/></turn></iq>")
-                                 .arg(currentGame_.jid)
-                                 .arg(newId())
-                                 .arg(currentGame_.chessId));
+                                 .arg(currentGame_.jid, newId(), currentGame_.chessId));
     board->youLose();
     theEnd_ = true;
     QMessageBox::information(board, tr("Chess Plugin"), tr("You Lose."), QMessageBox::Ok);
@@ -608,9 +589,7 @@ void ChessPlugin::draw()
         stanzaSender->sendStanza(currentGame_.account,
                                  QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><turn xmlns=\"games:board\" "
                                          "type=\"chess\" id=\"%3\"><draw/></turn></iq>")
-                                     .arg(currentGame_.jid)
-                                     .arg(newId())
-                                     .arg(currentGame_.chessId));
+                                     .arg(currentGame_.jid, newId(), currentGame_.chessId));
         if ((DefSoundSettings || psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool())
             && enableSound)
             playSound(soundStart);
@@ -645,7 +624,7 @@ bool ChessPlugin::incomingStanza(int account, const QDomElement &xml)
                 const QString xmlFrom = stanzaSender->escape(xml.attribute("from"));
                 if ((DndDisable && accInfoHost->getStatus(account) == "dnd") || game_) {
                     stanzaSender->sendStanza(
-                        account, QString("<iq type=\"error\" to=\"%1\" id=\"%2\"></iq>").arg(xmlFrom).arg(xmlId));
+                        account, QString("<iq type=\"error\" to=\"%1\" id=\"%2\"></iq>").arg(xmlFrom, xmlId));
                     return true;
                 }
                 const QString color = stanzaSender->escape(createElem.attribute("color"));
@@ -763,8 +742,8 @@ void ChessPlugin::doInviteDialog(const QString &jid)
 
     if (game_) {
         QMessageBox::information(nullptr, tr("Chess Plugin"), tr("You are already playing!"));
-        stanzaSender->sendStanza(
-            rec.account, QString("<iq type=\"error\" to=\"%1\" id=\"%2\"></iq>").arg(rec.jid).arg(rec.requestId));
+        stanzaSender->sendStanza(rec.account,
+                                 QString("<iq type=\"error\" to=\"%1\" id=\"%2\"></iq>").arg(rec.jid, rec.requestId));
         return;
     }
 

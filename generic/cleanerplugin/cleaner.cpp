@@ -322,8 +322,9 @@ void CleanerMainWindow::viewAvatar(const QModelIndex &index)
 
 void CleanerMainWindow::chooseProfileAct()
 {
-    QStringList prof;
-    for (const QString &dir : QDir(profilesConfigDir_).entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+    QStringList       prof;
+    const QStringList dirs = QDir(profilesConfigDir_).entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    for (const QString &dir : dirs) {
         prof.append(dir);
     }
     const QString profile = QInputDialog::getItem(this, tr("Choose profile"), tr("Profile:"), prof,
@@ -393,9 +394,10 @@ void CleanerMainWindow::clearBirhday()
 
 bool CleanerMainWindow::clearDir(const QString &path)
 {
-    bool b = true;
-    QDir dir(path);
-    for (auto filename : dir.entryList(QDir::Files)) {
+    bool              b = true;
+    QDir              dir(path);
+    const QStringList files = dir.entryList(QDir::Files);
+    for (auto const &filename : files) {
         QFile file(path + QDir::separator() + filename);
         if (file.open(QIODevice::ReadWrite)) {
             b = file.remove();
@@ -403,7 +405,8 @@ bool CleanerMainWindow::clearDir(const QString &path)
                 return b;
         }
     }
-    for (auto subDir : dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+    const QStringList subDirs = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    for (auto const &subDir : subDirs) {
         b = clearDir(path + QDir::separator() + subDir);
         if (!b)
             return b;

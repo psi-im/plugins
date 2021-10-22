@@ -24,7 +24,8 @@ NotesController::NotesController(StorageNotesPlugin *plugin) : QObject(nullptr),
 
 NotesController::~NotesController()
 {
-    for (Notes *n : notesList_.values()) {
+    const auto nList = notesList_.values();
+    for (Notes *n : nList) {
         delete n;
         n = nullptr;
     }

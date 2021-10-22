@@ -153,7 +153,7 @@ QStringList Model::getJids() const { return Jids; }
 QVariantList Model::enableFor() const
 {
     QVariantList list;
-    for (auto jid : Jids) {
+    for (const auto &jid : Jids) {
         list.append(selected.contains(jid));
     }
     return list;

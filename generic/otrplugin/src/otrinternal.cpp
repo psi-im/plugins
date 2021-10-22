@@ -566,8 +566,7 @@ void OtrInternal::create_privkey(const char *accountname, const char *protocol)
                                        "%2\n"
                                        "\n"
                                        "Thanks for your patience.")
-                               .arg(m_callback->humanAccount(QString::fromUtf8(accountname)))
-                               .arg(QString(fingerprint)));
+                               .arg(m_callback->humanAccount(QString::fromUtf8(accountname)), QString(fingerprint)));
         infoMb.exec();
     } else {
         QMessageBox failMb(QMessageBox::Critical, QObject::tr("Confirm action"),
@@ -683,8 +682,7 @@ void OtrInternal::new_fingerprint(OtrlUserState us, const char *accountname, con
     QString contact = QString::fromUtf8(username);
     QString message = QObject::tr("You have received a new "
                                   "fingerprint from %1:\n%2")
-                          .arg(m_callback->humanContact(account, contact))
-                          .arg(humanFingerprint(fingerprint));
+                          .arg(m_callback->humanContact(account, contact), humanFingerprint(fingerprint));
 
     if (!m_callback->displayOtrMessage(account, contact, message)) {
         m_callback->notifyUser(account, contact, message, psiotr::OTR_NOTIFY_INFO);

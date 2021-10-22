@@ -170,7 +170,7 @@ protected:
     void paintEvent(QPaintEvent *)
     {
         QPainter painter(this);
-        QColor   c("#f0f0f0");
+        QColor   c(0xf0, 0xf0, 0xf0);
         c.setAlpha(80);
         QRect r = getRect();
         if (r.isValid()) {
@@ -646,8 +646,8 @@ void Screenshot::uploadHttp()
 {
     ba.clear();
 
-    QString boundary  = "AaB03x";
-    QString filename  = tr("%1.").arg(QDateTime::currentDateTime().toString(fileNameFormat)) + format;
+    QString boundary = "AaB03x";
+    QString filename = tr("%1.").arg(QDateTime::currentDateTime().toString(fileNameFormat)) + format;
 
     Server *s = servers.at(ui_.cb_servers->currentIndex());
     if (!s) {
@@ -667,11 +667,13 @@ void Screenshot::uploadHttp()
     }
 
     ba.append(QString("--%1\r\n").arg(boundary).toLatin1());
-    ba.append(QString("Content-Disposition: form-data; name=\"%1\"; filename=\"%2\"\r\n").arg(s->servFileinput(), filename.toUtf8()).toLatin1());
+    ba.append(QString("Content-Disposition: form-data; name=\"%1\"; filename=\"%2\"\r\n")
+                  .arg(s->servFileinput(), filename.toUtf8())
+                  .toLatin1());
     ba.append(QString("Content-Transfer-Encoding: binary\r\n").toLatin1());
     ba.append(QString("Content-Type: image/%1\r\n")
-                         .arg(format == "jpg" ? "jpeg" : format) // FIXME!!!!! жуткий костыль, но что поделаешь
-                         .toLatin1());
+                  .arg(format == "jpg" ? "jpeg" : format) // FIXME!!!!! жуткий костыль, но что поделаешь
+                  .toLatin1());
     ba.append(QString("\r\n").toLatin1());
 
     QByteArray a;

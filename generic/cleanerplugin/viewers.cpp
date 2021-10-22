@@ -46,7 +46,8 @@ void ClearingViewer::init(IconFactoryAccessingHost *iconHost)
 void ClearingViewer::keyPressEvent(QKeyEvent *e)
 {
     if (e->key() == Qt::Key_Space) {
-        for (const QModelIndex &check : selectionModel()->selectedRows(0)) {
+        const QModelIndexList checks = selectionModel()->selectedRows(0);
+        for (const QModelIndex &check : checks) {
             model()->setData(check, 3); // invert
         }
         e->accept();
@@ -67,8 +68,9 @@ void ClearingViewer::contextMenuEvent(QContextMenuEvent *e)
     QAction *result = popup->exec(e->globalPos());
     int      iresult;
     if (result) {
-        iresult = actions.indexOf(result);
-        for (const QModelIndex &check : selectionModel()->selectedRows(0)) {
+        iresult                      = actions.indexOf(result);
+        const QModelIndexList checks = selectionModel()->selectedRows(0);
+        for (const QModelIndex &check : checks) {
             switch (iresult) {
             case 0: // check
                 model()->setData(check, QVariant(2));

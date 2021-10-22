@@ -408,8 +408,7 @@ void AttentionPlugin::sendAttention(int account, const QString &yourJid, const Q
     QString msg
         = QString(
               "<message from=\"%1\" to=\"%2\" type=\"headline\"><attention xmlns='urn:xmpp:attention:0'/></message>")
-              .arg(yourJid)
-              .arg(jid);
+              .arg(yourJid, jid);
     stanzaSender->sendStanza(account, msg);
 
     showPopup(FakeAccount, QString(), tr("You sent Attention message to %1").arg(jid));

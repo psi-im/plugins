@@ -100,7 +100,7 @@ bool MessageFilter::incomingStanza(int account, const QDomElement &stanza)
     QString to_full   = stanza.attribute("to");
     QString to        = to_full.split("/").takeFirst();
 
-    for (const Rule &rule : _rules) {
+    for (const Rule &rule : qAsConst(_rules)) {
         bool match = true;
         for (const Condition &condition : rule.conditions) {
             QString val;

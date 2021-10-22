@@ -114,21 +114,21 @@ QVariant BoardModel::data(const QModelIndex &i, int role) const
 
     if (role == Qt::BackgroundRole) {
         if (index == kingIndex() && isCheck())
-            return QVariant(QColor("#9a0000"));
+            return QVariant(QColor(0x9a, 0, 0));
         int i = index.column() + index.row();
         if (i & 1) {
             switch (gameState_) {
             case 1:
                 return QVariant(QColor("green"));
             case 2:
-                return QVariant(QColor("#b4ccff"));
+                return QVariant(QColor(0xb4, 0xcc, 0xff));
             case 3:
-                return QVariant(QColor("#9a0000"));
+                return QVariant(QColor(0x9a, 0, 0));
             default:
-                return QVariant(QColor("#74440e"));
+                return QVariant(QColor(0x74, 0x44, 0x0e));
             }
         } else
-            return QVariant(QColor("#ffedc2"));
+            return QVariant(QColor(0xff, 0xed, 0xc2));
     } else if (role == Qt::DisplayRole) {
         int x = index.column();
         int y = index.row();
@@ -885,7 +885,7 @@ int BoardModel::checkGameState()
     int state = 0;
     check     = isCheck();
     if (gameType_ == Figure::WhitePlayer) {
-        for (Figure *figure : whiteFigures_) {
+        for (Figure *figure : qAsConst(whiteFigures_)) {
             if (figure->positionX() != -1) {
                 QMultiMap<QModelIndex, int> moves = availableMoves(figure);
                 if (!moves.isEmpty()) {
@@ -899,7 +899,7 @@ int BoardModel::checkGameState()
             }
         }
     } else {
-        for (Figure *figure : blackFigures_) {
+        for (Figure *figure : qAsConst(blackFigures_)) {
             if (figure->positionX() != -1) {
                 QMultiMap<QModelIndex, int> moves = availableMoves(figure);
                 if (!moves.isEmpty()) {
@@ -1076,17 +1076,15 @@ QString BoardModel::saveString() const
     QString save;
     for (Figure *figure : whiteFigures_) {
         save += QString("%1,%2,%3,%4;")
-                    .arg(QString::number(figure->type()))
-                    .arg(QString::number(figure->positionY()))
-                    .arg(QString::number(figure->positionX()))
-                    .arg(figure->isMoved ? QString::number(1) : QString::number(0));
+                    .arg(QString::number(figure->type()), QString::number(figure->positionY()),
+                         QString::number(figure->positionX()),
+                         figure->isMoved ? QString::number(1) : QString::number(0));
     }
     for (Figure *figure : blackFigures_) {
         save += QString("%1,%2,%3,%4;")
-                    .arg(QString::number(figure->type()))
-                    .arg(QString::number(figure->positionY()))
-                    .arg(QString::number(figure->positionX()))
-                    .arg(figure->isMoved ? QString::number(1) : QString::number(0));
+                    .arg(QString::number(figure->type()), QString::number(figure->positionY()),
+                         QString::number(figure->positionX()),
+                         figure->isMoved ? QString::number(1) : QString::number(0));
     }
     save += myMove ? QString::number(1) : QString::number(0);
     save += ";" + QString::number(gameType_) + ";";
@@ -1098,7 +1096,7 @@ void BoardModel::loadSettings(const QString &settings, bool myLoad)
     reset();
 
     QStringList figuresSettings = settings.split(";");
-    for (Figure *figure : whiteFigures_) {
+    for (Figure *figure : qAsConst(whiteFigures_)) {
         if (!figuresSettings.isEmpty()) {
             QStringList set = figuresSettings.takeFirst().split(",");
             figure->setType(rankFigure(set.takeFirst().toInt()));
@@ -1106,7 +1104,7 @@ void BoardModel::loadSettings(const QString &settings, bool myLoad)
             figure->isMoved = set.takeFirst().toInt();
         }
     }
-    for (Figure *figure : blackFigures_) {
+    for (Figure *figure : qAsConst(blackFigures_)) {
         if (!figuresSettings.isEmpty()) {
             QStringList set = figuresSettings.takeFirst().split(",");
             figure->setType(rankFigure(set.takeFirst().toInt()));

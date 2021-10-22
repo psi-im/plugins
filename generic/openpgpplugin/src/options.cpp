@@ -307,7 +307,7 @@ void Options::deleteKey()
     }
 
     // Remove primary keys
-    for (auto key : pkeys) {
+    for (auto key : qAsConst(pkeys)) {
         const QStringList &&arguments = { "--yes", "--batch", "--delete-secret-and-public-key",
                                           "0x" + key.sibling(key.row(), Model::Fingerprint).data().toString() };
 
@@ -331,7 +331,7 @@ void Options::importKeyFromFile()
     }
 
     QStringList allFiles = dlg.selectedFiles();
-    for (auto filename : allFiles) {
+    for (const auto &filename : allFiles) {
         const QStringList &&arguments = { "--batch", "--import", filename };
 
         GpgProcess gpg;
@@ -370,7 +370,7 @@ void Options::exportKeyToFile()
     }
 
     // Remove primary keys
-    for (auto key : pkeys) {
+    for (auto key : qAsConst(pkeys)) {
         QString filename
             = key.sibling(key.row(), 1).data().toString() + " " + key.sibling(key.row(), 2).data().toString() + ".asc";
         QFileDialog dlg(this);
@@ -384,7 +384,7 @@ void Options::exportKeyToFile()
             break;
         }
 
-        filename = dlg.selectedFiles().first();
+        filename = dlg.selectedFiles().constFirst();
         if (filename.right(4) != ".asc") {
             filename += ".asc";
         }
@@ -449,7 +449,7 @@ void Options::exportKeyToClipboard()
 
     // Remove primary keys
     QString strKey = "";
-    for (auto key : pkeys) {
+    for (auto key : qAsConst(pkeys)) {
         const QString &&    fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
         const QStringList &&arguments   = { "--armor", "--export", fingerprint };
 
@@ -520,7 +520,8 @@ void Options::updateKnownKeys()
         if (knownKeysMap.isEmpty())
             continue;
 
-        for (const QString &user : knownKeysMap.keys()) {
+        const auto users = knownKeysMap.keys();
+        for (const QString &user : users) {
             QStandardItem *accItem = new QStandardItem(m_accountInfo->getName(idx));
             accItem->setData(QVariant(idx));
 
@@ -590,8 +591,9 @@ void Options::deleteKnownKey()
     if (!m_ui->knownKeysTable->selectionModel()->hasSelection())
         return;
 
-    bool keyRemoved = false;
-    for (auto selectIndex : m_ui->knownKeysTable->selectionModel()->selectedRows(0)) {
+    bool       keyRemoved = false;
+    const auto indexes    = m_ui->knownKeysTable->selectionModel()->selectedRows(0);
+    for (auto selectIndex : indexes) {
         const QVariant &accountId = m_knownKeysTableModel->item(selectIndex.row(), 0)->data();
         if (accountId.isNull())
             continue;
@@ -626,8 +628,9 @@ void Options::deleteOwnKey()
     if (!m_ui->ownKeysTable->selectionModel()->hasSelection())
         return;
 
-    bool keyRemoved = false;
-    for (auto selectIndex : m_ui->ownKeysTable->selectionModel()->selectedRows(0)) {
+    bool       keyRemoved = false;
+    const auto indexes    = m_ui->ownKeysTable->selectionModel()->selectedRows(0);
+    for (auto selectIndex : indexes) {
         const QVariant &accountId = m_ownKeysTableModel->item(selectIndex.row(), 0)->data().toString();
         if (accountId.isNull())
             continue;
@@ -727,10 +730,11 @@ void Options::loadGpgAgentConfigData()
         return;
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-    for (const QString &line : configText.split("\n", Qt::SkipEmptyParts)) {
+    const auto lines = configText.split("\n", Qt::SkipEmptyParts);
 #else
-    for (const QString &line : configText.split("\n", QString::SkipEmptyParts)) {
+    const auto lines = configText.split("\n", QString::SkipEmptyParts);
 #endif
+    for (const QString &line : lines) {
         if (line.contains("default-cache-ttl")) {
             QString str(line);
             str.replace("default-cache-ttl", "");

@@ -394,7 +394,8 @@ QString EnumMessagesPlugin::numToFormatedStr(int number) { return QString("%1").
 
 void EnumMessagesPlugin::nl2br(QDomElement *body, QDomDocument *doc, const QString &msg)
 {
-    for (const QString &str : msg.split("\n")) {
+    const QStringList strings = msg.split("\n");
+    for (const QString &str : strings) {
         body->appendChild(doc->createTextNode(str));
         body->appendChild(doc->createElement("br"));
     }

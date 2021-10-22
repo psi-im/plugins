@@ -144,7 +144,7 @@ bool JDModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int /*r
 
     JDItem *p = nullptr;
     if (parent != rootIndex()) {
-        for (const ProxyItem &i : items_) {
+        for (const ProxyItem &i : qAsConst(items_)) {
             if (i.index == parent) {
                 p = i.item;
                 break;
@@ -268,7 +268,7 @@ bool JDModel::addItem(JDItem *i)
     pi.item = i;
 
     if (i->parent()) {
-        for (const ProxyItem &item : items_) {
+        for (const ProxyItem &item : qAsConst(items_)) {
             if (item.item == i->parent()) {
                 pi.parent = item.index;
                 break;
@@ -279,7 +279,7 @@ bool JDModel::addItem(JDItem *i)
     }
 
     int count = 0;
-    for (const ProxyItem &item : items_) {
+    for (const ProxyItem &item : qAsConst(items_)) {
         if (item.item->parent() == i->parent())
             ++count;
     }

@@ -95,7 +95,7 @@ bool JabberDiskPlugin::incomingStanza(int account, const QDomElement &xml)
     if (xml.tagName() == "message" && !xml.firstChildElement("body").isNull()) {
         const QString from = xml.attribute("from");
         bool          find = false;
-        for (const QString &jid : jids_) {
+        for (const QString &jid : qAsConst(jids_)) {
             if (from.contains(jid, Qt::CaseInsensitive)) {
                 find = true;
                 break;
@@ -164,7 +164,7 @@ QList<QVariantHash> JabberDiskPlugin::getContactMenuParam() { return QList<QVari
 
 QAction *JabberDiskPlugin::getContactAction(QObject *p, int acc, const QString &jid)
 {
-    for (const QString &j : jids_) {
+    for (const QString &j : qAsConst(jids_)) {
         if (jid.contains(j)) {
             QAction *act = new QAction(iconHost->getIcon("psi/save"), tr("Jabber Disk"), p);
             act->setProperty("account", acc);

@@ -187,10 +187,9 @@ bool GpgProcess::info(QString &message)
         if (error() == FailedToStart) {
             message = tr("Can't start ") + m_gpgBin;
         } else {
-            message = QString("%1 %2\n%3")
-                          .arg(QDir::toNativeSeparators(m_gpgBin))
-                          .arg(arguments.join(" "))
-                          .arg(QString::fromLocal8Bit(readAll()));
+            message
+                = QString("%1 %2\n%3")
+                      .arg(QDir::toNativeSeparators(m_gpgBin), arguments.join(" "), QString::fromLocal8Bit(readAll()));
 #if defined(Q_OS_WIN)
             message.replace("\r", "");
 #endif

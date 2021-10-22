@@ -481,10 +481,7 @@ void PsiOtrClosure::sessionID(bool)
     if (sId.isEmpty()) {
         msg = tr("No active encrypted session");
     } else {
-        msg = tr("Session ID between account \"%1\" and %2: %3")
-                  .arg(m_otr->humanAccount(m_account))
-                  .arg(m_contact)
-                  .arg(sId);
+        msg = tr("Session ID between account \"%1\" and %2: %3").arg(m_otr->humanAccount(m_account), m_contact, sId);
     }
 
     m_otr->displayOtrMessage(m_account, m_contact, msg);
@@ -506,7 +503,7 @@ void PsiOtrClosure::fingerprint(bool)
     QString fingerprint = m_otr->getPrivateKeys().value(
         m_account, tr("No private key for account \"%1\"").arg(m_otr->humanAccount(m_account)));
 
-    QString msg(tr("Fingerprint for account \"%1\": %2").arg(m_otr->humanAccount(m_account)).arg(fingerprint));
+    QString msg(tr("Fingerprint for account \"%1\": %2").arg(m_otr->humanAccount(m_account), fingerprint));
 
     m_otr->displayOtrMessage(m_account, m_contact, msg);
 }

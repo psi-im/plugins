@@ -214,8 +214,7 @@ bool Watcher::enable()
         QStringList files;
         files << "watcher_on"
               << "watcher";
-        for (auto filename : files) {
-
+        for (const auto &filename : qAsConst(files)) {
             QFile file(":/icons/" + filename + ".png");
             file.open(QIODevice::ReadOnly);
             QByteArray image = file.readAll();
@@ -235,7 +234,7 @@ bool Watcher::disable()
     model_ = nullptr;
 
     qDeleteAll(items_);
-    for (QAction *action : actions_) {
+    for (QAction *action : qAsConst(actions_)) {
         action->disconnect();
         action->deleteLater();
     }
@@ -319,7 +318,7 @@ void Watcher::applyOptions()
     psiOptions->setPluginOption(constJids, QVariant(model_->getWatchedJids()));
     psiOptions->setPluginOption(constSndFiles, QVariant(model_->getSounds()));
 
-    for (auto wi : items_) {
+    for (auto wi : qAsConst(items_)) {
         delete (wi);
     }
     items_.clear();
@@ -346,7 +345,7 @@ void Watcher::restoreOptions()
     ui_.cb_disable_snd->setChecked(disableSnd);
     ui_.cb_disableDnd->setChecked(disablePopupDnd);
     model_->reset();
-    for (auto wi : items_) {
+    for (auto wi : qAsConst(items_)) {
         ui_.listWidget->addItem(wi->copy());
     }
 }
@@ -419,7 +418,7 @@ bool Watcher::incomingStanza(int acc, const QDomElement &stanza)
                 }
 
                 if (type == "groupchat") {
-                    for (auto wi : items_) {
+                    for (auto wi : qAsConst(items_)) {
                         if (!wi->groupChat())
                             continue;
 
@@ -427,7 +426,7 @@ bool Watcher::incomingStanza(int acc, const QDomElement &stanza)
                             break;
                     }
                 } else {
-                    for (auto wi : items_) {
+                    for (auto wi : qAsConst(items_)) {
                         if (wi->groupChat())
                             continue;
 
@@ -458,10 +457,11 @@ bool Watcher::checkWatchedItem(const QString &from, const QString &body, Watched
     }
     if (!wi->watchedText().isEmpty()) {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-        for (auto txt : wi->watchedText().split(QRegExp("\\s+"), Qt::SkipEmptyParts)) {
+        const auto texts = wi->watchedText().split(QRegExp("\\s+"), Qt::SkipEmptyParts);
 #else
-        for (auto txt : wi->watchedText().split(QRegExp("\\s+"), QString::SkipEmptyParts)) {
+        const auto texts = wi->watchedText().split(QRegExp("\\s+"), QString::SkipEmptyParts);
 #endif
+        for (const auto &txt : texts) {
             if (body.contains(QRegExp(txt, Qt::CaseInsensitive, QRegExp::Wildcard))) {
                 psiOptions->setGlobalOption("options.ui.notifications.sounds.enable", QVariant(false));
                 playSound(wi->sFile());

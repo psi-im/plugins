@@ -243,12 +243,7 @@ void ImagePlugin::actionActivated()
                               "<body xmlns=\"http://www.w3.org/1999/xhtml\">"
                               "<br/><img src=\"data:image/%5;base64,%6\" alt=\"img\"/> "
                               "</body></html></message>")
-                          .arg(mType)
-                          .arg(jidToSend)
-                          .arg(stanzaSender->uniqueId(account))
-                          .arg(body)
-                          .arg(mimeType)
-                          .arg(imageBase64);
+                          .arg(mType, jidToSend, stanzaSender->uniqueId(account), body, mimeType, imageBase64);
 
     stanzaSender->sendStanza(account, msgHtml);
     if (isClipboard) {
