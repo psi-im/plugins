@@ -668,7 +668,7 @@ void Screenshot::uploadHttp()
 
     ba.append(QString("--%1\r\n").arg(boundary).toLatin1());
     ba.append(QString("Content-Disposition: form-data; name=\"%1\"; filename=\"%2\"\r\n")
-                  .arg(s->servFileinput(), filename.toUtf8())
+                  .arg(s->servFileinput(), filename)
                   .toLatin1());
     ba.append(QString("Content-Transfer-Encoding: binary\r\n").toLatin1());
     ba.append(QString("Content-Type: image/%1\r\n")
