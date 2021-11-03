@@ -48,6 +48,8 @@ Form::Form(QWidget *parent) : QWidget(parent), ui(new Ui::Form), listUrl_(LIST_U
 
     connect(ui->treeView->selectionModel(), &QItemSelectionModel::currentChanged, this, &Form::modelSelectionChanged);
     connect(model, &CDItemModel::dataChanged, this, [this]() { modelSelectedItem(); });
+    connect(ui->btnLoadList, &QPushButton::clicked, this, &Form::onBtnLoadListClicked);
+    connect(ui->btnInstall, &QPushButton::clicked, this, &Form::onBtnInstallClicked);
     ui->widgetContent->hide();
 }
 
