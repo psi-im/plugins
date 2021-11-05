@@ -19,6 +19,17 @@ if(POLICY CMP0074)
 endif()
 set( CMAKE_AUTOMOC TRUE )
 
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR ("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo"))
+    option(IMGPREVIEW_SCROLL_DEBUG "Add -DSCROLL_DEBUG definition" OFF)
+    option(IMGPREVIEW_DEBUG "Add -DIMGPREVIEW_DEBUG definition" OFF)
+    if(IMGPREVIEW_SCROLL_DEBUG)
+        add_definitions(-DSCROLL_DEBUG)
+    endif()
+    if(IMGPREVIEW_DEBUG)
+        add_definitions(-DIMGPREVIEW_DEBUG)
+    endif()
+endif()
+
 find_package( Qt5 COMPONENTS Core REQUIRED )
 
 get_filename_component(ABS_PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
