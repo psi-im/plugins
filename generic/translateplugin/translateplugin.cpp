@@ -389,7 +389,7 @@ void TranslatePlugin::trans()
     }
 
     QTextCursor    c = ed->textCursor();
-    static QRegExp link("(xmpp:|mailto:|http://|https://|ftp://|news://|ed2k://|www.|ftp.)\\S+", Qt::CaseInsensitive);
+    static QRegExp link("(xmpp:|mailto:|http://|https://|git://|ftp://|ftps://|sftp://|news://|ed2k://|file://|magnet:|www.|ftp.)\\S+", Qt::CaseInsensitive);
     QStringList    newStrings;
 
     bool     isMuc = false;
