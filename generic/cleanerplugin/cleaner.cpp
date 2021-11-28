@@ -223,16 +223,16 @@ void CleanerMainWindow::currentTabChanged(int tab)
     tab = ui_.tw_tab->currentIndex();
     switch (tab) {
     case (0):
-        ui_.lbl_selected->setText(QString::number(historyModel_->selectedCount()));
+        ui_.lb_selected->setText(QString::number(historyModel_->selectedCount()));
         break;
     case (1):
-        ui_.lbl_selected->setText(QString::number(vcardsModel_->selectedCount()));
+        ui_.lb_selected->setText(QString::number(vcardsModel_->selectedCount()));
         break;
     case (2):
-        ui_.lbl_selected->setText(QString::number(avatarModel_->selectedCount()));
+        ui_.lb_selected->setText(QString::number(avatarModel_->selectedCount()));
         break;
     case (3):
-        ui_.lbl_selected->setText(QString::number(optionsModel_->selectedCount()));
+        ui_.lb_selected->setText(QString::number(optionsModel_->selectedCount()));
         break;
     }
     updateStatusBar();

@@ -148,7 +148,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="lbl_wiki">
+    <widget class="QLabel" name="lb_wiki">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
        <horstretch>0</horstretch>

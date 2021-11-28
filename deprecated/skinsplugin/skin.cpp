@@ -84,12 +84,12 @@ bool Previewer::loadSkinInformation()
         QMessageBox::warning(this, tr("Preview Skin"), tr("Skin is not valid!"));
         return false;
     }
-    ui_.lbl_author->setText(elem.attribute("author"));
-    ui_.lbl_version->setText(elem.attribute("version"));
-    ui_.lbl_name->setText(elem.attribute("name"));
+    ui_.lb_author->setText(elem.attribute("author"));
+    ui_.lb_version->setText(elem.attribute("version"));
+    ui_.lb_name->setText(elem.attribute("name"));
     QPixmap pix = skin_->previewPixmap();
     if (!pix.isNull())
-        ui_.lbl_preview->setPixmap(pix);
+        ui_.lb_preview->setPixmap(pix);
 
     return true;
 }

@@ -106,7 +106,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="lbl_selected">
+       <widget class="QLabel" name="lb_selected">
         <property name="minimumSize">
          <size>
           <width>50</width>

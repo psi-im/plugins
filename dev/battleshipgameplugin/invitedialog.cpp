@@ -71,7 +71,7 @@ InvitationDialog::InvitationDialog(const QString &jid, bool first, QWidget *pare
     else
         posStr = tr("first", "He wants to play first");
 
-    ui_.lbl_text->setText(tr("Player %1 invites you \nto play battleship. He wants to play %2.").arg(jid).arg(posStr));
+    ui_.lb_text->setText(tr("Player %1 invites you \nto play battleship. He wants to play %2.").arg(jid).arg(posStr));
 
     connect(ui_.pb_accept, SIGNAL(clicked()), this, SLOT(okPressed()));
     connect(ui_.pb_reject, SIGNAL(clicked()), this, SLOT(close()));
