@@ -31,8 +31,6 @@
 #include "skin.h"
 #include "ui_skinsplugin.h"
 
-#define cVer "0.3.3"
-
 class SkinsPlugin : public QObject,
                     public PsiPlugin,
                     public ApplicationInfoAccessor,
@@ -45,18 +43,15 @@ class SkinsPlugin : public QObject,
 public:
     SkinsPlugin();
     virtual QString  name() const;
-    virtual QString  shortName() const;
-    virtual QString  version() const;
     virtual QWidget *options();
     virtual bool     enable();
     virtual bool     disable();
-    virtual void     applyOptions() {};
+    virtual void     applyOptions();
     virtual void     restoreOptions();
     virtual void     setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
     virtual void     setOptionAccessingHost(OptionAccessingHost *host);
     virtual void     optionChanged(const QString & /*option*/) {};
     virtual QString  pluginInfo();
-    virtual QPixmap  icon() const;
 
 private:
     bool                          enabled;
@@ -91,11 +86,7 @@ SkinsPlugin::SkinsPlugin()
     psiOptions = nullptr;
 }
 
-QString SkinsPlugin::name() const { return "Skins Plugin"; }
-
-QString SkinsPlugin::shortName() const { return "skins"; }
-
-QString SkinsPlugin::version() const { return cVer; }
+QString SkinsPlugin::name() const { return "Skins Plugin"; };
 
 bool SkinsPlugin::enable()
 {
@@ -143,13 +134,30 @@ QWidget *SkinsPlugin::options()
     connect(ui_.pb_save, &QPushButton::released, this, &SkinsPlugin::overwrite);
     connect(ui_.lw_skins, &QListWidget::currentRowChanged, this, &SkinsPlugin::enableButton);
     connect(ui_.lw_skins, &QListWidget::doubleClicked, this, &SkinsPlugin::loadPreview);
+    connect(ui_.cb_backup, &QCheckBox::toggled, this, [this]() {
+        ui_.cb_hack->toggle(); /* enable Apply button */
+    });
 
-    ui_.cb_hack->setVisible(false); // Hack, to enable Apply button
+    ui_.cb_hack->setVisible(false); // Hide hack widget needed to enable Apply button
 
     return optionsWidget;
 }
 
-void SkinsPlugin::restoreOptions() { }
+void SkinsPlugin::applyOptions()
+{
+    if (!ui_.cb_backup)
+        return;
+    bool checked = psiOptions->getPluginOption("backup", false).toBool();
+    if (ui_.cb_backup->isChecked() != checked)
+        psiOptions->setPluginOption("backup", QVariant(ui_.cb_backup->isChecked()));
+}
+
+void SkinsPlugin::restoreOptions()
+{
+    if (!ui_.cb_backup)
+        return;
+    ui_.cb_backup->setChecked(psiOptions->getPluginOption("backup", true).toBool());
+}
 
 void SkinsPlugin::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) { appInfo = host; }
 
@@ -157,13 +165,12 @@ void SkinsPlugin::setOptionAccessingHost(OptionAccessingHost *host) { psiOptions
 
 void SkinsPlugin::updateSkins()
 {
-    QStringList dirs;
-    dirs << appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation) << appInfo->appResourcesDir() + "/skins"
-         << appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation) + "/skins";
+    const QStringList dirs
+        = { appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation), appInfo->appResourcesDir() + "/skins",
+            appInfo->appHomeDir(ApplicationInfoAccessingHost::DataLocation) + "/skins" };
 
-    for (auto dirName : dirs) {
+    for (const auto &dirName : dirs)
         findSkins(dirName);
-    }
 }
 
 void SkinsPlugin::findSkins(QString path)
@@ -172,7 +179,8 @@ void SkinsPlugin::findSkins(QString path)
         return;
 
     QDir dir(path);
-    for (auto filename : dir.entryList(QDir::Files)) {
+    const auto dirList = dir.entryList(QDir::Files);
+    for (const auto &filename : dirList) {
         if (filename.endsWith(".skn", Qt::CaseInsensitive)) {
             QString file = dir.absolutePath() + QString("/") + filename;
             if (skins_.contains(file))
@@ -185,9 +193,9 @@ void SkinsPlugin::findSkins(QString path)
         }
     }
 
-    for (auto subDir : dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+    const auto subDirList = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    for (const auto &subDir : subDirList)
         findSkins(path + QDir::separator() + subDir);
-    }
 }
 
 void SkinsPlugin::updateButtonPressed()
@@ -202,7 +210,7 @@ void SkinsPlugin::updateButtonPressed()
 
 void SkinsPlugin::loadPreview()
 {
-    Skin *skin = (Skin *)ui_.lw_skins->currentItem();
+    Skin *skin = static_cast<Skin *>(ui_.lw_skins->currentItem());
     if (!skin)
         return;
 
@@ -249,7 +257,7 @@ void SkinsPlugin::enableButton()
 void SkinsPlugin::getSkinName()
 {
     QString name, author, version;
-    Skin *  skin = (Skin *)ui_.lw_skins->currentItem();
+    Skin   *skin = static_cast<Skin *>(ui_.lw_skins->currentItem());
     if (skin) {
         QFile        file(skin->filePass());
         QDomDocument doc;
@@ -311,7 +319,7 @@ void SkinsPlugin::createSkin(const QString &name, const QString &author, const Q
 
 void SkinsPlugin::applySkin()
 {
-    Skin *skin = (Skin *)ui_.lw_skins->currentItem();
+    Skin *skin = static_cast<Skin *>(ui_.lw_skins->currentItem());
     if (!skin)
         return;
 
@@ -416,7 +424,7 @@ bool SkinsPlugin::validateOption(QString optionName)
 {
     bool b = (optionName.contains("options.ui.") || optionName.contains("options.iconsets."))
         && !optionName.contains("notifications.send-receipts") && !optionName.contains("spell-check.enabled")
-        && !optionName.contains("service-discovery");
+        && !optionName.contains("service-discovery") && !optionName.contains("options.ui.contactlist.toolbars");
 
     return b;
 }
@@ -428,7 +436,7 @@ void SkinsPlugin::overwrite()
     if (ret == QMessageBox::Cancel)
         return;
 
-    Skin *skin = (Skin *)ui_.lw_skins->currentItem();
+    Skin *skin = static_cast<Skin *>(ui_.lw_skins->currentItem());
     if (!skin)
         return;
 
@@ -460,7 +468,7 @@ void SkinsPlugin::overwrite()
 
 void SkinsPlugin::removeSkin()
 {
-    Skin *skin = (Skin *)ui_.lw_skins->currentItem();
+    Skin *skin = static_cast<Skin *>(ui_.lw_skins->currentItem());
     if (!skin)
         return;
 
@@ -493,7 +501,5 @@ QString SkinsPlugin::pluginInfo()
              "3. Apply the same skin again\n"
              "This allows all settings (icons, toolbar layout) to be picked up correctly. ");
 }
-
-QPixmap SkinsPlugin::icon() const { return QPixmap(":/skinsplugin/skins.png"); }
 
 #include "skinsplugin.moc"

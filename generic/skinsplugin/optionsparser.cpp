@@ -39,13 +39,15 @@ void OptionsParser::variantToElement(const QVariant &var, QDomElement &e)
 {
     QString type = var.typeName();
     if (type == "QVariantList") {
-        for (auto v : var.toList()) {
+        const auto varList = var.toList();
+        for (const auto &v : varList) {
             QDomElement item_element = e.ownerDocument().createElement("item");
             variantToElement(v, item_element);
             e.appendChild(item_element);
         }
     } else if (type == "QStringList") {
-        for (auto s : var.toStringList()) {
+        const auto varStrList = var.toStringList();
+        for (const auto &s : varStrList) {
             QDomElement item_element = e.ownerDocument().createElement("item");
             QDomText    text         = e.ownerDocument().createTextNode(s);
             item_element.appendChild(text);
