@@ -519,8 +519,9 @@ void OMEMOPlugin::updateAction(int account, const QString &user)
         bool       isGroup   = action->property("isGroup").toBool();
         bool       available = isGroup ? m_omemo->isAvailableForGroup(account, ownJid, bareJid)
                                        : m_omemo->isAvailableForUser(account, bareJid);
-        bool       enabled   = available && m_omemo->isEnabledForUser(account, bareJid);
-        action->setEnabled(available);
+        bool       enabled   = m_omemo->isEnabledForUser(account, bareJid);
+        // Prevents user from changing OMEMO state
+        // action->setEnabled(available);
         action->setChecked(enabled);
         action->setProperty("jid", bareJid);
         action->setProperty("account", account);
