@@ -486,7 +486,7 @@ QAction *OMEMOPlugin::createAction(QObject *parent, int account, const QString &
     action->setProperty("isGroup", QVariant(isGroup));
     connect(action, &QAction::triggered, this, &OMEMOPlugin::enableOMEMOAction);
     connect(action, &QAction::destroyed, this, &OMEMOPlugin::actionDestroyed);
-    m_actions.insert(bareJid, action);
+    m_actions.insert(QString::number(account) + bareJid, action);
     updateAction(account, bareJid);
     if (!isGroup) {
         const auto ownJid = m_accountInfo->getJid(account).split("/").first();
@@ -507,13 +507,15 @@ QAction *OMEMOPlugin::getGCAction(QObject *parent, int account, const QString &c
 
 void OMEMOPlugin::actionDestroyed(QObject *action)
 {
-    m_actions.remove(action->property("jid").toString(), reinterpret_cast<QAction *>(action));
+    QString key = QString::number(action->property("account").toInt()) + action->property("jid").toString();
+    m_actions.remove(key, reinterpret_cast<QAction *>(action));
 }
 
 void OMEMOPlugin::updateAction(int account, const QString &user)
 {
     QString    bareJid = m_contactInfo->realJid(account, user).split("/").first();
-    auto const actions = m_actions.values(bareJid);
+    QString        key = QString::number(account) + bareJid;
+    auto const actions = m_actions.values(key);
     for (QAction *action : actions) {
         const auto ownJid    = m_accountInfo->getJid(account).split("/").first();
         bool       isGroup   = action->property("isGroup").toBool();
