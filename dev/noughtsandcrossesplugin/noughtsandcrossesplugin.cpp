@@ -183,9 +183,9 @@ void NoughtsAndCrossesPlugin::startGame(QString jid, int size, bool meFirst, int
     playingWith = jid;
     game->show();
     account_ = account;
-    connect(game, &TicaTacToe::closing, this, &NoughtsAndCrossesPlugin::stopGame);
-    connect(game, &TicaTacToe::myMove, this, &NoughtsAndCrossesPlugin::myTurn);
-    connect(game, &TicaTacToe::gameOverSignal, this, &NoughtsAndCrossesPlugin::gameOver);
+    connect(game, &TicTacToe::closing, this, &NoughtsAndCrossesPlugin::stopGame);
+    connect(game, &TicTacToe::myMove, this, &NoughtsAndCrossesPlugin::myTurn);
+    connect(game, &TicTacToe::gameOverSignal, this, &NoughtsAndCrossesPlugin::gameOver);
 }
 
 void NoughtsAndCrossesPlugin::stopGame()
