@@ -2,6 +2,7 @@ cmake_minimum_required( VERSION 3.1.0 )
 
 set( plugins_list 
     battleshipgameplugin
+    noughtsandcrossesplugin
 )
 
 message(STATUS "Plugins from dev subdirectory")

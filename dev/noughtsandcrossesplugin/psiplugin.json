@@ -1,0 +1,26 @@
+{
+  "name": "Noughts And Crosses",
+  "name:ru": "Крестики-нолики",
+  "shortname": "noughtsandcrosses",
+  "version": "0.2.0",
+  "priority": 2,
+  "icon": "base64:iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAACAAAAAgAHPVpo3AAAA
+GXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAw9JREFUOI2dk01sVGUYhZ/73VuH
+FvpjqT8tuBCjWIQo9Wc1CTHEn2ACKhpZSJS0FhkXogtlgZooUUmU1kDjwEwmqdVajUpYiFRNibGB
+qFQFax2kdAZKKenM9M50yp3rne/e10XVGEJi4rM8yTl5c3JebNtxRpJZLSLa87Q+NnRBd3d3+yKi
+S4W8djIZLSI6Ho/72WxRl0qeFhE9O+tq2551VU3NPKuzK2V+e2TSfGH7sGkXMD3PU5meqDnTlzCd
+Q/vN87t3miKixiccszXyo2nbF82nn/3JnLZ9CxHxXNeTlvCAdHYlRUQkFotJ+sUt8jfpbRGJxWIi
+IvLVwLgsbRmQ479kRES0AujoOknkqcUc/X6a30cLAJiWhZe30a4LQQCA7wd89Ol5Iq3X8F7vWQCM
+9Jmcd/S7fMWGR5cwlbnIwf5xtDvIxofWkd//IUEQcOUDD/P+F19ybdPdhEKV3LO6ib5P0ixqVL4R
+jUa1YRgm/2JwcJBwOMx/aUqpwPDLZe/CrlcrgupaglyGqzdF6DnYz8nULTzy4A1UL6hgbyLJ8puG
+aW9v5xJ8a+bnH4yqxkXUbdxMcXIC54N9GHXXsePlO2l7ZgjDgHc776Cvb+RS819XVNcSFOy5uOks
+Rk0dANmci8hcf9mce1kzgFWzdJlkTwwxHt1FhQgNmyL43T28+fYwb72+AqUMXtlxglub9WUDjEQi
+ocvl8v8q0TTNwFq7bkPw9eGc+dj6xYylCpw6/QdKKR5fcx/5Ax/ji1B//1qUUrS1tZHvP4CTPs38
+m5dTu+peUQvrKzlzdoZ3un7lpdd+4/aVCwDI7H6Dhie30Ni+lam9HQAUDvfj2zmaNj+PlxymePwY
+CqD1ievp7s2wKlxPw8IqAAIBq7IKZVmgFACSHsVadhsAVzSvwE+NGpbjlHlu2wif9bbQsWeMzw/N
+TXT+yruY3LMTMxRi3o3NEEBo9Rqm93VgnEtRPPINV23dLkxl3NK5Ceefdx5JFnU8HvdFRJc9T3ul
+khYRHYvFfBHRulzWM2OntO/7WkTcPwGP+7S0UpsyDwAAAABJRU5ErkJggg==
+",
+  "description": "Psi plugin to play noughts and crosses.",
+  "vendor": "Kevin Smith"
+}
