@@ -129,7 +129,13 @@ private:
     AccountSettings *getAccountSetting(const QString &);
 
 private:
-    bool updateInfo(int account);
+    enum class UpdateStatus {
+        Ok,
+        Disabled,
+        NoAccount,
+        NoSettings
+    };
+    UpdateStatus updateInfo(int account);
 
 private slots:
     void enableAccountsList(int);

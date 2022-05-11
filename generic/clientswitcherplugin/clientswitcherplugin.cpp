@@ -434,18 +434,18 @@ AccountSettings *ClientSwitcherPlugin::getAccountSetting(const QString &acc_id)
     return nullptr;
 }
 
-bool ClientSwitcherPlugin::updateInfo(int account)
+ClientSwitcherPlugin::UpdateStatus ClientSwitcherPlugin::updateInfo(int account)
 {
     if (!enabled || !psiAccount || !psiAccountCtl)
-        return false;
+        return UpdateStatus::Disabled;
 
     QString acc_id = psiAccount->getId(account);
     if (acc_id == "-1" || acc_id.isEmpty())
-        return false;
+        return UpdateStatus::NoAccount;
 
     AccountSettings *as = getAccountSetting(acc_id);
     if (!as || !as->isValid())
-        return false;
+        return UpdateStatus::NoSettings;
 
     QVariantMap info = { { "os-name", as->os_name },
                          { "os-version", as->os_version },
@@ -453,7 +453,7 @@ bool ClientSwitcherPlugin::updateInfo(int account)
                          { "client-version", as->client_version },
                          { "caps-node", as->caps_node } };
     psiAccountCtl->setClientVersionInfo(account, info);
-    return true;
+    return UpdateStatus::Ok;
 }
 
 /**
@@ -468,7 +468,10 @@ void ClientSwitcherPlugin::setNewCaps(int account)
     if (acc == -1)
         acc = 0;
     for (;; acc++) {
-        if (updateInfo(acc)) {
+        auto ret = updateInfo(acc);
+        if (ret == UpdateStatus::NoAccount)
+            break;
+        if (ret == UpdateStatus::Ok) {
             QString acc_status = psiAccount->getStatus(acc);
             if (!acc_status.isEmpty() && acc_status != "offline" && acc_status != "invisible") {
                 // Отсылаем тот же статус, а капсы заменим в outgoingStanza()
