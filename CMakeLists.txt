@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.1.0 )
+cmake_minimum_required( VERSION 3.10.0 )
 get_directory_property(IS_SUBPROJECT PARENT_DIRECTORY)
 
 if(NOT IS_SUBPROJECT)
