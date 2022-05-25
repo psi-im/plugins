@@ -137,13 +137,13 @@ private:
     bool processMuc(int account, const QDomElement &stanza);
 
     bool                          enabled;
-    OptionAccessingHost *         psiOptions;
-    DefferedStanzaSender *        stanzaHost;
-    AccountInfoAccessingHost *    accInfoHost;
+    OptionAccessingHost          *psiOptions;
+    DefferedStanzaSender         *stanzaHost;
+    AccountInfoAccessingHost     *accInfoHost;
     ApplicationInfoAccessingHost *appInfoHost;
-    IconFactoryAccessingHost *    icoHost;
-    PopupAccessingHost *          popup;
-    ContactInfoAccessingHost *    contactInfo;
+    IconFactoryAccessingHost     *icoHost;
+    PopupAccessingHost           *popup;
+    ContactInfoAccessingHost     *contactInfo;
 
     QString      Question;  //вопрос
     QString      Answer;    // ответ
@@ -180,7 +180,7 @@ private:
     QVector<Blocked>  BlockedJids;
     QPointer<ViewLog> viewer;
     QPointer<Viewer>  tv_rules;
-    Model *           model_;
+    Model            *model_;
     QVector<MucUser>  mucUsers_;
     QPointer<QWidget> options_;
     Ui::Options       ui_;
@@ -768,7 +768,7 @@ bool StopSpam::processMuc(int account, const QDomElement &stanza)
         QStringList jidList = stanza.attribute("from").split("/");
         int         i       = mucUsers_.size();
         if (findMuc(jidList.first(), jidList.last(), i)) {
-            MucUser &    mu       = mucUsers_[i];
+            MucUser     &mu       = mucUsers_[i];
             QDomNodeList nodeList = stanza.elementsByTagName("x");
             for (int i = nodeList.size(); i > 0;) {
                 QDomNode node = nodeList.at(--i).firstChild();

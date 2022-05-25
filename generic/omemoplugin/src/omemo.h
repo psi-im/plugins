@@ -109,10 +109,10 @@ private:
         QHash<QString, uint32_t> sentStanzas;
     };
 
-    StanzaSendingHost *                                m_stanzaSender        = nullptr;
-    PsiAccountControllingHost *                        m_accountController   = nullptr;
-    AccountInfoAccessingHost *                         m_accountInfoAccessor = nullptr;
-    ContactInfoAccessingHost *                         m_contactInfoAccessor = nullptr;
+    StanzaSendingHost                                 *m_stanzaSender        = nullptr;
+    PsiAccountControllingHost                         *m_accountController   = nullptr;
+    AccountInfoAccessingHost                          *m_accountInfoAccessor = nullptr;
+    ContactInfoAccessingHost                          *m_contactInfoAccessor = nullptr;
     QVector<std::shared_ptr<MessageWaitingForBundles>> m_pendingMessages;
     QString                                            m_dataPath;
     QHash<int, std::shared_ptr<Signal>>                m_accountToSignal;

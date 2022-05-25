@@ -68,12 +68,12 @@ public:
 
     QString      text;
     bool         caseSensitive;
-    QTextEdit *  te;
-    QLineEdit *  le_find;
+    QTextEdit   *te;
+    QLineEdit   *le_find;
     QPushButton *but_next;
     QPushButton *but_prev;
     QPushButton *first_page, *next_page, *last_page, *prev_page;
-    QCheckBox *  cb_case;
+    QCheckBox   *cb_case;
 };
 
 TypeAheadFindBar::TypeAheadFindBar(IconFactoryAccessingHost *IcoHost, QTextEdit *textedit, const QString &title,

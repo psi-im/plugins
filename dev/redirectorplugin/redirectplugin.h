@@ -82,14 +82,14 @@ private:
     QString             targetJid;
     QHash<QString, int> contactIdMap;
     int                 nextContactId = 0;
-    QWidget *           options_      = nullptr;
+    QWidget            *options_      = nullptr;
 
     bool                          enabled     = false;
-    OptionAccessingHost *         psiOptions  = nullptr;
-    StanzaSendingHost *           stanzaHost  = nullptr;
-    AccountInfoAccessingHost *    accInfoHost = nullptr;
+    OptionAccessingHost          *psiOptions  = nullptr;
+    StanzaSendingHost            *stanzaHost  = nullptr;
+    AccountInfoAccessingHost     *accInfoHost = nullptr;
     ApplicationInfoAccessingHost *appInfoHost = nullptr;
-    ContactInfoAccessingHost *    contactInfo = nullptr;
+    ContactInfoAccessingHost     *contactInfo = nullptr;
 
     Ui::Options ui_;
 };

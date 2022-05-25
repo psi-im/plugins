@@ -74,7 +74,7 @@ void Signal::generatePreKeys()
             QVector<QPair<uint32_t, QByteArray>> keys;
 
             signal_protocol_key_helper_pre_key_list_node *cur_node = pre_keys_head;
-            signal_buffer *                               key_buf  = nullptr;
+            signal_buffer                                *key_buf  = nullptr;
             while (cur_node) {
                 session_pre_key *pre_key = signal_protocol_key_helper_key_list_element(cur_node);
                 if (session_pre_key_serialize(&key_buf, pre_key) == SG_SUCCESS) {
@@ -149,8 +149,8 @@ void Signal::processBundle(const QString &from, uint32_t deviceId, const Bundle 
                         signed_pre_key_public, reinterpret_cast<const uint8_t *>(bundle.signedPreKeySignature.data()),
                         static_cast<size_t>(bundle.signedPreKeySignature.size()), identity_key)
                     == SG_SUCCESS) {
-                    session_builder *       session_builder = nullptr;
-                    const QByteArray &      fromUtf8        = from.toUtf8();
+                    session_builder        *session_builder = nullptr;
+                    const QByteArray       &fromUtf8        = from.toUtf8();
                     signal_protocol_address addr            = getAddress(deviceId, fromUtf8);
 
                     if (session_builder_create(&session_builder, m_storage.storeContext(), &addr, m_signalContext)
@@ -215,8 +215,8 @@ bool Signal::sessionIsValid(const signal_protocol_address &addr) const
 QList<EncryptedKey> Signal::encryptKey(const QString &ownJid, const QString &recipient, const QByteArray &key)
 {
     QList<EncryptedKey> results;
-    const QByteArray &  recipientUtf8 = recipient.toUtf8();
-    const QByteArray &  ownJidUtf8    = ownJid.toUtf8();
+    const QByteArray   &recipientUtf8 = recipient.toUtf8();
+    const QByteArray   &ownJidUtf8    = ownJid.toUtf8();
 
     QSet<uint32_t> ownDevices       = m_storage.getDeviceList(ownJid);
     QSet<uint32_t> recipientDevices = m_storage.getDeviceList(recipient);
@@ -229,7 +229,7 @@ QList<EncryptedKey> Signal::encryptKey(const QString &ownJid, const QString &rec
     devices.unite(ownDevices).unite(recipientDevices).remove(m_deviceId);
 
     for (auto deviceId : devices) {
-        const QByteArray &      name = recipientDevices.contains(deviceId) ? recipientUtf8 : ownJidUtf8;
+        const QByteArray       &name = recipientDevices.contains(deviceId) ? recipientUtf8 : ownJidUtf8;
         signal_protocol_address addr = getAddress(deviceId, name);
         if (!sessionIsValid(addr))
             continue;
@@ -257,7 +257,7 @@ QPair<QByteArray, bool> Signal::decryptKey(const QString &sender, const Encrypte
     QByteArray key;
     bool       buildSessionWithPreKey = false;
 
-    const QByteArray &      senderUtf8  = sender.toUtf8();
+    const QByteArray       &senderUtf8  = sender.toUtf8();
     signal_protocol_address sender_addr = getAddress(encryptedKey.deviceId, senderUtf8);
 
     if (encryptedKey.isPreKey) {

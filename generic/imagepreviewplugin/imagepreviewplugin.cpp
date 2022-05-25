@@ -104,9 +104,9 @@ private slots:
     void imageReply(QNetworkReply *reply);
 
 private:
-    OptionAccessingHost *         psiOptions = nullptr;
+    OptionAccessingHost          *psiOptions = nullptr;
     bool                          enabled    = false;
-    QNetworkAccessManager *       manager    = nullptr;
+    QNetworkAccessManager        *manager    = nullptr;
     QSet<QString>                 pending, failed;
     int                           previewSize = 256;
     QPointer<ImagePreviewOptions> optionsDlg;
@@ -268,7 +268,7 @@ void ImagePreviewPlugin::imageReply(QNetworkReply *reply)
             qDebug() << "Image size:" << image.size();
 #endif
             ScrollKeeper sk(origin->chat_);
-            QTextEdit *  te_log = qobject_cast<QTextEdit *>(origin->chat_);
+            QTextEdit   *te_log = qobject_cast<QTextEdit *>(origin->chat_);
             if (te_log) {
                 te_log->document()->addResource(QTextDocument::ImageResource, urlStrEscaped, image);
                 QTextCursor saved = te_log->textCursor();

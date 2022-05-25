@@ -84,8 +84,8 @@ private:
     int                   account_;
     QString               jid_;
     JabberDiskController *jdc;
-    QTimer *              timer_;
-    QEventLoop *          eventLoop_;
+    QTimer               *timer_;
+    QEventLoop           *eventLoop_;
     Command               lastCommand_;
 };
 

@@ -58,7 +58,7 @@ QWidget *CleanerPlugin::options()
     if (!enabled) {
         return nullptr;
     }
-    QWidget *    options  = new QWidget();
+    QWidget     *options  = new QWidget();
     QVBoxLayout *hbox     = new QVBoxLayout(options);
     QPushButton *goButton = new QPushButton(tr("Launch Cleaner"));
     QHBoxLayout *h        = new QHBoxLayout;

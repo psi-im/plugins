@@ -81,7 +81,7 @@ public:
     virtual bool     outgoingStanza(int account, QDomElement &xml);
     virtual void     setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
     virtual void     setOptionAccessingHost(OptionAccessingHost *host);
-    virtual void     optionChanged(const QString & /*option*/) {};
+    virtual void     optionChanged(const QString     &/*option*/) {};
     virtual void     setPopupAccessingHost(PopupAccessingHost *host);
     virtual void     setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
     virtual void     setContactInfoAccessingHost(ContactInfoAccessingHost *host);
@@ -91,13 +91,13 @@ public:
 
 private:
     bool                          enabled;
-    OptionAccessingHost *         psiOptions;
-    AccountInfoAccessingHost *    accInfoHost;
-    PopupAccessingHost *          popup;
+    OptionAccessingHost          *psiOptions;
+    AccountInfoAccessingHost     *accInfoHost;
+    PopupAccessingHost           *popup;
     ApplicationInfoAccessingHost *appInfo;
-    ContactInfoAccessingHost *    contactInfo;
-    IconFactoryAccessingHost *    iconHost;
-    SoundAccessingHost *          sound_;
+    ContactInfoAccessingHost     *contactInfo;
+    IconFactoryAccessingHost     *iconHost;
+    SoundAccessingHost           *sound_;
     QString                       soundFile;
     // int interval;
     int               delay;
@@ -168,7 +168,7 @@ bool PepPlugin::enable()
 
         int interval = psiOptions->getPluginOption(constInterval, QVariant(5000)).toInt() / 1000;
         popupId      = popup->registerOption(POPUP_OPTION_NAME, interval,
-                                        QLatin1String("plugins.options.pepplugin.") + constInterval);
+                                             QLatin1String("plugins.options.pepplugin.") + constInterval);
     }
     return enabled;
 }

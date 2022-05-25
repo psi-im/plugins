@@ -231,7 +231,7 @@ void BattleshipGamePlugin::testSound()
 
 void BattleshipGamePlugin::getSound()
 {
-    QObject *  sender_ = sender();
+    QObject   *sender_ = sender();
     QLineEdit *le      = nullptr;
     if (sender_ == ui_.select_error) {
         le = ui_.le_error;

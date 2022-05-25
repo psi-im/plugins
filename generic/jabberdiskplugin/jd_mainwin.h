@@ -49,8 +49,8 @@ private:
 protected:
 private:
     Ui::JDMainWin ui_;
-    JDModel *     model_;
-    JDCommands *  commands_;
+    JDModel      *model_;
+    JDCommands   *commands_;
     QString       currentDir_;
     bool          refreshInProgres_;
     QString       yourJid_;

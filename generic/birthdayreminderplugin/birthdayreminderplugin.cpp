@@ -111,14 +111,14 @@ private slots:
 
 private:
     bool                          enabled     = false;
-    OptionAccessingHost *         psiOptions  = nullptr;
-    AccountInfoAccessingHost *    accInfoHost = nullptr;
+    OptionAccessingHost          *psiOptions  = nullptr;
+    AccountInfoAccessingHost     *accInfoHost = nullptr;
     ApplicationInfoAccessingHost *appInfoHost = nullptr;
-    StanzaSendingHost *           stanzaHost  = nullptr;
-    PopupAccessingHost *          popup       = nullptr;
-    IconFactoryAccessingHost *    icoHost     = nullptr;
-    SoundAccessingHost *          sound_      = nullptr;
-    ContactInfoAccessingHost *    contactInfo = nullptr;
+    StanzaSendingHost            *stanzaHost  = nullptr;
+    PopupAccessingHost           *popup       = nullptr;
+    IconFactoryAccessingHost     *icoHost     = nullptr;
+    SoundAccessingHost           *sound_      = nullptr;
+    ContactInfoAccessingHost     *contactInfo = nullptr;
 
     QString lastCheck = QStringLiteral("1901010101");
     int     days_     = 5;

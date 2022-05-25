@@ -77,7 +77,7 @@ class AttentionPlugin : public QObject,
 public:
     AttentionPlugin();
     QString             name() const override;
-    QWidget *           options() override;
+    QWidget            *options() override;
     bool                enable() override;
     bool                disable() override;
     void                applyOptions() override;
@@ -92,29 +92,29 @@ public:
     void                setPopupAccessingHost(PopupAccessingHost *host) override;
     void                setStanzaSendingHost(StanzaSendingHost *host) override;
     QList<QVariantHash> getButtonParam() override;
-    QAction *           getAction(QObject *, int, const QString &) override { return nullptr; };
+    QAction            *getAction(QObject *, int, const QString &) override { return nullptr; };
     QList<QVariantHash> getAccountMenuParam() override;
     QList<QVariantHash> getContactMenuParam() override;
-    QAction *           getContactAction(QObject *, int, const QString &) override { return nullptr; };
-    QAction *           getAccountAction(QObject *, int) override { return nullptr; };
+    QAction            *getContactAction(QObject *, int, const QString &) override { return nullptr; };
+    QAction            *getAccountAction(QObject *, int) override { return nullptr; };
     void                setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) override;
     void                setSoundAccessingHost(SoundAccessingHost *host) override;
     QString             pluginInfo() override;
 
 private:
     bool                          enabled;
-    OptionAccessingHost *         psiOptions;
-    AccountInfoAccessingHost *    accInfoHost;
-    ActiveTabAccessingHost *      activeTab;
-    IconFactoryAccessingHost *    icoHost;
-    PopupAccessingHost *          popup;
-    StanzaSendingHost *           stanzaSender;
+    OptionAccessingHost          *psiOptions;
+    AccountInfoAccessingHost     *accInfoHost;
+    ActiveTabAccessingHost       *activeTab;
+    IconFactoryAccessingHost     *icoHost;
+    PopupAccessingHost           *popup;
+    StanzaSendingHost            *stanzaSender;
     ApplicationInfoAccessingHost *appInfo;
-    SoundAccessingHost *          sound_;
+    SoundAccessingHost           *sound_;
     QString                       soundFile;
     int                           timeout_;
     bool                          infPopup, disableDnd;
-    QTimer *                      nudgeTimer_;
+    QTimer                       *nudgeTimer_;
     QPointer<QWidget>             nudgeWindow_;
     QPoint                        oldPoint_;
     QPointer<QWidget>             options_;
@@ -171,8 +171,8 @@ bool AttentionPlugin::enable()
         infPopup   = psiOptions->getPluginOption(constInfPopup, QVariant(infPopup)).toBool();
         disableDnd = psiOptions->getPluginOption(constDisableDnd, QVariant(disableDnd)).toBool();
         popupId    = popup->registerOption(POPUP_OPTION,
-                                        psiOptions->getPluginOption(constInterval, QVariant(4000)).toInt() / 1000,
-                                        QLatin1String("plugins.options.attention.") + constInterval);
+                                           psiOptions->getPluginOption(constInterval, QVariant(4000)).toInt() / 1000,
+                                           QLatin1String("plugins.options.attention.") + constInterval);
 
         QWidgetList wl = qApp->allWidgets();
         for (QWidget *w : wl) {

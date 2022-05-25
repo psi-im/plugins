@@ -154,7 +154,7 @@ bool JDModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int /*r
     if (p && p->type() == JDItem::File)
         return false;
 
-    JDItem *    newItem = new JDItem(JDItem::File, p);
+    JDItem     *newItem = new JDItem(JDItem::File, p);
     QByteArray  ba      = data->data(JDItem::mimeType());
     QDataStream in(&ba, QIODevice::ReadOnly);
     newItem->fromDataStream(&in);
@@ -175,7 +175,7 @@ QMimeData *JDModel::mimeData(const QModelIndexList &indexes) const
     if (indexes.isEmpty())
         return nullptr;
 
-    QMimeData * data = nullptr;
+    QMimeData  *data = nullptr;
     QModelIndex i    = indexes.first();
     for (const ProxyItem &item : items_) {
         if (item.index == i) {

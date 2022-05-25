@@ -87,23 +87,23 @@ class ChessPlugin : public QObject,
 public:
     ChessPlugin();
     virtual QString             name() const;
-    virtual QWidget *           options();
+    virtual QWidget            *options();
     virtual bool                enable();
     virtual bool                disable();
     virtual void                applyOptions();
     virtual void                restoreOptions();
-    virtual void                optionChanged(const QString & /*option*/) {};
+    virtual void                optionChanged(const QString                &/*option*/) {};
     virtual void                setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
     virtual void                setOptionAccessingHost(OptionAccessingHost *host);
     virtual void                setActiveTabAccessingHost(ActiveTabAccessingHost *host);
     virtual void                setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
     virtual void                setStanzaSendingHost(StanzaSendingHost *host);
     virtual QList<QVariantHash> getButtonParam();
-    virtual QAction *           getAction(QObject *, int, const QString &);
+    virtual QAction            *getAction(QObject *, int, const QString &);
     virtual QList<QVariantHash> getAccountMenuParam();
     virtual QList<QVariantHash> getContactMenuParam();
-    virtual QAction *           getContactAction(QObject *, int, const QString &) { return nullptr; };
-    virtual QAction *           getAccountAction(QObject *, int) { return nullptr; };
+    virtual QAction            *getContactAction(QObject *, int, const QString &) { return nullptr; };
+    virtual QAction            *getAccountAction(QObject *, int) { return nullptr; };
     virtual void                setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
     virtual bool                incomingStanza(int account, const QDomElement &xml);
     virtual bool                outgoingStanza(int account, QDomElement &xml);
@@ -148,16 +148,16 @@ private:
 
 private:
     bool                          enabled;
-    OptionAccessingHost *         psiOptions;
-    AccountInfoAccessingHost *    accInfoHost;
-    ActiveTabAccessingHost *      activeTab;
-    IconFactoryAccessingHost *    icoHost;
+    OptionAccessingHost          *psiOptions;
+    AccountInfoAccessingHost     *accInfoHost;
+    ActiveTabAccessingHost       *activeTab;
+    IconFactoryAccessingHost     *icoHost;
     ApplicationInfoAccessingHost *appInfo;
-    StanzaSendingHost *           stanzaSender;
-    EventCreatingHost *           psiEvent;
-    ContactInfoAccessingHost *    contactInfo;
-    PopupAccessingHost *          popup;
-    SoundAccessingHost *          sound_;
+    StanzaSendingHost            *stanzaSender;
+    EventCreatingHost            *psiEvent;
+    ContactInfoAccessingHost     *contactInfo;
+    PopupAccessingHost           *popup;
+    SoundAccessingHost           *sound_;
 
     ChessWindow *board;
     bool         game_, theEnd_;

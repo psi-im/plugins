@@ -32,8 +32,8 @@ public:
     IconDelegate(IconFactoryAccessingHost *iconHost, QObject *parent = nullptr) :
         QItemDelegate(parent), iconHost_(iconHost) {};
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    virtual void  drawDisplay(QPainter * /*painter*/, const QStyleOptionViewItem & /*option*/, const QRect & /*rect*/,
-                              const QString & /*text*/) const {};
+    virtual void  drawDisplay(QPainter  */*painter*/, const QStyleOptionViewItem  &/*option*/, const QRect  &/*rect*/,
+                              const QString  &/*text*/) const {};
     void          paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
 private:

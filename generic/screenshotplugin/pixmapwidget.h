@@ -79,7 +79,7 @@ signals:
     void modified(bool);
 
 private:
-    ToolBar *                 bar_;
+    ToolBar                  *bar_;
     QColor                    color_;
     QList<QPixmap>            undoList_;
     QPixmap                   mainPixmap;
@@ -89,7 +89,7 @@ private:
     QPen                      pen;
     QPen                      draftPen;
     QFont                     font_;
-    SelectionRect *           selectionRect;
+    SelectionRect            *selectionRect;
     QCursor                   currentCursor;
     SelectionRect::CornerType cornerType;
 

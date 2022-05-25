@@ -65,10 +65,10 @@ private:
     Ui::Notes           ui_;
     int                 account_;
     StorageNotesPlugin *storageNotes_;
-    TagModel *          tagModel_;
-    NoteModel *         noteModel_;
-    ProxyModel *        proxyModel_;
-    QTimer *            updateTagsTimer_;
+    TagModel           *tagModel_;
+    NoteModel          *noteModel_;
+    ProxyModel         *proxyModel_;
+    QTimer             *updateTagsTimer_;
     bool                newNotes;
     bool                waitForSave;
 };

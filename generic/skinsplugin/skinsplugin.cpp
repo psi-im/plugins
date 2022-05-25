@@ -50,12 +50,12 @@ public:
     virtual void     restoreOptions();
     virtual void     setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
     virtual void     setOptionAccessingHost(OptionAccessingHost *host);
-    virtual void     optionChanged(const QString & /*option*/) {};
+    virtual void     optionChanged(const QString     &/*option*/) {};
     virtual QString  pluginInfo();
 
 private:
     bool                          enabled;
-    OptionAccessingHost *         psiOptions;
+    OptionAccessingHost          *psiOptions;
     ApplicationInfoAccessingHost *appInfo;
     Ui::SkinsPlugin               ui_;
     QStringList                   skins_;
@@ -178,7 +178,7 @@ void SkinsPlugin::findSkins(QString path)
     if (!ui_.lw_skins)
         return;
 
-    QDir dir(path);
+    QDir       dir(path);
     const auto dirList = dir.entryList(QDir::Files);
     for (const auto &filename : dirList) {
         if (filename.endsWith(".skn", Qt::CaseInsensitive)) {

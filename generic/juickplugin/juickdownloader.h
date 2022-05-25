@@ -62,11 +62,11 @@ private:
 
 private:
     bool                          inProgress_;
-    QNetworkAccessManager *       manager_;
+    QNetworkAccessManager        *manager_;
     ApplicationInfoAccessingHost *appInfo_;
     QQueue<JuickDownloadItem>     items_;
     QList<QByteArray>             urls_;
-    QTimer *                      waitTimer_;
+    QTimer                       *waitTimer_;
 };
 
 #endif

@@ -40,8 +40,8 @@ private:
     bool                   authorized_;
     QString                narodLogin, narodPass;
     QNetworkAccessManager *manager_;
-    QEventLoop *           loop_;
-    QTimer *               timer_;
+    QEventLoop            *loop_;
+    QTimer                *timer_;
 };
 
 #endif // AUTHMANAGER_H

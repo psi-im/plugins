@@ -49,7 +49,7 @@ private:
     QNetworkAccessManager *manager_;
     QString                fileName_;
     bool                   success_;
-    HttpDevice *           hd_;
+    HttpDevice            *hd_;
 };
 
 #endif // UPLOADMANAGER_H

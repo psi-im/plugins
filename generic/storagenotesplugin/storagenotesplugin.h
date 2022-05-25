@@ -72,20 +72,20 @@ public:
     virtual void                setPopupAccessingHost(PopupAccessingHost *host);
     virtual QList<QVariantHash> getAccountMenuParam();
     virtual QList<QVariantHash> getContactMenuParam();
-    virtual QAction *           getContactAction(QObject *, int, const QString &) { return nullptr; }
-    virtual QAction *           getAccountAction(QObject *, int) { return nullptr; }
+    virtual QAction            *getContactAction(QObject *, int, const QString &) { return nullptr; }
+    virtual QAction            *getAccountAction(QObject *, int) { return nullptr; }
     virtual QString             pluginInfo();
 
 private slots:
     void start();
 
 private:
-    StanzaSendingHost *       stanzaSender;
+    StanzaSendingHost        *stanzaSender;
     IconFactoryAccessingHost *iconHost;
     AccountInfoAccessingHost *accInfo;
-    PopupAccessingHost *      popup;
+    PopupAccessingHost       *popup;
     bool                      enabled;
-    NotesController *         controller_;
+    NotesController          *controller_;
 
     friend class Notes;
 };

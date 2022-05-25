@@ -81,7 +81,7 @@ public:
 
     // from ToolbarIconAccessor
     QList<QVariantHash> getButtonParam();
-    QAction *           getAction(QObject *parent, int account, const QString &contact);
+    QAction            *getAction(QObject *parent, int account, const QString &contact);
 
     // from ActiveTabAccessor
     void setActiveTabAccessingHost(ActiveTabAccessingHost *host) override;
@@ -99,12 +99,12 @@ private:
     bool isEnabled() const;
 
 private:
-    OpenPgpMessaging *         m_pgpMessaging  = nullptr;
-    QAction *                  m_action        = nullptr;
-    Options *                  m_optionsDialog = nullptr;
+    OpenPgpMessaging          *m_pgpMessaging  = nullptr;
+    QAction                   *m_action        = nullptr;
+    Options                   *m_optionsDialog = nullptr;
     PsiAccountControllingHost *m_accountHost   = nullptr;
-    OptionAccessingHost *      m_optionHost    = nullptr;
-    QMenu *                    m_menu          = nullptr;
-    ActiveTabAccessingHost *   m_activeTab     = nullptr;
-    AccountInfoAccessingHost * m_accountInfo   = nullptr;
+    OptionAccessingHost       *m_optionHost    = nullptr;
+    QMenu                     *m_menu          = nullptr;
+    ActiveTabAccessingHost    *m_activeTab     = nullptr;
+    AccountInfoAccessingHost  *m_accountInfo   = nullptr;
 };

@@ -57,14 +57,14 @@ private:
     void parseContentList(const QString &text);
     void startDownload();
 
-    Ui::Form *             ui;
+    Ui::Form              *ui;
     QNetworkAccessManager *nam_;
     QString                dataDir_;
     QString                tmpDir_;
     QString                listUrl_;
     QList<ContentItem *>   toDownload_;
-    OptionAccessingHost *  psiOptions_;
-    QNetworkReply *        replyLastHtml_;
+    OptionAccessingHost   *psiOptions_;
+    QNetworkReply         *replyLastHtml_;
 
 private slots:
     void downloadContentListProgress(qint64 bytesReceived, qint64 bytesTotal);

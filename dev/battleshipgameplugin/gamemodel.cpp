@@ -190,7 +190,7 @@ QString GameModel::lastShotResult() const
 {
     QString res;
     if (lastShot_ != -1) {
-        const GameBoard::GameCell & cell = myBoard_.cell(lastShot_);
+        const GameBoard::GameCell  &cell = myBoard_.cell(lastShot_);
         const GameBoard::CellStatus cs   = cell.status;
         if (cs == GameBoard::CellHit) {
             if (destroyed_)
@@ -269,7 +269,7 @@ void GameBoard::makeShipRandomPosition()
 {
     int scnt = ships_.count();
     for (int snum = 0; snum < scnt; ++snum) {
-        GameShip *         ship = ships_.at(snum);
+        GameShip          *ship = ships_.at(snum);
         int                slen = ship->length();
         GameShip::ShipType dir;
         for (;;) {
@@ -530,7 +530,7 @@ GameShip *GameBoard::findShip(int length, const QString &digest)
 
 bool GameBoard::isShipPositionLegal(int shipNum)
 {
-    GameShip *         ship = ships_.at(shipNum);
+    GameShip          *ship = ships_.at(shipNum);
     GameShip::ShipType dir  = ship->direction();
     int                pos  = ship->position();
     int                len  = ship->length();
@@ -584,7 +584,7 @@ bool GameBoard::isShipPositionLegal(int shipNum)
 
 void GameBoard::fillShipMargin(int n)
 {
-    GameShip *         ship = ships_.at(n);
+    GameShip          *ship = ships_.at(n);
     int                pos  = ship->position();
     int                len  = ship->length();
     GameShip::ShipType dir  = ship->direction();

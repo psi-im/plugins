@@ -37,7 +37,7 @@ private:
 
 private:
     Ui::PluginWindow ui;
-    GameModel *      gm_;
+    GameModel       *gm_;
 
 private:
     void updateWidgets();

@@ -62,10 +62,10 @@ public:
 
 private:
     bool                          enabled;
-    OptionAccessingHost *         psiOptions;
+    OptionAccessingHost          *psiOptions;
     ApplicationInfoAccessingHost *appInfoHost;
     QString                       texto;
-    Form *                        form_;
+    Form                         *form_;
 };
 
 #endif // CONTENTDOWLOADER_H

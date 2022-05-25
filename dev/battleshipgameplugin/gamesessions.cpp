@@ -102,7 +102,7 @@ bool GameSessionList::processIncomingIqStanza(int account, const QDomElement &xm
         if (gameId.isEmpty())
             return true;
 
-        GameSession * gs      = nullptr;
+        GameSession  *gs      = nullptr;
         const QString tagName = childEl.tagName();
         if (tagName == "create") {
             Options *opt = Options::instance();

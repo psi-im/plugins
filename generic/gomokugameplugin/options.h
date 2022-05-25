@@ -47,7 +47,7 @@ class Options : public QObject {
     Q_OBJECT
 public:
     static OptionAccessingHost *psiOptions;
-    static Options *            instance();
+    static Options             *instance();
     static void                 reset();
     QVariant                    getOption(const QString &option_name) const;
     void                        setOption(const QString &option_name, const QVariant &option_value);

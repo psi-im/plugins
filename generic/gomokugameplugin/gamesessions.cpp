@@ -654,7 +654,7 @@ void GameSessions::sendDraw()
         QString      new_id = newId();
         sess->last_iq_id    = new_id;
         QString stanza      = QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><turn xmlns=\"games:board\" type=\"%3\" "
-                                 "id=\"%4\"><draw/></turn></iq>")
+                                           "id=\"%4\"><draw/></turn></iq>")
                              .arg(XML::escapeString(sess->full_jid), new_id, constProtoType, constProtoId);
         emit sendStanza(sess->my_acc, stanza);
     }

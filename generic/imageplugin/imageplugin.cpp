@@ -74,9 +74,9 @@ public:
     virtual void                applyOptions() { }
     virtual void                restoreOptions() { }
     virtual QList<QVariantHash> getButtonParam();
-    virtual QAction *           getAction(QObject *, int, const QString &) { return nullptr; }
+    virtual QAction            *getAction(QObject *, int, const QString &) { return nullptr; }
     virtual QList<QVariantHash> getGCButtonParam();
-    virtual QAction *           getGCAction(QObject *, int, const QString &) { return nullptr; }
+    virtual QAction            *getGCAction(QObject *, int, const QString &) { return nullptr; }
     virtual void                setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
     virtual void                setStanzaSendingHost(StanzaSendingHost *host);
     virtual void                setActiveTabAccessingHost(ActiveTabAccessingHost *host);
@@ -90,12 +90,12 @@ private slots:
     void actionActivated();
 
 private:
-    IconFactoryAccessingHost * iconHost;
-    StanzaSendingHost *        stanzaSender;
-    ActiveTabAccessingHost *   activeTab;
-    AccountInfoAccessingHost * accInfo;
+    IconFactoryAccessingHost  *iconHost;
+    StanzaSendingHost         *stanzaSender;
+    ActiveTabAccessingHost    *activeTab;
+    AccountInfoAccessingHost  *accInfo;
     PsiAccountControllingHost *psiController;
-    OptionAccessingHost *      psiOptions;
+    OptionAccessingHost       *psiOptions;
     bool                       enabled;
     QHash<QString, int>        accounts_;
 };
@@ -133,9 +133,9 @@ QWidget *ImagePlugin::options()
     if (!enabled) {
         return nullptr;
     }
-    QWidget *    optionsWid = new QWidget();
+    QWidget     *optionsWid = new QWidget();
     QVBoxLayout *vbox       = new QVBoxLayout(optionsWid);
-    QLabel *     wikiLink
+    QLabel      *wikiLink
         = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/en:plugins#image_plugin\">Wiki (Online)</a>"), optionsWid);
     wikiLink->setOpenExternalLinks(true);
     vbox->addWidget(wikiLink);
@@ -208,7 +208,7 @@ void ImagePlugin::actionActivated()
     } else {
         const QString lastPath = psiOptions->getPluginOption(CONST_LAST_FOLDER, QDir::homePath()).toString();
         fileName               = QFileDialog::getOpenFileName(nullptr, tr("Open Image"), lastPath,
-                                                tr("Images (*.png *.gif *.jpg *.jpeg *.ico)"));
+                                                              tr("Images (*.png *.gif *.jpg *.jpeg *.ico)"));
         if (fileName.isEmpty())
             return;
 

@@ -79,7 +79,7 @@ class ExtendedMenuPlugin : public QObject,
 public:
     ExtendedMenuPlugin();
     virtual QString             name() const;
-    virtual QWidget *           options();
+    virtual QWidget            *options();
     virtual bool                enable();
     virtual bool                disable();
     virtual void                applyOptions();
@@ -92,10 +92,10 @@ public:
     virtual void                setPsiAccountControllingHost(PsiAccountControllingHost *host);
     virtual QList<QVariantHash> getAccountMenuParam();
     virtual QList<QVariantHash> getContactMenuParam();
-    virtual QAction *           getContactAction(QObject *, int, const QString &);
-    virtual QAction *           getAccountAction(QObject *, int) { return nullptr; }
+    virtual QAction            *getContactAction(QObject *, int, const QString &);
+    virtual QAction            *getAccountAction(QObject *, int) { return nullptr; }
     virtual QList<QVariantHash> getButtonParam();
-    virtual QAction *           getAction(QObject *parent, int account, const QString &contact);
+    virtual QAction            *getAction(QObject *parent, int account, const QString &contact);
     virtual void                setContactInfoAccessingHost(ContactInfoAccessingHost *host);
     virtual void                setStanzaSendingHost(StanzaSendingHost *host);
     virtual bool                incomingStanza(int account, const QDomElement &xml);
@@ -108,13 +108,13 @@ private slots:
 
 private:
     bool                       enabled;
-    OptionAccessingHost *      psiOptions;
-    AccountInfoAccessingHost * accInfo;
-    IconFactoryAccessingHost * icoHost;
+    OptionAccessingHost       *psiOptions;
+    AccountInfoAccessingHost  *accInfo;
+    IconFactoryAccessingHost  *icoHost;
     PsiAccountControllingHost *accountHost;
-    PopupAccessingHost *       popup;
-    ContactInfoAccessingHost * contactInfo;
-    StanzaSendingHost *        stanzaSender;
+    PopupAccessingHost        *popup;
+    ContactInfoAccessingHost  *contactInfo;
+    StanzaSendingHost         *stanzaSender;
     bool                       enableMenu, enableAction;
     int                        popupId;
 
@@ -491,7 +491,7 @@ void ExtendedMenuPlugin::fillMenu(QMenu *menu, int account, const QString &jid)
 
 void ExtendedMenuPlugin::toolbarActionActivated()
 {
-    QAction *     act     = static_cast<QAction *>(sender());
+    QAction      *act     = static_cast<QAction *>(sender());
     const QString jid     = act->property("jid").toString();
     int           account = act->property("account").toInt();
     QMenu         m;

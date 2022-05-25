@@ -49,7 +49,7 @@ class HistoryKeeperPlugin : public QObject,
 public:
     HistoryKeeperPlugin();
     virtual QString             name() const;
-    virtual QWidget *           options();
+    virtual QWidget            *options();
     virtual bool                enable();
     virtual bool                disable();
     virtual void                applyOptions();
@@ -57,11 +57,11 @@ public:
     virtual void                setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
     virtual void                setOptionAccessingHost(OptionAccessingHost *host);
     virtual void                setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
-    virtual void                optionChanged(const QString & /*option*/) {};
+    virtual void                optionChanged(const QString                &/*option*/) {};
     virtual QList<QVariantHash> getAccountMenuParam();
     virtual QList<QVariantHash> getContactMenuParam();
-    virtual QAction *           getContactAction(QObject *p, int acc, const QString &jid);
-    virtual QAction *           getAccountAction(QObject *, int) { return nullptr; };
+    virtual QAction            *getContactAction(QObject *p, int acc, const QString &jid);
+    virtual QAction            *getAccountAction(QObject *, int) { return nullptr; };
     virtual QString             pluginInfo();
 
 private:
@@ -75,9 +75,9 @@ private slots:
 
 private:
     bool                          enabled;
-    OptionAccessingHost *         psiOptions;
+    OptionAccessingHost          *psiOptions;
     ApplicationInfoAccessingHost *appInfo;
-    IconFactoryAccessingHost *    icoHost;
+    IconFactoryAccessingHost     *icoHost;
     QPointer<QTextEdit>           contactsWidget;
     QStringList                   contacts;
 };
@@ -147,7 +147,7 @@ QWidget *HistoryKeeperPlugin::options()
     if (!enabled) {
         return nullptr;
     }
-    QWidget *    options = new QWidget();
+    QWidget     *options = new QWidget();
     QVBoxLayout *layout  = new QVBoxLayout(options);
 
     contactsWidget = new QTextEdit();

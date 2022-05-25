@@ -63,7 +63,7 @@ public:
 
 protected:
     virtual void        doUpdateData() = 0;
-    QTableView *        m_table;
+    QTableView         *m_table;
     QStandardItemModel *m_tableModel;
     QString             m_jid;
 };
@@ -97,8 +97,8 @@ protected:
     void updateData() override;
 
 private:
-    QLabel *     m_fingerprintLabel;
-    QLabel *     m_deviceIdLabel;
+    QLabel      *m_fingerprintLabel;
+    QLabel      *m_deviceIdLabel;
     uint32_t     m_currentDeviceId;
     QPushButton *m_deleteButton;
 
@@ -127,8 +127,8 @@ private:
     QRadioButton *m_alwaysEnabled;
     QRadioButton *m_enabledByDefault;
     QRadioButton *m_disabledByDefault;
-    QCheckBox *   m_trustOwnDevices;
-    QCheckBox *   m_trustContactDevices;
+    QCheckBox    *m_trustOwnDevices;
+    QCheckBox    *m_trustContactDevices;
 };
 
 class ConfigWidget : public QWidget {
@@ -145,7 +145,7 @@ private slots:
 
 private:
     AccountInfoAccessingHost *m_accountInfo;
-    QTabWidget *              m_tabWidget;
+    QTabWidget               *m_tabWidget;
 };
 }
 

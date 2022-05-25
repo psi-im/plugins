@@ -39,8 +39,8 @@ private slots:
     void timeout();
 
 private:
-    StanzaSendingHost *             stanzaSender_;
-    QTimer *                        timer_;
+    StanzaSendingHost              *stanzaSender_;
+    QTimer                         *timer_;
     typedef QPair<int, QDomElement> XmlStanzaItem;
     typedef QPair<int, QString>     StringStanzaItem;
     struct MessageItem {

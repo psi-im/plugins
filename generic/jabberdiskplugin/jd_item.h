@@ -33,7 +33,7 @@ public:
 
     void       setData(const QString &name, const QString &size = QString(), const QString &descr = QString(),
                        int number = -1);
-    JDItem *   parent() const;
+    JDItem    *parent() const;
     Type       type() const;
     QString    name() const;
     QString    size() const;
@@ -62,7 +62,7 @@ private:
 struct ProxyItem {
     ProxyItem() : item(nullptr), index(QModelIndex()), parent(QModelIndex()) { }
 
-    JDItem *    item;
+    JDItem     *item;
     QModelIndex index;
     QModelIndex parent;
 

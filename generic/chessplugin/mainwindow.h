@@ -65,11 +65,11 @@ signals:
 private:
     void createMenu();
 
-    BoardModel *    model_;
+    BoardModel     *model_;
     QModelIndex     tmpIndex_;
     bool            enabledSound;
     int             movesCount;
-    QAction *       loseAction;
+    QAction        *loseAction;
     Ui::ChessWindow ui_;
 };
 

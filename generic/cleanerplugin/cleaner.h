@@ -69,15 +69,15 @@ protected:
 private:
     QString                vCardDir_, historyDir_, cacheDir_;
     QString                profilesConfigDir_, profilesDataDir_, profilesCacheDir_;
-    QAction *              findHistory, *findVcards;
-    QLabel *               sb1, *sb2, *sb3;
-    CleanerPlugin *        cleaner_;
+    QAction               *findHistory, *findVcards;
+    QLabel                *sb1, *sb2, *sb3;
+    CleanerPlugin         *cleaner_;
     Ui::CleanerMainWindow  ui_;
-    ClearingHistoryModel * historyModel_;
-    ClearingVcardModel *   vcardsModel_;
-    ClearingAvatarModel *  avatarModel_;
-    ClearingOptionsModel * optionsModel_;
-    ClearingProxyModel *   proxyHistoryModel_, *proxyVcardsModel_;
+    ClearingHistoryModel  *historyModel_;
+    ClearingVcardModel    *vcardsModel_;
+    ClearingAvatarModel   *avatarModel_;
+    ClearingOptionsModel  *optionsModel_;
+    ClearingProxyModel    *proxyHistoryModel_, *proxyVcardsModel_;
     QSortFilterProxyModel *proxyAvatarModel_, *proxyOptionsModel_;
 };
 

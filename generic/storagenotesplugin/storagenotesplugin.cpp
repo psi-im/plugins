@@ -60,7 +60,7 @@ QWidget *StorageNotesPlugin::options()
     if (!enabled) {
         return nullptr;
     }
-    QWidget *    optionsWid = new QWidget();
+    QWidget     *optionsWid = new QWidget();
     QVBoxLayout *vbox       = new QVBoxLayout(optionsWid);
 
     QLabel *wikiLink = new QLabel(

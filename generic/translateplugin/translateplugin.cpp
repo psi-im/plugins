@@ -105,13 +105,13 @@ private:
     bool                    notTranslate;
     QMap<QString, QString>  map;
     QMap<QString, QString>  mapBackup;
-    QTableWidget *          table;
-    QLineEdit *             shortCutWidget;
-    OptionAccessingHost *   psiOptions;
-    ShortcutAccessingHost * psiShortcuts;
+    QTableWidget           *table;
+    QLineEdit              *shortCutWidget;
+    OptionAccessingHost    *psiOptions;
+    ShortcutAccessingHost  *psiShortcuts;
     ActiveTabAccessingHost *activeTab;
     QString                 shortCut;
-    QCheckBox *             check_button;
+    QCheckBox              *check_button;
     QString                 storage;
     QPointer<QWidget>       options_;
     QList<QAction *>        actions_;
@@ -389,8 +389,10 @@ void TranslatePlugin::trans()
     }
 
     QTextCursor    c = ed->textCursor();
-    static QRegExp link("(xmpp:|mailto:|http://|https://|git://|ftp://|ftps://|sftp://|news://|ed2k://|file://|magnet:|www.|ftp.)\\S+", Qt::CaseInsensitive);
-    QStringList    newStrings;
+    static QRegExp link(
+        "(xmpp:|mailto:|http://|https://|git://|ftp://|ftps://|sftp://|news://|ed2k://|file://|magnet:|www.|ftp.)\\S+",
+        Qt::CaseInsensitive);
+    QStringList newStrings;
 
     bool     isMuc = false;
     QAction *act   = dynamic_cast<QAction *>(sender());

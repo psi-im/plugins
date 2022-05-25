@@ -101,8 +101,8 @@ public:
     virtual void        setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
     QList<QVariantHash> getAccountMenuParam();
     QList<QVariantHash> getContactMenuParam();
-    virtual QAction *   getContactAction(QObject *, int, const QString &);
-    virtual QAction *   getAccountAction(QObject *, int) { return nullptr; }
+    virtual QAction    *getContactAction(QObject *, int, const QString &);
+    virtual QAction    *getAccountAction(QObject *, int) { return nullptr; }
     virtual void        setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
     virtual QString     pluginInfo();
     virtual void        setActiveTabAccessingHost(ActiveTabAccessingHost *host);
@@ -111,24 +111,24 @@ public:
     virtual void        setSoundAccessingHost(SoundAccessingHost *host);
 
     QList<QVariantHash> getButtonParam() { return QList<QVariantHash>(); }
-    QAction *           getAction(QObject *parent, int account, const QString &contact);
+    QAction            *getAction(QObject *parent, int account, const QString &contact);
 
     QAction *createAction(QObject *parent, const QString &contact);
 
 private:
-    OptionAccessingHost *         psiOptions;
-    PopupAccessingHost *          popup;
-    IconFactoryAccessingHost *    icoHost;
+    OptionAccessingHost          *psiOptions;
+    PopupAccessingHost           *popup;
+    IconFactoryAccessingHost     *icoHost;
     ApplicationInfoAccessingHost *appInfoHost;
-    ActiveTabAccessingHost *      activeTab;
-    ContactInfoAccessingHost *    contactInfo;
-    AccountInfoAccessingHost *    accInfo;
-    SoundAccessingHost *          sound_;
+    ActiveTabAccessingHost       *activeTab;
+    ContactInfoAccessingHost     *contactInfo;
+    AccountInfoAccessingHost     *accInfo;
+    SoundAccessingHost           *sound_;
     bool                          enabled;
     QString                       soundFile;
     // int Interval;
     QPointer<QWidget>         optionsWid;
-    Model *                   model_;
+    Model                    *model_;
     Ui::Options               ui_;
     QList<WatchedItem *>      items_;
     bool                      isSndEnable;
@@ -181,7 +181,7 @@ bool Watcher::enable()
 
         int interval = psiOptions->getPluginOption(constInterval, QVariant(3000)).toInt() / 1000;
         popupId      = popup->registerOption(POPUP_OPTION_NAME, interval,
-                                        QLatin1String("plugins.options.watcher.") + constInterval);
+                                             QLatin1String("plugins.options.watcher.") + constInterval);
 
         QStringList jids        = psiOptions->getPluginOption(constJids, QVariant(QStringList())).toStringList();
         QStringList soundFiles  = psiOptions->getPluginOption(constSndFiles, QVariant(QStringList())).toStringList();
@@ -501,7 +501,7 @@ void Watcher::setSoundAccessingHost(SoundAccessingHost *host) { sound_ = host; }
 QAction *Watcher::createAction(QObject *parent, const QString &contact)
 {
     QStringList jids = model_->getWatchedJids();
-    QAction *   action;
+    QAction    *action;
     if (jids.contains(contact, Qt::CaseInsensitive) && model_->jidEnabled(contact)) {
         action = new QAction(QIcon(":/icons/watcher_on.png"), tr("Don't watch for JID"), parent);
         action->setProperty("watch", QVariant(true));

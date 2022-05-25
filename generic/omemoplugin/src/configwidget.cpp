@@ -96,7 +96,7 @@ void ConfigWidgetTabWithTable::updateData()
     m_table->resizeColumnsToContents();
 }
 
-void ConfigWidgetTabWithTable::copyFingerprintFromTable(QStandardItemModel *   tableModel,
+void ConfigWidgetTabWithTable::copyFingerprintFromTable(QStandardItemModel    *tableModel,
                                                         const QModelIndexList &indexesList, const int column)
 {
     QString text;
@@ -381,9 +381,9 @@ void ManageDevices::deleteDevice()
         const QString &&deviceId    = m_tableModel->item(selectIndex.row(), 0)->data().toString();
         const QString &&fingerprint = m_tableModel->item(selectIndex.row(), 1)->text();
         const QString &&message     = tr("After deleting of device from list of available devices "
-                                     "it stops receiving offline messages from your contacts "
-                                     "until it will become online and your contacts mark it "
-                                     "as trusted.")
+                                             "it stops receiving offline messages from your contacts "
+                                             "until it will become online and your contacts mark it "
+                                             "as trusted.")
             + "\n\n" + tr("Device ID") + QString(": %1").arg(deviceId) + "\n" + tr("Fingerprint")
             + QString(": %1").arg(fingerprint) + "\n\n" + tr("Delete selected device?");
 

@@ -102,8 +102,8 @@ private:
     QByteArray                      ba;
     Proxy                           proxy_;
     QStringList                     history_;
-    GrabAreaWidget *                grabAreaWidget_;
-    QLabel *                        sbLbSize;
+    GrabAreaWidget                 *grabAreaWidget_;
+    QLabel                         *sbLbSize;
     QPointer<ScreenshotOptions>     so_;
 
     Ui::Screenshot ui_;

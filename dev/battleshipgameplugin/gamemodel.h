@@ -71,13 +71,13 @@ public:
     int                findAndInitShip(int pos);
     QRect              shipRect(int snum, bool margin) const;
     void               setShipDestroy(int n, bool margin);
-    const GameCell &   cell(int pos) const;
+    const GameCell    &cell(int pos) const;
     QStringList        toStringList(bool covered) const;
     bool               isAllDestroyed() const;
 
 private:
     static QString genSeed(int len);
-    GameShip *     findShip(int length, const QString &digest);
+    GameShip      *findShip(int length, const QString &digest);
     bool           isShipPositionLegal(int shipNum);
     void           fillShipMargin(int n);
 

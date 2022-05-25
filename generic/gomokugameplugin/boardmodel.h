@@ -46,7 +46,7 @@ public:
     virtual int           rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual int           columnCount(const QModelIndex &parent = QModelIndex()) const;
     // --
-    const GameElement *      getGameElement(int x, int y);
+    const GameElement       *getGameElement(int x, int y);
     bool                     clickToBoard(QModelIndex index);
     bool                     opponentTurn(int x, int y);
     void                     setAccept();

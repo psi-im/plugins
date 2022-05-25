@@ -162,9 +162,9 @@ public:
     inline void QXT_setPublic(PUB *pub) { qxt_p_ptr = pub; }
 
 protected:
-    inline PUB &      qxt_p() { return *qxt_p_ptr; }
+    inline PUB       &qxt_p() { return *qxt_p_ptr; }
     inline const PUB &qxt_p() const { return *qxt_p_ptr; }
-    inline PUB *      qxt_ptr() { return qxt_p_ptr; }
+    inline PUB       *qxt_ptr() { return qxt_p_ptr; }
     inline const PUB *qxt_ptr() const { return qxt_p_ptr; }
 
 private:
@@ -179,15 +179,15 @@ public:
     ~QxtPrivateInterface() { delete pvt; }
 
     inline void       setPublic(PUB *pub) { pvt->QXT_setPublic(pub); }
-    inline PVT &      operator()() { return *static_cast<PVT *>(pvt); }
+    inline PVT       &operator()() { return *static_cast<PVT *>(pvt); }
     inline const PVT &operator()() const { return *static_cast<PVT *>(pvt); }
-    inline PVT *      operator->() { return static_cast<PVT *>(pvt); }
+    inline PVT       *operator->() { return static_cast<PVT *>(pvt); }
     inline const PVT *operator->() const { return static_cast<PVT *>(pvt); }
 
 private:
     QxtPrivateInterface(const QxtPrivateInterface &) { }
     QxtPrivateInterface &operator=(const QxtPrivateInterface &) { }
-    QxtPrivate<PUB> *    pvt     = nullptr;
+    QxtPrivate<PUB>     *pvt     = nullptr;
 };
 
 #endif // QXT_GLOBAL

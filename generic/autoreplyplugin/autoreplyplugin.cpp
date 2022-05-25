@@ -88,25 +88,25 @@ public:
 private:
     bool                      enabled;
     AccountInfoAccessingHost *AccInfoHost;
-    ActiveTabAccessingHost *  ActiveTabHost;
-    OptionAccessingHost *     psiOptions;
-    StanzaSendingHost *       StanzaHost;
-    QTextEdit *               messageWidget;
-    QTextEdit *               disableforWidget;
+    ActiveTabAccessingHost   *ActiveTabHost;
+    OptionAccessingHost      *psiOptions;
+    StanzaSendingHost        *StanzaHost;
+    QTextEdit                *messageWidget;
+    QTextEdit                *disableforWidget;
     QString                   Message;
     QString                   DisableFor;
-    QSpinBox *                spinWidget;
-    QSpinBox *                resetWidget;
-    QCheckBox *               activetabWidget;
-    QComboBox *               enabledisableWidget;
-    QTextEdit *               DisableForAccWidget;
-    QCheckBox *               sonlineWidget;
-    QCheckBox *               sawayWidget;
-    QCheckBox *               sdndWidget;
-    QCheckBox *               sxaWidget;
-    QCheckBox *               schatWidget;
-    QCheckBox *               sinvisWidget;
-    QCheckBox *               NotInRosterWidget;
+    QSpinBox                 *spinWidget;
+    QSpinBox                 *resetWidget;
+    QCheckBox                *activetabWidget;
+    QComboBox                *enabledisableWidget;
+    QTextEdit                *DisableForAccWidget;
+    QCheckBox                *sonlineWidget;
+    QCheckBox                *sawayWidget;
+    QCheckBox                *sdndWidget;
+    QCheckBox                *sxaWidget;
+    QCheckBox                *schatWidget;
+    QCheckBox                *sinvisWidget;
+    QCheckBox                *NotInRosterWidget;
     bool                      NotInRoster;
     int                       EnableDisable;
     struct Base {
@@ -147,10 +147,10 @@ AutoReply::AutoReply()
     DisableForAcc       = "";
     DisableForAccWidget = nullptr;
     resetWidget         = nullptr;
-    DisableFor = "juick@juick.com\npsi-dev@conference.jabber.ru\njubo@nologin.ru\njabrss@cmeerw.net\nrss2jabber."
-                 "com\nbot.talk.google.com\nbot.rambler.ru\nnotify@planary.ru\nwebtoim@gmail.com\nwebtoim1@gmail."
-                 "com\narx-bot-11@onblabla.ru\nen2ru@jtalk.ru\nru2en@jtalk.ru\ngluxi@inhex.net\nisida@xmpp.ru\ntwitter."
-                 "tweet.im\nrss@isida-bot.com\nhuti.ua@gmail.com";
+    DisableFor       = "juick@juick.com\npsi-dev@conference.jabber.ru\njubo@nologin.ru\njabrss@cmeerw.net\nrss2jabber."
+                       "com\nbot.talk.google.com\nbot.rambler.ru\nnotify@planary.ru\nwebtoim@gmail.com\nwebtoim1@gmail."
+                       "com\narx-bot-11@onblabla.ru\nen2ru@jtalk.ru\nru2en@jtalk.ru\ngluxi@inhex.net\nisida@xmpp.ru\ntwitter."
+                       "tweet.im\nrss@isida-bot.com\nhuti.ua@gmail.com";
     enabled          = false;
     Message          = "I'll write you later...";
     messageWidget    = nullptr;
@@ -490,7 +490,7 @@ QWidget *AutoReply::options()
     sinvisWidget = new QCheckBox(tr("Invisible"));
     sinvisWidget->setChecked(SInvis);
 
-    QGroupBox *  groupBox     = new QGroupBox(tr("Enable if status is:"));
+    QGroupBox   *groupBox     = new QGroupBox(tr("Enable if status is:"));
     QHBoxLayout *statusLayout = new QHBoxLayout;
     statusLayout->setSizeConstraint(QLayout::SetMaximumSize);
     statusLayout->addWidget(sonlineWidget);

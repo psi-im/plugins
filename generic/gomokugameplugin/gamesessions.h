@@ -92,7 +92,7 @@ private:
     bool    removeGameSession(const int account, const QString &jid);
     QString newId(const bool big_add = false);
     QString getLastError() const;
-    void    sendErrorIq(const int account, const QString &jid, const QString &id, const QString & /*err_str*/);
+    void    sendErrorIq(const int account, const QString &jid, const QString &id, const QString    &/*err_str*/);
 
 private slots:
     void showInvitation(const QString &from);

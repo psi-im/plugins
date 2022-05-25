@@ -56,7 +56,7 @@ ConfigDialog::ConfigDialog(OtrMessaging *otr, OptionAccessingHost *optionHost, A
     m_otr(otr), m_optionHost(optionHost), m_accountInfo(accountInfo)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    QTabWidget * tabWidget  = new QTabWidget(this);
+    QTabWidget  *tabWidget  = new QTabWidget(this);
 
     tabWidget->addTab(new FingerprintWidget(m_otr, tabWidget), tr("Known Keys"));
     tabWidget->addTab(new PrivKeyWidget(m_accountInfo, m_otr, tabWidget), tr("Own Keys"));
@@ -73,7 +73,7 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost *optionHost, OtrMessaging *
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
 
-    QGroupBox *  policyGroup  = new QGroupBox(tr("OTR encryption policy"), this);
+    QGroupBox   *policyGroup  = new QGroupBox(tr("OTR encryption policy"), this);
     QVBoxLayout *policyLayout = new QVBoxLayout(policyGroup);
 
     m_policy = new QButtonGroup(policyGroup);

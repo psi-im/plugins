@@ -59,7 +59,7 @@ void ClearingViewer::keyPressEvent(QKeyEvent *e)
 
 void ClearingViewer::contextMenuEvent(QContextMenuEvent *e)
 {
-    QMenu *          popup = new QMenu(this);
+    QMenu           *popup = new QMenu(this);
     QList<QAction *> actions;
     actions << new QAction(iconHost_->getIcon("psi/cm_check"), tr("Check"), popup)
             << new QAction(iconHost_->getIcon("psi/cm_uncheck"), tr("Uncheck"), popup)

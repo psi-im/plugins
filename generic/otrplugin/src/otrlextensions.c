@@ -36,7 +36,7 @@
 static gcry_error_t sexp_write(FILE *privf, gcry_sexp_t sexp)
 {
     size_t buflen;
-    char * buf;
+    char  *buf;
 
     buflen = gcry_sexp_sprint(sexp, GCRYSEXP_FMT_ADVANCED, NULL, 0);
     buf    = malloc(buflen);
@@ -101,7 +101,7 @@ gcry_error_t otrl_privkey_write_FILEp(OtrlUserState us, FILE *privf)
 gcry_error_t otrl_privkey_write(OtrlUserState us, const char *filename)
 {
     gcry_error_t err;
-    FILE *       privf;
+    FILE        *privf;
 #ifndef WIN32
     mode_t oldmask;
 #endif

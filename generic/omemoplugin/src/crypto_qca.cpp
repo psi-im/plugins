@@ -115,7 +115,7 @@ int algo_final(void *context, signal_buffer **output, void *user_data)
     auto         mac    = static_cast<BufferedComputation *>(context);
     MemoryRegion result = mac->final();
     *output             = signal_buffer_create(reinterpret_cast<const uint8_t *>(result.constData()),
-                                   static_cast<size_t>(result.size()));
+                                               static_cast<size_t>(result.size()));
     return SG_SUCCESS;
 }
 
@@ -161,7 +161,7 @@ int aes(Crypto::Direction direction, signal_buffer **output, int cipherMode, con
     }
 
     Cipher       cipher(cipherName, mode, Cipher::DefaultPadding, direction == Crypto::Encode ? Encode : Decode,
-                  toQByteArray(key, key_len), toQByteArray(iv, iv_len));
+                        toQByteArray(key, key_len), toQByteArray(iv, iv_len));
     MemoryRegion result = cipher.process(toQByteArray(ciphertext, ciphertext_len));
     if (!cipher.ok()) {
         return SG_ERR_UNKNOWN;

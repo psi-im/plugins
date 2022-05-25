@@ -86,11 +86,11 @@ public:
 private:
     void                       loadRules();
     bool                       _enabled;
-    Options *                  _optionsForm;
+    Options                   *_optionsForm;
     PsiAccountControllingHost *_accountHost;
-    OptionAccessingHost *      _optionHost;
-    StanzaSendingHost *        _stanzaSending;
-    AccountInfoAccessingHost * _accountInfo;
+    OptionAccessingHost       *_optionHost;
+    StanzaSendingHost         *_stanzaSending;
+    AccountInfoAccessingHost  *_accountInfo;
     QList<Rule>                _rules;
 };
 

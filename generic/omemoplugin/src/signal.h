@@ -104,7 +104,7 @@ private:
     signal_protocol_address    getAddress(uint32_t deviceId, const QByteArray &name) const;
     bool                       sessionIsValid(const signal_protocol_address &addr) const;
     static void                signal_log(int level, const char *message, size_t len, void *user_data);
-    ec_public_key *            curveDecodePoint(const QByteArray &bytes) const;
+    ec_public_key             *curveDecodePoint(const QByteArray &bytes) const;
     void                       generatePreKeys();
     QString                    getFingerprint(const QByteArray &publicKeyBytes) const;
     QByteArray                 getIdentityPublicKey() const;

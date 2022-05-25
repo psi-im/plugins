@@ -23,12 +23,12 @@ using Display          = struct _XDisplay;
 using xcb_connection_t = struct xcb_connection_t;
 
 class X11Info {
-    static Display *         _display;
+    static Display          *_display;
     static xcb_connection_t *_xcb;
     static int               _xcbPreferredScreen;
 
 public:
-    static Display *         display();
+    static Display          *display();
     static unsigned long     appRootWindow(int screen = -1);
     static xcb_connection_t *xcbConnection();
     static inline int        xcbPreferredScreen() { return _xcbPreferredScreen; }

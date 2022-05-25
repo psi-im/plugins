@@ -224,7 +224,7 @@ void yandexnarodManage::on_btnDelete_clicked()
 {
     QList<yandexnarodNetMan::FileItem> out;
     foreach (QListWidgetItem *i, ui_->listWidget->selectedItems()) {
-        ListWidgetItem *             lwi = static_cast<ListWidgetItem *>(i);
+        ListWidgetItem              *lwi = static_cast<ListWidgetItem *>(i);
         yandexnarodNetMan::FileItem &f   = const_cast<yandexnarodNetMan::FileItem &>(lwi->fileItem());
         if (!f.deleted) {
             out.append(f);
@@ -251,7 +251,7 @@ void yandexnarodManage::on_btnProlong_clicked()
     netmanPrepare();
     QList<yandexnarodNetMan::FileItem> out;
     foreach (QListWidgetItem *i, ui_->listWidget->selectedItems()) {
-        ListWidgetItem *            lwi = static_cast<ListWidgetItem *>(i);
+        ListWidgetItem             *lwi = static_cast<ListWidgetItem *>(i);
         yandexnarodNetMan::FileItem f   = lwi->fileItem();
         if (f.prolong() < 45) {
             out.append(f);
@@ -334,7 +334,7 @@ void yandexnarodManage::doMenu(const yandexnarodNetMan::FileItem &it)
 {
     QMenu            m;
     QList<QAction *> actions;
-    QAction *        act = new QAction(tr("Set password"), &m);
+    QAction         *act = new QAction(tr("Set password"), &m);
     act->setVisible(!it.passset);
     act->setData(1);
     actions << act;

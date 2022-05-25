@@ -57,7 +57,7 @@ public:
     int                      boardSizeY() const { return boardSizeY_; };
     int                      turnsCount() const { return turnsCount_; };
     GameElement::ElementType myElementType() const { return my_el; };
-    const GameElement *      getElement(int x, int y) const;
+    const GameElement       *getElement(int x, int y) const;
     bool                     doTurn(int x, int y, bool local);
     bool                     doSwitchColor(bool local);
     bool                     accept();

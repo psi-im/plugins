@@ -82,7 +82,7 @@ private:
     void saveCondition(int rule, int row);
 
 private:
-    Ui::Options *        m_ui;
+    Ui::Options         *m_ui;
     OptionAccessingHost *m_optionHost;
     QList<Rule>          m_rules;
     int                  m_currentRule;

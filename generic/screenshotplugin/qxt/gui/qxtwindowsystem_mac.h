@@ -127,7 +127,7 @@ public:
             CFRelease(type2);
         return *this;
     }
-    inline T *     operator&() { return &type; }
+    inline T      *operator&() { return &type; }
     static QCFType constructFromGet(const T &t)
     {
         CFRetain(t);

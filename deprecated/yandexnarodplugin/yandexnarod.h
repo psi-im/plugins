@@ -55,7 +55,7 @@ public:
     virtual QString             name() const;
     virtual QString             shortName() const;
     virtual QString             version() const;
-    virtual QWidget *           options();
+    virtual QWidget            *options();
     virtual bool                enable();
     virtual bool                disable();
     virtual void                setOptionAccessingHost(OptionAccessingHost *host);
@@ -63,7 +63,7 @@ public:
     virtual void                setStanzaSendingHost(StanzaSendingHost *host);
     virtual void                setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
     virtual void                setPopupAccessingHost(PopupAccessingHost *host);
-    virtual void                optionChanged(const QString & /*option*/) {};
+    virtual void                optionChanged(const QString                &/*option*/) {};
     virtual void                applyOptions();
     virtual void                restoreOptions();
     virtual QList<QVariantHash> getAccountMenuParam();
@@ -83,11 +83,11 @@ private:
     void showPopup(int account, const QString &jid, const QString &text);
 
 private:
-    OptionAccessingHost *         psiOptions;
-    IconFactoryAccessingHost *    psiIcons;
-    StanzaSendingHost *           stanzaSender;
+    OptionAccessingHost          *psiOptions;
+    IconFactoryAccessingHost     *psiIcons;
+    StanzaSendingHost            *stanzaSender;
     ApplicationInfoAccessingHost *appInfo;
-    PopupAccessingHost *          popup;
+    PopupAccessingHost           *popup;
     bool                          enabled;
     QString                       currentJid;
     int                           currentAccount;

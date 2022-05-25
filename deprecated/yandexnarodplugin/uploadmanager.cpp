@@ -175,7 +175,7 @@ void UploadManager::go(const QString &file)
         AuthManager am;
         emit        statusText(O_M(MAuthStart));
         bool        auth = am.go(Options::instance()->getOption(CONST_LOGIN, "").toString(),
-                          Options::decodePassword(Options::instance()->getOption(CONST_PASS, "").toString()));
+                                 Options::decodePassword(Options::instance()->getOption(CONST_PASS, "").toString()));
         if (auth) {
             setCookies(am.cookies());
             Options::instance()->saveCookies(am.cookies());

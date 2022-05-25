@@ -59,8 +59,8 @@ public:
 private:
     bool                          enabled;
     ApplicationInfoAccessingHost *appInfo;
-    IconFactoryAccessingHost *    iconHost;
-    OptionAccessingHost *         psiOptions;
+    IconFactoryAccessingHost     *iconHost;
+    OptionAccessingHost          *psiOptions;
     QPointer<CleanerMainWindow>   cln;
     friend class CleanerMainWindow;
     int height, width;

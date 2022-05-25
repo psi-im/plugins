@@ -44,7 +44,7 @@ protected slots:
 
 private:
     // Inner widgets
-    QToolButton *    m_tbCalendar;
-    QToolButton *    m_tbClean;
+    QToolButton     *m_tbCalendar;
+    QToolButton     *m_tbClean;
     QCalendarWidget *m_calendar;
 };

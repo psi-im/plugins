@@ -500,7 +500,7 @@ bool OMEMO::processBundle(const QString &ownJid, int account, const QDomElement 
         bundle.signedPreKeyId          = signedPreKeyPublic.attribute("signedPreKeyId").toUInt();
         bundle.signedPreKeyPublic      = QByteArray::fromBase64(signedPreKeyPublic.firstChild().nodeValue().toUtf8());
         bundle.signedPreKeySignature   = QByteArray::fromBase64(
-            bundleElement.firstChildElement("signedPreKeySignature").firstChild().nodeValue().toUtf8());
+              bundleElement.firstChildElement("signedPreKeySignature").firstChild().nodeValue().toUtf8());
         bundle.identityKeyPublic
             = QByteArray::fromBase64(bundleElement.firstChildElement("identityKey").firstChild().nodeValue().toUtf8());
 
@@ -539,10 +539,10 @@ QString OMEMO::pepRequest(int account, const QString &ownJid, const QString &rec
     const QString &&item     = QString("<items node='%1'/>").arg(node);
     const QString &&stanzaId = m_stanzaSender->uniqueId(account);
     const QString &&stanza   = QString("<iq id='%1' from='%2' to='%3' type='get'>\n"
-                                     "<pubsub xmlns='http://jabber.org/protocol/pubsub'>\n"
-                                     "%4\n"
-                                     "</pubsub>\n"
-                                     "</iq>\n")
+                                         "<pubsub xmlns='http://jabber.org/protocol/pubsub'>\n"
+                                         "%4\n"
+                                         "</pubsub>\n"
+                                         "</iq>\n")
                                  .arg(stanzaId, ownJid, recipient, item);
 
     m_stanzaSender->sendStanza(account, stanza);

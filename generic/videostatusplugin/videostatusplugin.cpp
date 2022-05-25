@@ -119,8 +119,8 @@ public:
 
 private:
     bool                       enabled;
-    OptionAccessingHost *      psiOptions;
-    AccountInfoAccessingHost * accInfo;
+    OptionAccessingHost       *psiOptions;
+    AccountInfoAccessingHost  *accInfo;
     PsiAccountControllingHost *accControl;
     QString                    status, statusMessage;
     Ui::OptionsWidget          ui_;
@@ -508,9 +508,9 @@ static WindowList getWindows(Atom prop)
     WindowList res;
     Atom       type   = 0;
     int        format = 0;
-    uchar *    data   = nullptr;
+    uchar     *data   = nullptr;
     ulong      count, after;
-    Display *  display = X11Info::display();
+    Display   *display = X11Info::display();
     Window     window  = X11Info::appRootWindow();
     if (XGetWindowProperty(display, window, prop, 0, 1024 * sizeof(Window) / 4, False, AnyPropertyType, &type, &format,
                            &count, &after, &data)
@@ -562,7 +562,7 @@ void VideoStatusChanger::fullSTTimeout()
 {
 #ifdef HAVE_DBUS
     Window         w          = activeWindow();
-    Display *      display    = X11Info::display();
+    Display       *display    = X11Info::display();
     bool           full       = false;
     static Atom    state      = XInternAtom(display, "_NET_WM_STATE", False);
     static Atom    fullScreen = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);

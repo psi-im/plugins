@@ -86,7 +86,7 @@ public:
 
     // ToolbarIconAccessor
     virtual QList<QVariantHash> getButtonParam() { return QList<QVariantHash>(); }
-    virtual QAction *           getAction(QObject *parent, int account, const QString &contact);
+    virtual QAction            *getAction(QObject *parent, int account, const QString &contact);
 
 private slots:
     void removeWidget();
@@ -101,10 +101,10 @@ private:
 
 private:
     bool                          enabled;
-    OptionAccessingHost *         _psiOptions      = nullptr;
-    ActiveTabAccessingHost *      _activeTab       = nullptr;
+    OptionAccessingHost          *_psiOptions      = nullptr;
+    ActiveTabAccessingHost       *_activeTab       = nullptr;
     ApplicationInfoAccessingHost *_applicationInfo = nullptr;
-    PsiAccountControllingHost *   _accContrller    = nullptr;
+    PsiAccountControllingHost    *_accContrller    = nullptr;
 
     typedef QMap<QString, quint16> JidEnums;
     QMap<int, JidEnums>            _enumsIncomming, _enumsOutgoing;

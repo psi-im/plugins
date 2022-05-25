@@ -37,7 +37,7 @@ public:
     void setModel(QAbstractItemModel *model);
 
 private:
-    BoardModel * model_;
+    BoardModel  *model_;
     virtual void resizeEvent(QResizeEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
     void         setCellsSize();

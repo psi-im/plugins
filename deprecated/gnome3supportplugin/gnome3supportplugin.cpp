@@ -70,8 +70,8 @@ public:
 
 private:
     bool                       enabled;
-    OptionAccessingHost *      psiOptions;
-    AccountInfoAccessingHost * accInfo;
+    OptionAccessingHost       *psiOptions;
+    AccountInfoAccessingHost  *accInfo;
     PsiAccountControllingHost *accControl;
     QString                    status, statusMessage;
     bool                       isDBUSConnected;

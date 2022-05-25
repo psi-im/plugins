@@ -64,7 +64,7 @@ Options::Options(QWidget *parent) : QWidget(parent), m_ui(new Ui::Options)
 
         // Import key
         QAction *action;
-        QMenu *  menu = new QMenu(this);
+        QMenu   *menu = new QMenu(this);
 
         action = menu->addAction(tr("from file"));
         connect(action, &QAction::triggered, this, &Options::importKeyFromFile);
@@ -389,7 +389,7 @@ void Options::exportKeyToFile()
             filename += ".asc";
         }
 
-        const QString &&    fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
+        const QString     &&fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
         const QStringList &&arguments   = { "--output", filename, "--armor", "--export", fingerprint };
 
         GpgProcess gpg;
@@ -450,7 +450,7 @@ void Options::exportKeyToClipboard()
     // Remove primary keys
     QString strKey = "";
     for (auto key : qAsConst(pkeys)) {
-        const QString &&    fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
+        const QString     &&fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
         const QStringList &&arguments   = { "--armor", "--export", fingerprint };
 
         GpgProcess gpg;
@@ -529,10 +529,10 @@ void Options::updateKnownKeys()
             QStandardItem *keyItem  = new QStandardItem(knownKeysMap[user]);
 
             const QString &&userId     = PGPUtil::getUserId(knownKeysMap[user]);
-            QStandardItem * userIdItem = new QStandardItem(userId);
+            QStandardItem  *userIdItem = new QStandardItem(userId);
 
             const QString &&fingerprint     = PGPUtil::getFingerprint(knownKeysMap[user]);
-            QStandardItem * fingerprintItem = new QStandardItem(fingerprint);
+            QStandardItem  *fingerprintItem = new QStandardItem(fingerprint);
 
             const QList<QStandardItem *> &&row = { accItem, userItem, keyItem, userIdItem, fingerprintItem };
             m_knownKeysTableModel->appendRow(row);
@@ -570,10 +570,10 @@ void Options::updateOwnKeys()
         QStandardItem *keyItem = new QStandardItem(keyId);
 
         const QString &&userId     = PGPUtil::getUserId(keyId);
-        QStandardItem * userIdItem = new QStandardItem(userId);
+        QStandardItem  *userIdItem = new QStandardItem(userId);
 
         const QString &&fingerprint     = PGPUtil::getFingerprint(keyId);
-        QStandardItem * fingerprintItem = new QStandardItem(fingerprint);
+        QStandardItem  *fingerprintItem = new QStandardItem(fingerprint);
 
         const QList<QStandardItem *> &&row = { accItem, keyItem, userIdItem, fingerprintItem };
         m_ownKeysTableModel->appendRow(row);

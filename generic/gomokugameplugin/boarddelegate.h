@@ -41,7 +41,7 @@ public:
     QPixmap *getBoardPixmap(int, int, double, double);
 
 private:
-    QPixmap *             boardPixmap;
+    QPixmap              *boardPixmap;
     double                width;
     double                height;
     int                   w_cnt;
@@ -57,7 +57,7 @@ public:
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
 private:
-    BoardModel *  model_;
+    BoardModel   *model_;
     int           skin;
     BoardPixmaps *pixmaps;
 };

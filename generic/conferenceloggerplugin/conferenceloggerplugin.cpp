@@ -65,7 +65,7 @@ class ConferenceLogger : public QObject,
 public:
     ConferenceLogger() = default;
     virtual QString             name() const;
-    virtual QWidget *           options();
+    virtual QWidget            *options();
     virtual bool                enable();
     virtual bool                disable();
     virtual void                applyOptions();
@@ -75,24 +75,24 @@ public:
     virtual void                setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
     virtual void                setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
     virtual void                setOptionAccessingHost(OptionAccessingHost *host);
-    virtual void                optionChanged(const QString & /*option*/) { }
+    virtual void                optionChanged(const QString                &/*option*/) { }
     virtual void                setActiveTabAccessingHost(ActiveTabAccessingHost *host);
     virtual void                setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
     virtual QList<QVariantHash> getGCButtonParam();
-    virtual QAction *           getGCAction(QObject *, int, const QString &) { return nullptr; }
+    virtual QAction            *getGCAction(QObject *, int, const QString &) { return nullptr; }
     virtual QString             pluginInfo();
 
 private:
     void Logger(QString room, const QString &from, const QString &myJid, const QString &text, QString stamp);
     void showLog(QString filename);
 
-    AccountInfoAccessingHost *    AccInfoHost = nullptr;
+    AccountInfoAccessingHost     *AccInfoHost = nullptr;
     ApplicationInfoAccessingHost *AppInfoHost = nullptr;
-    OptionAccessingHost *         psiOptions  = nullptr;
-    ActiveTabAccessingHost *      activeTab   = nullptr;
-    IconFactoryAccessingHost *    IcoHost     = nullptr;
-    QComboBox *                   FilesBox    = nullptr;
-    QPushButton *                 viewButton  = nullptr;
+    OptionAccessingHost          *psiOptions  = nullptr;
+    ActiveTabAccessingHost       *activeTab   = nullptr;
+    IconFactoryAccessingHost     *IcoHost     = nullptr;
+    QComboBox                    *FilesBox    = nullptr;
+    QPushButton                  *viewButton  = nullptr;
 
     bool enabled = false;
     int  Height  = 500;
@@ -139,10 +139,10 @@ QWidget *ConferenceLogger::options()
     if (!enabled) {
         return nullptr;
     }
-    QWidget *    options = new QWidget();
+    QWidget     *options = new QWidget();
     QVBoxLayout *layout  = new QVBoxLayout(options);
-    QLabel *     label   = new QLabel(tr("You can find your logs here:"));
-    QLineEdit *  path    = new QLineEdit;
+    QLabel      *label   = new QLabel(tr("You can find your logs here:"));
+    QLineEdit   *path    = new QLineEdit;
     path->setText(HistoryDir);
     path->setEnabled(false);
     FilesBox = new QComboBox();

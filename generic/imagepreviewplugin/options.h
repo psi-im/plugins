@@ -20,7 +20,7 @@ public:
 
 private:
     Ui::ImagePreviewOptions *ui;
-    OptionAccessingHost *    optHost;
+    OptionAccessingHost     *optHost;
 };
 
 #endif // OPTIONS_H

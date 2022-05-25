@@ -34,6 +34,7 @@ endif()
 
 set( _SRCS
     ${PLUGIN}.cpp
+    syntaxhighlighter.cpp
 )
 find_package( Qt5 COMPONENTS Widgets Xml REQUIRED )
 set(QT_DEPLIBS

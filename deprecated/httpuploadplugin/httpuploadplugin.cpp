@@ -103,9 +103,9 @@ public:
     virtual void                applyOptions();
     virtual void                restoreOptions();
     virtual QList<QVariantHash> getButtonParam();
-    virtual QAction *           getAction(QObject *, int, const QString &) { return nullptr; }
+    virtual QAction            *getAction(QObject *, int, const QString &) { return nullptr; }
     virtual QList<QVariantHash> getGCButtonParam();
-    virtual QAction *           getGCAction(QObject *, int, const QString &) { return nullptr; }
+    virtual QAction            *getGCAction(QObject *, int, const QString &) { return nullptr; }
     virtual void                setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
     virtual void                setStanzaSendingHost(StanzaSendingHost *host);
     virtual void                setActiveTabAccessingHost(ActiveTabAccessingHost *host);
@@ -162,24 +162,24 @@ private:
     void    omemoEncryptData();
     QString omemoEncryptMessage(const QString &message);
 
-    IconFactoryAccessingHost *    iconHost;
-    StanzaSendingHost *           stanzaSender;
-    ActiveTabAccessingHost *      activeTab;
-    AccountInfoAccessingHost *    accInfo;
-    PsiAccountControllingHost *   psiController;
-    OptionAccessingHost *         psiOptions;
-    PluginAccessingHost *         pluginHost;
+    IconFactoryAccessingHost     *iconHost;
+    StanzaSendingHost            *stanzaSender;
+    ActiveTabAccessingHost       *activeTab;
+    AccountInfoAccessingHost     *accInfo;
+    PsiAccountControllingHost    *psiController;
+    OptionAccessingHost          *psiOptions;
+    PluginAccessingHost          *pluginHost;
     ApplicationInfoAccessingHost *appInfoHost;
     bool                          enabled;
-    QNetworkAccessManager *       manager;
+    QNetworkAccessManager        *manager;
     QMap<QString, UploadService>  serviceNames;
     QByteArray                    dataSource;
     CurrentUpload                 currentUpload;
     QTimer                        slotTimeout;
-    QSpinBox *                    sb_previewWidth;
-    QCheckBox *                   cb_resize;
-    QSpinBox *                    sb_size;
-    QSpinBox *                    sb_quality;
+    QSpinBox                     *sb_previewWidth;
+    QCheckBox                    *cb_resize;
+    QSpinBox                     *sb_size;
+    QSpinBox                     *sb_quality;
     bool                          imageResize;
     int                           imageSize;
     int                           imageQuality;
@@ -243,7 +243,7 @@ QWidget *HttpUploadPlugin::options()
     if (!enabled) {
         return nullptr;
     }
-    QWidget *    optionsWid = new QWidget();
+    QWidget     *optionsWid = new QWidget();
     QVBoxLayout *vbox       = new QVBoxLayout(optionsWid);
     vbox->addWidget(new QLabel(tr("Image preview width")));
     sb_previewWidth = new QSpinBox();
@@ -583,7 +583,7 @@ void HttpUploadPlugin::uploadComplete(QNetworkReply *reply)
     if (ok && (statusCode == 201 || statusCode == 200)) {
         QString  id = getId(currentUpload.account);
         QString  receipt(currentUpload.type == "chat"
-                                && psiOptions->getGlobalOption("options.ui.notifications.request-receipts").toBool()
+                                 && psiOptions->getGlobalOption("options.ui.notifications.request-receipts").toBool()
                              ? "<request xmlns='urn:xmpp:receipts'/>"
                              : "");
         QString &url            = currentUpload.getUrl;

@@ -38,9 +38,9 @@ static WindowList qxt_getWindows(Atom prop)
     WindowList res;
     Atom       type   = 0;
     int        format = 0;
-    uchar *    data   = nullptr;
+    uchar     *data   = nullptr;
     ulong      count, after;
-    Display *  display = QX11Info::display();
+    Display   *display = QX11Info::display();
     Window     window  = QX11Info::appRootWindow();
     if (XGetWindowProperty(display, window, prop, 0, 1024 * sizeof(Window) / 4, False, AnyPropertyType, &type, &format,
                            &count, &after, &data)
@@ -102,7 +102,7 @@ WId QxtWindowSystem::windowAt(const QPoint &pos)
 QString QxtWindowSystem::windowTitle(WId window)
 {
     QString name;
-    char *  str = nullptr;
+    char   *str = nullptr;
     if (XFetchName(QX11Info::display(), window, &str))
         name = QString::fromLatin1(str);
     if (str)

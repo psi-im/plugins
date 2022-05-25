@@ -42,11 +42,11 @@ class GameSessionList : public QObject {
 public:
     static GameSessionList *instance();
     static void             reset();
-    GameSession *           createSession(int account, const QString &jid, bool first, const QString &gameId);
+    GameSession            *createSession(int account, const QString &jid, bool first, const QString &gameId);
     void                    updateGameKey(GameSession *gs);
     void                    removeGame(GameSession *gs);
-    GameSession *           findGame(int account, const QString &jid, const QString &gameId);
-    GameSession *           findGameByStanzaId(int account, const QString &jid, const QString &stanzaId);
+    GameSession            *findGame(int account, const QString &jid, const QString &gameId);
+    GameSession            *findGameByStanzaId(int account, const QString &jid, const QString &stanzaId);
     bool    processIncomingIqStanza(int account, const QDomElement &xml, const QString &accStatus, bool fromPrivate);
     void    invite(int account, const QString &jid, const QStringList &resList);
     QString getStanzaId(bool bigOffset);
@@ -59,7 +59,7 @@ private:
     static QString getErrorMessage(const QDomElement &xml);
 
 private:
-    static GameSessionList *      instance_;
+    static GameSessionList       *instance_;
     QHash<QString, GameSession *> list_;
     int                           stanzaId_;
 

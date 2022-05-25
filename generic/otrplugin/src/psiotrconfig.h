@@ -61,8 +61,8 @@ public:
                  QWidget *parent = nullptr);
 
 private:
-    OtrMessaging *            m_otr;
-    OptionAccessingHost *     m_optionHost;
+    OtrMessaging             *m_otr;
+    OptionAccessingHost      *m_optionHost;
     AccountInfoAccessingHost *m_accountInfo;
 };
 
@@ -79,7 +79,7 @@ public:
 
 private:
     OptionAccessingHost *m_optionHost;
-    OtrMessaging *       m_otr;
+    OtrMessaging        *m_otr;
 
     QButtonGroup *m_policy;
 
@@ -104,8 +104,8 @@ protected:
     void updateData();
 
 private:
-    OtrMessaging *      m_otr;
-    QTableView *        m_table;
+    OtrMessaging       *m_otr;
+    QTableView         *m_table;
     QStandardItemModel *m_tableModel;
     QList<Fingerprint>  m_fingerprints;
 
@@ -133,11 +133,11 @@ protected:
 
 private:
     AccountInfoAccessingHost *m_accountInfo;
-    OtrMessaging *            m_otr;
-    QTableView *              m_table;
-    QStandardItemModel *      m_tableModel;
+    OtrMessaging             *m_otr;
+    QTableView               *m_table;
+    QStandardItemModel       *m_tableModel;
     QHash<QString, QString>   m_keys;
-    QComboBox *               m_accountBox;
+    QComboBox                *m_accountBox;
 
 private slots:
     void deleteOwnKey();

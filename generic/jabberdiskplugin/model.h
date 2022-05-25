@@ -49,7 +49,7 @@ public:
     QVariant      data(const QModelIndex &index, int role) const;
 
     bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
-    QMimeData *     mimeData(const QModelIndexList &indexes) const;
+    QMimeData      *mimeData(const QModelIndexList &indexes) const;
     Qt::DropActions supportedDropActions() const;
     QStringList     mimeTypes() const;
     // bool removeRow(int row, const QModelIndex &parent = QModelIndex());

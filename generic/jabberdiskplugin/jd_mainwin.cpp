@@ -190,16 +190,16 @@ void JDMainWin::indexContextMenu(const QModelIndex &index)
     QMenu            m;
     JDItem::Type     type = (JDItem::Type)index.data(JDModel::RoleType).toInt();
     QList<QAction *> aList;
-    QAction *        actRemove = new QAction(tr("Remove"), &m);
-    QAction *        actMake   = new QAction(tr("Make dir"), &m);
-    QAction *        actGet    = new QAction(tr("Get File"), &m);
-    QAction *        actSend   = new QAction(tr("Send File"), &m);
-    QAction *        actHash   = new QAction(tr("Hash"), &m);
-    QAction *        actLink   = new QAction(tr("Link"), &m);
-    QAction *        actHelp   = new QAction(tr("Help"), &m);
-    QAction *        actIntro  = new QAction(tr("Intro"), &m);
-    QAction *        actDu     = new QAction(tr("Statistics"), &m);
-    QAction *        actRename = new QAction(tr("Rename"), &m);
+    QAction         *actRemove = new QAction(tr("Remove"), &m);
+    QAction         *actMake   = new QAction(tr("Make dir"), &m);
+    QAction         *actGet    = new QAction(tr("Get File"), &m);
+    QAction         *actSend   = new QAction(tr("Send File"), &m);
+    QAction         *actHash   = new QAction(tr("Hash"), &m);
+    QAction         *actLink   = new QAction(tr("Link"), &m);
+    QAction         *actHelp   = new QAction(tr("Help"), &m);
+    QAction         *actIntro  = new QAction(tr("Intro"), &m);
+    QAction         *actDu     = new QAction(tr("Statistics"), &m);
+    QAction         *actRename = new QAction(tr("Rename"), &m);
 
     QMenu move;
     move.setTitle(tr("Move to..."));

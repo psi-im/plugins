@@ -55,9 +55,9 @@ protected slots:
     virtual void hidePopup();
 
 private:
-    QHBoxLayout *    m_layout;
+    QHBoxLayout     *m_layout;
     QList<QWidget *> m_toolbuttons;
-    QFrame *         m_popup;
+    QFrame          *m_popup;
 
     // Properties
     int     m_optimalLength;

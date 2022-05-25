@@ -62,7 +62,7 @@ signals:
 
 private:
     QList<Button *> buttons_;
-    QSpinBox *      sb;
+    QSpinBox       *sb;
 };
 
 #endif // TOOLBAR_H

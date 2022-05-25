@@ -124,7 +124,7 @@ public:
 
     // ToolbarIconAccessor
     virtual QList<QVariantHash> getButtonParam();
-    virtual QAction *           getAction(QObject *parent, int accountIndex, const QString &contact);
+    virtual QAction            *getAction(QObject *parent, int accountIndex, const QString &contact);
 
     // AccountInfoAccessor
     virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
@@ -191,16 +191,16 @@ private:
     QString getCorrectJid(int accountIndex, const QString &fullJid);
 
     bool                                            m_enabled;
-    OtrMessaging *                                  m_otrConnection;
+    OtrMessaging                                   *m_otrConnection;
     QHash<QString, QHash<QString, PsiOtrClosure *>> m_onlineUsers;
-    OptionAccessingHost *                           m_optionHost;
-    StanzaSendingHost *                             m_senderHost;
-    ApplicationInfoAccessingHost *                  m_applicationInfo;
-    PsiAccountControllingHost *                     m_accountHost;
-    AccountInfoAccessingHost *                      m_accountInfo;
-    ContactInfoAccessingHost *                      m_contactInfo;
-    IconFactoryAccessingHost *                      m_iconHost;
-    EventCreatingHost *                             m_psiEvent;
+    OptionAccessingHost                            *m_optionHost;
+    StanzaSendingHost                              *m_senderHost;
+    ApplicationInfoAccessingHost                   *m_applicationInfo;
+    PsiAccountControllingHost                      *m_accountHost;
+    AccountInfoAccessingHost                       *m_accountInfo;
+    ContactInfoAccessingHost                       *m_contactInfo;
+    IconFactoryAccessingHost                       *m_iconHost;
+    EventCreatingHost                              *m_psiEvent;
     QQueue<QMessageBox *>                           m_messageBoxList;
 };
 

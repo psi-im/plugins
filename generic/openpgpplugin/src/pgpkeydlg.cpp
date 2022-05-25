@@ -116,7 +116,7 @@ PGPKeyDlg::PGPKeyDlg(Type t, const QString &defaultKeyID, QWidget *parent) : QDi
     const QStringList &&keysList = keysRaw.split("\n");
     for (const QString &line : keysList) {
         const QString &&type = line.section(':', 0, 0);
-        QStandardItem * root = m_model->invisibleRootItem();
+        QStandardItem  *root = m_model->invisibleRootItem();
 
         if (type == "pub" || type == "sec") {
             uid                     = line.section(':', 9, 9);           // Used ID
@@ -203,7 +203,7 @@ void PGPKeyDlg::do_accept()
     QModelIndex realIndex = m_proxy->mapToSource(fakeIndex);
 
     QStandardItem *item = m_model->itemFromIndex(realIndex);
-    KeyViewItem *  i    = dynamic_cast<KeyViewItem *>(item);
+    KeyViewItem   *i    = dynamic_cast<KeyViewItem *>(item);
     if (!i) {
         QMessageBox::information(this, tr("Error"), tr("Please select a key."));
         return;

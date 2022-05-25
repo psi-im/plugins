@@ -36,9 +36,9 @@ QString Skin::skinFolder()
 
 QPixmap Skin::previewPixmap()
 {
-    QDir    dir(skinFolder());
-    QString skinName = name();
-    QPixmap pix      = QPixmap();
+    QDir       dir(skinFolder());
+    QString    skinName = name();
+    QPixmap    pix      = QPixmap();
     const auto dirList  = dir.entryList(QDir::Files);
     for (const auto &fileName : dirList) {
         if ((fileName.endsWith(".png", Qt::CaseInsensitive) || fileName.endsWith(".jpg", Qt::CaseInsensitive))

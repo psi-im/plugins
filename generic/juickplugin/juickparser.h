@@ -80,7 +80,7 @@ private:
     Q_DISABLE_COPY(JuickParser)
 
 private:
-    QDomElement * elem_;
+    QDomElement  *elem_;
     QDomElement   juickElement_;
     QDomElement   userElement_;
     JMType        type_;

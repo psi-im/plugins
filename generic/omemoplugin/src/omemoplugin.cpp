@@ -417,7 +417,7 @@ void OMEMOPlugin::enableOMEMOAction(bool checked)
 
     action->setChecked(!checked);
 
-    QMenu *  menu                  = new QMenu();
+    QMenu   *menu                  = new QMenu();
     QAction *actEnableOmemo        = new QAction(tr("Enable OMEMO encryption"), this);
     QAction *actDisableOmemo       = new QAction(tr("Disable OMEMO encryption"), this);
     QAction *actManageFingerprints = new QAction(tr("Manage contact fingerprints"), this);
@@ -514,7 +514,7 @@ void OMEMOPlugin::actionDestroyed(QObject *action)
 void OMEMOPlugin::updateAction(int account, const QString &user)
 {
     QString    bareJid = m_contactInfo->realJid(account, user).split("/").first();
-    QString        key = QString::number(account) + bareJid;
+    QString    key     = QString::number(account) + bareJid;
     auto const actions = m_actions.values(key);
     for (QAction *action : actions) {
         const auto ownJid    = m_accountInfo->getJid(account).split("/").first();

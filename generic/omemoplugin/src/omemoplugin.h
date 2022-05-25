@@ -69,7 +69,7 @@ public:
 
     // PsiPlugin interface
     QString     name() const override;
-    QWidget *   options() override;
+    QWidget    *options() override;
     bool        enable() override;
     bool        disable() override;
     void        applyOptions() override;
@@ -109,11 +109,11 @@ public:
 
     // ToolbarIconAccessor interface
     QList<QVariantHash> getButtonParam() override;
-    QAction *           getAction(QObject *parent, int account, const QString &contact) override;
+    QAction            *getAction(QObject *parent, int account, const QString &contact) override;
 
     // GCToolbarIconAccessor interface
     QList<QVariantHash> getGCButtonParam() override;
-    QAction *           getGCAction(QObject *parent, int account, const QString &contact) override;
+    QAction            *getGCAction(QObject *parent, int account, const QString &contact) override;
 
     // CommandExecutor interface
     bool execute(int account, const QHash<QString, QVariant> &args, QHash<QString, QVariant> *result) override;
@@ -138,16 +138,16 @@ private:
 private:
     bool                          m_enabled = false;
     QMultiMap<QString, QAction *> m_actions;
-    OMEMO *                       m_omemo = nullptr;
+    OMEMO                        *m_omemo = nullptr;
     QNetworkAccessManager         m_networkManager;
 
-    AccountInfoAccessingHost *    m_accountInfo       = nullptr;
-    ContactInfoAccessingHost *    m_contactInfo       = nullptr;
+    AccountInfoAccessingHost     *m_accountInfo       = nullptr;
+    ContactInfoAccessingHost     *m_contactInfo       = nullptr;
     ApplicationInfoAccessingHost *m_applicationInfo   = nullptr;
-    StanzaSendingHost *           m_stanzaSender      = nullptr;
-    EventCreatingHost *           m_eventCreator      = nullptr;
-    PsiAccountControllingHost *   m_accountController = nullptr;
-    OptionAccessingHost *         m_optionHost        = nullptr;
+    StanzaSendingHost            *m_stanzaSender      = nullptr;
+    EventCreatingHost            *m_eventCreator      = nullptr;
+    PsiAccountControllingHost    *m_accountController = nullptr;
+    OptionAccessingHost          *m_optionHost        = nullptr;
 };
 }
 #endif // PSIOMEMO_OMEMOPLUGIN_H

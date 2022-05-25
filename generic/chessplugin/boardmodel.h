@@ -45,7 +45,7 @@ public:
     bool        moveRequested(int oldX, int oldY, int newX, int newY);
     QModelIndex kingIndex() const;
     QModelIndex invert(QModelIndex index) const; // for black player
-    Figure *    findFigure(QModelIndex index) const;
+    Figure     *findFigure(QModelIndex index) const;
     void        reset();
     void        updateFigure(QModelIndex index, const QString &newFigure);
     QString     saveString() const;
@@ -80,8 +80,8 @@ private:
     struct Move {
         QModelIndex oldIndex;
         QModelIndex newIndex;
-        Figure *    figure;
-        Figure *    killedFigure;
+        Figure     *figure;
+        Figure     *killedFigure;
     };
     Move lastMove;
 };

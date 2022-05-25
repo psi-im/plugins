@@ -54,7 +54,7 @@ public:
     void setIsInstalled(bool b);
 
 private:
-    ContentItem *        parentItem_;
+    ContentItem         *parentItem_;
     QList<ContentItem *> childItems_;
 
     QString group_;

@@ -39,7 +39,7 @@ HistoryView::HistoryView(const QString &filename, QWidget *parent) : QDialog(par
     if (file.open(QIODevice::ReadOnly)) {
         setWindowTitle(filename.split(QDir::separator()).takeLast());
         QVBoxLayout *layout  = new QVBoxLayout(this);
-        QTextEdit *  textWid = new QTextEdit();
+        QTextEdit   *textWid = new QTextEdit();
         QString      text;
         QTextStream  in(&file);
         in.setCodec("UTF-8");
@@ -74,10 +74,10 @@ vCardView::vCardView(const QString &filename, QWidget *parent) : QDialog(parent,
         setWindowTitle(filename.split(QDir::separator()).takeLast());
         QVBoxLayout *layout = new QVBoxLayout(this);
         QGridLayout *main   = new QGridLayout;
-        QLineEdit *  name   = new QLineEdit;
-        QLineEdit *  nick   = new QLineEdit;
-        QLineEdit *  birth  = new QLineEdit;
-        QLineEdit *  email  = new QLineEdit;
+        QLineEdit   *name   = new QLineEdit;
+        QLineEdit   *nick   = new QLineEdit;
+        QLineEdit   *birth  = new QLineEdit;
+        QLineEdit   *email  = new QLineEdit;
         main->addWidget(new QLabel(tr("Full Name:")), 0, 0);
         main->addWidget(name, 0, 1);
         main->addWidget(new QLabel(tr("Nick:")), 1, 0);
@@ -124,7 +124,7 @@ AvatarView::AvatarView(const QPixmap &pix, QWidget *parent) : QDialog(parent), p
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Avatar"));
     QVBoxLayout *layout   = new QVBoxLayout(this);
-    QLabel *     pixLabel = new QLabel;
+    QLabel      *pixLabel = new QLabel;
     pixLabel->setPixmap(pix);
     pbSave = new QPushButton;
     pbSave->setFixedSize(25, 25);

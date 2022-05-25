@@ -30,7 +30,7 @@ public:
     BoardModel(QObject *parent = nullptr);
     ~BoardModel();
     void                  init(GameModel *gm);
-    GameModel *           gameModel() const { return gameModel_; }
+    GameModel            *gameModel() const { return gameModel_; }
     int                   model2oppboard(const QPoint &p);
     int                   model2myboard(const QPoint &p);
     virtual Qt::ItemFlags flags(const QModelIndex &index) const;

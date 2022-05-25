@@ -80,12 +80,12 @@ private:
     void copyFingerprintFromTable(QStandardItemModel *tableModel, const QModelIndexList &indexesList, const int column);
 
 private:
-    Ui::Options *              m_ui                  = nullptr;
-    GPGProc *                  m_gpgProc             = nullptr;
-    OptionAccessingHost *      m_optionHost          = nullptr;
-    AccountInfoAccessingHost * m_accountInfo         = nullptr;
+    Ui::Options               *m_ui                  = nullptr;
+    GPGProc                   *m_gpgProc             = nullptr;
+    OptionAccessingHost       *m_optionHost          = nullptr;
+    AccountInfoAccessingHost  *m_accountInfo         = nullptr;
     PsiAccountControllingHost *m_accountHost         = nullptr;
-    Model *                    m_allKeysTableModel   = nullptr;
-    QStandardItemModel *       m_knownKeysTableModel = nullptr;
-    QStandardItemModel *       m_ownKeysTableModel   = nullptr;
+    Model                     *m_allKeysTableModel   = nullptr;
+    QStandardItemModel        *m_knownKeysTableModel = nullptr;
+    QStandardItemModel        *m_ownKeysTableModel   = nullptr;
 };

@@ -46,8 +46,8 @@ private:
     bool processOutgoingPresence(int account, QDomElement &stanza);
 
 private:
-    OptionAccessingHost *      m_optionHost    = nullptr;
-    AccountInfoAccessingHost * m_accountInfo   = nullptr;
+    OptionAccessingHost       *m_optionHost    = nullptr;
+    AccountInfoAccessingHost  *m_accountInfo   = nullptr;
     PsiAccountControllingHost *m_accountHost   = nullptr;
-    StanzaSendingHost *        m_stanzaSending = nullptr;
+    StanzaSendingHost         *m_stanzaSending = nullptr;
 };

@@ -47,7 +47,7 @@ public:
 
 private:
     Ui::Previewer ui_;
-    Skin *        skin_;
+    Skin         *skin_;
 
 signals:
     void applySkin();

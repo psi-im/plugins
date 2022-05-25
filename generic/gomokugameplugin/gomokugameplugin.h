@@ -93,7 +93,7 @@ public:
     virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost *);
     // Toolbar icon accessor
     virtual QList<QVariantHash> getButtonParam();
-    virtual QAction *           getAction(QObject *, int, const QString &);
+    virtual QAction            *getAction(QObject *, int, const QString &);
     // Activetab accessor
     virtual void setActiveTabAccessingHost(ActiveTabAccessingHost *);
     // Account info accessor
@@ -112,21 +112,21 @@ public:
     // Menu accessor
     virtual QList<QVariantHash> getAccountMenuParam();
     virtual QList<QVariantHash> getContactMenuParam();
-    virtual QAction *           getContactAction(QObject *, int, const QString &);
-    virtual QAction *           getAccountAction(QObject *, int);
+    virtual QAction            *getContactAction(QObject *, int, const QString &);
+    virtual QAction            *getAccountAction(QObject *, int);
     // Popup accessor
     virtual void setPopupAccessingHost(PopupAccessingHost *);
 
 private:
     bool                      enabled_;
-    ActiveTabAccessingHost *  psiTab;
+    ActiveTabAccessingHost   *psiTab;
     IconFactoryAccessingHost *psiIcon;
     AccountInfoAccessingHost *psiAccInfo;
     ContactInfoAccessingHost *psiContactInfo;
-    StanzaSendingHost *       psiSender;
-    EventCreatingHost *       psiEvent;
-    SoundAccessingHost *      psiSound;
-    PopupAccessingHost *      psiPopup;
+    StanzaSendingHost        *psiSender;
+    EventCreatingHost        *psiEvent;
+    SoundAccessingHost       *psiSound;
+    PopupAccessingHost       *psiPopup;
     // --
     Ui::options ui_;
 

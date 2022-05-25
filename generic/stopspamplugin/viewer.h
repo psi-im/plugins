@@ -35,10 +35,10 @@ public:
     bool init();
 
 private:
-    IconFactoryAccessingHost *  icoHost_;
+    IconFactoryAccessingHost   *icoHost_;
     QString                     fileName_;
     QDateTime                   lastModified_;
-    QTextEdit *                 textWid;
+    QTextEdit                  *textWid;
     Stopspam::TypeAheadFindBar *findBar;
     QMap<int, QString>          pages_;
     int                         currentPage_;

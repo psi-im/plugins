@@ -110,10 +110,10 @@ private:
 
 private:
     bool                          enabled         = false;
-    OptionAccessingHost *         psiOptions      = nullptr;
-    ActiveTabAccessingHost *      activeTab       = nullptr;
+    OptionAccessingHost          *psiOptions      = nullptr;
+    ActiveTabAccessingHost       *activeTab       = nullptr;
     ApplicationInfoAccessingHost *applicationInfo = nullptr;
-    WebkitAccessingHost *         webkit          = nullptr;
+    WebkitAccessingHost          *webkit          = nullptr;
     QColor                        userColor, tagColor, msgColor, quoteColor, lineColor;
     bool userBold = true, tagBold = false, msgBold = false, quoteBold = false, lineBold = false;
     bool userItalic = false, tagItalic = true, msgItalic = false, quoteItalic = false, lineItalic = false;
@@ -126,7 +126,7 @@ private:
     QPointer<QWidget> optionsWid;
     QList<QWidget *>  logs_;
     Ui::settings      ui_;
-    JuickDownloader * downloader_ = nullptr;
+    JuickDownloader  *downloader_ = nullptr;
 };
 
 #endif // JUICKPLUGIN_H

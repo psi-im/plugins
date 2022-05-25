@@ -46,7 +46,7 @@ private slots:
 
 private:
     class Private;
-    Private *                 d;
+    Private                  *d;
     IconFactoryAccessingHost *icoHost_;
 };
 

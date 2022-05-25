@@ -43,7 +43,7 @@ private slots:
 
 private:
     QHash<int, QPointer<Notes>> notesList_;
-    StorageNotesPlugin *        plugin_;
+    StorageNotesPlugin         *plugin_;
 };
 
 #endif // NOTESCONTROLLER_H

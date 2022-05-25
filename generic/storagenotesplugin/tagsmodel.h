@@ -31,7 +31,7 @@ class TagModel : public QAbstractItemModel {
 public:
     TagModel(QObject *parent = nullptr);
     int         rowCount(const QModelIndex &parent = QModelIndex()) const;
-    int         columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const { return 1; }
+    int         columnCount(const QModelIndex         &/*parent*/ = QModelIndex()) const { return 1; }
     QVariant    headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     QModelIndex index(int row, int column = 0, const QModelIndex &parent = QModelIndex()) const;
     QModelIndex parent(const QModelIndex &index) const;

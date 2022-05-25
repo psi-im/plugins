@@ -37,6 +37,7 @@
 #include "optionaccessor.h"
 #include "plugininfoprovider.h"
 #include "psiplugin.h"
+#include "syntaxhighlighter.h"
 
 #define constVersion "0.4.5"
 
@@ -80,10 +81,14 @@ private:
     void    saveFile(const QString &text);
     QString profileDir();
 
-    OptionAccessingHost *         psiOptions = nullptr;
+    OptionAccessingHost          *psiOptions = nullptr;
     ApplicationInfoAccessingHost *appInfo    = nullptr;
     bool                          enabled    = false;
     QPointer<QWidget>             options_;
+    QPointer<SyntaxHighlighter>   chatHighlighter_;
+    QPointer<SyntaxHighlighter>   rosterHighlighter_;
+    QPointer<SyntaxHighlighter>   popupHighlighter_;
+    QPointer<SyntaxHighlighter>   tooltipHighlighter_;
 
     // Chats-----
     // QCheckBox *htmlRender = nullptr;
@@ -91,7 +96,7 @@ private:
     QCheckBox *messageIcons    = nullptr;
     // QCheckBox *altnSwitch = nullptr;
     QCheckBox *showAvatar                  = nullptr;
-    QSpinBox * avatarSize                  = nullptr;
+    QSpinBox  *avatarSize                  = nullptr;
     QCheckBox *sayMode                     = nullptr;
     QCheckBox *disableSend                 = nullptr;
     QCheckBox *auto_capitalize             = nullptr;
@@ -123,8 +128,8 @@ private:
     QComboBox *userlist_contact_sort_style = nullptr;
     QCheckBox *avatars_at_left             = nullptr;
     QCheckBox *avatars_show                = nullptr;
-    QSpinBox * userlist_avatars_size       = nullptr;
-    QSpinBox * userlist_avatars_radius     = nullptr;
+    QSpinBox  *userlist_avatars_size       = nullptr;
+    QSpinBox  *userlist_avatars_radius     = nullptr;
     QLineEdit *muc_leave_status_message    = nullptr;
     QCheckBox *accept_defaults             = nullptr;
     QCheckBox *auto_configure              = nullptr;
@@ -172,8 +177,8 @@ private:
     QToolButton *tipBase        = nullptr;
     QToolButton *composingBut   = nullptr;
     QToolButton *unreadBut      = nullptr;
-    QGroupBox *  groupTip       = nullptr;
-    QGroupBox *  groupMucRoster = nullptr;
+    QGroupBox   *groupTip       = nullptr;
+    QGroupBox   *groupMucRoster = nullptr;
 
     // CSS----------------
     QTextEdit *chatCss    = nullptr;
@@ -214,6 +219,14 @@ bool ExtendedOptions::enable()
 
 bool ExtendedOptions::disable()
 {
+    if (chatHighlighter_)
+        delete chatHighlighter_;
+    if (rosterHighlighter_)
+        delete rosterHighlighter_;
+    if (popupHighlighter_)
+        delete popupHighlighter_;
+    if (tooltipHighlighter_)
+        delete tooltipHighlighter_;
     enabled = false;
     return true;
 }
@@ -226,15 +239,15 @@ QWidget *ExtendedOptions::options()
 
     options_                = new QWidget;
     QVBoxLayout *mainLayout = new QVBoxLayout(options_);
-    QTabWidget * tabs       = new QTabWidget;
-    QWidget *    tab1       = new QWidget;
-    QWidget *    tab2       = new QWidget;
-    QWidget *    tab3       = new QWidget;
-    QWidget *    tab4       = new QWidget;
-    QWidget *    tab5       = new QWidget;
-    QWidget *    tab6       = new QWidget;
-    QWidget *    tab7       = new QWidget;
-    QWidget *    tab8       = new QWidget;
+    QTabWidget  *tabs       = new QTabWidget;
+    QWidget     *tab1       = new QWidget;
+    QWidget     *tab2       = new QWidget;
+    QWidget     *tab3       = new QWidget;
+    QWidget     *tab4       = new QWidget;
+    QWidget     *tab5       = new QWidget;
+    QWidget     *tab6       = new QWidget;
+    QWidget     *tab7       = new QWidget;
+    QWidget     *tab8       = new QWidget;
     QVBoxLayout *tab1Layout = new QVBoxLayout(tab1);
     QVBoxLayout *tab2Layout = new QVBoxLayout(tab2);
     QVBoxLayout *tab3Layout = new QVBoxLayout(tab3);
@@ -303,9 +316,9 @@ QWidget *ExtendedOptions::options()
     tab1Layout->addStretch();
 
     // MUC-----
-    QTabWidget * mucTabWidget     = new QTabWidget;
-    QWidget *    mucGeneralWidget = new QWidget;
-    QWidget *    mucRosterWidget  = new QWidget;
+    QTabWidget  *mucTabWidget     = new QTabWidget;
+    QWidget     *mucGeneralWidget = new QWidget;
+    QWidget     *mucRosterWidget  = new QWidget;
     QVBoxLayout *mucGeneralLayout = new QVBoxLayout(mucGeneralWidget);
     QVBoxLayout *mucRosterLayout  = new QVBoxLayout(mucRosterWidget);
     mucTabWidget->addTab(mucGeneralWidget, tr("General"));
@@ -405,7 +418,7 @@ QWidget *ExtendedOptions::options()
     auto_delete_unlisted = new QCheckBox(tr("Automatically remove temporary contacts"));
     auto_delete_unlisted->hide(); // FIXME!!!! Remove this when the option will be fixed
 
-    QGroupBox *  groupBox  = new QGroupBox(tr("Tooltips:"));
+    QGroupBox   *groupBox  = new QGroupBox(tr("Tooltips:"));
     QVBoxLayout *boxLayout = new QVBoxLayout(groupBox);
 
     avatarTip = new QCheckBox(tr("Show avatar"));
@@ -558,7 +571,7 @@ QWidget *ExtendedOptions::options()
     // TODO: update after stopping support of Ubuntu Xenial:
     connect(b_color, SIGNAL(buttonClicked(QAbstractButton *)), SLOT(chooseColor(QAbstractButton *)));
 
-    QGroupBox *  group3Box  = new QGroupBox(tr("Colors:"));
+    QGroupBox   *group3Box  = new QGroupBox(tr("Colors:"));
     QVBoxLayout *box3Layout = new QVBoxLayout(group3Box);
     box3Layout->addWidget(groupMucRoster);
     box3Layout->addWidget(groupTip);
@@ -590,6 +603,11 @@ QWidget *ExtendedOptions::options()
     cssTab->addTab(rosterCss, tr("Roster"));
     cssTab->addTab(popupCss, tr("Popup"));
     cssTab->addTab(tooltipCss, tr("Tooltip"));
+
+    chatHighlighter_    = new SyntaxHighlighter(chatCss->document());
+    rosterHighlighter_  = new SyntaxHighlighter(rosterCss->document());
+    popupHighlighter_   = new SyntaxHighlighter(popupCss->document());
+    tooltipHighlighter_ = new SyntaxHighlighter(tooltipCss->document());
 
     QLabel *cssLabel = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/en:skins_css\">CSS for Psi</a>"));
     cssLabel->setOpenExternalLinks(true);
@@ -646,7 +664,7 @@ QWidget *ExtendedOptions::options()
     popupsSuppressDnd           = new QCheckBox(tr("Disable popup notifications if status is DND"));
     popupsSuppressAway          = new QCheckBox(tr("Disable popup notifications if status is Away"));
 
-    QGroupBox *  ngb  = new QGroupBox(tr("Notifications"));
+    QGroupBox   *ngb  = new QGroupBox(tr("Notifications"));
     QVBoxLayout *nvbl = new QVBoxLayout(ngb);
     nvbl->addWidget(flash_windows);
     nvbl->addWidget(sndMucNotify);
@@ -978,6 +996,10 @@ void ExtendedOptions::restoreOptions()
     rosterCss->setText(psiOptions->getGlobalOption("options.ui.contactlist.css").toString());
     popupCss->setText(psiOptions->getGlobalOption("options.ui.notifications.passive-popups.css").toString());
     tooltipCss->setText(psiOptions->getGlobalOption("options.ui.contactlist.tooltip.css").toString());
+    chatHighlighter_->rehighlight();
+    rosterHighlighter_->rehighlight();
+    popupHighlighter_->rehighlight();
+    tooltipHighlighter_->rehighlight();
 
     // Misc--------------------
     flash_windows->setChecked(psiOptions->getGlobalOption("options.ui.flash-windows").toBool());

@@ -477,7 +477,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                     const QString unick("@" + jp.nick());
                     bool          getAv = true;
                     QDir          dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)
-                             + "/avatars/juick");
+                                      + "/avatars/juick");
                     if (!dir.exists()) {
                         getAv = false;
                     } else {
@@ -495,7 +495,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
 
                     if (getAv) {
                         QDir              dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)
-                                 + "/avatars/juick");
+                                              + "/avatars/juick");
                         const QString     path(QString("%1/%2").arg(dir.absolutePath(), unick));
                         JuickDownloadItem it(path, avatarUrl);
                         downloader_->get(it);
@@ -790,7 +790,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                         img.setAttribute("src", dlUrl);
                     } else {
                         const QDir    dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation)
-                                       + "/avatars/juick/photos");
+                                          + "/avatars/juick/photos");
                         const QString path(QString("%1/%2").arg(dir.absolutePath(), photoUrl.path().replace("/", "%")));
                         QString       imgdata = photoUrl.path().replace("/", "%");
                         img.setAttribute(

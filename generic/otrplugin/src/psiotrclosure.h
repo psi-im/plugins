@@ -72,14 +72,14 @@ private:
     AuthState     m_state;
     Fingerprint   m_fpr;
 
-    QWidget *     m_methodWidget[3];
-    QComboBox *   m_methodBox;
-    QLineEdit *   m_questionEdit;
-    QLineEdit *   m_answerEdit;
-    QLineEdit *   m_sharedSecretEdit;
+    QWidget      *m_methodWidget[3];
+    QComboBox    *m_methodBox;
+    QLineEdit    *m_questionEdit;
+    QLineEdit    *m_answerEdit;
+    QLineEdit    *m_sharedSecretEdit;
     QProgressBar *m_progressBar;
-    QPushButton * m_cancelButton;
-    QPushButton * m_startButton;
+    QPushButton  *m_cancelButton;
+    QPushButton  *m_startButton;
 
 private slots:
     void changeMethod(int index);
@@ -105,18 +105,18 @@ public:
     void     updateSMP(int progress);
 
 private:
-    OtrMessaging *        m_otr;
+    OtrMessaging         *m_otr;
     QString               m_account;
     QString               m_contact;
-    QMenu *               m_chatDlgMenu;
-    QAction *             m_chatDlgAction;
-    QAction *             m_authenticateAction;
-    QAction *             m_sessionIdAction;
-    QAction *             m_fingerprintAction;
-    QAction *             m_startSessionAction;
-    QAction *             m_endSessionAction;
+    QMenu                *m_chatDlgMenu;
+    QAction              *m_chatDlgAction;
+    QAction              *m_authenticateAction;
+    QAction              *m_sessionIdAction;
+    QAction              *m_fingerprintAction;
+    QAction              *m_startSessionAction;
+    QAction              *m_endSessionAction;
     bool                  m_isLoggedIn;
-    QObject *             m_parentWidget;
+    QObject              *m_parentWidget;
     AuthenticationDialog *m_authDialog;
 
 public slots:

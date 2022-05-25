@@ -49,6 +49,6 @@ private slots:
 
 private:
     Ui::requestAuthDialogClass ui;
-    QNetworkAccessManager *    manager_;
+    QNetworkAccessManager     *manager_;
 };
 #endif

@@ -381,7 +381,7 @@ int BoardModel::canMove(Figure *figure, int newX, int newY) const
 
         if (positionY_ - newY == 1) {
             QModelIndex index = createIndex(newY, newX);
-            Figure *    f     = findFigure(index);
+            Figure     *f     = findFigure(index);
             if (newX == positionX_) {
                 if (!f)
                     return 1;
@@ -413,7 +413,7 @@ int BoardModel::canMove(Figure *figure, int newX, int newY) const
 
         if (positionY_ - newY == -1) {
             QModelIndex index = createIndex(newY, newX);
-            Figure *    f     = findFigure(index);
+            Figure     *f     = findFigure(index);
             if (newX == positionX_) {
                 if (!f)
                     return 1;

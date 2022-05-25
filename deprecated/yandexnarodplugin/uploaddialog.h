@@ -36,7 +36,7 @@ private:
     void                  setFilename(const QString &str);
     Ui::uploadDialogClass ui;
     QTime                 utime;
-    UploadManager *       netman;
+    UploadManager        *netman;
 
 signals:
     void canceled();

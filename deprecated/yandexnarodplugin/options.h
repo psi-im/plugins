@@ -63,7 +63,7 @@ private:
     virtual ~Options();
 
     ApplicationInfoAccessingHost *appInfo;
-    OptionAccessingHost *         options;
+    OptionAccessingHost          *options;
 };
 
 #endif // PROXY_H

@@ -105,10 +105,10 @@ private:
     };
 
     Ui::OptionsWidget             ui_options;
-    OptionAccessingHost *         psiOptions;
+    OptionAccessingHost          *psiOptions;
     ApplicationInfoAccessingHost *psiInfo;
-    AccountInfoAccessingHost *    psiAccount;
-    PsiAccountControllingHost *   psiAccountCtl;
+    AccountInfoAccessingHost     *psiAccount;
+    PsiAccountControllingHost    *psiAccountCtl;
     //--
     bool                     enabled;
     bool                     for_all_acc;
@@ -129,12 +129,7 @@ private:
     AccountSettings *getAccountSetting(const QString &);
 
 private:
-    enum class UpdateStatus {
-        Ok,
-        Disabled,
-        NoAccount,
-        NoSettings
-    };
+    enum class UpdateStatus { Ok, Disabled, NoAccount, NoSettings };
     UpdateStatus updateInfo(int account);
 
 private slots:

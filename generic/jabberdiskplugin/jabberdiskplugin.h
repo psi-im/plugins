@@ -76,8 +76,8 @@ public:
     // virtual void setPopupAccessingHost(PopupAccessingHost* host);
     virtual QList<QVariantHash> getAccountMenuParam();
     virtual QList<QVariantHash> getContactMenuParam();
-    virtual QAction *           getContactAction(QObject *, int, const QString &);
-    virtual QAction *           getAccountAction(QObject *, int) { return nullptr; };
+    virtual QAction            *getContactAction(QObject *, int, const QString &);
+    virtual QAction            *getAccountAction(QObject *, int) { return nullptr; };
     virtual QString             pluginInfo();
 
     // signals:
@@ -93,7 +93,7 @@ private:
     bool                      enabled;
     QPointer<QWidget>         options_;
     Ui::Options               ui_;
-    OptionAccessingHost *     psiOptions;
+    OptionAccessingHost      *psiOptions;
     QStringList               jids_;
     IconFactoryAccessingHost *iconHost;
     //

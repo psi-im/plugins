@@ -54,18 +54,18 @@ public:
     ScreenshotPlugin();
 
     virtual QString             name() const;
-    virtual QWidget *           options();
+    virtual QWidget            *options();
     virtual bool                enable();
     virtual bool                disable();
     virtual void                setOptionAccessingHost(OptionAccessingHost *host);
-    virtual void                optionChanged(const QString & /*option*/) {};
+    virtual void                optionChanged(const QString                &/*option*/) {};
     virtual void                setShortcutAccessingHost(ShortcutAccessingHost *host);
     virtual void                setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
     virtual void                setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
     virtual QList<QVariantHash> getAccountMenuParam();
     virtual QList<QVariantHash> getContactMenuParam();
-    virtual QAction *           getContactAction(QObject *, int, const QString &) { return nullptr; };
-    virtual QAction *           getAccountAction(QObject *, int) { return nullptr; };
+    virtual QAction            *getContactAction(QObject *, int, const QString &) { return nullptr; };
+    virtual QAction            *getAccountAction(QObject *, int) { return nullptr; };
     virtual void                setShortcuts();
 
     virtual void applyOptions();
@@ -81,13 +81,13 @@ private:
 
 private:
     bool                          enabled_;
-    OptionAccessingHost *         psiOptions;
-    ShortcutAccessingHost *       psiShortcuts;
-    IconFactoryAccessingHost *    icoHost;
+    OptionAccessingHost          *psiOptions;
+    ShortcutAccessingHost        *psiShortcuts;
+    IconFactoryAccessingHost     *icoHost;
     ApplicationInfoAccessingHost *appInfo;
 
     QPointer<OptionsWidget> optionsWid;
-    Controller *            controller_;
+    Controller             *controller_;
 };
 
 ScreenshotPlugin::ScreenshotPlugin() :

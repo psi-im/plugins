@@ -61,8 +61,8 @@ public:
 
 private:
     Ui::PluginWindow *ui;
-    BoardModel *      bmodel;
-    BoardDelegate *   delegate;
+    BoardModel       *bmodel;
+    BoardDelegate    *delegate;
     bool              gameActive;
 
 private:

@@ -45,7 +45,7 @@
 
 //-----------------------------------------------------------------------------
 
-static const char *  OTR_PROTOCOL_STRING   = "prpl-jabber";
+static const char   *OTR_PROTOCOL_STRING   = "prpl-jabber";
 static const QString OTR_FINGERPRINTS_FILE = "otr.fingerprints";
 static const QString OTR_KEYS_FILE         = "otr.keys";
 static const QString OTR_INSTAGS_FILE      = "otr.instags";
@@ -95,7 +95,7 @@ OtrInternal::~OtrInternal() { otrl_userstate_free(m_userstate); }
 
 QString OtrInternal::encryptMessage(const QString &account, const QString &contact, const QString &message)
 {
-    char *       encMessage = nullptr;
+    char        *encMessage = nullptr;
     gcry_error_t err;
 
     err = otrl_message_sending(m_userstate, &m_uiOps, this, account.toUtf8().constData(), OTR_PROTOCOL_STRING,
@@ -131,7 +131,7 @@ psiotr::OtrMessageType OtrInternal::decryptMessage(const QString &account, const
     const char *userName    = userArray.constData();
 
     int      ignoreMessage = 0;
-    char *   newMessage    = nullptr;
+    char    *newMessage    = nullptr;
     OtrlTLV *tlvs          = nullptr;
     OtrlTLV *tlv           = nullptr;
 
@@ -171,8 +171,8 @@ psiotr::OtrMessageType OtrInternal::decryptMessage(const QString &account, const
 QList<psiotr::Fingerprint> OtrInternal::getFingerprints()
 {
     QList<psiotr::Fingerprint> fpList;
-    ConnContext *              context;
-    ::Fingerprint *            fingerprint;
+    ConnContext               *context;
+    ::Fingerprint             *fingerprint;
 
     for (context = m_userstate->context_root; context != nullptr; context = context->next) {
         fingerprint = context->fingerprint_root.next;
@@ -232,7 +232,7 @@ void OtrInternal::deleteFingerprint(const psiotr::Fingerprint &fingerprint)
 QHash<QString, QString> OtrInternal::getPrivateKeys()
 {
     QHash<QString, QString> privKeyList;
-    OtrlPrivKey *           privKey;
+    OtrlPrivKey            *privKey;
 
     for (privKey = m_userstate->privkey_root; privKey != nullptr; privKey = privKey->next) {
         char  fingerprintBuf[OTRL_PRIVKEY_FPRINT_HUMAN_LEN];

@@ -87,7 +87,7 @@ bool JDItem::operator==(const JDItem &i)
 
 QMimeData *JDItem::mimeData() const
 {
-    QMimeData * data = new QMimeData();
+    QMimeData  *data = new QMimeData();
     QByteArray  ba;
     QDataStream out(&ba, QIODevice::WriteOnly);
     out << name_ << size_ << descr_ << number_ << type_;

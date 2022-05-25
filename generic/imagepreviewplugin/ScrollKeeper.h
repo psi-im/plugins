@@ -15,7 +15,7 @@ class QWebFrame;
 
 class ScrollKeeper {
 private:
-    QWidget *  chatView_;
+    QWidget   *chatView_;
     int        scrollPos_;
     bool       scrollToEnd_;
     QTextEdit *ted_;

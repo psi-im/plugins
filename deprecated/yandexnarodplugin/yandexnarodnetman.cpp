@@ -47,7 +47,7 @@ public:
         leConfirmPass->setEchoMode(QLineEdit::Password);
 
         QDialogButtonBox *bb = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-        QVBoxLayout *     l  = new QVBoxLayout(this);
+        QVBoxLayout      *l  = new QVBoxLayout(this);
         l->addWidget(new QLabel(tr("Password:")));
         l->addWidget(lePass);
         l->addWidget(new QLabel(tr("Confirm password:")));
@@ -157,7 +157,7 @@ void yandexnarodNetMan::startRemovePass(const FileItem &item)
 
 void yandexnarodNetMan::netmanDo(QList<FileItem> fileItems)
 {
-    QNetworkCookieJar *   netcookjar = netman->cookieJar();
+    QNetworkCookieJar    *netcookjar = netman->cookieJar();
     QList<QNetworkCookie> cookList   = netcookjar->cookiesForUrl(mainUrl);
     if (cookList.isEmpty()) {
         bool auth = startAuth(Options::instance()->getOption(CONST_LOGIN, "").toString(),
@@ -252,10 +252,10 @@ void yandexnarodNetMan::netrpFinished(QNetworkReply *reply)
                 int        cpos  = 0;
                 static int count = 0;
                 QRegExp    rx("class=\"\\S+icon\\s(\\S+)\"[^<]+<img[^<]+</i[^<]+</"
-                           "td[^<]+<td[^<]+<input[^v]+value=\"(\\d+)\" data-token=\"(\\S+)\""
-                           "[^<]+</td[^<]+<td[^<]+<span\\sclass='b-fname'><a\\shref=\"(\\S+)\">([^<]+)</a>.*"
-                           "<td class=\"size\">(\\S+)</td>.*data-token=\"(\\S+)\".*<i class=\"([^\"]+)\".*"
-                           "<td class=\"date prolongate\"><nobr>([^>]+)</nobr></td>");
+                                 "td[^<]+<td[^<]+<input[^v]+value=\"(\\d+)\" data-token=\"(\\S+)\""
+                                 "[^<]+</td[^<]+<td[^<]+<span\\sclass='b-fname'><a\\shref=\"(\\S+)\">([^<]+)</a>.*"
+                                 "<td class=\"size\">(\\S+)</td>.*data-token=\"(\\S+)\".*<i class=\"([^\"]+)\".*"
+                                 "<td class=\"date prolongate\"><nobr>([^>]+)</nobr></td>");
                 rx.setMinimal(true);
                 cpos = rx.indexIn(page);
                 while (cpos != -1) {
