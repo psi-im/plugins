@@ -1,11 +1,29 @@
+/*
+ * syntaxhighlighter.cpp - plugin
+ * Copyright (C) 2022  Psi+ Project
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "syntaxhighlighter.h"
 
 SyntaxHighlighter::SyntaxHighlighter(QTextDocument *parent) : QSyntaxHighlighter(parent)
 {
     HighlightingRule rule;
 
-    keywordFormat.setFontItalic(true);
-    keywordFormat.setForeground(Qt::yellow);
+    keywordFormat.setForeground(Qt::magenta);
     rule.pattern = QRegularExpression(
         QStringLiteral("\\btrue|false|px\\b|%|a?rgb|url|x\\d|y\\d|qlineargradient|transparent\\b"));
     rule.format = keywordFormat;
@@ -13,10 +31,14 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument *parent) : QSyntaxHighlighter
 
     typesFormat.setFontWeight(QFont::Bold);
     typesFormat.setForeground(Qt::darkCyan);
-    rule.pattern = QRegularExpression(
-        QStringLiteral("\\bsolid|bold|inset|outset|upset|none|right|bottom|top|left|center|no-repeat\\b"));
-    rule.format = typesFormat;
-    highlightingRules.append(rule);
+    auto pattrens = { QStringLiteral("\\bsolid|bold|inset|outset|upset|none|no-repeat\\b"),
+                      QStringLiteral("\\bright|bottom|top|left|center\\b"),
+                      QStringLiteral("\\bblack|white|red|blue|yellow|magenta\\b") };
+    for (const auto &pattern : pattrens) {
+        rule.pattern = QRegularExpression(pattern);
+        rule.format  = typesFormat;
+        highlightingRules.append(rule);
+    }
 
     classFormat.setFontWeight(QFont::Bold);
     classFormat.setForeground(Qt::darkGreen);
