@@ -77,7 +77,7 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument *parent) : QSyntaxHighlighter
     valuesFormat.setFontWeight(QFont::Bold);
     valuesFormat.setForeground(Qt::darkYellow);
     rule.pattern
-        = QRegularExpression(QStringLiteral("(?:\\s|\\b|(?<=,|\\())[-]?\\d+(?:\\.\\d+)?|(?<=url\\().*(?=\\))"));
+        = QRegularExpression(QStringLiteral("(?:\\s|\\b|(?<=,|\\())[-]?\\d+(?:\\.\\d+)?|(?<=url\\()[^\\)]*(?=\\))"));
     rule.format = valuesFormat;
     highlightingRules.append(rule);
 
