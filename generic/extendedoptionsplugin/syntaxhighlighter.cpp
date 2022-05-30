@@ -24,17 +24,33 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument *parent) : QSyntaxHighlighter
     HighlightingRule rule;
 
     keywordFormat.setForeground(Qt::magenta);
-    rule.pattern = QRegularExpression(
-        QStringLiteral("\\btrue|false|px\\b|%|a?rgb|url|x\\d|y\\d|qlineargradient|transparent\\b"));
-    rule.format = keywordFormat;
-    highlightingRules.append(rule);
+    const auto keywordPatterns
+        = { QStringLiteral("(?<=\\d)(?:px|pt|em|ex)\\b|%"), QStringLiteral("a?rgba?|hsva?|hsla?|url|(?:x|y)\\d"),
+            QStringLiteral("q(?:linear|radial|conical){1}gradient|transparent") };
+    for (const auto &pattern : keywordPatterns) {
+        rule.pattern = QRegularExpression(pattern);
+        rule.format  = keywordFormat;
+        highlightingRules.append(rule);
+    }
 
     typesFormat.setFontWeight(QFont::Bold);
     typesFormat.setForeground(Qt::darkCyan);
-    auto pattrens = { QStringLiteral("\\bsolid|bold|inset|outset|upset|none|no-repeat\\b"),
-                      QStringLiteral("\\bright|bottom|top|left|center\\b"),
-                      QStringLiteral("\\bblack|white|red|blue|yellow|magenta\\b") };
-    for (const auto &pattern : pattrens) {
+    const auto typesPattrens
+        = { QStringLiteral("\\bbold|italic|normal|oblique|(?:under|over)?line(?:-through)?\\b"), // font style
+            QStringLiteral("\\btrue|false\\b"),
+            QStringLiteral("\\bscroll|fixed\\b"),
+            QStringLiteral(
+                "\\b(?:(?:dot-){1,2})?dash(?:ed)?|dotted|double|groove|(?:in|out|up)set|ridge|solid|none|stretch\\b"),
+            QStringLiteral("\\bright|bottom|top|left|center\\b"),
+            QStringLiteral("\\bblack|white|red|blue|yellow|magenta|green|grey\\b"), // colors
+            QStringLiteral("\\b(?:disabled|active|selected|on|off)\\b"),
+            QStringLiteral("\\bmargin|border|padding|content\\b"),
+            QStringLiteral("\\b(?:alternate-)?base|bright-text|button(?:-text)?|dark|highligh(?:ted-text)?\\b"),
+            QStringLiteral("\\blight|link(?:-visited)?|mid(?:light)?|shadow|text|window(?:-text)?\\b"),
+            QStringLiteral("\\b(?:no-)?repeat(?:-[xy])?\\b")
+
+          };
+    for (const auto &pattern : typesPattrens) {
         rule.pattern = QRegularExpression(pattern);
         rule.format  = typesFormat;
         highlightingRules.append(rule);
@@ -58,10 +74,11 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument *parent) : QSyntaxHighlighter
     rule.format  = variablesFormat;
     highlightingRules.append(rule);
 
-    numbersFormat.setFontWeight(QFont::Bold);
-    numbersFormat.setForeground(Qt::darkYellow);
-    rule.pattern = QRegularExpression(QStringLiteral("\\b\\d+(?=\\D)\\b|[-]?\\d+(?=px)"));
-    rule.format  = numbersFormat;
+    valuesFormat.setFontWeight(QFont::Bold);
+    valuesFormat.setForeground(Qt::darkYellow);
+    rule.pattern
+        = QRegularExpression(QStringLiteral("(?:\\s|\\b|(?<=,|\\())[-]?\\d+(?:\\.\\d+)?|(?<=url\\().*(?=\\))"));
+    rule.format = valuesFormat;
     highlightingRules.append(rule);
 
     hexNumbersFormat.setFontWeight(QFont::Bold);

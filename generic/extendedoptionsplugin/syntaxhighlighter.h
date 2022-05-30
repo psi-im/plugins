@@ -26,15 +26,15 @@
 class SyntaxHighlighter : public QSyntaxHighlighter {
     Q_OBJECT
 public:
-    SyntaxHighlighter(QTextDocument *parent = 0);
+    SyntaxHighlighter(QTextDocument* parent = 0);
 
 protected:
-    void highlightBlock(const QString &text) override;
+    void highlightBlock(const QString& text) override;
 
 private:
     struct HighlightingRule {
         QRegularExpression pattern;
-        QTextCharFormat    format;
+        QTextCharFormat format;
     };
     QVector<HighlightingRule> highlightingRules;
 
@@ -47,7 +47,7 @@ private:
     QTextCharFormat singleLineCommentFormat;
     QTextCharFormat multiLineCommentFormat;
     QTextCharFormat variablesFormat;
-    QTextCharFormat numbersFormat;
+    QTextCharFormat valuesFormat;
     QTextCharFormat hexNumbersFormat;
 };
 
