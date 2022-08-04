@@ -57,6 +57,10 @@ endif()
 option( BUILD_DEV_PLUGINS "Build plugins from dev directory" OFF )
 set(MAIN_PROGRAM_NAME "psi" CACHE STRING "Main program name: psi or psi-plus")
 
+if(NOT (DEFINED USE_X11))
+    option( USE_X11 "Enable X11 features support" ON )
+endif()
+
 if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/generic")
     set(GENERIC_PLUGINS_FOUND ON)
     message(STATUS "Generic plugins found: ${CMAKE_CURRENT_LIST_DIR}")
