@@ -212,7 +212,7 @@ bool VideoStatusChanger::enable()
             if (item.contains("mplayer")) {
                 playerGMPlayer_ = option;
             }
-            for (const QString &service : qAsConst(services_)) {
+            for (const QString &service : std::as_const(services_)) {
                 if (service.contains(item, Qt::CaseInsensitive)) {
                     connectToBus(service);
                 }
@@ -247,7 +247,7 @@ bool VideoStatusChanger::disable()
     fullST.stop();
 #ifdef HAVE_DBUS
     //отключаем прослушку активных плееров
-    for (const QString &player : qAsConst(services_)) {
+    for (const QString &player : std::as_const(services_)) {
         disconnectFromBus(player);
     }
     //отключаеся от шины
@@ -541,7 +541,11 @@ void VideoStatusChanger::asyncCallFinished(QDBusPendingCallWatcher *watcher)
         return;
     }
     QVariant reply = msg.arguments().constFirst();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     if (reply.type() != QVariant::Int) {
+#else
+    if (reply.typeId() != QMetaType::Int) {
+#endif
         return;
     } else {
         int stat = reply.toInt();
