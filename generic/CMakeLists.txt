@@ -31,13 +31,6 @@ set( plugins_list
     watcherplugin
 )
 
-if((WIN32 OR APPLE) OR USE_X11 AND (NOT HAIKU))
-    # qxt library is buildable only in Linux, *BSD, Windows and macOS
-    list(APPEND plugins_list
-        screenshotplugin
-    )
-endif()
-
 if(NOT APPLE AND (NOT HAIKU) AND (WIN32 OR USE_X11))
     list(APPEND plugins_list
         videostatusplugin
