@@ -113,22 +113,24 @@ set ( _RSCS
     ${PLUGIN}.qrc
 )
 
-find_package( Qt5 COMPONENTS Widgets Xml Network PrintSupport REQUIRED )
+find_package( Qt${QT_DEFAULT_MAJOR_VERSION} COMPONENTS Widgets Xml Network PrintSupport REQUIRED )
 set(QT_DEPLIBS
-    Qt5::Widgets
-    Qt5::Xml
-    Qt5::Network
-    Qt5::PrintSupport
+    Qt${QT_DEFAULT_MAJOR_VERSION}::Widgets
+    Qt${QT_DEFAULT_MAJOR_VERSION}::Xml
+    Qt${QT_DEFAULT_MAJOR_VERSION}::Network
+    Qt${QT_DEFAULT_MAJOR_VERSION}::PrintSupport
 )
 if( UNIX AND NOT( APPLE OR CYGWIN OR HAIKU ) )
-    find_package( Qt5 COMPONENTS X11Extras REQUIRED )
-    set(QT_DEPLIBS
-        ${QT_DEPLIBS}
-        Qt5::X11Extras
-    )
+    if(QT_DEFAULT_MAJOR_VERSION GREATER_EQUAL 6)
+        find_package( Qt6 COMPONENTS Gui REQUIRED)
+        list(APPEND QT_DEPLIBS Qt6::Gui)
+    else()
+        find_package( Qt5 COMPONENTS X11Extras REQUIRED )
+        list(APPEND QT_DEPLIBS Qt5::X11Extras)
+    endif()
 endif()
-qt5_wrap_ui(UIS ${_UIS})
-qt5_add_resources(RSCS ${_RSCS})
+qt_wrap_ui(UIS ${_UIS})
+qt_add_resources(RSCS ${_RSCS})
 
 if(WIN32)
     set(LIB_TYPE "MODULE")

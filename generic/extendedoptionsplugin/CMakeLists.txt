@@ -36,10 +36,10 @@ set( _SRCS
     ${PLUGIN}.cpp
     syntaxhighlighter.cpp
 )
-find_package( Qt5 COMPONENTS Widgets Xml REQUIRED )
+find_package( Qt${QT_DEFAULT_MAJOR_VERSION} COMPONENTS Widgets Xml REQUIRED )
 set(QT_DEPLIBS
-    Qt5::Widgets
-    Qt5::Xml
+    Qt${QT_DEFAULT_MAJOR_VERSION}::Widgets
+    Qt${QT_DEFAULT_MAJOR_VERSION}::Xml
 )
 
 if(WIN32)

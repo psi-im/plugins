@@ -54,12 +54,12 @@ set( _UIS
     options.ui
     jd_mainwin.ui
 )
-find_package( Qt5 COMPONENTS Widgets Xml REQUIRED )
+find_package( Qt${QT_DEFAULT_MAJOR_VERSION} COMPONENTS Widgets Xml REQUIRED )
 set(QT_DEPLIBS
-    Qt5::Widgets
-    Qt5::Xml
+    Qt${QT_DEFAULT_MAJOR_VERSION}::Widgets
+    Qt${QT_DEFAULT_MAJOR_VERSION}::Xml
 )
-qt5_wrap_ui(UIS ${_UIS})
+qt_wrap_ui(UIS ${_UIS})
 
 if(WIN32)
     set(LIB_TYPE "MODULE")

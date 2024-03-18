@@ -54,26 +54,31 @@ set( _SRCS
 set( _UIS
     options.ui
 )
-find_package( Qt5 COMPONENTS Widgets Xml REQUIRED )
+find_package( Qt${QT_DEFAULT_MAJOR_VERSION} COMPONENTS Widgets Xml REQUIRED )
 set(QT_DEPLIBS
-    Qt5::Widgets
-    Qt5::Xml
+    Qt${QT_DEFAULT_MAJOR_VERSION}::Widgets
+    Qt${QT_DEFAULT_MAJOR_VERSION}::Xml
 )
 if( UNIX AND NOT( APPLE OR CYGWIN OR HAIKU ) )
-    find_package( Qt5 COMPONENTS DBus X11Extras REQUIRED )
+    if(QT_DEFAULT_MAJOR_VERSION GREATER_EQUAL 6)
+        find_package( Qt6 COMPONENTS Gui REQUIRED )
+        list(APPEND QT_DEPLIBS Qt6::Gui)
+    else()
+        #find_package( Qt5 COMPONENTS X11Extras REQUIRED )
+        #list(APPEND QT_DEPLIBS Qt5::X11Extras)
+    endif()
+    find_package( Qt${QT_DEFAULT_MAJOR_VERSION} COMPONENTS DBus REQUIRED )
     find_package( XCB REQUIRED )
     add_definitions(
         -DHAVE_DBUS
     )
-    set(QT_DEPLIBS
-        ${QT_DEPLIBS}
-        Qt5::DBus
-        Qt5::X11Extras
+    list( APPEND QT_DEPLIBS
+        Qt${QT_DEFAULT_MAJOR_VERSION}::DBus
         ${XCB_LIBRARY}
     )
 endif()
 
-qt5_wrap_ui(UIS ${_UIS})
+qt_wrap_ui(UIS ${_UIS})
 
 if(WIN32)
     set(LIB_TYPE "MODULE")

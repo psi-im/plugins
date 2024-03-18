@@ -37,7 +37,7 @@ if(NOT PLUGINS_INSTALL_PATH)
     set(PLUGINS_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}")
 endif()
 
-find_package(Qt5 COMPONENTS Network Widgets Xml Sql REQUIRED)
+find_package(Qt${QT_DEFAULT_MAJOR_VERSION} COMPONENTS Network Widgets Xml Sql REQUIRED)
 find_package(OpenSSL COMPONENTS Crypto REQUIRED)
 find_package(SignalProtocolC REQUIRED)
 
@@ -83,13 +83,13 @@ set(SOURCES
     src/configwidget.cpp
 )
 
-qt5_add_resources(RESOURCES omemoplugin.qrc)
+qt_add_resources(RESOURCES omemoplugin.qrc)
 
 set(QT_DEPLIBS
-    Qt5::Network
-    Qt5::Widgets
-    Qt5::Xml
-    Qt5::Sql
+    Qt${QT_DEFAULT_MAJOR_VERSION}::Network
+    Qt${QT_DEFAULT_MAJOR_VERSION}::Widgets
+    Qt${QT_DEFAULT_MAJOR_VERSION}::Xml
+    Qt${QT_DEFAULT_MAJOR_VERSION}::Sql
 )
 
 if(WIN32)

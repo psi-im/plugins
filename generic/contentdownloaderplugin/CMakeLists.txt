@@ -47,13 +47,13 @@ set( _SRCS
 set( _UIS
     form.ui
 )
-find_package( Qt5 COMPONENTS Widgets Xml Network REQUIRED )
+find_package( Qt${QT_DEFAULT_MAJOR_VERSION} COMPONENTS Widgets Xml Network REQUIRED )
 set(QT_DEPLIBS
-    Qt5::Widgets
-    Qt5::Xml
-    Qt5::Network
+    Qt${QT_DEFAULT_MAJOR_VERSION}::Widgets
+    Qt${QT_DEFAULT_MAJOR_VERSION}::Xml
+    Qt${QT_DEFAULT_MAJOR_VERSION}::Network
 )
-qt5_wrap_ui(UIS ${_UIS})
+qt_wrap_ui(UIS ${_UIS})
 
 if(WIN32)
     set(LIB_TYPE "MODULE")
