@@ -380,7 +380,7 @@ bool ExtendedMenuPlugin::incomingStanza(int account, const QDomElement &xml)
                         default:
                             break;
                         }
-                        rl.removeAll(r); //!!!! QT6 error rl is const
+                        rl.removeAll(r);
                         if (!rl.isEmpty()) {
                             requestList_.insert(account, rl);
                         } else {

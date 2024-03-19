@@ -1,7 +1,7 @@
 {
   "name": "PEP Change Notify",
   "shortname": "pepplugin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "priority": 2,
   "icon": "base64:iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABr0lEQVR4XqWTTUsbYRSFz2sH/PgHheK6OzdpFt25Eyx050db4ibalIFSMFC60BZ1qd0Fiq50pyvBluy6U0gaaEoX3ZUEoQuzM8bk/bxyX9/BwChS8sCBGe7MnHNm7ggiwiAMYUDE5PNc5k2+UAKQ5YG1BsZYaKOhtYZSyktqBSUlJEvJ6s9f9fj74W4NB0cnlebpP/of6n+alH/3qcL1I3Yef/QQ/RABBAdtyYsgMOR4AH8+8XicU/jEEfrYFgJ38erSgBwSoKQCE3HnhCUiMI4AZRyMc2wKAQE4TuZnHqXCA4yxITZhdWsP9/F28QUYpUMCftsMp18vLngXSw7KEFyILECw1veHDSn5CzERHySsbO7iNt7HL/2NBi6pgMQ44i5JhbViDsbxkC8kiMTfAs6xO4CQyhgDz9aX/crfxmlqAc67mi56mjpdk5rVfjfo6dTM9R58LX+L2+12SUqZDVvmtfP5Izo9i7GRB3g2X+DOHNs7W2urw8MjcRI9JV7v2fwyMdNzr4nPwywl8WGjhBtnBdXr+b0/a7UyY6OjPy673ScA1YIz+jku72Pg3/kKGyOUrNFmYIsAAAAASUVORK5CYII=",
   "description": "See popup notifications from your contacts when they change their mood, tune or activity.",

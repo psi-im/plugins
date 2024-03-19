@@ -1,3 +1,7 @@
+2024-03-19
+v0.0.2
+ + added Qt6 support
+
 2014-12-15
 v0.0.1
  ! initial version

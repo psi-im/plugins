@@ -2,7 +2,7 @@
   "name": "Translate",
   "name:ru": "Исправление раскладки",
   "shortname": "Translate",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "priority": 2,
   "icon": "base64:iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAYFJREFUeNqcU8FKw0AQnU1mk4KmLeaugt+hIvRSpB/Qg3+mFr9AbaigFUQ92M9Qrw3YQy/V3aw7k2xiaEHtgyWTtzMvsy+zYjQafWit21mWwX/geR74vj9DKu71erAOkiRpo/vy69s7q/4FVLO7s81PFEIwGUUbtiUsRIzdNPwEEEA5Lo+KtFYcE4dOtd8/gTAMAFFyoVIKOp0OjMf3VlTQeVlMqS9YLD7h7vYm98IJbDYjSIZXEMdbdsUcv0wmcNztwvD6kjnaI55yHdAYw8HFYABKZxC1WvxO8fnZKdC+0hqiZosaYJ5yCbSHlTF0rgwaYegYbjeHhEaj4vPcooPqvyKbmKYpv+eG+mVc53FZIAiQOoR0Os0dZk6WcZ2vBDznQSAl7B8cWYcXvCgOJPJa5uUqDww8Pz3UBkbrXHyZz+xR8rkoB4n+NSmKIolHSJjiS1DjKbccJDe+TshBrOAc//NC4Xw+f7SX4pDvROHHr7DCVEy1JLhnVxvWw+xbgAEA5Siw2HVEPz8AAAAASUVORK5CYII=",
   "description": "Fix text typed with a wrong keyboard layout.",

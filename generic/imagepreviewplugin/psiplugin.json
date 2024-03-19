@@ -2,7 +2,7 @@
   "name": "Image Preview",
   "name:ru": "Предпросмотр изображений",
   "shortname": "imgpreview",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "priority": 2,
   "icon": "base64:iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAN1wAADdcBQiibeAAAAAd0SU1FB9gMHBMqIkntoSEAAAHJSURBVHjapZNNaxNRFIafO5nOvclMyCTa0GnVTj9UBBFSoUUQBYWCBVGoIIjgQv+Ei+K64NrfIK7cFPxYdCFF0FZdhKLBaBWr2GSaQGNITSbXDzJQ1EBrHzibs3jOeeEcARhADBDsDA2EJpACfMDdgUQDVWDFBHyt9Qv+AyHEmNmZTO7QDOdqd9lUa3ypH0WWeukb7Of70DMOyA/0VzzuWde5/20fAM3FaQDXjNY+GZuHzFdEBpw3Ao1BlhTvvAaHJxyOyGHKc0UeiJGtSYVBB5n9yCfPIUgqyjGDHrMHbcLzIMO6f4xqn8XUWEDCUaifFREJWNozSbU4ykJlL0YtjpQWbivBzZVLlAqnma83eTUwjmXHUfY/BKvuNWTNZ2JpBLORoJTVGBj0xlzOz/q4gxeZzY+jum0gk2k2zhwnzibSfE+hJXhoL2IELZwrbQpPR9nQSZQjf1eESYdfzcCewprUeJ/vcDV8yZPUftZuwKOm4nGQRTlE/C2IclVOTLO8UGZu/TUHz97idj2N1hplE9FFEOVqNbgwkKdx6jJvbY92WxPRTaC3CnRllfxykcxQEisht3PS5PQfhGGotwOQE0B6N8+063f+AXxbvHtDdMv6AAAAAElFTkSuQmCC",
   "description": "See previews for URLs to images in non-webkit Psi version.",

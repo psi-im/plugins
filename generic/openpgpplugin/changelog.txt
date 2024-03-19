@@ -1,3 +1,6 @@
+2024-03-19 - v1.8 - VitoZz
+    + added initial Qt6 support
+
 2020-05-28 - v1.7 - tehnick
     * Move more OpenPGP related code from Psi to plugin
     * Add option "Do not sign own presence status" to plugin options dialog

@@ -1,7 +1,7 @@
 {
   "name": "Qip X-Statuses",
   "shortname": "qipxstatuses",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "priority": 2,
   "icon": "base64:iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB8ElEQVR42mNgQAIevlEldc0T/4NoBnIASPPFS1f/g2gg1xSIlYFYgGgDahv73jS2Tfk/ZeZiMAYZhIwzcms3A5Wp4DTA1Se6DGQAMvjz5w8Yf/78+X9RRTvIZeb4HGEKM6DuRO7/yLNK/z2Oifx33S73/+3btzADTPEZIAczYOPv6v/hPxn++z5n+G80lxHZAGV8BojBDHA8zvDffDfDf4M5jP8NJjH+f/Lkyf+s/Lr/hAKVB2QAyM+TTlf/91gmBdZcdMTz/7179/4nZ5RhGuDmFVUD0gTDs+ev/H/27EVwoL179+7/q1ev/j9+/Pj/ydPnwDGDrNbRJaSNAeQvZLBz98H/m7bs/l922QsciHanGP5Hbrf6v3Hzrv979h5GUQt2EcgAUOLx9IsGxbEbSKKzf/b/3dc3/Q/5BAzEFwz/lxyc/b+1axpYE0wdSA/YAFCyXb5qEziUQf4E4ar6PjDf+RLDf8MVDP/3798PjgGYmrNnz/4H6bGyde8EBYOIb1DcWpACEAZJltd2/3/58uV/s40M4ECEGQCSA9kKwlCXqCGHpwhIEUhxSVUnONpAmkF43YaN/2Fy0JhwxZqkgyPSM2Au2blr7/+t27b/37R56/+Fi5fBbYbmVBV8aUEkJqlwKkwDDIPEoMlYBTktAAD6brSHVKUXSQAAAABJRU5ErkJggg==",
   "description": "Display x-statuses of contacts using the QIP Infium jabber client.",

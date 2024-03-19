@@ -1,3 +1,7 @@
+24.03.19
+v0.0.04
+  + added initial Qt6 support
+
 17.02.16
 ver 0.0.03
   + add tollbar button

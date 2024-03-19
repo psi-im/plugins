@@ -2,7 +2,7 @@
   "name": "Extended Menu",
   "name:ru": "Расширенное меню",
   "shortname": "extmenu",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "priority": 2,
   "icon": "base64:iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAjZJREFUOI2lk19IU2EYxn/nbLTcYSfnCCX/zGamIIxqZF4JQX/oD0Ih1EXoRUJXieBFt1I33Y+CiGhao5FJLcGZFOhNJKKJ1HAIiykzodn0rJ1tLM/pYnh0KVT0Xn287/c8PO/zPR/8ZwkvXgbOCwJPNU2z/+myKIpJXeda+6WrI0ZzKBhIqGpa/5tS1bQ+FAwktpOatQ3NUVJiZXp6CkVJIcs2XC7Xrgrsdgcb+bzjxjnH87r9dRfCK/O3zJtDRUlRWXmAeHwZgP7+gR0E3d3dzL17zM2LPZebHgyaeku0uwaBLNuIx5eRZRsAnZ0dRWBN2+D+nQ6O1TeSsLtMPktWUyQmzAD62gIN1hhYAb7DSuw3sIb/yUP2WiVq9y0zNjyZj5Ylp9fXf7QXFCQ/E5sNoaRzyJKFQ1WlBljXwRccZ49UgadyDf9ImMR6dpJ86vTgB7JbHqRzRR48ej2HDiwuRalxHabZqfJsNAxSNXJ65pT3LTkA0fBAshQ8kCwAXG9zYzUr1NY30OLKEgh9wlFeS3NbD97RAhigoMDehPPIT0N2HlhaipGTqmg9WkG/bxB7+UF6bw/wauJjkT8igFBaT0R1MrVSRkR1kq84yZuJ97hbWpmNZiit8dDVF8Rc1rjjaY0VNnOgKCm+ff1CZH4O3z0vC3EL1uoz+P2BHeCtFSjOQXhmnCtdfbhPnEUQhF2BBoFoElczGdXh8Rw3mtvP2yuTURFN4moRga7RERob/pffWBTRX9c5AsdFEog2AAAAAElFTkSuQmCC",
   "description": "This plugin adds several additional commands into contacts context menu.",

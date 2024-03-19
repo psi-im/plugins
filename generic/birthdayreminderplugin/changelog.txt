@@ -1,3 +1,7 @@
+2024-03-19
+v0.4.2
+  + added initial Qt6 support
+
 2013-08-13
 v0.4.1 - taurus
   + Иконка плагина
