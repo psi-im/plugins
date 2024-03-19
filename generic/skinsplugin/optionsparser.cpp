@@ -196,8 +196,11 @@ QVariant OptionsParser::elementToVariant(const QDomElement &e)
 
             if (!value.isValid())
                 value = QString("");
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             value.convert(varianttype);
+#else
+            value.convert(QMetaType(varianttype));
+#endif
         } else {
             value = QVariant();
         }
