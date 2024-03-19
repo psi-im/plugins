@@ -47,7 +47,7 @@ ToolBar::ToolBar(QWidget *parent) : QToolBar(parent) { init(); }
 
 ToolBar::~ToolBar()
 {
-    for (Button *b : qAsConst(buttons_)) {
+    for (Button *b : std::as_const(buttons_)) {
         delete (b);
     }
     buttons_.clear();
@@ -86,7 +86,7 @@ void ToolBar::init()
     buttons_.append(new Button(tr("Undo"), icoHost->getIcon("psi/undo"), ToolBar::ButtonUndo, false, this));
     buttons_.last()->setShortcut(QKeySequence("Ctrl+z"));
 
-    for (Button *b : qAsConst(buttons_)) {
+    for (Button *b : std::as_const(buttons_)) {
         addAction(b);
         // TODO: update after stopping support of Ubuntu Xenial:
         connect(b, SIGNAL(triggered(bool)), SLOT(buttonChecked(bool)));
@@ -98,7 +98,7 @@ void ToolBar::init()
 
 void ToolBar::enableButton(bool enable, ToolBar::ButtonType type)
 {
-    for (Button *b : qAsConst(buttons_)) {
+    for (Button *b : std::as_const(buttons_)) {
         if (b->type() == type) {
             b->setEnabled(enable);
             break;
@@ -108,7 +108,7 @@ void ToolBar::enableButton(bool enable, ToolBar::ButtonType type)
 
 void ToolBar::checkButton(ToolBar::ButtonType type)
 {
-    for (Button *b : qAsConst(buttons_)) {
+    for (Button *b : std::as_const(buttons_)) {
         if (b->type() == type && b->isCheckable()) {
             b->setChecked(true);
             break;
@@ -132,7 +132,7 @@ void ToolBar::buttonChecked(bool check)
     }
 
     if (check) {
-        for (Button *b : qAsConst(buttons_)) {
+        for (Button *b : std::as_const(buttons_)) {
             if (b != s)
                 b->setChecked(false);
         }
@@ -143,7 +143,7 @@ void ToolBar::buttonChecked(bool check)
 
 void ToolBar::setColorForColorButton(const QColor &color)
 {
-    for (Button *b : qAsConst(buttons_)) {
+    for (Button *b : std::as_const(buttons_)) {
         if (b->type() == ButtonColor) {
             QPixmap pix(16, 16);
             pix.fill(color);

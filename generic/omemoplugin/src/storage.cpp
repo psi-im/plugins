@@ -282,7 +282,7 @@ void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actual
         q.prepare("INSERT INTO devices (jid, device_id, trust) VALUES (?, ?, ?)");
         q.bindValue(0, user);
         q.bindValue(2, UNDECIDED);
-        for (auto id : qAsConst(added)) {
+        for (auto id : std::as_const(added)) {
             q.bindValue(1, id);
             q.exec();
         }
@@ -301,7 +301,7 @@ void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actual
         q3.bindValue(0, user);
 
         _db.transaction();
-        for (auto id : qAsConst(removed)) {
+        for (auto id : std::as_const(removed)) {
             q.bindValue(1, id);
             q.exec();
 
@@ -319,7 +319,7 @@ void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actual
         q.bindValue(1, user);
 
         _db.transaction();
-        for (auto id : qAsConst(intersect)) {
+        for (auto id : std::as_const(intersect)) {
             if (deviceLabels.contains(id)) {
                 q.bindValue(0, deviceLabels[id]);
                 q.bindValue(2, id);
