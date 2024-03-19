@@ -22,8 +22,8 @@
  *
  */
 
-//#include <QtCore>
-//#include <QDomDocument>
+// #include <QtCore>
+// #include <QDomDocument>
 #include <QMetaObject>
 
 #include "clientswitcherplugin.h"

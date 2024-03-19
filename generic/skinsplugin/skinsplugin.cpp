@@ -306,7 +306,11 @@ void SkinsPlugin::createSkin(const QString &name, const QString &author, const Q
 
     if (saveFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         QTextStream str(&saveFile);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         str.setCodec("UTF-8");
+#else
+        str.setEncoding(QStringConverter::Utf8);
+#endif
         int indent = 4;
         str.setGenerateByteOrderMark(false);
         newDoc.save(str, indent);
@@ -349,7 +353,11 @@ void SkinsPlugin::applySkin()
         QFile backUpFile(fileName);
         if (backUpFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
             QTextStream str(&backUpFile);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             str.setCodec("UTF-8");
+#else
+            str.setEncoding(QStringConverter::Utf8);
+#endif
             int indent = 4;
             str.setGenerateByteOrderMark(false);
             backUp.save(str, indent);
@@ -368,7 +376,12 @@ void SkinsPlugin::applySkin()
         QString     optionName = optionElem.tagName();
         if (validateOption(optionName)) {
             QVariant optionValue = OptionsParser::instance()->elementToVariant(optionElem);
-            if (!oldPath.isEmpty() && optionValue.type() == QVariant::String) {
+            if (!oldPath.isEmpty()
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+                && optionValue.type() == QVariant::String) {
+#else
+                && optionValue.typeId() == QMetaType::QString) {
+#endif
                 QString str = optionValue.toString();
                 str.replace(oldPath, skin->skinFolder());
                 optionValue = str;
@@ -456,7 +469,11 @@ void SkinsPlugin::overwrite()
                                                    elem.attribute("version"), skin->skinFolder());
     if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         QTextStream str(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         str.setCodec("UTF-8");
+#else
+        str.setEncoding(QStringConverter::Utf8);
+#endif
         int indent = 4;
         str.setGenerateByteOrderMark(false);
         overwriteDoc.save(str, indent);

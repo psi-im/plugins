@@ -232,13 +232,13 @@ void ConferenceLogger::Logger(QString room, const QString &from, const QString &
     if (file.open(QIODevice::WriteOnly | QIODevice::Append)) {
         QTextStream out(&file);
         // out.seek(file.size());
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         out.setCodec("UTF-8");
-        out.setGenerateByteOrderMark(false);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-        out << stamp << "  " << from << ": " << text << Qt::endl;
 #else
-        out << stamp << "  " << from << ": " << text << endl;
+        out.setEncoding(QStringConverter::Utf8);
 #endif
+        out.setGenerateByteOrderMark(false);
+        out << stamp << "  " << from << ": " << text << Qt::endl;
     }
 }
 

@@ -30,7 +30,7 @@ struct Session {
     QString    jid;
     JDMainWin *window;
 
-    bool operator==(const Session &s) { return account == s.account && jid == s.jid; }
+    bool operator==(const Session &s) const { return account == s.account && jid == s.jid; }
 };
 
 JabberDiskController::JabberDiskController() :

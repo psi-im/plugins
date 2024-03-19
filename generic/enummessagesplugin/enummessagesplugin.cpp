@@ -23,7 +23,7 @@
 #include <QFile>
 #include <QVariant>
 #include <QWidget>
-//#include <QTextStream>
+// #include <QTextStream>
 
 #include "enummessagesplugin.h"
 

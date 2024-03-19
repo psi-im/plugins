@@ -500,7 +500,7 @@ bool OMEMO::processBundle(const QString &ownJid, int account, const QDomElement 
         bundle.signedPreKeyId          = signedPreKeyPublic.attribute("signedPreKeyId").toUInt();
         bundle.signedPreKeyPublic      = QByteArray::fromBase64(signedPreKeyPublic.firstChild().nodeValue().toUtf8());
         bundle.signedPreKeySignature   = QByteArray::fromBase64(
-              bundleElement.firstChildElement("signedPreKeySignature").firstChild().nodeValue().toUtf8());
+            bundleElement.firstChildElement("signedPreKeySignature").firstChild().nodeValue().toUtf8());
         bundle.identityKeyPublic
             = QByteArray::fromBase64(bundleElement.firstChildElement("identityKey").firstChild().nodeValue().toUtf8());
 

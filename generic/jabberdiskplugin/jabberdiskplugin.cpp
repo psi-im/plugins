@@ -84,7 +84,7 @@ QWidget *JabberDiskPlugin::options()
     return options_;
 }
 
-//этот слот нужен для активации кнопки "Применить"
+// этот слот нужен для активации кнопки "Применить"
 void JabberDiskPlugin::hack() { ui_.cb_hack->toggle(); }
 
 bool JabberDiskPlugin::incomingStanza(int account, const QDomElement &xml)

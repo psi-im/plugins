@@ -18,14 +18,16 @@
 
 #include <QApplication>
 #include <QCalendarWidget>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QDesktopWidget>
+#endif
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QKeyEvent>
 #include <QLineEdit>
 #include <QLocale>
-#include <QRegExp>
-#include <QRegExpValidator>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 
 #include "datewidget.h"
 

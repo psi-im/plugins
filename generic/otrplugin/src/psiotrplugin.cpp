@@ -82,12 +82,12 @@ namespace {
     QString htmlToPlain(const QString &html)
     {
         QString plain(html);
-        plain.replace(QRegExp(" ?\\n"), " ")
-            .replace(QRegExp("<br(?:\\s[^>]*)?/>"), "\n")
-            .replace(QRegExp("<b(?:\\s[^>]*)?>([^<]+)</b>"), "*\\1*")
-            .replace(QRegExp("<i(?:\\s[^>]*)?>([^<]+)</i>"), "/\\1/")
-            .replace(QRegExp("<u(?:\\s[^>]*)?>([^<]+)</u>"), "_\\1_")
-            .remove(QRegExp("<[^>]*>"));
+        plain.replace(QRegularExpression(" ?\\n"), " ")
+            .replace(QRegularExpression("<br(?:\\s[^>]*)?/>"), "\n")
+            .replace(QRegularExpression("<b(?:\\s[^>]*)?>([^<]+)</b>"), "*\\1*")
+            .replace(QRegularExpression("<i(?:\\s[^>]*)?>([^<]+)</i>"), "/\\1/")
+            .replace(QRegularExpression("<u(?:\\s[^>]*)?>([^<]+)</u>"), "_\\1_")
+            .remove(QRegularExpression("<[^>]*>"));
         return plain;
     }
 

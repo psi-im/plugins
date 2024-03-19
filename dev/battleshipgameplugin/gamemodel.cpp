@@ -18,6 +18,7 @@
  */
 
 #include <QCryptographicHash>
+#include <QRandomGenerator>
 
 #include "gamemodel.h"
 
@@ -275,13 +276,13 @@ void GameBoard::makeShipRandomPosition()
         for (;;) {
             dir = GameShip::ShipHorizontal;
             int div;
-            if (slen > 1 && (qrand() & 1)) {
+            if (slen > 1 && (QRandomGenerator::global()->generate() & 1)) {
                 dir = GameShip::ShipVertical;
                 div = 100 - 10 * (slen - 1);
             } else
                 div = 100 - (slen - 1);
             ship->setDirection(dir);
-            ship->setPosition(qrand() % div);
+            ship->setPosition(QRandomGenerator::global()->generate() % div);
             if (isShipPositionLegal(snum))
                 break;
         }
@@ -513,7 +514,7 @@ QString GameBoard::genSeed(int len)
     QString        res;
     for (int i = 0; i < len; ++i) {
         if (rnd < ccnt)
-            rnd = qrand();
+            rnd = QRandomGenerator::global()->generate();
         res.append(chars.at(rnd % ccnt));
         rnd /= ccnt;
     }

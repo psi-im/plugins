@@ -20,7 +20,9 @@
 #include "mainwindow.h"
 
 #include <QFileDialog>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QTextCodec>
+#endif
 #include <QTextStream>
 
 using namespace Chess;
@@ -169,7 +171,7 @@ void ChessWindow::addMove(int oldX, int oldY, int newX, int newY)
     QString text       = ui_.te_moves->toPlainText();
     int     moveNumber = movesCount + 2;
     if (moveNumber & 1) {
-        text += "   " + type[0] + model_->headerData(oldX, Qt::Horizontal).toString().toLower()
+        text += QString("   ") + type[0] + model_->headerData(oldX, Qt::Horizontal).toString().toLower()
             + model_->headerData(oldY, Qt::Vertical).toString() + "-"
             + model_->headerData(newX, Qt::Horizontal).toString().toLower()
             + model_->headerData(newY, Qt::Vertical).toString() + "\n";
@@ -234,7 +236,11 @@ void ChessWindow::load()
     QFile file(fileName);
     if (file.open(QIODevice::ReadOnly)) {
         QTextStream in(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         in.setCodec("UTF-8");
+#else
+        in.setEncoding(QStringConverter::Utf8);
+#endif
         QString settings = in.readAll();
         model_->loadSettings(settings);
         if (model_->gameType_ == Figure::WhitePlayer)
@@ -271,7 +277,11 @@ void ChessWindow::save()
     QFile file(fileName);
     if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         QTextStream out(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         out.setCodec("UTF-8");
+#else
+        out.setEncoding(QStringConverter::Utf8);
+#endif
         out.setGenerateByteOrderMark(false);
         out << model_->saveString();
     }

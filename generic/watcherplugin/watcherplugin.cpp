@@ -21,6 +21,7 @@
 #include <QDomElement>
 #include <QFileDialog>
 #include <QHash>
+#include <QRegularExpression>
 
 #include "edititemdlg.h"
 #include "model.h"
@@ -214,7 +215,7 @@ bool Watcher::enable()
         QStringList files;
         files << "watcher_on"
               << "watcher";
-        for (const auto &filename : qAsConst(files)) {
+        for (const auto &filename : std::as_const(files)) {
             QFile file(":/icons/" + filename + ".png");
             file.open(QIODevice::ReadOnly);
             QByteArray image = file.readAll();
@@ -234,7 +235,7 @@ bool Watcher::disable()
     model_ = nullptr;
 
     qDeleteAll(items_);
-    for (QAction *action : qAsConst(actions_)) {
+    for (QAction *action : std::as_const(actions_)) {
         action->disconnect();
         action->deleteLater();
     }
@@ -318,7 +319,7 @@ void Watcher::applyOptions()
     psiOptions->setPluginOption(constJids, QVariant(model_->getWatchedJids()));
     psiOptions->setPluginOption(constSndFiles, QVariant(model_->getSounds()));
 
-    for (auto wi : qAsConst(items_)) {
+    for (auto wi : std::as_const(items_)) {
         delete (wi);
     }
     items_.clear();
@@ -345,7 +346,7 @@ void Watcher::restoreOptions()
     ui_.cb_disable_snd->setChecked(disableSnd);
     ui_.cb_disableDnd->setChecked(disablePopupDnd);
     model_->reset();
-    for (auto wi : qAsConst(items_)) {
+    for (auto wi : std::as_const(items_)) {
         ui_.listWidget->addItem(wi->copy());
     }
 }
@@ -418,7 +419,7 @@ bool Watcher::incomingStanza(int acc, const QDomElement &stanza)
                 }
 
                 if (type == "groupchat") {
-                    for (auto wi : qAsConst(items_)) {
+                    for (auto wi : std::as_const(items_)) {
                         if (!wi->groupChat())
                             continue;
 
@@ -426,7 +427,7 @@ bool Watcher::incomingStanza(int acc, const QDomElement &stanza)
                             break;
                     }
                 } else {
-                    for (auto wi : qAsConst(items_)) {
+                    for (auto wi : std::as_const(items_)) {
                         if (wi->groupChat())
                             continue;
 
@@ -444,7 +445,8 @@ bool Watcher::outgoingStanza(int /*account*/, QDomElement & /*xml*/) { return fa
 
 bool Watcher::checkWatchedItem(const QString &from, const QString &body, WatchedItem *wi)
 {
-    if (!wi->jid().isEmpty() && from.contains(QRegExp(wi->jid(), Qt::CaseInsensitive, QRegExp::Wildcard))) {
+    auto pattern = QRegularExpression::wildcardToRegularExpression(wi->jid());
+    if (!wi->jid().isEmpty() && from.contains(QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption))) {
         isSndEnable = psiOptions->getGlobalOption("options.ui.notifications.sounds.enable").toBool();
         if (wi->alwaysUse() || isSndEnable) {
             psiOptions->setGlobalOption("options.ui.notifications.sounds.enable", QVariant(false));
@@ -456,13 +458,10 @@ bool Watcher::checkWatchedItem(const QString &from, const QString &body, Watched
         }
     }
     if (!wi->watchedText().isEmpty()) {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-        const auto texts = wi->watchedText().split(QRegExp("\\s+"), Qt::SkipEmptyParts);
-#else
-        const auto texts = wi->watchedText().split(QRegExp("\\s+"), QString::SkipEmptyParts);
-#endif
+        const auto texts = wi->watchedText().split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
         for (const auto &txt : texts) {
-            if (body.contains(QRegExp(txt, Qt::CaseInsensitive, QRegExp::Wildcard))) {
+            auto pattern = QRegularExpression::wildcardToRegularExpression(txt);
+            if (body.contains(QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption))) {
                 psiOptions->setGlobalOption("options.ui.notifications.sounds.enable", QVariant(false));
                 playSound(wi->sFile());
                 QTimer::singleShot(500, this,

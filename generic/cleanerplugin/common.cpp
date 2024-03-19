@@ -42,7 +42,11 @@ HistoryView::HistoryView(const QString &filename, QWidget *parent) : QDialog(par
         QTextEdit   *textWid = new QTextEdit();
         QString      text;
         QTextStream  in(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         in.setCodec("UTF-8");
+#else
+        in.setEncoding(QStringConverter::Utf8);
+#endif
         text = in.readAll();
         textWid->setText(text);
         QTextCursor cur = textWid->textCursor();
@@ -87,7 +91,11 @@ vCardView::vCardView(const QString &filename, QWidget *parent) : QDialog(parent,
         main->addWidget(new QLabel(tr("Email:")), 3, 0);
         main->addWidget(email, 3, 1);
         QTextStream in(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         in.setCodec("UTF-8");
+#else
+        in.setEncoding(QStringConverter::Utf8);
+#endif
         QDomDocument text;
         text.setContent(in.readAll());
         QDomElement VCard = text.documentElement();

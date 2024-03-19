@@ -37,7 +37,7 @@
 #include <QHash>
 #include <QList>
 #include <QMessageBox>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QString>
 #include <Qt>
 #include <QtConcurrentRun>

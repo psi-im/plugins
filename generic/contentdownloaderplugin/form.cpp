@@ -26,7 +26,7 @@
 #include <QNetworkProxyFactory>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QUrl>
 
 #include "applicationinfoaccessinghost.h"
@@ -137,11 +137,12 @@ void Form::parseContentList(const QString &text)
     CDItemModel *model    = static_cast<CDItemModel *>(ui->treeView->model());
     int          position = 0;
 
-    QStringList list;
-    QRegExp     rx("\\[([^\\]]*)\\]([^\\[]*)");
+    QStringList        list;
+    QRegularExpression rx("\\[([^\\]]*)\\]([^\\[]*)");
 
     while (position < text.length()) {
-        position = rx.indexIn(text, position);
+        auto match = rx.match(text);
+        position   = match.capturedStart(); // rx.indexIn(text, position);
         if (position == -1) {
             break;
         }
@@ -151,12 +152,8 @@ void Form::parseContentList(const QString &text)
         QString url;
         QString html;
 
-        group = rx.cap(1);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-        list = rx.cap(2).split("\n", Qt::SkipEmptyParts);
-#else
-        list = rx.cap(2).split("\n", QString::SkipEmptyParts);
-#endif
+        group = match.captured(1);
+        list  = match.captured(2).split("\n", Qt::SkipEmptyParts);
         for (int i = list.size() - 1; i >= 0; i--) {
             QString left, right;
             left  = list[i].section("=", 0, 0).trimmed();
@@ -174,7 +171,7 @@ void Form::parseContentList(const QString &text)
         }
 
         model->addRecord(group, name, url, html);
-        position += rx.matchedLength();
+        position += match.capturedLength(0);
     }
 }
 
