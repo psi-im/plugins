@@ -269,7 +269,7 @@ static int stringToInt(const QString &str)
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     int result = str.midRef(1, 2).toInt() * sign;
 #else
-    int result = str.mid(1, 2).toInt() * sign;
+    int result = QStringView(str).mid(1, 2).toInt() * sign;
 #endif
     return result;
 }

@@ -87,9 +87,8 @@ JuickParser::JuickParser(QDomElement *elem) : elem_(elem)
         type_ = JM_Private;
     } else if (d->userRx.match(msg).hasMatch()) {
         type_ = JM_User_Info;
-    } else if (d->lastMsgRx.match(msg).hasMatch()) {
+    } else if ((match = d->lastMsgRx.match(msg)).hasMatch()) {
         type_       = JM_10_Messages;
-        match       = d->lastMsgRx.match(msg);
         infoText_   = match.captured(1);
         QString mes = match.captured(2);
         while (d->singleMsgRx.match(mes).hasMatch()) {
@@ -105,64 +104,55 @@ JuickParser::JuickParser(QDomElement *elem) : elem_(elem)
         infoText_ = d->topTag;
         QStringList tags;
         msg = msg.right(msg.size() - d->topTag.size() - 1);
-        while (d->tagRx.match(msg, 0).hasMatch()) {
-            match = d->tagRx.match(msg, 0);
+        while ((match = d->tagRx.match(msg, 0)).hasMatch()) {
             tags.append(match.captured(1));
             msg = msg.right(msg.size() - match.capturedLength(0));
         }
         JuickMessage m(QString(), QString(), tags, QString(), QString(), QString());
         messages_.append(m);
-    } else if (d->postRx.match(msg).hasMatch()) {
+    } else if ((match = d->postRx.match(msg)).hasMatch()) {
         type_     = JM_Message;
         infoText_ = QString();
-        match     = d->postRx.match(msg);
         JuickMessage m(match.captured(1), match.captured(4), match.captured(2).trimmed().split(" ", Qt::SkipEmptyParts),
                        match.captured(3), match.captured(5), QString());
         messages_.append(m);
-    } else if (d->replyRx.match(msg).hasMatch()) {
+    } else if ((match = d->replyRx.match(msg)).hasMatch()) {
         type_     = JM_Reply;
-        match     = d->replyRx.match(msg);
         infoText_ = match.captured(2);
         JuickMessage m(match.captured(1), match.captured(4), QStringList(), match.captured(3), match.captured(5),
                        QString());
         messages_.append(m);
-    } else if (d->rpostRx.match(msg).hasMatch()) {
+    } else if ((match = d->rpostRx.match(msg)).hasMatch()) {
         type_     = JM_Reply_Posted;
         infoText_ = QObject::tr("Reply posted.");
-        match     = d->rpostRx.match(msg);
         JuickMessage m(QString(), match.captured(1), QStringList(), QString(), match.captured(2), QString());
         messages_.append(m);
-    } else if (d->msgPostRx.match(msg).hasMatch()) {
+    } else if ((match = d->msgPostRx.match(msg)).hasMatch()) {
         type_     = JM_Message_Posted;
         infoText_ = QObject::tr("New message posted.");
-        match     = d->msgPostRx.match(msg);
         JuickMessage m(QString(), match.captured(1), QStringList(), QString(), match.captured(2), QString());
         messages_.append(m);
-    } else if (d->threadRx.match(msg).hasMatch()) {
+    } else if ((match = d->threadRx.match(msg)).hasMatch()) {
         type_     = JM_All_Messages;
         infoText_ = QString();
-        match     = d->threadRx.match(msg);
         JuickMessage m(match.captured(1), match.captured(4), match.captured(2).trimmed().split(" ", Qt::SkipEmptyParts),
                        match.captured(3), match.captured(5),
                        msg.right(msg.size() - match.capturedLength(0) + match.captured(6).length()));
         messages_.append(m);
-    } else if (d->singleMsgRx.match(msg).hasMatch()) {
+    } else if ((match = d->singleMsgRx.match(msg)).hasMatch()) {
         type_     = JM_Post_View;
         infoText_ = QString();
-        match     = d->singleMsgRx.match(msg);
         JuickMessage m(match.captured(1), match.captured(4), match.captured(2).trimmed().split(" ", Qt::SkipEmptyParts),
                        match.captured(3), match.captured(6), match.captured(5));
         messages_.append(m);
-    } else if (d->juboRx.match(msg).hasMatch()) {
+    } else if ((match = d->juboRx.match(msg)).hasMatch()) {
         type_ = JM_Jubo;
-        match = d->juboRx.match(msg);
         JuickMessage m(match.captured(2), match.captured(5), match.captured(3).trimmed().split(" ", Qt::SkipEmptyParts),
                        match.captured(4), match.captured(6), QString());
         messages_.append(m);
         infoText_ = match.captured(1);
-    } else if (d->yourMesRecRx.match(msg).hasMatch()) {
+    } else if ((match = d->yourMesRecRx.match(msg)).hasMatch()) {
         type_ = JM_Your_Post_Recommended;
-        match = d->yourMesRecRx.match(msg);
         JuickMessage m(match.captured(1), match.captured(3), QStringList(), match.captured(2), match.captured(4),
                        QObject::tr(" recommended your post "));
         messages_.append(m);
