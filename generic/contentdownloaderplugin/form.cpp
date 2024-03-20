@@ -141,9 +141,8 @@ void Form::parseContentList(const QString &text)
     QRegularExpression rx("\\[([^\\]]*)\\]([^\\[]*)");
 
     while (position < text.length()) {
-        auto match = rx.match(text);
-        position   = match.capturedStart(); // rx.indexIn(text, position);
-        if (position == -1) {
+        auto match = rx.match(text, position);
+        if (!match.hasMatch()) {
             break;
         }
 
