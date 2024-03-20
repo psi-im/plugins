@@ -78,7 +78,7 @@ JuickPlugin::JuickPlugin() :
     lineColor(0, 0, 255), tagRx("^\\s*(?!\\*\\S+\\*)(\\*\\S+)"),
     regx("(\\s+\\S?)(#\\d+/{0,1}\\d*(?:\\S+)|@\\S+|_[^\\n]+_|\\*[^\\n]+\\*|/[^\\n]+/|http://\\S+|ftp://\\S+|https://"
          "\\S+|\\[[^\\]]+\\]\\[[^\\]]+\\]){1}(\\S?\\s+)"),
-    idRx("(#\\d+)(/\\d+){0,1}(\\S+){0,1}"), nickRx("(@[\\w\\-\\.@\\|]*)(\\b.*)", QRegularExpression::DotMatchesEverythingOption),
+    idRx("(#\\d+)(/\\d+){0,1}(\\S+){0,1}"), nickRx("(@[\\w\\-\\.@\\|]*)(\\b.*)"),
     linkRx("\\[([^\\]]+)\\]\\[([^\\]]+)\\]")
 
 {
@@ -815,7 +815,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
             nonConstStanza.appendChild(element);
             if (!resource.isEmpty()) {
                 QString from = stanza.attribute("from");
-                from.replace(QRegularExpression("(.*)/.*", QRegularExpression::DotMatchesEverythingOption), "\\1/" + resource);
+                from.replace(QRegularExpression("(.*)/.*"), "\\1/" + resource);
                 nonConstStanza.setAttribute("from", from);
             }
 
