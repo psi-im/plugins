@@ -33,30 +33,30 @@ public:
         //          , regx
         //          ("(\\s+)(#\\d+(?:\\S+)|#\\d+/\\d+(?:\\S+)|@\\S+|_[^\\n]+_|\\*[^\\n]+\\*|/[^\\n]+/|http://\\S+|ftp://\\S+|https://\\S+){1}(\\s+)")
         ,
-        rpostRx("\\nReply posted.\\n(#.*)\\s(https://\\S*)\\n$"),
-        threadRx("^\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(https://juick.com/\\S+)\\n(.*)"),
-        userRx("^\\nBlog: https://.*"),
-        yourMesRecRx("\\n@(\\S*)( recommended your post )(#\\d+)\\.\\s+(https://juick.com/\\S+).*"),
+        rpostRx("\\nReply posted.\\n(#.*)\\s(https://\\S*)\\n$", QRegularExpression::DotMatchesEverythingOption),
+        threadRx("^\\n@(\\S*):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(https://juick.com/\\S+)\\n(.*)", QRegularExpression::DotMatchesEverythingOption),
+        userRx("^\\nBlog: https://.*", QRegularExpression::DotMatchesEverythingOption),
+        yourMesRecRx("\\n@(\\S*)( recommended your post )(#\\d+)\\.\\s+(https://juick.com/\\S+).*", QRegularExpression::DotMatchesEverythingOption),
         singleMsgRx("^\\n@(\\S+):( \\*[^\\n]*){0,1}\\n(.*)\\n(#\\d+) (\\(.*;{0,1}\\s*(?:\\d+ repl(?:ies|y)){0,1}\\) "
                     "){0,1}(https://juick.com/\\S+)\\n$"),
-        lastMsgRx("^\\n(Last (?:popular ){0,1}messages:)(.*)"),
+        lastMsgRx("^\\n(Last (?:popular ){0,1}messages:)(.*)", QRegularExpression::DotMatchesEverythingOption),
         juboRx("^\\n([^\\n]*)\\n@(\\S*):( [^\\n]*){0,1}\\n(.*)\\n(#\\d+)\\s(https://juick.com/\\S+)\\n$"),
-        msgPostRx("\\nNew message posted.\\n(#.*)\\s(https://\\S*)\\n$")
+        msgPostRx("\\nNew message posted.\\n(#.*)\\s(https://\\S*)\\n$", QRegularExpression::DotMatchesEverythingOption)
         //          , delMsgRx    ("^\\nMessage #\\d+ deleted.\\n$")
         //          , delReplyRx    ("^\\nReply #\\d+/\\d+ deleted.\\n$")
         //          , idRx        ("(#\\d+)(/\\d+){0,1}(\\S+){0,1}")
         //          , nickRx        ("(@[\\w\\-\\.@\\|]*)(\\b.*)")
         ,
         recomendRx("^\\nRecommended by @(\\S+):\\s+@(\\S+):( \\*[^\\n]+){0,1}\\n+(.*)\\s+(#\\d+) (\\(\\d+ "
-                   "repl(?:ies|y)\\) ){0,1}(https://\\S+)\\s+$"),
+                   "repl(?:ies|y)\\) ){0,1}(https://\\S+)\\s+$", QRegularExpression::DotMatchesEverythingOption),
         topTag("Top 20 tags:")
     {
-        /*pmRx.setMinimal(true);
-        replyRx.setMinimal(true);
+        pmRx.setPatternOptions(QRegularExpression::DotMatchesEverythingOption | QRegularExpression::InvertedGreedinessOption);
+        replyRx.setPatternOptions(QRegularExpression::DotMatchesEverythingOption | QRegularExpression::InvertedGreedinessOption);
         //        regx.setMinimal(true);
-        postRx.setMinimal(true);
-        singleMsgRx.setMinimal(true);
-        juboRx.setMinimal(true);*/
+        postRx.setPatternOptions(QRegularExpression::DotMatchesEverythingOption | QRegularExpression::InvertedGreedinessOption);
+        singleMsgRx.setPatternOptions(QRegularExpression::DotMatchesEverythingOption | QRegularExpression::InvertedGreedinessOption);
+        juboRx.setPatternOptions(QRegularExpression::DotMatchesEverythingOption | QRegularExpression::InvertedGreedinessOption);
     }
 
     QRegularExpression tagRx, pmRx, postRx, replyRx, /*regx,*/ rpostRx, threadRx, userRx, yourMesRecRx;
