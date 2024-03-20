@@ -82,7 +82,7 @@ JuickPlugin::JuickPlugin() :
     linkRx("\\[([^\\]]+)\\]\\[([^\\]]+)\\]")
 
 {
-    regx.setMinimal(true);
+    regx.setPatternOptions(QRegularExpression::InvertedGreedinessOption);
     jidList_ = QStringList { juick, jubo };
 }
 
@@ -115,7 +115,7 @@ bool JuickPlugin::enable()
 
     QVariant v = psiOptions->getPluginOption(constVersionOpt, QVariant::Invalid);
 
-    //Проверяем, обновился ли плагин
+    // Проверяем, обновился ли плагин
     if (!v.isValid() || v.toString() != constVersion) {
         QDir              dir(applicationInfo->appHomeDir(ApplicationInfoAccessingHost::CacheLocation) + "/avatars");
         const QStringList perFiles = QDir(dir.path() + "/juick/per").entryList(QDir::Files);
@@ -336,7 +336,7 @@ void JuickPlugin::updateJidList(const QStringList &jids)
 
 void JuickPlugin::setStyles()
 {
-    //Задаём стили
+    // Задаём стили
     idStyle = "color: " + msgColor.name() + ";";
     if (msgBold) {
         idStyle += "font-weight: bold;";
@@ -435,7 +435,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
 
         if (workInGroupChat && jid == "juick@conference.jabber.ru") {
             QString msg = stanza.firstChild().nextSibling().firstChild().nodeValue();
-            msg.replace(QRegExp("#(\\d+)"), "https://juick.com/\\1");
+            msg.replace(QRegularExpression("#(\\d+)"), "https://juick.com/\\1");
             stanza.firstChild().nextSibling().firstChild().setNodeValue(msg);
         }
 
@@ -503,12 +503,12 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                 }
             }
 
-            //добавляем перевод строки для обработки ссылок и номеров сообщений в конце сообщения
+            // добавляем перевод строки для обработки ссылок и номеров сообщений в конце сообщения
             QString msg = "\n" + jp.originMessage() + "\n";
             msg.replace("&gt;", ">");
             msg.replace("&lt;", "<");
 
-            //Создаем xhtml-im элемент
+            // Создаем xhtml-im элемент
             QDomElement element = doc.createElementNS("http://jabber.org/protocol/xhtml-im", "html");
             QDomElement body    = doc.createElementNS("http://www.w3.org/1999/xhtml", "body");
 
@@ -534,19 +534,19 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                     body.appendChild(doc.createElement("br"));
                     addUserLink(&body, &doc, "@" + m.unick, altTextUser, chatPlusAction, jidToSend);
                     body.appendChild(doc.createTextNode(": "));
-                    //добавляем теги
+                    // добавляем теги
                     for (const QString &tag : m.tags) {
                         addTagLink(&body, &doc, tag, jidToSend);
                     }
                     body.appendChild(doc.createElement("br"));
-                    //обрабатываем текст сообщения
+                    // обрабатываем текст сообщения
                     QString newMsg = " " + m.body + " ";
                     elementFromString(&body, &doc, newMsg, jidToSend);
                     // xmpp ссылка на сообщение
                     addMessageId(&body, &doc, m.messageId, replyMsgString, chatAction, jidToSend);
                     body.appendChild(doc.createTextNode("  "));
                     addPlus(&body, &doc, m.messageId, jidToSend);
-                    //ссылка на сообщение
+                    // ссылка на сообщение
                     body.appendChild(doc.createTextNode("  "));
                     addSubscribe(&body, &doc, m.messageId, jidToSend);
                     body.appendChild(doc.createTextNode("  "));
@@ -563,7 +563,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                 body.appendChild(doc.createTextNode(jp.infoText()));
                 body.appendChild(doc.createElement("br"));
                 JuickMessage m = jm.first();
-                for (const QString &tag : qAsConst(m.tags)) {
+                for (const QString &tag : std::as_const(m.tags)) {
                     addTagLink(&body, &doc, tag, jidToSend);
                     body.appendChild(doc.createElement("br"));
                 }
@@ -600,8 +600,8 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
 
                 addUserLink(&body, &doc, "@" + m.unick, altTextUser, chatPlusAction, jidToSend);
                 body.appendChild(doc.createTextNode(": "));
-                //добавляем теги
-                for (const QString &tag : qAsConst(m.tags)) {
+                // добавляем теги
+                for (const QString &tag : std::as_const(m.tags)) {
                     addTagLink(&body, &doc, tag, jidToSend);
                 }
                 msg = " " + m.body + " ";
@@ -610,7 +610,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                     addAvatar(&body, &doc, msg, jidToSend, m.unick, avatarUrl);
                 } else {
                     body.appendChild(doc.createElement("br"));
-                    //обрабатываем текст сообщения
+                    // обрабатываем текст сообщения
                     elementFromString(&body, &doc, msg, jidToSend);
                 }
 
@@ -620,7 +620,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                 }
                 // xmpp ссылка на сообщение
                 addMessageId(&body, &doc, m.messageId, replyMsgString, chatAction, jidToSend, resLink);
-                //ссылка на сообщение
+                // ссылка на сообщение
                 body.appendChild(doc.createTextNode("  "));
                 if (type != JuickParser::JM_All_Messages && type != JuickParser::JM_Post_View) {
                     addPlus(&body, &doc, m.messageId, jidToSend, resLink);
@@ -653,11 +653,11 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                 body.appendChild(doc.createElement("br"));
                 addUserLink(&body, &doc, "@" + m.unick, altTextUser, chatPlusAction, jidToSend);
                 body.appendChild(doc.createTextNode(tr(" replied:")));
-                //цитата
+                // цитата
                 QDomElement blockquote = doc.createElement("blockquote");
                 blockquote.setAttribute("style", quoteStyle);
                 blockquote.appendChild(doc.createTextNode(jp.infoText()));
-                //обрабатываем текст сообщения
+                // обрабатываем текст сообщения
                 msg = " " + m.body + " ";
                 body.appendChild(blockquote);
                 if (showAvatars) {
@@ -669,7 +669,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                 }
                 // xmpp ссылка на сообщение
                 addMessageId(&body, &doc, m.messageId, replyMsgString, chatAction, jidToSend, resLink);
-                //ссылка на сообщение
+                // ссылка на сообщение
                 body.appendChild(doc.createTextNode("  "));
                 QString msgId = m.messageId.split("/").first();
                 addUnsubscribe(&body, &doc, m.messageId, jidToSend, resLink);
@@ -711,7 +711,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                 }
                 addDelete(&body, &doc, m.messageId, jidToSend, resLink);
                 body.appendChild(doc.createTextNode("  "));
-                //ссылка на сообщение
+                // ссылка на сообщение
                 body.appendChild(doc.createTextNode("  "));
                 addHttpLink(&body, &doc, m.link);
                 msg.clear();
@@ -748,7 +748,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
             }
             default: {
                 if (msg.indexOf("Recommended blogs:") != -1) {
-                    //если команда @
+                    // если команда @
                     userLinkPattern = "xmpp:%1?message;type=chat;body=S %2";
                     altTextUser     = tr("Subscribe to %1's blog");
                 }
@@ -805,17 +805,17 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
                     link.appendChild(doc.createElement("br"));
                     body.insertAfter(link, body.lastChildElement("table"));
                 }
-                //удаление вложения, пока шлётся ссылка в сообщении
+                // удаление вложения, пока шлётся ссылка в сообщении
                 nonConstStanza.removeChild(jp.findElement("x", "jabber:x:oob"));
             }
 
-            //обработка по умолчанию
+            // обработка по умолчанию
             elementFromString(&body, &doc, msg, jidToSend, res);
             element.appendChild(body);
             nonConstStanza.appendChild(element);
             if (!resource.isEmpty()) {
                 QString from = stanza.attribute("from");
-                from.replace(QRegExp("(.*)/.*"), "\\1/" + resource);
+                from.replace(QRegularExpression("(.*)/.*"), "\\1/" + resource);
                 nonConstStanza.setAttribute("from", from);
             }
 
@@ -832,41 +832,44 @@ void JuickPlugin::elementFromString(QDomElement *body, QDomDocument *e, const QS
 {
     int new_pos = 0;
     int pos     = 0;
-    while ((new_pos = regx.indexIn(msg, pos)) != -1) {
-        QString before    = msg.mid(pos, new_pos - pos + regx.cap(1).length());
+    while (regx.match(msg, pos).hasMatch()) {
+        auto    match     = regx.match(msg, pos);
+        QString before    = msg.mid(pos, new_pos - pos + match.captured(1).length());
         int     quoteSize = 0;
         nl2br(body, e, before.right(before.size() - quoteSize));
-        QString seg = regx.cap(2);
+        QString seg = match.captured(2);
         switch (seg.at(0).toLatin1()) {
         case '#': {
-            Q_UNUSED(idRx.indexIn(seg));
-            if (!idRx.cap(2).isEmpty()) {
-                //для #1234/12 - +ненужен
+            auto idRxmatch = idRx.match(seg);
+            if (!idRxmatch.captured(2).isEmpty()) {
+                // для #1234/12 - +ненужен
                 messageLinkPattern = chatAction;
                 altTextMsg         = replyMsgString;
             }
-            addMessageId(body, e, idRx.cap(1) + idRx.cap(2), altTextMsg, messageLinkPattern, jid, resource);
-            body->appendChild(e->createTextNode(idRx.cap(3)));
+            addMessageId(body, e, idRxmatch.captured(1) + idRxmatch.captured(2), altTextMsg, messageLinkPattern, jid,
+                         resource);
+            body->appendChild(e->createTextNode(idRxmatch.captured(3)));
             break;
         }
         case '@': {
-            Q_UNUSED(nickRx.indexIn(seg));
-            addUserLink(body, e, nickRx.cap(1), altTextUser, userLinkPattern, jid);
-            body->appendChild(e->createTextNode(nickRx.cap(2)));
+            auto nickRxmatch = nickRx.match(seg);
+            addUserLink(body, e, nickRxmatch.captured(1), altTextUser, userLinkPattern, jid);
+            body->appendChild(e->createTextNode(nickRxmatch.captured(2)));
             // tag
-            if (nickRx.cap(2) == ":" && (regx.cap(1) == "\n" || regx.cap(1) == "\n\n")) {
+            if (nickRxmatch.captured(2) == ":" && (match.captured(1) == "\n" || match.captured(1) == "\n\n")) {
                 body->appendChild(e->ownerDocument().createTextNode(" "));
-                QString tagMsg = msg.right(msg.size() - (new_pos + regx.matchedLength() - regx.cap(3).size()));
+                QString tagMsg = msg.right(msg.size() - (new_pos + match.capturedLength(0) - match.captured(3).size()));
                 for (int i = 0; i < 6; ++i) {
-                    if (tagRx.indexIn(tagMsg, 0) != -1) {
-                        addTagLink(body, e, tagRx.cap(1), jid);
-                        tagMsg = tagMsg.right(tagMsg.size() - tagRx.matchedLength());
-                        new_pos += tagRx.matchedLength();
+                    auto tagRxmatch = tagRx.match(tagMsg, 0);
+                    if (tagRxmatch.hasMatch()) {
+                        addTagLink(body, e, tagRxmatch.captured(1), jid);
+                        tagMsg = tagMsg.right(tagMsg.size() - tagRxmatch.capturedLength(0));
+                        new_pos += tagRxmatch.capturedLength(0);
                     } else {
                         break;
                     }
                 }
-                new_pos += regx.cap(3).size() - 1;
+                new_pos += match.captured(3).size() - 1;
             }
             break;
         }
@@ -898,18 +901,18 @@ void JuickPlugin::elementFromString(QDomElement *body, QDomDocument *e, const QS
             break;
         }
         case '[': {
-            QDomElement ahref = e->createElement("a");
-            Q_UNUSED(linkRx.indexIn(seg));
+            QDomElement ahref       = e->createElement("a");
+            auto        linkRxmatch = linkRx.match(seg);
             ahref.setAttribute("style", "color:" + commonLinkColor + ";");
-            ahref.setAttribute("href", linkRx.cap(2));
-            ahref.appendChild(e->createTextNode(linkRx.cap(1)));
+            ahref.setAttribute("href", linkRxmatch.captured(2));
+            ahref.appendChild(e->createTextNode(linkRxmatch.captured(1)));
             body->appendChild(ahref);
             break;
         }
         default: {
         }
         }
-        pos = new_pos + regx.matchedLength() - regx.cap(3).size();
+        pos = new_pos + match.capturedLength(0) - match.captured(3).size();
         // new_pos = pos;
     }
     nl2br(body, e, msg.right(msg.size() - pos));
@@ -1081,7 +1084,7 @@ void JuickPlugin::removeWidget()
 // картинки с диска.
 void JuickPlugin::updateWidgets(const QList<QByteArray> &urls)
 {
-    for (QWidget *w : qAsConst(logs_)) {
+    for (QWidget *w : std::as_const(logs_)) {
         QTextEdit *te = qobject_cast<QTextEdit *>(w);
         if (te) {
             QTextDocument *td = te->document();

@@ -17,6 +17,7 @@
  *
  */
 
+#include <QRandomGenerator>
 #include <QTextDocument>
 
 #include "gamesessions.h"
@@ -25,7 +26,10 @@
 
 #define TIMEOUT_INTERVAL_SECS 60 * 60 * 1 // One hour
 
-GameSessionList::GameSessionList(QObject *parent) : QObject(parent), stanzaId_(qrand() % 10000) { }
+GameSessionList::GameSessionList(QObject *parent) :
+    QObject(parent), stanzaId_(QRandomGenerator::global()->generate() % 10000)
+{
+}
 
 GameSessionList::~GameSessionList()
 {
@@ -222,9 +226,9 @@ QString GameSessionList::generateKey(int account, const QString &jid, const QStr
 QString GameSessionList::getStanzaId(bool bigOffset)
 {
     if (bigOffset)
-        stanzaId_ += (qrand() % 50) + 5;
+        stanzaId_ += (QRandomGenerator::global()->generate() % 50) + 5;
     else
-        stanzaId_ += (qrand() % 5) + 2;
+        stanzaId_ += (QRandomGenerator::global()->generate() % 5) + 2;
     return "bsg_" + QString::number(stanzaId_);
 }
 
@@ -429,8 +433,9 @@ void GameSession::sendInvite(QString jid, bool first)
 
 void GameSession::generateGameId()
 {
-    gameId_
-        = "battleship_" + QString::number(qrand(), 16) + QString::number(qrand(), 16) + QString::number(qrand(), 16);
+    gameId_ = "battleship_" + QString::number(QRandomGenerator::global()->generate(), 16)
+        + QString::number(QRandomGenerator::global()->generate(), 16)
+        + QString::number(QRandomGenerator::global()->generate(), 16);
 }
 
 void GameSession::endSession()

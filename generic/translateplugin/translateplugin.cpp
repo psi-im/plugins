@@ -35,6 +35,7 @@
 #include <QLineEdit>
 #include <QMap>
 #include <QPushButton>
+#include <QRegularExpression>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QTextEdit>
@@ -352,7 +353,7 @@ bool TranslatePlugin::enable()
     notTranslate = psiOptions->getPluginOption(constNotTranslate, notTranslate).toBool();
     //    psiShortcuts->connectShortcut(QKeySequence(shortCut),this, SLOT(trans()));
 
-    for (auto act : qAsConst(actions_)) {
+    for (auto act : std::as_const(actions_)) {
         act->setShortcut(QKeySequence(shortCut));
     }
 
@@ -370,7 +371,7 @@ bool TranslatePlugin::enable()
 bool TranslatePlugin::disable()
 {
     enabled_ = false;
-    for (auto act : qAsConst(actions_)) {
+    for (auto act : std::as_const(actions_)) {
         act->disconnect(this, SLOT(trans()));
     }
 
@@ -388,10 +389,10 @@ void TranslatePlugin::trans()
         return;
     }
 
-    QTextCursor    c = ed->textCursor();
-    static QRegExp link(
+    QTextCursor               c = ed->textCursor();
+    static QRegularExpression link(
         "(xmpp:|mailto:|http://|https://|git://|ftp://|ftps://|sftp://|news://|ed2k://|file://|magnet:|www.|ftp.)\\S+",
-        Qt::CaseInsensitive);
+        QRegularExpression::CaseInsensitiveOption);
     QStringList newStrings;
 
     bool     isMuc = false;
@@ -414,23 +415,23 @@ void TranslatePlugin::trans()
     if (!nick.isEmpty())
         newStrings.append(nick);
 
-    //запоминаем позицию курсора
+    // запоминаем позицию курсора
     int pos = c.position();
 
-    int index = link.indexIn(toReverse);
-    while (index != -1 && !isSelect) {
+    auto match = link.match(toReverse);
+    while (match.hasMatch() && !isSelect) {
         QString newStr;
-        QString oldStr = toReverse.left(index);
+        QString oldStr = toReverse.left(match.capturedStart());
         for (const QChar &symbol : oldStr) {
             newStr.append(map.value(symbol, symbol));
         }
-        newStrings << newStr << link.cap();
-        toReverse = toReverse.right(toReverse.size() - (index + link.matchedLength()));
-        index     = link.indexIn(toReverse);
+        newStrings << newStr << match.captured();
+        toReverse = toReverse.right(toReverse.size() - (match.capturedStart() + match.capturedLength(0)));
+        // index     = link.indexIn(toReverse);
     }
 
     QString newStr;
-    for (const QChar &symbol : qAsConst(toReverse)) {
+    for (const QChar &symbol : std::as_const(toReverse)) {
         newStr.append(map.value(symbol, symbol));
     }
     newStrings << newStr;
@@ -439,7 +440,7 @@ void TranslatePlugin::trans()
 
     if (!isSelect) {
         ed->setPlainText(newString);
-        //восстанавливаем позицию курсора
+        // восстанавливаем позицию курсора
         c.setPosition(pos);
         ed->setTextCursor(c);
     } else {
@@ -495,7 +496,7 @@ void TranslatePlugin::applyOptions()
     //    psiShortcuts->disconnectShortcut(QKeySequence(shortCut), this, SLOT(trans()));
     shortCut = shortCutWidget->text();
     psiOptions->setPluginOption(constShortCut, shortCut);
-    for (auto act : qAsConst(actions_)) {
+    for (auto act : std::as_const(actions_)) {
         act->setShortcut(QKeySequence(shortCut));
     }
 
@@ -550,10 +551,10 @@ void TranslatePlugin::onNewShortcutKey(QKeySequence ks)
 void TranslatePlugin::changeItem(int row, int column)
 {
     if (column == 0 && !storage.isEmpty()) {
-        //если первая колонка, то её менять нельзя, возвращаем старое значение
+        // если первая колонка, то её менять нельзя, возвращаем старое значение
         table->item(row, column)->setText(storage);
     } else {
-        //иначе приравниваем ячейке значение первого символа
+        // иначе приравниваем ячейке значение первого символа
         if (table->item(row, column)->text().isEmpty()) {
             table->item(row, column)->setText(storage);
         } else {

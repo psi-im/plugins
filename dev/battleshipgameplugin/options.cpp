@@ -25,7 +25,7 @@
 #include <QVariant>
 
 #include "options.h"
-//#include "common.h"
+// #include "common.h"
 #include "optionaccessinghost.h"
 
 Options::Options(QObject *parent) :

@@ -604,12 +604,8 @@ bool AutoReply::incomingStanza(int account, const QDomElement &stanza)
             if (!state)
                 return false;
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-            QStringList Disable = DisableForAcc.split(QRegExp("\\s+"), Qt::SkipEmptyParts);
-#else
-            QStringList Disable = DisableForAcc.split(QRegExp("\\s+"), QString::SkipEmptyParts);
-#endif
-            QString AccJid = AccInfoHost->getJid(account);
+            QStringList Disable = DisableForAcc.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+            QString     AccJid  = AccInfoHost->getJid(account);
             while (!Disable.isEmpty()) {
                 if (AccJid == Disable.takeFirst())
                     return false;
@@ -645,11 +641,7 @@ bool AutoReply::incomingStanza(int account, const QDomElement &stanza)
             if (!from.contains("@"))
                 return false;
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-            Disable = DisableFor.split(QRegExp("\\s+"), Qt::SkipEmptyParts);
-#else
-            Disable             = DisableFor.split(QRegExp("\\s+"), QString::SkipEmptyParts);
-#endif
+            Disable = DisableFor.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
 
             if (EnableDisable) {
                 while (!Disable.isEmpty()) {

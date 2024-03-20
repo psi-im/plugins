@@ -118,15 +118,15 @@ private:
     bool userBold = true, tagBold = false, msgBold = false, quoteBold = false, lineBold = false;
     bool userItalic = false, tagItalic = true, msgItalic = false, quoteItalic = false, lineItalic = false;
     bool userUnderline = false, tagUnderline = false, msgUnderline = true, quoteUnderline = false, lineUnderline = true;
-    QString           idStyle, userStyle, tagStyle, quoteStyle, linkStyle;
-    QRegExp           tagRx, regx, idRx, nickRx, linkRx;
-    QString           userLinkPattern, messageLinkPattern, altTextUser, altTextMsg, commonLinkColor;
-    bool              idAsResource = false, showPhoto = false, showAvatars = true, workInGroupChat = false;
-    QStringList       jidList_;
-    QPointer<QWidget> optionsWid;
-    QList<QWidget *>  logs_;
-    Ui::settings      ui_;
-    JuickDownloader  *downloader_ = nullptr;
+    QString            idStyle, userStyle, tagStyle, quoteStyle, linkStyle;
+    QRegularExpression tagRx, regx, idRx, nickRx, linkRx;
+    QString            userLinkPattern, messageLinkPattern, altTextUser, altTextMsg, commonLinkColor;
+    bool               idAsResource = false, showPhoto = false, showAvatars = true, workInGroupChat = false;
+    QStringList        jidList_;
+    QPointer<QWidget>  optionsWid;
+    QList<QWidget *>   logs_;
+    Ui::settings       ui_;
+    JuickDownloader   *downloader_ = nullptr;
 };
 
 #endif // JUICKPLUGIN_H

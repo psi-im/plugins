@@ -47,7 +47,7 @@
 #include <QVBoxLayout>
 #include <stdexcept>
 
-//#define IMGPREVIEW_DEBUG
+// #define IMGPREVIEW_DEBUG
 
 #define sizeLimitName "imgpreview-size-limit"
 #define previewSizeName "imgpreview-preview-size"
@@ -197,7 +197,7 @@ void ImagePreviewPlugin::messageAppended(const QString &, QWidget *logWidget)
     te_log->moveCursor(QTextCursor::End, QTextCursor::MoveAnchor);
     te_log->moveCursor(QTextCursor::StartOfBlock, QTextCursor::MoveAnchor);
     QTextCursor found = te_log->textCursor();
-    while (!(found = te_log->document()->find(QRegExp("https?://\\S*"), found)).isNull()) {
+    while (!(found = te_log->document()->find(QRegularExpression("https?://\\S*"), found)).isNull()) {
         QString url = found.selectedText();
         if (std::any_of(exceptions.begin(), exceptions.end(), [&url](auto &r) { return r.match(url).hasMatch(); })) {
 #ifdef IMGPREVIEW_DEBUG
@@ -273,7 +273,7 @@ void ImagePreviewPlugin::imageReply(QNetworkReply *reply)
                 te_log->document()->addResource(QTextDocument::ImageResource, urlStrEscaped, image);
                 QTextCursor saved = te_log->textCursor();
                 te_log->moveCursor(QTextCursor::End);
-                QRegExp rawUrlRE = QRegExp("(<a href=\"[^\"]*\">)(.*)(</a>)");
+                QRegularExpression rawUrlRE("(<a href=\"[^\"]*\">)(.*)(</a>)");
                 while (te_log->find(urlStr, QTextDocument::FindBackward)) {
                     QTextCursor cur  = te_log->textCursor();
                     QString     html = cur.selection().toHtml();

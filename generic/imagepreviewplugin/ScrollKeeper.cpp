@@ -8,7 +8,7 @@
 #include "ScrollKeeper.h"
 #include <QScrollBar>
 
-//#define SCROLL_DEBUG
+// #define SCROLL_DEBUG
 
 ScrollKeeper::ScrollKeeper(QWidget *chatView) : chatView_(chatView), scrollPos_(0), scrollToEnd_(false), ted_(nullptr)
 {

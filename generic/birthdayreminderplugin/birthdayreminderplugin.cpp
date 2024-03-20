@@ -176,7 +176,7 @@ bool Reminder::enable()
     if (startCheck) {
         lastCheck = QDateTime::currentDateTime().toString("yyyyMMddhh");
         psiOptions->setPluginOption(constLastCheck, QVariant(lastCheck));
-        QTimer::singleShot(4000, this, SLOT(check())); //необходимо для инициализации приложения
+        QTimer::singleShot(4000, this, SLOT(check())); // необходимо для инициализации приложения
     }
 
     return enabled;
@@ -234,13 +234,13 @@ bool Reminder::incomingStanza(int account, const QDomElement &stanza)
                     QFile file(bdaysDir() + QDir::separator() + Jid);
                     if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
                         QTextStream out(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                         out.setCodec("UTF-8");
-                        out.setGenerateByteOrderMark(false);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-                        out << Date << "__" << Nick << Qt::endl;
 #else
-                        out << Date << "__" << Nick << endl;
+                        out.setEncoding(QStringConverter::Utf8);
 #endif
+                        out.setGenerateByteOrderMark(false);
+                        out << Date << "__" << Nick << Qt::endl;
                     }
                 }
             }
@@ -322,7 +322,11 @@ void Reminder::updateVCard()
             QFile file(path + QDir::separator() + filename);
             if (file.open(QIODevice::ReadOnly)) {
                 QTextStream in(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                 in.setCodec("UTF-8");
+#else
+                in.setEncoding(QStringConverter::Utf8);
+#endif
                 QDomDocument doc;
                 doc.setContent(in.readAll());
                 QDomElement vCard = doc.documentElement();
@@ -338,13 +342,13 @@ void Reminder::updateVCard()
                         QFile file(bdaysDir() + QDir::separator() + filename);
                         if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
                             QTextStream out(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                             out.setCodec("UTF-8");
-                            out.setGenerateByteOrderMark(false);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-                            out << Date << "__" << Nick << Qt::endl;
 #else
-                            out << Date << "__" << Nick << endl;
+                            out.setEncoding(QStringConverter::Utf8);
 #endif
+                            out.setGenerateByteOrderMark(false);
+                            out << Date << "__" << Nick << Qt::endl;
                         }
                     }
                 }
@@ -404,7 +408,11 @@ QString Reminder::checkBirthdays()
             QFile file(bdaysDir() + QDir::separator() + jid);
             if (file.open(QIODevice::ReadOnly)) {
                 QTextStream in(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                 in.setCodec("UTF-8");
+#else
+                in.setEncoding(QStringConverter::Utf8);
+#endif
                 QString     line   = in.readLine();
                 QStringList fields = line.split("__");
                 QString     Date   = fields.takeFirst();

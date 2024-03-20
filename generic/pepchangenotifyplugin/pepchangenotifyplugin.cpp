@@ -44,7 +44,7 @@
 #define constTune "tune"
 #define constMood "mood"
 #define constActivity "act"
-//#define constGeoloc "geo"
+// #define constGeoloc "geo"
 #define constDisableDnd "dsbldnd"
 #define constContactDelay "contactdelay"
 
@@ -460,9 +460,9 @@ bool PepPlugin::checkContactState(QList<ContactState>::iterator &it, ContactStat
 bool PepPlugin::checkContactStatus(const QString &jid)
 {
     if (!contactsOnlineTime_.contains(
-            jid)) { //такое может произойти, если плагин включили, когда аккаунт уже был в онлайне
-        return true; //а вообще, ивенты от контактов не должны приходить раньше презенсов.
-    }                //если такое произойдет - таймаут не сработает
+            jid)) { // такое может произойти, если плагин включили, когда аккаунт уже был в онлайне
+        return true; // а вообще, ивенты от контактов не должны приходить раньше презенсов.
+    }                // если такое произойдет - таймаут не сработает
     QTime contactTime = contactsOnlineTime_.value(jid);
     return (contactTime.secsTo(QTime::currentTime()) < delay) ? false : true;
 }

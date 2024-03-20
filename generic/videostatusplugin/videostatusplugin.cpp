@@ -50,7 +50,7 @@ static const int gmpStatusPlaying = 3;
 using WindowList = QList<Window>;
 typedef QPair<QString, QString> StringMap;
 
-//имена сервисов. Для добавления нового плеера дописываем имя сервиса
+// имена сервисов. Для добавления нового плеера дописываем имя сервиса
 static const QList<StringMap> players({ { "vlc", "VLC" },
                                         { "Totem", "Totem (>=2.30.2)" },
                                         { "kaffeine", "Kaffeine (>=1.0)" },
@@ -125,22 +125,22 @@ private:
     QString                    status, statusMessage;
     Ui::OptionsWidget          ui_;
 #ifdef HAVE_DBUS
-    bool                 playerGMPlayer_; //только для не MPRIS плеера GMPlayer
+    bool                 playerGMPlayer_; // только для не MPRIS плеера GMPlayer
     QHash<QString, bool> playerDictList;
-    QPointer<QTimer>     checkTimer;    //Таймер GNOME Mplayer
-    QStringList          validPlayers_; //список включенных плееров
-    QStringList          services_;     //очередь плееров которые слушает плагин
+    QPointer<QTimer>     checkTimer;    // Таймер GNOME Mplayer
+    QStringList          validPlayers_; // список включенных плееров
+    QStringList          services_;     // очередь плееров которые слушает плагин
     void                 connectToBus(const QString &service_);
     void                 disconnectFromBus(const QString &service_);
     void                 startCheckTimer();
     bool                 isPlayerValid(const QString &service);
 #endif
     QTimer fullST;
-    bool   isStatusSet; // здесь храним информацию, установлен ли уже статус (чтобы не устанавливать повторно при каждом
-                        // срабатывании таймера)
+    bool isStatusSet; // здесь храним информацию, установлен ли уже статус (чтобы не устанавливать повторно при каждом
+                      // срабатывании таймера)
     bool setOnline;
-    int  restoreDelay; //задержка восстановления статуса
-    int  setDelay;     //задержка установки статуса
+    int  restoreDelay; // задержка восстановления статуса
+    int  setDelay;     // задержка установки статуса
     bool fullScreen;
 #ifdef Q_OS_WIN
     HWND lastWorkerWindow = nullptr;
@@ -162,7 +162,7 @@ private slots:
     void checkMprisService(const QString &name, const QString &oldOwner, const QString &newOwner);
     void onPlayerStatusChange(const PlayerStatus &ps);
     void onPropertyChange(const QDBusMessage &msg);
-    void timeOut(); //здесь проверяем проигрыватель GNOME Mplayer
+    void timeOut(); // здесь проверяем проигрыватель GNOME Mplayer
     void asyncCallFinished(QDBusPendingCallWatcher *watcher);
 #endif
 
@@ -204,7 +204,7 @@ bool VideoStatusChanger::enable()
 #ifdef HAVE_DBUS
         qDBusRegisterMetaType<PlayerStatus>();
         services_ = QDBusConnection::sessionBus().interface()->registeredServiceNames().value();
-        //проверка на наличие уже запущенных плееров
+        // проверка на наличие уже запущенных плееров
         const QStringList items = playerDictList.keys();
         for (const QString &item : items) {
             bool option          = psiOptions->getPluginOption(item, QVariant(playerDictList.value(item))).toBool();
@@ -227,7 +227,7 @@ bool VideoStatusChanger::enable()
         setDelay      = psiOptions->getPluginOption(constSetDelay, QVariant(setDelay)).toInt();
         fullScreen    = psiOptions->getPluginOption(constFullScreen, fullScreen).toBool();
 #ifdef HAVE_DBUS
-        //цепляем сигнал появления новых плееров
+        // цепляем сигнал появления новых плееров
         QDBusConnection::sessionBus().connect(QLatin1String("org.freedesktop.DBus"),
                                               QLatin1String("/org/freedesktop/DBus"),
                                               QLatin1String("org.freedesktop.DBus"), QLatin1String("NameOwnerChanged"),
@@ -246,16 +246,16 @@ bool VideoStatusChanger::disable()
     enabled = false;
     fullST.stop();
 #ifdef HAVE_DBUS
-    //отключаем прослушку активных плееров
+    // отключаем прослушку активных плееров
     for (const QString &player : std::as_const(services_)) {
         disconnectFromBus(player);
     }
-    //отключаеся от шины
+    // отключаеся от шины
     QDBusConnection::sessionBus().disconnect(QLatin1String("org.freedesktop.DBus"),
                                              QLatin1String("/org/freedesktop/DBus"),
                                              QLatin1String("org.freedesktop.DBus"), QLatin1String("NameOwnerChanged"),
                                              this, SLOT(checkMprisService(QString, QString, QString)));
-    //убиваем таймер если он есть
+    // убиваем таймер если он есть
     if (checkTimer) {
         checkTimer->stop();
         disconnect(checkTimer, &QTimer::timeout, this, &VideoStatusChanger::timeOut);
@@ -271,7 +271,7 @@ bool VideoStatusChanger::disable()
 void VideoStatusChanger::applyOptions()
 {
 #ifdef HAVE_DBUS
-    //читаем состояние плееров
+    // читаем состояние плееров
     if (playerDictList.size() > 0) {
         const QStringList items = playerDictList.keys();
         for (const QString &item : items) {
@@ -310,7 +310,7 @@ void VideoStatusChanger::applyOptions()
 void VideoStatusChanger::restoreOptions()
 {
 #ifdef HAVE_DBUS
-    //читаем состояние плееров
+    // читаем состояние плееров
     if (playerDictList.size() > 0) {
         const QStringList items = playerDictList.keys();
         for (const QString &item : items) {
@@ -342,7 +342,7 @@ QWidget *VideoStatusChanger::options()
     QWidget *optionsWid = new QWidget();
     ui_.setupUi(optionsWid);
 #ifdef HAVE_DBUS
-    //добавляем чекбоксы плееров
+    // добавляем чекбоксы плееров
     int i       = 0;
     int columns = (players.length() < 5) ? 2 : 3;
     for (const auto &item : players) {
@@ -380,7 +380,7 @@ QString VideoStatusChanger::pluginInfo()
 }
 
 #ifdef HAVE_DBUS
-bool VideoStatusChanger::isPlayerValid(const QString &service) //проверка является ли плеер разрешенным
+bool VideoStatusChanger::isPlayerValid(const QString &service) // проверка является ли плеер разрешенным
 {
     const QStringList items = playerDictList.keys();
     for (const QString &item : items) {
@@ -393,18 +393,18 @@ bool VideoStatusChanger::isPlayerValid(const QString &service) //проверк�
 
 void VideoStatusChanger::checkMprisService(const QString &name, const QString &oldOwner, const QString &newOwner)
 {
-    //слот вызывается при изменении имён сервисов в шине
+    // слот вызывается при изменении имён сервисов в шине
     Q_UNUSED(oldOwner);
     if ((name.startsWith(MPRIS_PREFIX) || name.startsWith(GMP_PREFIX)) && isPlayerValid(name)) {
         int playerIndex = services_.indexOf(name);
         if (playerIndex == -1) {
             if (!newOwner.isEmpty()) {
-                //если сервис только появился добавляем его в очередь и подключаемся к нему
+                // если сервис только появился добавляем его в очередь и подключаемся к нему
                 services_.append(name);
                 connectToBus(name);
             }
         } else if (newOwner.isEmpty()) {
-            //если сервис был то отключаемся от него и удаляем из очереди
+            // если сервис был то отключаемся от него и удаляем из очереди
             disconnectFromBus(name);
             services_.removeAt(playerIndex);
         }
@@ -413,7 +413,7 @@ void VideoStatusChanger::checkMprisService(const QString &name, const QString &o
 
 void VideoStatusChanger::startCheckTimer()
 {
-    //работа с таймером для плеера GNOME MPlayer
+    // работа с таймером для плеера GNOME MPlayer
     if (!checkTimer) {
         checkTimer = new QTimer();
         checkTimer->setInterval(timeout);
@@ -641,7 +641,7 @@ bool VideoStatusChanger::isFullscreenWindow()
 
 void VideoStatusChanger::setStatusTimer(const int delay, const bool isStart)
 {
-    //запуск таймера установки / восстановления статуса
+    // запуск таймера установки / восстановления статуса
     if ((isStart | setOnline) != 0) {
         QTimer::singleShot(delay * 1000, this, SLOT(delayTimeout()));
         isStatusSet = isStart;

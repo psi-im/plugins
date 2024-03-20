@@ -400,7 +400,11 @@ void PluginWindow::saveGame()
     QFile file(fileName);
     if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         QTextStream out(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         out.setCodec("UTF-8");
+#else
+        out.setEncoding(QStringConverter::Utf8);
+#endif
         out.setGenerateByteOrderMark(false);
         out << bmodel->saveToString();
     }
@@ -417,7 +421,11 @@ void PluginWindow::loadGame()
     QFile file(fileName);
     if (file.open(QIODevice::ReadOnly)) {
         QTextStream in(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         in.setCodec("UTF-8");
+#else
+        in.setEncoding(QStringConverter::Utf8);
+#endif
         QString saved_str = in.readAll();
         saved_str.replace("\n", "");
         if (tryLoadGame(saved_str, true)) {

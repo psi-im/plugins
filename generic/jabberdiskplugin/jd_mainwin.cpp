@@ -20,13 +20,14 @@
 #include "jd_mainwin.h"
 #include "model.h"
 
+#include <QIODevice>
 #include <QInputDialog>
 #include <QMenu>
 #include <QMessageBox>
 #include <QTextStream>
 #include <QTimer>
 
-//#include <QDebug>
+// #include <QDebug>
 
 JDMainWin::JDMainWin(const QString &name, const QString &jid, int acc, QWidget *p) :
     QDialog(p, Qt::Window), model_(nullptr), commands_(nullptr), refreshInProgres_(false), yourJid_(name)
@@ -146,16 +147,18 @@ void JDMainWin::clearLog() { ui_.te_log->clear(); }
 
 void JDMainWin::parse(QString message)
 {
-    static const QRegExp dirRE("<dir> (\\S+/)");
-    static const QRegExp fileRE("([0-9]+) - (.*) \\[(\\S+)\\] - (.*)");
+    static const QRegularExpression dirRE("<dir> (\\S+/)");
+    static const QRegularExpression fileRE("([0-9]+) - (.*) \\[(\\S+)\\] - (.*)");
 
     QTextStream str(&message, QIODevice::ReadOnly);
     while (!str.atEnd()) {
         QString line = str.readLine();
-        if (dirRE.indexIn(line) != -1) {
-            model_->addDir(currentDir_, dirRE.cap(1));
-        } else if (fileRE.indexIn(line) != -1) {
-            model_->addFile(currentDir_, fileRE.cap(2), fileRE.cap(3), fileRE.cap(4), fileRE.cap(1).toInt());
+        if (dirRE.match(line).hasMatch()) {
+            model_->addDir(currentDir_, dirRE.match(line).captured(1));
+        } else if (fileRE.match(line).hasMatch()) {
+            auto match = fileRE.match(line);
+            model_->addFile(currentDir_, match.captured(2), match.captured(3), match.captured(4),
+                            match.captured(1).toInt());
         }
     }
 }

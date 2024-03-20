@@ -21,6 +21,7 @@
 #define NOTESCONTROLLER_H
 
 #include <QHash>
+#include <QObject>
 #include <QPointer>
 
 class QDomElement;

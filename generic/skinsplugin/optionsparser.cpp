@@ -152,6 +152,7 @@ QVariant OptionsParser::elementToVariant(const QDomElement &e)
             }
         }
     } else { // Standard values
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         QVariant::Type varianttype;
         bool           known = true;
 
@@ -168,6 +169,24 @@ QVariant OptionsParser::elementToVariant(const QDomElement &e)
         } else {
             known = false;
         }
+#else
+        QMetaType::Type varianttype;
+        bool            known = true;
+
+        if (type == "QString") {
+            varianttype = QMetaType::QString;
+        } else if (type == "bool") {
+            varianttype = QMetaType::Bool;
+        } else if (type == "int") {
+            varianttype = QMetaType::Int;
+        } else if (type == "QKeySequence") {
+            varianttype = QMetaType::QKeySequence;
+        } else if (type == "QColor") {
+            varianttype = QMetaType::QColor;
+        } else {
+            known = false;
+        }
+#endif
 
         if (known) {
             for (QDomNode node = e.firstChild(); !node.isNull(); node = node.nextSibling()) {
@@ -177,8 +196,11 @@ QVariant OptionsParser::elementToVariant(const QDomElement &e)
 
             if (!value.isValid())
                 value = QString("");
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             value.convert(varianttype);
+#else
+            value.convert(QMetaType(varianttype));
+#endif
         } else {
             value = QVariant();
         }

@@ -235,7 +235,7 @@ QStringList NoteModel::getAllTags() const
 bool ProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &parent) const
 {
     QModelIndex index  = sourceModel()->index(sourceRow, 0, parent);
-    QString     filter = filterRegExp().pattern();
+    QString     filter = filterRegularExpression().pattern();
     if (allTags.contains(filter))
         return true;
 

@@ -1,3 +1,7 @@
+2024-03-19
+v1.8
+  + added initial Qt6 support
+
 2020-06-03
 v1.7 tehnick
   * Improve compatibility with XMPP clients which do not support of XEP-0380

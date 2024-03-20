@@ -283,4 +283,4 @@ void UploadManager::verifyingFinished()
     reply->deleteLater();
 }
 
-//#include "uploadmanager.moc"
+// #include "uploadmanager.moc"

@@ -598,13 +598,13 @@ void OMEMOPlugin::logMuc(QString room, const QString &from, const QString &myJid
     QFile file(m_applicationInfo->appHistoryDir() + QDir::separator() + myJid + room + ".conferencehistory");
     if (file.open(QIODevice::WriteOnly | QIODevice::Append)) {
         QTextStream out(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         out.setCodec("UTF-8");
-        out.setGenerateByteOrderMark(false);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-        out << stamp << "  " << from << ": " << text << Qt::endl;
 #else
-        out << stamp << "  " << from << ": " << text << endl;
+        out.setEncoding(QStringConverter::Utf8);
 #endif
+        out.setGenerateByteOrderMark(false);
+        out << stamp << "  " << from << ": " << text << Qt::endl;
     }
 }
 }

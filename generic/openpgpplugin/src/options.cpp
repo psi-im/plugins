@@ -307,7 +307,7 @@ void Options::deleteKey()
     }
 
     // Remove primary keys
-    for (auto key : qAsConst(pkeys)) {
+    for (auto key : std::as_const(pkeys)) {
         const QStringList &&arguments = { "--yes", "--batch", "--delete-secret-and-public-key",
                                           "0x" + key.sibling(key.row(), Model::Fingerprint).data().toString() };
 
@@ -370,7 +370,7 @@ void Options::exportKeyToFile()
     }
 
     // Remove primary keys
-    for (auto key : qAsConst(pkeys)) {
+    for (auto key : std::as_const(pkeys)) {
         QString filename
             = key.sibling(key.row(), 1).data().toString() + " " + key.sibling(key.row(), 2).data().toString() + ".asc";
         QFileDialog dlg(this);
@@ -449,7 +449,7 @@ void Options::exportKeyToClipboard()
 
     // Remove primary keys
     QString strKey = "";
-    for (auto key : qAsConst(pkeys)) {
+    for (auto key : std::as_const(pkeys)) {
         const QString     &&fingerprint = "0x" + key.sibling(key.row(), 8).data().toString();
         const QStringList &&arguments   = { "--armor", "--export", fingerprint };
 

@@ -33,7 +33,7 @@
 #include <QFile>
 #include <QMenu>
 #include <QMessageBox>
-#include <QRegExp>
+#include <QRegularExpression>
 
 MessageFilter::MessageFilter() :
     _enabled(false), _optionsForm(nullptr), _accountHost(nullptr), _optionHost(nullptr), _stanzaSending(nullptr),
@@ -100,7 +100,7 @@ bool MessageFilter::incomingStanza(int account, const QDomElement &stanza)
     QString to_full   = stanza.attribute("to");
     QString to        = to_full.split("/").takeFirst();
 
-    for (const Rule &rule : qAsConst(_rules)) {
+    for (const Rule &rule : std::as_const(_rules)) {
         bool match = true;
         for (const Condition &condition : rule.conditions) {
             QString val;
@@ -134,12 +134,12 @@ bool MessageFilter::incomingStanza(int account, const QDomElement &stanza)
                 break;
 
             case Contains:
-                if (!val.contains(QRegExp(condition.text)))
+                if (!val.contains(QRegularExpression(condition.text)))
                     match = false;
                 break;
 
             case NotContains:
-                if (val.contains(QRegExp(condition.text)))
+                if (val.contains(QRegularExpression(condition.text)))
                     match = false;
                 break;
             }

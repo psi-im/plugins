@@ -42,7 +42,7 @@ void Storage::init(signal_context *ctx, const QString &dataPath, const QString &
     }
 
     initializeDB(ctx);
-    db().exec("VACUUM");
+    QSqlQuery(db()).exec("VACUUM");
 
     signal_protocol_session_store        session_store        = { /*.load_session_func =*/&loadSession,
                                                     /*.get_sub_device_sessions_func =*/nullptr,
@@ -80,7 +80,7 @@ void Storage::init(signal_context *ctx, const QString &dataPath, const QString &
 
 void Storage::deinit()
 {
-    db().exec("VACUUM");
+    QSqlQuery(db()).exec("VACUUM");
     QSqlDatabase::database(m_databaseConnectionName).close();
     QSqlDatabase::removeDatabase(m_databaseConnectionName);
 
@@ -95,18 +95,24 @@ void Storage::initializeDB(signal_context *signalContext)
     QSqlDatabase _db = db();
     _db.transaction();
 
-    QString error;
-    if (!_db.exec("PRAGMA table_info(simple_store)").next()) {
-        _db.exec("CREATE TABLE IF NOT EXISTS enabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
-        _db.exec("CREATE TABLE IF NOT EXISTS disabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
-        _db.exec("CREATE TABLE IF NOT EXISTS devices (jid TEXT NOT NULL, device_id INTEGER NOT NULL, trust INTEGER NOT "
-                 "NULL, label TEXT, PRIMARY KEY(jid, device_id))");
-        _db.exec("CREATE TABLE IF NOT EXISTS identity_key_store (jid TEXT NOT NULL, device_id INTEGER NOT NULL, key "
-                 "BLOB NOT NULL, PRIMARY KEY(jid, device_id))");
-        _db.exec("CREATE TABLE IF NOT EXISTS pre_key_store (id INTEGER NOT NULL PRIMARY KEY, pre_key BLOB NOT NULL)");
-        _db.exec("CREATE TABLE IF NOT EXISTS session_store (jid TEXT NOT NULL, device_id INTEGER NOT NULL, session "
-                 "BLOB NOT NULL, PRIMARY KEY(jid, device_id))");
-        _db.exec("CREATE TABLE IF NOT EXISTS simple_store (key TEXT NOT NULL PRIMARY KEY, value BLOB NOT NULL)");
+    QString   error;
+    QSqlQuery simple_store_query(_db);
+    if (!simple_store_query.exec("PRAGMA table_info(simple_store)") || !simple_store_query.next()) {
+        QSqlQuery(_db).exec("CREATE TABLE IF NOT EXISTS enabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
+        QSqlQuery(_db).exec("CREATE TABLE IF NOT EXISTS disabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
+        QSqlQuery(_db).exec(
+            "CREATE TABLE IF NOT EXISTS devices (jid TEXT NOT NULL, device_id INTEGER NOT NULL, trust INTEGER NOT "
+            "NULL, label TEXT, PRIMARY KEY(jid, device_id))");
+        QSqlQuery(_db).exec(
+            "CREATE TABLE IF NOT EXISTS identity_key_store (jid TEXT NOT NULL, device_id INTEGER NOT NULL, key "
+            "BLOB NOT NULL, PRIMARY KEY(jid, device_id))");
+        QSqlQuery(_db).exec(
+            "CREATE TABLE IF NOT EXISTS pre_key_store (id INTEGER NOT NULL PRIMARY KEY, pre_key BLOB NOT NULL)");
+        QSqlQuery(_db).exec(
+            "CREATE TABLE IF NOT EXISTS session_store (jid TEXT NOT NULL, device_id INTEGER NOT NULL, session "
+            "BLOB NOT NULL, PRIMARY KEY(jid, device_id))");
+        QSqlQuery(_db).exec(
+            "CREATE TABLE IF NOT EXISTS simple_store (key TEXT NOT NULL PRIMARY KEY, value BLOB NOT NULL)");
 
         storeValue("db_ver", 2);
 
@@ -180,8 +186,8 @@ void Storage::initializeDB(signal_context *signalContext)
 void Storage::migrateDatabase()
 {
     QSqlDatabase _db = db();
-    _db.exec("CREATE TABLE IF NOT EXISTS enabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
-    _db.exec("CREATE TABLE IF NOT EXISTS disabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
+    QSqlQuery(_db).exec("CREATE TABLE IF NOT EXISTS enabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
+    QSqlQuery(_db).exec("CREATE TABLE IF NOT EXISTS disabled_buddies (jid TEXT NOT NULL PRIMARY KEY)");
 
     { // Update old tables without "label" column
         QSqlQuery q(db());
@@ -282,7 +288,7 @@ void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actual
         q.prepare("INSERT INTO devices (jid, device_id, trust) VALUES (?, ?, ?)");
         q.bindValue(0, user);
         q.bindValue(2, UNDECIDED);
-        for (auto id : qAsConst(added)) {
+        for (auto id : std::as_const(added)) {
             q.bindValue(1, id);
             q.exec();
         }
@@ -301,7 +307,7 @@ void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actual
         q3.bindValue(0, user);
 
         _db.transaction();
-        for (auto id : qAsConst(removed)) {
+        for (auto id : std::as_const(removed)) {
             q.bindValue(1, id);
             q.exec();
 
@@ -319,7 +325,7 @@ void Storage::updateDeviceList(const QString &user, const QSet<uint32_t> &actual
         q.bindValue(1, user);
 
         _db.transaction();
-        for (auto id : qAsConst(intersect)) {
+        for (auto id : std::as_const(intersect)) {
             if (deviceLabels.contains(id)) {
                 q.bindValue(0, deviceLabels[id]);
                 q.bindValue(2, id);

@@ -27,7 +27,7 @@ class QDomElement;
 
 #include <QObject>
 
-//#include "iconfactoryaccessinghost.h"
+// #include "iconfactoryaccessinghost.h"
 #include "accountinfoaccessinghost.h"
 #include "stanzasendinghost.h"
 

@@ -885,7 +885,7 @@ int BoardModel::checkGameState()
     int state = 0;
     check     = isCheck();
     if (gameType_ == Figure::WhitePlayer) {
-        for (Figure *figure : qAsConst(whiteFigures_)) {
+        for (Figure *figure : std::as_const(whiteFigures_)) {
             if (figure->positionX() != -1) {
                 QMultiMap<QModelIndex, int> moves = availableMoves(figure);
                 if (!moves.isEmpty()) {
@@ -899,7 +899,7 @@ int BoardModel::checkGameState()
             }
         }
     } else {
-        for (Figure *figure : qAsConst(blackFigures_)) {
+        for (Figure *figure : std::as_const(blackFigures_)) {
             if (figure->positionX() != -1) {
                 QMultiMap<QModelIndex, int> moves = availableMoves(figure);
                 if (!moves.isEmpty()) {
@@ -1096,7 +1096,7 @@ void BoardModel::loadSettings(const QString &settings, bool myLoad)
     reset();
 
     QStringList figuresSettings = settings.split(";");
-    for (Figure *figure : qAsConst(whiteFigures_)) {
+    for (Figure *figure : std::as_const(whiteFigures_)) {
         if (!figuresSettings.isEmpty()) {
             QStringList set = figuresSettings.takeFirst().split(",");
             figure->setType(rankFigure(set.takeFirst().toInt()));
@@ -1104,7 +1104,7 @@ void BoardModel::loadSettings(const QString &settings, bool myLoad)
             figure->isMoved = set.takeFirst().toInt();
         }
     }
-    for (Figure *figure : qAsConst(blackFigures_)) {
+    for (Figure *figure : std::as_const(blackFigures_)) {
         if (!figuresSettings.isEmpty()) {
             QStringList set = figuresSettings.takeFirst().split(",");
             figure->setType(rankFigure(set.takeFirst().toInt()));

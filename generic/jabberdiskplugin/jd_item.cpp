@@ -21,7 +21,7 @@
 #include <QDataStream>
 #include <QIODevice>
 #include <QMimeData>
-//#include <QDebug>
+// #include <QDebug>
 
 JDItem::JDItem(Type t, const QString &name, const QString &size, const QString &descr, int number, JDItem *parent) :
     parent_(parent), name_(name), size_(size), descr_(descr), number_(number), type_(t)
@@ -91,7 +91,7 @@ QMimeData *JDItem::mimeData() const
     QByteArray  ba;
     QDataStream out(&ba, QIODevice::WriteOnly);
     out << name_ << size_ << descr_ << number_ << type_;
-    out << fullPath(); //Эта информация нам потребуется в моделе
+    out << fullPath(); // Эта информация нам потребуется в моделе
     data->setData(mimeType(), ba);
     return data;
 }
@@ -109,7 +109,7 @@ void JDItem::fromDataStream(QDataStream *const in)
 
 ItemsList::ItemsList() : QList<ProxyItem>() { }
 
-//ВНИМАНИЕ! Перед удалением листа желательно явно вызвать метод clear();
+// ВНИМАНИЕ! Перед удалением листа желательно явно вызвать метод clear();
 ItemsList::~ItemsList() { }
 
 bool ItemsList::contains(const JDItem *const item) const

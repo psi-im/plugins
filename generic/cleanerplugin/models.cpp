@@ -179,7 +179,7 @@ void BaseFileModel::deleteSelected()
 {
     emit layoutAboutToBeChanged();
 
-    for (const QModelIndex &index : qAsConst(selected_)) {
+    for (const QModelIndex &index : std::as_const(selected_)) {
         const QString fileName = filePass(index);
         if (fileName.isEmpty())
             continue;
@@ -199,7 +199,7 @@ void BaseFileModel::setDirs(const QStringList &dirs)
 {
     reset();
     dirs_ = dirs;
-    for (const QString &dirName : qAsConst(dirs_)) {
+    for (const QString &dirName : std::as_const(dirs_)) {
         QDir              Dir(dirName);
         const QStringList files = Dir.entryList(QDir::Files);
         for (const QString &fileName : files) {
@@ -463,7 +463,7 @@ bool ClearingProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &pare
 {
     QModelIndex index1 = sourceModel()->index(sourceRow, 1, parent);
     QModelIndex index2 = sourceModel()->index(sourceRow, 2, parent);
-    bool        b      = index1.data(Qt::DisplayRole).toString().contains(filterRegExp());
-    bool        c      = index2.data(Qt::DisplayRole).toString().contains(filterRegExp());
+    bool        b      = index1.data(Qt::DisplayRole).toString().contains(filterRegularExpression());
+    bool        c      = index2.data(Qt::DisplayRole).toString().contains(filterRegularExpression());
     return (b | c);
 }

@@ -127,7 +127,7 @@ private:
         {
         }
 
-        bool operator==(const Request &other) { return id == other.id; }
+        bool operator==(const Request &other) const { return id == other.id; }
 
         QString    id;
         QTime      time;
@@ -265,8 +265,12 @@ static const QString secondsToString(ulong seconds)
 
 static int stringToInt(const QString &str)
 {
-    int sign   = (str.at(0) == '-') ? -1 : 1;
+    int sign = (str.at(0) == '-') ? -1 : 1;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     int result = str.midRef(1, 2).toInt() * sign;
+#else
+    int result = QStringView(str).mid(1, 2).toInt() * sign;
+#endif
     return result;
 }
 

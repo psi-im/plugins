@@ -18,9 +18,13 @@
 
 #include <QApplication>
 #include <QBoxLayout>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QDesktopWidget>
+#else
+#include <QScreen>
+#endif
 #include <QEvent>
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 
 #include "lineeditwidget.h"
 
@@ -80,8 +84,8 @@ void LineEditWidget::setRxValidator(const QString &str)
         return;
     }
 
-    QRegExp           rx(str);
-    QRegExpValidator *validator = new QRegExpValidator(rx, this);
+    QRegularExpression           rx(str);
+    QRegularExpressionValidator *validator = new QRegularExpressionValidator(rx, this);
     setValidator(validator);
 }
 
@@ -106,7 +110,6 @@ void LineEditWidget::setPopup(QWidget *w)
 
     QBoxLayout *layout = new QBoxLayout(QBoxLayout::TopToBottom);
     layout->setSpacing(0);
-    layout->setMargin(0);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(w);
     m_popup->setLayout(layout);
@@ -116,7 +119,11 @@ void LineEditWidget::showPopup()
 {
     m_popup->adjustSize();
     m_popup->move(mapToGlobal(QPoint(width() - m_popup->geometry().width(), height())));
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QSize size = qApp->desktop()->size();
+#else
+    QSize size = qApp->primaryScreen()->size();
+#endif
     QRect rect = m_popup->geometry();
 
     // if widget is beyond edge of display

@@ -59,7 +59,7 @@ public:
     {
         for (int column = 0; column <= 1; ++column) {
             QModelIndex index = sourceModel()->index(sourceRow, column, sourceParent);
-            if (index.data(Qt::DisplayRole).toString().contains(filterRegExp()))
+            if (index.data(Qt::DisplayRole).toString().contains(filterRegularExpression()))
                 return true;
         }
         return false;

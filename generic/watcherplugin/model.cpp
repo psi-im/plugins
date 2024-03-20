@@ -18,6 +18,7 @@
  */
 
 #include "model.h"
+#include <QRegularExpression>
 
 Model::Model(const QStringList &watchedJids_, const QStringList &Sounds_, const QStringList &enabledJids_,
              QObject *parent) :
@@ -201,7 +202,7 @@ void Model::reset()
     tmpSounds_      = sounds;
 
     tmpEnabledJids_.clear();
-    for (const auto &enabledJid : qAsConst(enabledJids)) {
+    for (const auto &enabledJid : std::as_const(enabledJids)) {
         tmpEnabledJids_ << (enabledJid == "true" ? true : false);
     }
 }
@@ -212,7 +213,7 @@ void Model::addRow(const QString &jid)
     tmpWatchedJids_ << jid;
     tmpSounds_ << "";
 
-    if (!jid.isEmpty()) { //вызов происходит из меню контакта
+    if (!jid.isEmpty()) { // вызов происходит из меню контакта
         watchedJids.append(jid);
         sounds.append("");
         enabledJids.append("true");
@@ -224,7 +225,7 @@ void Model::addRow(const QString &jid)
 
 void Model::deleteRow(const QString &jid)
 {
-    int index = watchedJids.indexOf(QRegExp(jid, Qt::CaseInsensitive));
+    int index = watchedJids.indexOf(QRegularExpression(jid, QRegularExpression::CaseInsensitiveOption));
     if (index == -1)
         return;
     watchedJids.removeAt(index);
@@ -241,7 +242,7 @@ void Model::apply()
     watchedJids = tmpWatchedJids_;
     sounds      = tmpSounds_;
     enabledJids.clear();
-    for (auto enabledJid : qAsConst(tmpEnabledJids_)) {
+    for (auto enabledJid : std::as_const(tmpEnabledJids_)) {
         enabledJids << (enabledJid ? "true" : "false");
     }
 }
@@ -251,14 +252,17 @@ QString Model::statusByJid(const QString &jid) const { return statuses.value(jid
 QString Model::soundByJid(const QString &jid) const
 {
     QString sound;
-    int     index = watchedJids.indexOf(QRegExp(jid, Qt::CaseInsensitive));
+    int     index = watchedJids.indexOf(QRegularExpression(jid, QRegularExpression::CaseInsensitiveOption));
     if (index < sounds.size() && index != -1)
         sound = sounds.at(index);
 
     return sound;
 }
 
-int Model::indexByJid(const QString &jid) const { return watchedJids.indexOf(QRegExp(jid, Qt::CaseInsensitive)); }
+int Model::indexByJid(const QString &jid) const
+{
+    return watchedJids.indexOf(QRegularExpression(jid, QRegularExpression::CaseInsensitiveOption));
+}
 
 QStringList Model::getWatchedJids() const { return watchedJids; }
 

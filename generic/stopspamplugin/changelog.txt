@@ -1,3 +1,7 @@
+2024-03-19
+v0.6.0
+  + added initial Qt6 support
+
 2021-08-26
 v0.5.9 - Vitozz
   * Fixed missing TreeView in plugin options

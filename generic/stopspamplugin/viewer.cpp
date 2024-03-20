@@ -112,7 +112,11 @@ void ViewLog::saveLog()
     }
     if (file.open(QIODevice::ReadWrite)) {
         QTextStream out(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         out.setCodec("UTF-8");
+#else
+        out.setEncoding(QStringConverter::Utf8);
+#endif
         QString Text = textWid->toPlainText();
         pages_.insert(currentPage_, Text);
         for (int i = 0; i < pages_.size(); i++) {
@@ -136,7 +140,11 @@ bool ViewLog::init()
         QString     page;
         int         numPage = 0;
         QTextStream in(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         in.setCodec("UTF-8");
+#else
+        in.setEncoding(QStringConverter::Utf8);
+#endif
         while (!in.atEnd()) {
             page = "";
             for (int i = 0; i < 500; i++) {

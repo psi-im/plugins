@@ -49,7 +49,7 @@ Controller::Controller(ApplicationInfoAccessingHost *appInfo) : QObject(), appIn
     Options *o        = Options::instance();
     QVariant vServers = o->getOption(constServerList);
 
-    if (!vServers.isValid()) { //приложение запущено впервые
+    if (!vServers.isValid()) { // приложение запущено впервые
         o->setOption(constShortCut, QVariant("Alt+Shift+p"));
         o->setOption(constFormat, QVariant("png"));
         o->setOption(constFileName, QVariant("pic-yyyyMMdd-hhmmss"));
@@ -74,7 +74,7 @@ Controller::Controller(ApplicationInfoAccessingHost *appInfo) : QObject(), appIn
         o->setOption(constVersionOption, cVersion);
     }
 
-    o->setOption(constServerList, servers); //сохраняем обновленный список серверов
+    o->setOption(constServerList, servers); // сохраняем обновленный список серверов
 }
 
 Controller::~Controller()

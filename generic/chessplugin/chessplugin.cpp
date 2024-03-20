@@ -413,7 +413,7 @@ void ChessPlugin::invite(Request &r)
     id->show();
 }
 
-//В этом методе отправляется приглашение
+// В этом методе отправляется приглашение
 void ChessPlugin::sendInvite(const Request &req, const QString &resource, const QString &color)
 {
     Request r = req;
@@ -433,7 +433,7 @@ void ChessPlugin::sendInvite(const Request &req, const QString &resource, const 
     invites.push_back(r);
 }
 
-//Этот метод вызывается, когда вы принимаете приглашение
+// Этот метод вызывается, когда вы принимаете приглашение
 void ChessPlugin::accept()
 {
     stanzaSender->sendStanza(
@@ -443,7 +443,7 @@ void ChessPlugin::accept()
     acceptGame();
 }
 
-//Этот метод вызывается, когда вы отказываетесь от игры
+// Этот метод вызывается, когда вы отказываетесь от игры
 void ChessPlugin::reject()
 {
     stanzaSender->sendStanza(

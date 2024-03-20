@@ -2,7 +2,7 @@
     "name": "Battleship Game Plugin",
     "name:ru": "Морской бой",
     "shortname": "battleshipgameplugin",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "priority": 2,
     "icon": "base64:iVBORw0KGgoAAAANSUhEUgAAABEAAAAQCAYAAADwMZRfAAAACXBIWXMAAAAYAAAAGAGH+w4LAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAh5JREFUOI2tkU1oE3EQxX/ZbA3rhqRJhLampYcQW6UE/KAoFNL2UkGQtlBQ8CAIIoQcStSTF0UFKz3m5kkIFvEjgtVDPEivRYuFSLZIRUIPLWzdhF2yi9n8PRil1ZpacC4z8B5v3puB/1CefyFpmjYoy/K0x+PZ77ru43g8ntuKy7sJlEql+4qiXJQkKey6blUI8QnYJiK1EhBCSEKIoOM4dw3DOFYsFjtjsVhmT3ESicRKvV73y7JsLi8vH/obr2UcVVUPNhoNVZIkqxWvVZxYbzjsHo/H6Q2HXSC2Fyce4DJQPj01Ve3r6wtomladm58/DIwCDwCxm5MLwGvglST9gJv9JVBo4n9sJZPJTEaj0X7LstoKhUJifHz8HYCqqtcjkUhQ1/WKZVkzAPl8/sTY2NgHRVG+ra2tlWZnZ5/JAIZhfE4mk9lyudyZTqfp7u6e3LopGo0GgTvNGV3XJ3p6ejaWlpbO/nICkEqlJhRFeWTbtk9VVQACgQADAwMUi0UqlQoApmmiKIpTq9XOZ7PZ5wDenyKLi4ul9vb2aiiUGDaMS20+31FGRrpYWHjD0NAZNC2Jrp/E6/1SW119fzWXyz3c4Z5iGBpP4F7d7/9aAdsB2+7ouKWD44Dt+P2bBsy40HgBYnSn7wRBbMKpadOM3IS3XeC7sb5eX4F91+Bpp2keuA2DV0BsAP5t39mhQsA5oAEcAT42uXOA8Tv5O0/cxqkoyWRZAAAAAElFTkSuQmCC",
     "description": "Play Battleship game with your friends!",

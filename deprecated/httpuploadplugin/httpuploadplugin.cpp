@@ -60,7 +60,7 @@
 #include <QTextDocument>
 #include <QVBoxLayout>
 
-//#define DEBUG_UPLOAD
+// #define DEBUG_UPLOAD
 #define constVersion "0.1.0"
 #define CONST_LAST_FOLDER "httpupload-lastfolder"
 #define SLOT_TIMEOUT 10000

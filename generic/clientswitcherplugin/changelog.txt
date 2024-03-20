@@ -1,3 +1,7 @@
+2024-03-19
+v0.2
+  + added initial Qt6 support
+
 2020-07-22
 v0.1
   * The plugin was rewritten to reuse caps generation of iris

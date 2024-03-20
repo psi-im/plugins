@@ -145,13 +145,13 @@ private:
     PopupAccessingHost           *popup;
     ContactInfoAccessingHost     *contactInfo;
 
-    QString      Question;  //вопрос
+    QString      Question;  // вопрос
     QString      Answer;    // ответ
     QString      Unblocked; // прошедшие проверку
     QStringList  Jids;      // список джидов правил
     QVariantList selected;  // список вкл\выкл
     int          Counter;   // счетчик
-    int          Height;    //высота и ширина
+    int          Height;    // высота и ширина
     int          Width;
     QString      Congratulation; // поздравление
     bool         DefaultAct;     // выключить, если не подошло ни одно правило
@@ -160,8 +160,8 @@ private:
     bool         LogHistory;     // логировать в историю
     bool         UseMuc, BlockAll,
         EnableBlockAllMes; // включечить для конф, блокировать все приваты, слать сообщение, если блокируем все приваты
-    bool    Admin, Owner, None, Member;  // аффилиации
-    bool    Moder, Participant, Visitor; // роли
+    bool Admin, Owner, None, Member;  // аффилиации
+    bool Moder, Participant, Visitor; // роли
     QString BlockAllMes; // сообщение, которое шлется приватам если блокируем все приваты
 
     struct Blocked { // структура, необходимая для подсчета кол-ва сообщений для конкретного джида
@@ -665,14 +665,14 @@ void StopSpam::updateCounter(const QDomElement &stanza, bool b)
     if (file.open(QIODevice::WriteOnly | QIODevice::Append)) {
         QString     date = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
         QTextStream out(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         out.setCodec("UTF-8");
+#else
+        out.setEncoding(QStringConverter::Utf8);
+#endif
         // out.seek(file.size());
         out.setGenerateByteOrderMark(false);
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-        out << date << endl << stanza << endl;
-#else
         out << date << Qt::endl << stanza << Qt::endl;
-#endif
     }
 
     if (!popup->popupDuration(POPUP_OPTION))
@@ -752,14 +752,14 @@ void StopSpam::logHistory(const QDomElement &stanza)
         body = "subscribe";
     QString     outText = time + type + QString::fromUtf8("from|N---|") + body;
     QTextStream out(&file);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     out.setCodec("UTF-8");
+#else
+    out.setEncoding(QStringConverter::Utf8);
+#endif
     // out.seek(file.size());
     out.setGenerateByteOrderMark(false);
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-    out << outText << endl;
-#else
     out << outText << Qt::endl;
-#endif
 }
 
 bool StopSpam::processMuc(int account, const QDomElement &stanza)

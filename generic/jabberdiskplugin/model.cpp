@@ -19,9 +19,10 @@
 
 #include "model.h"
 #include <QApplication>
+#include <QIODevice>
 #include <QMimeData>
 #include <QStyle>
-//#include <QDebug>
+// #include <QDebug>
 
 JDModel::JDModel(const QString &diskName, QObject *parent) :
     QAbstractItemModel(parent), diskName_(diskName), rootIndex_(createIndex(0, 0, static_cast<quintptr>(0)))
@@ -144,7 +145,7 @@ bool JDModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int /*r
 
     JDItem *p = nullptr;
     if (parent != rootIndex()) {
-        for (const ProxyItem &i : qAsConst(items_)) {
+        for (const ProxyItem &i : std::as_const(items_)) {
             if (i.index == parent) {
                 p = i.item;
                 break;
@@ -160,8 +161,8 @@ bool JDModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int /*r
     newItem->fromDataStream(&in);
 
     if (addItem(newItem)) {
-        //В DataStream осталась только информация о полном пути
-        //к старому элементу, и ее можно получить
+        // В DataStream осталась только информация о полном пути
+        // к старому элементу, и ее можно получить
         QString path;
         in >> path;
         emit moveItem(path, p ? p->fullPath() : rootPath());
@@ -268,7 +269,7 @@ bool JDModel::addItem(JDItem *i)
     pi.item = i;
 
     if (i->parent()) {
-        for (const ProxyItem &item : qAsConst(items_)) {
+        for (const ProxyItem &item : std::as_const(items_)) {
             if (item.item == i->parent()) {
                 pi.parent = item.index;
                 break;
@@ -279,7 +280,7 @@ bool JDModel::addItem(JDItem *i)
     }
 
     int count = 0;
-    for (const ProxyItem &item : qAsConst(items_)) {
+    for (const ProxyItem &item : std::as_const(items_)) {
         if (item.item->parent() == i->parent())
             ++count;
     }

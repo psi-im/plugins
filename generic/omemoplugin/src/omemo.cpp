@@ -90,7 +90,7 @@ void OMEMO::publishOwnBundle(int account)
     QDomElement preKeys = doc.createElement("prekeys");
     bundle.appendChild(preKeys);
 
-    for (auto &preKey : qAsConst(b.preKeys)) {
+    for (auto &preKey : std::as_const(b.preKeys)) {
         QDomElement preKeyPublic = doc.createElement("preKeyPublic");
         preKeyPublic.setAttribute("preKeyId", preKey.first);
         setNodeText(preKeyPublic, preKey.second);
@@ -298,7 +298,7 @@ bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml,
                      "[OMEMO] " + tr("Unable to build any sessions, the message was not sent"));
         xml = QDomElement();
     } else {
-        for (auto &encKey : qAsConst(encryptedKeys)) {
+        for (auto &encKey : std::as_const(encryptedKeys)) {
             if (toDeviceId != nullptr && *toDeviceId != encKey.deviceId) {
                 continue;
             }
@@ -476,7 +476,7 @@ bool OMEMO::processBundle(const QString &ownJid, int account, const QDomElement 
         return false;
 
     std::shared_ptr<MessageWaitingForBundles> message;
-    for (auto &msg : qAsConst(m_pendingMessages)) {
+    for (auto &msg : std::as_const(m_pendingMessages)) {
         if (msg->sentStanzas.contains(stanzaId)) {
             message = msg;
             break;
@@ -500,7 +500,7 @@ bool OMEMO::processBundle(const QString &ownJid, int account, const QDomElement 
         bundle.signedPreKeyId          = signedPreKeyPublic.attribute("signedPreKeyId").toUInt();
         bundle.signedPreKeyPublic      = QByteArray::fromBase64(signedPreKeyPublic.firstChild().nodeValue().toUtf8());
         bundle.signedPreKeySignature   = QByteArray::fromBase64(
-              bundleElement.firstChildElement("signedPreKeySignature").firstChild().nodeValue().toUtf8());
+            bundleElement.firstChildElement("signedPreKeySignature").firstChild().nodeValue().toUtf8());
         bundle.identityKeyPublic
             = QByteArray::fromBase64(bundleElement.firstChildElement("identityKey").firstChild().nodeValue().toUtf8());
 
