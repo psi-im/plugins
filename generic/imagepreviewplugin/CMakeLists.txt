@@ -26,7 +26,7 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR ("${CMAKE_BUILD_TYPE}" STREQUAL "Re
     endif()
 endif()
 
-find_package( Qt5 COMPONENTS Core REQUIRED )
+find_package( Qt${QT_DEFAULT_MAJOR_VERSION} COMPONENTS Core REQUIRED )
 
 get_filename_component(ABS_PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
 set(PLUGINS_ROOT_DIR "${ABS_PLUGINS_ROOT_DIR}" CACHE STRING "Plugins root path. Path where include directory placed")
