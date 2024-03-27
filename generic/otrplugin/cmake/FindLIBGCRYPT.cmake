@@ -80,11 +80,12 @@ find_library(
 )
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(
-                LibGcrypt
+                LIBGCRYPT
                 DEFAULT_MSG
                 LIBGCRYPT_LIBRARY
                 LIBGCRYPT_INCLUDE_DIR
 )
+
 if( LIBGCRYPT_FOUND )
     set( LIBGCRYPT_LIBRARIES ${LIBGCRYPT_LIBRARY} )
     set( LIBGCRYPT_INCLUDE_DIRS ${LIBGCRYPT_INCLUDE_DIR} )

@@ -80,7 +80,7 @@ find_library(
 )
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(
-                LibGpgError
+                LIBGPGERROR
                 DEFAULT_MSG
                 LIBGPGERROR_LIBRARY
                 LIBGPGERROR_INCLUDE_DIR

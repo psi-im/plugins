@@ -48,10 +48,10 @@ if( WIN32 )
     endif()
 endif()
 
-find_package( LibGcrypt REQUIRED )
-find_package( LibOtr REQUIRED )
-find_package( LibTidy REQUIRED )
-find_package( LibGpgError REQUIRED )
+find_package( LIBGCRYPT REQUIRED )
+find_package( LIBOTR REQUIRED )
+find_package( LIBTIDY REQUIRED )
+find_package( LIBGPGERROR REQUIRED )
 add_definitions(
         ${LIBOTR_DEFINITIONS}
         ${LIBTIDY_DEFINITIONS}

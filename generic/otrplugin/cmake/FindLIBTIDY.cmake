@@ -28,55 +28,66 @@
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND WIN32)
     set(D "d")
 endif()
-if( LIBOTR_INCLUDE_DIR AND LIBOTR_LIBRARY )
+if( LIBTIDY_INCLUDE_DIR AND LIBTIDY_LIBRARY )
     # in cache already
-    set(LIBOTR_FIND_QUIETLY TRUE)
+    set(LIBTIDY_FIND_QUIETLY TRUE)
 endif()
 
 if( UNIX AND NOT( APPLE OR CYGWIN ) )
     find_package( PkgConfig QUIET )
-    pkg_check_modules( PC_LIBOTR QUIET libotr )
-    if( PC_LIBOTR_FOUND )
-        set( LIBOTR_DEFINITIONS ${PC_LIBOTR_CFLAGS} ${PC_LIBOTR_CFLAGS_OTHER} )
+    pkg_check_modules( PC_LIBTIDY QUIET libtidy )
+    if( PC_LIBTIDY_FOUND )
+        set( LIBTIDY_DEFINITIONS ${PC_LIBTIDY_CFLAGS} ${PC_LIBTIDY_CFLAGS_OTHER} )
     endif()
 endif()
 
-set( LIBOTR_ROOT "" CACHE STRING "Path to libotr library" )
+set( LIBTIDY_ROOT "" CACHE STRING "Path to libtidy library" )
 
 find_path(
-    LIBOTR_INCLUDE_DIR libotr/privkey.h
+    LIBTIDY_INCLUDE_DIR tidy.h
     HINTS
-    ${LIBOTR_ROOT}/include
-    ${PC_LIBOTR_INCLUDEDIR}
-    ${PC_LIBOTR_INCLUDE_DIRS}
+    ${PC_LIBTIDY_INCLUDEDIR}
+    ${PC_LIBTIDY_INCLUDE_DIRS}
+    PATHS
+    ${LIBTIDY_ROOT}/include
     PATH_SUFFIXES
     ""
-    libotr
+    tidy
 )
-set(LIBOTR_NAMES
-    otr${D}
-    libotr${D}
-    otr-5
+
+if( EXISTS "${LIBTIDY_INCLUDE_DIR}/tidybuffio.h" OR (EXISTS "${LIBTIDY_INCLUDE_DIR}/tidy/tidybuffio.h") )
+    message(STATUS "Tidy-html5 detected")
+else()
+    message(STATUS "Tidy-html legacy detected")
+    set( LIBTIDY_DEFINITIONS "${LIBTIDY_DEFINITIONS} -DLEGACY_TIDY" )
+endif()
+set(LIBTIDY_NAMES
+    tidy${D}
+    tidys${D}
+    libtidy${D}
+    libtidys${D}
+    libtidy-0-99-0
+    tidy-0-99-0
 )
 find_library(
-    LIBOTR_LIBRARY
-    NAMES ${LIBOTR_NAMES}
-    HINTS 
-    ${PC_LIBOTR_LIBDIR}
-    ${PC_LIBOTR_LIBRARY_DIRS}
-    ${LIBOTR_ROOT}/lib
-    ${LIBOTR_ROOT}/bin
+    LIBTIDY_LIBRARY
+    NAMES ${LIBTIDY_NAMES}
+    HINTS
+    ${PC_LIBTIDY_LIBDIR}
+    ${PC_LIBTIDY_LIBRARY_DIRS}
+    ${LIBTIDY_ROOT}/lib
+    ${LIBTIDY_ROOT}/bin
 )
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(
-                LibOtr
+                LIBTIDY
                 DEFAULT_MSG
-                LIBOTR_LIBRARY
-                LIBOTR_INCLUDE_DIR
+                LIBTIDY_LIBRARY
+                LIBTIDY_INCLUDE_DIR
 )
-if( LIBOTR_FOUND )
-    set( LIBOTR_LIBRARIES ${LIBOTR_LIBRARY} )
-    set( LIBOTR_INCLUDE_DIRS ${LIBOTR_INCLUDE_DIR} )
+if( LIBTIDY_FOUND )
+    set( LIBTIDY_LIBRARIES ${LIBTIDY_LIBRARY} )
+    set( LIBTIDY_INCLUDE_DIRS ${LIBTIDY_INCLUDE_DIR} )
 endif()
 
-mark_as_advanced( LIBOTR_INCLUDE_DIR LIBOTR_LIBRARY )
+mark_as_advanced( LIBTIDY_INCLUDE_DIR LIBTIDY_LIBRARY )
