@@ -115,6 +115,10 @@ else()
     set(PLUGINS_PATH "${MAIN_PROGRAM_NAME}/plugins" CACHE STRING "Install suffix for plugins")
 endif()
 
+if("${QT_DEFAULT_MAJOR_VERSION}" STREQUAL "")
+    set(QT_DEFAULT_MAJOR_VERSION 5)
+endif()
+
 if(GENERIC_PLUGINS_FOUND)
     add_subdirectory(generic)
 endif()
