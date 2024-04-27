@@ -25,25 +25,19 @@
 static const QString k_omemoXmlns("eu.siacs.conversations.axolotl");
 
 namespace psiomemo {
-void OMEMO::init(const QString &dataPath)
+OMEMO::OMEMO(const QString &dataPath, std::shared_ptr<Crypto> crypto, AccountInfoAccessingHost *accountInfoAccessor,
+             StanzaSendingHost *stanzaSender, PsiAccountControllingHost *accountController,
+             ContactInfoAccessingHost *contactInfoAccessor) :
+    m_crypto(crypto), m_accountInfoAccessor(accountInfoAccessor), m_stanzaSender(stanzaSender),
+    m_accountController(accountController), m_contactInfoAccessor(contactInfoAccessor), m_dataPath(dataPath)
 {
-    m_dataPath = dataPath;
     m_accountController->subscribeLogout(this, [this](int account) {
-        auto signal = m_accountToSignal.take(account);
-        if (signal) {
-            signal->deinit();
-        }
+        m_accountToSignal.remove(account);
         // TODO cleanup m_pendingMessages for this account as well. They all have null xml.
     });
 }
 
-void OMEMO::deinit()
-{
-    auto const signals_ = m_accountToSignal.values();
-    for (auto signal : signals_) {
-        signal->deinit();
-    }
-}
+OMEMO::~OMEMO() { }
 
 void OMEMO::accountConnected(int account, const QString &ownJid)
 {
@@ -189,7 +183,7 @@ bool OMEMO::decryptMessage(int account, QDomElement &xml)
             }
 
             QPair<QByteArray, QByteArray> decryptedBody
-                = Crypto::aes_gcm(Crypto::Decode, iv, decryptedKey, payload, tag);
+                = m_crypto->aes_gcm(Crypto::Decode, iv, decryptedKey, payload, tag);
             if (!decryptedBody.first.isNull()) {
                 bool trusted = signal->isTrusted(sender, deviceId);
                 message.removeChild(encrypted);
@@ -269,18 +263,18 @@ bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml,
     encrypted.appendChild(header);
     xml.appendChild(encrypted);
 
-    QByteArray iv = Crypto::randomBytes(OMEMO_AES_GCM_IV_LENGTH);
+    QByteArray iv = m_crypto->randomBytes(OMEMO_AES_GCM_IV_LENGTH);
 
     QDomElement ivElement = xml.ownerDocument().createElement("iv");
     ivElement.appendChild(xml.ownerDocument().createTextNode(iv.toBase64()));
     header.appendChild(ivElement);
 
-    QByteArray                    key  = Crypto::randomBytes(OMEMO_AES_128_KEY_LENGTH);
+    QByteArray                    key  = m_crypto->randomBytes(OMEMO_AES_128_KEY_LENGTH);
     QDomElement                   body = xml.firstChildElement("body");
     QPair<QByteArray, QByteArray> encryptedBody;
     if (!body.isNull()) {
         QString plainText = body.firstChild().nodeValue();
-        encryptedBody     = Crypto::aes_gcm(Crypto::Encode, iv, key, plainText.toUtf8());
+        encryptedBody     = m_crypto->aes_gcm(Crypto::Encode, iv, key, plainText.toUtf8());
         key += encryptedBody.second;
     }
     QList<EncryptedKey> encryptedKeys;
@@ -579,23 +573,6 @@ void OMEMO::setNodeText(QDomElement &node, const QByteArray &byteArray) const
     node.appendChild(node.ownerDocument().createTextNode(array));
 }
 
-void OMEMO::setStanzaSender(StanzaSendingHost *stanzaSender) { m_stanzaSender = stanzaSender; }
-
-void OMEMO::setAccountController(PsiAccountControllingHost *accountController)
-{
-    m_accountController = accountController;
-}
-
-void OMEMO::setAccountInfoAccessor(AccountInfoAccessingHost *accountInfoAccessor)
-{
-    m_accountInfoAccessor = accountInfoAccessor;
-}
-
-void OMEMO::setContactInfoAccessor(ContactInfoAccessingHost *contactInfoAccessor)
-{
-    m_contactInfoAccessor = contactInfoAccessor;
-}
-
 bool OMEMO::appendSysMsg(int account, const QString &jid, const QString &message)
 {
     return m_accountController->appendSysMsg(account, jid, message);
@@ -732,13 +709,12 @@ bool OMEMO::trustNewContactDevices() const { return m_trustNewContactDevices; }
 
 std::shared_ptr<Signal> OMEMO::getSignal(int account)
 {
-    if (!m_accountToSignal.contains(account)) {
-        std::shared_ptr<Signal> signal(new Signal);
-        QString                 accountId = m_accountInfoAccessor->getId(account).replace('{', "").replace('}', "");
-        signal->init(m_dataPath, accountId);
-        m_accountToSignal[account] = signal;
+    auto signal = m_accountToSignal.value(account);
+    if (!signal) {
+        QString accountId = m_accountInfoAccessor->getId(account).replace('{', "").replace('}', "");
+        signal = m_accountToSignal[account] = std::make_shared<Signal>(m_crypto, m_dataPath, accountId);
     }
-    return m_accountToSignal[account];
+    return signal;
 }
 
 template <typename T>

@@ -32,15 +32,17 @@
 #include <memory>
 
 namespace psiomemo {
+class Crypto;
+
 class OMEMO : public QObject {
     Q_OBJECT
 
 public:
-    void init(const QString &dataPath);
-    void setStanzaSender(StanzaSendingHost *stanzaSender);
-    void setAccountController(PsiAccountControllingHost *accountController);
-    void setAccountInfoAccessor(AccountInfoAccessingHost *accountInfoAccessor);
-    void setContactInfoAccessor(ContactInfoAccessingHost *contactInfoAccessor);
+    OMEMO(const QString &dataPath, std::shared_ptr<Crypto> crypto, AccountInfoAccessingHost *accountInfoAccessor,
+          StanzaSendingHost *stanzaSender, PsiAccountControllingHost *accountController,
+          ContactInfoAccessingHost *contactInfoAccessor);
+    ~OMEMO();
+
     bool appendSysMsg(int account, const QString &jid, const QString &message);
 
     bool decryptMessage(int account, QDomElement &message);
@@ -49,7 +51,6 @@ public:
     bool processDeviceList(const QString &ownJid, int account, const QDomElement &xml);
     void processUndecidedDevices(int account, const QString &ownJid, const QString &user);
     void processUnknownDevices(int account, const QString &ownJid, const QString &user);
-    void deinit();
     bool processBundle(const QString &ownJid, int account, const QDomElement &xml);
 
     void accountConnected(int account, const QString &ownJid);
@@ -109,6 +110,7 @@ private:
         QHash<QString, uint32_t> sentStanzas;
     };
 
+    std::shared_ptr<Crypto>                            m_crypto;
     StanzaSendingHost                                 *m_stanzaSender        = nullptr;
     PsiAccountControllingHost                         *m_accountController   = nullptr;
     AccountInfoAccessingHost                          *m_accountInfoAccessor = nullptr;

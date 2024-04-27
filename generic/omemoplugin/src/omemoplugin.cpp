@@ -43,8 +43,9 @@ QWidget *OMEMOPlugin::options()
     if (!m_enabled)
         return nullptr;
 
-    auto configWidget = new ConfigWidget(m_omemo, m_accountInfo);
+    auto configWidget = new ConfigWidget(m_omemo.get(), m_accountInfo);
     connect(this, &OMEMOPlugin::applyPluginSettings, configWidget, &ConfigWidget::applySettings);
+    connect(m_omemo.get(), &QObject::destroyed, configWidget, &ConfigWidget::deleteLater);
     return configWidget;
 }
 
@@ -60,23 +61,25 @@ bool OMEMOPlugin::enable()
     if (m_enabled)
         return true;
 
-    if (!(Crypto::isSupported() && m_accountInfo && m_stanzaSender && m_accountController && m_contactInfo
-          && m_optionHost)) {
+    if (!(m_accountInfo && m_stanzaSender && m_accountController && m_contactInfo && m_optionHost)) {
         return false;
     }
-    m_omemo = new OMEMO();
-    m_omemo->setAccountInfoAccessor(m_accountInfo);
-    m_omemo->setStanzaSender(m_stanzaSender);
-    m_omemo->setAccountController(m_accountController);
-    m_omemo->setContactInfoAccessor(m_contactInfo);
+
+    m_crypto = std::make_shared<Crypto>();
+    if (!m_crypto->isSupported()) {
+        qWarning("omemo: crypto backend failed to initialize");
+        m_crypto = {};
+        return false;
+    }
+
+    m_omemo.reset(new OMEMO(m_applicationInfo->appCurrentProfileDir(ApplicationInfoAccessingHost::DataLocation),
+                            m_crypto, m_accountInfo, m_stanzaSender, m_accountController, m_contactInfo));
 
     bool firstCall = (m_optionHost == nullptr);
     if (firstCall)
         optionChanged(QString());
 
-    connect(m_omemo, &OMEMO::saveSettings, this, &OMEMOPlugin::savePluginOptions);
-
-    m_omemo->init(m_applicationInfo->appCurrentProfileDir(ApplicationInfoAccessingHost::DataLocation));
+    connect(m_omemo.get(), &OMEMO::saveSettings, this, &OMEMOPlugin::savePluginOptions);
 
     m_enabled = true;
     return true;
@@ -88,9 +91,8 @@ bool OMEMOPlugin::disable()
         return true;
 
     m_enabled = false;
-    m_omemo->deinit();
-    delete m_omemo;
-    m_omemo = nullptr;
+    m_omemo   = {};
+    m_crypto  = {};
 
     return true;
 }
@@ -309,7 +311,7 @@ void OMEMOPlugin::fileDownloadFinished()
     QByteArray iv      = keyData.left(OMEMO_AES_GCM_IV_LENGTH);
     QByteArray key     = keyData.right(keyData.size() - OMEMO_AES_GCM_IV_LENGTH);
 
-    QByteArray decrypted = Crypto::aes_gcm(Crypto::Decode, iv, key, data, tag).first;
+    QByteArray decrypted = m_crypto->aes_gcm(Crypto::Decode, iv, key, data, tag).first;
     if (!decrypted.isNull()) {
         QFile f(reply->property("filePath").toString());
         f.open(QIODevice::WriteOnly);
@@ -454,7 +456,8 @@ void OMEMOPlugin::enableOMEMOAction(bool checked)
         updateAction(account, jid);
     } else if (act == actManageFingerprints) {
         auto screen = QGuiApplication::primaryScreen();
-        auto w      = new KnownFingerprints(account, m_omemo, nullptr);
+        auto w      = new KnownFingerprints(account, m_omemo.get(), nullptr);
+        connect(m_omemo.get(), &QObject::destroyed, w, &KnownFingerprints::deleteLater);
         w->filterContacts(jid);
         w->setWindowTitle(tr("Manage contact fingerprints"));
         w->resize(1000, 500);
@@ -549,10 +552,10 @@ bool OMEMOPlugin::execute(int account, const QHash<QString, QVariant> &args, QHa
             account, m_contactInfo->realJid(account, args["is_enabled_for"].toString()).split("/").first());
     } else if (args.contains("encrypt_data")) {
         QByteArray data = args["encrypt_data"].toByteArray();
-        QByteArray iv   = Crypto::randomBytes(OMEMO_AES_GCM_IV_LENGTH);
-        QByteArray key  = Crypto::randomBytes(32);
+        QByteArray iv   = m_crypto->randomBytes(OMEMO_AES_GCM_IV_LENGTH);
+        QByteArray key  = m_crypto->randomBytes(32);
 
-        QPair<QByteArray, QByteArray> encResult = Crypto::aes_gcm(Crypto::Encode, iv, key, data);
+        QPair<QByteArray, QByteArray> encResult = m_crypto->aes_gcm(Crypto::Encode, iv, key, data);
         result->insert("data", encResult.first + encResult.second);
         result->insert("anchor", iv + key);
 

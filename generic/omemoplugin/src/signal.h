@@ -24,9 +24,11 @@
 #include "storage.h"
 #include <QMap>
 #include <QObject>
-#include <utility>
 
 namespace psiomemo {
+
+class Crypto;
+
 class Bundle {
 public:
     Bundle() : signedPreKeyId(), signedPreKeyPublic(), signedPreKeySignature(), identityKeyPublic(), preKeys() { }
@@ -63,8 +65,8 @@ public:
 
 class Signal {
 public:
-    void     init(const QString &dataPath, const QString &accountId);
-    void     deinit();
+    Signal(std::shared_ptr<Crypto> crypto, const QString &dataPath, const QString &accountId);
+    ~Signal();
     Bundle   collectBundle();
     void     processBundle(const QString &from, uint32_t deviceId, const Bundle &bundle);
     uint32_t getDeviceId();
@@ -94,9 +96,10 @@ public:
     void removeCurrentDevice();
 
 private:
-    signal_context *m_signalContext = nullptr;
-    uint32_t        m_deviceId      = 0;
-    Storage         m_storage;
+    std::shared_ptr<Crypto> m_crypto;
+    signal_context         *m_signalContext = nullptr;
+    uint32_t                m_deviceId      = 0;
+    Storage                 m_storage;
 
     QByteArray getPublicKey(const ec_key_pair *key_pair) const;
 

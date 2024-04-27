@@ -1,3 +1,7 @@
+2024-04-27
+v2.11
+  + OpenSSL 3.0 support
+
 2024-03-19
 v2.10
   + added initial Qt6 support

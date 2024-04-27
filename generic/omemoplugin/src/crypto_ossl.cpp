@@ -1,6 +1,6 @@
 /*
  * OMEMO Plugin for Psi
- * Copyright (C) 2018 Vyacheslav Karpukhin
+ * Copyright (C) 2018-2024 Vyacheslav Karpukhin, Psi IM team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,45 +17,47 @@
  *
  */
 
-#include <QVector>
-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-#include <QRandomGenerator>
-#endif
+#include "crypto_ossl.h"
 
-#include "crypto.h"
-extern "C" {
-#include <openssl/hmac.h>
-#include <openssl/rand.h>
+#include <QRandomGenerator>
+#include <QVector>
+
+namespace {
+
 }
 
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
-#define OSSL_110
-#endif
-
 namespace psiomemo {
-void Crypto::doInit()
+CryptoOssl::CryptoOssl() noexcept
 {
     OpenSSL_add_all_algorithms();
     if (RAND_status() == 0) {
-        char buf[128];
-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-        auto rg = QRandomGenerator::global();
-        for (char &n : buf) {
-            n = static_cast<char>(rg->bounded(256));
-        }
-#else
-        qsrand(static_cast<uint>(time(nullptr)));
-        for (char &n : buf) {
-            n = static_cast<char>(qrand());
-        }
-#endif
-        RAND_seed(buf, 128);
+        quint32 buf[32];
+        auto    rg = QRandomGenerator::global();
+        rg->fillRange(buf);
+        RAND_seed(buf, sizeof(buf));
     }
+#ifdef OSSL_300
+    m_mac = EVP_MAC_fetch(NULL, "HMAC", NULL);
+#endif
 }
 
-bool Crypto::isSupported() { return true; }
+CryptoOssl::~CryptoOssl() noexcept
+{
+#ifdef OSSL_300
+    EVP_MAC_free(m_mac);
+#endif
+}
 
-QByteArray Crypto::randomBytes(int length)
+bool CryptoOssl::isSupported() const
+{
+#ifdef OSSL_300
+    return m_mac != nullptr;
+#else
+    return true;
+#endif
+}
+
+QByteArray CryptoOssl::randomBytes(int length)
 {
     QVector<uint8_t> vector(length);
     while (RAND_bytes(vector.data(), length) != 1)
@@ -63,7 +65,7 @@ QByteArray Crypto::randomBytes(int length)
     return toQByteArray(vector.data(), static_cast<size_t>(vector.size()));
 }
 
-uint32_t Crypto::randomInt()
+uint32_t CryptoOssl::randomInt()
 {
     uint8_t data[4];
     while (RAND_bytes(data, 4) != 1)
@@ -71,59 +73,86 @@ uint32_t Crypto::randomInt()
     return ((uint32_t)data[0]) | ((uint32_t)data[1]) << 8 | ((uint32_t)data[2]) << 16 | ((uint32_t)data[3]) << 24;
 }
 
-int random(uint8_t *data, size_t len, void *user_data)
+int CryptoOssl::random(uint8_t *data, size_t len)
 {
-    Q_UNUSED(user_data);
     while (RAND_bytes(data, static_cast<int>(len)) != 1)
         ;
     return SG_SUCCESS;
 }
 
-int hmac_sha256_init(void **context, const uint8_t *key, size_t key_len, void *user_data)
+int CryptoOssl::hmac_sha256_init(void **context, const uint8_t *key, size_t key_len)
 {
-    Q_UNUSED(user_data);
-#ifdef OSSL_110
+#ifdef OSSL_300
+    auto ctx = EVP_MAC_CTX_new(m_mac);
+#elif defined(OSSL_110)
     auto ctx = HMAC_CTX_new();
 #else
     auto ctx = static_cast<HMAC_CTX *>(OPENSSL_malloc(sizeof(HMAC_CTX)));
 #endif
-    if (ctx != nullptr) {
-        *context = ctx;
-
-#ifndef OSSL_110
-        HMAC_CTX_init(ctx);
-#endif
-        if (HMAC_Init_ex(ctx, key, static_cast<int>(key_len), EVP_sha256(), nullptr) == 1) {
-            return SG_SUCCESS;
-        }
+    if (ctx == nullptr) {
+        qDebug("omemo: failed to create mac context");
+        return SG_ERR_INVAL;
     }
-    return SG_ERR_INVAL;
+
+#ifdef OSSL_300
+    OSSL_PARAM params[]
+        = { OSSL_PARAM_construct_utf8_string("digest", (char *)"sha256", 0), OSSL_PARAM_construct_end() };
+    if (!EVP_MAC_init(ctx, (const unsigned char *)key, static_cast<int>(key_len), params)) {
+        qDebug("omemo: EVP_MAC_init failed");
+        EVP_MAC_CTX_free(ctx);
+        return SG_ERR_INVAL;
+    }
+
+#elif defined(OSSL_110)
+    if (HMAC_Init_ex(ctx, key, static_cast<int>(key_len), EVP_sha256(), nullptr) != 1) {
+        qDebug("omemo: HMAC_Init_ex failed");
+        return SG_ERR_INVAL;
+    }
+#else
+    HMAC_CTX_init(ctx);
+#endif
+    *context = ctx;
+    return SG_SUCCESS;
 }
 
-int hmac_sha256_update(void *context, const uint8_t *data, size_t data_len, void *user_data)
+int CryptoOssl::hmac_sha256_update(void *context, const uint8_t *data, size_t data_len)
 {
-    Q_UNUSED(user_data);
+#ifdef OSSL_300
+    return EVP_MAC_update(static_cast<EVP_MAC_CTX *>(context), data, data_len) == 1 ? SG_SUCCESS : SG_ERR_INVAL;
+#else
     return HMAC_Update(static_cast<HMAC_CTX *>(context), data, data_len) == 1 ? SG_SUCCESS : SG_ERR_INVAL;
+#endif
 }
 
-int hmac_sha256_final(void *context, signal_buffer **output, void *user_data)
+int CryptoOssl::hmac_sha256_final(void *context, signal_buffer **output)
 {
-    Q_UNUSED(user_data);
-    int              length = EVP_MD_size(EVP_sha256());
-    QVector<uint8_t> vector(length);
-    int              res = HMAC_Final(static_cast<HMAC_CTX *>(context), vector.data(), nullptr);
-    *output              = signal_buffer_create(vector.data(), static_cast<size_t>(vector.size()));
+
+    int        length = EVP_MD_size(EVP_sha256());
+    QByteArray vector(length, Qt::Uninitialized);
+#ifdef OSSL_300
+    size_t out_length;
+    int    res = EVP_MAC_final(static_cast<EVP_MAC_CTX *>(context), reinterpret_cast<unsigned char *>(vector.data()),
+                               &out_length, length);
+
+#else
+    int res = HMAC_Final(static_cast<HMAC_CTX *>(context), reinterpret_cast<unsigned char *>(vector.data()), nullptr);
+#endif
+    *output
+        = signal_buffer_create(reinterpret_cast<unsigned char *>(vector.data()), static_cast<size_t>(vector.size()));
     return res == 1 ? SG_SUCCESS : SG_ERR_INVAL;
 }
 
-void hmac_sha256_cleanup(void *context, void *user_data)
+void CryptoOssl::hmac_sha256_cleanup(void *context)
 {
-    Q_UNUSED(user_data);
-    auto ctx = static_cast<HMAC_CTX *>(context);
-    if (ctx != nullptr) {
-#ifdef OSSL_110
+    if (context != nullptr) {
+#ifdef OSSL_300
+        auto ctx = static_cast<EVP_MAC_CTX *>(context);
+        EVP_MAC_CTX_free(ctx);
+#elif defined(OSSL_110)
+        auto ctx = static_cast<HMAC_CTX *>(context);
         HMAC_CTX_reset(ctx);
 #else
+        auto ctx = static_cast<HMAC_CTX *>(context);
         HMAC_CTX_cleanup(ctx);
         EVP_MD_CTX_cleanup(&ctx->i_ctx);
         EVP_MD_CTX_cleanup(&ctx->o_ctx);
@@ -133,9 +162,9 @@ void hmac_sha256_cleanup(void *context, void *user_data)
     }
 }
 
-int sha512_digest_init(void **context, void *user_data)
+int CryptoOssl::sha512_digest_init(void **context)
 {
-    Q_UNUSED(user_data);
+
     auto ctx = EVP_MD_CTX_create();
     if (ctx != nullptr) {
         *context = ctx;
@@ -147,15 +176,15 @@ int sha512_digest_init(void **context, void *user_data)
     return SG_ERR_INVAL;
 }
 
-int sha512_digest_update(void *context, const uint8_t *data, size_t data_len, void *user_data)
+int CryptoOssl::sha512_digest_update(void *context, const uint8_t *data, size_t data_len)
 {
-    Q_UNUSED(user_data);
+
     return EVP_DigestUpdate(static_cast<EVP_MD_CTX *>(context), data, data_len) == 1 ? SG_SUCCESS : SG_ERR_INVAL;
 }
 
-int sha512_digest_final(void *context, signal_buffer **output, void *user_data)
+int CryptoOssl::sha512_digest_final(void *context, signal_buffer **output)
 {
-    Q_UNUSED(user_data);
+
     int              length = EVP_MD_size(EVP_sha512());
     QVector<uint8_t> vector(length);
     int              res = EVP_DigestFinal(static_cast<EVP_MD_CTX *>(context), vector.data(), nullptr);
@@ -163,15 +192,11 @@ int sha512_digest_final(void *context, signal_buffer **output, void *user_data)
     return res == 1 ? SG_SUCCESS : SG_ERR_INVAL;
 }
 
-void sha512_digest_cleanup(void *context, void *user_data)
-{
-    Q_UNUSED(user_data);
-    EVP_MD_CTX_destroy(static_cast<EVP_MD_CTX *>(context));
-}
+void CryptoOssl::sha512_digest_cleanup(void *context) { EVP_MD_CTX_destroy(static_cast<EVP_MD_CTX *>(context)); }
 
-QPair<QByteArray, QByteArray> aes(Crypto::Direction direction, const EVP_CIPHER *cipher, bool cbcMode,
-                                  const QByteArray &key, const QByteArray &iv, const QByteArray &ciphertext,
-                                  const QByteArray &inputTag)
+std::pair<QByteArray, QByteArray> CryptoOssl::aes(Crypto::Direction direction, const EVP_CIPHER *cipher, bool cbcMode,
+                                                  const QByteArray &key, const QByteArray &iv,
+                                                  const QByteArray &ciphertext, const QByteArray &inputTag)
 {
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
     EVP_CIPHER_CTX_init(ctx);
@@ -223,8 +248,9 @@ QPair<QByteArray, QByteArray> aes(Crypto::Direction direction, const EVP_CIPHER 
     return qMakePair(cryptoText, outTag);
 }
 
-QPair<QByteArray, QByteArray> Crypto::aes_gcm(Crypto::Direction direction, const QByteArray &iv, const QByteArray &key,
-                                              const QByteArray &input, const QByteArray &inputTag)
+std::pair<QByteArray, QByteArray> CryptoOssl::aes_gcm(Crypto::Direction direction, const QByteArray &iv,
+                                                      const QByteArray &key, const QByteArray &input,
+                                                      const QByteArray &inputTag)
 {
     const EVP_CIPHER *cipher;
     switch (key.size()) {
@@ -243,8 +269,8 @@ QPair<QByteArray, QByteArray> Crypto::aes_gcm(Crypto::Direction direction, const
     return aes(direction, cipher, false, key, iv, input, inputTag);
 }
 
-int aes(Crypto::Direction direction, signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len,
-        const uint8_t *iv, size_t iv_len, const uint8_t *ciphertext, size_t ciphertext_len)
+int CryptoOssl::aes(Crypto::Direction direction, signal_buffer **output, int cipherMode, const uint8_t *key,
+                    size_t key_len, const uint8_t *iv, size_t iv_len, const uint8_t *ciphertext, size_t ciphertext_len)
 {
     const EVP_CIPHER *cipher;
     switch (key_len) {
@@ -272,17 +298,17 @@ int aes(Crypto::Direction direction, signal_buffer **output, int cipherMode, con
     return SG_SUCCESS;
 }
 
-int aes_decrypt(signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len, const uint8_t *iv,
-                size_t iv_len, const uint8_t *ciphertext, size_t ciphertext_len, void *user_data)
+int CryptoOssl::decrypt(signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len, const uint8_t *iv,
+                        size_t iv_len, const uint8_t *ciphertext, size_t ciphertext_len)
 {
-    Q_UNUSED(user_data);
+
     return aes(Crypto::Decode, output, cipherMode, key, key_len, iv, iv_len, ciphertext, ciphertext_len);
 }
 
-int aes_encrypt(signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len, const uint8_t *iv,
-                size_t iv_len, const uint8_t *plaintext, size_t plaintext_len, void *user_data)
+int CryptoOssl::encrypt(signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len, const uint8_t *iv,
+                        size_t iv_len, const uint8_t *plaintext, size_t plaintext_len)
 {
-    Q_UNUSED(user_data);
+
     return aes(Crypto::Encode, output, cipherMode, key, key_len, iv, iv_len, plaintext, plaintext_len);
 }
 }

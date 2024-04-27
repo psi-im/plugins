@@ -1,6 +1,7 @@
+cmake_minimum_required(VERSION 3.10.0)
+
 set(PLUGIN omemoplugin)
 project(${PLUGIN} LANGUAGES CXX)
-cmake_minimum_required(VERSION 3.10.0)
 if(POLICY CMP0071)
     cmake_policy(SET CMP0071 NEW)
 endif()
@@ -14,8 +15,8 @@ if(WIN32)
     if(NOT QCA_DIR)
         set( QCA_DIR "E:\\build\\psisdk\\qca" CACHE STRING "Path to qca library" )
     endif()
-    if(NOT SIGNAL_PROTOCOL_C_ROOT)
-        set( SIGNAL_PROTOCOL_C_ROOT "E:\\build\\psisdk\\signal-protocol-c" CACHE STRING "Path to signal-protocol-c library" )
+    if(NOT OMEMO_C_ROOT)
+        set( OMEMO_C_ROOT "E:\\build\\psisdk\\omemo-c" CACHE STRING "Path to omemo-c library" )
     endif()
 endif()
 
@@ -38,31 +39,14 @@ if(NOT PLUGINS_INSTALL_PATH)
 endif()
 
 find_package(Qt${QT_DEFAULT_MAJOR_VERSION} COMPONENTS Network Widgets Xml Sql REQUIRED)
-find_package(OpenSSL COMPONENTS Crypto REQUIRED)
-find_package(SignalProtocolC REQUIRED)
+#find_package(OpenSSL COMPONENTS Crypto REQUIRED)
+#find_package(SignalProtocolC REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(OMEMO_C REQUIRED IMPORTED_TARGET libomemo-c)
 
 include_directories(
-    ${OPENSSL_INCLUDE_DIR}
-    ${SIGNAL_PROTOCOL_C_INCLUDE_DIR}
     ${PLUGINS_ROOT_DIR}/include
 )
-
-#Hack to check signal-protocol-c version
-if(SignalProtocolC_FOUND)
-    try_compile(OLD_SIGNAL
-                ${CMAKE_BINARY_DIR}/oldSignal
-                ${PROJECT_SOURCE_DIR}/config.tests/oldSignal/main.cpp
-                LINK_LIBRARIES ${SIGNAL_PROTOCOL_C_LIBRARY}
-                CMAKE_FLAGS -DINCLUDE_DIRECTORIES=${SIGNAL_PROTOCOL_C_INCLUDE_DIR}
-    )
-    set(MSG_TEST "Performing test: OLD_SIGNAL")
-    if(OLD_SIGNAL)
-        message(STATUS "${MSG_TEST} - Complete")
-        add_definitions(-DOLD_SIGNAL)
-    else()
-        message(STATUS "${MSG_TEST}  - Failed")
-    endif()
-endif()
 
 set(HEADERS
     src/omemoplugin.h
@@ -71,13 +55,14 @@ set(HEADERS
     src/omemo.h
     src/signal.h
     src/configwidget.h
+    src/crypto_ossl.h
 )
 
 set(SOURCES
     src/omemoplugin.cpp
     src/storage.cpp
+    src/crypto.cpp
     src/crypto_ossl.cpp
-    src/crypto_common.cpp
     src/omemo.cpp
     src/signal.cpp
     src/configwidget.cpp
@@ -104,13 +89,13 @@ add_library(
     ${SOURCES}
     ${HEADERS}
     ${RESOURCES}
+    src/psiplugin.json
 )
 
 target_link_libraries(
     ${PLUGIN}
     ${QT_DEPLIBS}
-    ${OPENSSL_CRYPTO_LIBRARY}
-    ${SIGNAL_PROTOCOL_C_LIBRARY}
+    PkgConfig::OMEMO_C
 )
 
 install(

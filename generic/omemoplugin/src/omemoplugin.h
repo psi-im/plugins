@@ -138,7 +138,8 @@ private:
 private:
     bool                          m_enabled = false;
     QMultiMap<QString, QAction *> m_actions;
-    OMEMO                        *m_omemo = nullptr;
+    std::shared_ptr<Crypto>       m_crypto;
+    std::unique_ptr<OMEMO>        m_omemo;
     QNetworkAccessManager         m_networkManager;
 
     AccountInfoAccessingHost     *m_accountInfo       = nullptr;

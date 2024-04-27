@@ -32,38 +32,63 @@ extern "C" {
 #define OMEMO_AES_GCM_TAG_LENGTH 16
 
 namespace psiomemo {
+
+class CryptoImpl;
+
+// this is basically a singleton created as soon as the plugin is enabled
 class Crypto {
 public:
     enum Direction { Encode, Decode };
 
-    static void initCryptoProvider(signal_context *pContext);
+    Crypto();
+    ~Crypto();
+    bool isSupported();
 
-    static bool isSupported();
+    void initCryptoProvider(signal_context *pContext);
 
-    static QPair<QByteArray, QByteArray>
-    aes_gcm(Direction direction, const QByteArray &iv, const QByteArray &key, const QByteArray &input,
+    QByteArray randomBytes(int length);
+    uint32_t   randomInt();
+    std::pair<QByteArray, QByteArray>
+    aes_gcm(Crypto::Direction direction, const QByteArray &iv, const QByteArray &key, const QByteArray &input,
             const QByteArray &tag = QByteArray(OMEMO_AES_GCM_TAG_LENGTH, Qt::Uninitialized));
-
-    static QByteArray randomBytes(int length);
-    static uint32_t   randomInt();
 
 private:
     static void doInit();
+
+    std::unique_ptr<CryptoImpl> impl;
 };
 
-int        random(uint8_t *data, size_t len, void *user_data);
-int        hmac_sha256_init(void **context, const uint8_t *key, size_t key_len, void *user_data);
-int        hmac_sha256_update(void *context, const uint8_t *data, size_t data_len, void *user_data);
-int        hmac_sha256_final(void *context, signal_buffer **output, void *user_data);
-void       hmac_sha256_cleanup(void *context, void *user_data);
-int        sha512_digest_init(void **context, void *user_data);
-int        sha512_digest_update(void *context, const uint8_t *data, size_t data_len, void *user_data);
-int        sha512_digest_final(void *context, signal_buffer **output, void *user_data);
-void       sha512_digest_cleanup(void *context, void *user_data);
-int        aes_decrypt(signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len, const uint8_t *iv,
-                       size_t iv_len, const uint8_t *ciphertext, size_t ciphertext_len, void *user_data);
-int        aes_encrypt(signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len, const uint8_t *iv,
-                       size_t iv_len, const uint8_t *plaintext, size_t plaintext_len, void *user_data);
+class CryptoImpl {
+public:
+    virtual bool isSupported() const = 0;
+
+    // required for signal
+    virtual int  random(uint8_t *data, size_t len)                                         = 0;
+    virtual int  hmac_sha256_init(void **context, const uint8_t *key, size_t key_len)      = 0;
+    virtual int  hmac_sha256_update(void *context, const uint8_t *data, size_t data_len)   = 0;
+    virtual int  hmac_sha256_final(void *context, signal_buffer **output)                  = 0;
+    virtual void hmac_sha256_cleanup(void *context)                                        = 0;
+    virtual int  sha512_digest_init(void **context)                                        = 0;
+    virtual int  sha512_digest_update(void *context, const uint8_t *data, size_t data_len) = 0;
+    virtual int  sha512_digest_final(void *context, signal_buffer **output)                = 0;
+    virtual void sha512_digest_cleanup(void *context)                                      = 0;
+    virtual int  decrypt(signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len, const uint8_t *iv,
+                         size_t iv_len, const uint8_t *ciphertext, size_t ciphertext_len)
+        = 0;
+    virtual int encrypt(signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len, const uint8_t *iv,
+                        size_t iv_len, const uint8_t *plaintext, size_t plaintext_len)
+        = 0;
+
+    // aux methods
+    virtual std::pair<QByteArray, QByteArray>
+    aes_gcm(Crypto::Direction direction, const QByteArray &iv, const QByteArray &key, const QByteArray &input,
+            const QByteArray &tag = QByteArray(OMEMO_AES_GCM_TAG_LENGTH, Qt::Uninitialized))
+        = 0;
+
+    virtual QByteArray randomBytes(int length) = 0;
+    virtual uint32_t   randomInt()             = 0;
+};
+
 QByteArray toQByteArray(const uint8_t *key, size_t key_len);
 }
 

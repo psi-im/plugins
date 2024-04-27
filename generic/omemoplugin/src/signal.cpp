@@ -37,18 +37,18 @@ void Signal::signal_log(int level, const char *message, size_t len, void *user_d
     qDebug() << "Signal: " << QByteArray(message, static_cast<int>(len));
 }
 
-void Signal::init(const QString &dataPath, const QString &accountId)
+Signal::Signal(std::shared_ptr<Crypto> crypto, const QString &dataPath, const QString &accountId) : m_crypto(crypto)
 {
-    signal_context_create(&m_signalContext, nullptr);
+    signal_context_create(&m_signalContext, this);
     signal_context_set_log_function(m_signalContext, &signal_log);
 
-    Crypto::initCryptoProvider(m_signalContext);
+    m_crypto->initCryptoProvider(m_signalContext);
     m_storage.init(m_signalContext, dataPath, accountId);
 
     signal_protocol_identity_get_local_registration_id(m_storage.storeContext(), &m_deviceId);
 }
 
-void Signal::deinit()
+Signal::~Signal()
 {
     m_storage.deinit();
     signal_context_destroy(m_signalContext);
@@ -132,7 +132,7 @@ Bundle Signal::collectBundle()
 
 void Signal::processBundle(const QString &from, uint32_t deviceId, const Bundle &bundle)
 {
-    QPair<uint32_t, QByteArray> preKey = bundle.preKeys.at(Crypto::randomInt() % bundle.preKeys.size());
+    QPair<uint32_t, QByteArray> preKey = bundle.preKeys.at(m_crypto->randomInt() % bundle.preKeys.size());
 
     ec_public_key *pre_key_public = curveDecodePoint(preKey.second);
     if (pre_key_public != nullptr) {
