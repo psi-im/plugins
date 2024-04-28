@@ -11,13 +11,8 @@ endif()
 set(CMAKE_AUTOMOC TRUE)
 set(CMAKE_CXX_STANDARD 14)
 
-if(WIN32)
-    if(NOT QCA_DIR)
-        set( QCA_DIR "E:\\build\\psisdk\\qca" CACHE STRING "Path to qca library" )
-    endif()
-    if(NOT OMEMO_C_ROOT)
-        set( OMEMO_C_ROOT "E:\\build\\psisdk\\omemo-c" CACHE STRING "Path to omemo-c library" )
-    endif()
+if(WIN32 AND (NOT OMEMO_C_ROOT))
+    set( OMEMO_C_ROOT "E:\\build\\psisdk\\omemo-c" CACHE STRING "Path to omemo-c library" )
 endif()
 
 get_filename_component(ABS_PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
@@ -39,13 +34,17 @@ if(NOT PLUGINS_INSTALL_PATH)
 endif()
 
 find_package(Qt${QT_DEFAULT_MAJOR_VERSION} COMPONENTS Network Widgets Xml Sql REQUIRED)
-#find_package(OpenSSL COMPONENTS Crypto REQUIRED)
+find_package(OpenSSL COMPONENTS Crypto REQUIRED)
 #find_package(SignalProtocolC REQUIRED)
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(OMEMO_C REQUIRED IMPORTED_TARGET libomemo-c)
+find_package(OMEMO_C REQUIRED)
+if(WIN32)
+    find_package(PROTOBUF_C REQUIRED)
+endif()
 
 include_directories(
     ${PLUGINS_ROOT_DIR}/include
+    ${OPENSSL_INCLUDE_DIR}
+    ${OMEMO_C_INCLUDE_DIR}
 )
 
 set(HEADERS
@@ -95,8 +94,15 @@ add_library(
 target_link_libraries(
     ${PLUGIN}
     ${QT_DEPLIBS}
-    PkgConfig::OMEMO_C
+    ${OPENSSL_CRYPTO_LIBRARY}
+    ${OMEMO_C_LIBRARY}
 )
+
+if(WIN32)
+    target_link_libraries(${PLUGIN}
+        ${PROTOBUF_C_LIBRARY}
+    )
+endif()
 
 install(
     TARGETS
