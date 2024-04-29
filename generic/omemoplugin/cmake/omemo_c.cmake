@@ -1,12 +1,5 @@
 cmake_minimum_required(VERSION 3.10.0)
 
-if(BUNDLED_OMEMO_C_ALL)
-    include(cmake/protobuf_c.cmake)
-    set(DEPENDS ProtobufCProject)
-else()
-    find_package(Protobuf_C)
-endif()
-
 set(OmemoCGitRepo "https://github.com/psi-im/libomemo-c.git")
 
 message(STATUS "OMEMO_C: using bundled")
@@ -14,6 +7,7 @@ set(OMEMO_C_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/omemo-c)
 set(OMEMO_C_BUILD_DIR ${OMEMO_C_PREFIX}/build)
 set(OMEMO_C_INCLUDE_DIR ${OMEMO_C_PREFIX}/src/OmemoCProject/src)
 set(OMEMO_C_LIBRARY ${OMEMO_C_BUILD_DIR}/src/${CMAKE_STATIC_LIBRARY_PREFIX}omemo-c${D}${CMAKE_STATIC_LIBRARY_SUFFIX})
+set(Protobuf_C_LIBRARY ${OMEMO_C_BUILD_DIR}/src/protobuf-c/build/${CMAKE_STATIC_LIBRARY_PREFIX}protobuf-c${CMAKE_STATIC_LIBRARY_SUFFIX})
 if(APPLE)
     set(COREFOUNDATION_LIBRARY "-framework CoreFoundation")
     set(COREFOUNDATION_LIBRARY_SECURITY "-framework Security")
@@ -27,8 +21,7 @@ set(OMEMO_C_BUILD_OPTIONS
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
     -DCMAKE_INSTALL_PREFIX=${OMEMO_C_PREFIX}/build 
     -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-    -DProtobuf_C_INCLUDE_DIR=${Protobuf_C_INCLUDE_DIR}
-    -DProtobuf_C_LIBRARY=${Protobuf_C_LIBRARY}
+    -DBUNDLED_PROTOBUF_C=ON
     -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
     -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM} 
     -DOSX_FRAMEWORK=OFF
@@ -46,4 +39,3 @@ ExternalProject_Add(OmemoCProject
     UPDATE_COMMAND ""
     DEPENDS ${DEPENDS}
 )
-set(OMEMO_C_LIBRARIES ${OMEMO_C_LIBRARY} ${Protobuf_C_LIBRARY})

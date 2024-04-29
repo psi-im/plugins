@@ -76,6 +76,11 @@ find_package_handle_standard_args(
 if( OMEMO_C_FOUND )
     set( OMEMO_C_LIBRARIES ${OMEMO_C_LIBRARY} )
     set( OMEMO_C_INCLUDE_DIRS ${OMEMO_C_INCLUDE_DIR} )
+    add_library(omemo-c UNKNOWN IMPORTED ${OMEMO_C_LIBRARY})
+    set_property(TARGET omemo-c PROPERTY
+        IMPORTED_LOCATION "${OMEMO_C_LIBRARY}")
+    add_library(omemo-c::omemo-c ALIAS omemo-c)
+    target_include_directories(omemo-c INTERFACE "${OMEMO_C_INCLUDE_DIR}")
 endif()
 
 mark_as_advanced( OMEMO_C_INCLUDE_DIR OMEMO_C_LIBRARY )

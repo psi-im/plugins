@@ -48,17 +48,20 @@ if(EXISTS "${CMAKE_TOOLCHAIN_FILE}")
 endif()
 if(BUNDLED_OMEMO_C_ALL)
     include(cmake/omemo_c.cmake)
-elseif(WIN32)
-    find_package(PROTOBUF_C REQUIRED)
 else()
-    find_package(OMEMO_C REQUIRED)
+    find_package(omemo-c)
+    if(NOT omemo-c_FOUND)
+        find_package(OMEMO_C)
+        if(NOT OMEMO_C_FOUND)
+            message(FATAL_ERROR "omemo-c library not found. Install omemo-c library or set OMEMO_C_ROOT variable with path to library")
+        endif()
+    endif()
 endif()
 
 
 include_directories(
     ${PLUGINS_ROOT_DIR}/include
     ${OPENSSL_INCLUDE_DIR}
-    ${OMEMO_C_INCLUDE_DIR}
 )
 
 set(HEADERS
@@ -105,21 +108,22 @@ add_library(
     src/psiplugin.json
 )
 
-if(BUNDLED_OMEMO_C_ALL)
-    add_dependencies(${PLUGIN} OmemoCProject)
-    target_include_directories(${PLUGIN} PRIVATE ${OMEMO_C_INCLUDE_DIR})
-endif()
-
 target_link_libraries(
     ${PLUGIN}
     ${QT_DEPLIBS}
     ${OPENSSL_CRYPTO_LIBRARY}
-    ${OMEMO_C_LIBRARIES}
 )
 
-if(WIN32)
+if(BUNDLED_OMEMO_C_ALL)
+    add_dependencies(${PLUGIN} OmemoCProject)
+    target_include_directories(${PLUGIN} PRIVATE ${OMEMO_C_INCLUDE_DIR})
     target_link_libraries(${PLUGIN}
+        ${OMEMO_C_LIBRARY}
         ${Protobuf_C_LIBRARY}
+    )
+else()
+    target_link_libraries(${PLUGIN}
+        omemo-c::omemo-c
     )
 endif()
 
