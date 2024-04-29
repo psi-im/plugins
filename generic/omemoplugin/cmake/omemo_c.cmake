@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10.0)
 
 if(BUNDLED_OMEMO_C_ALL)
     include(cmake/protobuf_c.cmake)
+    set(DEPENDS ProtobufCProject)
 else()
     find_package(Protobuf_C)
 endif()
@@ -43,6 +44,6 @@ ExternalProject_Add(OmemoCProject
     BUILD_BYPRODUCTS ${OMEMO_C_LIBRARY}
     INSTALL_COMMAND ""
     UPDATE_COMMAND ""
-    DEPENDS ProtobufCProject
+    DEPENDS ${DEPENDS}
 )
 set(OMEMO_C_LIBRARIES ${OMEMO_C_LIBRARY} ${Protobuf_C_LIBRARY})
