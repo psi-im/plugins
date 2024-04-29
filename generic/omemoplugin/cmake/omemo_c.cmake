@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10.0)
 
-if(USE_MXE)
+if(BUNDLED_OMEMO_C_ALL)
     include(cmake/protobuf_c.cmake)
 else()
     find_package(Protobuf_C)
