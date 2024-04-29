@@ -245,7 +245,7 @@ std::pair<QByteArray, QByteArray> CryptoOssl::aes(Crypto::Direction direction, c
     EVP_CIPHER_CTX_cleanup(ctx);
     EVP_CIPHER_CTX_free(ctx);
 
-    return qMakePair(cryptoText, outTag);
+    return std::make_pair(cryptoText, outTag);
 }
 
 std::pair<QByteArray, QByteArray> CryptoOssl::aes_gcm(Crypto::Direction direction, const QByteArray &iv,
@@ -264,7 +264,7 @@ std::pair<QByteArray, QByteArray> CryptoOssl::aes_gcm(Crypto::Direction directio
         cipher = EVP_aes_256_gcm();
         break;
     default:
-        return qMakePair(QByteArray(), QByteArray());
+        return std::make_pair(QByteArray(), QByteArray());
     }
     return aes(direction, cipher, false, key, iv, input, inputTag);
 }

@@ -555,7 +555,7 @@ bool OMEMOPlugin::execute(int account, const QHash<QString, QVariant> &args, QHa
         QByteArray iv   = m_crypto->randomBytes(OMEMO_AES_GCM_IV_LENGTH);
         QByteArray key  = m_crypto->randomBytes(32);
 
-        QPair<QByteArray, QByteArray> encResult = m_crypto->aes_gcm(Crypto::Encode, iv, key, data);
+        std::pair<QByteArray, QByteArray> encResult = m_crypto->aes_gcm(Crypto::Encode, iv, key, data);
         result->insert("data", encResult.first + encResult.second);
         result->insert("anchor", iv + key);
 

@@ -22,6 +22,7 @@
 
 #include <QByteArray>
 #include <QPair>
+#include <memory>
 
 extern "C" {
 #include <signal_protocol.h>

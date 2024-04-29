@@ -182,7 +182,7 @@ bool OMEMO::decryptMessage(int account, QDomElement &xml)
                 payload.chop(OMEMO_AES_GCM_TAG_LENGTH);
             }
 
-            QPair<QByteArray, QByteArray> decryptedBody
+            std::pair<QByteArray, QByteArray> decryptedBody
                 = m_crypto->aes_gcm(Crypto::Decode, iv, decryptedKey, payload, tag);
             if (!decryptedBody.first.isNull()) {
                 bool trusted = signal->isTrusted(sender, deviceId);
@@ -271,7 +271,7 @@ bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml,
 
     QByteArray                    key  = m_crypto->randomBytes(OMEMO_AES_128_KEY_LENGTH);
     QDomElement                   body = xml.firstChildElement("body");
-    QPair<QByteArray, QByteArray> encryptedBody;
+    std::pair<QByteArray, QByteArray> encryptedBody;
     if (!body.isNull()) {
         QString plainText = body.firstChild().nodeValue();
         encryptedBody     = m_crypto->aes_gcm(Crypto::Encode, iv, key, plainText.toUtf8());

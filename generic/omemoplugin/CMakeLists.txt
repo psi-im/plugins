@@ -33,13 +33,27 @@ if(NOT PLUGINS_INSTALL_PATH)
     set(PLUGINS_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}")
 endif()
 
+option(BUNDLED_OMEMO_C_ALL "Build plugin with bundlel omemo-c and protobuf-c libraries from GitHub" OFF)
+
 find_package(Qt${QT_DEFAULT_MAJOR_VERSION} COMPONENTS Network Widgets Xml Sql REQUIRED)
 find_package(OpenSSL COMPONENTS Crypto REQUIRED)
 #find_package(SignalProtocolC REQUIRED)
-find_package(OMEMO_C REQUIRED)
-if(WIN32)
-    find_package(PROTOBUF_C REQUIRED)
+
+if(EXISTS "${CMAKE_TOOLCHAIN_FILE}")
+    string(TOLOWER ${CMAKE_TOOLCHAIN_FILE} TOOLCHAIN_FILE)
+    string(REGEX MATCH "mxe-conf" MXE_DETECTED "${TOOLCHAIN_FILE}")
+    if(MXE_DETECTED)
+        set(BUNDLED_OMEMO_C_ALL ON)
+    endif()
 endif()
+if(BUNDLED_OMEMO_C_ALL)
+    include(cmake/omemo_c.cmake)
+elseif(WIN32)
+    find_package(PROTOBUF_C REQUIRED)
+else()
+    find_package(OMEMO_C REQUIRED)
+endif()
+
 
 include_directories(
     ${PLUGINS_ROOT_DIR}/include
@@ -91,16 +105,21 @@ add_library(
     src/psiplugin.json
 )
 
+if(BUNDLED_OMEMO_C_ALL)
+    add_dependencies(${PLUGIN} OmemoCProject)
+    target_include_directories(${PLUGIN} PRIVATE ${OMEMO_C_INCLUDE_DIR})
+endif()
+
 target_link_libraries(
     ${PLUGIN}
     ${QT_DEPLIBS}
     ${OPENSSL_CRYPTO_LIBRARY}
-    ${OMEMO_C_LIBRARY}
+    ${OMEMO_C_LIBRARIES}
 )
 
 if(WIN32)
     target_link_libraries(${PLUGIN}
-        ${PROTOBUF_C_LIBRARY}
+        ${Protobuf_C_LIBRARY}
     )
 endif()
 
