@@ -17,7 +17,8 @@ endif()
 include(ExternalProject)
 #set CMake options and transfer the environment to an external project
 set(OMEMO_C_BUILD_OPTIONS
-    -DBUILD_SHARED_LIBS=OFF 
+    -DBUILD_SHARED_LIBS=OFF
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
     -DCMAKE_INSTALL_PREFIX=${OMEMO_C_PREFIX}/build 
     -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
@@ -34,7 +35,7 @@ ExternalProject_Add(OmemoCProject
     GIT_REPOSITORY "${OmemoCGitRepo}"
     GIT_TAG omemo
     CMAKE_ARGS ${OMEMO_C_BUILD_OPTIONS}
-    BUILD_BYPRODUCTS ${OMEMO_C_LIBRARY}
+    BUILD_BYPRODUCTS ${OMEMO_C_LIBRARY} ${Protobuf_C_LIBRARY}
     INSTALL_COMMAND ""
     UPDATE_COMMAND ""
     DEPENDS ${DEPENDS}
