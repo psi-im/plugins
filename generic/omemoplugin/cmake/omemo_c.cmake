@@ -14,6 +14,9 @@ if(APPLE)
     list(APPEND OMEMO_C_LIBRARY ${COREFOUNDATION_LIBRARY} ${COREFOUNDATION_LIBRARY_SECURITY})
 endif()
 
+include(FindGit)
+find_package(Git REQUIRED)
+
 include(ExternalProject)
 #set CMake options and transfer the environment to an external project
 set(OMEMO_C_BUILD_OPTIONS
@@ -23,12 +26,12 @@ set(OMEMO_C_BUILD_OPTIONS
     -DCMAKE_INSTALL_PREFIX=${OMEMO_C_PREFIX}/build 
     -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
     -DBUNDLED_PROTOBUF_C=ON
+    -DGIT_EXEXUTABLE=${GIT_EXECUTABLE}
     -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
     -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM} 
     -DOSX_FRAMEWORK=OFF
 )
-include(FindGit)
-find_package(Git REQUIRED)
+
 ExternalProject_Add(OmemoCProject
     PREFIX ${OMEMO_C_PREFIX}
     BINARY_DIR ${OMEMO_C_BUILD_DIR}
