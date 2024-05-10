@@ -113,7 +113,7 @@ bool JuickPlugin::enable()
 {
     enabled = true;
 
-    QVariant v = psiOptions->getPluginOption(constVersionOpt, QVariant::Invalid);
+    QVariant v = psiOptions->getPluginOption(constVersionOpt, {});
 
     // Проверяем, обновился ли плагин
     if (!v.isValid() || v.toString() != constVersion) {
