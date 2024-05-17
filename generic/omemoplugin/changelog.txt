@@ -1,6 +1,7 @@
 2024-04-27
 v2.11
   + OpenSSL 3.0 support
+  + Change build dependency from libsignal-protocol-c to libomemo-c
 
 2024-03-19
 v2.10

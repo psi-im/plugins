@@ -178,8 +178,8 @@ QString OMEMOPlugin::pluginInfo()
     out += "</dl>";
     out += "<br/>";
     out += tr("Credits: ") + "<br/>";
-    out += "* <a href=\"https://github.com/signalapp/libsignal-protocol-c\">"
-           "libsignal-protocol-c</a> -- Open Whisper Systems<br/>";
+    out += "* <a href=\"https://github.com/gkdr/libomemo\">"
+           "libomemo</a> -- Richard Bayerle<br/>";
     out += "* OMEMO logo -- <a href=\"https://github.com/fiaxh\">fiaxh</a><br/>";
     return out;
 }
