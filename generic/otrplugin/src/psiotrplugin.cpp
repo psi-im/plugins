@@ -198,8 +198,8 @@ QString PsiOtrPlugin::pluginInfo()
     out += "<br/>";
     out += tr("In comparison with OpenPGP and OMEMO, the OTR protocol does "
               "not depend on XMPP specific structures which allows one to use it "
-              "for protecting conversations via XMPP transports (to ICQ, "
-              "Skype, Telegram, QQ, vkontakte and other networks).")
+              "for protecting conversations via XMPP transports (to Telegram, "
+              "Skype, VK, QQ and other networks).")
         + "<br/>";
     out += "<br/>";
     out += tr("OTR features:") + "<br/>";
