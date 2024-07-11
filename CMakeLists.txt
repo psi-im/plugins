@@ -30,8 +30,7 @@ set_directory_properties(PROPERTIES
     COMPILE_DEFINITIONS ""
 )
 
-set( CMAKE_MODULE_PATH
-    ${CMAKE_MODULE_PATH}
+list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/cmake/modules
     ${CMAKE_CURRENT_LIST_DIR}/cmake/modules
 )
