@@ -378,9 +378,15 @@ QWidget *StopSpam::options()
     tv_rules->init();
     ui_.tvRulesLayout->addWidget(tv_rules);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 7, 0)
     connect(ui_.cb_send_block_all_mes, &QCheckBox::stateChanged, this, &StopSpam::changeWidgetsState);
     connect(ui_.cb_enable_muc, &QCheckBox::stateChanged, this, &StopSpam::changeWidgetsState);
     connect(ui_.cb_block_privates, &QCheckBox::stateChanged, this, &StopSpam::changeWidgetsState);
+#else
+    connect(ui_.cb_send_block_all_mes, &QCheckBox::checkStateChanged, this, &StopSpam::changeWidgetsState);
+    connect(ui_.cb_enable_muc, &QCheckBox::checkStateChanged, this, &StopSpam::changeWidgetsState);
+    connect(ui_.cb_block_privates, &QCheckBox::checkStateChanged, this, &StopSpam::changeWidgetsState);
+#endif
 
     connect(ui_.pb_add, &QPushButton::released, this, &StopSpam::addRow);
     connect(ui_.pb_del, &QPushButton::released, this, &StopSpam::removeRow);

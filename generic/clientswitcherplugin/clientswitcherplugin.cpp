@@ -162,7 +162,11 @@ QWidget *ClientSwitcherPlugin::options()
     }
 
     //--
+#if QT_VERSION < QT_VERSION_CHECK(6, 7, 0)
     connect(ui_options.cb_allaccounts, &QCheckBox::stateChanged, this, &ClientSwitcherPlugin::enableAccountsList);
+#else
+    connect(ui_options.cb_allaccounts, &QCheckBox::checkStateChanged, this, &ClientSwitcherPlugin::enableAccountsList);
+#endif
     // TODO: update after stopping support of Ubuntu Xenial:
     connect(ui_options.cb_accounts, SIGNAL(currentIndexChanged(int)), this, SLOT(restoreOptionsAcc(int)));
     connect(ui_options.cmb_lockrequ, SIGNAL(currentIndexChanged(int)), this, SLOT(enableMainParams(int)));

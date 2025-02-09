@@ -122,7 +122,11 @@ ConfigOtrWidget::ConfigOtrWidget(OptionAccessingHost *optionHost, OtrMessaging *
     // TODO: update after stopping support of Ubuntu Xenial:
     connect(m_policy, SIGNAL(buttonClicked(int)), this, SLOT(updateOptions()));
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 7, 0)
     connect(m_endWhenOffline, &QCheckBox::stateChanged, this, &ConfigOtrWidget::updateOptions);
+#else
+    connect(m_endWhenOffline, &QCheckBox::checkStateChanged, this, &ConfigOtrWidget::updateOptions);
+#endif
 }
 
 // ---------------------------------------------------------------------------

@@ -55,6 +55,11 @@ endif()
 
 option( BUILD_DEV_PLUGINS "Build plugins from dev directory" OFF )
 set(MAIN_PROGRAM_NAME "psi" CACHE STRING "Main program name: psi or psi-plus")
+option( USE_QT6 "Enable Qt6 support" OFF )
+
+if(USE_QT6)
+    set(QT_DEFAULT_MAJOR_VERSION 6)
+endif()
 
 if(NOT (DEFINED USE_X11))
     option( USE_X11 "Enable X11 features support" ON )
