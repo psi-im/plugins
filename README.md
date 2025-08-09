@@ -11,7 +11,9 @@ This repository contains all Psi plugins which their developers prefer to mainta
 
 ## Installation
 
-Normally you don't need compile these plugins yourself: they are distributed together with main program (in special packages for your Linux distro, in installer or archive for Windows, in app bundle for macOS, etc.). But if you need to build plugins yourself see instructions below.
+Normally you don't need to compile these plugins yourself: they are distributed together with main program
+(in special packages for your Linux distro, in installer or archive for Windows, in app bundle for macOS, etc.).
+But if you need to build plugins yourself see instructions below.
 
 All plugins may be built separately using qmake or cmake or they may be built together using cmake.
 
@@ -30,15 +32,14 @@ make -j4
 make install DESTDIR="../installdir"
 # If necessary replace "../installdir" from command above to any path you need
 # or copy them manually from "../installdir".
-
 ```
 
 Some available configuration options:
 
-* -DBUILD_PLUGINS="${plugins}"	- set list of plugins to build or to not build
-* -DBUILD_DEV_PLUGINS="ON"	- enable build of some plugins from dev/ (disabled by default)
-* -DPLUGINS_PATH="psi/plugins"	- set suffix for installation path to plugins
-* -DPLUGINS_ROOT_DIR="${path}"	- set path to directory with `plugins.cmake` file
+* `-DBUILD_PLUGINS="${plugins}"` - set list of plugins to build or to not build
+* `-DBUILD_DEV_PLUGINS="ON"` - enable build of some plugins from dev/ (disabled by default)
+* `-DPLUGINS_PATH="psi/plugins"` - set suffix for installation path to plugins
+* `-DPLUGINS_ROOT_DIR="${path}"` - set path to directory with `plugins.cmake` file
 
 Option `-DPLUGINS_ROOT_DIR` should be used only when:
 
