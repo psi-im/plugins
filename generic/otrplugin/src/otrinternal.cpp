@@ -89,7 +89,11 @@ OtrInternal::OtrInternal(psiotr::OtrCallback *callback, psiotr::OtrPolicy &polic
 
 //-----------------------------------------------------------------------------
 
-OtrInternal::~OtrInternal() { otrl_userstate_free(m_userstate); }
+OtrInternal::~OtrInternal() {
+    // FIXME workaround to avoid crash on gcry_sexp_release(privkey->privkey) inside of otrl_privkey_forget()
+    m_userstate->privkey_root = nullptr;
+    otrl_userstate_free(m_userstate);
+}
 
 //-----------------------------------------------------------------------------
 
