@@ -516,22 +516,6 @@ void OtrInternal::create_privkey(const char *accountname, const char *protocol)
         return;
     }
 
-    QMessageBox qMB(QMessageBox::Question, QObject::tr("Confirm action"),
-                    QObject::tr("Private keys for account \"%1\" need to be generated. "
-                                "This takes quite some time (from a few seconds to a "
-                                "couple of minutes), and while you can use Psi in the "
-                                "meantime, all the messages will be sent unencrypted "
-                                "until keys are generated. You will be notified when "
-                                "this process finishes.\n"
-                                "\n"
-                                "Do you want to generate keys now?")
-                        .arg(m_callback->humanAccount(QString::fromUtf8(accountname))),
-                    QMessageBox::Yes | QMessageBox::No);
-
-    if (qMB.exec() != QMessageBox::Yes) {
-        return;
-    }
-
     void *newkeyp;
     if (otrl_privkey_generate_start(m_userstate, accountname, protocol, &newkeyp) == gcry_error(GPG_ERR_EEXIST)) {
         qWarning("libotr reports it's still generating a previous key while it shouldn't be");
