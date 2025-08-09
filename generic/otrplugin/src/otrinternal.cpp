@@ -41,7 +41,6 @@
 #include <QString>
 #include <Qt>
 #include <QtConcurrentRun>
-#include <assert.h>
 
 //-----------------------------------------------------------------------------
 
@@ -63,24 +62,24 @@ OtrInternal::OtrInternal(psiotr::OtrCallback *callback, psiotr::OtrPolicy &polic
 
     OTRL_INIT;
     m_userstate                 = otrl_userstate_create();
-    m_uiOps.policy              = (*OtrInternal::cb_policy);
-    m_uiOps.create_privkey      = (*OtrInternal::cb_create_privkey);
-    m_uiOps.is_logged_in        = (*OtrInternal::cb_is_logged_in);
-    m_uiOps.inject_message      = (*OtrInternal::cb_inject_message);
-    m_uiOps.update_context_list = (*OtrInternal::cb_update_context_list);
-    m_uiOps.new_fingerprint     = (*OtrInternal::cb_new_fingerprint);
-    m_uiOps.write_fingerprints  = (*OtrInternal::cb_write_fingerprints);
-    m_uiOps.gone_secure         = (*OtrInternal::cb_gone_secure);
-    m_uiOps.gone_insecure       = (*OtrInternal::cb_gone_insecure);
-    m_uiOps.still_secure        = (*OtrInternal::cb_still_secure);
+    m_uiOps.policy              = OtrInternal::cb_policy;
+    m_uiOps.create_privkey      = OtrInternal::cb_create_privkey;
+    m_uiOps.is_logged_in        = OtrInternal::cb_is_logged_in;
+    m_uiOps.inject_message      = OtrInternal::cb_inject_message;
+    m_uiOps.update_context_list = OtrInternal::cb_update_context_list;
+    m_uiOps.new_fingerprint     = OtrInternal::cb_new_fingerprint;
+    m_uiOps.write_fingerprints  = OtrInternal::cb_write_fingerprints;
+    m_uiOps.gone_secure         = OtrInternal::cb_gone_secure;
+    m_uiOps.gone_insecure       = OtrInternal::cb_gone_insecure;
+    m_uiOps.still_secure        = OtrInternal::cb_still_secure;
 
     m_uiOps.max_message_size  = nullptr;
-    m_uiOps.account_name      = (*OtrInternal::cb_account_name);
-    m_uiOps.account_name_free = (*OtrInternal::cb_account_name_free);
+    m_uiOps.account_name      = OtrInternal::cb_account_name;
+    m_uiOps.account_name_free = OtrInternal::cb_account_name_free;
 
-    m_uiOps.handle_msg_event = (*OtrInternal::cb_handle_msg_event);
-    m_uiOps.handle_smp_event = (*OtrInternal::cb_handle_smp_event);
-    m_uiOps.create_instag    = (*OtrInternal::cb_create_instag);
+    m_uiOps.handle_msg_event = OtrInternal::cb_handle_msg_event;
+    m_uiOps.handle_smp_event = OtrInternal::cb_handle_smp_event;
+    m_uiOps.create_instag    = OtrInternal::cb_create_instag;
 
     otrl_privkey_read(m_userstate, QFile::encodeName(m_keysFile).constData());
     otrl_privkey_read_fingerprints(m_userstate, QFile::encodeName(m_fingerprintFile).constData(), nullptr, nullptr);

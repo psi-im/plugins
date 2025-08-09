@@ -404,9 +404,7 @@ PsiOtrClosure::PsiOtrClosure(const QString &account, const QString &contact, Otr
 
 PsiOtrClosure::~PsiOtrClosure()
 {
-    if (m_chatDlgMenu) {
-        delete m_chatDlgMenu;
-    }
+    delete m_chatDlgMenu;
 }
 
 //-----------------------------------------------------------------------------
