@@ -1,0 +1,11 @@
+{
+  "name": "Redirector Plugin",
+  "shortname": "redirector",
+  "version": "0.0.2",
+  "priority": 2,
+  "icon": "base64:iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8=",
+  "description": "Redirects all incoming messages to some jid and allows one to redirect messages back.",
+  "vendor": "rion rion4ik@gmail.com"
+}
+
+

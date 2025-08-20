@@ -17,8 +17,8 @@
  *
  */
 
-#ifndef REDIRECTPLUGIN_H
-#define REDIRECTPLUGIN_H
+#ifndef REDIRECTORPLUGIN_H
+#define REDIRECTORPLUGIN_H
 
 #include "accountinfoaccessor.h"
 #include "applicationinfoaccessor.h"
@@ -38,8 +38,6 @@ class AccountInfoAccessingHost;
 class ApplicationInfoAccessingHost;
 class ContactInfoAccessingHost;
 
-#include "ui_options.h"
-
 class Redirector : public QObject,
                    public PsiPlugin,
                    public OptionAccessor,
@@ -50,14 +48,14 @@ class Redirector : public QObject,
                    public PluginInfoProvider,
                    public ContactInfoAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.Redirector")
+    Q_PLUGIN_METADATA(IID "com.psi-plus.Redirector"  FILE "psiplugin.json" )
     Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter AccountInfoAccessor ApplicationInfoAccessor
                      PluginInfoProvider ContactInfoAccessor)
 
 public:
     Redirector() = default;
-    QString name() const { return "Redirect Plugin"; }
-    QString shortName() const { return "redirect"; }
+    QString name() const { return "Redirector Plugin"; }
+    QString shortName() const { return "redirector"; }
     QString version() const { return "0.0.2"; }
     // PsiPlugin::Priority priority() {return PriorityNormal;}
     QWidget *options();

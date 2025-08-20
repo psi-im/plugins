@@ -1,11 +1,12 @@
 CONFIG += release
-TARGET = redirectplugin
+TARGET = redirectorplugin
 
 exists($$sdkdir) {
     include($$sdkdir/psiplugin.pri)
 } else {
     include(../../psiplugin.pri)
 }
-SOURCES += redirectplugin.cpp
-HEADERS += redirectplugin.h
+
+SOURCES += redirectorplugin.cpp
+HEADERS += redirectorplugin.h
 FORMS += options.ui
