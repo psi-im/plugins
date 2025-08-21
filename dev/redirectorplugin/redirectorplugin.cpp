@@ -21,13 +21,17 @@
 #include <QDomElement>
 #include <QTextDocument>
 
-#include "redirectplugin.h"
+#include "redirectorplugin.h"
 
 #include "accountinfoaccessinghost.h"
 #include "applicationinfoaccessinghost.h"
 #include "contactinfoaccessinghost.h"
 #include "optionaccessinghost.h"
 #include "stanzasendinghost.h"
+
+#include "ui_options.h"
+
+
 
 bool Redirector::enable()
 {
