@@ -15,7 +15,11 @@ if(POLICY CMP0074)
 endif()
 set( CMAKE_AUTOMOC TRUE )
 
-get_filename_component(ABS_PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
+if(CMAKE_VERSION GREATER_EQUAL 3.20)
+    cmake_path(SET ABS_PLUGINS_ROOT_DIR NORMALIZE "${CMAKE_CURRENT_LIST_DIR}/../..")
+else()
+    get_filename_component(ABS_PLUGINS_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
+endif()
 set(PLUGINS_ROOT_DIR "${ABS_PLUGINS_ROOT_DIR}" CACHE STRING "Plugins root path. Path where include directory placed")
 set( CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
@@ -30,13 +34,21 @@ include_directories(
     ${PsiPluginsApi_INCLUDE_DIR}
 )
 if(NOT PLUGINS_INSTALL_PATH)
-    set(PLUGINS_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}")
+    if(CMAKE_VERSION GREATER_EQUAL 3.20)
+        cmake_path(SET PLUGINS_INSTALL_PATH NORMALIZE "${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}")
+    else()
+        set(PLUGINS_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/${PLUGINS_PATH}")
+    endif()
 endif()
 
 if( NOT WIN32 AND NOT HAIKU )
     add_definitions( -Ddbus -DHAVE_DBUS )
     find_package( X11 REQUIRED )
     set(EXTRA_LIBS ${X11_LIBRARIES})
+endif()
+
+if(USE_QT6)
+    set(QT_DEFAULT_MAJOR_VERSION 6)
 endif()
 
 if( NOT WIN32 AND NOT HAIKU )
