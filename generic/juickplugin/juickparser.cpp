@@ -21,6 +21,9 @@
 #include <QDateTime>
 #include <QObject>
 #include <QRegularExpression>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 9, 0)
+#include <QTimeZone>
+#endif
 
 static const QString juickLink("https://juick.com/%1");
 
@@ -247,7 +250,11 @@ QString JuickParser::timeStamp() const
             if (offset == -1) {
                 QDateTime cur = QDateTime::currentDateTime();
                 QDateTime utc = cur.toUTC();
+#if QT_VERSION < QT_VERSION_CHECK(6, 9, 0)
                 utc.setTimeSpec(Qt::LocalTime);
+#else
+                utc.setTimeZone(QTimeZone::LocalTime);
+#endif
                 offset = utc.secsTo(cur);
             }
             dt = dt.addSecs(offset);

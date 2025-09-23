@@ -89,7 +89,15 @@ QDomElement HtmlTidy::output(QDomDocument &document)
     QString errorText;
 
     QString html = writeOutput();
+#if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
     if (!document.setContent(html, true, &errorText, &errorLine, &errorColumn)) {
+#else
+    auto result = document.setContent(html, QDomDocument::ParseOption::UseNamespaceProcessing);
+    errorLine = result.errorLine;
+    errorColumn = result.errorColumn;
+    errorText = result.errorMessage;
+    if (!result) {
+#endif
         qWarning() << "---- parsing error:\n"
                    << html << "\n----\n"
                    << errorText << " line:" << errorLine << " column:" << errorColumn;

@@ -271,7 +271,15 @@ void Form::downloadHtmlFinished()
 
         QString errorMsg;
         int     errorLine, errorColumn;
+#if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
         if (doc.setContent(html, &errorMsg, &errorLine, &errorColumn)) {
+#else
+        auto parseResult = doc.setContent(html);
+        errorMsg = parseResult.errorMessage;
+        errorLine = parseResult.errorLine;
+        errorColumn = parseResult.errorColumn;
+        if (parseResult) {
+#endif
             QString           imgsdir = tmpDir_ + QDir::separator() + "imgs";
             QDir              dir(imgsdir);
             QFileSystemModel *model = new QFileSystemModel();

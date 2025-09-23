@@ -111,9 +111,9 @@ private:
     };
 
     std::shared_ptr<Crypto>                            m_crypto;
+    AccountInfoAccessingHost                          *m_accountInfoAccessor = nullptr;
     StanzaSendingHost                                 *m_stanzaSender        = nullptr;
     PsiAccountControllingHost                         *m_accountController   = nullptr;
-    AccountInfoAccessingHost                          *m_accountInfoAccessor = nullptr;
     ContactInfoAccessingHost                          *m_contactInfoAccessor = nullptr;
     QVector<std::shared_ptr<MessageWaitingForBundles>> m_pendingMessages;
     QString                                            m_dataPath;

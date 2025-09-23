@@ -302,7 +302,15 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
             QDomDocument document;
             int          errorLine = 0, errorColumn = 0;
             QString      errorText;
+#if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
             if (document.setContent(decrypted, true, &errorText, &errorLine, &errorColumn)) {
+#else
+            auto result = document.setContent(decrypted, QDomDocument::ParseOption::UseNamespaceProcessing);
+            errorColumn = result.errorColumn;
+            errorLine = result.errorLine;
+            errorText = result.errorMessage;
+            if (result) {
+#endif
                 htmlElement.appendChild(document.documentElement());
             } else {
                 qWarning() << "---- parsing error:\n"
