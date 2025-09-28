@@ -41,7 +41,6 @@
 #include <QString>
 #include <Qt>
 #include <QtConcurrentRun>
-#include <assert.h>
 
 //-----------------------------------------------------------------------------
 
@@ -63,24 +62,24 @@ OtrInternal::OtrInternal(psiotr::OtrCallback *callback, psiotr::OtrPolicy &polic
 
     OTRL_INIT;
     m_userstate                 = otrl_userstate_create();
-    m_uiOps.policy              = (*OtrInternal::cb_policy);
-    m_uiOps.create_privkey      = (*OtrInternal::cb_create_privkey);
-    m_uiOps.is_logged_in        = (*OtrInternal::cb_is_logged_in);
-    m_uiOps.inject_message      = (*OtrInternal::cb_inject_message);
-    m_uiOps.update_context_list = (*OtrInternal::cb_update_context_list);
-    m_uiOps.new_fingerprint     = (*OtrInternal::cb_new_fingerprint);
-    m_uiOps.write_fingerprints  = (*OtrInternal::cb_write_fingerprints);
-    m_uiOps.gone_secure         = (*OtrInternal::cb_gone_secure);
-    m_uiOps.gone_insecure       = (*OtrInternal::cb_gone_insecure);
-    m_uiOps.still_secure        = (*OtrInternal::cb_still_secure);
+    m_uiOps.policy              = OtrInternal::cb_policy;
+    m_uiOps.create_privkey      = OtrInternal::cb_create_privkey;
+    m_uiOps.is_logged_in        = OtrInternal::cb_is_logged_in;
+    m_uiOps.inject_message      = OtrInternal::cb_inject_message;
+    m_uiOps.update_context_list = OtrInternal::cb_update_context_list;
+    m_uiOps.new_fingerprint     = OtrInternal::cb_new_fingerprint;
+    m_uiOps.write_fingerprints  = OtrInternal::cb_write_fingerprints;
+    m_uiOps.gone_secure         = OtrInternal::cb_gone_secure;
+    m_uiOps.gone_insecure       = OtrInternal::cb_gone_insecure;
+    m_uiOps.still_secure        = OtrInternal::cb_still_secure;
 
     m_uiOps.max_message_size  = nullptr;
-    m_uiOps.account_name      = (*OtrInternal::cb_account_name);
-    m_uiOps.account_name_free = (*OtrInternal::cb_account_name_free);
+    m_uiOps.account_name      = OtrInternal::cb_account_name;
+    m_uiOps.account_name_free = OtrInternal::cb_account_name_free;
 
-    m_uiOps.handle_msg_event = (*OtrInternal::cb_handle_msg_event);
-    m_uiOps.handle_smp_event = (*OtrInternal::cb_handle_smp_event);
-    m_uiOps.create_instag    = (*OtrInternal::cb_create_instag);
+    m_uiOps.handle_msg_event = OtrInternal::cb_handle_msg_event;
+    m_uiOps.handle_smp_event = OtrInternal::cb_handle_smp_event;
+    m_uiOps.create_instag    = OtrInternal::cb_create_instag;
 
     otrl_privkey_read(m_userstate, QFile::encodeName(m_keysFile).constData());
     otrl_privkey_read_fingerprints(m_userstate, QFile::encodeName(m_fingerprintFile).constData(), nullptr, nullptr);
@@ -518,22 +517,6 @@ OtrlPolicy OtrInternal::policy(ConnContext *)
 void OtrInternal::create_privkey(const char *accountname, const char *protocol)
 {
     if (is_generating) {
-        return;
-    }
-
-    QMessageBox qMB(QMessageBox::Question, QObject::tr("Confirm action"),
-                    QObject::tr("Private keys for account \"%1\" need to be generated. "
-                                "This takes quite some time (from a few seconds to a "
-                                "couple of minutes), and while you can use Psi in the "
-                                "meantime, all the messages will be sent unencrypted "
-                                "until keys are generated. You will be notified when "
-                                "this process finishes.\n"
-                                "\n"
-                                "Do you want to generate keys now?")
-                        .arg(m_callback->humanAccount(QString::fromUtf8(accountname))),
-                    QMessageBox::Yes | QMessageBox::No);
-
-    if (qMB.exec() != QMessageBox::Yes) {
         return;
     }
 
