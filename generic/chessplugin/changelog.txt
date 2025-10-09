@@ -1,3 +1,7 @@
+2025-10-09
+v0.3.1
+  * fixed plugin events
+
 2024-03-19
 v0.3.0
   + added initial Qt6 support

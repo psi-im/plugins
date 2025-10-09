@@ -145,16 +145,14 @@ QWidget *SkinsPlugin::options()
 
 void SkinsPlugin::applyOptions()
 {
-    if (!ui_.cb_backup)
+    if (!optionsWidget)
         return;
-    bool checked = psiOptions->getPluginOption("backup", false).toBool();
-    if (ui_.cb_backup->isChecked() != checked)
-        psiOptions->setPluginOption("backup", QVariant(ui_.cb_backup->isChecked()));
+    psiOptions->setPluginOption("backup", QVariant(ui_.cb_backup->isChecked()));
 }
 
 void SkinsPlugin::restoreOptions()
 {
-    if (!ui_.cb_backup)
+    if (!optionsWidget)
         return;
     ui_.cb_backup->setChecked(psiOptions->getPluginOption("backup", true).toBool());
 }

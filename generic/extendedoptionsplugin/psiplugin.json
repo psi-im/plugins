@@ -2,7 +2,7 @@
   "name": "Extended Options",
   "name:ru": "Дополнительные опции",
   "shortname": "extopt",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "priority": 2,
   "icon": "base64:iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADWUlEQVR42n1Ta0yTVxh+zkfvfkBZK1KFUineNiACIzidtyw2OjREjCUuQ+aiQcNmdPgDFq+zqNnivATdYEaCbky81BhlRoguzstGhE2Go3O1sRSQElYsUHvvd/z6GRMviSc5OSdvnvfyvO/zErxyii+4CpUI1xEOiQ/8SOJNNF2GQcoQuxsxG5sKVRdfxJNXA6z4+dGlbUWaAsr/TU2O/qhta7F2UhRoMg80n101celrAeaeGMj3uUb3e4Jes0IsNx4vn5YftXuDz0AKybP30yP327wh32lWoiiSq+IqbqzWtJGcYw6JMhT474tl6alONwclyyCGAfad6cbYyAg4yiE2Xokq4zvgOMDt4ZCkZPDtxQc9brF0KsmosaaliImtyqhHnAK42unHd42tiAQ84CJhIHpBwUgV2FBaCMNMOUa9wN7TNvSGqF6goK9qXjQvJ7vFkKuBqbFTcBYo9FmEV6pO5gNFwMhY7Fw7Hy0dA/jtz78Mtr0FrUS3+czu8PDQkvVrS3JdY0HctjgxaL0LLuCFo36dkEC75odoT8HqZmJBthbJKhZH6xo6RG+Nv0ze2/8PrSx+GxGe35X2QdzsdsLvtMJWs/KlCek3nqMiVoXZ2VOxNE8DkYjvU1M3SIapk+74KAsBnqqlbxTNbT1w3buG3p82vRRAV/YjjdVmYvG7KcjSJUAmBnY1/g2i+eTQbt/DriUflm3PnZcxEe3WIZgP70Tc9Lmw135Mnjt7HZ1Yvq4COVPUuN71CL/UftUhn5x5WQDEGT5blDyntGWLMRciQmC+bcf1+mrEpgtygMfegQ/WVGLl+6nwB6Olt6PvVoNhtKWmlahXVadJObFt65ebBLBEIsKEeIJ7dh8sjmHBlpWmQmaqDM7HUXFFQHltmPYcRIAJ6UliydcSMuaxLi8t1/a6nsDPN2N+lgbTJ7FITAB4TWFoBLjf78W1u/2Q8glS1ONwvuGIg8ayUwQKmrLv8/0PLd+EvcP/MyGu0FBezQil+8L8dCgSWAlCEYqrRyvBSWWnRPL4JJluRtVA3fo/Xlum5JKarryFBRlB3vHO+VpE9ZtXtAGSGII7v176t+/k5zPeuI2pFWcXUPfjeup/oqNK5SwB5Hb/DkZMGPX4FT0HjOYX8U8BAC1WEP5RKIoAAAAASUVORK5CYII=",
   "description": "Get access to advanced application options, which do not have a graphical user interface.",

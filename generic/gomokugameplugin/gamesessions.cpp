@@ -99,7 +99,7 @@ bool GameSessions::processIncomingIqStanza(int account, const QDomElement &xml, 
             }
             if (incomingInvitation(account, from, childElem.attribute("color"), id)) {
                 emit doInviteEvent(account, from, tr("%1: Invitation from %2").arg(constPluginName, from), this,
-                                   SLOT(showInvitation(QString)));
+                                   "showInvitation");
             }
             return true;
         }
@@ -223,14 +223,13 @@ bool GameSessions::incomingInvitation(const int account, const QString &from, co
 /**
  * Отображение окна приглашения
  */
-void GameSessions::showInvitation(const QString &from)
+void GameSessions::showInvitation(const QString &from, int account)
 {
-    int       account_ = 0;
     const int idx      = findGameSessionByJid(from);
     if (idx == -1 || gameSessions.at(idx).status != StatusInviteInDialog)
         return;
-    account_ = gameSessions.at(idx).my_acc;
-    doInviteDialog(account_, from);
+    account = gameSessions.at(idx).my_acc;
+    doInviteDialog(account, from);
 }
 
 /**

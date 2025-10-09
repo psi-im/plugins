@@ -119,6 +119,7 @@ public slots:
     void moveAccepted();
     void error();
     void load(const QString &settings);
+    void doInviteDialog(const QString &jid, int account=0);
 
 private slots:
     void toolButtonPressed();
@@ -133,7 +134,6 @@ private slots:
     void getSound();
     void testSound();
     void toggleEnableSound(bool enable);
-    void doInviteDialog(const QString &jid);
 
 private:
     const QString newId();
@@ -496,7 +496,7 @@ void ChessPlugin::acceptGame()
     board   = new ChessWindow(currentGame_.type, enableSound);
 
     // TODO: update after stopping support of Ubuntu Xenial:
-    connect(board, SIGNAL(load(QString)), this, SLOT(load(QString)));
+    connect(board, qOverload<QString>(&ChessWindow::load), this, &ChessPlugin::load);
 
     connect(board, &ChessWindow::closeBoard, this, &ChessPlugin::closeBoardEvent, Qt::QueuedConnection);
     connect(board, &ChessWindow::move, this, &ChessPlugin::move);
@@ -641,7 +641,7 @@ bool ChessPlugin::incomingStanza(int account, const QDomElement &xml)
                 requests.append(r);
 
                 psiEvent->createNewEvent(account, r.jid, tr("Chess Plugin: Invitation from %1").arg(r.jid), this,
-                                         SLOT(doInviteDialog(QString)));
+                                         "doInviteDialog");
                 return true;
             }
             QDomElement turn = xml.firstChildElement("turn");
@@ -729,7 +729,7 @@ bool ChessPlugin::incomingStanza(int account, const QDomElement &xml)
 
 bool ChessPlugin::outgoingStanza(int /*account*/, QDomElement & /*xml*/) { return false; }
 
-void ChessPlugin::doInviteDialog(const QString &jid)
+void ChessPlugin::doInviteDialog(const QString &jid, int account)
 {
     if (!enabled || requests.isEmpty())
         return;

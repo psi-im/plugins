@@ -573,13 +573,16 @@ QWidget *ExtendedOptions::options()
 
     QGroupBox   *group3Box  = new QGroupBox(tr("Colors:"));
     QVBoxLayout *box3Layout = new QVBoxLayout(group3Box);
+    QGroupBox   *group4Box  = new QGroupBox(tr("Other Colors:"));
+    QVBoxLayout *box4Layout = new QVBoxLayout(group4Box);
     box3Layout->addWidget(groupMucRoster);
     box3Layout->addWidget(groupTip);
-    box3Layout->addLayout(pbLayout);
-    box3Layout->addLayout(lcLayout);
-    box3Layout->addLayout(mcLayout);
-    box3Layout->addLayout(composingLayout);
-    box3Layout->addLayout(unreadLayout);
+    box3Layout->addWidget(group4Box);
+    box4Layout->addLayout(pbLayout);
+    box4Layout->addLayout(lcLayout);
+    box4Layout->addLayout(mcLayout);
+    box4Layout->addLayout(composingLayout);
+    box4Layout->addLayout(unreadLayout);
     box3Layout->addStretch();
 
     tab6Layout->addWidget(group3Box);

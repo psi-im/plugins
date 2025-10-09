@@ -1,3 +1,7 @@
+2025-10-09
+v0.4.8
+  * fixed look tab view of plugin options
+
 2024-03-19
 v0.4.7
   + added initial Qt6 support

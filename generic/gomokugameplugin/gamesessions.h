@@ -95,7 +95,7 @@ private:
     void    sendErrorIq(const int account, const QString &jid, const QString &id, const QString    &/*err_str*/);
 
 private slots:
-    void showInvitation(const QString &from);
+    void showInvitation(const QString &from, int account = 0);
     void doInviteDialog(const int account, const QString &from);
     void sendInvite(const int account, const QString &full_jid, const QString &element);
     void cancelInvite(const int account, const QString &full_jid);
