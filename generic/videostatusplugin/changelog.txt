@@ -1,3 +1,9 @@
+2025-10-11
+v0.3.2
+  * fullscreen detection using X11 functions disabled for Wayland
+  * X11 dependencies only needed when USE_X11 or LIMIT_X11_USAGE flags enabled
+  + added Haruna KDE player support
+
 2024-03-19
 v0.3.1
   + added initial Qt6 support

@@ -19,8 +19,12 @@
 #ifndef X11INFO_H
 #define X11INFO_H
 
+#include <QList>
+#include <X11/X.h>
+
 using Display          = struct _XDisplay;
 using xcb_connection_t = struct xcb_connection_t;
+using WindowList = QList<Window>;
 
 class X11Info {
     static Display          *_display;
@@ -30,6 +34,10 @@ class X11Info {
 public:
     static Display          *display();
     static unsigned long     appRootWindow(int screen = -1);
+    static bool              isPlatformX11();
+    static WindowList        getWindows(Atom prop);
+    static Window            activeWindow();
+    static bool              isWindowFullscreen();
     static xcb_connection_t *xcbConnection();
     static inline int        xcbPreferredScreen() { return _xcbPreferredScreen; }
 };

@@ -31,7 +31,7 @@ set( plugins_list
     watcherplugin
 )
 
-if(NOT APPLE AND (NOT HAIKU) AND (WIN32 OR USE_X11))
+if(NOT APPLE AND (NOT HAIKU))
     list(APPEND plugins_list
         videostatusplugin
     )

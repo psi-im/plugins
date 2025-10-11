@@ -35,6 +35,10 @@ list(APPEND CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_LIST_DIR}/cmake/modules
 )
 
+if(UNIX AND (NOT (APPLE OR HAIKU) AND NOT CYGWIN))
+    set(LINUX ON)
+endif()
+
 #Find Psi Plugins API
 find_package(PsiPluginsApi QUIET)
 if(PsiPluginsApi_DIR)
@@ -61,7 +65,7 @@ if(USE_QT6)
     set(QT_DEFAULT_MAJOR_VERSION 6)
 endif()
 
-if(NOT (DEFINED USE_X11))
+if(LINUX AND (NOT (DEFINED USE_X11)))
     option( USE_X11 "Enable X11 features support" ON )
 endif()
 

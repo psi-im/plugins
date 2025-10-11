@@ -16,9 +16,15 @@
  *
  */
 
+#include <QtGlobal>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#include <QX11Info>
+#else
+#include <QGuiApplication>
+#endif
+
 #include "x11info.h"
 
-#include <QtGlobal>
 #include <X11/Xlib.h>
 #include <xcb/xcb.h>
 
@@ -42,6 +48,77 @@ xcb_connection_t *X11Info::xcbConnection()
         Q_ASSERT(_xcb);
     }
     return _xcb;
+}
+
+bool X11Info::isPlatformX11()
+{
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    return QX11Info::isPlatformX11();
+#else
+    auto x11app = qApp->nativeInterface<QNativeInterface::QX11Application>();
+    return !!x11app;
+#endif
+}
+
+WindowList X11Info::getWindows(Atom prop)
+{
+    WindowList res;
+    Atom       type   = 0;
+    int        format = 0;
+    uchar     *data   = nullptr;
+    ulong      count, after;
+    Display   *display = X11Info::display();
+    Window     window  = X11Info::appRootWindow();
+    if (XGetWindowProperty(display, window, prop, 0, 1024 * sizeof(Window) / 4, False, AnyPropertyType, &type, &format,
+                           &count, &after, &data)
+        == Success) {
+        Window *list = reinterpret_cast<Window *>(data);
+        for (uint i = 0; i < count; ++i)
+            res += list[i];
+        if (data)
+            XFree(data);
+    }
+    return res;
+}
+
+Window X11Info::activeWindow()
+{
+    static Atom net_active = 0;
+    if (!net_active)
+        net_active = XInternAtom(X11Info::display(), "_NET_ACTIVE_WINDOW", True);
+
+    return X11Info::getWindows(net_active).value(0);
+}
+
+bool X11Info::isWindowFullscreen()
+{
+    Window         w          = activeWindow();
+    Display       *display    = X11Info::display();
+    bool           full       = false;
+    static Atom    state      = XInternAtom(display, "_NET_WM_STATE", False);
+    static Atom    fullScreen = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);
+    Atom           actual_type;
+    int            actual_format;
+    unsigned long  nitems;
+    unsigned long  bytes;
+    unsigned char *data = nullptr;
+
+    if (XGetWindowProperty(display, w, state, 0, (~0L), False, AnyPropertyType, &actual_type, &actual_format, &nitems,
+                           &bytes, &data)
+        == Success) {
+        if (nitems != 0) {
+            Atom *atom = reinterpret_cast<Atom *>(data);
+            for (ulong i = 0; i < nitems; i++) {
+                if (atom[i] == fullScreen) {
+                    full = true;
+                    break;
+                }
+            }
+        }
+    }
+    if (data)
+        XFree(data);
+    return full;
 }
 
 xcb_connection_t *X11Info::_xcb = nullptr;

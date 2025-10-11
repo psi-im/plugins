@@ -41,17 +41,28 @@ if(NOT PLUGINS_INSTALL_PATH)
     endif()
 endif()
 
-if( NOT WIN32 AND NOT HAIKU )
+if(UNIX AND (NOT (APPLE OR HAIKU) AND NOT CYGWIN))
+    set(LINUX ON)
+endif()
+
+if(LINUX AND (NOT (DEFINED USE_X11)))
+    option( USE_X11 "Enable X11 features support" ON )
+endif()
+
+if( LINUX )
     add_definitions( -Ddbus -DHAVE_DBUS )
-    find_package( X11 REQUIRED )
-    set(EXTRA_LIBS ${X11_LIBRARIES})
+    if(USE_X11 OR LIMIT_X11_USAGE)
+        add_definitions(-DHAVE_X11)
+        find_package( X11 REQUIRED )
+        set(EXTRA_LIBS ${X11_LIBRARIES})
+    endif()
 endif()
 
 if(USE_QT6)
     set(QT_DEFAULT_MAJOR_VERSION 6)
 endif()
 
-if( NOT WIN32 AND NOT HAIKU )
+if( LINUX AND USE_X11 )
     set( x11_SRCS
         x11info.cpp
         )
