@@ -322,7 +322,9 @@ void VideoStatusChanger::restoreOptions()
 #elif defined(Q_OS_WIN)
     ui_.groupBox->hide();
 #endif
-    QStringList list({ "away", "xa", "dnd" });
+    const QStringList list({ "away", "xa", "dnd" });
+    if (ui_.cb_status->count() > 0)
+        ui_.cb_status->clear();
     ui_.cb_status->addItems(list);
     ui_.cb_status->setCurrentIndex(ui_.cb_status->findText(status));
     ui_.le_message->setText(statusMessage);
