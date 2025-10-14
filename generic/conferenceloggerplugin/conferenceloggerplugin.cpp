@@ -168,7 +168,7 @@ QWidget *ConferenceLogger::options()
     viewButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     connect(viewButton, &QPushButton::released, this, &ConferenceLogger::viewFromOpt);
     QLabel *wikiLink
-        = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/en:plugins#conference_logger_plugin\">Wiki (Online)</a>"));
+        = new QLabel(tr("<a href=\"https://psi-im.org/wiki/doku.php?id=en:plugins#conference_logger_plugin\">Wiki (Online)</a>"));
     wikiLink->setOpenExternalLinks(true);
     filesLayout->addWidget(viewButton);
 

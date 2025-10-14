@@ -64,7 +64,7 @@ QWidget *StorageNotesPlugin::options()
     QVBoxLayout *vbox       = new QVBoxLayout(optionsWid);
 
     QLabel *wikiLink = new QLabel(
-        tr("<a href=\"https://psi-plus.com/wiki/en:plugins#storage_notes_plugin\">Wiki (Online)</a>"), optionsWid);
+        tr("<a href=\"https://psi-im.org/wiki/doku.php?id=en:plugins#storage_notes_plugin\">Wiki (Online)</a>"), optionsWid);
     wikiLink->setOpenExternalLinks(true);
 
     vbox->addWidget(wikiLink);

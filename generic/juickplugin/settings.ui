@@ -824,7 +824,7 @@ to this message in juick@conference.jabber.ru</string>
    <item>
     <widget class="QLabel" name="label_10">
      <property name="text">
-      <string>&lt;a href=&quot;https://psi-plus.com/wiki/en:plugins#juick_plugin&quot;&gt;Wiki (Online)&lt;/a&gt;</string>
+      <string>&lt;a href=&quot;https://psi-im.org/wiki/doku.php?id=en:plugins#juick_plugin&quot;&gt;Wiki (Online)&lt;/a&gt;</string>
      </property>
      <property name="openExternalLinks">
       <bool>true</bool>

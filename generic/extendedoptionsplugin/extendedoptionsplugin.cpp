@@ -612,7 +612,7 @@ QWidget *ExtendedOptions::options()
     popupHighlighter_   = new SyntaxHighlighter(popupCss->document());
     tooltipHighlighter_ = new SyntaxHighlighter(tooltipCss->document());
 
-    QLabel *cssLabel = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/en:skins_css\">CSS for Psi</a>"));
+    QLabel *cssLabel = new QLabel(tr("<a href=\"https://psi-im.org/wiki/doku.php?id=en:skins_css\">CSS for Psi</a>"));
     cssLabel->setOpenExternalLinks(true);
 
     tab7Layout->addWidget(cssTab);
@@ -681,7 +681,7 @@ QWidget *ExtendedOptions::options()
     tab8Layout->addStretch();
 
     QLabel *wikiLink
-        = new QLabel(tr("<a href=\"https://psi-plus.com/wiki/en:plugins#extended_options_plugin\">Wiki (Online)</a>"));
+        = new QLabel(tr("<a href=\"https://psi-im.org/wiki/doku.php?id=en:plugins#extended_options_plugin\">Wiki (Online)</a>"));
     wikiLink->setOpenExternalLinks(true);
 
     mainLayout->addWidget(tabs);

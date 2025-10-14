@@ -216,7 +216,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>&lt;a href=&quot;https://psi-plus.com/wiki/en:plugins#content_downloader_plugin&quot;&gt;Wiki (Online)&lt;/a&gt;</string>
+      <string>&lt;a href=&quot;https://psi-im.org/wiki/doku.php?id=en:plugins#content_downloader_plugin&quot;&gt;Wiki (Online)&lt;/a&gt;</string>
      </property>
      <property name="openExternalLinks">
       <bool>true</bool>

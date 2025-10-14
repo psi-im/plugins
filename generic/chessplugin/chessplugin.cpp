@@ -236,7 +236,7 @@ QWidget *ChessPlugin::options()
 
     QWidget *options = new QWidget;
     ui_.setupUi(options);
-    ui_.wiki->setText(tr("<a href=\"https://psi-plus.com/wiki/en:plugins#chess_plugin\">Wiki (Online)</a>"));
+    ui_.wiki->setText(tr("<a href=\"https://psi-im.org/wiki/doku.php?id=en:plugins#chess_plugin\">Wiki (Online)</a>"));
     ui_.wiki->setOpenExternalLinks(true);
 
     ui_.play_error->setIcon(icoHost->getIcon("psi/play"));

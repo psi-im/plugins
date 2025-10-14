@@ -262,7 +262,7 @@
    <item>
     <widget class="QLabel" name="lb_link">
      <property name="text">
-      <string>&lt;a href=&quot;https://psi-plus.com/wiki/en:plugins#client_switcher_plugin&quot;&gt;Wiki (Online)&lt;/a&gt;</string>
+      <string>&lt;a href=&quot;https://psi-im.org/wiki/doku.php?id=en:plugins#client_switcher_plugin&quot;&gt;Wiki (Online)&lt;/a&gt;</string>
      </property>
      <property name="openExternalLinks">
       <bool>true</bool>
