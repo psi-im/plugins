@@ -1,3 +1,7 @@
+2025-10-14
+v0.3.3
+  + Added Parole player (xfce4)
+
 2025-10-11
 v0.3.2
   * fullscreen detection using X11 functions disabled for Wayland
