@@ -1,3 +1,7 @@
+2026-03-17
+v0.2.2
+  * Advertise urn:xmpp:attention:0 in the capabilities of the client so that Pidgin will show the attention icon
+
 2024-03-19
 v0.2.1
   + added initial Qt6 support
