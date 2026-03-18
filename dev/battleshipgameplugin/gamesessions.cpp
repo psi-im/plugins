@@ -165,13 +165,14 @@ bool GameSessionList::processIncomingIqStanza(int account, const QDomElement &xm
                     }
                     break;
                 case GameSession::StageInitBoard:
-                    break;
-                case GameSession::StageShowBoard:
                     if (gs->status_ == GameSession::StatusWaitBoardVerification) {
                         gs->myBoardChecked_ = true;
                         gs->status_         = GameSession::StatusNone;
                         err                 = false;
                     }
+                    break;
+                case GameSession::StageShowBoard:
+                    err = false;
                     break;
                 case GameSession::StageShooting:
                     if (gs->status_ == GameSession::StatusWaitShotConfirmation) {
@@ -182,7 +183,8 @@ bool GameSessionList::processIncomingIqStanza(int account, const QDomElement &xm
                 case GameSession::StageEnd:
                     err = false;
                     break;
-                default:
+                case GameSession::StageNone:
+                    err = false;
                     break;
                 }
                 if (err)
