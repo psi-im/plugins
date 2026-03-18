@@ -82,10 +82,10 @@ private:
 
 NoughtsAndCrossesPlugin::NoughtsAndCrossesPlugin()
 {
-    game          = NULL;
+    game          = nullptr;
     enabled_      = false;
-    stanzaSender_ = 0;
-    optionsWid    = 0;
+    stanzaSender_ = nullptr;
+    optionsWid    = nullptr;
 }
 
 QString NoughtsAndCrossesPlugin::name() const { return "NoughtsAndCrosses Plugin"; }
@@ -93,7 +93,7 @@ QString NoughtsAndCrossesPlugin::name() const { return "NoughtsAndCrosses Plugin
 QWidget *NoughtsAndCrossesPlugin::options()
 {
     if (!enabled_) {
-        return 0;
+        return nullptr;
     }
     optionsWid          = new QWidget();
     QGridLayout *layout = new QGridLayout(optionsWid);
@@ -191,7 +191,7 @@ void NoughtsAndCrossesPlugin::startGame(QString jid, int size, bool meFirst, int
 void NoughtsAndCrossesPlugin::stopGame()
 {
     delete game;
-    game = NULL;
+    game = nullptr;
 }
 
 void NoughtsAndCrossesPlugin::gameOver(TicTacGameBoard::State state)
@@ -242,6 +242,6 @@ bool NoughtsAndCrossesPlugin::processEvent(int acc, QDomElement &e)
     return false;
 }
 
-QString NoughtsAndCrossesPlugin::pluginInfo() { return tr("Psi plugin to play noughts and crosses"); }
+QString NoughtsAndCrossesPlugin::pluginInfo() { return tr("Play Noughts And Crosses (Tic-tac-toe)"); }
 
 #include "noughtsandcrossesplugin.moc"
