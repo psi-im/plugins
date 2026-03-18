@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Battliship Game Plugin - Invite</string>
+   <string>Battleship Game Plugin - Invite</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
