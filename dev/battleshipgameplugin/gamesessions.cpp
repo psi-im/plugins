@@ -366,7 +366,7 @@ void GameSession::executeNextAction()
 void GameSession::processIncomingInvite()
 {
     if (!boardWid_.isNull())
-        showInvitationDialog();
+        showInvitationDialog(jid_, account_);
     else
         appendInvitationEvent();
 }
@@ -374,10 +374,10 @@ void GameSession::processIncomingInvite()
 void GameSession::appendInvitationEvent()
 {
     emit doInviteEvent(account_, jid_, tr("%1: Invitation from %2").arg("Battleship Game Plugin").arg(jid_), this,
-                       SLOT(showInvitationDialog()));
+                       "showInvitationDialog");
 }
 
-void GameSession::showInvitationDialog()
+void GameSession::showInvitationDialog(const QString &from, int account)
 {
     inviteDlg_ = new InvitationDialog(jid_, first_, boardWid_.data());
     connect(inviteDlg_.data(), SIGNAL(accepted()), this, SLOT(acceptInvitation()));

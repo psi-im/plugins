@@ -141,7 +141,7 @@ private slots:
     void timeout();
 
 public slots:
-    void showInvitationDialog();
+    void showInvitationDialog(const QString &from, int account);
 
 signals:
     void sendStanza(int, QString);
