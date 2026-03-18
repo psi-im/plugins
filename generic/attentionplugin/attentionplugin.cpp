@@ -100,6 +100,7 @@ public:
     void                setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) override;
     void                setSoundAccessingHost(SoundAccessingHost *host) override;
     QString             pluginInfo() override;
+    QStringList         pluginFeatures() override;
 
 private:
     bool                          enabled;
@@ -271,51 +272,12 @@ bool AttentionPlugin::incomingStanza(int account, const QDomElement &stanza)
                 nudge();
         }
 
-        else if (stanza.tagName() == "iq" && stanza.attribute("type") == "get") {
-            QDomElement query = stanza.firstChildElement("query");
-            if (!query.isNull() && query.namespaceURI() == "http://jabber.org/protocol/disco#info") {
-                if (query.attribute("node") == "https://psi-im.org#at-pl") {
-                    QString reply = QString("<iq type=\"result\" to=\"%1\" id=\"%2\">"
-                                            "<query xmlns=\"http://jabber.org/protocol/disco#info\" "
-                                            "node=\"https://psi-im.org#at-pl\">"
-                                            "<feature var=\"urn:xmpp:attention:0\"/></query></iq>")
-                                        .arg(stanzaSender->escape(stanza.attribute("from")),
-                                             stanzaSender->escape(stanza.attribute("id")));
-                    stanzaSender->sendStanza(account, reply);
-                    return true;
-                }
-            }
-        }
     }
     return false;
 }
 
 bool AttentionPlugin::outgoingStanza(int /*account*/, QDomElement &xml)
 {
-    if (enabled) {
-        if (xml.tagName() == "iq" && xml.attribute("type") == "result") {
-            QDomNodeList list = xml.elementsByTagNameNS("http://jabber.org/protocol/disco#info", "query");
-            if (!list.isEmpty()) {
-                QDomElement query = list.at(0).toElement();
-                if (!query.hasAttribute("node")) {
-                    QDomDocument doc     = xml.ownerDocument();
-                    QDomElement  feature = doc.createElement("feature");
-                    feature.setAttribute("var", "urn:xmpp:attention:0");
-                    query.appendChild(feature);
-                }
-            }
-        } else if (xml.tagName() == "presence") {
-            QDomNodeList list = xml.elementsByTagNameNS("http://jabber.org/protocol/caps", "c");
-            if (!list.isEmpty()) {
-                QDomElement c = list.at(0).toElement();
-                if (c.hasAttribute("ext")) {
-                    QString ext = c.attribute("ext");
-                    ext += " at-pl";
-                    c.setAttribute("ext", ext);
-                }
-            }
-        }
-    }
     return false;
 }
 
@@ -505,6 +467,13 @@ QString AttentionPlugin::pluginInfo()
         "This plugin is designed to send and receive special messages such as Attentions.\n"
         "To work correctly, the plugin requires that the client of the other part supports XEP-0224 (for example: "
         "Pidgin, Miranda IM with Nudge plugin).");
+}
+
+QStringList AttentionPlugin::pluginFeatures()
+{
+    if (!enabled)
+        return QStringList();
+    return QStringList("urn:xmpp:attention:0");
 }
 
 #include "attentionplugin.moc"
