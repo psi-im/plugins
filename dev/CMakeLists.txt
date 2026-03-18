@@ -2,6 +2,7 @@ cmake_minimum_required( VERSION 3.10.0 )
 
 set( plugins_list 
     noughtsandcrossesplugin
+    redirectorplugin
 )
 
 message(STATUS "Plugins from dev subdirectory")

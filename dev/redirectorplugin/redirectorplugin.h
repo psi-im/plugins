@@ -30,6 +30,8 @@
 #include "stanzasender.h"
 #include <QPixmap>
 
+#include "ui_options.h"
+
 class QDomElement;
 
 class OptionAccessingHost;
