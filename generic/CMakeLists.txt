@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.10.0)
 set( plugins_list
     attentionplugin
     autoreplyplugin
+    battleshipgameplugin
     birthdayreminderplugin
     chessplugin
     cleanerplugin
