@@ -276,9 +276,8 @@ void BattleshipGamePlugin::playSound(const QString &sound_id)
 QString BattleshipGamePlugin::pluginInfo()
 {
     return name() + "\n\n" + tr("Author: ") + "Liuch\n" + tr("Email: ") + "liuch@mail.ru\n\n"
-        + tr("This plugin allows you to play battleship with your friends.\n"
-             "For sending commands, normal messages are used, so this plugin will always work wherever you are able to "
-             "log in."
+        + tr("Play Battleship with your friends.\n"
+            "This is a paper board game where you try to sink the opponent's ships."
              "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat "
              "window.");
 }
