@@ -79,7 +79,7 @@ void GameSessionList::removeGame(GameSession *gs)
 GameSession *GameSessionList::findGame(int account, const QString &jid, const QString &gameId)
 {
     QString      key = generateKey(account, jid, gameId);
-    GameSession *gs  = list_.value(key, NULL);
+    GameSession *gs  = list_.value(key, nullptr);
     return gs;
 }
 
@@ -165,13 +165,14 @@ bool GameSessionList::processIncomingIqStanza(int account, const QDomElement &xm
                     }
                     break;
                 case GameSession::StageInitBoard:
-                    break;
-                case GameSession::StageShowBoard:
                     if (gs->status_ == GameSession::StatusWaitBoardVerification) {
                         gs->myBoardChecked_ = true;
                         gs->status_         = GameSession::StatusNone;
                         err                 = false;
                     }
+                    break;
+                case GameSession::StageShowBoard:
+                    err = false;
                     break;
                 case GameSession::StageShooting:
                     if (gs->status_ == GameSession::StatusWaitShotConfirmation) {
@@ -182,7 +183,8 @@ bool GameSessionList::processIncomingIqStanza(int account, const QDomElement &xm
                 case GameSession::StageEnd:
                     err = false;
                     break;
-                default:
+                case GameSession::StageNone:
+                    err = false;
                     break;
                 }
                 if (err)
@@ -220,7 +222,7 @@ void GameSessionList::sendErrorIq(int account, const QString &jid, const QString
 
 QString GameSessionList::generateKey(int account, const QString &jid, const QString &gameId)
 {
-    return QString("%1:%2:%3").arg(QString::number(account)).arg(jid).arg(gameId);
+    return QString("%1:%2:%3").arg(QString::number(account), jid, gameId);
 }
 
 QString GameSessionList::getStanzaId(bool bigOffset)
@@ -257,8 +259,7 @@ QString XML::iqErrorString(const QString &jid, const QString &id)
 {
     QString stanza = QString("<iq type=\"error\" to=\"%1\" id=\"%2\">\n<error type=\"cancel\" code=\"407\">\n"
                              "<error-message>Not Acceptable</error-message>\n</error></iq>\n")
-                         .arg(XML::escapeString(jid))
-                         .arg(XML::escapeString(id));
+                         .arg(XML::escapeString(jid), XML::escapeString(id));
     return stanza;
 }
 
@@ -366,18 +367,18 @@ void GameSession::executeNextAction()
 void GameSession::processIncomingInvite()
 {
     if (!boardWid_.isNull())
-        showInvitationDialog();
+        showInvitationDialog(jid_, account_);
     else
         appendInvitationEvent();
 }
 
 void GameSession::appendInvitationEvent()
 {
-    emit doInviteEvent(account_, jid_, tr("%1: Invitation from %2").arg("Battleship Game Plugin").arg(jid_), this,
-                       SLOT(showInvitationDialog()));
+    emit doInviteEvent(account_, jid_, tr("%1: Invitation from %2").arg("Battleship Game Plugin", jid_), this,
+                       "showInvitationDialog");
 }
 
-void GameSession::showInvitationDialog()
+void GameSession::showInvitationDialog(const QString &from, int account)
 {
     inviteDlg_ = new InvitationDialog(jid_, first_, boardWid_.data());
     connect(inviteDlg_.data(), SIGNAL(accepted()), this, SLOT(acceptInvitation()));
@@ -410,7 +411,7 @@ void GameSession::invite(const QStringList &resList)
     dlg->show();
 }
 
-void GameSession::sendInvite(QString jid, bool first)
+void GameSession::sendInvite(const QString& jid, bool first)
 {
     first_       = first;
     jid_         = jid;
@@ -424,10 +425,7 @@ void GameSession::sendInvite(QString jid, bool first)
     stanzaId_      = gsl_->getStanzaId(true);
     QString stanza = QString("<iq type=\"set\" to=\"%1\" id=\"%2\">"
                              "<create xmlns=\"games:board\" id=\"%3\" type=\"battleship\" first=\"%4\" /></iq>\n")
-                         .arg(XML::escapeString(jid))
-                         .arg(stanzaId_)
-                         .arg(XML::escapeString(gameId_))
-                         .arg((first) ? "true" : "false");
+                         .arg(XML::escapeString(jid), stanzaId_, XML::escapeString(gameId_), (first) ? "true" : "false");
     emit sendStanza(account_, stanza);
 }
 
@@ -464,9 +462,7 @@ void GameSession::sendIqResponse(const QString &id)
         if (stage_ == StageShooting && !resign_) {
             body = QString("<turn xmlns=\"games:board\" type=\"battleship\" id=\"%1\">\n"
                            "<shot result=\"%2\" seed=\"%3\"/>\n</turn>\n")
-                       .arg(XML::escapeString(gameId_))
-                       .arg(lastTurnResult_)
-                       .arg(XML::escapeString(lastTurnSeed_));
+                       .arg(XML::escapeString(gameId_), lastTurnResult_, XML::escapeString(lastTurnSeed_));
         }
         sendStanzaResult(id, body);
     }
@@ -475,7 +471,7 @@ void GameSession::sendIqResponse(const QString &id)
 void GameSession::sendStanzaResult(const QString &id, const QString &body)
 {
     QString stanza
-        = QString("<iq type=\"result\" to=\"%1\" id=\"%2\"").arg(XML::escapeString(jid_)).arg(XML::escapeString(id));
+        = QString("<iq type=\"result\" to=\"%1\" id=\"%2\"").arg(XML::escapeString(jid_), XML::escapeString(id));
     if (body.isEmpty())
         stanza.append("/>\n");
     else
@@ -543,8 +539,8 @@ void GameSession::checkOpponentBoard(const QDomElement &xml)
     opBoardChecked_ = false;
     bool cells[100];
     int  cellsCnt = 0;
-    for (int i = 0; i < 100; ++i)
-        cells[i] = false;
+    for (bool & cell : cells)
+        cell = false;
     QStringList data("check-opp-board");
     QDomElement el = xml.firstChildElement();
     while (!el.isNull()) {
@@ -562,7 +558,7 @@ void GameSession::checkOpponentBoard(const QDomElement &xml)
                 ship = "1";
             else if (ship != "1")
                 ship = "0";
-            data.append(QString("%1;%2;%3").arg(pos).arg(ship).arg(seed));
+            data.append(QString("%1;%2;%3").arg(pos).arg(ship, seed));
             cells[pos] = true;
             ++cellsCnt;
         }
@@ -654,7 +650,7 @@ bool GameSession::handleTurnResult(const QDomElement &xml)
             return false;
 
         QString seed = el.attribute("seed");
-        data.append(QString("shot-result;%1;%2").arg(res).arg(seed));
+        data.append(QString("shot-result;%1;%2").arg(res, seed));
     }
     QStringList res = boardWid_->dataExchange(data);
     QString     s   = res.takeFirst();
@@ -671,7 +667,7 @@ bool GameSession::handleTurnResult(const QDomElement &xml)
     return false;
 }
 
-void GameSession::boardEvent(QString data)
+void GameSession::boardEvent(const QString& data)
 {
     QStringList dataList = data.split('\n');
     QString     dataStr  = dataList.takeFirst();
@@ -732,7 +728,7 @@ void GameSession::boardEvent(QString data)
         return;
     }
     stanzaId_      = gsl_->getStanzaId(false);
-    QString stanza = QString("<iq type=\"set\" to=\"%1\" id=\"%2\">\n").arg(XML::escapeString(jid_)).arg(stanzaId_);
+    QString stanza = QString("<iq type=\"set\" to=\"%1\" id=\"%2\">\n").arg(XML::escapeString(jid_), stanzaId_);
     stanza.append(body);
     stanza.append("</iq>\n");
     emit sendStanza(account_, stanza);
@@ -778,11 +774,10 @@ void GameSession::sendUncoveredBoard()
         body.append(QString("<cell row=\"%1\" col=\"%2\" ship=\"%3\" seed=\"%4\"/>\n")
                         .arg(row)
                         .arg(col)
-                        .arg(ship)
-                        .arg(XML::escapeString(seed)));
+                        .arg(ship, XML::escapeString(seed)));
     }
     stanzaId_      = gsl_->getStanzaId(false);
-    QString stanza = QString("<iq type=\"set\" to=\"%1\" id=\"%2\">\n").arg(XML::escapeString(jid_)).arg(stanzaId_);
+    QString stanza = QString("<iq type=\"set\" to=\"%1\" id=\"%2\">\n").arg(XML::escapeString(jid_), stanzaId_);
     stanza.append(
         QString("<board xmlns=\"games:board\" type=\"battleship\" id=\"%1\">\n").arg(XML::escapeString(gameId_)));
     stanza.append(body);

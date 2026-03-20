@@ -55,7 +55,7 @@ public:
 private:
     GameSessionList(QObject *parent = nullptr);
     ~GameSessionList();
-    QString        generateKey(int account, const QString &jid, const QString &gameId);
+    static QString generateKey(int account, const QString &jid, const QString &gameId);
     static QString getErrorMessage(const QDomElement &xml);
 
 private:
@@ -133,15 +133,15 @@ private:
     QString boardStatus_;
 
 private slots:
-    void sendInvite(QString jid, bool first);
+    void sendInvite(const QString& jid, bool first);
     void acceptInvitation();
     void rejectInvitation();
     void endSession();
-    void boardEvent(QString data);
+    void boardEvent(const QString& data);
     void timeout();
 
 public slots:
-    void showInvitationDialog();
+    void showInvitationDialog(const QString &from, int account);
 
 signals:
     void sendStanza(int, QString);

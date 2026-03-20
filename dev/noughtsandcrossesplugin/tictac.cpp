@@ -25,7 +25,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QVBoxLayout>
-#include <stdlib.h> // rand() function
+#include <cstdlib> // rand() function
 
 //***************************************************************************
 //* TicTacButton member functions

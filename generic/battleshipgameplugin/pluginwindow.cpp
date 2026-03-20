@@ -135,9 +135,9 @@ QString PluginWindow::stringStatus(bool short_) const
     case GameModel::StatusWaitingOpponent:
         return short_ ? QString("waiting") : tr("Waiting for opponent");
     case GameModel::StatusWin:
-        return short_ ? QString("end") : tr("You Win!");
+        return short_ ? QString("end") : tr("You Won!");
     case GameModel::StatusLose:
-        return short_ ? QString("end") : tr("You Lose.");
+        return short_ ? QString("end") : tr("You Lost.");
     case GameModel::StatusDraw:
         return short_ ? QString("end") : tr("Draw");
     case GameModel::StatusError:

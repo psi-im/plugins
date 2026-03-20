@@ -14,3 +14,6 @@ Makefile
 
 # kde crap?
 .directory
+
+/cmake-build-debug/
+/.idea/

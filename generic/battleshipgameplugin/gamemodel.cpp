@@ -509,8 +509,8 @@ bool GameBoard::isAllDestroyed() const
 QString GameBoard::genSeed(int len)
 {
     static QString chars("1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM-=[]/!@#$%^&*()");
-    int            ccnt = chars.length();
-    int            rnd  = 0;
+    quint32        ccnt = chars.length();
+    quint32        rnd  = 0;
     QString        res;
     for (int i = 0; i < len; ++i) {
         if (rnd < ccnt)
