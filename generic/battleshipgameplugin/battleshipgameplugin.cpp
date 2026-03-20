@@ -74,11 +74,9 @@ bool BattleshipGamePlugin::enable()
     if (enabled_)
         return true;
     // Грузим иконку плагина
-    QFile file(":/battleshipgameplugin/battleship");
-    if (file.open(QIODevice::ReadOnly)) {
-        QByteArray ico = file.readAll();
-        psiIcon->addIcon("battleshipgameplugin/battleship", ico);
-        file.close();
+    QByteArray image = PSI_PLUGIN_MD("rawIcon").toByteArray();
+    if (!image.isEmpty()) {
+        psiIcon->addIcon("battleshipgameplugin/battleship", image);
     }
     // Создаем соединения с менеджером игровых сессий
     GameSessionList *gsl = GameSessionList::instance();

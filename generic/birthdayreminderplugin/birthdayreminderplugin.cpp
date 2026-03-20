@@ -143,13 +143,10 @@ bool Reminder::enable()
     if (!psiOptions)
         return enabled;
 
-    QFile file(":/reminder/birthdayreminderplugin.png");
-    if (file.open(QIODevice::ReadOnly)) {
-        QByteArray image = file.readAll();
-        icoHost->addIcon("reminder/birthdayicon", image);
-        file.close();
-    } else {
-        return enabled;
+    // Грузим иконку плагина
+    QByteArray image = PSI_PLUGIN_MD("rawIcon").toByteArray();
+    if (!image.isEmpty()) {
+        icoHost->addIcon("reminder/birthdayreminderplugin", image);
     }
 
     enabled = true;
@@ -474,7 +471,7 @@ bool Reminder::check()
         playSound(soundFile);
 
     text = text.replace("\n", "<br>");
-    popup->initPopup(text, tr("Birthday Reminder"), "reminder/birthdayicon", popupId);
+    popup->initPopup(text, tr("Birthday Reminder"), "reminder/birthdayreminderplugin", popupId);
 
     return true;
 }

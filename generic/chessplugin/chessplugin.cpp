@@ -200,11 +200,10 @@ bool ChessPlugin::enable()
     invites.clear();
 
     enabled = true;
-    QFile file(":/chessplugin/figures/Black queen 2d.png");
-    if (file.open(QIODevice::ReadOnly)) {
-        QByteArray ico = file.readAll();
-        icoHost->addIcon("chessplugin/chess", ico);
-        file.close();
+    // Грузим иконку плагина
+    QByteArray image = PSI_PLUGIN_MD("rawIcon").toByteArray();
+    if (!image.isEmpty()) {
+        icoHost->addIcon("chessplugin/chess", image);
     }
     soundStart       = psiOptions->getPluginOption(soundStartConst, QVariant(soundStart)).toString();
     soundFinish      = psiOptions->getPluginOption(soundFinishConst, QVariant(soundFinish)).toString();

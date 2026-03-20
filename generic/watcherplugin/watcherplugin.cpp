@@ -212,15 +212,10 @@ bool Watcher::enable()
                 wi->setText(tr("Empty item"));
         }
 
-        QStringList files;
-        files << "watcher_on"
-              << "watcher";
-        for (const auto &filename : std::as_const(files)) {
-            QFile file(":/icons/" + filename + ".png");
-            file.open(QIODevice::ReadOnly);
-            QByteArray image = file.readAll();
-            icoHost->addIcon("watcher/" + filename, image);
-            file.close();
+        // Грузим иконку плагина
+        QByteArray image = PSI_PLUGIN_MD("rawIcon").toByteArray();
+        if (!image.isEmpty()) {
+            icoHost->addIcon("watcher/watcher", image);
         }
 
         showInContext_ = psiOptions->getPluginOption(constShowInContext, QVariant(true)).toBool();

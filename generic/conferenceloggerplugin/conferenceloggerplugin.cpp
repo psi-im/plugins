@@ -111,12 +111,10 @@ QString ConferenceLogger::name() const { return "Conference Logger Plugin"; }
 
 bool ConferenceLogger::enable()
 {
+    // Грузим иконку плагина
     QByteArray image = PSI_PLUGIN_MD("rawIcon").toByteArray();
     if (!image.isEmpty()) {
         IcoHost->addIcon("loggerplugin/openlog", image);
-    } else {
-        enabled = false;
-        return enabled;
     }
     if (psiOptions) {
         enabled    = true;

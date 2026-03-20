@@ -36,11 +36,11 @@ bool StorageNotesPlugin::enable()
 {
     enabled = true;
 
-    QFile file(":/storagenotesplugin/storagenotesplugin.png");
-    file.open(QIODevice::ReadOnly);
-    QByteArray image = file.readAll();
-    iconHost->addIcon("storagenotes/storagenotes", image);
-    file.close();
+    // Грузим иконку плагина
+    QByteArray image = PSI_PLUGIN_MD("rawIcon").toByteArray();
+    if (!image.isEmpty()) {
+        iconHost->addIcon("storagenotes/storagenotes", image);
+    }
     controller_ = new NotesController(this);
 
     return enabled;

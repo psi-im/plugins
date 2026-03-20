@@ -70,11 +70,9 @@ bool GomokuGamePlugin::enable()
     if (enabled_)
         return true;
     // Грузим иконку плагина
-    QFile file(":/gomokugameplugin/gomoku");
-    if (file.open(QIODevice::ReadOnly)) {
-        QByteArray ico = file.readAll();
-        psiIcon->addIcon("gomokugameplugin/gomoku", ico);
-        file.close();
+    QByteArray image = PSI_PLUGIN_MD("rawIcon").toByteArray();
+    if (!image.isEmpty()) {
+        psiIcon->addIcon("gomokugameplugin/gomoku", image);
     }
     // Грузим настройки плагина
     // -- загрузятся по требованию

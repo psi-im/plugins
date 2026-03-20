@@ -157,12 +157,10 @@ QString AttentionPlugin::name() const { return "Attention Plugin"; }
 
 bool AttentionPlugin::enable()
 {
-    QByteArray bytes = PSI_PLUGIN_MD("rawIcon").toByteArray();
-    if (!bytes.isEmpty()) {
-        icoHost->addIcon("attentionplugin/attention", bytes);
-    } else {
-        enabled = false;
-        return enabled;
+    // Грузим иконку плагина
+    QByteArray image = PSI_PLUGIN_MD("rawIcon").toByteArray();
+    if (!image.isEmpty()) {
+        icoHost->addIcon("attentionplugin/attention", image);
     }
     if (psiOptions) {
         blockedJids_.clear();
