@@ -110,15 +110,12 @@ QString ImagePlugin::name() const { return "Image Plugin"; }
 
 bool ImagePlugin::enable()
 {
-    QFile file(":/imageplugin/imageplugin.gif");
-    if (file.open(QIODevice::ReadOnly)) {
-        QByteArray image = file.readAll();
+    // Грузим иконку плагина
+    QByteArray image = PSI_PLUGIN_MD("rawIcon").toByteArray();
+    if (!image.isEmpty()) {
         iconHost->addIcon("imageplugin/icon", image);
-        file.close();
-        enabled = true;
-    } else {
-        enabled = false;
     }
+    enabled = true;
     return enabled;
 }
 
