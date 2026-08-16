@@ -46,7 +46,7 @@ namespace psiotr {
 const QString  OPTION_POLICY            = "otr-policy";
 const QVariant DEFAULT_POLICY           = QVariant(OTR_POLICY_ENABLED);
 const QString  OPTION_END_WHEN_OFFLINE  = "end-session-when-offline";
-const QVariant DEFAULT_END_WHEN_OFFLINE = QVariant(false);
+const QVariant DEFAULT_END_WHEN_OFFLINE = QVariant(true);
 
 // ---------------------------------------------------------------------------
 

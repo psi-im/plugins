@@ -30,11 +30,13 @@
 #include <QMessageBox>
 #include <QObject>
 #include <QQueue>
+#include <QSet>
 
 #include "accountinfoaccessor.h"
 #include "applicationinfoaccessor.h"
 #include "contactinfoaccessor.h"
-#include "encryptionsupport.h"
+#include "encryptionmethodaccessor.h"
+#include "encryptionmethodprovider.h"
 #include "eventcreatinghost.h"
 #include "eventcreator.h"
 #include "eventfilter.h"
@@ -80,12 +82,12 @@ class PsiOtrPlugin : public QObject,
                      public ContactInfoAccessor,
                      public IconFactoryAccessor,
                      public OtrCallback,
-                     public EncryptionSupport {
+                     public EncryptionMethodAccessor {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "com.psi-plus.PsiOtrPlugin" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin PluginInfoProvider EventCreator OptionAccessor StanzaSender ApplicationInfoAccessor
                      PsiAccountController StanzaFilter ToolbarIconAccessor AccountInfoAccessor ContactInfoAccessor
-                         IconFactoryAccessor EncryptionSupport)
+                         IconFactoryAccessor EncryptionMethodAccessor)
 
 public:
     PsiOtrPlugin();
@@ -135,9 +137,12 @@ public:
     // IconFactoryAccessingHost
     virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
 
-    // EncryptionSupport
-    virtual bool decryptMessageElement(int account, QDomElement &message);
-    virtual bool encryptMessageElement(int account, QDomElement &message);
+    // EncryptionMethodAccessor
+    void setEncryptionMethodAccessingHost(EncryptionMethodAccessingHost *host) override;
+
+    // New encryption provider implementation helpers.
+    bool decryptMessageElement(int account, QDomElement &message, const QString &contact = QString());
+    bool encryptMessageElement(int account, QDomElement &message, const QString &contact = QString());
 
     // OtrCallback
     virtual QString dataDir();
@@ -184,6 +189,8 @@ private slots:
     void eventActivated();
 
 private:
+    friend class OtrEncryptionProvider;
+
     /**
      * Returns full Jid for private contacts,
      * bare Jid for non-private contacts.
@@ -201,6 +208,9 @@ private:
     ContactInfoAccessingHost                       *m_contactInfo;
     IconFactoryAccessingHost                       *m_iconHost;
     EventCreatingHost                              *m_psiEvent;
+    EncryptionMethodAccessingHost                  *m_encryptionHost;
+    EncryptionMethodProvider                       *m_encryptionProvider;
+    QSet<QString>                                    m_otrDiscoveredResources;
     QQueue<QMessageBox *>                           m_messageBoxList;
 };
 

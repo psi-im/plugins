@@ -663,17 +663,46 @@ void OtrInternal::new_fingerprint(OtrlUserState us, const char *accountname, con
                                   unsigned char fingerprint[20])
 {
     Q_UNUSED(us);
-    Q_UNUSED(protocol);
 
-    QString account = QString::fromUtf8(accountname);
-    QString contact = QString::fromUtf8(username);
-    QString message = QObject::tr("You have received a new "
-                                  "fingerprint from %1:\n%2")
-                          .arg(m_callback->humanContact(account, contact), humanFingerprint(fingerprint));
+    const QString account = QString::fromUtf8(accountname);
+    const QString contact = QString::fromUtf8(username);
 
-    if (!m_callback->displayOtrMessage(account, contact, message)) {
-        m_callback->notifyUser(account, contact, message, psiotr::OTR_NOTIFY_INFO);
+    // The XEP-0364 integration now binds libotr contexts to full JIDs so a
+    // session cannot drift to another resource. Preserve trust from the old
+    // plugin layout when the exact same fingerprint was already known for the
+    // bare JID. This is an exact-key migration, not trust propagation to an
+    // unrelated resource.
+    const auto slash = contact.indexOf(QLatin1Char('/'));
+    if (slash > 0) {
+        const QByteArray bare = contact.left(slash).toUtf8();
+        ConnContext     *oldContext
+            = otrl_context_find(m_userstate, bare.constData(), accountname, protocol, OTRL_INSTAG_BEST, false, nullptr,
+                                nullptr, nullptr);
+        if (oldContext) {
+            auto *oldFingerprint = otrl_context_find_fingerprint(oldContext, fingerprint, 0, nullptr);
+            if (oldFingerprint) {
+                ConnContext *newContext
+                    = otrl_context_find(m_userstate, username, accountname, protocol, OTRL_INSTAG_BEST, false, nullptr,
+                                        nullptr, nullptr);
+                auto *newFingerprint
+                    = newContext ? otrl_context_find_fingerprint(newContext, fingerprint, 0, nullptr) : nullptr;
+                if (newFingerprint) {
+                    if (oldFingerprint->trust && oldFingerprint->trust[0]) {
+                        otrl_context_set_trust(newFingerprint, oldFingerprint->trust);
+                        write_fingerprints();
+                    }
+                    return;
+                }
+            }
+        }
     }
+
+    const QString message = QObject::tr("You have received a new "
+                                        "fingerprint from %1:\n%2")
+                                .arg(m_callback->humanContact(account, contact), humanFingerprint(fingerprint));
+
+    if (!m_callback->displayOtrMessage(account, contact, message))
+        m_callback->notifyUser(account, contact, message, psiotr::OTR_NOTIFY_INFO);
 }
 
 // ---------------------------------------------------------------------------
