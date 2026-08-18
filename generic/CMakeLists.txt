@@ -20,7 +20,6 @@ set( plugins_list
     jabberdiskplugin
     juickplugin
     messagefilterplugin
-    omemoplugin
     openpgpplugin
     otrplugin
     pepchangenotifyplugin
