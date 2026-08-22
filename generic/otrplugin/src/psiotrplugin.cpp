@@ -38,7 +38,7 @@
 #include <QAction>
 #include <QDomDocument>
 #include <QDomElement>
-#include <QtGui>
+#include <QTextDocument>
 
 namespace psiotr {
 
@@ -313,19 +313,28 @@ bool PsiOtrPlugin::enable()
     m_enabled             = true;
 
     QFile f(":/otrplugin/otr_yes.png");
-    f.open(QIODevice::ReadOnly);
-    m_iconHost->addIcon("otrplugin/otr_yes", f.readAll());
-    f.close();
+    if (f.open(QIODevice::ReadOnly)) {
+        m_iconHost->addIcon("otrplugin/otr_yes", f.readAll());
+        f.close();
+    } else {
+        qWarning("failed to open %s", qPrintable(f.errorString()));
+    }
 
     f.setFileName(":/otrplugin/otr_no.png");
-    f.open(QIODevice::ReadOnly);
-    m_iconHost->addIcon("otrplugin/otr_no", f.readAll());
-    f.close();
+    if (f.open(QIODevice::ReadOnly)) {
+        m_iconHost->addIcon("otrplugin/otr_no", f.readAll());
+        f.close();
+    } else {
+        qWarning("failed to open %s", qPrintable(f.errorString()));
+    }
 
     f.setFileName(":/otrplugin/otr_unverified.png");
-    f.open(QIODevice::ReadOnly);
-    m_iconHost->addIcon("otrplugin/otr_unverified", f.readAll());
-    f.close();
+    if (f.open(QIODevice::ReadOnly)) {
+        m_iconHost->addIcon("otrplugin/otr_unverified", f.readAll());
+        f.close();
+    } else {
+        qWarning("failed to open %s", qPrintable(f.errorString()));
+    }
 
     if (!m_encryptionHost) {
         delete m_otrConnection;

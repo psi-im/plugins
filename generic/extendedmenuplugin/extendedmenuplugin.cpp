@@ -164,29 +164,44 @@ bool ExtendedMenuPlugin::enable()
         = popup->registerOption(POPUP_OPTION_NAME, interval, QLatin1String("plugins.options.extmenu.") + constInterval);
 
     QFile f(":/icons/icons/ping.png");
-    f.open(QIODevice::ReadOnly);
-    icoHost->addIcon("menu/ping", f.readAll());
-    f.close();
+    if (f.open(QIODevice::ReadOnly)) {
+        icoHost->addIcon("menu/ping", f.readAll());
+        f.close();
+    } else {
+        qWarning("failed to open %s", qPrintable(f.errorString()));
+    }
 
     f.setFileName(":/icons/icons/copyjid.png");
-    f.open(QIODevice::ReadOnly);
-    icoHost->addIcon("menu/copyjid", f.readAll());
-    f.close();
+    if (f.open(QIODevice::ReadOnly)) {
+        icoHost->addIcon("menu/copyjid", f.readAll());
+        f.close();
+    } else {
+        qWarning("failed to open %s", qPrintable(f.errorString()));
+    }
 
     f.setFileName(":/icons/icons/copynick.png");
-    f.open(QIODevice::ReadOnly);
-    icoHost->addIcon("menu/copynick", f.readAll());
-    f.close();
+    if (f.open(QIODevice::ReadOnly)) {
+        icoHost->addIcon("menu/copynick", f.readAll());
+        f.close();
+    } else {
+        qWarning("failed to open %s", qPrintable(f.errorString()));
+    }
 
     f.setFileName(":/icons/icons/copystatusmsg.png");
-    f.open(QIODevice::ReadOnly);
-    icoHost->addIcon("menu/copystatusmsg", f.readAll());
-    f.close();
+    if (f.open(QIODevice::ReadOnly)) {
+        icoHost->addIcon("menu/copystatusmsg", f.readAll());
+        f.close();
+    } else {
+        qWarning("failed to open %s", qPrintable(f.errorString()));
+    }
 
     f.setFileName(":/icons/extendedmenu.png");
-    f.open(QIODevice::ReadOnly);
-    icoHost->addIcon("menu/extendedmenu", f.readAll());
-    f.close();
+    if (f.open(QIODevice::ReadOnly)) {
+        icoHost->addIcon("menu/extendedmenu", f.readAll());
+        f.close();
+    } else {
+        qWarning("failed to open %s", qPrintable(f.errorString()));
+    }
 
     return enabled;
 }
@@ -297,7 +312,7 @@ bool ExtendedMenuPlugin::incomingStanza(int account, const QDomElement &xml)
         if (xml.tagName() == "iq" && xml.hasAttribute("id")) {
             if (requestList_.contains(account)) {
                 Requests rl = requestList_.value(account);
-                for (const Request &r : rl) {
+                for (const Request &r : std::as_const(rl)) {
                     if (r.id == xml.attribute("id")) {
                         const QString jid = xml.attribute("from");
                         QString       name;
@@ -546,7 +561,7 @@ void ExtendedMenuPlugin::menuActivated()
         if (type == RequestLastSeen && res.isEmpty()) {
             doCommand(account, jid, command, type);
         } else {
-            for (const QString &resource : res) {
+            for (const QString &resource : std::as_const(res)) {
                 QString fullJid = jid;
                 if (!resource.isEmpty()) {
                     fullJid += QString("/") + resource;
