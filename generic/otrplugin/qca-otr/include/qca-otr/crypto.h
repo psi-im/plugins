@@ -30,14 +30,6 @@ struct DsaSignature
     QCA::BigInteger s;
 };
 
-// Arithmetic needed by OTRv3/SMP. These live here until QCA exposes native
-// BigInteger modular exponentiation and inversion.
-QCA::BigInteger positiveMod(const QCA::BigInteger &value, const QCA::BigInteger &modulus);
-QCA::BigInteger modPow(const QCA::BigInteger &base,
-                       const QCA::BigInteger &exponent,
-                       const QCA::BigInteger &modulus);
-bool modInverse(const QCA::BigInteger &value, const QCA::BigInteger &modulus, QCA::BigInteger *inverse);
-
 DsaPublicKey dsaPublicKey(const DsaPrivateKey &privateKey);
 bool dsaSignDigest(const DsaPrivateKey &privateKey, const QByteArray &digest, DsaSignature *signature);
 bool dsaVerifyDigest(const DsaPublicKey &publicKey, const QByteArray &digest, const DsaSignature &signature);
