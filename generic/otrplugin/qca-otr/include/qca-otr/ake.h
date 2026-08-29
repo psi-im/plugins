@@ -24,6 +24,13 @@ struct AkeKeys
     QCA::SecureArray m2Prime;
 };
 
+struct AkeAuthenticator
+{
+    DsaPublicKey publicKey;
+    quint32      keyId = 0;
+    DsaSignature signature;
+};
+
 QCA::BigInteger dhModulus();
 QCA::BigInteger dhGenerator();
 bool isValidDhPublicValue(const QCA::BigInteger &value);
@@ -40,6 +47,23 @@ QByteArray akeSignatureDigest(const QCA::BigInteger &firstDhPublic,
                               const QCA::SecureArray &macKey);
 QByteArray akeSignatureMac(const QByteArray &encryptedSignature,
                            const QCA::SecureArray &macKey);
+QByteArray dsaPublicKeyFingerprint(const DsaPublicKey &publicKey);
+
+bool createAkeAuthenticator(const DsaPrivateKey &identityKey,
+                            quint32 keyId,
+                            const QCA::BigInteger &senderDhPublic,
+                            const QCA::BigInteger &receiverDhPublic,
+                            const QCA::SecureArray &macKey,
+                            const QCA::SecureArray &encryptionKey,
+                            QByteArray *encryptedAuthenticator);
+
+bool verifyAkeAuthenticator(const QByteArray &encryptedAuthenticator,
+                            const QCA::BigInteger &senderDhPublic,
+                            const QCA::BigInteger &receiverDhPublic,
+                            const QCA::SecureArray &macKey,
+                            const QCA::SecureArray &encryptionKey,
+                            AkeAuthenticator *authenticator,
+                            QByteArray *fingerprint = nullptr);
 
 struct DhCommitMessage
 {
