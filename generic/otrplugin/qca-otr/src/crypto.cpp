@@ -34,18 +34,26 @@ bool validDomain(const DsaDomain &domain)
 
 QCA::BigInteger randomScalar(const QCA::BigInteger &q)
 {
-    QCA::BigInteger range(q);
-    range -= one();
+    QByteArray limit = q.toArray().toByteArray();
+    while (!limit.isEmpty() && limit.front() == '\0')
+        limit.remove(0, 1);
+    if (limit.isEmpty())
+        return {};
 
-    const int byteCount = q.toArray().size() + 1;
-    QCA::SecureArray bytes = QCA::Random::randomArray(byteCount);
-    if (!bytes.isEmpty())
-        bytes[0] = 0;
+    // Rejection sampling avoids the modulo bias of reducing a random integer
+    // modulo q. DSA nonces are secret values and must be uniformly selected
+    // from [1, q - 1].
+    for (int attempt = 0; attempt < 256; ++attempt) {
+        const QCA::SecureArray random = QCA::Random::randomArray(limit.size());
+        if (random.size() != limit.size())
+            return {};
 
-    QCA::BigInteger value(bytes);
-    value %= range;
-    value += one();
-    return value;
+        const QCA::BigInteger value = unsignedInteger(random.toByteArray());
+        if (value > zero() && value < q)
+            return value;
+    }
+
+    return {};
 }
 
 } // namespace
@@ -73,6 +81,8 @@ bool dsaSignDigest(const DsaPrivateKey &privateKey, const QByteArray &digest, Ds
     // vanishingly unlikely for real OTR parameters, but keep a finite guard.
     for (int attempt = 0; attempt < 128; ++attempt) {
         const QCA::BigInteger k = randomScalar(privateKey.domain.q);
+        if (k <= zero())
+            return false;
 
         QCA::BigInteger kInverse;
         if (!QCA::BigIntegerMath::modInverse(k, privateKey.domain.q, &kInverse))
@@ -131,6 +141,15 @@ bool dsaVerifyDigest(const DsaPublicKey &publicKey, const QByteArray &digest, co
     v %= publicKey.domain.q;
 
     return v == signature.r;
+}
+
+QByteArray sha1(const QByteArray &data)
+{
+    if (!QCA::isSupported("sha1"))
+        return {};
+
+    QCA::Hash hash(QStringLiteral("sha1"));
+    return hash.hash(data).toByteArray();
 }
 
 QByteArray sha256(const QByteArray &data)
