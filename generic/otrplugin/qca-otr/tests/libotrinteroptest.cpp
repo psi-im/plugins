@@ -19,21 +19,26 @@ namespace {
 
 constexpr quint32 QcaInstance = 0x11111111;
 constexpr quint32 LibotrInstance = 0x22222222;
-constexpr const char *LibotrAccount = "libotr-test";
-constexpr const char *Protocol = "prpl-jabber";
+constexpr const char *LibotrAccount = "otrtest3";
+constexpr const char *Protocol = "prpl-aim";
 constexpr const char *RemoteUser = "qca-peer";
 
+// Exact otrtest3 entry from libotr 4.1.1's test_suite/otr.private_key.
 const char LibotrPrivateKey[] = R"KEY((privkeys
  (account
-  (name libotr-test)
-  (protocol prpl-jabber)
-  (private-key
-   (dsa
-    (p #00BB4C57669E50E4C35F8E4CA84855CF2C83EE75C4F44B4BB4A7E88590D394D7A738E82EE97892E5051CE45E200741E18D423137AA8E6679B1CFAB4FF11D45D8C9CBDE388D30FC800B4879713E3C57BA48A92FE135BB9AF265F770B706FB9A04802244D12CBFFD97ACE5C73FCE88C2B716B4B22B994CD6429A7E16D9B6D1874137#)
-    (q #00C40DA63B679A80FC31BF49A68503BB39754D0A45#)
-    (g #6C0A48BEA859587D6677306D1777A2A0635470F149A86EB64EA62EAAA4C21ECE4375ACD016B776E3AD3411C18BB3FF37F963FCEBB8820FF8838AFA6FCD1B39558DAB78450AE2ED9457DEDBDCE13DF5A6B20A738D2973D375D360C044AF7F0204CCC372098F0B6460963274B1EA0B5FEC93571A15F5C03DCDF54EE83BB198F363#)
-    (y #00AB2C8A82F020DB99EF5B7A8330EC43E0D5EBD623FEB67D1B046D88FACA01D8E31E4D7865DC62D4DA58CF8BC7FF4B57C203A9F7F5C85DAB1B63D63299EF13AD89AAA7E6638C9DBC42D096408936C9F0382224CFB5C1528DCC8C7F2554CB4CA2FF3C3239BC921F1C690295DD9AE69C8EF5BBD8E58A8FAA8BB9D5F88463CAECEE7B#)
-    (x #7824B713A4E5FA6D6C69172196648CD4657A1ED1#))))
+(name otrtest3)
+(protocol prpl-aim)
+(private-key
+ (dsa
+  (p #00BB4C57669E50E4C35F8E4CA84855CF2C83EE75C4F44B4BB4A7E88590D394D7A738E82EE97892E5051CE45E200741E18D423137AA8E6679B1CFAB4FF11D45D8C9CBDE388D30FC800B4879713E3C57BA48A92FE135BB9AF265F770B706FB9A04802244D12CBFFD97ACE5C73FCE88C2B716B4B22B994CD6429A7E16D9B6D1874137#)
+  (q #00C40DA63B679A80FC31BF49A68503BB39754D0A45#)
+  (g #6C0A48BEA859587D6677306D1777A2A0635470F149A86EB64EA62EAAA4C21ECE4375ACD016B776E3AD3411C18BB3FF37F963FCEBB8820FF8838AFA6FCD1B39558DAB78450AE2ED9457DEDBDCE13DF5A6B20A738D2973D375D360C044AF7F0204CCC372098F0B6460963274B1EA0B5FEC93571A15F5C03DCDF54EE83BB198F363#)
+  (y #00AB2C8A82F020DB99EF5B7A8330EC43E0D5EBD623FEB67D1B046D88FACA01D8E31E4D7865DC62D4DA58CF8BC7FF4B57C203A9F7F5C85DAB1B63D63299EF13AD89AAA7E6638C9DBC42D096408936C9F0382224CFB5C1528DCC8C7F2554CB4CA2FF3C3239BC921F1C690295DD9AE69C8EF5BBD8E58A8FAA8BB9D5F88463CAECEE7B#)
+  (x #7824B713A4E5FA6D6C69172196648CD4657A1ED1#)
+  )
+ )
+ )
+)
 )KEY";
 
 QCA::BigInteger unsignedHex(const char *hex)
@@ -116,24 +121,32 @@ public:
     LibotrPeer(quint32 localInstance, quint32 peerInstance)
     {
         userState = otrl_userstate_create();
-        if (!userState)
+        if (!userState) {
+            setupError = "otrl_userstate_create failed";
             return;
+        }
 
         FILE *file = std::tmpfile();
-        if (!file)
+        if (!file) {
+            setupError = "tmpfile failed";
             return;
+        }
         const size_t fixtureSize = sizeof(LibotrPrivateKey) - 1;
         const bool written = std::fwrite(LibotrPrivateKey, 1, fixtureSize, file) == fixtureSize;
         if (written)
             std::rewind(file);
-        const gcry_error_t readError = written ? otrl_privkey_read_FILEp(userState, file) : 1;
+        const gcry_error_t readError = written ? otrl_privkey_read_FILEp(userState, file) : gcry_error(GPG_ERR_EIO);
         std::fclose(file);
-        if (readError)
+        if (readError) {
+            setupError = QByteArray("otrl_privkey_read_FILEp: ") + gcry_strerror(readError);
             return;
+        }
 
         privateKey = otrl_privkey_find(userState, LibotrAccount, Protocol);
-        if (!privateKey)
+        if (!privateKey) {
+            setupError = "otrl_privkey_find failed";
             return;
+        }
 
         int added = 0;
         context = otrl_context_find(userState,
@@ -145,8 +158,10 @@ public:
                                     &added,
                                     nullptr,
                                     nullptr);
-        if (!context)
+        if (!context) {
+            setupError = "otrl_context_find failed";
             return;
+        }
         context->our_instance = localInstance;
         context->their_instance = peerInstance;
         valid = true;
@@ -169,6 +184,7 @@ public:
     OtrlUserState userState = nullptr;
     OtrlPrivKey *privateKey = nullptr;
     ConnContext *context = nullptr;
+    QByteArray setupError;
     bool valid = false;
 };
 
@@ -206,7 +222,7 @@ void LibotrInteropTest::cleanupTestCase()
 void LibotrInteropTest::qcaInitiates()
 {
     LibotrPeer libotr(LibotrInstance, QcaInstance);
-    QVERIFY(libotr.valid);
+    QVERIFY2(libotr.valid, libotr.setupError.constData());
 
     const QcaOtr::DsaPrivateKey qcaKey = qcaPrivateKey();
     QcaOtr::AkeSession qca(qcaKey, QcaInstance, LibotrInstance);
@@ -258,7 +274,7 @@ void LibotrInteropTest::qcaInitiates()
 void LibotrInteropTest::libotrInitiates()
 {
     LibotrPeer libotr(LibotrInstance, QcaInstance);
-    QVERIFY(libotr.valid);
+    QVERIFY2(libotr.valid, libotr.setupError.constData());
 
     const QcaOtr::DsaPrivateKey qcaKey = qcaPrivateKey();
     QcaOtr::AkeSession qca(qcaKey, QcaInstance, LibotrInstance);
