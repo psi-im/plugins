@@ -5,13 +5,11 @@
 namespace QcaOtr::Wire {
 namespace {
 
-const QCA::BigInteger Zero(0);
-
 QByteArray unsignedMinimalBytes(const QCA::BigInteger &value, bool *ok)
 {
     if (ok)
         *ok = false;
-    if (value < Zero)
+    if (value < QCA::BigInteger(0))
         return {};
 
     QByteArray bytes = value.toArray().toByteArray();
