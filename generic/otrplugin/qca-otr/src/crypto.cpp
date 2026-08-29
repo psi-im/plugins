@@ -180,6 +180,24 @@ QByteArray sha256(const QByteArray &data)
     return hash.hash(data).toByteArray();
 }
 
+QCA::SecureArray sha1Secure(const QCA::SecureArray &data)
+{
+    if (!QCA::isSupported("sha1"))
+        return {};
+
+    QCA::Hash hash(QStringLiteral("sha1"));
+    return QCA::SecureArray(hash.hash(data));
+}
+
+QCA::SecureArray sha256Secure(const QCA::SecureArray &data)
+{
+    if (!QCA::isSupported("sha256"))
+        return {};
+
+    QCA::Hash hash(QStringLiteral("sha256"));
+    return QCA::SecureArray(hash.hash(data));
+}
+
 QByteArray hmacSha1(const QCA::SecureArray &key, const QByteArray &data)
 {
     if (!QCA::isSupported("hmac(sha1)"))
