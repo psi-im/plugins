@@ -40,6 +40,16 @@ target_link_libraries(qca-otr-ake-session-test
 )
 add_test(NAME qca-otr-ake-session COMMAND qca-otr-ake-session-test)
 
+add_executable(qca-otr-data-test
+    datatest.cpp
+)
+target_link_libraries(qca-otr-data-test
+    PRIVATE
+        QcaOtr::QcaOtr
+        Qt${QT_DEFAULT_MAJOR_VERSION}::Test
+)
+add_test(NAME qca-otr-data COMMAND qca-otr-data-test)
+
 if(QCA_OTR_BUILD_LIBOTR_INTEROP_TESTS)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(LIBOTR REQUIRED IMPORTED_TARGET libotr)
