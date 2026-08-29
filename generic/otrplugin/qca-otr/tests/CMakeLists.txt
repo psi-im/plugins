@@ -19,3 +19,13 @@ target_link_libraries(qca-otr-wire-test
         Qt${QT_DEFAULT_MAJOR_VERSION}::Test
 )
 add_test(NAME qca-otr-wire COMMAND qca-otr-wire-test)
+
+add_executable(qca-otr-ake-test
+    aketest.cpp
+)
+target_link_libraries(qca-otr-ake-test
+    PRIVATE
+        QcaOtr::QcaOtr
+        Qt${QT_DEFAULT_MAJOR_VERSION}::Test
+)
+add_test(NAME qca-otr-ake COMMAND qca-otr-ake-test)

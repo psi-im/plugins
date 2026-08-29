@@ -17,6 +17,7 @@ set(QCA_PACKAGE_NAME "Qca3-qt${QT_DEFAULT_MAJOR_VERSION}")
 find_package(${QCA_PACKAGE_NAME} CONFIG REQUIRED)
 
 add_library(qca-otr STATIC
+    src/ake.cpp
     src/codec.cpp
     src/crypto.cpp
 )

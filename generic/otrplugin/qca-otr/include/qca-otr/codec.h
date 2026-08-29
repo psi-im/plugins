@@ -15,6 +15,7 @@ public:
     void writeByte(quint8 value);
     void writeShort(quint16 value);
     void writeInt(quint32 value);
+    void writeBytes(const QByteArray &value);
     bool writeMpi(const QCA::BigInteger &value);
     void writeData(const QByteArray &value);
     bool writeDsaPublicKey(const DsaPublicKey &key);
@@ -34,6 +35,7 @@ public:
     bool readByte(quint8 *value);
     bool readShort(quint16 *value);
     bool readInt(quint32 *value);
+    bool readBytes(quint32 length, QByteArray *value);
     bool readMpi(QCA::BigInteger *value);
     bool readData(QByteArray *value);
     bool readDsaPublicKey(DsaPublicKey *key);
@@ -42,8 +44,6 @@ public:
     quint64 remaining() const { return static_cast<quint64>(data_.size()) - offset_; }
 
 private:
-    bool readBytes(quint32 length, QByteArray *value);
-
     QByteArray data_;
     quint64 offset_ = 0;
 };
