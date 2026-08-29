@@ -54,6 +54,11 @@ void Writer::writeInt(quint32 value)
     data_.append(static_cast<char>(value & 0xff));
 }
 
+void Writer::writeBytes(const QByteArray &value)
+{
+    data_.append(value);
+}
+
 bool Writer::writeMpi(const QCA::BigInteger &value)
 {
     bool ok = false;
