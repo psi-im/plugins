@@ -6,8 +6,13 @@ if(NOT DEFINED QT_DEFAULT_MAJOR_VERSION)
     set(QT_DEFAULT_MAJOR_VERSION 6 CACHE STRING "Qt major version used by qca-otr")
 endif()
 
+if(NOT QT_DEFAULT_MAJOR_VERSION MATCHES "^[56]$")
+    message(FATAL_ERROR "qca-otr supports Qt 5 or Qt 6")
+endif()
+
 find_package(Qt${QT_DEFAULT_MAJOR_VERSION} REQUIRED COMPONENTS Core)
-find_package(Qca3 CONFIG REQUIRED)
+set(QCA_PACKAGE_NAME "Qca3-qt${QT_DEFAULT_MAJOR_VERSION}")
+find_package(${QCA_PACKAGE_NAME} CONFIG REQUIRED)
 
 add_library(qca-otr STATIC
     src/codec.cpp

@@ -10,11 +10,12 @@ The first stage contains only cryptographic primitives required by OTRv3:
 - modular exponentiation and modular inversion over `QCA::BigInteger`;
 - raw/prehashed DSA operations;
 - SHA-256 and HMAC-SHA256;
-- AES-128-CTR.
+- AES-128-CTR;
+- strict OTR wire encoding/decoding for integers, MPI, DATA and DSA public keys.
 
 The modular arithmetic helpers are temporary compatibility code. They are
-intended to move into QCA3 as native `BigInteger` operations, after which this
-library can consume those public APIs without changing its OTR-facing API.
+intended to move to the public QCA3 API, after which this library can consume
+those operations without changing its OTR-facing API.
 
 Planned layers are:
 
@@ -27,13 +28,15 @@ Planned layers are:
 
 ## Standalone build
 
+Install a Qt5 or Qt6 build of QCA3 into a prefix and point CMake at that prefix:
+
 ```sh
 cmake -S . -B build \
   -DQT_DEFAULT_MAJOR_VERSION=6 \
-  -DQca3_DIR=/path/to/qca3/lib/cmake/Qca3
+  -DCMAKE_PREFIX_PATH=/path/to/qca3-prefix
 cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-Use `QT_DEFAULT_MAJOR_VERSION=5` with the Qt5 build of QCA3 for the Windows 7
-profile.
+Use `QT_DEFAULT_MAJOR_VERSION=5` with `Qca3-qt5` for the Windows 7 profile. The
+repository CI builds and tests the same source against both Qt 5 and Qt 6.
