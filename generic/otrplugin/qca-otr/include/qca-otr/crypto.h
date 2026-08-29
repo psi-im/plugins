@@ -36,6 +36,7 @@ bool dsaVerifyDigest(const DsaPublicKey &publicKey, const QByteArray &digest, co
 
 QByteArray sha1(const QByteArray &data);
 QByteArray sha256(const QByteArray &data);
+QByteArray hmacSha1(const QCA::SecureArray &key, const QByteArray &data);
 QByteArray hmacSha256(const QCA::SecureArray &key, const QByteArray &data);
 
 // OTRv3 uses AES-128 in CTR mode. Encryption and decryption are the same
