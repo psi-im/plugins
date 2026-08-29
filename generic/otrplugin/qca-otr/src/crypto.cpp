@@ -39,6 +39,13 @@ QCA::BigInteger unsignedInteger(const QByteArray &bytes)
     return QCA::BigInteger(QCA::SecureArray(positive));
 }
 
+QCA::BigInteger unsignedInteger(const QCA::SecureArray &bytes)
+{
+    QCA::SecureArray positive(1, '\0');
+    positive.append(bytes);
+    return QCA::BigInteger(positive);
+}
+
 bool validDomain(const DsaDomain &domain)
 {
     return domain.p > two() && domain.q > one() && domain.g > one() && domain.g < domain.p;
@@ -60,7 +67,7 @@ QCA::BigInteger randomScalar(const QCA::BigInteger &q)
         if (random.size() != limit.size())
             return {};
 
-        const QCA::BigInteger value = unsignedInteger(random.toByteArray());
+        const QCA::BigInteger value = unsignedInteger(random);
         if (value > zero() && value < q)
             return value;
     }
