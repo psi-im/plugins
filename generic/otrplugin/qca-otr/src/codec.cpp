@@ -1,5 +1,6 @@
 #include "qca-otr/codec.h"
 
+#include <cstring>
 #include <limits>
 
 namespace QcaOtr::Wire {
@@ -19,6 +20,27 @@ QByteArray unsignedMinimalBytes(const QCA::BigInteger &value, bool *ok)
     if (ok)
         *ok = true;
     return bytes;
+}
+
+QCA::SecureArray unsignedMinimalSecureBytes(const QCA::BigInteger &value, bool *ok)
+{
+    if (ok)
+        *ok = false;
+    if (value < QCA::BigInteger(0))
+        return {};
+
+    const QCA::SecureArray bytes = value.toArray();
+    int offset = 0;
+    while (offset < bytes.size() && bytes.at(offset) == '\0')
+        ++offset;
+
+    QCA::SecureArray result(bytes.size() - offset);
+    if (!result.isEmpty())
+        std::memcpy(result.data(), bytes.constData() + offset, static_cast<size_t>(result.size()));
+
+    if (ok)
+        *ok = true;
+    return result;
 }
 
 QCA::BigInteger unsignedInteger(const QByteArray &bytes)
@@ -197,6 +219,30 @@ QByteArray encodeMpi(const QCA::BigInteger &value, bool *ok)
     if (ok)
         *ok = success;
     return success ? writer.take() : QByteArray();
+}
+
+QCA::SecureArray encodeMpiSecure(const QCA::BigInteger &value, bool *ok)
+{
+    if (ok)
+        *ok = false;
+
+    bool bytesOk = false;
+    const QCA::SecureArray bytes = unsignedMinimalSecureBytes(value, &bytesOk);
+    if (!bytesOk || static_cast<quint64>(bytes.size()) > std::numeric_limits<quint32>::max())
+        return {};
+
+    const quint32 length = static_cast<quint32>(bytes.size());
+    QCA::SecureArray encoded(4 + bytes.size());
+    encoded[0] = static_cast<char>((length >> 24) & 0xff);
+    encoded[1] = static_cast<char>((length >> 16) & 0xff);
+    encoded[2] = static_cast<char>((length >> 8) & 0xff);
+    encoded[3] = static_cast<char>(length & 0xff);
+    if (!bytes.isEmpty())
+        std::memcpy(encoded.data() + 4, bytes.constData(), static_cast<size_t>(bytes.size()));
+
+    if (ok)
+        *ok = true;
+    return encoded;
 }
 
 bool decodeMpi(const QByteArray &encoded, QCA::BigInteger *value)
