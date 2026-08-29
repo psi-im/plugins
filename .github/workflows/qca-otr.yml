@@ -41,9 +41,9 @@ jobs:
         run: |
           sudo apt-get update
           if [[ '${{ matrix.qt }}' == '6' ]]; then
-            sudo apt-get install -y cmake ninja-build qt6-base-dev libssl-dev
+            sudo apt-get install -y cmake ninja-build pkg-config qt6-base-dev libssl-dev libotr5-dev
           else
-            sudo apt-get install -y cmake ninja-build qtbase5-dev libssl-dev
+            sudo apt-get install -y cmake ninja-build pkg-config qtbase5-dev libssl-dev libotr5-dev
           fi
 
       - name: Build and install QCA3
@@ -70,6 +70,7 @@ jobs:
         run: |
           cmake -S generic/otrplugin/qca-otr -B qca-otr-build -G Ninja \
             -DQT_DEFAULT_MAJOR_VERSION='${{ matrix.qt }}' \
+            -DQCA_OTR_BUILD_LIBOTR_INTEROP_TESTS=ON \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_PREFIX_PATH="$PWD/qca-install"
           cmake --build qca-otr-build
