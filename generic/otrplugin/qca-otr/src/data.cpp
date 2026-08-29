@@ -445,7 +445,7 @@ DataReceiveResult DataSession::processIncoming(const QByteArray &encoded)
 
     session.receiveCounter = block;
     session.receiveMacUsed = true;
-    result.extraKey = session.extraKey.toByteArray();
+    result.extraKey = session.extraKey;
     result.flags = message.flags;
 
     const int nul = cleartext.indexOf('\0');
