@@ -3,7 +3,7 @@
 The native qca-otr work is completed in protocol layers so each stage can be
 validated against libotr 4.1.1 before the Psi plugin switches backend.
 
-## 1. Fragmentation and OTRv3 instance routing
+## 1. Fragmentation and OTRv3 instance routing — completed
 
 - transport armor/dearmor (`?OTR:base64.`)
 - exact OTRv3 fragment format and reassembly
@@ -18,7 +18,7 @@ validated against libotr 4.1.1 before the Psi plugin switches backend.
 Exit criterion: fragmented and unfragmented AKE/Data traffic interoperates in
 both directions with libotr 4.1.1, including multiple remote instances.
 
-## 2. Negotiation, message envelope and control TLVs
+## 2. Negotiation, message envelope and control TLVs — active
 
 The current Psi plugin does not start OTR by sending a D-H Commit directly: it
 sends `otrl_proto_default_query_msg()` and also delegates ordinary outgoing
