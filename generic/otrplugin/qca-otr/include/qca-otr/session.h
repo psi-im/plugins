@@ -25,7 +25,7 @@ struct SessionResult
     SessionStatus status = SessionStatus::Ignored;
     quint32 peerInstance = 0;
     QByteArray plaintext;
-    QByteArray extraKey;
+    QCA::SecureArray extraKey;
     quint8 flags = 0;
     QVector<QByteArray> outgoingMessages;
 };
