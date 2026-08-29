@@ -43,6 +43,7 @@ add_test(NAME qca-otr-ake-session COMMAND qca-otr-ake-session-test)
 if(QCA_OTR_BUILD_LIBOTR_INTEROP_TESTS)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(LIBOTR REQUIRED IMPORTED_TARGET libotr)
+    pkg_check_modules(GCRYPT REQUIRED IMPORTED_TARGET libgcrypt)
 
     add_executable(qca-otr-libotr-interop-test
         libotrinteroptest.cpp
@@ -52,6 +53,7 @@ if(QCA_OTR_BUILD_LIBOTR_INTEROP_TESTS)
             QcaOtr::QcaOtr
             Qt${QT_DEFAULT_MAJOR_VERSION}::Test
             PkgConfig::LIBOTR
+            PkgConfig::GCRYPT
     )
     add_test(NAME qca-otr-libotr-interop COMMAND qca-otr-libotr-interop-test)
 endif()
