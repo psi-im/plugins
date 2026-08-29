@@ -57,8 +57,11 @@ void CryptoTest::rawDsa()
     rawDigestSignature.s = QCA::BigInteger(9);
     QVERIFY(QcaOtr::dsaVerifyDigest(publicKey, QByteArray(32, static_cast<char>(0xf0)), rawDigestSignature));
 
+    // Do not perturb a valid toy signature by a small amount: with q=11 a
+    // different (r,s) pair can accidentally verify. Use an out-of-range value
+    // that DSA validation must reject deterministically.
     QcaOtr::DsaSignature damaged = signature;
-    damaged.r += QCA::BigInteger(1);
+    damaged.r = privateKey.domain.q;
     QVERIFY(!QcaOtr::dsaVerifyDigest(publicKey, QByteArray::fromHex("09"), damaged));
 }
 
