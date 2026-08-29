@@ -98,4 +98,16 @@ if(QCA_OTR_BUILD_LIBOTR_INTEROP_TESTS)
             PkgConfig::GCRYPT
     )
     add_test(NAME qca-otr-fragment-interop COMMAND qca-otr-fragment-interop-test)
+
+    add_executable(qca-otr-session-interop-test
+        sessioninteroptest.cpp
+    )
+    target_link_libraries(qca-otr-session-interop-test
+        PRIVATE
+            QcaOtr::QcaOtr
+            Qt${QT_DEFAULT_MAJOR_VERSION}::Test
+            PkgConfig::LIBOTR
+            PkgConfig::GCRYPT
+    )
+    add_test(NAME qca-otr-session-interop COMMAND qca-otr-session-interop-test)
 endif()
