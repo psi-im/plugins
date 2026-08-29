@@ -2,6 +2,8 @@
 
 #include "qca-otr/codec.h"
 
+#include <cstring>
+
 namespace QcaOtr {
 namespace {
 
@@ -31,6 +33,24 @@ QCA::BigInteger unsignedInteger(const QByteArray &bytes)
     positive.append('\0');
     positive.append(bytes);
     return QCA::BigInteger(QCA::SecureArray(positive));
+}
+
+QCA::BigInteger unsignedInteger(const QCA::SecureArray &bytes)
+{
+    QCA::SecureArray positive(1, '\0');
+    positive.append(bytes);
+    return QCA::BigInteger(positive);
+}
+
+QCA::SecureArray secureSlice(const QCA::SecureArray &value, int offset, int length)
+{
+    if (offset < 0 || length < 0 || offset > value.size() || length > value.size() - offset)
+        return {};
+
+    QCA::SecureArray result(length);
+    if (length > 0)
+        std::memcpy(result.data(), value.constData() + offset, static_cast<size_t>(length));
+    return result;
 }
 
 bool fixedWidthDsaInteger(const QCA::BigInteger &value, QByteArray *encoded)
@@ -98,13 +118,13 @@ bool readHeader(Wire::Reader *reader, quint8 expectedType, quint32 *sender, quin
     return validInstanceTags(*sender, *receiver);
 }
 
-QByteArray h2(quint8 selector, const QByteArray &secbytes)
+QCA::SecureArray h2(quint8 selector, const QCA::SecureArray &secbytes)
 {
-    QByteArray input;
-    input.reserve(secbytes.size() + 1);
-    input.append(static_cast<char>(selector));
-    input.append(secbytes);
-    return sha256(input);
+    QCA::SecureArray input(secbytes.size() + 1);
+    input[0] = static_cast<char>(selector);
+    if (!secbytes.isEmpty())
+        std::memcpy(input.data() + 1, secbytes.constData(), static_cast<size_t>(secbytes.size()));
+    return sha256Secure(input);
 }
 
 } // namespace
@@ -147,7 +167,7 @@ bool generateDhKeyPair(DhKeyPair *keyPair)
         if (random.size() != 40)
             return false;
 
-        const QCA::BigInteger privateExponent = unsignedInteger(random.toByteArray());
+        const QCA::BigInteger privateExponent = unsignedInteger(random);
         if (privateExponent <= zero())
             continue;
 
@@ -186,29 +206,29 @@ bool deriveAkeKeys(const QCA::BigInteger &sharedSecret, AkeKeys *keys)
         return false;
 
     bool ok = false;
-    const QByteArray secbytes = Wire::encodeMpi(sharedSecret, &ok);
+    const QCA::SecureArray secbytes = Wire::encodeMpiSecure(sharedSecret, &ok);
     if (!ok)
         return false;
 
-    const QByteArray h0 = h2(0x00, secbytes);
-    const QByteArray h1 = h2(0x01, secbytes);
-    const QByteArray hM1 = h2(0x02, secbytes);
-    const QByteArray hM2 = h2(0x03, secbytes);
-    const QByteArray hM1Prime = h2(0x04, secbytes);
-    const QByteArray hM2Prime = h2(0x05, secbytes);
+    const QCA::SecureArray h0 = h2(0x00, secbytes);
+    const QCA::SecureArray h1 = h2(0x01, secbytes);
+    const QCA::SecureArray hM1 = h2(0x02, secbytes);
+    const QCA::SecureArray hM2 = h2(0x03, secbytes);
+    const QCA::SecureArray hM1Prime = h2(0x04, secbytes);
+    const QCA::SecureArray hM2Prime = h2(0x05, secbytes);
     if (h0.size() != 32 || h1.size() != 32 || hM1.size() != 32 || hM2.size() != 32 ||
         hM1Prime.size() != 32 || hM2Prime.size() != 32) {
         return false;
     }
 
     AkeKeys derived;
-    derived.sessionId = h0.left(8);
-    derived.c = QCA::SecureArray(h1.left(16));
-    derived.cPrime = QCA::SecureArray(h1.mid(16, 16));
-    derived.m1 = QCA::SecureArray(hM1);
-    derived.m2 = QCA::SecureArray(hM2);
-    derived.m1Prime = QCA::SecureArray(hM1Prime);
-    derived.m2Prime = QCA::SecureArray(hM2Prime);
+    derived.sessionId = QByteArray(h0.constData(), 8);
+    derived.c = secureSlice(h1, 0, 16);
+    derived.cPrime = secureSlice(h1, 16, 16);
+    derived.m1 = hM1;
+    derived.m2 = hM2;
+    derived.m1Prime = hM1Prime;
+    derived.m2Prime = hM2Prime;
     *keys = derived;
     return true;
 }

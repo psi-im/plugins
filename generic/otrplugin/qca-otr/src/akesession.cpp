@@ -55,6 +55,17 @@ AkeSession::AkeSession(const DsaPrivateKey &identityKey, quint32 localInstance, 
 {
 }
 
+bool AkeSession::bindPeerInstance(quint32 peerInstance)
+{
+    if (peerInstance < MinimumInstanceTag)
+        return false;
+    if (peerInstance_ != 0 && peerInstance_ != peerInstance)
+        return false;
+
+    peerInstance_ = peerInstance;
+    return true;
+}
+
 void AkeSession::clearPending()
 {
     initiated_ = false;
@@ -134,7 +145,7 @@ QByteArray AkeSession::start(bool *ok)
     initiated_ = true;
     localDh_ = keyPair;
     localKeyId_ = 1;
-    revealKey_ = randomKey.toByteArray();
+    revealKey_ = randomKey;
     encryptedGx_ = encryptedGx;
     hashedGx_ = hashGx;
     lastOutgoing_ = encoded;
@@ -205,7 +216,7 @@ bool AkeSession::makeRevealSignature(const QCA::BigInteger &peerPublic,
     RevealSignatureMessage reveal;
     reveal.senderInstance = localInstance_;
     reveal.receiverInstance = peerInstance_;
-    reveal.revealedKey = revealKey_;
+    reveal.revealedKey = revealKey_.toByteArray();
     reveal.encryptedSignature = encryptedAuthenticator;
     reveal.mac = akeSignatureMac(encryptedAuthenticator, keys.m2);
     if (reveal.mac.size() != 20)
@@ -275,7 +286,7 @@ AkeHandleResult AkeSession::handleCommit(const DhCommitMessage &message)
 
     case AkeState::AwaitingRevealSignature:
         // libotr accepts a replacement commit here while keeping the same
-        // responder DH key and retransmitting the exact previous DH Key.
+        // responder DH key and retransmitting the exact previous D-H Key.
         encryptedGx_ = message.encryptedGx;
         hashedGx_ = message.hashedGx;
         return handledResult(lastOutgoing_);

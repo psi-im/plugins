@@ -56,7 +56,7 @@ struct DataReceiveResult
 {
     DataReceiveStatus status = DataReceiveStatus::Ignored;
     QByteArray plaintext;
-    QByteArray extraKey;
+    QCA::SecureArray extraKey;
     quint8 flags = 0;
 };
 

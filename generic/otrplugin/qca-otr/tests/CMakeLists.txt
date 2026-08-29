@@ -50,6 +50,26 @@ target_link_libraries(qca-otr-data-test
 )
 add_test(NAME qca-otr-data COMMAND qca-otr-data-test)
 
+add_executable(qca-otr-transport-test
+    transporttest.cpp
+)
+target_link_libraries(qca-otr-transport-test
+    PRIVATE
+        QcaOtr::QcaOtr
+        Qt${QT_DEFAULT_MAJOR_VERSION}::Test
+)
+add_test(NAME qca-otr-transport COMMAND qca-otr-transport-test)
+
+add_executable(qca-otr-session-test
+    sessiontest.cpp
+)
+target_link_libraries(qca-otr-session-test
+    PRIVATE
+        QcaOtr::QcaOtr
+        Qt${QT_DEFAULT_MAJOR_VERSION}::Test
+)
+add_test(NAME qca-otr-session COMMAND qca-otr-session-test)
+
 if(QCA_OTR_BUILD_LIBOTR_INTEROP_TESTS)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(LIBOTR REQUIRED IMPORTED_TARGET libotr)
@@ -66,4 +86,28 @@ if(QCA_OTR_BUILD_LIBOTR_INTEROP_TESTS)
             PkgConfig::GCRYPT
     )
     add_test(NAME qca-otr-libotr-interop COMMAND qca-otr-libotr-interop-test)
+
+    add_executable(qca-otr-fragment-interop-test
+        fragmentinteroptest.cpp
+    )
+    target_link_libraries(qca-otr-fragment-interop-test
+        PRIVATE
+            QcaOtr::QcaOtr
+            Qt${QT_DEFAULT_MAJOR_VERSION}::Test
+            PkgConfig::LIBOTR
+            PkgConfig::GCRYPT
+    )
+    add_test(NAME qca-otr-fragment-interop COMMAND qca-otr-fragment-interop-test)
+
+    add_executable(qca-otr-session-interop-test
+        sessioninteroptest.cpp
+    )
+    target_link_libraries(qca-otr-session-interop-test
+        PRIVATE
+            QcaOtr::QcaOtr
+            Qt${QT_DEFAULT_MAJOR_VERSION}::Test
+            PkgConfig::LIBOTR
+            PkgConfig::GCRYPT
+    )
+    add_test(NAME qca-otr-session-interop COMMAND qca-otr-session-interop-test)
 endif()

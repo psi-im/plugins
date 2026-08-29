@@ -39,6 +39,13 @@ QCA::BigInteger unsignedInteger(const QByteArray &bytes)
     return QCA::BigInteger(QCA::SecureArray(positive));
 }
 
+QCA::BigInteger unsignedInteger(const QCA::SecureArray &bytes)
+{
+    QCA::SecureArray positive(1, '\0');
+    positive.append(bytes);
+    return QCA::BigInteger(positive);
+}
+
 bool validDomain(const DsaDomain &domain)
 {
     return domain.p > two() && domain.q > one() && domain.g > one() && domain.g < domain.p;
@@ -60,7 +67,7 @@ QCA::BigInteger randomScalar(const QCA::BigInteger &q)
         if (random.size() != limit.size())
             return {};
 
-        const QCA::BigInteger value = unsignedInteger(random.toByteArray());
+        const QCA::BigInteger value = unsignedInteger(random);
         if (value > zero() && value < q)
             return value;
     }
@@ -171,6 +178,24 @@ QByteArray sha256(const QByteArray &data)
 
     QCA::Hash hash(QStringLiteral("sha256"));
     return hash.hash(data).toByteArray();
+}
+
+QCA::SecureArray sha1Secure(const QCA::SecureArray &data)
+{
+    if (!QCA::isSupported("sha1"))
+        return {};
+
+    QCA::Hash hash(QStringLiteral("sha1"));
+    return QCA::SecureArray(hash.hash(data));
+}
+
+QCA::SecureArray sha256Secure(const QCA::SecureArray &data)
+{
+    if (!QCA::isSupported("sha256"))
+        return {};
+
+    QCA::Hash hash(QStringLiteral("sha256"));
+    return QCA::SecureArray(hash.hash(data));
 }
 
 QByteArray hmacSha1(const QCA::SecureArray &key, const QByteArray &data)

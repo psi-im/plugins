@@ -32,13 +32,26 @@ bool constantTimeEqual(const QByteArray &left, const QByteArray &right)
     return difference == 0;
 }
 
-QByteArray hashDataKey(quint8 selector, const QByteArray &encodedSharedSecret)
+QCA::SecureArray secureSlice(const QCA::SecureArray &value, int offset, int length)
 {
-    QByteArray input;
-    input.reserve(encodedSharedSecret.size() + 1);
-    input.append(static_cast<char>(selector));
-    input.append(encodedSharedSecret);
-    return sha1(input);
+    if (offset < 0 || length < 0 || offset > value.size() || length > value.size() - offset)
+        return {};
+
+    QCA::SecureArray result(length);
+    if (length > 0)
+        std::memcpy(result.data(), value.constData() + offset, static_cast<size_t>(length));
+    return result;
+}
+
+QCA::SecureArray hashDataKey(quint8 selector, const QCA::SecureArray &encodedSharedSecret)
+{
+    QCA::SecureArray input(encodedSharedSecret.size() + 1);
+    input[0] = static_cast<char>(selector);
+    if (!encodedSharedSecret.isEmpty())
+        std::memcpy(input.data() + 1,
+                    encodedSharedSecret.constData(),
+                    static_cast<size_t>(encodedSharedSecret.size()));
+    return sha1Secure(input);
 }
 
 bool incrementCounter(QByteArray *counter)
@@ -97,7 +110,7 @@ bool deriveDataSessionKeys(const DhKeyPair &localDh,
         return false;
 
     bool ok = false;
-    const QByteArray encodedSharedSecret = Wire::encodeMpi(sharedSecret, &ok);
+    const QCA::SecureArray encodedSharedSecret = Wire::encodeMpiSecure(sharedSecret, &ok);
     if (!ok)
         return false;
 
@@ -106,30 +119,32 @@ bool deriveDataSessionKeys(const DhKeyPair &localDh,
     // keys without any role-specific state.
     const quint8 sendSelector = localDh.publicValue > peerDhPublic ? 0x01 : 0x02;
     const quint8 receiveSelector = sendSelector == 0x01 ? 0x02 : 0x01;
-    const QByteArray sendHash = hashDataKey(sendSelector, encodedSharedSecret);
-    const QByteArray receiveHash = hashDataKey(receiveSelector, encodedSharedSecret);
+    const QCA::SecureArray sendHash = hashDataKey(sendSelector, encodedSharedSecret);
+    const QCA::SecureArray receiveHash = hashDataKey(receiveSelector, encodedSharedSecret);
     if (sendHash.size() != 20 || receiveHash.size() != 20)
         return false;
 
-    const QByteArray sendEncryption = sendHash.left(16);
-    const QByteArray receiveEncryption = receiveHash.left(16);
-    const QByteArray sendMac = sha1(sendEncryption);
-    const QByteArray receiveMac = sha1(receiveEncryption);
+    const QCA::SecureArray sendEncryption = secureSlice(sendHash, 0, 16);
+    const QCA::SecureArray receiveEncryption = secureSlice(receiveHash, 0, 16);
+    const QCA::SecureArray sendMac = sha1Secure(sendEncryption);
+    const QCA::SecureArray receiveMac = sha1Secure(receiveEncryption);
 
-    QByteArray extraInput;
-    extraInput.reserve(encodedSharedSecret.size() + 1);
-    extraInput.append(static_cast<char>(0xff));
-    extraInput.append(encodedSharedSecret);
-    const QByteArray extra = sha256(extraInput);
+    QCA::SecureArray extraInput(encodedSharedSecret.size() + 1);
+    extraInput[0] = static_cast<char>(0xff);
+    if (!encodedSharedSecret.isEmpty())
+        std::memcpy(extraInput.data() + 1,
+                    encodedSharedSecret.constData(),
+                    static_cast<size_t>(encodedSharedSecret.size()));
+    const QCA::SecureArray extra = sha256Secure(extraInput);
     if (sendMac.size() != MacSize || receiveMac.size() != MacSize || extra.size() != 32)
         return false;
 
     DataSessionKeys derived;
-    derived.sendEncryptionKey = QCA::SecureArray(sendEncryption);
-    derived.receiveEncryptionKey = QCA::SecureArray(receiveEncryption);
-    derived.sendMacKey = QCA::SecureArray(sendMac);
-    derived.receiveMacKey = QCA::SecureArray(receiveMac);
-    derived.extraKey = QCA::SecureArray(extra);
+    derived.sendEncryptionKey = sendEncryption;
+    derived.receiveEncryptionKey = receiveEncryption;
+    derived.sendMacKey = sendMac;
+    derived.receiveMacKey = receiveMac;
+    derived.extraKey = extra;
     *keys = derived;
     return true;
 }
@@ -445,7 +460,7 @@ DataReceiveResult DataSession::processIncoming(const QByteArray &encoded)
 
     session.receiveCounter = block;
     session.receiveMacUsed = true;
-    result.extraKey = session.extraKey.toByteArray();
+    result.extraKey = session.extraKey;
     result.flags = message.flags;
 
     const int nul = cleartext.indexOf('\0');
