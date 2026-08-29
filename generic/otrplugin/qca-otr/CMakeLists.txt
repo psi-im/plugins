@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16)
 
 project(qca-otr LANGUAGES CXX)
 
+set(CMAKE_AUTOMOC ON)
+
 if(NOT DEFINED QT_DEFAULT_MAJOR_VERSION)
     set(QT_DEFAULT_MAJOR_VERSION 6 CACHE STRING "Qt major version used by qca-otr")
 endif()
