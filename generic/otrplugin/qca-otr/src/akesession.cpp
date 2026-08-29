@@ -60,7 +60,7 @@ void AkeSession::clearPending()
     initiated_ = false;
     localDh_ = {};
     localKeyId_ = 0;
-    peerDhPublic_ = {};
+    peerDhPublic_ = QCA::BigInteger(0);
     revealKey_.clear();
     encryptedGx_.clear();
     hashedGx_.clear();
