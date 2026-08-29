@@ -51,6 +51,12 @@ public:
     bool isAuthenticated() const { return state_ == AkeState::Authenticated; }
     const AkeEstablishedSession &established() const { return established_; }
 
+    // A broadcast v3 Commit uses receiver instance 0. A router may copy that
+    // pending AKE state for each remote instance that answers and bind the copy
+    // before processing the instance-specific D-H Key. Existing bindings are
+    // immutable so one child session can never migrate to another peer.
+    bool bindPeerInstance(quint32 peerInstance);
+
     QByteArray start(bool *ok = nullptr);
     AkeHandleResult processIncoming(const QByteArray &encoded);
     void reset();
