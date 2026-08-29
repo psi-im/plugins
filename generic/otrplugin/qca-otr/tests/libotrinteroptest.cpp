@@ -1,4 +1,5 @@
 #include "qca-otr/akesession.h"
+#include "qca-otr/data.h"
 
 #include <QTest>
 #include <QtCrypto>
@@ -12,6 +13,8 @@ extern "C" {
 #include <libotr/context.h>
 #include <libotr/privkey.h>
 #include <libotr/proto.h>
+#include <libotr/tlv.h>
+#include <libotr/message.h>
 #include <libotr/userstate.h>
 }
 
@@ -115,10 +118,48 @@ gcry_error_t authSucceeded(const OtrlAuthInfo *auth, void *data)
     return 0;
 }
 
+struct AppCapture
+{
+    QByteArray injected;
+    bool goneSecure = false;
+};
+
+OtrlPolicy appPolicy(void *, ConnContext *)
+{
+    return OTRL_POLICY_ALWAYS;
+}
+
+int appIsLoggedIn(void *, const char *, const char *, const char *)
+{
+    return 1;
+}
+
+void appInjectMessage(void *data, const char *, const char *, const char *, const char *message)
+{
+    auto *capture = static_cast<AppCapture *>(data);
+    capture->injected = message ? QByteArray(message) : QByteArray();
+}
+
+void appGoneSecure(void *data, ConnContext *)
+{
+    static_cast<AppCapture *>(data)->goneSecure = true;
+}
+
+OtrlMessageAppOps appOps()
+{
+    OtrlMessageAppOps ops = {};
+    ops.policy = appPolicy;
+    ops.is_logged_in = appIsLoggedIn;
+    ops.inject_message = appInjectMessage;
+    ops.gone_secure = appGoneSecure;
+    return ops;
+}
+
 class LibotrPeer
 {
 public:
     LibotrPeer(quint32 localInstance, quint32 peerInstance)
+        : ops(appOps())
     {
         userState = otrl_userstate_create();
         if (!userState) {
@@ -164,6 +205,7 @@ public:
         }
         context->our_instance = localInstance;
         context->their_instance = peerInstance;
+        peerInstance_ = peerInstance;
         valid = true;
     }
 
@@ -181,11 +223,96 @@ public:
         return QByteArray(reinterpret_cast<const char *>(fingerprint), 20);
     }
 
+    bool receiveRaw(const QByteArray &raw, QByteArray *injectedRaw = nullptr, QByteArray *plaintext = nullptr)
+    {
+        if (!valid)
+            return false;
+
+        const QByteArray armored = toLibotrMessage(raw);
+        if (armored.isEmpty())
+            return false;
+
+        capture.injected.clear();
+        char *newMessage = nullptr;
+        OtrlTLV *tlvs = nullptr;
+        ConnContext *usedContext = nullptr;
+        const int internal = otrl_message_receiving(userState,
+                                                    &ops,
+                                                    &capture,
+                                                    LibotrAccount,
+                                                    Protocol,
+                                                    RemoteUser,
+                                                    armored.constData(),
+                                                    &newMessage,
+                                                    &tlvs,
+                                                    &usedContext,
+                                                    nullptr,
+                                                    nullptr);
+        if (usedContext)
+            context = usedContext;
+
+        if (plaintext)
+            plaintext->clear();
+        if (!internal && newMessage && plaintext)
+            *plaintext = QByteArray(newMessage);
+
+        if (injectedRaw) {
+            *injectedRaw = capture.injected.isEmpty() ? QByteArray() : fromLibotrMessage(capture.injected.constData());
+        }
+
+        if (newMessage)
+            otrl_message_free(newMessage);
+        if (tlvs)
+            otrl_tlv_free(tlvs);
+        return true;
+    }
+
+    bool sendPlaintext(const QByteArray &plaintext, QByteArray *raw)
+    {
+        if (!valid || !raw)
+            return false;
+
+        char *encoded = nullptr;
+        ConnContext *usedContext = nullptr;
+        const gcry_error_t error = otrl_message_sending(userState,
+                                                        &ops,
+                                                        &capture,
+                                                        LibotrAccount,
+                                                        Protocol,
+                                                        RemoteUser,
+                                                        peerInstance_,
+                                                        plaintext.constData(),
+                                                        nullptr,
+                                                        &encoded,
+                                                        OTRL_FRAGMENT_SEND_SKIP,
+                                                        &usedContext,
+                                                        nullptr,
+                                                        nullptr);
+        if (usedContext)
+            context = usedContext;
+        if (error || !encoded)
+            return false;
+
+        *raw = fromLibotrMessage(encoded);
+        otrl_message_free(encoded);
+        return !raw->isEmpty();
+    }
+
+    bool isEncrypted() const
+    {
+        return context && context->msgstate == OTRL_MSGSTATE_ENCRYPTED;
+    }
+
     OtrlUserState userState = nullptr;
     OtrlPrivKey *privateKey = nullptr;
     ConnContext *context = nullptr;
     QByteArray setupError;
     bool valid = false;
+    OtrlMessageAppOps ops = {};
+    AppCapture capture;
+
+private:
+    quint32 peerInstance_ = 0;
 };
 
 } // namespace
@@ -199,6 +326,8 @@ private Q_SLOTS:
     void cleanupTestCase();
     void qcaInitiates();
     void libotrInitiates();
+    void qcaInitiatesDataMessages();
+    void libotrInitiatesDataMessages();
 
 private:
     QCA::Initializer *initializer_ = nullptr;
@@ -325,6 +454,111 @@ void LibotrInteropTest::libotrInitiates()
     QCOMPARE(capture.peerKeyId, quint32(1));
     QVERIFY(!qca.established().initiated);
     QVERIFY(capture.initiated);
+}
+
+void LibotrInteropTest::qcaInitiatesDataMessages()
+{
+    LibotrPeer libotr(LibotrInstance, QcaInstance);
+    QVERIFY2(libotr.valid, libotr.setupError.constData());
+
+    QcaOtr::AkeSession qca(qcaPrivateKey(), QcaInstance, LibotrInstance);
+    bool ok = false;
+    const QByteArray commit = qca.start(&ok);
+    QVERIFY(ok);
+    const QByteArray armoredCommit = toLibotrMessage(commit);
+    QCOMPARE(otrl_auth_handle_commit(&libotr.context->auth, armoredCommit.constData(), 3), gcry_error_t(0));
+
+    const QByteArray dhKey = fromLibotrMessage(libotr.context->auth.lastauthmsg);
+    const QcaOtr::AkeHandleResult reveal = qca.processIncoming(dhKey);
+    QCOMPARE(reveal.status, QcaOtr::AkeHandleStatus::Handled);
+
+    QByteArray signature;
+    QVERIFY(libotr.receiveRaw(reveal.outgoingMessage, &signature));
+    QVERIFY(!signature.isEmpty());
+    QVERIFY(libotr.capture.goneSecure);
+    QVERIFY(libotr.isEncrypted());
+
+    const QcaOtr::AkeHandleResult done = qca.processIncoming(signature);
+    QCOMPARE(done.status, QcaOtr::AkeHandleStatus::Authenticated);
+    QVERIFY(qca.isAuthenticated());
+
+    QcaOtr::DataSession data(qca.established(), QcaInstance, LibotrInstance);
+    QVERIFY(data.isReady());
+
+    QByteArray fromLibotr;
+    QVERIFY(libotr.sendPlaintext("libotr one", &fromLibotr));
+    QcaOtr::DataReceiveResult received = data.processIncoming(fromLibotr);
+    QCOMPARE(received.status, QcaOtr::DataReceiveStatus::Message);
+    QCOMPARE(received.plaintext, QByteArray("libotr one"));
+
+    QByteArray fromQca;
+    QVERIFY(data.sendMessage("qca one", &fromQca));
+    QByteArray libotrPlaintext;
+    QVERIFY(libotr.receiveRaw(fromQca, nullptr, &libotrPlaintext));
+    QCOMPARE(libotrPlaintext, QByteArray("qca one"));
+
+    QVERIFY(libotr.sendPlaintext("libotr two", &fromLibotr));
+    received = data.processIncoming(fromLibotr);
+    QCOMPARE(received.status, QcaOtr::DataReceiveStatus::Message);
+    QCOMPARE(received.plaintext, QByteArray("libotr two"));
+    QCOMPARE(data.localKeyId(), quint32(3));
+    QCOMPARE(data.peerKeyId(), quint32(3));
+
+    QVERIFY(data.sendMessage("qca two", &fromQca));
+    QVERIFY(libotr.receiveRaw(fromQca, nullptr, &libotrPlaintext));
+    QCOMPARE(libotrPlaintext, QByteArray("qca two"));
+}
+
+void LibotrInteropTest::libotrInitiatesDataMessages()
+{
+    LibotrPeer libotr(LibotrInstance, QcaInstance);
+    QVERIFY2(libotr.valid, libotr.setupError.constData());
+
+    QcaOtr::AkeSession qca(qcaPrivateKey(), QcaInstance, LibotrInstance);
+    QCOMPARE(otrl_auth_start_v23(&libotr.context->auth, 3), gcry_error_t(0));
+    const QByteArray commit = fromLibotrMessage(libotr.context->auth.lastauthmsg);
+    QVERIFY(!commit.isEmpty());
+
+    const QcaOtr::AkeHandleResult dhKey = qca.processIncoming(commit);
+    QCOMPARE(dhKey.status, QcaOtr::AkeHandleStatus::Handled);
+
+    QByteArray reveal;
+    QVERIFY(libotr.receiveRaw(dhKey.outgoingMessage, &reveal));
+    QVERIFY(!reveal.isEmpty());
+
+    const QcaOtr::AkeHandleResult signature = qca.processIncoming(reveal);
+    QCOMPARE(signature.status, QcaOtr::AkeHandleStatus::Authenticated);
+    QVERIFY(qca.isAuthenticated());
+
+    QByteArray noResponse;
+    QVERIFY(libotr.receiveRaw(signature.outgoingMessage, &noResponse));
+    QVERIFY(noResponse.isEmpty());
+    QVERIFY(libotr.capture.goneSecure);
+    QVERIFY(libotr.isEncrypted());
+
+    QcaOtr::DataSession data(qca.established(), QcaInstance, LibotrInstance);
+    QVERIFY(data.isReady());
+
+    QByteArray fromQca;
+    QVERIFY(data.sendMessage("qca first", &fromQca));
+    QByteArray libotrPlaintext;
+    QVERIFY(libotr.receiveRaw(fromQca, nullptr, &libotrPlaintext));
+    QCOMPARE(libotrPlaintext, QByteArray("qca first"));
+
+    QByteArray fromLibotr;
+    QVERIFY(libotr.sendPlaintext("libotr reply", &fromLibotr));
+    QcaOtr::DataReceiveResult received = data.processIncoming(fromLibotr);
+    QCOMPARE(received.status, QcaOtr::DataReceiveStatus::Message);
+    QCOMPARE(received.plaintext, QByteArray("libotr reply"));
+
+    QVERIFY(data.sendMessage("qca ratchet", &fromQca));
+    QVERIFY(libotr.receiveRaw(fromQca, nullptr, &libotrPlaintext));
+    QCOMPARE(libotrPlaintext, QByteArray("qca ratchet"));
+
+    QVERIFY(libotr.sendPlaintext("libotr ratchet", &fromLibotr));
+    received = data.processIncoming(fromLibotr);
+    QCOMPARE(received.status, QcaOtr::DataReceiveStatus::Message);
+    QCOMPARE(received.plaintext, QByteArray("libotr ratchet"));
 }
 
 QTEST_GUILESS_MAIN(LibotrInteropTest)

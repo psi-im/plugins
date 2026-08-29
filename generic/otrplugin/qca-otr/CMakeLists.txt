@@ -21,6 +21,7 @@ add_library(qca-otr STATIC
     src/akesession.cpp
     src/codec.cpp
     src/crypto.cpp
+    src/data.cpp
 )
 
 add_library(QcaOtr::QcaOtr ALIAS qca-otr)

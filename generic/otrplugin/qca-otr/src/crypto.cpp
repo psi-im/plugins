@@ -173,6 +173,16 @@ QByteArray sha256(const QByteArray &data)
     return hash.hash(data).toByteArray();
 }
 
+QByteArray hmacSha1(const QCA::SecureArray &key, const QByteArray &data)
+{
+    if (!QCA::isSupported("hmac(sha1)"))
+        return {};
+
+    QCA::MessageAuthenticationCode mac(QStringLiteral("hmac(sha1)"), QCA::SymmetricKey(key));
+    mac.update(data);
+    return mac.final().toByteArray();
+}
+
 QByteArray hmacSha256(const QCA::SecureArray &key, const QByteArray &data)
 {
     if (!QCA::isSupported("hmac(sha256)"))

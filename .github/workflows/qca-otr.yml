@@ -16,6 +16,9 @@ on:
 permissions:
   contents: read
 
+env:
+  QCA_VERSION: 3.0.3
+
 jobs:
   test:
     name: Qt ${{ matrix.qt }}
@@ -29,34 +32,46 @@ jobs:
       - name: Checkout plugins
         uses: actions/checkout@v4
 
-      - name: Checkout QCA3
-        uses: actions/checkout@v4
-        with:
-          repository: psi-im/qca
-          ref: v3.0.3
-          path: qca
-
       - name: Install build dependencies
         shell: bash
         run: |
           sudo apt-get update
           if [[ '${{ matrix.qt }}' == '6' ]]; then
-            sudo apt-get install -y cmake ninja-build pkg-config qt6-base-dev libssl-dev libotr5-dev
+            sudo apt-get install -y cmake ninja-build pkg-config qt6-base-dev libssl-dev libotr5-dev unzip curl
           else
             sudo apt-get install -y cmake ninja-build pkg-config qtbase5-dev libssl-dev libotr5-dev
           fi
 
-      - name: Build and install QCA3
+      - name: Install released QCA3 Qt6 packages
+        if: matrix.qt == '6'
         shell: bash
         run: |
-          if [[ '${{ matrix.qt }}' == '6' ]]; then
-            qt6=ON
-          else
-            qt6=OFF
-          fi
+          set -euo pipefail
+          mkdir qca-packages
+          curl -fL \
+            "https://github.com/psi-im/qca/releases/download/v${QCA_VERSION}/qca3-deb-ubuntu-24.04.zip" \
+            -o qca3.zip
+          unzip -q qca3.zip -d qca-packages
+          sudo apt-get install -y ./qca-packages/*.deb
 
+          plugin_path=$(find /usr/lib -type d -path '*/qca3-qt6/crypto' -print -quit)
+          test -n "$plugin_path"
+          echo "QCA_PLUGIN_PATH=$plugin_path" >> "$GITHUB_ENV"
+
+      - name: Checkout QCA3 for Qt5
+        if: matrix.qt == '5'
+        uses: actions/checkout@v4
+        with:
+          repository: psi-im/qca
+          ref: v${{ env.QCA_VERSION }}
+          path: qca
+
+      - name: Build and install QCA3 Qt5
+        if: matrix.qt == '5'
+        shell: bash
+        run: |
           cmake -S qca -B qca-build -G Ninja \
-            -DBUILD_WITH_QT6="$qt6" \
+            -DBUILD_WITH_QT6=OFF \
             -DBUILD_TESTS=OFF \
             -DBUILD_TOOLS=OFF \
             -DBUILD_PLUGINS=ossl \
@@ -65,19 +80,27 @@ jobs:
           cmake --build qca-build
           cmake --install qca-build
 
+          echo "QCA_PREFIX=$PWD/qca-install" >> "$GITHUB_ENV"
+          echo "QCA_PLUGIN_PATH=$PWD/qca-install/lib/qca3-qt5/crypto" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$PWD/qca-install/lib" >> "$GITHUB_ENV"
+
       - name: Build qca-otr
         shell: bash
         run: |
-          cmake -S generic/otrplugin/qca-otr -B qca-otr-build -G Ninja \
-            -DQT_DEFAULT_MAJOR_VERSION='${{ matrix.qt }}' \
-            -DQCA_OTR_BUILD_LIBOTR_INTEROP_TESTS=ON \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_PREFIX_PATH="$PWD/qca-install"
+          cmake_args=(
+            -S generic/otrplugin/qca-otr
+            -B qca-otr-build
+            -G Ninja
+            -DQT_DEFAULT_MAJOR_VERSION='${{ matrix.qt }}'
+            -DQCA_OTR_BUILD_LIBOTR_INTEROP_TESTS=ON
+            -DCMAKE_BUILD_TYPE=Release
+          )
+          if [[ -n "${QCA_PREFIX:-}" ]]; then
+            cmake_args+=("-DCMAKE_PREFIX_PATH=$QCA_PREFIX")
+          fi
+          cmake "${cmake_args[@]}"
           cmake --build qca-otr-build
 
       - name: Run qca-otr tests
         shell: bash
-        run: |
-          export LD_LIBRARY_PATH="$PWD/qca-install/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-          export QCA_PLUGIN_PATH="$PWD/qca-install/lib/qca3-qt${{ matrix.qt }}/crypto"
-          ctest --test-dir qca-otr-build --output-on-failure
+        run: ctest --test-dir qca-otr-build --output-on-failure
