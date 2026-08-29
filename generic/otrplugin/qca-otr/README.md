@@ -18,7 +18,8 @@ The current core contains:
 - the OTRv3 AKE state machine, including simultaneous-start collision resolution and retransmission behavior;
 - OTRv3 encrypted Data Messages with directional session-key derivation, AES-CTR counters and replay protection;
 - the OTRv3 DH/key-id ratchet, including current/old session-key slots and revealed MAC keys;
-- OTR transport armoring and OTRv3 fragmentation/reassembly.
+- OTR transport armoring and exact libotr-compatible OTRv3 fragmentation/reassembly;
+- transport-facing `OtrSession` routing with independent AKE/Data children for multiple remote instance tags and broadcast/master AKE cloning.
 
 Modular exponentiation and modular inversion are provided by
 `QCA::BigIntegerMath` in QCA3. Small normalization helpers that are only needed
@@ -26,12 +27,13 @@ inside qca-otr remain private implementation details.
 
 The regular qca-otr library remains QtCore + QCA3 only. Optional test targets
 link against libotr 4.1.1 as an interoperability oracle; CI enables them and
-validates complete AKE handshakes, encrypted Data Message exchanges and the
-transport fragmentation format in both implementation directions.
+validates complete AKE handshakes, encrypted Data Message exchanges, exact
+fragment streams, fragmented public-API exchanges and a single broadcast Commit
+answered independently by multiple libotr instances.
 
-The detailed completion roadmap is in [PLAN.md](PLAN.md). The active layer is
-fragmentation and full OTRv3 instance routing; TLV/SMP, persistence migration,
-Psi adapter integration and dependency cleanup follow after it.
+The detailed completion roadmap is in [PLAN.md](PLAN.md). The next protocol
+layer is query/policy negotiation plus encrypted TLV/control framing, followed
+by SMP, persistence migration, Psi adapter integration and dependency cleanup.
 
 ## Standalone build
 
