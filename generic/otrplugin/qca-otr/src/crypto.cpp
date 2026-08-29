@@ -18,6 +18,18 @@ QCA::BigInteger two()
     return QCA::BigInteger(2);
 }
 
+QCA::BigInteger positiveMod(const QCA::BigInteger &value, const QCA::BigInteger &modulus)
+{
+    if (modulus <= zero())
+        return zero();
+
+    QCA::BigInteger result(value);
+    result %= modulus;
+    if (result < zero())
+        result += modulus;
+    return result;
+}
+
 QCA::BigInteger unsignedInteger(const QByteArray &bytes)
 {
     QByteArray positive;
@@ -75,7 +87,7 @@ bool dsaSignDigest(const DsaPrivateKey &privateKey, const QByteArray &digest, Ds
         return false;
     }
 
-    const QCA::BigInteger m = QCA::BigIntegerMath::positiveMod(unsignedInteger(digest), privateKey.domain.q);
+    const QCA::BigInteger m = positiveMod(unsignedInteger(digest), privateKey.domain.q);
 
     // r == 0 or s == 0 is valid reason to choose a fresh DSA nonce. Both are
     // vanishingly unlikely for real OTR parameters, but keep a finite guard.
@@ -124,7 +136,7 @@ bool dsaVerifyDigest(const DsaPublicKey &publicKey, const QByteArray &digest, co
     if (!QCA::BigIntegerMath::modInverse(signature.s, publicKey.domain.q, &w))
         return false;
 
-    QCA::BigInteger m = QCA::BigIntegerMath::positiveMod(unsignedInteger(digest), publicKey.domain.q);
+    QCA::BigInteger m = positiveMod(unsignedInteger(digest), publicKey.domain.q);
 
     QCA::BigInteger u1(m);
     u1 *= w;
