@@ -10,6 +10,7 @@ find_package(Qt${QT_DEFAULT_MAJOR_VERSION} REQUIRED COMPONENTS Core)
 find_package(Qca3 CONFIG REQUIRED)
 
 add_library(qca-otr STATIC
+    src/codec.cpp
     src/crypto.cpp
 )
 
