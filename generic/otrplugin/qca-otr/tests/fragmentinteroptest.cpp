@@ -3,11 +3,11 @@
 #include <QTest>
 
 #include <cstdlib>
-#include <cstring>
 
 extern "C" {
 #include <libotr/context.h>
 #include <libotr/proto.h>
+#include <libotr/userstate.h>
 }
 
 namespace {
@@ -15,14 +15,45 @@ namespace {
 constexpr quint32 LocalInstance = 0x11111111;
 constexpr quint32 PeerInstance = 0x22222222;
 
-void initializeContext(ConnContext *context)
+class LibotrContext
 {
-    std::memset(context, 0, sizeof(*context));
-    context->protocol_version = 3;
-    context->our_instance = LocalInstance;
-    context->their_instance = PeerInstance;
-    context->auth.protocol_version = 3;
-}
+public:
+    LibotrContext()
+    {
+        userState = otrl_userstate_create();
+        if (!userState)
+            return;
+
+        int added = 0;
+        context = otrl_context_find(userState,
+                                    "peer",
+                                    "account",
+                                    "protocol",
+                                    PeerInstance,
+                                    1,
+                                    &added,
+                                    nullptr,
+                                    nullptr);
+        if (!context)
+            return;
+
+        context->protocol_version = 3;
+        context->our_instance = LocalInstance;
+        context->their_instance = PeerInstance;
+        context->auth.protocol_version = 3;
+    }
+
+    ~LibotrContext()
+    {
+        if (userState)
+            otrl_userstate_free(userState);
+    }
+
+    explicit operator bool() const { return context != nullptr; }
+
+    OtrlUserState userState = nullptr;
+    ConnContext *context = nullptr;
+};
 
 } // namespace
 
@@ -31,15 +62,21 @@ class FragmentInteropTest : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase();
     void qcaFragmentsMatchLibotr();
     void qcaReassemblesLibotr();
     void libotrReassemblesQca();
 };
 
+void FragmentInteropTest::initTestCase()
+{
+    OTRL_INIT;
+}
+
 void FragmentInteropTest::qcaFragmentsMatchLibotr()
 {
-    ConnContext context;
-    initializeContext(&context);
+    LibotrContext libotr;
+    QVERIFY(libotr);
 
     const QByteArray message = "?OTR:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/ABCDEFGHIJKLMNOPQRSTUVWXYZ.";
     constexpr int MaxMessageSize = 60;
@@ -50,7 +87,7 @@ void FragmentInteropTest::qcaFragmentsMatchLibotr()
     QCOMPARE(otrl_proto_fragment_create(MaxMessageSize,
                                         fragmentCount,
                                         &libotrFragments,
-                                        &context,
+                                        libotr.context,
                                         message.constData()),
              gcry_error_t(0));
     QVERIFY(libotrFragments != nullptr);
@@ -70,8 +107,8 @@ void FragmentInteropTest::qcaFragmentsMatchLibotr()
 
 void FragmentInteropTest::qcaReassemblesLibotr()
 {
-    ConnContext context;
-    initializeContext(&context);
+    LibotrContext libotr;
+    QVERIFY(libotr);
 
     const QByteArray message = "?OTR:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/ABCDEFGHIJKLMNOPQRSTUVWXYZ.";
     constexpr int MaxMessageSize = 60;
@@ -82,7 +119,7 @@ void FragmentInteropTest::qcaReassemblesLibotr()
     QCOMPARE(otrl_proto_fragment_create(MaxMessageSize,
                                         fragmentCount,
                                         &fragments,
-                                        &context,
+                                        libotr.context,
                                         message.constData()),
              gcry_error_t(0));
 
@@ -99,8 +136,8 @@ void FragmentInteropTest::qcaReassemblesLibotr()
 
 void FragmentInteropTest::libotrReassemblesQca()
 {
-    ConnContext context;
-    initializeContext(&context);
+    LibotrContext libotr;
+    QVERIFY(libotr);
 
     const QByteArray message = "?OTR:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/ABCDEFGHIJKLMNOPQRSTUVWXYZ.";
     QVector<QByteArray> fragments;
@@ -114,7 +151,7 @@ void FragmentInteropTest::libotrReassemblesQca()
     char *complete = nullptr;
     for (int i = 0; i < fragments.size(); ++i) {
         const OtrlFragmentResult result =
-            otrl_proto_fragment_accumulate(&complete, &context, fragments.at(i).constData());
+            otrl_proto_fragment_accumulate(&complete, libotr.context, fragments.at(i).constData());
         QCOMPARE(result,
                  i + 1 == fragments.size() ? OTRL_FRAGMENT_COMPLETE : OTRL_FRAGMENT_INCOMPLETE);
     }
