@@ -1,6 +1,6 @@
 #pragma once
 
-#include "qca-otr/ake.h"
+#include "qca-otr/akesession.h"
 
 #include <QByteArray>
 #include <QVector>
