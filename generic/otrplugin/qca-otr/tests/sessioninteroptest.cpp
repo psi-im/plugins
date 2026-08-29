@@ -287,6 +287,24 @@ QVector<QByteArray> deliverToQca(QcaOtr::OtrSession *qca,
     return outgoing;
 }
 
+bool finishLibotrResponderHandshake(QcaOtr::OtrSession *qca,
+                                    LibotrPeer *libotr,
+                                    const QVector<QByteArray> &dhKey)
+{
+    QcaOtr::SessionResult state;
+    QVector<QByteArray> messages = deliverToQca(qca, dhKey, &state);
+    if (state.status != QcaOtr::SessionStatus::Handled || messages.isEmpty())
+        return false;
+
+    messages = libotr->receive(messages);
+    if (messages.isEmpty() || !libotr->isEncrypted())
+        return false;
+
+    messages = deliverToQca(qca, messages, &state);
+    return state.status == QcaOtr::SessionStatus::Authenticated && messages.isEmpty() &&
+        qca->isEncrypted(libotr->localInstance);
+}
+
 } // namespace
 
 class SessionInteropTest : public QObject
@@ -297,6 +315,7 @@ private Q_SLOTS:
     void initTestCase();
     void cleanupTestCase();
     void fragmentedPublicApiExchange();
+    void broadcastToMultipleLibotrInstances();
 
 private:
     QCA::Initializer *initializer_ = nullptr;
@@ -329,22 +348,7 @@ void SessionInteropTest::fragmentedPublicApiExchange()
     messages = libotr.receive(messages);
     QVERIFY(messages.size() > 1);
 
-    // libotr D-H Key -> QCA Reveal Signature.
-    QcaOtr::SessionResult state;
-    messages = deliverToQca(&qca, messages, &state);
-    QCOMPARE(state.status, QcaOtr::SessionStatus::Handled);
-    QVERIFY(messages.size() > 1);
-
-    // QCA Reveal Signature -> libotr Signature.
-    messages = libotr.receive(messages);
-    QVERIFY(messages.size() > 1);
-    QVERIFY(libotr.isEncrypted());
-
-    // libotr Signature -> authenticated QCA child.
-    messages = deliverToQca(&qca, messages, &state);
-    QCOMPARE(state.status, QcaOtr::SessionStatus::Authenticated);
-    QVERIFY(messages.isEmpty());
-    QVERIFY(qca.isEncrypted(libotr.localInstance));
+    QVERIFY(finishLibotrResponderHandshake(&qca, &libotr, messages));
 
     // QCA -> libotr: force a large encrypted Data Message through fragments.
     const QByteArray fromQca = QByteArray("qca-fragmented:") + QByteArray(500, 'q');
@@ -360,9 +364,61 @@ void SessionInteropTest::fragmentedPublicApiExchange()
     const QByteArray fromLibotr = QByteArray("libotr-fragmented:") + QByteArray(500, 'l');
     QVERIFY(libotr.sendPlaintext(fromLibotr, &messages));
     QVERIFY(messages.size() > 1);
+    QcaOtr::SessionResult state;
     deliverToQca(&qca, messages, &state);
     QCOMPARE(state.status, QcaOtr::SessionStatus::Message);
     QCOMPARE(state.plaintext, fromLibotr);
+}
+
+void SessionInteropTest::broadcastToMultipleLibotrInstances()
+{
+    LibotrPeer first;
+    LibotrPeer second;
+    QVERIFY2(first.valid, first.setupError.constData());
+    QVERIFY2(second.valid, second.setupError.constData());
+    QVERIFY(first.localInstance != second.localInstance);
+
+    QcaOtr::OtrSession qca(qcaPrivateKey(), QcaInstance);
+    bool ok = false;
+    const QVector<QByteArray> broadcastCommit = qca.start(0, FragmentMms, &ok);
+    QVERIFY(ok);
+    QVERIFY(broadcastCommit.size() > 1);
+
+    // Both independent libotr user states answer the exact same receiver=0
+    // Commit. QCA must retain the master AKE long enough to clone it into two
+    // independent child contexts rather than binding the first response globally.
+    const QVector<QByteArray> firstDh = first.receive(broadcastCommit);
+    const QVector<QByteArray> secondDh = second.receive(broadcastCommit);
+    QVERIFY(firstDh.size() > 1);
+    QVERIFY(secondDh.size() > 1);
+
+    QVERIFY(finishLibotrResponderHandshake(&qca, &first, firstDh));
+    QVERIFY(finishLibotrResponderHandshake(&qca, &second, secondDh));
+    QVERIFY(qca.isEncrypted(first.localInstance));
+    QVERIFY(qca.isEncrypted(second.localInstance));
+
+    QVector<QByteArray> messages;
+    QByteArray plaintext;
+    QVERIFY(qca.sendMessage(first.localInstance, "first libotr instance", &messages, FragmentMms));
+    first.receive(messages, &plaintext);
+    QCOMPARE(plaintext, QByteArray("first libotr instance"));
+
+    QVERIFY(qca.sendMessage(second.localInstance, "second libotr instance", &messages, FragmentMms));
+    second.receive(messages, &plaintext);
+    QCOMPARE(plaintext, QByteArray("second libotr instance"));
+
+    QVERIFY(first.sendPlaintext("reply from first", &messages));
+    QcaOtr::SessionResult state;
+    deliverToQca(&qca, messages, &state);
+    QCOMPARE(state.status, QcaOtr::SessionStatus::Message);
+    QCOMPARE(state.peerInstance, first.localInstance);
+    QCOMPARE(state.plaintext, QByteArray("reply from first"));
+
+    QVERIFY(second.sendPlaintext("reply from second", &messages));
+    deliverToQca(&qca, messages, &state);
+    QCOMPARE(state.status, QcaOtr::SessionStatus::Message);
+    QCOMPARE(state.peerInstance, second.localInstance);
+    QCOMPARE(state.plaintext, QByteArray("reply from second"));
 }
 
 QTEST_GUILESS_MAIN(SessionInteropTest)
