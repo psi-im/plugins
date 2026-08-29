@@ -5,22 +5,21 @@ It deliberately has no dependency on Psi or the Psi plugin API. The existing
 `otrplugin` continues to use libotr while this implementation is developed and
 validated side-by-side.
 
-The first stage contains only cryptographic primitives required by OTRv3:
+The first stage contains only cryptographic and wire-format primitives required
+by OTRv3:
 
-- modular exponentiation and modular inversion over `QCA::BigInteger`;
-- raw/prehashed DSA operations;
+- raw/prehashed DSA operations built on QCA3 modular arithmetic;
 - SHA-256 and HMAC-SHA256;
 - AES-128-CTR;
 - strict OTR wire encoding/decoding for integers, MPI, DATA and DSA public keys.
 
-The modular arithmetic helpers are temporary compatibility code. They are
-intended to move to the public QCA3 API, after which this library can consume
-those operations without changing its OTR-facing API.
+Modular exponentiation, modular inversion and positive modulo are provided by
+`QCA::BigIntegerMath` in QCA3 rather than duplicated in this library.
 
 Planned layers are:
 
-1. protocol encoding/decoding and key derivation;
-2. OTRv3 authenticated key exchange and session state machine;
+1. key derivation and OTRv3 authenticated key exchange;
+2. session state machine;
 3. encrypted data messages, fragmentation and instance tags;
 4. SMP;
 5. interoperability tests against libotr 4.1.1;
