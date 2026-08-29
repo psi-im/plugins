@@ -60,6 +60,16 @@ target_link_libraries(qca-otr-transport-test
 )
 add_test(NAME qca-otr-transport COMMAND qca-otr-transport-test)
 
+add_executable(qca-otr-session-test
+    sessiontest.cpp
+)
+target_link_libraries(qca-otr-session-test
+    PRIVATE
+        QcaOtr::QcaOtr
+        Qt${QT_DEFAULT_MAJOR_VERSION}::Test
+)
+add_test(NAME qca-otr-session COMMAND qca-otr-session-test)
+
 if(QCA_OTR_BUILD_LIBOTR_INTEROP_TESTS)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(LIBOTR REQUIRED IMPORTED_TARGET libotr)
