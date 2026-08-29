@@ -17,26 +17,21 @@ The current core contains:
 - strict binary codecs for D-H Commit, D-H Key, Reveal Signature, Signature and Data messages, including v3 instance tags;
 - the OTRv3 AKE state machine, including simultaneous-start collision resolution and retransmission behavior;
 - OTRv3 encrypted Data Messages with directional session-key derivation, AES-CTR counters and replay protection;
-- the OTRv3 DH/key-id ratchet, including current/old session-key slots and revealed MAC keys.
+- the OTRv3 DH/key-id ratchet, including current/old session-key slots and revealed MAC keys;
+- OTR transport armoring and OTRv3 fragmentation/reassembly.
 
 Modular exponentiation and modular inversion are provided by
 `QCA::BigIntegerMath` in QCA3. Small normalization helpers that are only needed
 inside qca-otr remain private implementation details.
 
-The regular qca-otr library remains QtCore + QCA3 only. An optional test target
-can link against libotr 4.1.1 as an interoperability oracle; CI enables it and
-runs complete AKE handshakes and encrypted Data Message exchanges with qca-otr
-and libotr acting as initiator in turn. The Data Message tests exercise multiple
-messages so that DH/key-id rotation is validated across implementations, not
-just the first post-AKE message.
+The regular qca-otr library remains QtCore + QCA3 only. Optional test targets
+link against libotr 4.1.1 as an interoperability oracle; CI enables them and
+validates complete AKE handshakes, encrypted Data Message exchanges and the
+transport fragmentation format in both implementation directions.
 
-Planned layers are:
-
-1. fragmentation and full instance routing;
-2. SMP;
-3. persistence/migration of existing OTR identities, fingerprints and instance tags;
-4. replacement of the libotr backend in Psi's OTR plugin;
-5. removal of the libotr/libgcrypt/libgpg-error runtime/build dependencies.
+The detailed completion roadmap is in [PLAN.md](PLAN.md). The active layer is
+fragmentation and full OTRv3 instance routing; TLV/SMP, persistence migration,
+Psi adapter integration and dependency cleanup follow after it.
 
 ## Standalone build
 
@@ -50,7 +45,7 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-To run the optional libotr oracle test, install libotr 4.1.1 development files
+To run the optional libotr oracle tests, install libotr 4.1.1 development files
 and add `-DQCA_OTR_BUILD_LIBOTR_INTEROP_TESTS=ON` when configuring.
 
 Use `QT_DEFAULT_MAJOR_VERSION=5` with `Qca3-qt5` for the Windows 7 profile. The
