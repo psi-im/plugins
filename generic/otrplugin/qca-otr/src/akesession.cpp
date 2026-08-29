@@ -145,7 +145,7 @@ QByteArray AkeSession::start(bool *ok)
     initiated_ = true;
     localDh_ = keyPair;
     localKeyId_ = 1;
-    revealKey_ = randomKey.toByteArray();
+    revealKey_ = randomKey;
     encryptedGx_ = encryptedGx;
     hashedGx_ = hashGx;
     lastOutgoing_ = encoded;
@@ -216,7 +216,7 @@ bool AkeSession::makeRevealSignature(const QCA::BigInteger &peerPublic,
     RevealSignatureMessage reveal;
     reveal.senderInstance = localInstance_;
     reveal.receiverInstance = peerInstance_;
-    reveal.revealedKey = revealKey_;
+    reveal.revealedKey = revealKey_.toByteArray();
     reveal.encryptedSignature = encryptedAuthenticator;
     reveal.mac = akeSignatureMac(encryptedAuthenticator, keys.m2);
     if (reveal.mac.size() != 20)
