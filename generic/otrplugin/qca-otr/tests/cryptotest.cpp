@@ -48,6 +48,15 @@ void CryptoTest::rawDsa()
     QVERIFY(QcaOtr::dsaVerifyDigest(publicKey, QByteArray::fromHex("09"), signature));
     QVERIFY(!QcaOtr::dsaVerifyDigest(publicKey, QByteArray::fromHex("0a"), signature));
 
+    // OTR signs the 32-byte M_A/M_B HMAC value directly, without hashing it
+    // again. Interpret the complete digest as an unsigned big-endian integer;
+    // the DSA arithmetic itself reduces it modulo q. With nonce k=1 this
+    // vector has r=2, s=9 for the toy key above.
+    QcaOtr::DsaSignature rawDigestSignature;
+    rawDigestSignature.r = QCA::BigInteger(2);
+    rawDigestSignature.s = QCA::BigInteger(9);
+    QVERIFY(QcaOtr::dsaVerifyDigest(publicKey, QByteArray(32, static_cast<char>(0xf0)), rawDigestSignature));
+
     QcaOtr::DsaSignature damaged = signature;
     damaged.r += QCA::BigInteger(1);
     QVERIFY(!QcaOtr::dsaVerifyDigest(publicKey, QByteArray::fromHex("09"), damaged));
