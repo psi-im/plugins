@@ -15,6 +15,7 @@ private Q_SLOTS:
     void dhKeyAgreement();
     void keyDerivation();
     void signatureInputs();
+    void innerAuthenticator();
     void messageEncoding();
     void rejectsMalformedMessages();
 
@@ -131,6 +132,65 @@ void AkeTest::signatureInputs()
              QByteArrayLiteral("8614e209a0009f7b8189ba83c88079b7cfb4cc95"));
 
     QVERIFY(QcaOtr::akeSignatureDigest(QCA::BigInteger(8), QCA::BigInteger(16), publicKey, 0, m1).isEmpty());
+}
+
+void AkeTest::innerAuthenticator()
+{
+    QcaOtr::DsaPrivateKey privateKey;
+    privateKey.domain.p = QCA::BigInteger(23);
+    privateKey.domain.q = QCA::BigInteger(11);
+    privateKey.domain.g = QCA::BigInteger(2);
+    privateKey.x = QCA::BigInteger(3);
+    const QcaOtr::DsaPublicKey publicKey = QcaOtr::dsaPublicKey(privateKey);
+
+    QCOMPARE(QcaOtr::dsaPublicKeyFingerprint(publicKey).toHex(),
+             QByteArrayLiteral("69b8710fa263a4f067eef5404043c21dc88e534f"));
+
+    const QCA::SecureArray macKey(
+        QByteArray::fromHex("fabfea340eddca81e5cef27fa7b5335313498b1ee3a1b9a1d49291e684835c2b"));
+    const QCA::SecureArray encryptionKey(QByteArray::fromHex("fea6bc3378decf96c4bfb74f2d9fced0"));
+
+    QByteArray encrypted;
+    QVERIFY(QcaOtr::createAkeAuthenticator(privateKey,
+                                            1,
+                                            QCA::BigInteger(8),
+                                            QCA::BigInteger(16),
+                                            macKey,
+                                            encryptionKey,
+                                            &encrypted));
+    QVERIFY(!encrypted.isEmpty());
+
+    QcaOtr::AkeAuthenticator decoded;
+    QByteArray fingerprint;
+    QVERIFY(QcaOtr::verifyAkeAuthenticator(encrypted,
+                                            QCA::BigInteger(8),
+                                            QCA::BigInteger(16),
+                                            macKey,
+                                            encryptionKey,
+                                            &decoded,
+                                            &fingerprint));
+    QCOMPARE(decoded.keyId, quint32(1));
+    QCOMPARE(decoded.publicKey.domain.p, privateKey.domain.p);
+    QCOMPARE(decoded.publicKey.domain.q, privateKey.domain.q);
+    QCOMPARE(decoded.publicKey.domain.g, privateKey.domain.g);
+    QCOMPARE(decoded.publicKey.y, publicKey.y);
+    QCOMPARE(fingerprint, QcaOtr::dsaPublicKeyFingerprint(publicKey));
+
+    QByteArray damaged = encrypted;
+    damaged[damaged.size() / 2] = static_cast<char>(damaged.at(damaged.size() / 2) ^ 0x40);
+    QVERIFY(!QcaOtr::verifyAkeAuthenticator(damaged,
+                                             QCA::BigInteger(8),
+                                             QCA::BigInteger(16),
+                                             macKey,
+                                             encryptionKey,
+                                             &decoded));
+
+    QVERIFY(!QcaOtr::verifyAkeAuthenticator(encrypted,
+                                             QCA::BigInteger(16),
+                                             QCA::BigInteger(8),
+                                             macKey,
+                                             encryptionKey,
+                                             &decoded));
 }
 
 void AkeTest::messageEncoding()

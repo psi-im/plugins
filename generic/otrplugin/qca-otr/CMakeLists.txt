@@ -18,6 +18,7 @@ find_package(${QCA_PACKAGE_NAME} CONFIG REQUIRED)
 
 add_library(qca-otr STATIC
     src/ake.cpp
+    src/akesession.cpp
     src/codec.cpp
     src/crypto.cpp
 )
@@ -43,6 +44,11 @@ if(PROJECT_IS_TOP_LEVEL)
     option(QCA_OTR_BUILD_TESTS "Build qca-otr tests" ON)
 else()
     option(QCA_OTR_BUILD_TESTS "Build qca-otr tests" OFF)
+endif()
+option(QCA_OTR_BUILD_LIBOTR_INTEROP_TESTS "Build tests against libotr 4.1.1" OFF)
+
+if(QCA_OTR_BUILD_LIBOTR_INTEROP_TESTS AND NOT QCA_OTR_BUILD_TESTS)
+    message(FATAL_ERROR "QCA_OTR_BUILD_LIBOTR_INTEROP_TESTS requires QCA_OTR_BUILD_TESTS")
 endif()
 
 if(QCA_OTR_BUILD_TESTS)
