@@ -7,12 +7,27 @@ class WireTest : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase();
+    void cleanupTestCase();
     void integers();
     void mpiEncoding();
     void mpiRejectsInvalidEncoding();
     void opaqueData();
     void dsaPublicKey();
+
+private:
+    QCA::Initializer *initializer_ = nullptr;
 };
+
+void WireTest::initTestCase()
+{
+    initializer_ = new QCA::Initializer;
+}
+
+void WireTest::cleanupTestCase()
+{
+    delete initializer_;
+}
 
 void WireTest::integers()
 {
