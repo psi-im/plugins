@@ -49,6 +49,7 @@ private:
 };
 
 QByteArray encodeMpi(const QCA::BigInteger &value, bool *ok = nullptr);
+QCA::SecureArray encodeMpiSecure(const QCA::BigInteger &value, bool *ok = nullptr);
 bool decodeMpi(const QByteArray &encoded, QCA::BigInteger *value);
 
 QByteArray encodeDsaPublicKey(const DsaPublicKey &key, bool *ok = nullptr);
