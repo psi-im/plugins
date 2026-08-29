@@ -33,6 +33,13 @@ QCA::BigInteger unsignedInteger(const QByteArray &bytes)
     return QCA::BigInteger(QCA::SecureArray(positive));
 }
 
+QCA::BigInteger unsignedInteger(const QCA::SecureArray &bytes)
+{
+    QCA::SecureArray positive(1, '\0');
+    positive.append(bytes);
+    return QCA::BigInteger(positive);
+}
+
 bool fixedWidthDsaInteger(const QCA::BigInteger &value, QByteArray *encoded)
 {
     if (!encoded || value < zero())
@@ -147,7 +154,7 @@ bool generateDhKeyPair(DhKeyPair *keyPair)
         if (random.size() != 40)
             return false;
 
-        const QCA::BigInteger privateExponent = unsignedInteger(random.toByteArray());
+        const QCA::BigInteger privateExponent = unsignedInteger(random);
         if (privateExponent <= zero())
             continue;
 
