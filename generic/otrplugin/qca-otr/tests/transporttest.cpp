@@ -53,9 +53,9 @@ void TransportTest::fragmentsAndReassembles()
 
     QVector<QByteArray> fragments;
     QVERIFY(QcaOtr::Transport::fragmentMessage(message, 60, Sender, Receiver, &fragments));
-    QCOMPARE(fragments.size(), 3);
+    QCOMPARE(fragments.size(), 4);
     QCOMPARE(fragments.at(0),
-             QByteArray("?OTR|11111111|22222222,00001,00003,?OTR:ABCDEFGHIJKLMNOPQR,"));
+             QByteArray("?OTR|11111111|22222222,00001,00004,?OTR:ABCDEFGHIJKLMNOPQR,"));
     for (const QByteArray &fragment : fragments)
         QVERIFY(fragment.size() <= 60);
 
@@ -65,15 +65,16 @@ void TransportTest::fragmentsAndReassembles()
     QCOMPARE(parsed.route.senderInstance, Sender);
     QCOMPARE(parsed.route.receiverInstance, Receiver);
     QCOMPARE(parsed.index, quint16(1));
-    QCOMPARE(parsed.count, quint16(3));
+    QCOMPARE(parsed.count, quint16(4));
     QCOMPARE(parsed.payload, QByteArray("?OTR:ABCDEFGHIJKLMNOPQR"));
 
     QcaOtr::Transport::FragmentAccumulator accumulator;
     QByteArray complete;
-    QCOMPARE(accumulator.accumulate(fragments.at(0), &complete), QcaOtr::Transport::FragmentResult::Incomplete);
-    QVERIFY(complete.isEmpty());
-    QCOMPARE(accumulator.accumulate(fragments.at(1), &complete), QcaOtr::Transport::FragmentResult::Incomplete);
-    QCOMPARE(accumulator.accumulate(fragments.at(2), &complete), QcaOtr::Transport::FragmentResult::Complete);
+    for (int i = 0; i < fragments.size(); ++i) {
+        const auto expected = i + 1 == fragments.size() ? QcaOtr::Transport::FragmentResult::Complete
+                                                       : QcaOtr::Transport::FragmentResult::Incomplete;
+        QCOMPARE(accumulator.accumulate(fragments.at(i), &complete), expected);
+    }
     QCOMPARE(complete, message);
 
     QVector<QByteArray> unfragmented;
