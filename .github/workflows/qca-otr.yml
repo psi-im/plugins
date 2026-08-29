@@ -1,0 +1,82 @@
+name: qca-otr
+
+on:
+  pull_request:
+    paths:
+      - 'generic/otrplugin/qca-otr/**'
+      - '.github/workflows/qca-otr.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'generic/otrplugin/qca-otr/**'
+      - '.github/workflows/qca-otr.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Qt ${{ matrix.qt }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        qt: ['5', '6']
+
+    steps:
+      - name: Checkout plugins
+        uses: actions/checkout@v4
+
+      - name: Checkout QCA3
+        uses: actions/checkout@v4
+        with:
+          repository: psi-im/qca
+          ref: master
+          path: qca
+
+      - name: Install build dependencies
+        shell: bash
+        run: |
+          sudo apt-get update
+          if [[ '${{ matrix.qt }}' == '6' ]]; then
+            sudo apt-get install -y cmake ninja-build qt6-base-dev libssl-dev
+          else
+            sudo apt-get install -y cmake ninja-build qtbase5-dev libssl-dev
+          fi
+
+      - name: Build and install QCA3
+        shell: bash
+        run: |
+          if [[ '${{ matrix.qt }}' == '6' ]]; then
+            qt6=ON
+          else
+            qt6=OFF
+          fi
+
+          cmake -S qca -B qca-build -G Ninja \
+            -DBUILD_WITH_QT6="$qt6" \
+            -DBUILD_TESTS=OFF \
+            -DBUILD_TOOLS=OFF \
+            -DBUILD_PLUGINS=ossl \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$PWD/qca-install"
+          cmake --build qca-build
+          cmake --install qca-build
+
+      - name: Build qca-otr
+        shell: bash
+        run: |
+          cmake -S generic/otrplugin/qca-otr -B qca-otr-build -G Ninja \
+            -DQT_DEFAULT_MAJOR_VERSION='${{ matrix.qt }}' \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH="$PWD/qca-install"
+          cmake --build qca-otr-build
+
+      - name: Run qca-otr tests
+        shell: bash
+        run: |
+          export LD_LIBRARY_PATH="$PWD/qca-install/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+          export QCA_PLUGIN_PATH="$PWD/qca-install/lib/qca3-qt${{ matrix.qt }}/crypto"
+          ctest --test-dir qca-otr-build --output-on-failure
