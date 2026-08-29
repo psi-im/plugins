@@ -3,9 +3,20 @@
 namespace QcaOtr {
 namespace {
 
-const QCA::BigInteger Zero(0);
-const QCA::BigInteger One(1);
-const QCA::BigInteger Two(2);
+QCA::BigInteger zero()
+{
+    return QCA::BigInteger(0);
+}
+
+QCA::BigInteger one()
+{
+    return QCA::BigInteger(1);
+}
+
+QCA::BigInteger two()
+{
+    return QCA::BigInteger(2);
+}
 
 QCA::BigInteger unsignedInteger(const QByteArray &bytes)
 {
@@ -18,13 +29,13 @@ QCA::BigInteger unsignedInteger(const QByteArray &bytes)
 
 bool validDomain(const DsaDomain &domain)
 {
-    return domain.p > Two && domain.q > One && domain.g > One && domain.g < domain.p;
+    return domain.p > two() && domain.q > one() && domain.g > one() && domain.g < domain.p;
 }
 
 QCA::BigInteger randomScalar(const QCA::BigInteger &q)
 {
     QCA::BigInteger range(q);
-    range -= One;
+    range -= one();
 
     const int byteCount = q.toArray().size() + 1;
     QCA::SecureArray bytes = QCA::Random::randomArray(byteCount);
@@ -33,7 +44,7 @@ QCA::BigInteger randomScalar(const QCA::BigInteger &q)
 
     QCA::BigInteger value(bytes);
     value %= range;
-    value += One;
+    value += one();
     return value;
 }
 
@@ -43,7 +54,7 @@ DsaPublicKey dsaPublicKey(const DsaPrivateKey &privateKey)
 {
     DsaPublicKey result;
     result.domain = privateKey.domain;
-    if (validDomain(privateKey.domain) && privateKey.x > Zero && privateKey.x < privateKey.domain.q) {
+    if (validDomain(privateKey.domain) && privateKey.x > zero() && privateKey.x < privateKey.domain.q) {
         result.y = QCA::BigIntegerMath::modPow(privateKey.domain.g, privateKey.x, privateKey.domain.p);
     }
     return result;
@@ -51,7 +62,7 @@ DsaPublicKey dsaPublicKey(const DsaPrivateKey &privateKey)
 
 bool dsaSignDigest(const DsaPrivateKey &privateKey, const QByteArray &digest, DsaSignature *signature)
 {
-    if (!signature || !validDomain(privateKey.domain) || privateKey.x <= Zero ||
+    if (!signature || !validDomain(privateKey.domain) || privateKey.x <= zero() ||
         privateKey.x >= privateKey.domain.q) {
         return false;
     }
@@ -69,7 +80,7 @@ bool dsaSignDigest(const DsaPrivateKey &privateKey, const QByteArray &digest, Ds
 
         QCA::BigInteger r = QCA::BigIntegerMath::modPow(privateKey.domain.g, k, privateKey.domain.p);
         r %= privateKey.domain.q;
-        if (r == Zero)
+        if (r == zero())
             continue;
 
         QCA::BigInteger xr(privateKey.x);
@@ -80,7 +91,7 @@ bool dsaSignDigest(const DsaPrivateKey &privateKey, const QByteArray &digest, Ds
         QCA::BigInteger s(kInverse);
         s *= xr;
         s %= privateKey.domain.q;
-        if (s == Zero)
+        if (s == zero())
             continue;
 
         signature->r = r;
@@ -93,8 +104,8 @@ bool dsaSignDigest(const DsaPrivateKey &privateKey, const QByteArray &digest, Ds
 
 bool dsaVerifyDigest(const DsaPublicKey &publicKey, const QByteArray &digest, const DsaSignature &signature)
 {
-    if (!validDomain(publicKey.domain) || publicKey.y <= Zero || publicKey.y >= publicKey.domain.p ||
-        signature.r <= Zero || signature.r >= publicKey.domain.q || signature.s <= Zero ||
+    if (!validDomain(publicKey.domain) || publicKey.y <= zero() || publicKey.y >= publicKey.domain.p ||
+        signature.r <= zero() || signature.r >= publicKey.domain.q || signature.s <= zero() ||
         signature.s >= publicKey.domain.q) {
         return false;
     }
