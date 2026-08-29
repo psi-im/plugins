@@ -54,7 +54,7 @@ jobs:
           unzip -q qca3.zip -d qca-packages
           sudo apt-get install -y ./qca-packages/*.deb
 
-          plugin_path=$(find /usr -type d -path '*/qca3-qt6/crypto' -print -quit)
+          plugin_path=$(find /usr/lib -type d -path '*/qca3-qt6/crypto' -print -quit)
           test -n "$plugin_path"
           echo "QCA_PLUGIN_PATH=$plugin_path" >> "$GITHUB_ENV"
 
@@ -95,8 +95,8 @@ jobs:
             -DQCA_OTR_BUILD_LIBOTR_INTEROP_TESTS=ON
             -DCMAKE_BUILD_TYPE=Release
           )
-          if [[ -n '${{ env.QCA_PREFIX }}' ]]; then
-            cmake_args+=("-DCMAKE_PREFIX_PATH=${{ env.QCA_PREFIX }}")
+          if [[ -n "${QCA_PREFIX:-}" ]]; then
+            cmake_args+=("-DCMAKE_PREFIX_PATH=$QCA_PREFIX")
           fi
           cmake "${cmake_args[@]}"
           cmake --build qca-otr-build
