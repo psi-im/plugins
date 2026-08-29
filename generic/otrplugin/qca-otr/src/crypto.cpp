@@ -39,91 +39,13 @@ QCA::BigInteger randomScalar(const QCA::BigInteger &q)
 
 } // namespace
 
-QCA::BigInteger positiveMod(const QCA::BigInteger &value, const QCA::BigInteger &modulus)
-{
-    if (modulus <= Zero)
-        return Zero;
-
-    QCA::BigInteger result(value);
-    result %= modulus;
-    if (result < Zero)
-        result += modulus;
-    return result;
-}
-
-QCA::BigInteger modPow(const QCA::BigInteger &base,
-                       const QCA::BigInteger &exponent,
-                       const QCA::BigInteger &modulus)
-{
-    if (modulus <= Zero || exponent < Zero)
-        return Zero;
-
-    QCA::BigInteger result(1);
-    result %= modulus;
-
-    QCA::BigInteger factor = positiveMod(base, modulus);
-    QCA::BigInteger power(exponent);
-
-    while (power > Zero) {
-        QCA::BigInteger bit(power);
-        bit %= Two;
-        if (bit != Zero) {
-            result *= factor;
-            result %= modulus;
-        }
-
-        power /= Two;
-        if (power != Zero) {
-            factor *= factor;
-            factor %= modulus;
-        }
-    }
-
-    return result;
-}
-
-bool modInverse(const QCA::BigInteger &value, const QCA::BigInteger &modulus, QCA::BigInteger *inverse)
-{
-    if (!inverse || modulus <= One)
-        return false;
-
-    QCA::BigInteger t(0);
-    QCA::BigInteger newT(1);
-    QCA::BigInteger r(modulus);
-    QCA::BigInteger newR = positiveMod(value, modulus);
-
-    while (newR != Zero) {
-        QCA::BigInteger quotient(r);
-        quotient /= newR;
-
-        QCA::BigInteger product(quotient);
-        product *= newT;
-        QCA::BigInteger nextT(t);
-        nextT -= product;
-        t = newT;
-        newT = nextT;
-
-        product = quotient;
-        product *= newR;
-        QCA::BigInteger nextR(r);
-        nextR -= product;
-        r = newR;
-        newR = nextR;
-    }
-
-    if (r != One)
-        return false;
-
-    *inverse = positiveMod(t, modulus);
-    return true;
-}
-
 DsaPublicKey dsaPublicKey(const DsaPrivateKey &privateKey)
 {
     DsaPublicKey result;
     result.domain = privateKey.domain;
-    if (validDomain(privateKey.domain) && privateKey.x > Zero && privateKey.x < privateKey.domain.q)
-        result.y = modPow(privateKey.domain.g, privateKey.x, privateKey.domain.p);
+    if (validDomain(privateKey.domain) && privateKey.x > Zero && privateKey.x < privateKey.domain.q) {
+        result.y = QCA::BigIntegerMath::modPow(privateKey.domain.g, privateKey.x, privateKey.domain.p);
+    }
     return result;
 }
 
@@ -134,7 +56,7 @@ bool dsaSignDigest(const DsaPrivateKey &privateKey, const QByteArray &digest, Ds
         return false;
     }
 
-    const QCA::BigInteger m = positiveMod(unsignedInteger(digest), privateKey.domain.q);
+    const QCA::BigInteger m = QCA::BigIntegerMath::positiveMod(unsignedInteger(digest), privateKey.domain.q);
 
     // r == 0 or s == 0 is valid reason to choose a fresh DSA nonce. Both are
     // vanishingly unlikely for real OTR parameters, but keep a finite guard.
@@ -142,10 +64,10 @@ bool dsaSignDigest(const DsaPrivateKey &privateKey, const QByteArray &digest, Ds
         const QCA::BigInteger k = randomScalar(privateKey.domain.q);
 
         QCA::BigInteger kInverse;
-        if (!modInverse(k, privateKey.domain.q, &kInverse))
+        if (!QCA::BigIntegerMath::modInverse(k, privateKey.domain.q, &kInverse))
             continue;
 
-        QCA::BigInteger r = modPow(privateKey.domain.g, k, privateKey.domain.p);
+        QCA::BigInteger r = QCA::BigIntegerMath::modPow(privateKey.domain.g, k, privateKey.domain.p);
         r %= privateKey.domain.q;
         if (r == Zero)
             continue;
@@ -178,10 +100,10 @@ bool dsaVerifyDigest(const DsaPublicKey &publicKey, const QByteArray &digest, co
     }
 
     QCA::BigInteger w;
-    if (!modInverse(signature.s, publicKey.domain.q, &w))
+    if (!QCA::BigIntegerMath::modInverse(signature.s, publicKey.domain.q, &w))
         return false;
 
-    QCA::BigInteger m = positiveMod(unsignedInteger(digest), publicKey.domain.q);
+    QCA::BigInteger m = QCA::BigIntegerMath::positiveMod(unsignedInteger(digest), publicKey.domain.q);
 
     QCA::BigInteger u1(m);
     u1 *= w;
@@ -191,8 +113,8 @@ bool dsaVerifyDigest(const DsaPublicKey &publicKey, const QByteArray &digest, co
     u2 *= w;
     u2 %= publicKey.domain.q;
 
-    QCA::BigInteger v = modPow(publicKey.domain.g, u1, publicKey.domain.p);
-    QCA::BigInteger yPart = modPow(publicKey.y, u2, publicKey.domain.p);
+    QCA::BigInteger v = QCA::BigIntegerMath::modPow(publicKey.domain.g, u1, publicKey.domain.p);
+    QCA::BigInteger yPart = QCA::BigIntegerMath::modPow(publicKey.y, u2, publicKey.domain.p);
     v *= yPart;
     v %= publicKey.domain.p;
     v %= publicKey.domain.q;
