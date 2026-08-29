@@ -87,7 +87,7 @@ private:
     DhKeyPair localDh_;
     quint32 localKeyId_ = 0;
     QCA::BigInteger peerDhPublic_;
-    QByteArray revealKey_;
+    QCA::SecureArray revealKey_;
     QByteArray encryptedGx_;
     QByteArray hashedGx_;
     AkeKeys keys_;
