@@ -22,6 +22,7 @@ add_library(qca-otr STATIC
     src/codec.cpp
     src/crypto.cpp
     src/data.cpp
+    src/transport.cpp
 )
 
 add_library(QcaOtr::QcaOtr ALIAS qca-otr)
