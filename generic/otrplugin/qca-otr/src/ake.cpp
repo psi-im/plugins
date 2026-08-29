@@ -11,6 +11,8 @@ constexpr quint8 DhKeyType = 0x0a;
 constexpr quint8 RevealSignatureType = 0x11;
 constexpr quint8 SignatureType = 0x12;
 constexpr quint32 MinimumInstanceTag = 0x00000100;
+constexpr int DsaSignatureComponentSize = 20;
+constexpr int DsaSignatureSize = 40;
 
 QCA::BigInteger zero()
 {
@@ -29,6 +31,47 @@ QCA::BigInteger unsignedInteger(const QByteArray &bytes)
     positive.append('\0');
     positive.append(bytes);
     return QCA::BigInteger(QCA::SecureArray(positive));
+}
+
+bool fixedWidthDsaInteger(const QCA::BigInteger &value, QByteArray *encoded)
+{
+    if (!encoded || value < zero())
+        return false;
+
+    QByteArray bytes = value.toArray().toByteArray();
+    while (!bytes.isEmpty() && bytes.front() == '\0')
+        bytes.remove(0, 1);
+    if (bytes.size() > DsaSignatureComponentSize)
+        return false;
+
+    *encoded = QByteArray(DsaSignatureComponentSize - bytes.size(), '\0') + bytes;
+    return true;
+}
+
+bool encodeDsaSignature(const DsaSignature &signature, QByteArray *encoded)
+{
+    if (!encoded)
+        return false;
+
+    QByteArray r;
+    QByteArray s;
+    if (!fixedWidthDsaInteger(signature.r, &r) || !fixedWidthDsaInteger(signature.s, &s))
+        return false;
+
+    *encoded = r + s;
+    return true;
+}
+
+bool decodeDsaSignature(const QByteArray &encoded, DsaSignature *signature)
+{
+    if (!signature || encoded.size() != DsaSignatureSize)
+        return false;
+
+    DsaSignature decoded;
+    decoded.r = unsignedInteger(encoded.left(DsaSignatureComponentSize));
+    decoded.s = unsignedInteger(encoded.mid(DsaSignatureComponentSize, DsaSignatureComponentSize));
+    *signature = decoded;
+    return true;
 }
 
 bool validInstanceTags(quint32 sender, quint32 receiver)
@@ -198,6 +241,100 @@ QByteArray akeSignatureMac(const QByteArray &encryptedSignature,
     writer.writeData(encryptedSignature);
     const QByteArray fullMac = hmacSha256(macKey, writer.data());
     return fullMac.size() == 32 ? fullMac.left(20) : QByteArray();
+}
+
+QByteArray dsaPublicKeyFingerprint(const DsaPublicKey &publicKey)
+{
+    // libotr fingerprints only the four encoded DSA MPIs, excluding the
+    // two-byte OTR public-key type field.
+    Wire::Writer writer;
+    if (!writer.writeMpi(publicKey.domain.p) || !writer.writeMpi(publicKey.domain.q) ||
+        !writer.writeMpi(publicKey.domain.g) || !writer.writeMpi(publicKey.y)) {
+        return {};
+    }
+    const QByteArray fingerprint = sha1(writer.data());
+    return fingerprint.size() == 20 ? fingerprint : QByteArray();
+}
+
+bool createAkeAuthenticator(const DsaPrivateKey &identityKey,
+                            quint32 keyId,
+                            const QCA::BigInteger &senderDhPublic,
+                            const QCA::BigInteger &receiverDhPublic,
+                            const QCA::SecureArray &macKey,
+                            const QCA::SecureArray &encryptionKey,
+                            QByteArray *encryptedAuthenticator)
+{
+    if (!encryptedAuthenticator || keyId == 0 || !isValidDhPublicValue(senderDhPublic) ||
+        !isValidDhPublicValue(receiverDhPublic) || macKey.size() != 32 || encryptionKey.size() != 16) {
+        return false;
+    }
+
+    const DsaPublicKey publicKey = dsaPublicKey(identityKey);
+    const QByteArray digest = akeSignatureDigest(senderDhPublic, receiverDhPublic, publicKey, keyId, macKey);
+    if (digest.size() != 32)
+        return false;
+
+    DsaSignature signature;
+    if (!dsaSignDigest(identityKey, digest, &signature))
+        return false;
+
+    QByteArray encodedSignature;
+    if (!encodeDsaSignature(signature, &encodedSignature))
+        return false;
+
+    Wire::Writer writer;
+    if (!writer.writeDsaPublicKey(publicKey))
+        return false;
+    writer.writeInt(keyId);
+    writer.writeBytes(encodedSignature);
+
+    QByteArray encrypted;
+    if (!aes128Ctr(encryptionKey, QByteArray(16, '\0'), writer.data(), &encrypted))
+        return false;
+
+    *encryptedAuthenticator = encrypted;
+    return true;
+}
+
+bool verifyAkeAuthenticator(const QByteArray &encryptedAuthenticator,
+                            const QCA::BigInteger &senderDhPublic,
+                            const QCA::BigInteger &receiverDhPublic,
+                            const QCA::SecureArray &macKey,
+                            const QCA::SecureArray &encryptionKey,
+                            AkeAuthenticator *authenticator,
+                            QByteArray *fingerprint)
+{
+    if (!authenticator || encryptedAuthenticator.isEmpty() || !isValidDhPublicValue(senderDhPublic) ||
+        !isValidDhPublicValue(receiverDhPublic) || macKey.size() != 32 || encryptionKey.size() != 16) {
+        return false;
+    }
+
+    QByteArray cleartext;
+    if (!aes128Ctr(encryptionKey, QByteArray(16, '\0'), encryptedAuthenticator, &cleartext))
+        return false;
+
+    Wire::Reader reader(cleartext);
+    AkeAuthenticator decoded;
+    QByteArray encodedSignature;
+    if (!reader.readDsaPublicKey(&decoded.publicKey) || !reader.readInt(&decoded.keyId) || decoded.keyId == 0 ||
+        !reader.readBytes(DsaSignatureSize, &encodedSignature) || !reader.atEnd() ||
+        !decodeDsaSignature(encodedSignature, &decoded.signature)) {
+        return false;
+    }
+
+    const QByteArray digest =
+        akeSignatureDigest(senderDhPublic, receiverDhPublic, decoded.publicKey, decoded.keyId, macKey);
+    if (digest.size() != 32 || !dsaVerifyDigest(decoded.publicKey, digest, decoded.signature))
+        return false;
+
+    const QByteArray decodedFingerprint = dsaPublicKeyFingerprint(decoded.publicKey);
+    if (decodedFingerprint.size() != 20)
+        return false;
+
+    *authenticator = decoded;
+    if (fingerprint)
+        *fingerprint = decodedFingerprint;
+    return true;
 }
 
 namespace Wire {
