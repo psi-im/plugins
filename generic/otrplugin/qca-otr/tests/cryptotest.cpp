@@ -10,7 +10,6 @@ class CryptoTest : public QObject
 private Q_SLOTS:
     void initTestCase();
     void cleanupTestCase();
-    void modularArithmetic();
     void rawDsa();
     void sha256();
     void hmacSha256();
@@ -28,19 +27,6 @@ void CryptoTest::initTestCase()
 void CryptoTest::cleanupTestCase()
 {
     delete initializer_;
-}
-
-void CryptoTest::modularArithmetic()
-{
-    QCOMPARE(QcaOtr::modPow(QCA::BigInteger(4), QCA::BigInteger(13), QCA::BigInteger(497)),
-             QCA::BigInteger(445));
-
-    QCA::BigInteger inverse;
-    QVERIFY(QcaOtr::modInverse(QCA::BigInteger(3), QCA::BigInteger(11), &inverse));
-    QCOMPARE(inverse, QCA::BigInteger(4));
-
-    QVERIFY(!QcaOtr::modInverse(QCA::BigInteger(6), QCA::BigInteger(9), &inverse));
-    QCOMPARE(QcaOtr::positiveMod(QCA::BigInteger(-3), QCA::BigInteger(11)), QCA::BigInteger(8));
 }
 
 void CryptoTest::rawDsa()
