@@ -3,6 +3,7 @@
 #include <QTest>
 
 #include <cstdlib>
+#include <cstring>
 
 extern "C" {
 #include <libotr/context.h>
