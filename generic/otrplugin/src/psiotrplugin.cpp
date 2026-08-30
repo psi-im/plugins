@@ -490,9 +490,12 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
             }
         }
 
+        // Replace the plaintext fallback with the authenticated OTR plaintext.
         plainBody.removeChild(plainBody.firstChild());
         plainBody.appendChild(messageElement.ownerDocument().createTextNode(unescape(bodyText)));
 
+        // Keep EME metadata for clients that understand XEP-0380 even when
+        // the original stanza did not carry an encryption marker.
         if (messageElement.elementsByTagNameNS("urn:xmpp:eme:0", "encryption").isEmpty()) {
             QDomElement encElement = messageElement.ownerDocument().createElementNS("urn:xmpp:eme:0", "encryption");
             encElement.setAttribute("namespace", "urn:xmpp:otr:0");
@@ -520,6 +523,9 @@ bool PsiOtrPlugin::encryptMessageElement(int accountIndex, QDomElement &message,
 
     QDomNode body = bodyElement.firstChild();
     QString encrypted = m_otrConnection->encryptMessage(account, contact, body.nodeValue().toHtmlEscaped());
+
+    // A failed encryption must drop the stanza rather than let the caller
+    // accidentally send the original plaintext body.
     if (encrypted.isEmpty()) {
         message = QDomElement();
         return false;
@@ -629,6 +635,8 @@ bool PsiOtrPlugin::incomingStanza(int accountIndex, const QDomElement &xml)
     if (xml.nodeName() != QLatin1String("presence"))
         return false;
 
+    // OTR is resource-bound (XEP-0364): presence/session state is tracked
+    // per full JID rather than collapsed to the roster bare JID.
     const QString contact = xml.attribute(QStringLiteral("from"));
     const QString type = xml.attribute(QStringLiteral("type"), QStringLiteral("available"));
 
@@ -666,6 +674,8 @@ bool PsiOtrPlugin::outgoingStanza(int accountIndex, QDomElement &xml)
     if (body.isNull() || body.text().startsWith(QLatin1String("?OTR")))
         return false;
 
+    // Do not append whitespace discovery to an already encrypted stanza or
+    // its plaintext fallback. XEP-0378 disco remains independent.
     if (!xml.elementsByTagNameNS(QStringLiteral("urn:xmpp:eme:0"), QStringLiteral("encryption")).isEmpty())
         return false;
     for (auto child = xml.firstChildElement(); !child.isNull(); child = child.nextSiblingElement()) {
@@ -726,11 +736,15 @@ void PsiOtrPlugin::sendMessage(const QString &account, const QString &contact, c
     body.appendChild(document.createTextNode(htmlToPlain(message)));
     stanza.appendChild(body);
 
+    // XEP-0364: OTR protocol traffic is bound to one resource and must not
+    // be carbon-copied or permanently archived.
     stanza.appendChild(document.createElementNS(QStringLiteral("urn:xmpp:hints"), QStringLiteral("no-copy")));
     stanza.appendChild(
         document.createElementNS(QStringLiteral("urn:xmpp:hints"), QStringLiteral("no-permanent-store")));
     stanza.appendChild(document.createElementNS(QStringLiteral("urn:xmpp:carbons:2"), QStringLiteral("private")));
 
+    // Data Messages get the EME marker recommended by XEP-0364/XEP-0380;
+    // the version Query Message is negotiation traffic, not ciphertext.
     if (message.startsWith(QLatin1String("?OTR:"))) {
         auto eme = document.createElementNS(QStringLiteral("urn:xmpp:eme:0"), QStringLiteral("encryption"));
         eme.setAttribute(QStringLiteral("namespace"), QString::fromLatin1(OtrEncryptionProvider::OtrNamespace));
@@ -901,6 +915,9 @@ QString PsiOtrPlugin::getCorrectJid(int accountIndex, const QString &fullJid)
         correctJid = fullJid;
     } else {
         correctJid = removeResource(fullJid);
+
+        // A private conference occupant may not be in the roster yet, so the
+        // normal privacy lookup cannot be the only reason to preserve resource.
         if (m_contactInfo->isConference(accountIndex, correctJid))
             correctJid = fullJid;
     }
