@@ -18,25 +18,28 @@ validated against libotr 4.1.1 before the Psi plugin switches backend.
 Exit criterion: fragmented and unfragmented AKE/Data traffic interoperates in
 both directions with libotr 4.1.1, including multiple remote instances.
 
-## 2. Negotiation, message envelope and control TLVs — active
+## 2. Negotiation, message envelope and control TLVs — completed
 
 The current Psi plugin does not start OTR by sending a D-H Commit directly: it
 sends `otrl_proto_default_query_msg()` and also delegates ordinary outgoing
-messages to libotr policy handling. The native backend therefore needs the
-transport-facing protocol envelope before plugin integration.
+messages to libotr policy handling. The native backend therefore implements the
+same transport-facing negotiation and control envelope before plugin integration.
 
 - OTR query generation/parsing and version negotiation (`?OTRv3?` and combined queries)
 - OTRv3 whitespace-tag detection/generation for opportunistic policy
 - policy behavior needed by the current plugin (manual/opportunistic/always)
 - encrypted framing as `plaintext || NUL || TLVs`
 - strict TLV codec with duplicate/length/truncation handling
-- disconnected TLV and FINISHED-state semantics
-- symmetric-key TLV / extra-key plumbing used by libotr-compatible applications
-- protocol error parsing/generation and unreadable/error result events
-- preserve per-instance routing for every control path
+- disconnected TLV and libotr-compatible PLAINTEXT/ENCRYPTED/FINISHED semantics
+- symmetric-key TLV / secure extra-key plumbing used by libotr-compatible applications
+- canonical OTR error generation, tolerant parsing, unreadable/error result events and ERROR_START_AKE behavior
+- preserve per-instance routing for every control path, including per-instance disconnect
+- public libotr 4.1.1 oracle coverage in both directions for query, whitespace discovery,
+  generic TLVs, disconnect/restart, SYMKEY and protocol-error/unreadable handling
 
 Exit criterion: start/disconnect/error and encrypted TLV traffic round-trip with
-libotr 4.1.1 without relying on libotr message wrappers.
+libotr 4.1.1 through its public message APIs. This is covered by the Qt5 and Qt6
+CI matrix without linking libotr into the qca-otr runtime library.
 
 ## 3. SMP
 
@@ -65,8 +68,7 @@ where the file format is intended to remain compatible.
 
 ## 5. Complete `OtrSession` and Psi adapter
 
-- extend the routed `OtrSession` already introduced by stage 1 with negotiation,
-  TLVs, disconnect and SMP
+- extend the routed `OtrSession` with SMP and the remaining adapter-facing state
 - final API: `start`, `processIncoming`, `sendMessage`, `disconnect`, `startSmp`,
   `respondSmp`, `abortSmp`
 - expose peer identity/fingerprint/trust and per-instance secure state

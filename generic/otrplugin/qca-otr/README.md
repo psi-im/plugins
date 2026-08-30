@@ -19,6 +19,12 @@ The current core contains:
 - OTRv3 encrypted Data Messages with directional session-key derivation, AES-CTR counters and replay protection;
 - the OTRv3 DH/key-id ratchet, including current/old session-key slots and revealed MAC keys;
 - OTR transport armoring and exact libotr-compatible OTRv3 fragmentation/reassembly;
+- libotr-compatible Query Message/version negotiation and OTR whitespace capability tags;
+- manual, opportunistic and require-encryption policy behavior at the routed session layer;
+- strict generic OTR TLV framing integrated into the `plaintext || NUL || TLVs` Data envelope;
+- DISCONNECTED control handling with per-instance PLAINTEXT/ENCRYPTED/FINISHED state semantics and restart support;
+- SYMKEY control messages with the derived extra symmetric key kept in `QCA::SecureArray` at the session API boundary;
+- canonical `?OTR Error: ...` generation, tolerant error parsing, unreadable-message handling and automatic error-triggered AKE restart policy;
 - transport-facing `OtrSession` routing with independent AKE/Data children for multiple remote instance tags and broadcast/master AKE cloning.
 
 Modular exponentiation and modular inversion are provided by
@@ -28,12 +34,14 @@ inside qca-otr remain private implementation details.
 The regular qca-otr library remains QtCore + QCA3 only. Optional test targets
 link against libotr 4.1.1 as an interoperability oracle; CI enables them and
 validates complete AKE handshakes, encrypted Data Message exchanges, exact
-fragment streams, fragmented public-API exchanges and a single broadcast Commit
-answered independently by multiple libotr instances.
+fragment streams, fragmented public-API exchanges, multi-instance broadcast AKE,
+query and whitespace negotiation, generic TLVs, disconnect/restart semantics,
+SYMKEY extra-key agreement and protocol-error/unreadable behavior in both
+directions through libotr's public message APIs.
 
 The detailed completion roadmap is in [PLAN.md](PLAN.md). The next protocol
-layer is query/policy negotiation plus encrypted TLV/control framing, followed
-by SMP, persistence migration, Psi adapter integration and dependency cleanup.
+layer is SMP, followed by persistence migration, Psi adapter integration and
+dependency cleanup.
 
 ## Standalone build
 
