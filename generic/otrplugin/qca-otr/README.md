@@ -25,7 +25,8 @@ The current core contains:
 - DISCONNECTED control handling with per-instance PLAINTEXT/ENCRYPTED/FINISHED state semantics and restart support;
 - SYMKEY control messages with the derived extra symmetric key kept in `QCA::SecureArray` at the session API boundary;
 - canonical `?OTR Error: ...` generation, tolerant error parsing, unreadable-message handling and automatic error-triggered AKE restart policy;
-- transport-facing `OtrSession` routing with independent AKE/Data children for multiple remote instance tags and broadcast/master AKE cloning.
+- a complete OTRv3 SMP state machine with question/answer, success/failure, abort and cheating handling, using libotr-compatible combined-secret derivation while retaining secret material in `QCA::SecureArray`;
+- transport-facing `OtrSession` routing with independent AKE/Data/SMP children for multiple remote instance tags and broadcast/master AKE cloning.
 
 Modular exponentiation and modular inversion are provided by
 `QCA::BigIntegerMath` in QCA3. Small normalization helpers that are only needed
@@ -36,12 +37,12 @@ link against libotr 4.1.1 as an interoperability oracle; CI enables them and
 validates complete AKE handshakes, encrypted Data Message exchanges, exact
 fragment streams, fragmented public-API exchanges, multi-instance broadcast AKE,
 query and whitespace negotiation, generic TLVs, disconnect/restart semantics,
-SYMKEY extra-key agreement and protocol-error/unreadable behavior in both
-directions through libotr's public message APIs.
+SYMKEY extra-key agreement, protocol-error/unreadable behavior and bidirectional
+SMP success/failure, question and abort flows through libotr's public message APIs.
 
-The detailed completion roadmap is in [PLAN.md](PLAN.md). The next protocol
-layer is SMP, followed by persistence migration, Psi adapter integration and
-dependency cleanup.
+The detailed completion roadmap is in [PLAN.md](PLAN.md). The next layer is
+persistence and migration of existing libotr identity, fingerprint/trust and
+instance-tag data, followed by Psi adapter integration and dependency cleanup.
 
 ## Standalone build
 
