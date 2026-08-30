@@ -26,7 +26,9 @@ The current core contains:
 - SYMKEY control messages with the derived extra symmetric key kept in `QCA::SecureArray` at the session API boundary;
 - canonical `?OTR Error: ...` generation, tolerant error parsing, unreadable-message handling and automatic error-triggered AKE restart policy;
 - a complete OTRv3 SMP state machine with question/answer, success/failure, abort and cheating handling, using libotr-compatible combined-secret derivation while retaining secret material in `QCA::SecureArray`;
-- transport-facing `OtrSession` routing with independent AKE/Data/SMP children for multiple remote instance tags and broadcast/master AKE cloning.
+- transport-facing `OtrSession` routing with independent AKE/Data/SMP children for multiple remote instance tags and broadcast/master AKE cloning;
+- libotr-compatible persistence codecs for `otr.keys`, `otr.fingerprints` and `otr.instags`, including Psi's historical `prpl-jabber` on-disk protocol identifier;
+- profile migration/loading with exact DSA identity, arbitrary fingerprint trust and OTRv3 instance-tag preservation, plus atomic store replacement.
 
 Modular exponentiation and modular inversion are provided by
 `QCA::BigIntegerMath` in QCA3. Small normalization helpers that are only needed
@@ -37,12 +39,15 @@ link against libotr 4.1.1 as an interoperability oracle; CI enables them and
 validates complete AKE handshakes, encrypted Data Message exchanges, exact
 fragment streams, fragmented public-API exchanges, multi-instance broadcast AKE,
 query and whitespace negotiation, generic TLVs, disconnect/restart semantics,
-SYMKEY extra-key agreement, protocol-error/unreadable behavior and bidirectional
-SMP success/failure, question and abort flows through libotr's public message APIs.
+SYMKEY extra-key agreement, protocol-error/unreadable behavior, bidirectional
+SMP success/failure/question/abort flows, and persistence/profile migration in
+both directions. The persistence oracle also performs a complete disk migration
+from a libotr-created legacy profile through qca-otr and back to libotr while
+checking the exact identity fingerprint, trust string and instance tag.
 
-The detailed completion roadmap is in [PLAN.md](PLAN.md). The next layer is
-persistence and migration of existing libotr identity, fingerprint/trust and
-instance-tag data, followed by Psi adapter integration and dependency cleanup.
+The detailed completion roadmap is in [PLAN.md](PLAN.md). The next layer is the
+Psi adapter and the remaining adapter-facing identity/trust/key-management API,
+followed by the backend switch and dependency cleanup.
 
 ## Standalone build
 
