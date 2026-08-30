@@ -1,0 +1,166 @@
+name: plugins-build
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  QCA_VERSION: 3.0.5
+
+jobs:
+  build:
+    name: Qt ${{ matrix.qt }} / Linux
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        qt: ['5', '6']
+
+    steps:
+      - name: Checkout plugins
+        uses: actions/checkout@v4
+
+      - name: Checkout Psi plugin API
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 https://github.com/psi-im/psi.git "$RUNNER_TEMP/psi"
+          test -f "$RUNNER_TEMP/psi/plugins/cmake/modules/variables.cmake"
+          test -f "$RUNNER_TEMP/psi/plugins/include/applicationinfoaccessor.h"
+
+      - name: Install build dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          common_packages=(
+            cmake
+            ninja-build
+            pkg-config
+            libssl-dev
+            libx11-dev
+            libxcb1-dev
+          )
+          if [[ '${{ matrix.qt }}' == '6' ]]; then
+            sudo apt-get install -y "${common_packages[@]}" \
+              qt6-base-dev \
+              qt6-svg-dev \
+              qt6-multimedia-dev \
+              curl \
+              unzip
+          else
+            sudo apt-get install -y "${common_packages[@]}" \
+              qtbase5-dev \
+              libqt5svg5-dev \
+              libqt5x11extras5-dev \
+              qtmultimedia5-dev
+          fi
+
+      - name: Install released QCA3 Qt6 packages
+        if: matrix.qt == '6'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir qca-packages
+          curl -fL \
+            "https://github.com/psi-im/qca/releases/download/v${QCA_VERSION}/qca3-deb-ubuntu-24.04.zip" \
+            -o qca3.zip
+          unzip -q qca3.zip -d qca-packages
+          sudo apt-get install -y ./qca-packages/*.deb
+
+      - name: Build and install QCA3 Qt5
+        if: matrix.qt == '5'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch "v${QCA_VERSION}" https://github.com/psi-im/qca.git qca
+          cmake -S qca -B qca-build -G Ninja \
+            -DBUILD_WITH_QT6=OFF \
+            -DBUILD_TESTS=OFF \
+            -DBUILD_TOOLS=OFF \
+            -DBUILD_PLUGINS=ossl \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$PWD/qca-install"
+          cmake --build qca-build --parallel 2
+          cmake --install qca-build
+          echo "QCA_PREFIX=$PWD/qca-install" >> "$GITHUB_ENV"
+
+      - name: Configure all plugins
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake_args=(
+            -S .
+            -B build
+            -G Ninja
+            -DBUILD_PLUGINS=ALL
+            -DBUILD_DEV_PLUGINS=ON
+            -DQT_DEFAULT_MAJOR_VERSION='${{ matrix.qt }}'
+            -DCMAKE_BUILD_TYPE=Release
+            "-DPLUGINS_ROOT_DIR=$RUNNER_TEMP/psi/plugins"
+          )
+          if [[ '${{ matrix.qt }}' == '6' ]]; then
+            cmake_args+=(-DUSE_QT6=ON)
+          else
+            cmake_args+=(-DUSE_QT6=OFF)
+          fi
+          if [[ -n "${QCA_PREFIX:-}" ]]; then
+            cmake_args+=("-DCMAKE_PREFIX_PATH=$QCA_PREFIX")
+          fi
+          cmake "${cmake_args[@]}"
+
+      - name: Build all plugins
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake --build build --parallel 4
+
+      - name: Verify plugin artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected=(
+            attentionplugin
+            autoreplyplugin
+            battleshipgameplugin
+            birthdayreminderplugin
+            chessplugin
+            cleanerplugin
+            clientswitcherplugin
+            conferenceloggerplugin
+            contentdownloaderplugin
+            enummessagesplugin
+            extendedmenuplugin
+            extendedoptionsplugin
+            gomokugameplugin
+            historykeeperplugin
+            imageplugin
+            imagepreviewplugin
+            jabberdiskplugin
+            juickplugin
+            messagefilterplugin
+            openpgpplugin
+            otrplugin
+            pepchangenotifyplugin
+            qipxstatusesplugin
+            skinsplugin
+            stopspamplugin
+            storagenotesplugin
+            translateplugin
+            watcherplugin
+            videostatusplugin
+            noughtsandcrossesplugin
+            redirectorplugin
+          )
+          for plugin in "${expected[@]}"; do
+            if [[ ! -f "build/psi/plugins/lib${plugin}.so" ]]; then
+              echo "Missing plugin artifact: lib${plugin}.so" >&2
+              exit 1
+            fi
+          done
