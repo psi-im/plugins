@@ -12,6 +12,8 @@
 
 namespace {
 
+constexpr char PsiProtocolId[] = "prpl-jabber";
+
 QByteArray fileContents(FILE *file)
 {
     if (!file || std::fflush(file) != 0 || std::fseek(file, 0, SEEK_END) != 0)
@@ -81,7 +83,7 @@ void PersistenceInteropTest::cleanupTestCase()
 void PersistenceInteropTest::privateKeysRoundTripWithLibotr()
 {
     const QByteArray account("migration@example.net");
-    const QByteArray protocol(QcaOtr::LegacyPsiProtocolId);
+    const QByteArray protocol(PsiProtocolId);
 
     OtrlUserState original = otrl_userstate_create();
     QVERIFY(original);
@@ -123,7 +125,7 @@ void PersistenceInteropTest::fingerprintsRoundTripWithLibotr()
 {
     const QByteArray user("romeo@example.net");
     const QByteArray account("account-a");
-    const QByteArray protocol(QcaOtr::LegacyPsiProtocolId);
+    const QByteArray protocol(PsiProtocolId);
     const QByteArray fingerprint = QByteArray::fromHex("00112233445566778899aabbccddeeff00112233");
     const QByteArray trust("native-custom-trust");
     QByteArray mutableFingerprint = fingerprint;
@@ -200,7 +202,7 @@ void PersistenceInteropTest::fingerprintsRoundTripWithLibotr()
 void PersistenceInteropTest::instanceTagsRoundTripWithLibotr()
 {
     const QByteArray account("account-a");
-    const QByteArray protocol(QcaOtr::LegacyPsiProtocolId);
+    const QByteArray protocol(PsiProtocolId);
 
     QcaOtr::InstanceTagRecord nativeRecord;
     nativeRecord.account = account;
@@ -250,7 +252,7 @@ void PersistenceInteropTest::completeProfileMigrationWithLibotr()
     QVERIFY(nativeDir.isValid());
 
     const QByteArray account("psi-account-a");
-    const QByteArray protocol(QcaOtr::LegacyPsiProtocolId);
+    const QByteArray protocol(PsiProtocolId);
     const QByteArray peer("juliet@example.net");
     const QByteArray peerFingerprint = QByteArray::fromHex("102132435465768798a9bacbdcedfe0f10213243");
     const QByteArray trust("psi-user-verified");
