@@ -1,0 +1,11 @@
+if(NOT DEFINED PLUGIN_CMAKE OR NOT EXISTS "${PLUGIN_CMAKE}")
+    message(FATAL_ERROR "OTR plugin CMakeLists.txt not found: ${PLUGIN_CMAKE}")
+endif()
+
+file(READ "${PLUGIN_CMAKE}" plugin_cmake)
+foreach(forbidden IN ITEMS LIBOTR LIBGCRYPT LIBGPGERROR libotr libgcrypt libgpg-error)
+    string(FIND "${plugin_cmake}" "${forbidden}" position)
+    if(NOT position EQUAL -1)
+        message(FATAL_ERROR "Normal OTR plugin build still references forbidden runtime dependency: ${forbidden}")
+    endif()
+endforeach()
