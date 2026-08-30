@@ -3,7 +3,8 @@
 namespace QcaOtr::Negotiation {
 namespace {
 
-const QByteArray ErrorPrefix("?OTR Error:");
+const QByteArray ErrorTypePrefix("?OTR Error:");
+const QByteArray ErrorMessagePrefix("?OTR Error: ");
 const QByteArray BaseWhitespaceTag(" \t  \t\t\t\t \t \t \t  ");
 const QByteArray V1WhitespaceTag(" \t \t  \t ");
 const QByteArray V2WhitespaceTag("  \t\t  \t ");
@@ -108,7 +109,7 @@ quint8 queryBestVersion(const QByteArray &message,
 
 QByteArray errorMessage(const QByteArray &text)
 {
-    QByteArray message = ErrorPrefix;
+    QByteArray message = ErrorMessagePrefix;
     message.append(text);
     return message;
 }
@@ -119,13 +120,16 @@ bool parseErrorMessage(const QByteArray &message, QByteArray *text)
         text->clear();
 
     const int start = message.indexOf("?OTR");
-    if (start < 0 || message.size() - start < ErrorPrefix.size())
+    if (start < 0 || message.size() - start < ErrorTypePrefix.size())
         return false;
-    if (message.mid(start, ErrorPrefix.size()) != ErrorPrefix)
+    if (message.mid(start, ErrorTypePrefix.size()) != ErrorTypePrefix)
         return false;
 
+    int textStart = start + ErrorTypePrefix.size();
+    if (textStart < message.size() && message.at(textStart) == ' ')
+        ++textStart;
     if (text)
-        *text = message.mid(start + ErrorPrefix.size());
+        *text = message.mid(textStart);
     return true;
 }
 
