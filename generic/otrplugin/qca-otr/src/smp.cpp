@@ -30,27 +30,22 @@ QCA::BigInteger two()
     return QCA::BigInteger(2);
 }
 
-const QCA::BigInteger &modulus()
+QCA::BigInteger modulus()
 {
-    static const QCA::BigInteger value = dhModulus();
-    return value;
+    return dhModulus();
 }
 
-const QCA::BigInteger &generator()
+QCA::BigInteger generator()
 {
-    static const QCA::BigInteger value = dhGenerator();
-    return value;
+    return dhGenerator();
 }
 
-const QCA::BigInteger &order()
+QCA::BigInteger order()
 {
-    static const QCA::BigInteger value = [] {
-        QCA::BigInteger result(modulus());
-        result -= one();
-        result /= two();
-        return result;
-    }();
-    return value;
+    QCA::BigInteger result(modulus());
+    result -= one();
+    result /= two();
+    return result;
 }
 
 QCA::BigInteger positiveMod(const QCA::BigInteger &value, const QCA::BigInteger &modulusValue)
