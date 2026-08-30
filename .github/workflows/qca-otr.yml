@@ -8,64 +8,18 @@ on:
   push:
     branches:
       - master
-      - cleanup/otr-native
     paths:
-      - 'generic/otrplugin/src/otrinternal.cpp'
-      - 'generic/otrplugin/src/otrinternal.h'
+      - 'generic/otrplugin/qca-otr/**'
       - '.github/workflows/qca-otr.yml'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   QCA_VERSION: 3.0.5
 
 jobs:
-  license-native-adapter:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/cleanup/otr-native'
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout plugins
-        uses: actions/checkout@v4
-        with:
-          ref: cleanup/otr-native
-
-      - name: Add native adapter GPL SPDX headers
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-
-          for name in ('otrinternal.cpp', 'otrinternal.h'):
-              path = Path('generic/otrplugin/src') / name
-              text = path.read_text(encoding='utf-8')
-              if 'SPDX-License-Identifier:' in text[:500]:
-                  continue
-              marker = ' */\n'
-              pos = text.find(marker)
-              if not text.startswith('/*\n') or pos < 0:
-                  raise SystemExit(f'Unexpected header in {path}')
-              replacement = (' *\n'
-                             ' * SPDX-FileCopyrightText: 2026 Sergei Ilinykh\n'
-                             ' * SPDX-License-Identifier: GPL-2.0-or-later\n'
-                             ' */\n')
-              text = text[:pos] + replacement + text[pos + len(marker):]
-              path.write_text(text, encoding='utf-8')
-          PY
-
-          if git diff --quiet; then
-            echo 'No SPDX changes required.'
-            exit 0
-          fi
-
-          git config user.name 'Sergei Ilinykh'
-          git config user.email 'rion4ik@gmail.com'
-          git add generic/otrplugin/src/otrinternal.cpp generic/otrplugin/src/otrinternal.h
-          git commit -m 'License native OTR adapter glue'
-          git push origin HEAD:cleanup/otr-native
-
   test:
     name: Qt ${{ matrix.qt }} / Linux
     runs-on: ubuntu-24.04
