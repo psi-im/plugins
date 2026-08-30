@@ -8,6 +8,8 @@
 
 namespace {
 
+constexpr char TestProtocolId[] = "prpl-jabber";
+
 const char LibotrPrivateKey[] = R"KEY((privkeys
  (account
 (name otrtest3)
@@ -39,7 +41,6 @@ class PersistenceTest : public QObject
 private Q_SLOTS:
     void initTestCase();
     void cleanupTestCase();
-    void legacyProtocolId();
     void privateKeysParseAndRoundTrip();
     void fingerprintsParseAndRoundTrip();
     void instanceTagsParseAndRoundTrip();
@@ -58,11 +59,6 @@ void PersistenceTest::initTestCase()
 void PersistenceTest::cleanupTestCase()
 {
     delete initializer_;
-}
-
-void PersistenceTest::legacyProtocolId()
-{
-    QCOMPARE(QByteArray(QcaOtr::LegacyPsiProtocolId), QByteArray("prpl-jabber"));
 }
 
 void PersistenceTest::privateKeysParseAndRoundTrip()
@@ -179,14 +175,14 @@ void PersistenceTest::atomicFileRoundTrip()
     QcaOtr::FingerprintRecord fp;
     fp.username = "romeo@example.net";
     fp.account = "account-a";
-    fp.protocol = QcaOtr::LegacyPsiProtocolId;
+    fp.protocol = TestProtocolId;
     fp.fingerprint = QByteArray::fromHex("00112233445566778899aabbccddeeff00112233");
     fp.trust = "verified";
     const QList<QcaOtr::FingerprintRecord> fingerprints{fp};
 
     QcaOtr::InstanceTagRecord tag;
     tag.account = "account-a";
-    tag.protocol = QcaOtr::LegacyPsiProtocolId;
+    tag.protocol = TestProtocolId;
     tag.instanceTag = 0x12345678;
     const QList<QcaOtr::InstanceTagRecord> tags{tag};
 
