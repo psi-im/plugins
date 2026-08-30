@@ -646,7 +646,7 @@ void ControlInteropTest::protocolErrorsBothDirections()
     QVERIFY(libotr.capture.events.contains(OTRL_MSGEVENT_RCVDMSG_UNREADABLE) ||
             libotr.capture.events.contains(OTRL_MSGEVENT_RCVDMSG_MALFORMED));
     QCOMPARE(errors.size(), 1);
-    QVERIFY(errors.front().startsWith("?OTR Error:oracle error"));
+    QVERIFY(errors.front().startsWith("?OTR Error: oracle error"));
 
     const QcaOtr::SessionResult received = qca.processIncoming(errors.front());
     QCOMPARE(received.status, QcaOtr::SessionStatus::RemoteError);
