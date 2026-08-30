@@ -139,7 +139,7 @@ jobs:
           test -n "$(find qca-sdk/bin -type f -iname '*qca3-qt5*.dll' -print -quit)"
           plugin_path=$(find "$PWD/qca-sdk" -type d -path '*/qca3-qt5/crypto' -print -quit)
           test -n "$plugin_path"
-          echo "QCA_PLUGIN_PATH=$plugin_path" >> "$GITHUB_ENV"
+          echo "QCA_PLUGIN_PATH=$(cygpath -w "$plugin_path")" >> "$GITHUB_ENV"
 
       - name: Build and run qca-otr native tests
         shell: msys2 {0}
