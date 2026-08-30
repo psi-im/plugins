@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Sergei Ilinykh
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ */
+
 #include "htmlnormalizer.h"
 
 #include <QDomDocument>
@@ -20,7 +25,8 @@ QDomElement normalizedBody(QDomDocument &target, const QString &input)
 #if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
     const bool parsed = normalized.setContent(richText.toHtml());
 #else
-    const bool parsed = normalized.setContent(richText.toHtml(), QDomDocument::ParseOption::UseNamespaceProcessing);
+    const auto parseResult = normalized.setContent(richText.toHtml(), QDomDocument::ParseOption::UseNamespaceProcessing);
+    const bool parsed = static_cast<bool>(parseResult);
 #endif
     if (!parsed) {
         QDomElement body = target.createElementNS(QString::fromLatin1(XhtmlNamespace), QStringLiteral("body"));
