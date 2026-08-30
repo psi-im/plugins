@@ -182,4 +182,16 @@ if(QCA_OTR_BUILD_LIBOTR_INTEROP_TESTS)
             PkgConfig::GCRYPT
     )
     add_test(NAME qca-otr-control-interop COMMAND qca-otr-control-interop-test)
+
+    add_executable(qca-otr-smp-interop-test
+        smpinteroptest.cpp
+    )
+    target_link_libraries(qca-otr-smp-interop-test
+        PRIVATE
+            QcaOtr::QcaOtr
+            Qt${QT_DEFAULT_MAJOR_VERSION}::Test
+            PkgConfig::LIBOTR
+            PkgConfig::GCRYPT
+    )
+    add_test(NAME qca-otr-smp-interop COMMAND qca-otr-smp-interop-test)
 endif()
