@@ -34,7 +34,15 @@ namespace psiotr {
 
 enum OtrPolicy { OTR_POLICY_OFF, OTR_POLICY_ENABLED, OTR_POLICY_AUTO, OTR_POLICY_REQUIRE };
 
-enum OtrMessageType { OTR_MESSAGETYPE_NONE, OTR_MESSAGETYPE_IGNORE, OTR_MESSAGETYPE_OTR };
+/** Result of processing an incoming message through the OTR backend. */
+enum OtrMessageType {
+    /** Message is ordinary plaintext and should continue through Psi unchanged. */
+    OTR_MESSAGETYPE_NONE,
+    /** Message is OTR protocol/control traffic and must not be shown to the user. */
+    OTR_MESSAGETYPE_IGNORE,
+    /** Message contained authenticated OTR application plaintext in @c decrypted. */
+    OTR_MESSAGETYPE_OTR
+};
 
 enum OtrMessageState {
     OTR_MESSAGESTATE_UNKNOWN,
@@ -43,6 +51,7 @@ enum OtrMessageState {
     OTR_MESSAGESTATE_FINISHED
 };
 
+/** Conversation-state changes reported by the backend to the Psi UI. */
 enum OtrStateChange {
     OTR_STATECHANGE_GOINGSECURE,
     OTR_STATECHANGE_GONESECURE,
@@ -90,8 +99,13 @@ public:
     /** Reports SMP progress; negative values denote abort/error states. */
     virtual void updateSMP(const QString &account, const QString &contact, int progress) = 0;
 
+    /** Returns a user-facing label for an account, falling back to its internal id. */
     virtual QString humanAccount(const QString &accountId) = 0;
+
+    /** Returns the public XMPP address/JID associated with an account id. */
     virtual QString humanAccountPublic(const QString &accountId) = 0;
+
+    /** Returns a user-facing contact name for the given account/contact pair. */
     virtual QString humanContact(const QString &accountId, const QString &contact) = 0;
 };
 
@@ -99,9 +113,13 @@ public:
 struct Fingerprint {
     /** Raw 20-byte OTR fingerprint. */
     QByteArray value;
+    /** Psi account that owns the local side of this trust record. */
     QString account;
+    /** Remote OTR identity/JID to which the fingerprint belongs. */
     QString username;
+    /** Human-readable hexadecimal representation used by the UI. */
     QString fingerprintHuman;
+    /** Persisted libotr-compatible trust string; empty means unverified. */
     QString trust;
 
     Fingerprint() = default;
@@ -119,6 +137,10 @@ struct Fingerprint {
  */
 class OtrMessaging {
 public:
+    /**
+     * Creates the facade with the default @p policy.
+     * @p callback is non-owning and must outlive this OtrMessaging instance.
+     */
     OtrMessaging(OtrCallback *callback, OtrPolicy policy);
     OtrMessaging(const OtrMessaging &) = delete;
     OtrMessaging &operator=(const OtrMessaging &) = delete;
@@ -151,7 +173,7 @@ public:
     /** Removes the local OTR identity for @p account. */
     void deleteKey(const QString &account);
 
-    /** Regenerates the local OTR identity for @p account. */
+    /** Regenerates the local OTR identity synchronously before returning. */
     void generateKey(const QString &account);
 
     /** Starts an explicit OTR negotiation with @p contact. */
@@ -196,9 +218,16 @@ public:
     /** Returns the currently configured default OTR policy. */
     OtrPolicy getPolicy();
 
+    /** Forwards an OTR system message to the application callback/UI. */
     bool displayOtrMessage(const QString &account, const QString &contact, const QString &message);
+
+    /** Forwards a native backend state change to the application callback/UI. */
     void stateChange(const QString &account, const QString &contact, OtrStateChange change);
+
+    /** Returns the application's user-facing label for @p accountId. */
     QString humanAccount(const QString &accountId);
+
+    /** Returns the application's user-facing name for @p contact. */
     QString humanContact(const QString &accountId, const QString &contact);
 
 private:
