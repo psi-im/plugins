@@ -50,10 +50,6 @@ public:
     bool isVerified(const QString &account, const QString &contact);
     bool smpSucceeded(const QString &account, const QString &contact);
 
-    // Temporary compatibility surface for the existing UI value type. The
-    // underlying fingerprint bytes are native qca-otr data, not libotr memory.
-    static QString humanFingerprint(const unsigned char *fingerprint);
-
 private:
     struct Conversation;
 
