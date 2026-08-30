@@ -1,6 +1,7 @@
 #include "qca-otr/profile.h"
 
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 
 namespace QcaOtr::Persistence {
@@ -17,6 +18,55 @@ bool readOptionalStore(const QString &path, QList<Record> *records, Reader reade
     return reader(path, records, error);
 }
 
+template<typename Record, typename Parser>
+bool readTolerantLineStore(const QString &path, QList<Record> *records, Parser parser, QString *error)
+{
+    if (!records)
+        return false;
+    records->clear();
+    if (!QFileInfo::exists(path))
+        return true;
+
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)) {
+        if (error)
+            *error = file.errorString();
+        return false;
+    }
+    const QByteArray data = file.readAll();
+    if (file.error() != QFileDevice::NoError) {
+        if (error)
+            *error = file.errorString();
+        return false;
+    }
+
+    // libotr deliberately treats fingerprints and instance-tag files as
+    // line-oriented best-effort stores: malformed records are skipped while
+    // valid records around them remain usable. Preserve that migration
+    // behavior at the profile boundary without weakening the strict codecs.
+    const QList<QByteArray> lines = data.split('\n');
+    for (QByteArray line : lines) {
+        if (line.isEmpty())
+            continue;
+        line.append('\n');
+        QList<Record> parsed;
+        QString ignoredError;
+        if (parser(line, &parsed, &ignoredError))
+            records->append(parsed);
+    }
+    return true;
+}
+
+bool readProfileFingerprints(const QString &path, QList<FingerprintRecord> *records, QString *error)
+{
+    return readTolerantLineStore(path, records, parseFingerprints, error);
+}
+
+bool readProfileInstanceTags(const QString &path, QList<InstanceTagRecord> *records, QString *error)
+{
+    return readTolerantLineStore(path, records, parseInstanceTags, error);
+}
+
 } // namespace
 
 bool loadProfile(const QString &directory, ProfileData *profile, QString *error)
@@ -29,8 +79,8 @@ bool loadProfile(const QString &directory, ProfileData *profile, QString *error)
     const QDir dir(directory);
     ProfileData loaded;
     if (!readOptionalStore(dir.filePath(OtrKeysFileName), &loaded.privateKeys, readPrivateKeysFile, error) ||
-        !readOptionalStore(dir.filePath(OtrFingerprintsFileName), &loaded.fingerprints, readFingerprintsFile, error) ||
-        !readOptionalStore(dir.filePath(OtrInstanceTagsFileName), &loaded.instanceTags, readInstanceTagsFile, error)) {
+        !readProfileFingerprints(dir.filePath(OtrFingerprintsFileName), &loaded.fingerprints, error) ||
+        !readProfileInstanceTags(dir.filePath(OtrInstanceTagsFileName), &loaded.instanceTags, error)) {
         return false;
     }
 
