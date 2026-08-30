@@ -41,16 +41,22 @@ Exit criterion: start/disconnect/error and encrypted TLV traffic round-trip with
 libotr 4.1.1 through its public message APIs. This is covered by the Qt5 and Qt6
 CI matrix without linking libotr into the qca-otr runtime library.
 
-## 3. SMP
+## 3. SMP — completed
 
-- OTRv3 SMP state machine
-- initiation with and without a question
-- response, progress and expected-message tracking
-- success, failure, abort, cheating/unexpected-message handling
-- SMP TLVs over the normal encrypted Data Message path
-- bidirectional libotr 4.1.1 interoperability
+- standalone OTRv3 Socialist Millionaires' Protocol state machine and zero-knowledge proofs
+- libotr-compatible group-5 MPI serialization and SHA-256 proof hashing
+- exact combined-secret derivation from initiator/responder fingerprints, secure session id
+  and the user-entered secret, with secret material retained in `QCA::SecureArray`
+- initiation with and without a question, response and progress/event tracking
+- success, failure, abort, cheating and unexpected/malformed-message handling
+- SMP TLVs 2-7 transported through the normal encrypted Data Message ratchet
+- independent SMP state for every routed remote OTRv3 instance
+- public libotr 4.1.1 interoperability in both directions for matching secrets,
+  mismatching secrets, question/answer flow and abort
 
-Exit criterion: qca-otr and libotr agree on every SMP outcome and event sequence.
+Exit criterion: qca-otr and libotr 4.1.1 agree on SMP proofs, outcomes and public
+SMP event flow in both directions. The same oracle suite passes in the Qt5 and
+Qt6 CI matrix without adding libotr to the qca-otr runtime dependency set.
 
 ## 4. Persistence and migration
 
@@ -68,7 +74,8 @@ where the file format is intended to remain compatible.
 
 ## 5. Complete `OtrSession` and Psi adapter
 
-- extend the routed `OtrSession` with SMP and the remaining adapter-facing state
+- complete the remaining adapter-facing identity/trust/state surface on top of
+  the routed negotiation, control and SMP session core
 - final API: `start`, `processIncoming`, `sendMessage`, `disconnect`, `startSmp`,
   `respondSmp`, `abortSmp`
 - expose peer identity/fingerprint/trust and per-instance secure state

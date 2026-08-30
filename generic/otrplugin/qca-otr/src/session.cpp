@@ -2,6 +2,7 @@
 
 #include "qca-otr/data.h"
 #include "qca-otr/negotiation.h"
+#include "qca-otr/smp.h"
 #include "qca-otr/transport.h"
 
 #include <map>
@@ -78,6 +79,16 @@ bool containsTlv(const QVector<Tlv> &tlvs, TlvType type)
     return false;
 }
 
+const Tlv *findTlv(const QVector<Tlv> &tlvs, TlvType type)
+{
+    const quint16 wanted = static_cast<quint16>(type);
+    for (const Tlv &tlv : tlvs) {
+        if (tlv.type == wanted)
+            return &tlv;
+    }
+    return nullptr;
+}
+
 bool parseSymmetricKeyTlv(const QVector<Tlv> &tlvs, quint32 *use, QByteArray *useData)
 {
     if (use)
@@ -104,6 +115,11 @@ bool parseSymmetricKeyTlv(const QVector<Tlv> &tlvs, quint32 *use, QByteArray *us
     return false;
 }
 
+SmpEvent finalSmpEvent(SmpProgress progress)
+{
+    return progress == SmpProgress::Succeeded ? SmpEvent::Success : SmpEvent::Failure;
+}
+
 } // namespace
 
 struct OtrSession::Private
@@ -127,6 +143,7 @@ struct OtrSession::Private
         AkeSession ake;
         std::unique_ptr<DataSession> data;
         AkeEstablishedSession established;
+        SmpSession smp;
         bool hasEstablished = false;
         PeerState state = PeerState::Plaintext;
     };
@@ -183,6 +200,7 @@ struct OtrSession::Private
         peer->ake.reset();
         peer->data.reset();
         peer->established = AkeEstablishedSession();
+        peer->smp.reset();
         peer->hasEstablished = false;
         peer->state = state;
     }
@@ -224,6 +242,31 @@ struct OtrSession::Private
                 return entry.first;
         }
         return 0;
+    }
+
+    QCA::SecureArray combinedSmpSecret(const PeerContext *peer,
+                                       const QCA::SecureArray &secret,
+                                       bool initiating) const
+    {
+        if (!peer || !peer->hasEstablished || peer->established.sessionId.isEmpty())
+            return {};
+
+        const QByteArray ourFingerprint = dsaPublicKeyFingerprint(dsaPublicKey(identityKey));
+        const QByteArray peerFingerprint = peer->established.peerFingerprint;
+        if (ourFingerprint.size() != 20 || peerFingerprint.size() != 20)
+            return {};
+
+        QCA::SecureArray combined(1, static_cast<char>(0x01));
+        if (initiating) {
+            combined.append(QCA::SecureArray(ourFingerprint));
+            combined.append(QCA::SecureArray(peerFingerprint));
+        } else {
+            combined.append(QCA::SecureArray(peerFingerprint));
+            combined.append(QCA::SecureArray(ourFingerprint));
+        }
+        combined.append(QCA::SecureArray(peer->established.sessionId));
+        combined.append(secret);
+        return sha256Secure(combined);
     }
 
     void clearPendingRequired()
@@ -540,6 +583,7 @@ SessionResult OtrSession::processIncoming(const QByteArray &transportMessage, in
             peer->established = peer->ake.established();
             peer->hasEstablished = true;
             peer->data = std::move(data);
+            peer->smp.reset();
             peer->state = PeerState::Encrypted;
             d->activePeerInstance = route.senderInstance;
             routed.status = SessionStatus::Authenticated;
@@ -617,10 +661,102 @@ SessionResult OtrSession::processIncoming(const QByteArray &transportMessage, in
                 routed.symmetricKey = dataResult.extraKey;
             }
 
+            auto handleInvalidSmp = [&]() {
+                routed.smpEvent = SmpEvent::Cheated;
+                routed.smpProgress = 0;
+                peer->smp.reset();
+            };
+            auto handleUnexpectedSmp = [&]() {
+                routed.smpEvent = SmpEvent::Error;
+                routed.smpProgress = 0;
+            };
+            auto sendSmpReply = [&](TlvType replyType, const QByteArray &payload) {
+                QVector<Tlv> tlvs;
+                tlvs.append(Tlv {static_cast<quint16>(replyType), payload});
+                QVector<QByteArray> messages;
+                if (!sendMessage(route.senderInstance,
+                                 QByteArray(),
+                                 tlvs,
+                                 &messages,
+                                 maxMessageSize,
+                                 DataFlagIgnoreUnreadable)) {
+                    routed.status = SessionStatus::Error;
+                    routed.smpEvent = SmpEvent::Error;
+                    routed.smpProgress = 0;
+                    return false;
+                }
+                routed.outgoingMessages += messages;
+                return true;
+            };
+
+            if (const Tlv *tlv = findTlv(dataResult.tlvs, TlvType::Smp1Question)) {
+                const int separator = tlv->value.indexOf('\0');
+                if (separator < 0) {
+                    handleInvalidSmp();
+                } else {
+                    const SmpStepResult step = peer->smp.receiveMessage1(tlv->value.mid(separator + 1), true);
+                    if (step.status == SmpStepStatus::Ok) {
+                        routed.smpEvent = SmpEvent::AskForAnswer;
+                        routed.smpProgress = 25;
+                        routed.smpQuestion = tlv->value.left(separator);
+                    } else if (step.status == SmpStepStatus::Invalid) {
+                        handleInvalidSmp();
+                    } else {
+                        handleUnexpectedSmp();
+                    }
+                }
+            } else if (const Tlv *tlv = findTlv(dataResult.tlvs, TlvType::Smp1)) {
+                const SmpStepResult step = peer->smp.receiveMessage1(tlv->value, false);
+                if (step.status == SmpStepStatus::Ok) {
+                    routed.smpEvent = SmpEvent::AskForSecret;
+                    routed.smpProgress = 25;
+                } else if (step.status == SmpStepStatus::Invalid) {
+                    handleInvalidSmp();
+                } else {
+                    handleUnexpectedSmp();
+                }
+            } else if (const Tlv *tlv = findTlv(dataResult.tlvs, TlvType::Smp2)) {
+                const SmpStepResult step = peer->smp.receiveMessage2(tlv->value);
+                if (step.status == SmpStepStatus::Ok) {
+                    routed.smpEvent = SmpEvent::InProgress;
+                    routed.smpProgress = 60;
+                    sendSmpReply(TlvType::Smp3, step.outgoing);
+                } else if (step.status == SmpStepStatus::Invalid) {
+                    handleInvalidSmp();
+                } else {
+                    handleUnexpectedSmp();
+                }
+            } else if (const Tlv *tlv = findTlv(dataResult.tlvs, TlvType::Smp3)) {
+                const SmpStepResult step = peer->smp.receiveMessage3(tlv->value);
+                if (step.status == SmpStepStatus::Ok) {
+                    routed.smpEvent = finalSmpEvent(step.progress);
+                    routed.smpProgress = 100;
+                    sendSmpReply(TlvType::Smp4, step.outgoing);
+                } else if (step.status == SmpStepStatus::Invalid) {
+                    handleInvalidSmp();
+                } else {
+                    handleUnexpectedSmp();
+                }
+            } else if (const Tlv *tlv = findTlv(dataResult.tlvs, TlvType::Smp4)) {
+                const SmpStepResult step = peer->smp.receiveMessage4(tlv->value);
+                if (step.status == SmpStepStatus::Ok) {
+                    routed.smpEvent = finalSmpEvent(step.progress);
+                    routed.smpProgress = 100;
+                } else if (step.status == SmpStepStatus::Invalid) {
+                    handleInvalidSmp();
+                } else {
+                    handleUnexpectedSmp();
+                }
+            } else if (findTlv(dataResult.tlvs, TlvType::SmpAbort)) {
+                peer->smp.abort();
+                routed.smpEvent = SmpEvent::Abort;
+                routed.smpProgress = 0;
+            }
+
             if (containsTlv(dataResult.tlvs, TlvType::Disconnected)) {
                 d->forcePeerState(peer, PeerState::Finished);
                 routed.status = SessionStatus::Disconnected;
-            } else {
+            } else if (routed.status != SessionStatus::Error) {
                 routed.status = SessionStatus::Message;
             }
             break;
@@ -747,6 +883,132 @@ bool OtrSession::sendSymmetricKey(quint32 peerInstance,
 
     *symmetricKey = extraKey;
     return true;
+}
+
+bool OtrSession::startSmp(quint32 peerInstance,
+                          const QCA::SecureArray &secret,
+                          QVector<QByteArray> *transportMessages,
+                          int maxMessageSize)
+{
+    return startSmp(peerInstance, QByteArray(), secret, transportMessages, maxMessageSize);
+}
+
+bool OtrSession::startSmp(quint32 peerInstance,
+                          const QByteArray &question,
+                          const QCA::SecureArray &secret,
+                          QVector<QByteArray> *transportMessages,
+                          int maxMessageSize)
+{
+    if (!transportMessages)
+        return false;
+    transportMessages->clear();
+
+    const quint32 selectedPeer = d->preferredEncryptedPeer(peerInstance);
+    Private::PeerContext *peer = d->findPeer(selectedPeer);
+    if (!peer)
+        return false;
+
+    const QCA::SecureArray combined = d->combinedSmpSecret(peer, secret, true);
+    if (combined.size() != 32)
+        return false;
+
+    const SmpStepResult step = peer->smp.initiate(combined);
+    if (step.status != SmpStepStatus::Ok) {
+        peer->smp.reset();
+        return false;
+    }
+
+    TlvType type = TlvType::Smp1;
+    QByteArray value = step.outgoing;
+    if (!question.isNull()) {
+        QByteArray wireQuestion = question;
+        const int embeddedNul = wireQuestion.indexOf('\0');
+        if (embeddedNul >= 0)
+            wireQuestion.truncate(embeddedNul);
+        if (wireQuestion.size() + 1 + value.size() > 65535) {
+            peer->smp.reset();
+            return false;
+        }
+        wireQuestion.append('\0');
+        wireQuestion.append(value);
+        value = wireQuestion;
+        type = TlvType::Smp1Question;
+    }
+
+    QVector<Tlv> tlvs;
+    tlvs.append(Tlv {static_cast<quint16>(type), value});
+    if (!sendMessage(selectedPeer,
+                     QByteArray(),
+                     tlvs,
+                     transportMessages,
+                     maxMessageSize,
+                     DataFlagIgnoreUnreadable)) {
+        peer->smp.reset();
+        return false;
+    }
+    return true;
+}
+
+bool OtrSession::respondSmp(quint32 peerInstance,
+                            const QCA::SecureArray &secret,
+                            QVector<QByteArray> *transportMessages,
+                            int maxMessageSize)
+{
+    if (!transportMessages)
+        return false;
+    transportMessages->clear();
+
+    const quint32 selectedPeer = d->preferredEncryptedPeer(peerInstance);
+    Private::PeerContext *peer = d->findPeer(selectedPeer);
+    if (!peer || !peer->smp.awaitingSecret())
+        return false;
+
+    const QCA::SecureArray combined = d->combinedSmpSecret(peer, secret, false);
+    if (combined.size() != 32)
+        return false;
+
+    const SmpStepResult step = peer->smp.respond(combined);
+    if (step.status != SmpStepStatus::Ok) {
+        peer->smp.reset();
+        return false;
+    }
+
+    QVector<Tlv> tlvs;
+    tlvs.append(Tlv {static_cast<quint16>(TlvType::Smp2), step.outgoing});
+    if (!sendMessage(selectedPeer,
+                     QByteArray(),
+                     tlvs,
+                     transportMessages,
+                     maxMessageSize,
+                     DataFlagIgnoreUnreadable)) {
+        peer->smp.reset();
+        return false;
+    }
+    return true;
+}
+
+bool OtrSession::abortSmp(quint32 peerInstance,
+                          QVector<QByteArray> *transportMessages,
+                          int maxMessageSize)
+{
+    if (!transportMessages)
+        return false;
+    transportMessages->clear();
+
+    const quint32 selectedPeer = d->preferredEncryptedPeer(peerInstance);
+    Private::PeerContext *peer = d->findPeer(selectedPeer);
+    if (!peer)
+        return false;
+
+    peer->smp.abort();
+    QVector<Tlv> tlvs;
+    tlvs.append(Tlv {static_cast<quint16>(TlvType::SmpAbort), QByteArray()});
+    return sendMessage(selectedPeer,
+                       QByteArray(),
+                       tlvs,
+                       transportMessages,
+                       maxMessageSize,
+                       DataFlagIgnoreUnreadable);
 }
 
 PeerState OtrSession::peerState(quint32 peerInstance) const

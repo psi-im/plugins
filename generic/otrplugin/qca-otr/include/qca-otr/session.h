@@ -41,6 +41,18 @@ enum class SessionStatus {
     Error
 };
 
+enum class SmpEvent {
+    None,
+    Error,
+    Abort,
+    Cheated,
+    AskForAnswer,
+    AskForSecret,
+    InProgress,
+    Success,
+    Failure
+};
+
 struct SessionResult
 {
     SessionStatus status = SessionStatus::Ignored;
@@ -55,6 +67,10 @@ struct SessionResult
     quint32 symmetricKeyUse = 0;
     QByteArray symmetricKeyData;
     QCA::SecureArray symmetricKey;
+
+    SmpEvent smpEvent = SmpEvent::None;
+    quint16 smpProgress = 0;
+    QByteArray smpQuestion;
 
     QVector<QByteArray> outgoingMessages;
 };
@@ -149,6 +165,27 @@ public:
                           QCA::SecureArray *symmetricKey,
                           QVector<QByteArray> *transportMessages,
                           int maxMessageSize = 0);
+
+    // SMP APIs take the user-entered secret. The libotr-compatible combined
+    // secret is derived internally from the ordered fingerprints and secure
+    // session id, so the application never has to handle that protocol detail.
+    // peerInstance == 0 selects the current encrypted child when possible.
+    bool startSmp(quint32 peerInstance,
+                  const QCA::SecureArray &secret,
+                  QVector<QByteArray> *transportMessages,
+                  int maxMessageSize = 0);
+    bool startSmp(quint32 peerInstance,
+                  const QByteArray &question,
+                  const QCA::SecureArray &secret,
+                  QVector<QByteArray> *transportMessages,
+                  int maxMessageSize = 0);
+    bool respondSmp(quint32 peerInstance,
+                    const QCA::SecureArray &secret,
+                    QVector<QByteArray> *transportMessages,
+                    int maxMessageSize = 0);
+    bool abortSmp(quint32 peerInstance,
+                  QVector<QByteArray> *transportMessages,
+                  int maxMessageSize = 0);
 
     PeerState peerState(quint32 peerInstance) const;
     bool isEncrypted(quint32 peerInstance) const;
