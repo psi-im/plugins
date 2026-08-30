@@ -1,24 +1,5 @@
-/*
- * htmltidy.h - Normalize rich text with Qt
- */
+#pragma once
 
-#ifndef HTMLTIDY_H_
-#define HTMLTIDY_H_
+#include "htmlnormalizer.h"
 
-#include <QString>
-
-class QDomDocument;
-class QDomElement;
-
-class HtmlTidy {
-public:
-    explicit HtmlTidy(QString html);
-
-    QString output() const;
-    QDomElement output(QDomDocument &document) const;
-
-private:
-    QString m_input;
-};
-
-#endif
+using HtmlTidy = HtmlNormalizer;

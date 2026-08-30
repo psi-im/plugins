@@ -1,8 +1,4 @@
-/*
- * htmltidy.cpp - Normalize rich text with Qt
- */
-
-#include "htmltidy.h"
+#include "htmlnormalizer.h"
 
 #include <QDomDocument>
 #include <QDomElement>
@@ -22,10 +18,11 @@ QDomElement normalizedBody(QDomDocument &target, const QString &input)
 
     QDomDocument normalized;
 #if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
-    if (!normalized.setContent(richText.toHtml())) {
+    const bool parsed = normalized.setContent(richText.toHtml());
 #else
-    if (!normalized.setContent(richText.toHtml())) {
+    const bool parsed = normalized.setContent(richText.toHtml(), QDomDocument::ParseOption::UseNamespaceProcessing);
 #endif
+    if (!parsed) {
         QDomElement body = target.createElementNS(QString::fromLatin1(XhtmlNamespace), QStringLiteral("body"));
         body.appendChild(target.createTextNode(richText.toPlainText()));
         return body;
@@ -33,6 +30,11 @@ QDomElement normalizedBody(QDomDocument &target, const QString &input)
 
     const QDomElement sourceBody = normalized.documentElement().firstChildElement(QStringLiteral("body"));
     QDomElement body = target.createElementNS(QString::fromLatin1(XhtmlNamespace), QStringLiteral("body"));
+    if (sourceBody.isNull()) {
+        body.appendChild(target.createTextNode(richText.toPlainText()));
+        return body;
+    }
+
     for (QDomNode node = sourceBody.firstChild(); !node.isNull(); node = node.nextSibling())
         body.appendChild(target.importNode(node, true));
     return body;
@@ -40,19 +42,19 @@ QDomElement normalizedBody(QDomDocument &target, const QString &input)
 
 } // namespace
 
-HtmlTidy::HtmlTidy(QString html) : m_input(std::move(html)) { }
+HtmlNormalizer::HtmlNormalizer(QString html) : input_(std::move(html)) { }
 
-QString HtmlTidy::output() const
+QString HtmlNormalizer::output() const
 {
     QDomDocument document;
-    const QDomElement body = normalizedBody(document, m_input);
+    const QDomElement body = normalizedBody(document, input_);
     QString result;
     QTextStream stream(&result);
     body.save(stream, 0);
     return result;
 }
 
-QDomElement HtmlTidy::output(QDomDocument &document) const
+QDomElement HtmlNormalizer::output(QDomDocument &document) const
 {
-    return normalizedBody(document, m_input);
+    return normalizedBody(document, input_);
 }
