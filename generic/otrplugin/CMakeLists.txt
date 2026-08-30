@@ -47,22 +47,8 @@ elseif(NOT DEFINED QT_DEFAULT_MAJOR_VERSION)
     set(QT_DEFAULT_MAJOR_VERSION 5)
 endif()
 
-if(WIN32 AND NOT LIBTIDY_ROOT)
-    set(LIBTIDY_ROOT "C:\\build\\psisdk\\libtidy\\i386" CACHE STRING "Path to libtidy library")
-endif()
-
-find_package(LIBTIDY REQUIRED)
-add_definitions(${LIBTIDY_DEFINITIONS})
-
-# dirty hack for windows
-if(WIN32)
-    set(TIDY_INCLUDES ${LIBTIDY_INCLUDE_DIR}/..)
-endif()
-
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${LIBTIDY_INCLUDE_DIR}
-    ${TIDY_INCLUDES}
     ${PLUGINS_ROOT_DIR}/include
     ${CMAKE_CURRENT_LIST_DIR}
     ${CMAKE_CURRENT_LIST_DIR}/src
@@ -74,7 +60,7 @@ set(_HDRS
     src/otrinternal.h
     src/psiotrconfig.h
     src/psiotrclosure.h
-    src/htmltidy.h
+    src/htmlnormalizer.h
 )
 set(_SRCS
     src/psiotrplugin.cpp
@@ -82,7 +68,7 @@ set(_SRCS
     src/otrinternal.cpp
     src/psiotrconfig.cpp
     src/psiotrclosure.cpp
-    src/htmltidy.cpp
+    src/htmlnormalizer.cpp
 )
 set(_RSCS ${PLUGIN}.qrc)
 
@@ -115,7 +101,6 @@ target_link_libraries(
     ${PLUGIN}
     ${QT_DEPLIBS}
     QcaOtr::QcaOtr
-    ${LIBTIDY_LIBRARY}
 )
 
 install(

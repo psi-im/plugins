@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Sergei Ilinykh
+ * SPDX-License-Identifier: MIT
+ */
+
 #pragma once
 
 // libotr 4.1.1's message.h is not self-contained: it relies on protocol

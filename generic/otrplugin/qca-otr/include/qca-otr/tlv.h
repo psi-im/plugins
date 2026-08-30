@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Sergei Ilinykh
+ * SPDX-License-Identifier: MIT
+ */
+
 #pragma once
 
 #include <QByteArray>
@@ -6,6 +11,7 @@
 
 namespace QcaOtr {
 
+/** Standard OTRv3 TLV type numbers. */
 enum class TlvType : quint16 {
     Padding = 0x0000,
     Disconnected = 0x0001,
@@ -18,13 +24,17 @@ enum class TlvType : quint16 {
     SymmetricKey = 0x0008
 };
 
+/** One OTR TLV record. Unknown type numbers are preserved verbatim. */
 struct Tlv
 {
     quint16 type = 0;
     QByteArray value;
 };
 
+/** Encodes TLVs consecutively using the OTR type/length/value representation. */
 QByteArray encodeTlvs(const QVector<Tlv> &tlvs, bool *ok = nullptr);
+
+/** Decodes a complete TLV byte sequence; malformed/truncated input fails. */
 bool decodeTlvs(const QByteArray &encoded, QVector<Tlv> *tlvs);
 
 } // namespace QcaOtr

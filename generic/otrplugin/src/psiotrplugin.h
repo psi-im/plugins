@@ -21,7 +21,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
  */
 
 #ifndef PSIOTRPLUGIN_H_
@@ -66,8 +65,6 @@ namespace psiotr {
 
 class PsiOtrClosure;
 
-//-----------------------------------------------------------------------------
-
 class PsiOtrPlugin : public QObject,
                      public PsiPlugin,
                      public PluginInfoProvider,
@@ -94,95 +91,93 @@ public:
     ~PsiOtrPlugin();
 
     // PsiPlugin
-    virtual QString  name() const;
-    virtual QWidget *options();
-    virtual bool     enable();
-    virtual bool     disable();
-    virtual void     applyOptions();
-    virtual void     restoreOptions();
+    QString name() const override;
+    QWidget *options() override;
+    bool enable() override;
+    bool disable() override;
+    void applyOptions() override;
+    void restoreOptions() override;
 
     // PluginInfoProvider
-    virtual QString pluginInfo();
+    QString pluginInfo() override;
 
     // EventCreator
-    virtual void setEventCreatingHost(EventCreatingHost *host);
+    void setEventCreatingHost(EventCreatingHost *host) override;
 
     // OptionAccessor
-    virtual void setOptionAccessingHost(OptionAccessingHost *host);
-    virtual void optionChanged(const QString &option);
+    void setOptionAccessingHost(OptionAccessingHost *host) override;
+    void optionChanged(const QString &option) override;
 
     // StanzaSender
-    virtual void setStanzaSendingHost(StanzaSendingHost *host);
+    void setStanzaSendingHost(StanzaSendingHost *host) override;
 
     // ApplicationInfoAccessor
-    virtual void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
+    void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) override;
 
     // PsiAccountController
-    virtual void setPsiAccountControllingHost(PsiAccountControllingHost *host);
+    void setPsiAccountControllingHost(PsiAccountControllingHost *host) override;
 
     // StanzaFilter
-    virtual bool incomingStanza(int accountIndex, const QDomElement &xml);
-    virtual bool outgoingStanza(int accountIndex, QDomElement &xml);
+    bool incomingStanza(int accountIndex, const QDomElement &xml) override;
+    bool outgoingStanza(int accountIndex, QDomElement &xml) override;
 
     // ToolbarIconAccessor
-    virtual QList<QVariantHash> getButtonParam();
-    virtual QAction            *getAction(QObject *parent, int accountIndex, const QString &contact);
+    QList<QVariantHash> getButtonParam() override;
+    QAction *getAction(QObject *parent, int accountIndex, const QString &contact) override;
 
     // AccountInfoAccessor
-    virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
+    void setAccountInfoAccessingHost(AccountInfoAccessingHost *host) override;
 
     // ContactInfoAccessor
-    virtual void setContactInfoAccessingHost(ContactInfoAccessingHost *host);
+    void setContactInfoAccessingHost(ContactInfoAccessingHost *host) override;
 
-    // IconFactoryAccessingHost
-    virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
+    // IconFactoryAccessor
+    void setIconFactoryAccessingHost(IconFactoryAccessingHost *host) override;
 
     // EncryptionMethodAccessor
     void setEncryptionMethodAccessingHost(EncryptionMethodAccessingHost *host) override;
 
-    // New encryption provider implementation helpers.
+    // Native EncryptionMethodProvider helpers
+    /**
+     * Applies native OTR processing to an incoming message DOM in place.
+     * Protocol-only messages clear @p message; decrypted application messages
+     * replace body/XHTML content and receive an EME marker when needed.
+     */
     bool decryptMessageElement(int account, QDomElement &message, const QString &contact = QString());
+
+    /**
+     * Encrypts the message body for a resource-bound OTR conversation in place.
+     * On encryption failure @p message is cleared so the caller cannot send the
+     * original plaintext accidentally.
+     */
     bool encryptMessageElement(int account, QDomElement &message, const QString &contact = QString());
 
     // OtrCallback
-    virtual QString dataDir();
-    virtual void    sendMessage(const QString &account, const QString &contact, const QString &message);
-    virtual bool    isLoggedIn(const QString &account, const QString &contact);
-    virtual void    notifyUser(const QString &account, const QString &contact, const QString &message,
-                               const OtrNotifyType &type);
+    QString dataDir() override;
+    void sendMessage(const QString &account, const QString &contact, const QString &message) override;
+    void notifyUser(const QString &account,
+                    const QString &contact,
+                    const QString &message,
+                    const OtrNotifyType &type) override;
+    bool displayOtrMessage(const QString &account, const QString &contact, const QString &message) override;
+    void stateChange(const QString &account, const QString &contact, OtrStateChange change) override;
+    void receivedSMP(const QString &account, const QString &contact, const QString &question) override;
+    void updateSMP(const QString &account, const QString &contact, int progress) override;
+    QString humanAccount(const QString &accountId) override;
+    QString humanAccountPublic(const QString &accountId) override;
+    QString humanContact(const QString &accountId, const QString &contact) override;
 
-    virtual bool displayOtrMessage(const QString &account, const QString &contact, const QString &message);
-    virtual void stateChange(const QString &account, const QString &contact, OtrStateChange change);
-
-    virtual void receivedSMP(const QString &account, const QString &contact, const QString &question);
-    virtual void updateSMP(const QString &account, const QString &contact, int progress);
-
-    virtual void stopMessages();
-    virtual void startMessages();
-
-    virtual QString humanAccount(const QString &accountId);
-    virtual QString humanAccountPublic(const QString &accountId);
-    virtual QString humanContact(const QString &accountId, const QString &contact);
-
-    /**
-     * Displays a rich text system message for (account, contact)
-     */
+    // Plugin helpers
+    /** Displays a rich-text system message for the given account/contact pair. */
     bool appendSysMsg(const QString &account, const QString &contact, const QString &message, const QString &icon = "");
 
-    // Helper methods
-    /**
-     * Returns the index of the account identified by accountId or -1
-     */
+    /** Returns the Psi account index for @p accountId, or -1 when it is unknown. */
     int getAccountIndexById(const QString &accountId);
 
-    /**
-     * Returns the name of the account identified by accountId or ""
-     */
+    /** Returns the configured human-readable account name. */
     QString getAccountNameById(const QString &accountId);
 
-    /**
-     * Returns the Jid of the account identified by accountId or "-1"
-     */
+    /** Returns the public JID of the account identified by @p accountId. */
     QString getAccountJidById(const QString &accountId);
 
 private slots:
@@ -192,29 +187,27 @@ private:
     friend class OtrEncryptionProvider;
 
     /**
-     * Returns full Jid for private contacts,
-     * bare Jid for non-private contacts.
+     * Returns a full JID for private/MUC contacts and a bare JID for ordinary
+     * roster contacts. OTR itself remains resource-bound once a session starts.
      */
     QString getCorrectJid(int accountIndex, const QString &fullJid);
 
-    bool                                            m_enabled;
-    OtrMessaging                                   *m_otrConnection;
+    bool m_enabled;
+    OtrMessaging *m_otrConnection;
     QHash<QString, QHash<QString, PsiOtrClosure *>> m_onlineUsers;
-    OptionAccessingHost                            *m_optionHost;
-    StanzaSendingHost                              *m_senderHost;
-    ApplicationInfoAccessingHost                   *m_applicationInfo;
-    PsiAccountControllingHost                      *m_accountHost;
-    AccountInfoAccessingHost                       *m_accountInfo;
-    ContactInfoAccessingHost                       *m_contactInfo;
-    IconFactoryAccessingHost                       *m_iconHost;
-    EventCreatingHost                              *m_psiEvent;
-    EncryptionMethodAccessingHost                  *m_encryptionHost;
-    EncryptionMethodProvider                       *m_encryptionProvider;
-    QSet<QString>                                    m_otrDiscoveredResources;
-    QQueue<QMessageBox *>                           m_messageBoxList;
+    OptionAccessingHost *m_optionHost;
+    StanzaSendingHost *m_senderHost;
+    ApplicationInfoAccessingHost *m_applicationInfo;
+    PsiAccountControllingHost *m_accountHost;
+    AccountInfoAccessingHost *m_accountInfo;
+    ContactInfoAccessingHost *m_contactInfo;
+    IconFactoryAccessingHost *m_iconHost;
+    EventCreatingHost *m_psiEvent;
+    EncryptionMethodAccessingHost *m_encryptionHost;
+    EncryptionMethodProvider *m_encryptionProvider;
+    QSet<QString> m_otrDiscoveredResources;
+    QQueue<QMessageBox *> m_messageBoxList;
 };
-
-//-----------------------------------------------------------------------------
 
 } // namespace psiotr
 

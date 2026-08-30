@@ -1,5 +1,8 @@
 /*
  * otrinternal.cpp - Native qca-otr backend for the Psi OTR plugin
+ *
+ * SPDX-FileCopyrightText: 2026 Sergei Ilinykh
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "otrinternal.h"
@@ -9,7 +12,6 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QObject>
-#include <QSet>
 #include <QStringList>
 #include <QtCrypto>
 
@@ -388,13 +390,10 @@ QList<psiotr::Fingerprint> OtrInternal::getFingerprints()
     if (!m_profileLoaded)
         return result;
 
-    const QcaOtr::ProfileData &profile = m_profile->data();
-    for (const QcaOtr::FingerprintRecord &record : profile.fingerprints) {
-        if (record.protocol != PsiOtrProtocolId || record.fingerprint.size() != 20)
+    for (const QcaOtr::FingerprintRecord &record : m_profile->fingerprints()) {
+        if (record.fingerprint.size() != 20)
             continue;
-        auto *bytes = const_cast<unsigned char *>(
-            reinterpret_cast<const unsigned char *>(record.fingerprint.constData()));
-        result.append(psiotr::Fingerprint(bytes,
+        result.append(psiotr::Fingerprint(record.fingerprint,
                                           QString::fromUtf8(record.account),
                                           QString::fromUtf8(record.username),
                                           QString::fromUtf8(record.trust)));
@@ -406,11 +405,10 @@ bool OtrInternal::activeFingerprintMatches(const psiotr::Fingerprint &fingerprin
 {
     if (matched)
         *matched = nullptr;
-    if (!fingerprint.fingerprint)
+    if (!fingerprint.isValid())
         return false;
-    const QByteArray value(reinterpret_cast<const char *>(fingerprint.fingerprint), 20);
     const auto it = m_conversations.constFind(conversationKey(fingerprint.account, fingerprint.username));
-    if (it == m_conversations.constEnd() || it.value()->activeFingerprint != value)
+    if (it == m_conversations.constEnd() || it.value()->activeFingerprint != fingerprint.value)
         return false;
     if (matched)
         *matched = it.value().get();
@@ -419,13 +417,12 @@ bool OtrInternal::activeFingerprintMatches(const psiotr::Fingerprint &fingerprin
 
 void OtrInternal::verifyFingerprint(const psiotr::Fingerprint &fingerprint, bool verified)
 {
-    if (!m_profileLoaded || !fingerprint.fingerprint)
+    if (!m_profileLoaded || !fingerprint.isValid())
         return;
-    const QByteArray value(reinterpret_cast<const char *>(fingerprint.fingerprint), 20);
     QString error;
     if (!m_profile->setFingerprintTrust(fingerprint.username.toUtf8(),
                                         fingerprint.account.toUtf8(),
-                                        value,
+                                        fingerprint.value,
                                         verified ? QObject::tr("verified").toUtf8() : QByteArray(),
                                         &error)) {
         displayProtocolError(fingerprint.account,
@@ -441,14 +438,16 @@ void OtrInternal::verifyFingerprint(const psiotr::Fingerprint &fingerprint, bool
 
 void OtrInternal::deleteFingerprint(const psiotr::Fingerprint &fingerprint)
 {
-    if (!m_profileLoaded || !fingerprint.fingerprint)
+    if (!m_profileLoaded || !fingerprint.isValid())
         return;
-    const QByteArray value(reinterpret_cast<const char *>(fingerprint.fingerprint), 20);
 
     Conversation *ctx = nullptr;
     const bool active = activeFingerprintMatches(fingerprint, &ctx);
     QString error;
-    if (!m_profile->removeFingerprint(fingerprint.username.toUtf8(), fingerprint.account.toUtf8(), value, &error)) {
+    if (!m_profile->removeFingerprint(fingerprint.username.toUtf8(),
+                                      fingerprint.account.toUtf8(),
+                                      fingerprint.value,
+                                      &error)) {
         displayProtocolError(fingerprint.account,
                              fingerprint.username,
                              QObject::tr("Cannot delete OTR fingerprint: %1").arg(error));
@@ -468,13 +467,7 @@ QHash<QString, QString> OtrInternal::getPrivateKeys()
     if (!m_profileLoaded)
         return result;
 
-    QSet<QByteArray> seen;
-    const QList<QcaOtr::PrivateKeyRecord> &keys = m_profile->data().privateKeys;
-    for (int i = keys.size() - 1; i >= 0; --i) {
-        const QcaOtr::PrivateKeyRecord &record = keys.at(i);
-        if (record.protocol != PsiOtrProtocolId || seen.contains(record.account))
-            continue;
-        seen.insert(record.account);
+    for (const QcaOtr::PrivateKeyRecord &record : m_profile->identities()) {
         result.insert(QString::fromUtf8(record.account),
                       formatFingerprint(QcaOtr::dsaPublicKeyFingerprint(QcaOtr::dsaPublicKey(record.key))));
     }
@@ -539,7 +532,8 @@ void OtrInternal::startSession(const QString &account, const QString &contact)
     ctx->forcedFinished = false;
     ctx->smpSucceeded = false;
     m_callback->stateChange(account, contact, psiotr::OTR_STATECHANGE_GOINGSECURE);
-    const QcaOtr::OutgoingResult outgoing = ctx->session->startNegotiation(m_callback->humanAccountPublic(account).toUtf8());
+    const QcaOtr::OutgoingResult outgoing =
+        ctx->session->startNegotiation(m_callback->humanAccountPublic(account).toUtf8());
     if (outgoing.status == QcaOtr::OutgoingStatus::Error || outgoing.messages.isEmpty()) {
         displayProtocolError(account, contact, QObject::tr("Could not start an OTR session."));
         return;
@@ -682,12 +676,11 @@ psiotr::Fingerprint OtrInternal::getActiveFingerprint(const QString &account, co
 {
     Conversation *ctx = conversation(account, contact, false);
     if (!ctx || ctx->activeFingerprint.size() != 20)
-        return psiotr::Fingerprint();
+        return {};
 
     const QcaOtr::FingerprintRecord *record =
         m_profile->fingerprint(contact.toUtf8(), account.toUtf8(), ctx->activeFingerprint);
-    auto *bytes = reinterpret_cast<unsigned char *>(ctx->activeFingerprint.data());
-    return psiotr::Fingerprint(bytes,
+    return psiotr::Fingerprint(ctx->activeFingerprint,
                                account,
                                contact,
                                record ? QString::fromUtf8(record->trust) : QString());
@@ -707,11 +700,4 @@ bool OtrInternal::smpSucceeded(const QString &account, const QString &contact)
 {
     const Conversation *ctx = conversation(account, contact);
     return ctx && ctx->smpSucceeded;
-}
-
-QString OtrInternal::humanFingerprint(const unsigned char *fingerprint)
-{
-    if (!fingerprint)
-        return {};
-    return formatFingerprint(QByteArray(reinterpret_cast<const char *>(fingerprint), 20));
 }

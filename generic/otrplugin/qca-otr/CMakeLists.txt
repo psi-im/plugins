@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Sergei Ilinykh
+# SPDX-License-Identifier: MIT
+
 cmake_minimum_required(VERSION 3.16)
 
 project(qca-otr LANGUAGES CXX)
