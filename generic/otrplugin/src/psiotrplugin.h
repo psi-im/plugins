@@ -90,6 +90,7 @@ public:
     PsiOtrPlugin();
     ~PsiOtrPlugin();
 
+    // PsiPlugin
     QString name() const override;
     QWidget *options() override;
     bool enable() override;
@@ -97,22 +98,46 @@ public:
     void applyOptions() override;
     void restoreOptions() override;
 
+    // PluginInfoProvider
     QString pluginInfo() override;
+
+    // EventCreator
     void setEventCreatingHost(EventCreatingHost *host) override;
+
+    // OptionAccessor
     void setOptionAccessingHost(OptionAccessingHost *host) override;
     void optionChanged(const QString &option) override;
+
+    // StanzaSender
     void setStanzaSendingHost(StanzaSendingHost *host) override;
+
+    // ApplicationInfoAccessor
     void setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host) override;
+
+    // PsiAccountController
     void setPsiAccountControllingHost(PsiAccountControllingHost *host) override;
+
+    // StanzaFilter
     bool incomingStanza(int accountIndex, const QDomElement &xml) override;
     bool outgoingStanza(int accountIndex, QDomElement &xml) override;
+
+    // ToolbarIconAccessor
     QList<QVariantHash> getButtonParam() override;
     QAction *getAction(QObject *parent, int accountIndex, const QString &contact) override;
+
+    // AccountInfoAccessor
     void setAccountInfoAccessingHost(AccountInfoAccessingHost *host) override;
+
+    // ContactInfoAccessor
     void setContactInfoAccessingHost(ContactInfoAccessingHost *host) override;
+
+    // IconFactoryAccessor
     void setIconFactoryAccessingHost(IconFactoryAccessingHost *host) override;
+
+    // EncryptionMethodAccessor
     void setEncryptionMethodAccessingHost(EncryptionMethodAccessingHost *host) override;
 
+    // Native EncryptionMethodProvider helpers
     /**
      * Applies native OTR processing to an incoming message DOM in place.
      * Protocol-only messages clear @p message; decrypted application messages
@@ -127,6 +152,7 @@ public:
      */
     bool encryptMessageElement(int account, QDomElement &message, const QString &contact = QString());
 
+    // OtrCallback
     QString dataDir() override;
     void sendMessage(const QString &account, const QString &contact, const QString &message) override;
     void notifyUser(const QString &account,
@@ -141,6 +167,7 @@ public:
     QString humanAccountPublic(const QString &accountId) override;
     QString humanContact(const QString &accountId, const QString &contact) override;
 
+    // Plugin helpers
     /** Displays a rich-text system message for the given account/contact pair. */
     bool appendSysMsg(const QString &account, const QString &contact, const QString &message, const QString &icon = "");
 
