@@ -43,6 +43,7 @@ jobs:
             cmake
             ninja-build
             pkg-config
+            libssl-dev
             libtidy-dev
             libx11-dev
             libxcb1-dev
