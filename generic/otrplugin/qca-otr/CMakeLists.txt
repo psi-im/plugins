@@ -23,6 +23,9 @@ add_library(qca-otr STATIC
     src/crypto.cpp
     src/data.cpp
     src/negotiation.cpp
+    src/persistence.cpp
+    src/persistence_secret.cpp
+    src/profile.cpp
     src/session.cpp
     src/smp.cpp
     src/tlv.cpp

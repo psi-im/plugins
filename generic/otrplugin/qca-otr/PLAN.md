@@ -58,24 +58,39 @@ Exit criterion: qca-otr and libotr 4.1.1 agree on SMP proofs, outcomes and publi
 SMP event flow in both directions. The same oracle suite passes in the Qt5 and
 Qt6 CI matrix without adding libotr to the qca-otr runtime dependency set.
 
-## 4. Persistence and migration
+## 4. Persistence and migration — completed
 
-- read existing `otr.keys` DSA identities without regenerating them
-- read/write `otr.fingerprints` including arbitrary libotr trust strings
-- read/write `otr.instags`
-- preserve account/protocol/user mapping exactly as the current plugin expects
-- fixtures produced by libotr 4.1.1 plus fixtures from real/current Psi files
-- deterministic round-trip tests and malformed/partial-file handling
-- atomic writes so a crash cannot destroy identity or trust databases
+- parse and write the existing libotr `otr.keys` DSA private-key S-expression format
+  without regenerating identities, validating the stored public `y` against the private key
+- preserve the current Psi account/protocol namespace exactly, including the historical
+  `prpl-jabber` persistence identifier without introducing a libpurple dependency
+- parse/write `otr.fingerprints`, including arbitrary libotr trust strings and legacy
+  records without an explicit trust field
+- parse/write `otr.instags`, including libotr's reserved-instance-tag boundary and
+  warning/header format
+- profile-level loading/saving for the exact `otr.keys`, `otr.fingerprints` and
+  `otr.instags` filenames used by the current plugin
+- missing stores load as an empty partial profile; malformed fingerprint/instance-tag
+  records are skipped like libotr while a malformed private-key store fails closed
+- duplicate account/fingerprint/instance-tag lookups preserve libotr's last-record-wins
+  behavior
+- atomic replacement of every store through `QSaveFile`, with owner-only private-key
+  permissions on platforms where Qt exposes POSIX permissions
+- deterministic codec/profile round-trip tests plus an exact libotr `otrtest3` DSA fixture
+- public libotr 4.1.1 oracle coverage in both directions for private identities,
+  fingerprint/trust records and instance tags
+- full disk-profile migration oracle: libotr-created legacy profile -> qca-otr load/save ->
+  libotr reread, preserving the exact DSA identity fingerprint, trust and instance tag
 
-Exit criterion: an existing Psi OTR profile can switch backend without identity,
-fingerprint/trust or instance-tag loss, and can still be read by the old backend
-where the file format is intended to remain compatible.
+Exit criterion: an existing Psi/libotr OTR profile can be loaded and rewritten by
+qca-otr without identity, fingerprint/trust or instance-tag loss, and the rewritten
+profile remains readable by libotr 4.1.1. The persistence code remains QtCore + QCA3;
+libotr/libgcrypt are linked only into the optional oracle tests.
 
 ## 5. Complete `OtrSession` and Psi adapter
 
 - complete the remaining adapter-facing identity/trust/state surface on top of
-  the routed negotiation, control and SMP session core
+  the routed negotiation, control, SMP and persistence core
 - final API: `start`, `processIncoming`, `sendMessage`, `disconnect`, `startSmp`,
   `respondSmp`, `abortSmp`
 - expose peer identity/fingerprint/trust and per-instance secure state
