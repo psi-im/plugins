@@ -82,7 +82,7 @@ QCA::BigInteger randomExponent()
 {
     const QCA::SecureArray random = QCA::Random::randomArray(SmpModulusBytes);
     if (random.size() != SmpModulusBytes)
-        return {};
+        return QCA::BigInteger(0);
     return unsignedInteger(random);
 }
 
@@ -317,17 +317,18 @@ struct SmpSession::Private
 {
     void clear(SmpProgress newProgress = SmpProgress::Ok)
     {
-        secret = {};
-        x2 = {};
-        x3 = {};
-        g1 = {};
-        g2 = {};
-        g3 = {};
-        g3o = {};
-        p = {};
-        q = {};
-        pab = {};
-        qab = {};
+        const QCA::BigInteger empty(0);
+        secret = empty;
+        x2 = empty;
+        x3 = empty;
+        g1 = empty;
+        g2 = empty;
+        g3 = empty;
+        g3o = empty;
+        p = empty;
+        q = empty;
+        pab = empty;
+        qab = empty;
         expected = SmpExpected::Message1;
         progress = newProgress;
         waitingSecret = false;
