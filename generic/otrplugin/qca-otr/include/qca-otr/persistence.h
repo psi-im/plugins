@@ -9,8 +9,6 @@
 
 namespace QcaOtr {
 
-inline constexpr char LegacyPsiProtocolId[] = "prpl-jabber";
-
 struct PrivateKeyRecord
 {
     QByteArray account;
