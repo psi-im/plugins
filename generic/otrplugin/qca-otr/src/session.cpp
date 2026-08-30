@@ -1,6 +1,7 @@
 #include "qca-otr/session.h"
 
 #include "qca-otr/data.h"
+#include "qca-otr/negotiation.h"
 #include "qca-otr/transport.h"
 
 #include <map>
@@ -45,10 +46,22 @@ bool encodeOutgoing(const QByteArray &raw, int maxMessageSize, QVector<QByteArra
                                       messages);
 }
 
+bool startsAkeFromWhitespace(SessionPolicy policy)
+{
+    return policy == SessionPolicy::Opportunistic || policy == SessionPolicy::Always;
+}
+
 } // namespace
 
 struct OtrSession::Private
 {
+    enum class OfferState {
+        None,
+        Sent,
+        Accepted,
+        Rejected
+    };
+
     struct PeerContext
     {
         PeerContext(const DsaPrivateKey &identityKey, quint32 localInstance, quint32 peerInstance) :
@@ -109,8 +122,42 @@ struct OtrSession::Private
         return result;
     }
 
+    quint32 preferredEncryptedPeer(quint32 requested) const
+    {
+        if (requested != 0) {
+            const PeerContext *peer = findPeer(requested);
+            return peer && peer->data && peer->data->isReady() ? requested : 0;
+        }
+
+        const PeerContext *active = findPeer(activePeerInstance);
+        if (active && active->data && active->data->isReady())
+            return activePeerInstance;
+
+        for (const auto &entry : peers) {
+            const PeerContext *peer = entry.second.get();
+            if (peer->data && peer->data->isReady())
+                return entry.first;
+        }
+        return 0;
+    }
+
+    void clearPendingRequired()
+    {
+        pendingRequiredMessage.clear();
+        hasPendingRequired = false;
+        pendingRequiredFlags = 0;
+        pendingRequiredMms = 0;
+    }
+
     DsaPrivateKey identityKey;
     quint32 localInstance = 0;
+    SessionPolicy policy = SessionPolicy::Manual;
+    OfferState offer = OfferState::None;
+    quint32 activePeerInstance = 0;
+    QByteArray pendingRequiredMessage;
+    bool hasPendingRequired = false;
+    quint8 pendingRequiredFlags = 0;
+    int pendingRequiredMms = 0;
     std::unique_ptr<AkeSession> masterAke;
     std::map<quint32, std::unique_ptr<PeerContext>> peers;
     std::map<quint32, Transport::FragmentAccumulator> fragments;
@@ -128,6 +175,78 @@ OtrSession &OtrSession::operator=(OtrSession &&) noexcept = default;
 quint32 OtrSession::localInstance() const
 {
     return d->localInstance;
+}
+
+void OtrSession::setPolicy(SessionPolicy policy)
+{
+    d->policy = policy;
+    if (policy != SessionPolicy::Always)
+        d->clearPendingRequired();
+    if (policy != SessionPolicy::Opportunistic)
+        d->offer = Private::OfferState::None;
+}
+
+SessionPolicy OtrSession::policy() const
+{
+    return d->policy;
+}
+
+OutgoingResult OtrSession::startNegotiation(const QByteArray &ourName)
+{
+    OutgoingResult outgoing;
+    if (d->policy == SessionPolicy::Disabled)
+        return outgoing;
+
+    outgoing.status = OutgoingStatus::Negotiation;
+    outgoing.messages.append(Negotiation::defaultQueryMessage(ourName));
+    if (d->policy == SessionPolicy::Opportunistic)
+        d->offer = Private::OfferState::Sent;
+    return outgoing;
+}
+
+OutgoingResult OtrSession::prepareOutgoing(const QByteArray &plaintext,
+                                           quint32 peerInstance,
+                                           const QByteArray &ourName,
+                                           int maxMessageSize,
+                                           quint8 flags)
+{
+    OutgoingResult outgoing;
+    const quint32 encryptedPeer = d->preferredEncryptedPeer(peerInstance);
+    if (encryptedPeer != 0) {
+        if (!sendMessage(encryptedPeer, plaintext, &outgoing.messages, maxMessageSize, flags))
+            return outgoing;
+        outgoing.status = OutgoingStatus::Encrypted;
+        outgoing.peerInstance = encryptedPeer;
+        d->activePeerInstance = encryptedPeer;
+        return outgoing;
+    }
+
+    switch (d->policy) {
+    case SessionPolicy::Disabled:
+    case SessionPolicy::Manual:
+        outgoing.status = OutgoingStatus::Plaintext;
+        outgoing.messages.append(plaintext);
+        return outgoing;
+    case SessionPolicy::Opportunistic:
+        outgoing.status = OutgoingStatus::Plaintext;
+        if (d->offer == Private::OfferState::Rejected) {
+            outgoing.messages.append(plaintext);
+        } else {
+            outgoing.messages.append(Negotiation::appendWhitespaceTag(plaintext));
+            d->offer = Private::OfferState::Sent;
+        }
+        return outgoing;
+    case SessionPolicy::Always:
+        d->pendingRequiredMessage = plaintext;
+        d->hasPendingRequired = true;
+        d->pendingRequiredFlags = flags;
+        d->pendingRequiredMms = maxMessageSize;
+        outgoing.status = OutgoingStatus::Negotiation;
+        outgoing.messages.append(Negotiation::defaultQueryMessage(ourName));
+        return outgoing;
+    }
+
+    return outgoing;
 }
 
 QVector<QByteArray> OtrSession::start(quint32 peerInstance, int maxMessageSize, bool *ok)
@@ -165,6 +284,45 @@ QVector<QByteArray> OtrSession::start(quint32 peerInstance, int maxMessageSize, 
 
 SessionResult OtrSession::processIncoming(const QByteArray &transportMessage, int maxMessageSize)
 {
+    bool isQuery = false;
+    const quint8 queryVersion = Negotiation::queryBestVersion(transportMessage,
+                                                               Negotiation::NativeVersions,
+                                                               &isQuery);
+    if (isQuery) {
+        if (d->policy == SessionPolicy::Opportunistic)
+            d->offer = Private::OfferState::Accepted;
+
+        SessionResult routed = result(SessionStatus::ProtocolMessage);
+        if (d->policy != SessionPolicy::Disabled && queryVersion == 3) {
+            bool ok = false;
+            routed.outgoingMessages = start(0, maxMessageSize, &ok);
+            if (!ok)
+                routed.status = SessionStatus::Error;
+        }
+        return routed;
+    }
+
+    const Negotiation::WhitespaceTag whitespace = Negotiation::detectWhitespaceTag(transportMessage);
+    if (whitespace.found) {
+        QByteArray stripped = transportMessage;
+        Negotiation::VersionMask versions = 0;
+        Negotiation::stripWhitespaceTag(&stripped, &versions);
+
+        SessionResult routed = result(SessionStatus::Plaintext);
+        routed.plaintext = stripped;
+        if (d->policy == SessionPolicy::Opportunistic)
+            d->offer = Private::OfferState::Accepted;
+
+        if (startsAkeFromWhitespace(d->policy) &&
+            Negotiation::bestVersion(versions, Negotiation::NativeVersions) == 3) {
+            bool ok = false;
+            routed.outgoingMessages = start(0, maxMessageSize, &ok);
+            if (!ok)
+                routed.status = SessionStatus::Error;
+        }
+        return routed;
+    }
+
     QByteArray completeTransport;
     Transport::Route fragmentRoute;
     bool hadFragmentRoute = false;
@@ -200,8 +358,18 @@ SessionResult OtrSession::processIncoming(const QByteArray &transportMessage, in
     if (!Transport::dearmor(completeTransport, &raw)) {
         if (completeTransport.contains("?OTR:") || hadFragmentRoute)
             return result(SessionStatus::Error, fragmentRoute.senderInstance);
-        return result(SessionStatus::Ignored);
+        if (completeTransport.contains("?OTR"))
+            return result(SessionStatus::ProtocolMessage);
+
+        if (d->policy == SessionPolicy::Opportunistic && d->offer == Private::OfferState::Sent)
+            d->offer = Private::OfferState::Rejected;
+        SessionResult plaintextResult = result(SessionStatus::Plaintext);
+        plaintextResult.plaintext = completeTransport;
+        return plaintextResult;
     }
+
+    if (d->policy == SessionPolicy::Opportunistic)
+        d->offer = Private::OfferState::Accepted;
 
     Transport::Route route;
     if (!Transport::routeFromRaw(raw, &route))
@@ -266,6 +434,7 @@ SessionResult OtrSession::processIncoming(const QByteArray &transportMessage, in
             peer->established = peer->ake.established();
             peer->hasEstablished = true;
             peer->data = std::move(data);
+            d->activePeerInstance = route.senderInstance;
             routed.status = SessionStatus::Authenticated;
             break;
         }
@@ -275,6 +444,21 @@ SessionResult OtrSession::processIncoming(const QByteArray &transportMessage, in
             !encodeOutgoing(akeResult.outgoingMessage, maxMessageSize, &routed.outgoingMessages)) {
             routed.outgoingMessages.clear();
             routed.status = SessionStatus::Error;
+            return routed;
+        }
+
+        if (routed.status == SessionStatus::Authenticated && d->hasPendingRequired) {
+            QVector<QByteArray> pendingMessages;
+            if (!sendMessage(route.senderInstance,
+                             d->pendingRequiredMessage,
+                             &pendingMessages,
+                             d->pendingRequiredMms,
+                             d->pendingRequiredFlags)) {
+                routed.status = SessionStatus::Error;
+                return routed;
+            }
+            routed.outgoingMessages += pendingMessages;
+            d->clearPendingRequired();
         }
         return routed;
     }
@@ -289,6 +473,7 @@ SessionResult OtrSession::processIncoming(const QByteArray &transportMessage, in
         routed.peerInstance = route.senderInstance;
         routed.flags = dataResult.flags;
         routed.extraKey = dataResult.extraKey;
+        routed.tlvs = dataResult.tlvs;
         switch (dataResult.status) {
         case DataReceiveStatus::Ignored:
             routed.status = SessionStatus::Ignored;
@@ -299,6 +484,7 @@ SessionResult OtrSession::processIncoming(const QByteArray &transportMessage, in
         case DataReceiveStatus::Message:
             routed.status = SessionStatus::Message;
             routed.plaintext = dataResult.plaintext;
+            d->activePeerInstance = route.senderInstance;
             break;
         }
         return routed;
@@ -309,6 +495,16 @@ SessionResult OtrSession::processIncoming(const QByteArray &transportMessage, in
 
 bool OtrSession::sendMessage(quint32 peerInstance,
                              const QByteArray &plaintext,
+                             QVector<QByteArray> *transportMessages,
+                             int maxMessageSize,
+                             quint8 flags)
+{
+    return sendMessage(peerInstance, plaintext, {}, transportMessages, maxMessageSize, flags);
+}
+
+bool OtrSession::sendMessage(quint32 peerInstance,
+                             const QByteArray &plaintext,
+                             const QVector<Tlv> &tlvs,
                              QVector<QByteArray> *transportMessages,
                              int maxMessageSize,
                              quint8 flags)
@@ -326,7 +522,7 @@ bool OtrSession::sendMessage(quint32 peerInstance,
     // message; an invalid MMS must not consume ratchet state.
     DataSession snapshot = *peer->data;
     QByteArray raw;
-    if (!peer->data->sendMessage(plaintext, &raw, flags))
+    if (!peer->data->sendMessage(plaintext, tlvs, &raw, flags))
         return false;
 
     if (!encodeOutgoing(raw, maxMessageSize, transportMessages)) {
@@ -334,6 +530,7 @@ bool OtrSession::sendMessage(quint32 peerInstance,
         transportMessages->clear();
         return false;
     }
+    d->activePeerInstance = peerInstance;
     return true;
 }
 
@@ -367,6 +564,8 @@ void OtrSession::resetPeer(quint32 peerInstance)
 {
     d->peers.erase(peerInstance);
     d->fragments.erase(peerInstance);
+    if (d->activePeerInstance == peerInstance)
+        d->activePeerInstance = 0;
 }
 
 void OtrSession::reset()
@@ -374,6 +573,9 @@ void OtrSession::reset()
     d->masterAke.reset();
     d->peers.clear();
     d->fragments.clear();
+    d->activePeerInstance = 0;
+    d->offer = Private::OfferState::None;
+    d->clearPendingRequired();
 }
 
 } // namespace QcaOtr

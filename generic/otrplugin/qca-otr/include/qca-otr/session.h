@@ -1,6 +1,7 @@
 #pragma once
 
 #include "qca-otr/akesession.h"
+#include "qca-otr/tlv.h"
 
 #include <QByteArray>
 #include <QVector>
@@ -10,8 +11,17 @@
 
 namespace QcaOtr {
 
+enum class SessionPolicy {
+    Disabled,
+    Manual,
+    Opportunistic,
+    Always
+};
+
 enum class SessionStatus {
     Ignored,
+    Plaintext,
+    ProtocolMessage,
     FragmentIncomplete,
     Handled,
     Authenticated,
@@ -25,9 +35,24 @@ struct SessionResult
     SessionStatus status = SessionStatus::Ignored;
     quint32 peerInstance = 0;
     QByteArray plaintext;
+    QVector<Tlv> tlvs;
     QCA::SecureArray extraKey;
     quint8 flags = 0;
     QVector<QByteArray> outgoingMessages;
+};
+
+enum class OutgoingStatus {
+    Plaintext,
+    Encrypted,
+    Negotiation,
+    Error
+};
+
+struct OutgoingResult
+{
+    OutgoingStatus status = OutgoingStatus::Error;
+    quint32 peerInstance = 0;
+    QVector<QByteArray> messages;
 };
 
 // Transport-facing OTRv3 session router for one logical correspondent.
@@ -47,6 +72,24 @@ public:
 
     quint32 localInstance() const;
 
+    void setPolicy(SessionPolicy policy);
+    SessionPolicy policy() const;
+
+    // Build the user-visible libotr-style Query Message used for an explicit
+    // manual start. Receiving a compatible query starts the broadcast AKE.
+    OutgoingResult startNegotiation(const QByteArray &ourName = {});
+
+    // Apply plaintext/encryption policy to one outgoing application message.
+    // peerInstance == 0 uses the most recently active encrypted child when
+    // available. Always policy retains the last plaintext and emits a Query
+    // Message until an encrypted child is established, matching libotr's
+    // REQUIRE_ENCRYPTION last-message behavior.
+    OutgoingResult prepareOutgoing(const QByteArray &plaintext,
+                                   quint32 peerInstance = 0,
+                                   const QByteArray &ourName = {},
+                                   int maxMessageSize = 0,
+                                   quint8 flags = 0);
+
     // peerInstance == 0 starts the OTRv3 broadcast/master AKE. Each remote
     // instance that answers receives an independent copy of that pending AKE
     // state, matching libotr's master/child context behavior.
@@ -59,6 +102,12 @@ public:
 
     bool sendMessage(quint32 peerInstance,
                      const QByteArray &plaintext,
+                     QVector<QByteArray> *transportMessages,
+                     int maxMessageSize = 0,
+                     quint8 flags = 0);
+    bool sendMessage(quint32 peerInstance,
+                     const QByteArray &plaintext,
+                     const QVector<Tlv> &tlvs,
                      QVector<QByteArray> *transportMessages,
                      int maxMessageSize = 0,
                      quint8 flags = 0);
