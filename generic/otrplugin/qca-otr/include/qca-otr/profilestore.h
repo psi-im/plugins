@@ -25,6 +25,7 @@ public:
     const PrivateKeyRecord *identity(const QByteArray &account) const;
     QByteArray identityFingerprint(const QByteArray &account) const;
     bool ensureIdentity(const QByteArray &account, QString *error = nullptr);
+    bool regenerateIdentity(const QByteArray &account, QString *error = nullptr);
     bool removeIdentity(const QByteArray &account, QString *error = nullptr);
 
     quint32 instanceTag(const QByteArray &account, bool *found = nullptr) const;

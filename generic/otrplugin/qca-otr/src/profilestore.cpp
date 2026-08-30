@@ -155,6 +155,46 @@ bool ProfileStore::ensureIdentity(const QByteArray &account, QString *error)
     return false;
 }
 
+bool ProfileStore::regenerateIdentity(const QByteArray &account, QString *error)
+{
+    if (account.isEmpty()) {
+        setError(error, QStringLiteral("OTR account id must not be empty"));
+        return false;
+    }
+
+    DsaPrivateKey generated = generateIdentity(error);
+    if (generated.x <= QCA::BigInteger(0))
+        return false;
+
+    int replaceIndex = -1;
+    for (int i = data_.privateKeys.size() - 1; i >= 0; --i) {
+        const PrivateKeyRecord &record = data_.privateKeys.at(i);
+        if (record.account == account && record.protocol == protocolId_) {
+            replaceIndex = i;
+            break;
+        }
+    }
+
+    if (replaceIndex < 0) {
+        PrivateKeyRecord record;
+        record.account = account;
+        record.protocol = protocolId_;
+        record.key = generated;
+        data_.privateKeys.append(record);
+        if (save(error))
+            return true;
+        data_.privateKeys.removeLast();
+        return false;
+    }
+
+    const DsaPrivateKey previous = data_.privateKeys.at(replaceIndex).key;
+    data_.privateKeys[replaceIndex].key = generated;
+    if (save(error))
+        return true;
+    data_.privateKeys[replaceIndex].key = previous;
+    return false;
+}
+
 bool ProfileStore::removeIdentity(const QByteArray &account, QString *error)
 {
     bool removed = false;
