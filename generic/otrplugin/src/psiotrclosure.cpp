@@ -316,7 +316,7 @@ void AuthenticationDialog::startAuthentication()
         break;
 
     case METHOD_FINGERPRINT:
-        if (m_fpr.fingerprint) {
+        if (m_fpr.isValid()) {
             QString msg(tr("Account: ") + m_otr->humanAccount(m_account) + "\n" + tr("User: ") + m_contact + "\n"
                         + tr("Fingerprint: ") + m_fpr.fingerprintHuman + "\n\n"
                         + tr("Have you verified that this is in fact the correct fingerprint?"));
