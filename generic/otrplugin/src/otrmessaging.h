@@ -136,12 +136,19 @@ public:
                                   const QString &message,
                                   QString &decrypted);
 
+    /** Returns all peer fingerprints stored in the current OTR profile. */
     QList<Fingerprint> getFingerprints();
+
+    /** Marks the specified stored fingerprint as verified or unverified. */
     void verifyFingerprint(const Fingerprint &fingerprint, bool verified);
+
+    /** Removes the specified stored peer fingerprint from the profile. */
     void deleteFingerprint(const Fingerprint &fingerprint);
 
     /** Returns own identity fingerprints keyed by Psi account id. */
     QHash<QString, QString> getPrivateKeys();
+
+    /** Removes the local OTR identity for @p account. */
     void deleteKey(const QString &account);
 
     /** Regenerates the local OTR identity for @p account. */
@@ -156,20 +163,37 @@ public:
     /** Drops local secure state without sending a disconnect message. */
     void expireSession(const QString &account, const QString &contact);
 
+    /** Starts SMP for the active encrypted session, optionally with a question. */
     void startSMP(const QString &account, const QString &contact, const QString &question, const QString &secret);
+
+    /** Supplies the answer/secret requested by an incoming SMP exchange. */
     void continueSMP(const QString &account, const QString &contact, const QString &secret);
+
+    /** Aborts the SMP exchange for the active OTR session. */
     void abortSMP(const QString &account, const QString &contact);
 
+    /** Returns plaintext/encrypted/finished state for the active peer session. */
     OtrMessageState getMessageState(const QString &account, const QString &contact);
+
+    /** Returns a user-visible description of the active peer session state. */
     QString getMessageStateString(const QString &account, const QString &contact);
 
     /** Returns the formatted secure-session identifier for the active session. */
     QString getSessionId(const QString &account, const QString &contact);
+
+    /** Returns the peer fingerprint currently bound to the active OTR session. */
     Fingerprint getActiveFingerprint(const QString &account, const QString &contact);
+
+    /** Returns true when the active session's peer fingerprint is trusted/verified. */
     bool isVerified(const QString &account, const QString &contact);
+
+    /** Returns true when SMP has succeeded for the active OTR session. */
     bool smpSucceeded(const QString &account, const QString &contact);
 
+    /** Sets the default policy used for newly processed OTR conversations. */
     void setPolicy(OtrPolicy policy);
+
+    /** Returns the currently configured default OTR policy. */
     OtrPolicy getPolicy();
 
     bool displayOtrMessage(const QString &account, const QString &contact, const QString &message);
