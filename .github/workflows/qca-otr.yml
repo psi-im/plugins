@@ -8,119 +8,18 @@ on:
   push:
     branches:
       - master
-      - cleanup/otr-native
     paths:
       - 'generic/otrplugin/qca-otr/**'
       - '.github/workflows/qca-otr.yml'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   QCA_VERSION: 3.0.5
 
 jobs:
-  license-qca-otr:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/cleanup/otr-native'
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout plugins
-        uses: actions/checkout@v4
-        with:
-          ref: cleanup/otr-native
-
-      - name: Add qca-otr MIT headers and license
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-
-          root = Path('generic/otrplugin/qca-otr')
-          cpp_header = """/*
-           * SPDX-FileCopyrightText: 2026 Sergei Ilinykh
-           * SPDX-License-Identifier: MIT
-           */
-
-          """
-          cmake_header = """# SPDX-FileCopyrightText: 2026 Sergei Ilinykh
-          # SPDX-License-Identifier: MIT
-
-          """
-          markdown_header = """<!--
-          SPDX-FileCopyrightText: 2026 Sergei Ilinykh
-          SPDX-License-Identifier: MIT
-          -->
-
-          """
-
-          changed = []
-          for path in sorted(root.rglob('*')):
-              if not path.is_file() or path.name == 'LICENSE':
-                  continue
-              if path.suffix in {'.h', '.cpp'}:
-                  header = cpp_header
-              elif path.name == 'CMakeLists.txt' or path.suffix == '.cmake':
-                  header = cmake_header
-              elif path.suffix == '.md':
-                  header = markdown_header
-              else:
-                  continue
-              text = path.read_text(encoding='utf-8')
-              if 'SPDX-License-Identifier:' in text[:500]:
-                  continue
-              path.write_text(header + text, encoding='utf-8')
-              changed.append(str(path))
-
-          license_text = """MIT License
-
-          Copyright (c) 2026 Sergei Ilinykh
-
-          Permission is hereby granted, free of charge, to any person obtaining a copy
-          of this software and associated documentation files (the "Software"), to deal
-          in the Software without restriction, including without limitation the rights
-          to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-          copies of the Software, and to permit persons to whom the Software is
-          furnished to do so, subject to the following conditions:
-
-          The above copyright notice and this permission notice shall be included in all
-          copies or substantial portions of the Software.
-
-          THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-          IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-          FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-          AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-          LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-          OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-          SOFTWARE.
-          """
-          license_path = root / 'LICENSE'
-          if not license_path.exists() or license_path.read_text(encoding='utf-8') != license_text:
-              license_path.write_text(license_text, encoding='utf-8')
-              changed.append(str(license_path))
-
-          readme = root / 'README.md'
-          text = readme.read_text(encoding='utf-8')
-          if '## License' not in text:
-              readme.write_text(text.rstrip() + '\n\n## License\n\nqca-otr is licensed under the MIT License. Copyright (c) 2026 Sergei Ilinykh.\n',
-                                encoding='utf-8')
-              changed.append(str(readme))
-
-          print('\n'.join(changed))
-          PY
-
-          if git diff --quiet && [[ -z "$(git status --porcelain)" ]]; then
-            echo 'No licensing changes required.'
-            exit 0
-          fi
-
-          git config user.name 'Sergei Ilinykh'
-          git config user.email 'rion4ik@gmail.com'
-          git add generic/otrplugin/qca-otr
-          git commit -m 'License qca-otr under MIT'
-          git push origin HEAD:cleanup/otr-native
-
   test:
     name: Qt ${{ matrix.qt }} / Linux
     runs-on: ubuntu-24.04
