@@ -50,6 +50,12 @@ struct SessionResult
     QCA::SecureArray extraKey;
     QByteArray errorText;
     quint8 flags = 0;
+
+    bool hasSymmetricKey = false;
+    quint32 symmetricKeyUse = 0;
+    QByteArray symmetricKeyData;
+    QCA::SecureArray symmetricKey;
+
     QVector<QByteArray> outgoingMessages;
 };
 
@@ -133,6 +139,16 @@ public:
     bool disconnect(quint32 peerInstance,
                     QVector<QByteArray> *transportMessages,
                     int maxMessageSize = 0);
+
+    // Match otrl_message_symkey(): send type-8 TLV containing a 32-bit use
+    // identifier followed by opaque usedata, and return the exact extra key
+    // used by that encrypted Data Message without converting it to QByteArray.
+    bool sendSymmetricKey(quint32 peerInstance,
+                          quint32 use,
+                          const QByteArray &useData,
+                          QCA::SecureArray *symmetricKey,
+                          QVector<QByteArray> *transportMessages,
+                          int maxMessageSize = 0);
 
     PeerState peerState(quint32 peerInstance) const;
     bool isEncrypted(quint32 peerInstance) const;

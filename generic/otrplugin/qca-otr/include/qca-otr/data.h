@@ -73,6 +73,15 @@ public:
     const QCA::BigInteger &localDhPublic() const { return localDh_.publicValue; }
     const QCA::BigInteger &peerDhPublic() const { return peerDhPublic_; }
 
+    // Extra symmetric key for the exact key slot used by the next outgoing
+    // Data Message. Keep it in secure memory for session/control APIs.
+    QCA::SecureArray currentSendExtraKey() const
+    {
+        if (!ready_ || !sessionValid_[1][0])
+            return {};
+        return sessions_[1][0].extraKey;
+    }
+
     bool sendMessage(const QByteArray &plaintext, QByteArray *encoded, quint8 flags = 0);
     bool sendMessage(const QByteArray &plaintext,
                      const QVector<Tlv> &tlvs,

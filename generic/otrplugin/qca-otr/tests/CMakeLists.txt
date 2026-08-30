@@ -100,6 +100,16 @@ target_link_libraries(qca-otr-control-test
 )
 add_test(NAME qca-otr-control COMMAND qca-otr-control-test)
 
+add_executable(qca-otr-symkey-test
+    symkeytest.cpp
+)
+target_link_libraries(qca-otr-symkey-test
+    PRIVATE
+        QcaOtr::QcaOtr
+        Qt${QT_DEFAULT_MAJOR_VERSION}::Test
+)
+add_test(NAME qca-otr-symkey COMMAND qca-otr-symkey-test)
+
 if(QCA_OTR_BUILD_LIBOTR_INTEROP_TESTS)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(LIBOTR REQUIRED IMPORTED_TARGET libotr)

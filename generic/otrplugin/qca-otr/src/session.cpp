@@ -78,6 +78,32 @@ bool containsTlv(const QVector<Tlv> &tlvs, TlvType type)
     return false;
 }
 
+bool parseSymmetricKeyTlv(const QVector<Tlv> &tlvs, quint32 *use, QByteArray *useData)
+{
+    if (use)
+        *use = 0;
+    if (useData)
+        useData->clear();
+
+    const quint16 wanted = static_cast<quint16>(TlvType::SymmetricKey);
+    for (const Tlv &tlv : tlvs) {
+        if (tlv.type != wanted || tlv.value.size() < 4)
+            continue;
+
+        const auto *data = reinterpret_cast<const unsigned char *>(tlv.value.constData());
+        const quint32 parsedUse = (static_cast<quint32>(data[0]) << 24) |
+            (static_cast<quint32>(data[1]) << 16) |
+            (static_cast<quint32>(data[2]) << 8) |
+            static_cast<quint32>(data[3]);
+        if (use)
+            *use = parsedUse;
+        if (useData)
+            *useData = tlv.value.mid(4);
+        return true;
+    }
+    return false;
+}
+
 } // namespace
 
 struct OtrSession::Private
@@ -578,9 +604,19 @@ SessionResult OtrSession::processIncoming(const QByteArray &transportMessage, in
                 routed.outgoingMessages.append(Negotiation::errorMessage(UnreadableErrorText));
             }
             break;
-        case DataReceiveStatus::Message:
+        case DataReceiveStatus::Message: {
             routed.plaintext = dataResult.plaintext;
             d->activePeerInstance = route.senderInstance;
+
+            quint32 use = 0;
+            QByteArray useData;
+            if (parseSymmetricKeyTlv(dataResult.tlvs, &use, &useData)) {
+                routed.hasSymmetricKey = true;
+                routed.symmetricKeyUse = use;
+                routed.symmetricKeyData = useData;
+                routed.symmetricKey = dataResult.extraKey;
+            }
+
             if (containsTlv(dataResult.tlvs, TlvType::Disconnected)) {
                 d->forcePeerState(peer, PeerState::Finished);
                 routed.status = SessionStatus::Disconnected;
@@ -588,6 +624,7 @@ SessionResult OtrSession::processIncoming(const QByteArray &transportMessage, in
                 routed.status = SessionStatus::Message;
             }
             break;
+        }
         }
         return routed;
     }
@@ -667,6 +704,48 @@ bool OtrSession::disconnect(quint32 peerInstance,
     d->forcePeerState(peer, PeerState::Plaintext);
     if (d->activePeerInstance == peerInstance)
         d->activePeerInstance = 0;
+    return true;
+}
+
+bool OtrSession::sendSymmetricKey(quint32 peerInstance,
+                                  quint32 use,
+                                  const QByteArray &useData,
+                                  QCA::SecureArray *symmetricKey,
+                                  QVector<QByteArray> *transportMessages,
+                                  int maxMessageSize)
+{
+    if (!symmetricKey || !transportMessages || useData.size() > 65531)
+        return false;
+    *symmetricKey = QCA::SecureArray();
+    transportMessages->clear();
+
+    Private::PeerContext *peer = d->findPeer(peerInstance);
+    if (!peer || peer->state != PeerState::Encrypted || !peer->data || !peer->data->isReady())
+        return false;
+
+    const QCA::SecureArray extraKey = peer->data->currentSendExtraKey();
+    if (extraKey.size() != 32)
+        return false;
+
+    QByteArray value(4, '\0');
+    value[0] = static_cast<char>((use >> 24) & 0xff);
+    value[1] = static_cast<char>((use >> 16) & 0xff);
+    value[2] = static_cast<char>((use >> 8) & 0xff);
+    value[3] = static_cast<char>(use & 0xff);
+    value.append(useData);
+
+    QVector<Tlv> tlvs;
+    tlvs.append(Tlv {static_cast<quint16>(TlvType::SymmetricKey), value});
+    if (!sendMessage(peerInstance,
+                     QByteArray(),
+                     tlvs,
+                     transportMessages,
+                     maxMessageSize,
+                     DataFlagIgnoreUnreadable)) {
+        return false;
+    }
+
+    *symmetricKey = extraKey;
     return true;
 }
 
