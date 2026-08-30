@@ -5,10 +5,22 @@
  * Copyright (C) 2007-2011  Timo Engel (timo-e@freenet.de)
  *                    2011  Florian Fieber
  *
+ * This program was originally written as part of a diplom thesis
+ * advised by Prof. Dr. Ruediger Weis (PST Labor)
+ * at the Technical University of Applied Sciences Berlin.
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #ifndef PSIOTRPLUGIN_H_
@@ -101,7 +113,18 @@ public:
     void setIconFactoryAccessingHost(IconFactoryAccessingHost *host) override;
     void setEncryptionMethodAccessingHost(EncryptionMethodAccessingHost *host) override;
 
+    /**
+     * Applies native OTR processing to an incoming message DOM in place.
+     * Protocol-only messages clear @p message; decrypted application messages
+     * replace body/XHTML content and receive an EME marker when needed.
+     */
     bool decryptMessageElement(int account, QDomElement &message, const QString &contact = QString());
+
+    /**
+     * Encrypts the message body for a resource-bound OTR conversation in place.
+     * On encryption failure @p message is cleared so the caller cannot send the
+     * original plaintext accidentally.
+     */
     bool encryptMessageElement(int account, QDomElement &message, const QString &contact = QString());
 
     QString dataDir() override;
@@ -118,10 +141,16 @@ public:
     QString humanAccountPublic(const QString &accountId) override;
     QString humanContact(const QString &accountId, const QString &contact) override;
 
+    /** Displays a rich-text system message for the given account/contact pair. */
     bool appendSysMsg(const QString &account, const QString &contact, const QString &message, const QString &icon = "");
 
+    /** Returns the Psi account index for @p accountId, or -1 when it is unknown. */
     int getAccountIndexById(const QString &accountId);
+
+    /** Returns the configured human-readable account name. */
     QString getAccountNameById(const QString &accountId);
+
+    /** Returns the public JID of the account identified by @p accountId. */
     QString getAccountJidById(const QString &accountId);
 
 private slots:
@@ -130,6 +159,10 @@ private slots:
 private:
     friend class OtrEncryptionProvider;
 
+    /**
+     * Returns a full JID for private/MUC contacts and a bare JID for ordinary
+     * roster contacts. OTR itself remains resource-bound once a session starts.
+     */
     QString getCorrectJid(int accountIndex, const QString &fullJid);
 
     bool m_enabled;
