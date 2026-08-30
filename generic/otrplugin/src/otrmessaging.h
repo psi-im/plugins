@@ -32,7 +32,17 @@ class OtrInternal;
 
 namespace psiotr {
 
-enum OtrPolicy { OTR_POLICY_OFF, OTR_POLICY_ENABLED, OTR_POLICY_AUTO, OTR_POLICY_REQUIRE };
+/** User policy controlling when OTR negotiation/encryption is attempted. */
+enum OtrPolicy {
+    /** Disable OTR handling for ordinary conversations. */
+    OTR_POLICY_OFF,
+    /** Manual mode: OTR is available, but negotiation starts only explicitly. */
+    OTR_POLICY_ENABLED,
+    /** Opportunistic mode: advertise/discover OTR and negotiate when possible. */
+    OTR_POLICY_AUTO,
+    /** Require encryption: do not allow application plaintext to leave unencrypted. */
+    OTR_POLICY_REQUIRE
+};
 
 /** Result of processing an incoming message through the OTR backend. */
 enum OtrMessageType {
@@ -44,10 +54,15 @@ enum OtrMessageType {
     OTR_MESSAGETYPE_OTR
 };
 
+/** State of the currently selected peer OTR session. */
 enum OtrMessageState {
+    /** No conversation/session state is available for the account/contact pair. */
     OTR_MESSAGESTATE_UNKNOWN,
+    /** Conversation is currently carrying ordinary plaintext. */
     OTR_MESSAGESTATE_PLAINTEXT,
+    /** An authenticated encrypted OTR session is established. */
     OTR_MESSAGESTATE_ENCRYPTED,
+    /** OTR was explicitly finished; a new negotiation is required before secure messaging resumes. */
     OTR_MESSAGESTATE_FINISHED
 };
 
