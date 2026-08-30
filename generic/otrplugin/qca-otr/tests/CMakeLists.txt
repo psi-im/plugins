@@ -110,6 +110,16 @@ target_link_libraries(qca-otr-symkey-test
 )
 add_test(NAME qca-otr-symkey COMMAND qca-otr-symkey-test)
 
+add_executable(qca-otr-smp-test
+    smptest.cpp
+)
+target_link_libraries(qca-otr-smp-test
+    PRIVATE
+        QcaOtr::QcaOtr
+        Qt${QT_DEFAULT_MAJOR_VERSION}::Test
+)
+add_test(NAME qca-otr-smp COMMAND qca-otr-smp-test)
+
 if(QCA_OTR_BUILD_LIBOTR_INTEROP_TESTS)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(LIBOTR REQUIRED IMPORTED_TARGET libotr)
