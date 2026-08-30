@@ -26,6 +26,7 @@ add_library(qca-otr STATIC
     src/persistence.cpp
     src/persistence_secret.cpp
     src/profile.cpp
+    src/profilestore.cpp
     src/session.cpp
     src/smp.cpp
     src/tlv.cpp
@@ -38,7 +39,7 @@ set_target_properties(qca-otr PROPERTIES
     POSITION_INDEPENDENT_CODE ON
 )
 
-target_compile_features(qca-otr PUBLIC cxx_std_17)
+target_compile_features(qca-otr PUBLIC cxx_std_20)
 target_include_directories(qca-otr
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -63,4 +64,5 @@ endif()
 if(QCA_OTR_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
+    add_subdirectory(adaptertest)
 endif()

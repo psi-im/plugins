@@ -15,103 +15,68 @@ validated against libotr 4.1.1 before the Psi plugin switches backend.
 - broadcast/master AKE cloned independently for every answering instance
 - libotr interoperability for fragmented AKE and encrypted data messages
 
-Exit criterion: fragmented and unfragmented AKE/Data traffic interoperates in
-both directions with libotr 4.1.1, including multiple remote instances.
-
 ## 2. Negotiation, message envelope and control TLVs — completed
 
-The current Psi plugin does not start OTR by sending a D-H Commit directly: it
-sends `otrl_proto_default_query_msg()` and also delegates ordinary outgoing
-messages to libotr policy handling. The native backend therefore implements the
-same transport-facing negotiation and control envelope before plugin integration.
-
-- OTR query generation/parsing and version negotiation (`?OTRv3?` and combined queries)
+- OTR query generation/parsing and version negotiation
 - OTRv3 whitespace-tag detection/generation for opportunistic policy
-- policy behavior needed by the current plugin (manual/opportunistic/always)
-- encrypted framing as `plaintext || NUL || TLVs`
-- strict TLV codec with duplicate/length/truncation handling
-- disconnected TLV and libotr-compatible PLAINTEXT/ENCRYPTED/FINISHED semantics
-- symmetric-key TLV / secure extra-key plumbing used by libotr-compatible applications
-- canonical OTR error generation, tolerant parsing, unreadable/error result events and ERROR_START_AKE behavior
-- preserve per-instance routing for every control path, including per-instance disconnect
-- public libotr 4.1.1 oracle coverage in both directions for query, whitespace discovery,
-  generic TLVs, disconnect/restart, SYMKEY and protocol-error/unreadable handling
-
-Exit criterion: start/disconnect/error and encrypted TLV traffic round-trip with
-libotr 4.1.1 through its public message APIs. This is covered by the Qt5 and Qt6
-CI matrix without linking libotr into the qca-otr runtime library.
+- manual/opportunistic/always policy behavior
+- encrypted plaintext/TLV envelope
+- disconnected and symmetric-key TLVs
+- protocol errors/unreadable handling
+- libotr interoperability coverage
 
 ## 3. SMP — completed
 
-- standalone OTRv3 Socialist Millionaires' Protocol state machine and zero-knowledge proofs
-- libotr-compatible group-5 MPI serialization and SHA-256 proof hashing
-- exact combined-secret derivation from initiator/responder fingerprints, secure session id
-  and the user-entered secret, with secret material retained in `QCA::SecureArray`
-- initiation with and without a question, response and progress/event tracking
-- success, failure, abort, cheating and unexpected/malformed-message handling
-- SMP TLVs 2-7 transported through the normal encrypted Data Message ratchet
-- independent SMP state for every routed remote OTRv3 instance
-- public libotr 4.1.1 interoperability in both directions for matching secrets,
-  mismatching secrets, question/answer flow and abort
-
-Exit criterion: qca-otr and libotr 4.1.1 agree on SMP proofs, outcomes and public
-SMP event flow in both directions. The same oracle suite passes in the Qt5 and
-Qt6 CI matrix without adding libotr to the qca-otr runtime dependency set.
+- standalone OTRv3 SMP state machine and zero-knowledge proofs
+- libotr-compatible combined-secret derivation
+- secret material retained in `QCA::SecureArray`
+- complete question/answer, abort and result event flow
+- libotr interoperability coverage
 
 ## 4. Persistence and migration — completed
 
-- parse and write the existing libotr `otr.keys` DSA private-key S-expression format
-  without regenerating identities, validating the stored public `y` against the private key
-- preserve the current Psi account/protocol namespace exactly, including the historical
-  `prpl-jabber` persistence identifier without introducing a libpurple dependency
-- parse/write `otr.fingerprints`, including arbitrary libotr trust strings and legacy
-  records without an explicit trust field
-- parse/write `otr.instags`, including libotr's reserved-instance-tag boundary and
-  warning/header format
-- profile-level loading/saving for the exact `otr.keys`, `otr.fingerprints` and
-  `otr.instags` filenames used by the current plugin
-- missing stores load as an empty partial profile; malformed fingerprint/instance-tag
-  records are skipped like libotr while a malformed private-key store fails closed
-- duplicate account/fingerprint/instance-tag lookups preserve libotr's last-record-wins
-  behavior
-- atomic replacement of every store through `QSaveFile`, with owner-only private-key
-  permissions on platforms where Qt exposes POSIX permissions
-- deterministic codec/profile round-trip tests plus an exact libotr `otrtest3` DSA fixture
-- public libotr 4.1.1 oracle coverage in both directions for private identities,
-  fingerprint/trust records and instance tags
-- full disk-profile migration oracle: libotr-created legacy profile -> qca-otr load/save ->
-  libotr reread, preserving the exact DSA identity fingerprint, trust and instance tag
+- libotr-compatible `otr.keys`, `otr.fingerprints` and `otr.instags`
+- exact migration of existing Psi identities and trust data
+- private-key serialization retained in `QCA::SecureArray`
+- private-key disk I/O through `QCA::SecureFile`
+- explicit application-owned opaque protocol id
+- Linux Qt5/Qt6 and Windows Qt5/Win7-baseline coverage
 
-Exit criterion: an existing Psi/libotr OTR profile can be loaded and rewritten by
-qca-otr without identity, fingerprint/trust or instance-tag loss, and the rewritten
-profile remains readable by libotr 4.1.1. The persistence code remains QtCore + QCA3;
-libotr/libgcrypt are linked only into the optional oracle tests.
+## 5. Native Psi adapter and default dependency switch
 
-## 5. Complete `OtrSession` and Psi adapter
+The primary objective of this stage is not a long-lived dual-backend abstraction.
+The normal OTR plugin build must stop depending on libotr, libgcrypt and
+libgpg-error as soon as the native adapter is feature-complete enough to replace
+`OtrInternal`.
 
-- complete the remaining adapter-facing identity/trust/state surface on top of
-  the routed negotiation, control, SMP and persistence core
-- final API: `start`, `processIncoming`, `sendMessage`, `disconnect`, `startSmp`,
-  `respondSmp`, `abortSmp`
-- expose peer identity/fingerprint/trust and per-instance secure state
-- map qca-otr events to the existing plugin state-change, notification and SMP UI
-- retain current fingerprint/key management and options behavior
-- register the native backend through Psi's current encryption interface
-- keep the old libotr backend available behind a temporary build/runtime switch
-  until migration and interoperability smoke tests are complete
+- add an application-facing qca-otr `ProfileStore` for identity generation,
+  instance tags and fingerprint/trust management
+- make `psiotr::Fingerprint` an owning value type with no pointer into libotr
+- replace the implementation of `OtrInternal` with qca-otr `OtrSession` +
+  `ProfileStore`, preserving the existing `OtrMessaging`/UI-facing API
+- map native negotiation, encryption, disconnect, session state and SMP events
+  to the existing Psi callbacks
+- preserve historical Psi persistence id `prpl-jabber` only in the Psi adapter
+- remove `LIBOTR`, `LIBGCRYPT` and `LIBGPGERROR` from the normal plugin CMake
+  dependency graph; libotr/libgcrypt remain only in optional qca-otr oracle tests
+- keep Qt5/Windows 7 and Qt6 coverage on the native path
 
-Exit criterion: the existing plugin UI and encryption interface operate on
-qca-otr with no libotr calls on the native path.
+Exit criterion: the normal OTR plugin builds and operates on qca-otr/QCA without
+linking libotr, libgcrypt or libgpg-error. Existing profiles remain compatible.
 
-## 6. Backend switch and dependency cleanup
+## 6. Legacy cleanup and final integration
 
-- make qca-otr the default OTR backend
-- Qt5/Windows 7 and Qt6 CI coverage
-- real new-Psi <-> old-Psi/libotr interoperability smoke tests
-- migration test using an existing profile before and after backend switch
-- remove the temporary libotr backend switch
-- remove libotr, libgcrypt and libgpg-error runtime/build dependencies
-- remove dead compatibility adapter code
+There is no intention to return to the old libotr backend after the native switch.
+Once native behavior and interoperability smoke tests are green:
 
-Exit criterion: Psi builds and runs OTR without libotr/libgcrypt/libgpg-error,
-while preserving interoperability, Win7/Qt5 support and existing user data.
+- delete obsolete libotr callbacks, headers, `otrlextensions` and compatibility
+  implementation code
+- remove any temporary migration-only adapter seams
+- simplify `OtrMessaging` and related UI plumbing around the native model
+- run real new-Psi <-> old-Psi/libotr interoperability smoke tests
+- verify migration using an existing profile before and after the backend switch
+- remove remaining dead build configuration and documentation
+
+Exit criterion: the OTR plugin contains no runtime/build dependency or dead
+adapter code for libotr/libgcrypt/libgpg-error while remaining interoperable with
+older clients over the wire and preserving existing user data.
