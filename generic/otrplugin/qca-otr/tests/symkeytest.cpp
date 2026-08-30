@@ -1,3 +1,4 @@
+#include "qca-otr/data.h"
 #include "qca-otr/session.h"
 #include "qca-otr/transport.h"
 
