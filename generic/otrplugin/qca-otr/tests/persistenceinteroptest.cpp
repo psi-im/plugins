@@ -19,7 +19,7 @@ QByteArray fileContents(FILE *file)
     if (!file || std::fflush(file) != 0 || std::fseek(file, 0, SEEK_END) != 0)
         return {};
     const long size = std::ftell(file);
-    if (size < 0 || std::fseek(file, 0, SEEK_SET) != 0)
+    if (size < 0 || size > INT_MAX || std::fseek(file, 0, SEEK_SET) != 0)
         return {};
 
     QByteArray data;
@@ -29,7 +29,34 @@ QByteArray fileContents(FILE *file)
     return data;
 }
 
+QCA::SecureArray secureFileContents(FILE *file)
+{
+    if (!file || std::fflush(file) != 0 || std::fseek(file, 0, SEEK_END) != 0)
+        return {};
+    const long size = std::ftell(file);
+    if (size < 0 || size > INT_MAX || std::fseek(file, 0, SEEK_SET) != 0)
+        return {};
+
+    QCA::SecureArray data(static_cast<int>(size));
+    if (size > 0 && std::fread(data.data(), 1, static_cast<size_t>(size), file) != static_cast<size_t>(size))
+        return {};
+    return data;
+}
+
 FILE *fileFromData(const QByteArray &data)
+{
+    FILE *file = std::tmpfile();
+    if (!file)
+        return nullptr;
+    if (!data.isEmpty() && std::fwrite(data.constData(), 1, static_cast<size_t>(data.size()), file) != static_cast<size_t>(data.size())) {
+        std::fclose(file);
+        return nullptr;
+    }
+    std::rewind(file);
+    return file;
+}
+
+FILE *fileFromData(const QCA::SecureArray &data)
 {
     FILE *file = std::tmpfile();
     if (!file)
@@ -90,7 +117,7 @@ void PersistenceInteropTest::privateKeysRoundTripWithLibotr()
     FILE *generated = std::tmpfile();
     QVERIFY(generated);
     QCOMPARE(otrl_privkey_generate_FILEp(original, generated, account.constData(), protocol.constData()), gcry_error_t(0));
-    const QByteArray libotrStore = fileContents(generated);
+    const QCA::SecureArray libotrStore = secureFileContents(generated);
     std::fclose(generated);
     QVERIFY(!libotrStore.isEmpty());
 
@@ -106,7 +133,7 @@ void PersistenceInteropTest::privateKeysRoundTripWithLibotr()
     QCOMPARE(QcaOtr::dsaPublicKeyFingerprint(QcaOtr::dsaPublicKey(nativeKeys.first().key)), originalFingerprint);
 
     bool ok = false;
-    const QByteArray nativeStore = QcaOtr::Persistence::serializePrivateKeys(nativeKeys, &ok);
+    const QCA::SecureArray nativeStore = QcaOtr::Persistence::serializePrivateKeys(nativeKeys, &ok);
     QVERIFY(ok);
     FILE *nativeFile = fileFromData(nativeStore);
     QVERIFY(nativeFile);
@@ -264,8 +291,7 @@ void PersistenceInteropTest::completeProfileMigrationWithLibotr()
 
     OtrlUserState legacy = otrl_userstate_create();
     QVERIFY(legacy);
-    QCOMPARE(otrl_privkey_generate(legacy, legacyKeysPath.constData(), account.constData(), protocol.constData()),
-             gcry_error_t(0));
+    QCOMPARE(otrl_privkey_generate(legacy, legacyKeysPath.constData(), account.constData(), protocol.constData()), gcry_error_t(0));
     const QByteArray identityFingerprint = libotrFingerprint(legacy, account, protocol);
     QCOMPARE(identityFingerprint.size(), 20);
 
@@ -285,8 +311,7 @@ void PersistenceInteropTest::completeProfileMigrationWithLibotr()
     QVERIFY(peerRecord);
     otrl_context_set_trust(peerRecord, trust.constData());
     QCOMPARE(otrl_privkey_write_fingerprints(legacy, legacyFingerprintsPath.constData()), gcry_error_t(0));
-    QCOMPARE(otrl_instag_generate(legacy, legacyInstagsPath.constData(), account.constData(), protocol.constData()),
-             gcry_error_t(0));
+    QCOMPARE(otrl_instag_generate(legacy, legacyInstagsPath.constData(), account.constData(), protocol.constData()), gcry_error_t(0));
     OtrlInsTag *legacyTag = otrl_instag_find(legacy, account.constData(), protocol.constData());
     QVERIFY(legacyTag);
     const quint32 instanceTag = legacyTag->instag;
@@ -319,8 +344,7 @@ void PersistenceInteropTest::completeProfileMigrationWithLibotr()
     OtrlUserState reread = otrl_userstate_create();
     QVERIFY(reread);
     QCOMPARE(otrl_privkey_read(reread, nativeKeysPath.constData()), gcry_error_t(0));
-    QCOMPARE(otrl_privkey_read_fingerprints(reread, nativeFingerprintsPath.constData(), nullptr, nullptr),
-             gcry_error_t(0));
+    QCOMPARE(otrl_privkey_read_fingerprints(reread, nativeFingerprintsPath.constData(), nullptr, nullptr), gcry_error_t(0));
     QCOMPARE(otrl_instag_read(reread, nativeInstagsPath.constData()), gcry_error_t(0));
     QCOMPARE(libotrFingerprint(reread, account, protocol), identityFingerprint);
 

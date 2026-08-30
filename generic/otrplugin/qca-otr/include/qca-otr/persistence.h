@@ -5,6 +5,7 @@
 #include <QByteArray>
 #include <QList>
 #include <QString>
+#include <QtCrypto>
 #include <QtGlobal>
 
 namespace QcaOtr {
@@ -34,8 +35,11 @@ struct InstanceTagRecord
 
 namespace Persistence {
 
-bool parsePrivateKeys(const QByteArray &data, QList<PrivateKeyRecord> *records, QString *error = nullptr);
-QByteArray serializePrivateKeys(const QList<PrivateKeyRecord> &records, bool *ok = nullptr);
+// Private-key stores contain long-lived identity secrets. Keep their complete
+// serialized representation in QCA secure memory; account/protocol metadata in
+// the parsed records remains ordinary QByteArray data.
+bool parsePrivateKeys(const QCA::SecureArray &data, QList<PrivateKeyRecord> *records, QString *error = nullptr);
+QCA::SecureArray serializePrivateKeys(const QList<PrivateKeyRecord> &records, bool *ok = nullptr);
 
 bool parseFingerprints(const QByteArray &data, QList<FingerprintRecord> *records, QString *error = nullptr);
 QByteArray serializeFingerprints(const QList<FingerprintRecord> &records, bool *ok = nullptr);

@@ -17,11 +17,11 @@ permissions:
   contents: read
 
 env:
-  QCA_VERSION: 3.0.3
+  QCA_VERSION: 3.0.5
 
 jobs:
   test:
-    name: Qt ${{ matrix.qt }}
+    name: Qt ${{ matrix.qt }} / Linux
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -104,3 +104,53 @@ jobs:
       - name: Run qca-otr tests
         shell: bash
         run: ctest --test-dir qca-otr-build --output-on-failure
+
+  windows-qt5:
+    name: Qt 5 / Windows 7 baseline
+    runs-on: windows-2022
+    steps:
+      - name: Checkout plugins
+        uses: actions/checkout@v4
+
+      - name: Set up MSYS2 MINGW64 Qt5
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-qt5-base
+            mingw-w64-x86_64-openssl
+            curl
+            unzip
+
+      - name: Download released QCA3 Qt5 SDK
+        shell: msys2 {0}
+        run: |
+          set -euo pipefail
+          curl -fL \
+            "https://github.com/psi-im/qca/releases/download/v${QCA_VERSION}/qca3-qt5-windows-x64.zip" \
+            -o qca3-qt5.zip
+          mkdir qca-sdk
+          unzip -q qca3-qt5.zip -d qca-sdk
+          test -f qca-sdk/lib/cmake/Qca3-qt5/Qca3-qt5Config.cmake
+          test -n "$(find qca-sdk/bin -type f -iname '*qca3-qt5*.dll' -print -quit)"
+          plugin_path=$(find qca-sdk -type d -path '*/qca3-qt5/crypto' -print -quit)
+          test -n "$plugin_path"
+          echo "QCA_PLUGIN_PATH=$plugin_path" >> "$GITHUB_ENV"
+
+      - name: Build and run qca-otr native tests
+        shell: msys2 {0}
+        run: |
+          set -euo pipefail
+          export PATH="$PWD/qca-sdk/bin:$PATH"
+          cmake -S generic/otrplugin/qca-otr -B qca-otr-build -G Ninja \
+            -DQT_DEFAULT_MAJOR_VERSION=5 \
+            -DQCA_OTR_BUILD_LIBOTR_INTEROP_TESTS=OFF \
+            -DCMAKE_BUILD_TYPE=Release \
+            "-DCMAKE_PREFIX_PATH=$PWD/qca-sdk;/mingw64" \
+            "-DQca3-qt5_DIR=$PWD/qca-sdk/lib/cmake/Qca3-qt5"
+          cmake --build qca-otr-build --parallel 2
+          ctest --test-dir qca-otr-build --output-on-failure

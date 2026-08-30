@@ -57,24 +57,14 @@ inline bool readFile(const QString &path, QByteArray *data, QString *error)
     return true;
 }
 
-template<typename Buffer>
-bool writeFileAtomically(const QString &path, const Buffer &data, bool privateFile, QString *error)
+inline bool writeFileAtomically(const QString &path, const QByteArray &data, QString *error)
 {
     QSaveFile file(path);
     if (!file.open(QIODevice::WriteOnly)) {
         setError(error, file.errorString());
         return false;
     }
-#ifdef Q_OS_UNIX
-    if (privateFile && !file.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner)) {
-        file.cancelWriting();
-        setError(error, QStringLiteral("Failed to set private-key file permissions"));
-        return false;
-    }
-#else
-    Q_UNUSED(privateFile)
-#endif
-    if (file.write(data.constData(), data.size()) != data.size()) {
+    if (file.write(data) != data.size()) {
         const QString message = file.errorString();
         file.cancelWriting();
         setError(error, message);
