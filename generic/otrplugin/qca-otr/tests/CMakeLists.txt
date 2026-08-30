@@ -60,6 +60,16 @@ target_link_libraries(qca-otr-negotiation-test
 )
 add_test(NAME qca-otr-negotiation COMMAND qca-otr-negotiation-test)
 
+add_executable(qca-otr-tlv-test
+    tlvtest.cpp
+)
+target_link_libraries(qca-otr-tlv-test
+    PRIVATE
+        QcaOtr::QcaOtr
+        Qt${QT_DEFAULT_MAJOR_VERSION}::Test
+)
+add_test(NAME qca-otr-tlv COMMAND qca-otr-tlv-test)
+
 add_executable(qca-otr-transport-test
     transporttest.cpp
 )

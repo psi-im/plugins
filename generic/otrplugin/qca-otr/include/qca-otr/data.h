@@ -1,6 +1,7 @@
 #pragma once
 
 #include "qca-otr/akesession.h"
+#include "qca-otr/tlv.h"
 
 #include <QByteArray>
 #include <QtGlobal>
@@ -56,6 +57,7 @@ struct DataReceiveResult
 {
     DataReceiveStatus status = DataReceiveStatus::Ignored;
     QByteArray plaintext;
+    QVector<Tlv> tlvs;
     QCA::SecureArray extraKey;
     quint8 flags = 0;
 };
@@ -72,6 +74,10 @@ public:
     const QCA::BigInteger &peerDhPublic() const { return peerDhPublic_; }
 
     bool sendMessage(const QByteArray &plaintext, QByteArray *encoded, quint8 flags = 0);
+    bool sendMessage(const QByteArray &plaintext,
+                     const QVector<Tlv> &tlvs,
+                     QByteArray *encoded,
+                     quint8 flags = 0);
     DataReceiveResult processIncoming(const QByteArray &encoded);
 
 private:
