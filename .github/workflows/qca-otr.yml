@@ -137,7 +137,7 @@ jobs:
           unzip -q qca3-qt5.zip -d qca-sdk
           test -f qca-sdk/lib/cmake/Qca3-qt5/Qca3-qt5Config.cmake
           test -n "$(find qca-sdk/bin -type f -iname '*qca3-qt5*.dll' -print -quit)"
-          plugin_path=$(find qca-sdk -type d -path '*/qca3-qt5/crypto' -print -quit)
+          plugin_path=$(find "$PWD/qca-sdk" -type d -path '*/qca3-qt5/crypto' -print -quit)
           test -n "$plugin_path"
           echo "QCA_PLUGIN_PATH=$plugin_path" >> "$GITHUB_ENV"
 
