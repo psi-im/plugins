@@ -7,6 +7,8 @@
 
 namespace {
 
+constexpr char TestProtocolId[] = "prpl-jabber";
+
 QcaOtr::DsaPrivateKey toyKey(int x)
 {
     QcaOtr::DsaPrivateKey key;
@@ -72,7 +74,7 @@ void ProfileTest::profileRoundTripAndLookup()
 
     QcaOtr::PrivateKeyRecord oldKey;
     oldKey.account = "account-a";
-    oldKey.protocol = QcaOtr::LegacyPsiProtocolId;
+    oldKey.protocol = TestProtocolId;
     oldKey.key = toyKey(3);
     profile.privateKeys.append(oldKey);
 
@@ -82,14 +84,14 @@ void ProfileTest::profileRoundTripAndLookup()
 
     QcaOtr::PrivateKeyRecord otherKey;
     otherKey.account = "account-b";
-    otherKey.protocol = QcaOtr::LegacyPsiProtocolId;
+    otherKey.protocol = TestProtocolId;
     otherKey.key = toyKey(5);
     profile.privateKeys.append(otherKey);
 
     QcaOtr::FingerprintRecord oldFingerprint;
     oldFingerprint.username = "romeo@example.net";
     oldFingerprint.account = "account-a";
-    oldFingerprint.protocol = QcaOtr::LegacyPsiProtocolId;
+    oldFingerprint.protocol = TestProtocolId;
     oldFingerprint.fingerprint = QByteArray::fromHex("00112233445566778899aabbccddeeff00112233");
     oldFingerprint.trust = "old-trust";
     profile.fingerprints.append(oldFingerprint);
@@ -100,7 +102,7 @@ void ProfileTest::profileRoundTripAndLookup()
 
     QcaOtr::InstanceTagRecord oldTag;
     oldTag.account = "account-a";
-    oldTag.protocol = QcaOtr::LegacyPsiProtocolId;
+    oldTag.protocol = TestProtocolId;
     oldTag.instanceTag = 0x11111111;
     profile.instanceTags.append(oldTag);
 
@@ -117,22 +119,21 @@ void ProfileTest::profileRoundTripAndLookup()
     QCOMPARE(loaded.fingerprints.size(), 2);
     QCOMPARE(loaded.instanceTags.size(), 2);
 
-    const QcaOtr::PrivateKeyRecord *key = QcaOtr::Persistence::findPrivateKey(loaded, "account-a");
+    const QcaOtr::PrivateKeyRecord *key = QcaOtr::Persistence::findPrivateKey(loaded, "account-a", TestProtocolId);
     QVERIFY(key);
     QCOMPARE(key->key.x, QCA::BigInteger(4));
 
     const QcaOtr::FingerprintRecord *fingerprint = QcaOtr::Persistence::findFingerprint(
-        loaded, "romeo@example.net", "account-a", oldFingerprint.fingerprint);
+        loaded, "romeo@example.net", "account-a", oldFingerprint.fingerprint, TestProtocolId);
     QVERIFY(fingerprint);
     QCOMPARE(fingerprint->trust, QByteArray("custom-libotr-trust"));
 
     bool found = false;
-    QCOMPARE(QcaOtr::Persistence::findInstanceTag(loaded, "account-a", QcaOtr::LegacyPsiProtocolId, &found),
-             quint32(0x22222222));
+    QCOMPARE(QcaOtr::Persistence::findInstanceTag(loaded, "account-a", TestProtocolId, &found), quint32(0x22222222));
     QVERIFY(found);
 
     found = true;
-    QCOMPARE(QcaOtr::Persistence::findInstanceTag(loaded, "missing", QcaOtr::LegacyPsiProtocolId, &found), quint32(0));
+    QCOMPARE(QcaOtr::Persistence::findInstanceTag(loaded, "missing", TestProtocolId, &found), quint32(0));
     QVERIFY(!found);
 }
 
