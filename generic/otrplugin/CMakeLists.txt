@@ -61,7 +61,6 @@ set(_HDRS
     src/psiotrconfig.h
     src/psiotrclosure.h
     src/htmlnormalizer.h
-    src/htmltidy.h
 )
 set(_SRCS
     src/psiotrplugin.cpp
