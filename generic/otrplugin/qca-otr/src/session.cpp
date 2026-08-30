@@ -17,6 +17,8 @@ constexpr quint8 DhKeyType = 0x0a;
 constexpr quint8 RevealSignatureType = 0x11;
 constexpr quint8 SignatureType = 0x12;
 
+const QByteArray UnreadableErrorText("Unreadable encrypted message.");
+
 bool isAkeType(quint8 type)
 {
     return type == DhCommitType || type == DhKeyType || type == RevealSignatureType || type == SignatureType;
@@ -51,6 +53,31 @@ bool startsAkeFromWhitespace(SessionPolicy policy)
     return policy == SessionPolicy::Opportunistic || policy == SessionPolicy::Always;
 }
 
+bool rawDataFlags(const QByteArray &raw, quint8 *flags)
+{
+    if (flags)
+        *flags = 0;
+    if (raw.size() < 12 || static_cast<quint8>(raw.at(0)) != 0x00 ||
+        static_cast<quint8>(raw.at(1)) != 0x03 ||
+        static_cast<quint8>(raw.at(2)) != DataMessageType) {
+        return false;
+    }
+
+    if (flags)
+        *flags = static_cast<quint8>(raw.at(11));
+    return true;
+}
+
+bool containsTlv(const QVector<Tlv> &tlvs, TlvType type)
+{
+    const quint16 wanted = static_cast<quint16>(type);
+    for (const Tlv &tlv : tlvs) {
+        if (tlv.type == wanted)
+            return true;
+    }
+    return false;
+}
+
 } // namespace
 
 struct OtrSession::Private
@@ -75,6 +102,7 @@ struct OtrSession::Private
         std::unique_ptr<DataSession> data;
         AkeEstablishedSession established;
         bool hasEstablished = false;
+        PeerState state = PeerState::Plaintext;
     };
 
     Private(const DsaPrivateKey &identity, quint32 instance) : identityKey(identity), localInstance(instance) { }
@@ -122,20 +150,51 @@ struct OtrSession::Private
         return result;
     }
 
+    void forcePeerState(PeerContext *peer, PeerState state)
+    {
+        if (!peer)
+            return;
+        peer->ake.reset();
+        peer->data.reset();
+        peer->established = AkeEstablishedSession();
+        peer->hasEstablished = false;
+        peer->state = state;
+    }
+
     quint32 preferredEncryptedPeer(quint32 requested) const
     {
         if (requested != 0) {
             const PeerContext *peer = findPeer(requested);
-            return peer && peer->data && peer->data->isReady() ? requested : 0;
+            return peer && peer->state == PeerState::Encrypted && peer->data && peer->data->isReady()
+                ? requested
+                : 0;
         }
 
         const PeerContext *active = findPeer(activePeerInstance);
-        if (active && active->data && active->data->isReady())
+        if (active && active->state == PeerState::Encrypted && active->data && active->data->isReady())
             return activePeerInstance;
 
         for (const auto &entry : peers) {
             const PeerContext *peer = entry.second.get();
-            if (peer->data && peer->data->isReady())
+            if (peer->state == PeerState::Encrypted && peer->data && peer->data->isReady())
+                return entry.first;
+        }
+        return 0;
+    }
+
+    quint32 preferredFinishedPeer(quint32 requested) const
+    {
+        if (requested != 0) {
+            const PeerContext *peer = findPeer(requested);
+            return peer && peer->state == PeerState::Finished ? requested : 0;
+        }
+
+        const PeerContext *active = findPeer(activePeerInstance);
+        if (active && active->state == PeerState::Finished)
+            return activePeerInstance;
+
+        for (const auto &entry : peers) {
+            if (entry.second->state == PeerState::Finished)
                 return entry.first;
         }
         return 0;
@@ -154,6 +213,7 @@ struct OtrSession::Private
     SessionPolicy policy = SessionPolicy::Manual;
     OfferState offer = OfferState::None;
     quint32 activePeerInstance = 0;
+    QByteArray queryName;
     QByteArray pendingRequiredMessage;
     bool hasPendingRequired = false;
     quint8 pendingRequiredFlags = 0;
@@ -197,6 +257,7 @@ OutgoingResult OtrSession::startNegotiation(const QByteArray &ourName)
     if (d->policy == SessionPolicy::Disabled)
         return outgoing;
 
+    d->queryName = ourName;
     outgoing.status = OutgoingStatus::Negotiation;
     outgoing.messages.append(Negotiation::defaultQueryMessage(ourName));
     if (d->policy == SessionPolicy::Opportunistic)
@@ -211,6 +272,9 @@ OutgoingResult OtrSession::prepareOutgoing(const QByteArray &plaintext,
                                            quint8 flags)
 {
     OutgoingResult outgoing;
+    if (!ourName.isEmpty())
+        d->queryName = ourName;
+
     const quint32 encryptedPeer = d->preferredEncryptedPeer(peerInstance);
     if (encryptedPeer != 0) {
         if (!sendMessage(encryptedPeer, plaintext, &outgoing.messages, maxMessageSize, flags))
@@ -218,6 +282,13 @@ OutgoingResult OtrSession::prepareOutgoing(const QByteArray &plaintext,
         outgoing.status = OutgoingStatus::Encrypted;
         outgoing.peerInstance = encryptedPeer;
         d->activePeerInstance = encryptedPeer;
+        return outgoing;
+    }
+
+    const quint32 finishedPeer = d->preferredFinishedPeer(peerInstance);
+    if (finishedPeer != 0) {
+        outgoing.status = OutgoingStatus::Finished;
+        outgoing.peerInstance = finishedPeer;
         return outgoing;
     }
 
@@ -242,7 +313,7 @@ OutgoingResult OtrSession::prepareOutgoing(const QByteArray &plaintext,
         d->pendingRequiredFlags = flags;
         d->pendingRequiredMms = maxMessageSize;
         outgoing.status = OutgoingStatus::Negotiation;
-        outgoing.messages.append(Negotiation::defaultQueryMessage(ourName));
+        outgoing.messages.append(Negotiation::defaultQueryMessage(d->queryName));
         return outgoing;
     }
 
@@ -299,6 +370,15 @@ SessionResult OtrSession::processIncoming(const QByteArray &transportMessage, in
             if (!ok)
                 routed.status = SessionStatus::Error;
         }
+        return routed;
+    }
+
+    QByteArray remoteErrorText;
+    if (Negotiation::parseErrorMessage(transportMessage, &remoteErrorText)) {
+        SessionResult routed = result(SessionStatus::RemoteError);
+        routed.errorText = remoteErrorText;
+        if (d->policy == SessionPolicy::Opportunistic || d->policy == SessionPolicy::Always)
+            routed.outgoingMessages.append(Negotiation::defaultQueryMessage(d->queryName));
         return routed;
     }
 
@@ -434,6 +514,7 @@ SessionResult OtrSession::processIncoming(const QByteArray &transportMessage, in
             peer->established = peer->ake.established();
             peer->hasEstablished = true;
             peer->data = std::move(data);
+            peer->state = PeerState::Encrypted;
             d->activePeerInstance = route.senderInstance;
             routed.status = SessionStatus::Authenticated;
             break;
@@ -464,27 +545,48 @@ SessionResult OtrSession::processIncoming(const QByteArray &transportMessage, in
     }
 
     if (type == DataMessageType) {
+        quint8 flags = 0;
+        const bool haveFlags = rawDataFlags(raw, &flags);
         Private::PeerContext *peer = d->findPeer(route.senderInstance);
-        if (!peer || !peer->data || !peer->data->isReady())
-            return result(SessionStatus::Ignored, route.senderInstance);
+        if (!peer || peer->state != PeerState::Encrypted || !peer->data || !peer->data->isReady()) {
+            if (haveFlags && (flags & DataFlagIgnoreUnreadable))
+                return result(SessionStatus::Ignored, route.senderInstance);
+
+            SessionResult routed = result(SessionStatus::Unreadable, route.senderInstance);
+            routed.flags = flags;
+            routed.errorText = UnreadableErrorText;
+            return routed;
+        }
 
         const DataReceiveResult dataResult = peer->data->processIncoming(raw);
         SessionResult routed;
         routed.peerInstance = route.senderInstance;
-        routed.flags = dataResult.flags;
+        routed.flags = haveFlags ? flags : dataResult.flags;
         routed.extraKey = dataResult.extraKey;
         routed.tlvs = dataResult.tlvs;
+
         switch (dataResult.status) {
         case DataReceiveStatus::Ignored:
             routed.status = SessionStatus::Ignored;
             break;
         case DataReceiveStatus::Error:
-            routed.status = SessionStatus::Error;
+            if (haveFlags && (flags & DataFlagIgnoreUnreadable)) {
+                routed.status = SessionStatus::Ignored;
+            } else {
+                routed.status = SessionStatus::Unreadable;
+                routed.errorText = UnreadableErrorText;
+                routed.outgoingMessages.append(Negotiation::errorMessage(UnreadableErrorText));
+            }
             break;
         case DataReceiveStatus::Message:
-            routed.status = SessionStatus::Message;
             routed.plaintext = dataResult.plaintext;
             d->activePeerInstance = route.senderInstance;
+            if (containsTlv(dataResult.tlvs, TlvType::Disconnected)) {
+                d->forcePeerState(peer, PeerState::Finished);
+                routed.status = SessionStatus::Disconnected;
+            } else {
+                routed.status = SessionStatus::Message;
+            }
             break;
         }
         return routed;
@@ -514,7 +616,7 @@ bool OtrSession::sendMessage(quint32 peerInstance,
     transportMessages->clear();
 
     Private::PeerContext *peer = d->findPeer(peerInstance);
-    if (!peer || !peer->data || !peer->data->isReady())
+    if (!peer || peer->state != PeerState::Encrypted || !peer->data || !peer->data->isReady())
         return false;
 
     // Creating a Data Message advances counters and may rotate keys. Preserve
@@ -534,10 +636,50 @@ bool OtrSession::sendMessage(quint32 peerInstance,
     return true;
 }
 
+bool OtrSession::disconnect(quint32 peerInstance,
+                            QVector<QByteArray> *transportMessages,
+                            int maxMessageSize)
+{
+    if (!transportMessages)
+        return false;
+    transportMessages->clear();
+
+    if (peerInstance < Transport::MinimumInstanceTag)
+        return false;
+
+    Private::PeerContext *peer = d->findPeer(peerInstance);
+    if (!peer)
+        return true;
+
+    if (peer->state == PeerState::Encrypted && peer->data && peer->data->isReady()) {
+        QVector<Tlv> tlvs;
+        tlvs.append(Tlv {static_cast<quint16>(TlvType::Disconnected), QByteArray()});
+        if (!sendMessage(peerInstance,
+                         QByteArray(),
+                         tlvs,
+                         transportMessages,
+                         maxMessageSize,
+                         DataFlagIgnoreUnreadable)) {
+            return false;
+        }
+    }
+
+    d->forcePeerState(peer, PeerState::Plaintext);
+    if (d->activePeerInstance == peerInstance)
+        d->activePeerInstance = 0;
+    return true;
+}
+
+PeerState OtrSession::peerState(quint32 peerInstance) const
+{
+    const Private::PeerContext *peer = d->findPeer(peerInstance);
+    return peer ? peer->state : PeerState::Plaintext;
+}
+
 bool OtrSession::isEncrypted(quint32 peerInstance) const
 {
     const Private::PeerContext *peer = d->findPeer(peerInstance);
-    return peer && peer->data && peer->data->isReady();
+    return peer && peer->state == PeerState::Encrypted && peer->data && peer->data->isReady();
 }
 
 QVector<quint32> OtrSession::peerInstances() const
@@ -554,7 +696,7 @@ bool OtrSession::establishedSession(quint32 peerInstance, AkeEstablishedSession 
     if (!established)
         return false;
     const Private::PeerContext *peer = d->findPeer(peerInstance);
-    if (!peer || !peer->hasEstablished)
+    if (!peer || peer->state != PeerState::Encrypted || !peer->hasEstablished)
         return false;
     *established = peer->established;
     return true;

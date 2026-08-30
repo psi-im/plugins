@@ -31,6 +31,11 @@ quint8 queryBestVersion(const QByteArray &message,
                         VersionMask localVersions = NativeVersions,
                         bool *isQuery = nullptr);
 
+// OTR Error Messages are text-level protocol messages. As with libotr's
+// message classifier, only the first ?OTR occurrence is considered.
+QByteArray errorMessage(const QByteArray &text);
+bool parseErrorMessage(const QByteArray &message, QByteArray *text = nullptr);
+
 struct WhitespaceTag
 {
     bool found = false;

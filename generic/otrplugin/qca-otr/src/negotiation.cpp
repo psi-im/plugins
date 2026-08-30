@@ -3,6 +3,7 @@
 namespace QcaOtr::Negotiation {
 namespace {
 
+const QByteArray ErrorPrefix("?OTR Error:");
 const QByteArray BaseWhitespaceTag(" \t  \t\t\t\t \t \t \t  ");
 const QByteArray V1WhitespaceTag(" \t \t  \t ");
 const QByteArray V2WhitespaceTag("  \t\t  \t ");
@@ -103,6 +104,29 @@ quint8 queryBestVersion(const QByteArray &message,
                         bool *isQuery)
 {
     return bestVersion(queryVersions(message, isQuery), localVersions);
+}
+
+QByteArray errorMessage(const QByteArray &text)
+{
+    QByteArray message = ErrorPrefix;
+    message.append(text);
+    return message;
+}
+
+bool parseErrorMessage(const QByteArray &message, QByteArray *text)
+{
+    if (text)
+        text->clear();
+
+    const int start = message.indexOf("?OTR");
+    if (start < 0 || message.size() - start < ErrorPrefix.size())
+        return false;
+    if (message.mid(start, ErrorPrefix.size()) != ErrorPrefix)
+        return false;
+
+    if (text)
+        *text = message.mid(start + ErrorPrefix.size());
+    return true;
 }
 
 QByteArray whitespaceTag(VersionMask versions)

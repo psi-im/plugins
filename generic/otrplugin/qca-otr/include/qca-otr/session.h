@@ -11,11 +11,19 @@
 
 namespace QcaOtr {
 
+constexpr quint8 DataFlagIgnoreUnreadable = 0x01;
+
 enum class SessionPolicy {
     Disabled,
     Manual,
     Opportunistic,
     Always
+};
+
+enum class PeerState {
+    Plaintext,
+    Encrypted,
+    Finished
 };
 
 enum class SessionStatus {
@@ -26,6 +34,9 @@ enum class SessionStatus {
     Handled,
     Authenticated,
     Message,
+    Disconnected,
+    Unreadable,
+    RemoteError,
     ForOtherInstance,
     Error
 };
@@ -37,6 +48,7 @@ struct SessionResult
     QByteArray plaintext;
     QVector<Tlv> tlvs;
     QCA::SecureArray extraKey;
+    QByteArray errorText;
     quint8 flags = 0;
     QVector<QByteArray> outgoingMessages;
 };
@@ -45,6 +57,7 @@ enum class OutgoingStatus {
     Plaintext,
     Encrypted,
     Negotiation,
+    Finished,
     Error
 };
 
@@ -83,7 +96,8 @@ public:
     // peerInstance == 0 uses the most recently active encrypted child when
     // available. Always policy retains the last plaintext and emits a Query
     // Message until an encrypted child is established, matching libotr's
-    // REQUIRE_ENCRYPTION last-message behavior.
+    // REQUIRE_ENCRYPTION last-message behavior. A FINISHED child suppresses
+    // application traffic until a new AKE establishes another private state.
     OutgoingResult prepareOutgoing(const QByteArray &plaintext,
                                    quint32 peerInstance = 0,
                                    const QByteArray &ourName = {},
@@ -112,6 +126,15 @@ public:
                      int maxMessageSize = 0,
                      quint8 flags = 0);
 
+    // Match otrl_message_disconnect() for one concrete remote instance. If
+    // encrypted, send an empty Data Message with the DISCONNECTED TLV and the
+    // IGNORE_UNREADABLE flag, then force the local child to PLAINTEXT. Calling
+    // this for an unknown/already-plain child is a successful no-op.
+    bool disconnect(quint32 peerInstance,
+                    QVector<QByteArray> *transportMessages,
+                    int maxMessageSize = 0);
+
+    PeerState peerState(quint32 peerInstance) const;
     bool isEncrypted(quint32 peerInstance) const;
     QVector<quint32> peerInstances() const;
     bool establishedSession(quint32 peerInstance, AkeEstablishedSession *established) const;
