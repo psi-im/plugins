@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Sergei Ilinykh
+ * SPDX-License-Identifier: MIT
+ */
+
 #pragma once
 
 #include "qca-otr/akesession.h"
@@ -8,20 +13,22 @@
 
 namespace QcaOtr {
 
+/** Decoded OTRv3 Data Message fields. */
 struct DataMessage
 {
-    quint32         senderInstance = 0;
-    quint32         receiverInstance = 0;
-    quint8          flags = 0;
-    quint32         senderKeyId = 0;
-    quint32         recipientKeyId = 0;
+    quint32 senderInstance = 0;
+    quint32 receiverInstance = 0;
+    quint8 flags = 0;
+    quint32 senderKeyId = 0;
+    quint32 recipientKeyId = 0;
     QCA::BigInteger nextDhPublic;
-    QByteArray      counter;
-    QByteArray      encryptedData;
-    QByteArray      mac;
-    QByteArray      revealedMacKeys;
+    QByteArray counter;
+    QByteArray encryptedData;
+    QByteArray mac;
+    QByteArray revealedMacKeys;
 };
 
+/** Directional encryption/MAC material for one OTR ratchet key slot. */
 struct DataSessionKeys
 {
     QCA::SecureArray sendEncryptionKey;
@@ -29,30 +36,38 @@ struct DataSessionKeys
     QCA::SecureArray sendMacKey;
     QCA::SecureArray receiveMacKey;
     QCA::SecureArray extraKey;
-    QByteArray       sendCounter = QByteArray(16, '\0');
-    QByteArray       receiveCounter = QByteArray(16, '\0');
-    bool             sendMacUsed = false;
-    bool             receiveMacUsed = false;
+    QByteArray sendCounter = QByteArray(16, '\0');
+    QByteArray receiveCounter = QByteArray(16, '\0');
+    bool sendMacUsed = false;
+    bool receiveMacUsed = false;
 };
 
+/** Derives directional OTRv3 data keys for one local/peer D-H pair. */
 bool deriveDataSessionKeys(const DhKeyPair &localDh,
                            const QCA::BigInteger &peerDhPublic,
                            DataSessionKeys *keys);
+
+/** Returns the exact serialized prefix covered by an OTR Data Message MAC. */
 QByteArray dataMessageMacInput(const DataMessage &message, bool *ok = nullptr);
 
 namespace Wire {
 
+/** Encodes a complete raw OTRv3 Data Message. */
 QByteArray encodeDataMessage(const DataMessage &message, bool *ok = nullptr);
+
+/** Decodes and validates a complete raw OTRv3 Data Message. */
 bool decodeDataMessage(const QByteArray &encoded, DataMessage *message);
 
 } // namespace Wire
 
+/** Result category for encrypted data processing. */
 enum class DataReceiveStatus {
     Ignored,
     Message,
     Error
 };
 
+/** Plaintext/control material recovered from one valid Data Message. */
 struct DataReceiveResult
 {
     DataReceiveStatus status = DataReceiveStatus::Ignored;
@@ -62,9 +77,17 @@ struct DataReceiveResult
     quint8 flags = 0;
 };
 
+/**
+ * OTRv3 encrypted-data state for one authenticated remote instance.
+ *
+ * The object owns D-H ratchet state and the four current/old key combinations
+ * required by the OTRv3 key rotation rules. Symmetric keys remain in
+ * `QCA::SecureArray`.
+ */
 class DataSession
 {
 public:
+    /** Initializes data-message state from a completed authenticated key exchange. */
     DataSession(const AkeEstablishedSession &ake, quint32 localInstance, quint32 peerInstance);
 
     bool isReady() const { return ready_; }
@@ -73,8 +96,11 @@ public:
     const QCA::BigInteger &localDhPublic() const { return localDh_.publicValue; }
     const QCA::BigInteger &peerDhPublic() const { return peerDhPublic_; }
 
-    // Extra symmetric key for the exact key slot used by the next outgoing
-    // Data Message. Keep it in secure memory for session/control APIs.
+    /**
+     * Returns the extra symmetric key for the exact slot used by the next
+     * outgoing Data Message. The key is returned in secure memory for control
+     * APIs such as the OTR symmetric-key TLV.
+     */
     QCA::SecureArray currentSendExtraKey() const
     {
         if (!ready_ || !sessionValid_[1][0])
@@ -82,11 +108,16 @@ public:
         return sessions_[1][0].extraKey;
     }
 
+    /** Encrypts an application plaintext into one raw OTRv3 Data Message. */
     bool sendMessage(const QByteArray &plaintext, QByteArray *encoded, quint8 flags = 0);
+
+    /** Encrypts plaintext and the supplied TLVs into one raw OTRv3 Data Message. */
     bool sendMessage(const QByteArray &plaintext,
                      const QVector<Tlv> &tlvs,
                      QByteArray *encoded,
                      quint8 flags = 0);
+
+    /** Authenticates/decrypts one raw OTRv3 Data Message and advances ratchet state. */
     DataReceiveResult processIncoming(const QByteArray &encoded);
 
 private:
