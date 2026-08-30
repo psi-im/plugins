@@ -116,14 +116,20 @@ void ControlTest::cleanupTestCase()
 
 void ControlTest::errorMessagesUseFirstOtrMarker()
 {
-    QCOMPARE(QcaOtr::Negotiation::errorMessage("boom"), QByteArray("?OTR Error:boom"));
+    QCOMPARE(QcaOtr::Negotiation::errorMessage("boom"), QByteArray("?OTR Error: boom"));
 
     QByteArray text;
+    QVERIFY(QcaOtr::Negotiation::parseErrorMessage("prefix ?OTR Error: boom", &text));
+    QCOMPARE(text, QByteArray("boom"));
+
+    // libotr classifies the prefix without requiring the canonical separating
+    // space, so keep accepting legacy/no-space peers while generating the
+    // canonical libotr form ourselves.
     QVERIFY(QcaOtr::Negotiation::parseErrorMessage("prefix ?OTR Error:boom", &text));
     QCOMPARE(text, QByteArray("boom"));
 
     // libotr classifies from the first ?OTR occurrence only.
-    QVERIFY(!QcaOtr::Negotiation::parseErrorMessage("?OTRbroken ?OTR Error:boom", &text));
+    QVERIFY(!QcaOtr::Negotiation::parseErrorMessage("?OTRbroken ?OTR Error: boom", &text));
 }
 
 void ControlTest::remoteErrorRestartsOnlyAutomaticPolicies()
@@ -138,7 +144,7 @@ void ControlTest::remoteErrorRestartsOnlyAutomaticPolicies()
     QcaOtr::OtrSession automatic(toyKey(6), BobInstance);
     automatic.setPolicy(QcaOtr::SessionPolicy::Opportunistic);
     automatic.startNegotiation("bob@example.test");
-    result = automatic.processIncoming("text ?OTR Error:remote failure");
+    result = automatic.processIncoming("text ?OTR Error: remote failure");
     QCOMPARE(result.status, QcaOtr::SessionStatus::RemoteError);
     QCOMPARE(result.errorText, QByteArray("remote failure"));
     QCOMPARE(result.outgoingMessages.size(), 1);
@@ -252,7 +258,7 @@ void ControlTest::unreadableAndIgnoreUnreadableSemantics()
     QCOMPARE(received.status, QcaOtr::SessionStatus::Unreadable);
     QCOMPARE(received.errorText, QByteArray("Unreadable encrypted message."));
     QCOMPARE(received.outgoingMessages.size(), 1);
-    QVERIFY(received.outgoingMessages.front().startsWith("?OTR Error:"));
+    QVERIFY(received.outgoingMessages.front().startsWith("?OTR Error: "));
 }
 
 QTEST_GUILESS_MAIN(ControlTest)
