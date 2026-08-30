@@ -50,6 +50,26 @@ target_link_libraries(qca-otr-data-test
 )
 add_test(NAME qca-otr-data COMMAND qca-otr-data-test)
 
+add_executable(qca-otr-negotiation-test
+    negotiationtest.cpp
+)
+target_link_libraries(qca-otr-negotiation-test
+    PRIVATE
+        QcaOtr::QcaOtr
+        Qt${QT_DEFAULT_MAJOR_VERSION}::Test
+)
+add_test(NAME qca-otr-negotiation COMMAND qca-otr-negotiation-test)
+
+add_executable(qca-otr-tlv-test
+    tlvtest.cpp
+)
+target_link_libraries(qca-otr-tlv-test
+    PRIVATE
+        QcaOtr::QcaOtr
+        Qt${QT_DEFAULT_MAJOR_VERSION}::Test
+)
+add_test(NAME qca-otr-tlv COMMAND qca-otr-tlv-test)
+
 add_executable(qca-otr-transport-test
     transporttest.cpp
 )
@@ -69,6 +89,26 @@ target_link_libraries(qca-otr-session-test
         Qt${QT_DEFAULT_MAJOR_VERSION}::Test
 )
 add_test(NAME qca-otr-session COMMAND qca-otr-session-test)
+
+add_executable(qca-otr-control-test
+    controltest.cpp
+)
+target_link_libraries(qca-otr-control-test
+    PRIVATE
+        QcaOtr::QcaOtr
+        Qt${QT_DEFAULT_MAJOR_VERSION}::Test
+)
+add_test(NAME qca-otr-control COMMAND qca-otr-control-test)
+
+add_executable(qca-otr-symkey-test
+    symkeytest.cpp
+)
+target_link_libraries(qca-otr-symkey-test
+    PRIVATE
+        QcaOtr::QcaOtr
+        Qt${QT_DEFAULT_MAJOR_VERSION}::Test
+)
+add_test(NAME qca-otr-symkey COMMAND qca-otr-symkey-test)
 
 if(QCA_OTR_BUILD_LIBOTR_INTEROP_TESTS)
     find_package(PkgConfig REQUIRED)
@@ -110,4 +150,16 @@ if(QCA_OTR_BUILD_LIBOTR_INTEROP_TESTS)
             PkgConfig::GCRYPT
     )
     add_test(NAME qca-otr-session-interop COMMAND qca-otr-session-interop-test)
+
+    add_executable(qca-otr-control-interop-test
+        controlinteroptest.cpp
+    )
+    target_link_libraries(qca-otr-control-interop-test
+        PRIVATE
+            QcaOtr::QcaOtr
+            Qt${QT_DEFAULT_MAJOR_VERSION}::Test
+            PkgConfig::LIBOTR
+            PkgConfig::GCRYPT
+    )
+    add_test(NAME qca-otr-control-interop COMMAND qca-otr-control-interop-test)
 endif()

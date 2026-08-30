@@ -75,6 +75,10 @@ private Q_SLOTS:
     void cleanupTestCase();
     void fragmentedHandshakeAndData();
     void broadcastCommitAuthenticatesMultipleInstances();
+    void queryNegotiationStartsAke();
+    void whitespacePolicyNegotiation();
+    void alwaysPolicyQueuesUntilEncrypted();
+    void routesTlvsThroughChildSession();
     void rejectsOtherLocalInstance();
     void rejectsFragmentRouteMismatch();
 
@@ -181,6 +185,122 @@ void SessionTest::broadcastCommitAuthenticatesMultipleInstances()
     deliver(&bobTwo, encrypted, 0, &state);
     QCOMPARE(state.status, QcaOtr::SessionStatus::Message);
     QCOMPARE(state.plaintext, QByteArray("for second instance"));
+}
+
+void SessionTest::queryNegotiationStartsAke()
+{
+    QcaOtr::OtrSession alice(toyKey(3), AliceInstance);
+    QcaOtr::OtrSession bob(toyKey(6), BobInstance);
+    alice.setPolicy(QcaOtr::SessionPolicy::Manual);
+    bob.setPolicy(QcaOtr::SessionPolicy::Manual);
+
+    const QcaOtr::OutgoingResult query = alice.startNegotiation("alice@example.test");
+    QCOMPARE(query.status, QcaOtr::OutgoingStatus::Negotiation);
+    QCOMPARE(query.messages.size(), 1);
+    QVERIFY(query.messages.front().startsWith("?OTRv3?"));
+
+    QcaOtr::SessionResult state = bob.processIncoming(query.messages.front());
+    QCOMPARE(state.status, QcaOtr::SessionStatus::ProtocolMessage);
+    QCOMPARE(state.outgoingMessages.size(), 1);
+
+    QVector<QByteArray> messages = state.outgoingMessages;
+    messages = deliver(&alice, messages, 0, &state);
+    QCOMPARE(state.status, QcaOtr::SessionStatus::Handled);
+    messages = deliver(&bob, messages, 0, &state);
+    QCOMPARE(state.status, QcaOtr::SessionStatus::Handled);
+    messages = deliver(&alice, messages, 0, &state);
+    QCOMPARE(state.status, QcaOtr::SessionStatus::Authenticated);
+    messages = deliver(&bob, messages, 0, &state);
+    QCOMPARE(state.status, QcaOtr::SessionStatus::Authenticated);
+    QVERIFY(messages.isEmpty());
+    QVERIFY(alice.isEncrypted(BobInstance));
+    QVERIFY(bob.isEncrypted(AliceInstance));
+}
+
+void SessionTest::whitespacePolicyNegotiation()
+{
+    QcaOtr::OtrSession alice(toyKey(3), AliceInstance);
+    QcaOtr::OtrSession manualBob(toyKey(6), BobInstance);
+    alice.setPolicy(QcaOtr::SessionPolicy::Opportunistic);
+    manualBob.setPolicy(QcaOtr::SessionPolicy::Manual);
+
+    const QcaOtr::OutgoingResult tagged = alice.prepareOutgoing("hello");
+    QCOMPARE(tagged.status, QcaOtr::OutgoingStatus::Plaintext);
+    QCOMPARE(tagged.messages.size(), 1);
+    QVERIFY(tagged.messages.front().size() > 5);
+
+    QcaOtr::SessionResult received = manualBob.processIncoming(tagged.messages.front());
+    QCOMPARE(received.status, QcaOtr::SessionStatus::Plaintext);
+    QCOMPARE(received.plaintext, QByteArray("hello"));
+    QVERIFY(received.outgoingMessages.isEmpty());
+
+    // A normal plaintext reply after our offer is libotr's signal that the
+    // peer rejected whitespace discovery, so subsequent messages stay clean.
+    received = alice.processIncoming("plain reply");
+    QCOMPARE(received.status, QcaOtr::SessionStatus::Plaintext);
+    const QcaOtr::OutgoingResult afterRejection = alice.prepareOutgoing("again");
+    QCOMPARE(afterRejection.messages, QVector<QByteArray>({QByteArray("again")}));
+
+    QcaOtr::OtrSession opportunisticBob(toyKey(7), BobSecondInstance);
+    opportunisticBob.setPolicy(QcaOtr::SessionPolicy::Opportunistic);
+    received = opportunisticBob.processIncoming(tagged.messages.front());
+    QCOMPARE(received.status, QcaOtr::SessionStatus::Plaintext);
+    QCOMPARE(received.plaintext, QByteArray("hello"));
+    QCOMPARE(received.outgoingMessages.size(), 1);
+}
+
+void SessionTest::alwaysPolicyQueuesUntilEncrypted()
+{
+    QcaOtr::OtrSession alice(toyKey(3), AliceInstance);
+    QcaOtr::OtrSession bob(toyKey(6), BobInstance);
+    alice.setPolicy(QcaOtr::SessionPolicy::Always);
+    bob.setPolicy(QcaOtr::SessionPolicy::Manual);
+
+    const QcaOtr::OutgoingResult initial = alice.prepareOutgoing("held secret", 0, "alice@example.test");
+    QCOMPARE(initial.status, QcaOtr::OutgoingStatus::Negotiation);
+    QCOMPARE(initial.messages.size(), 1);
+    QVERIFY(!initial.messages.front().contains("held secret"));
+
+    QcaOtr::SessionResult state = bob.processIncoming(initial.messages.front());
+    QCOMPARE(state.status, QcaOtr::SessionStatus::ProtocolMessage);
+    QCOMPARE(state.outgoingMessages.size(), 1);
+
+    QVector<QByteArray> messages = state.outgoingMessages;
+    messages = deliver(&alice, messages, 0, &state);
+    QCOMPARE(state.status, QcaOtr::SessionStatus::Handled);
+    messages = deliver(&bob, messages, 0, &state);
+    QCOMPARE(state.status, QcaOtr::SessionStatus::Handled);
+    messages = deliver(&alice, messages, 0, &state);
+    QCOMPARE(state.status, QcaOtr::SessionStatus::Authenticated);
+    QCOMPARE(messages.size(), 2); // Signature first, then the retained Data Message.
+
+    const QcaOtr::SessionResult authenticated = bob.processIncoming(messages.at(0));
+    QCOMPARE(authenticated.status, QcaOtr::SessionStatus::Authenticated);
+    const QcaOtr::SessionResult secret = bob.processIncoming(messages.at(1));
+    QCOMPARE(secret.status, QcaOtr::SessionStatus::Message);
+    QCOMPARE(secret.plaintext, QByteArray("held secret"));
+}
+
+void SessionTest::routesTlvsThroughChildSession()
+{
+    QcaOtr::OtrSession alice(toyKey(3), AliceInstance);
+    QcaOtr::OtrSession bob(toyKey(6), BobInstance);
+    QVERIFY(completeHandshake(&alice, BobInstance, &bob, 0));
+
+    QVector<QcaOtr::Tlv> tlvs;
+    tlvs.append(QcaOtr::Tlv {0x1234, QByteArray::fromHex("00010200")});
+
+    QVector<QByteArray> encrypted;
+    QVERIFY(alice.sendMessage(BobInstance, "payload", tlvs, &encrypted));
+    QCOMPARE(encrypted.size(), 1);
+
+    const QcaOtr::SessionResult received = bob.processIncoming(encrypted.front());
+    QCOMPARE(received.status, QcaOtr::SessionStatus::Message);
+    QCOMPARE(received.peerInstance, AliceInstance);
+    QCOMPARE(received.plaintext, QByteArray("payload"));
+    QCOMPARE(received.tlvs.size(), 1);
+    QCOMPARE(received.tlvs.front().type, quint16(0x1234));
+    QCOMPARE(received.tlvs.front().value, QByteArray::fromHex("00010200"));
 }
 
 void SessionTest::rejectsOtherLocalInstance()

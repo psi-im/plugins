@@ -1,6 +1,7 @@
 #pragma once
 
 #include "qca-otr/akesession.h"
+#include "qca-otr/tlv.h"
 
 #include <QByteArray>
 #include <QtGlobal>
@@ -56,6 +57,7 @@ struct DataReceiveResult
 {
     DataReceiveStatus status = DataReceiveStatus::Ignored;
     QByteArray plaintext;
+    QVector<Tlv> tlvs;
     QCA::SecureArray extraKey;
     quint8 flags = 0;
 };
@@ -71,7 +73,20 @@ public:
     const QCA::BigInteger &localDhPublic() const { return localDh_.publicValue; }
     const QCA::BigInteger &peerDhPublic() const { return peerDhPublic_; }
 
+    // Extra symmetric key for the exact key slot used by the next outgoing
+    // Data Message. Keep it in secure memory for session/control APIs.
+    QCA::SecureArray currentSendExtraKey() const
+    {
+        if (!ready_ || !sessionValid_[1][0])
+            return {};
+        return sessions_[1][0].extraKey;
+    }
+
     bool sendMessage(const QByteArray &plaintext, QByteArray *encoded, quint8 flags = 0);
+    bool sendMessage(const QByteArray &plaintext,
+                     const QVector<Tlv> &tlvs,
+                     QByteArray *encoded,
+                     quint8 flags = 0);
     DataReceiveResult processIncoming(const QByteArray &encoded);
 
 private:

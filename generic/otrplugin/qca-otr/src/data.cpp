@@ -360,7 +360,20 @@ bool DataSession::rotatePeerDh(const QCA::BigInteger &newPeerPublic)
 
 bool DataSession::sendMessage(const QByteArray &plaintext, QByteArray *encoded, quint8 flags)
 {
+    return sendMessage(plaintext, {}, encoded, flags);
+}
+
+bool DataSession::sendMessage(const QByteArray &plaintext,
+                              const QVector<Tlv> &tlvs,
+                              QByteArray *encoded,
+                              quint8 flags)
+{
     if (!ready_ || !encoded || peerKeyId_ == 0 || localKeyId_ <= 1 || !sessionValid_[1][0])
+        return false;
+
+    bool tlvOk = false;
+    const QByteArray encodedTlvs = encodeTlvs(tlvs, &tlvOk);
+    if (!tlvOk)
         return false;
 
     DataSessionKeys &session = sessions_[1][0];
@@ -370,6 +383,7 @@ bool DataSession::sendMessage(const QByteArray &plaintext, QByteArray *encoded, 
 
     QByteArray cleartext = plaintext;
     cleartext.append('\0');
+    cleartext.append(encodedTlvs);
 
     QByteArray encryptedData;
     if (!aes128Ctr(session.sendEncryptionKey, nextCounter, cleartext, &encryptedData))
@@ -458,13 +472,21 @@ DataReceiveResult DataSession::processIncoming(const QByteArray &encoded)
         return result;
     }
 
+    const int nul = cleartext.indexOf('\0');
+    if (nul >= 0) {
+        if (!decodeTlvs(cleartext.mid(nul + 1), &result.tlvs)) {
+            result.status = DataReceiveStatus::Error;
+            return result;
+        }
+        result.plaintext = cleartext.left(nul);
+    } else {
+        result.plaintext = cleartext;
+    }
+
     session.receiveCounter = block;
     session.receiveMacUsed = true;
     result.extraKey = session.extraKey;
     result.flags = message.flags;
-
-    const int nul = cleartext.indexOf('\0');
-    result.plaintext = nul >= 0 ? cleartext.left(nul) : cleartext;
 
     // Match libotr's receive-side ratchet order exactly. A message addressed
     // to our current key first advances our own DH keypair. A message from the

@@ -53,6 +53,7 @@ private Q_SLOTS:
     void sessionKeysAreDirectional();
     void wireRoundTrip();
     void exchangesMessagesAndRotatesKeys();
+    void exchangesTlvs();
     void rejectsReplayAndTampering();
 
 private:
@@ -155,6 +156,7 @@ void DataTest::exchangesMessagesAndRotatesKeys()
     const QcaOtr::DataReceiveResult bobFirst = bob.processIncoming(aliceFirst);
     QCOMPARE(bobFirst.status, QcaOtr::DataReceiveStatus::Message);
     QCOMPARE(bobFirst.plaintext, QByteArray("hello bob"));
+    QVERIFY(bobFirst.tlvs.isEmpty());
     QCOMPARE(bob.peerKeyId(), quint32(2));
     QCOMPARE(bob.localKeyId(), quint32(2));
 
@@ -168,6 +170,7 @@ void DataTest::exchangesMessagesAndRotatesKeys()
     const QcaOtr::DataReceiveResult aliceReply = alice.processIncoming(bobFirstReply);
     QCOMPARE(aliceReply.status, QcaOtr::DataReceiveStatus::Message);
     QCOMPARE(aliceReply.plaintext, QByteArray("hello alice"));
+    QVERIFY(aliceReply.tlvs.isEmpty());
     QCOMPARE(alice.localKeyId(), quint32(3));
     QCOMPARE(alice.peerKeyId(), quint32(2));
 
@@ -183,8 +186,38 @@ void DataTest::exchangesMessagesAndRotatesKeys()
     const QcaOtr::DataReceiveResult bobSecond = bob.processIncoming(aliceSecond);
     QCOMPARE(bobSecond.status, QcaOtr::DataReceiveStatus::Message);
     QCOMPARE(bobSecond.plaintext, QByteArray("ratcheted"));
+    QVERIFY(bobSecond.tlvs.isEmpty());
     QCOMPARE(bob.localKeyId(), quint32(3));
     QCOMPARE(bob.peerKeyId(), quint32(3));
+}
+
+void DataTest::exchangesTlvs()
+{
+    QcaOtr::AkeSession aliceAke(toyKey(3), AliceInstance, BobInstance);
+    QcaOtr::AkeSession bobAke(toyKey(6), BobInstance, AliceInstance);
+    QVERIFY(completeAke(&aliceAke, &bobAke));
+
+    QcaOtr::DataSession alice(aliceAke.established(), AliceInstance, BobInstance);
+    QcaOtr::DataSession bob(bobAke.established(), BobInstance, AliceInstance);
+    QVERIFY(alice.isReady());
+    QVERIFY(bob.isReady());
+
+    QVector<QcaOtr::Tlv> tlvs;
+    tlvs.append({static_cast<quint16>(QcaOtr::TlvType::Padding), QByteArray::fromHex("00010200")});
+    tlvs.append({0x1234, QByteArray::fromHex("61006200ff")});
+
+    QByteArray encrypted;
+    QVERIFY(alice.sendMessage("control payload", tlvs, &encrypted));
+
+    const QcaOtr::DataReceiveResult received = bob.processIncoming(encrypted);
+    QCOMPARE(received.status, QcaOtr::DataReceiveStatus::Message);
+    QCOMPARE(received.plaintext, QByteArray("control payload"));
+    QCOMPARE(received.tlvs.size(), 2);
+    QCOMPARE(received.tlvs.at(0).type, quint16(0));
+    QCOMPARE(received.tlvs.at(0).value, QByteArray::fromHex("00010200"));
+    QCOMPARE(received.tlvs.at(1).type, quint16(0x1234));
+    QCOMPARE(received.tlvs.at(1).value, QByteArray::fromHex("61006200ff"));
+    QCOMPARE(received.extraKey.size(), 32);
 }
 
 void DataTest::rejectsReplayAndTampering()
