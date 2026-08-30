@@ -8,119 +8,18 @@ on:
   push:
     branches:
       - master
-      - cleanup/otr-native
     paths:
       - 'generic/otrplugin/qca-otr/**'
-      - 'generic/otrplugin/src/psiotrplugin.cpp'
       - '.github/workflows/qca-otr.yml'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   QCA_VERSION: 3.0.5
 
 jobs:
-  restore-plugin-comments:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/cleanup/otr-native'
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout plugins
-        uses: actions/checkout@v4
-        with:
-          ref: cleanup/otr-native
-
-      - name: Restore semantic OTR plugin comments
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-
-          path = Path('generic/otrplugin/src/psiotrplugin.cpp')
-          text = path.read_text(encoding='utf-8')
-
-          replacements = [
-              (
-                  '        plainBody.removeChild(plainBody.firstChild());\n',
-                  '        // Replace the plaintext fallback with the authenticated OTR plaintext.\n'
-                  '        plainBody.removeChild(plainBody.firstChild());\n'
-              ),
-              (
-                  '        if (messageElement.elementsByTagNameNS("urn:xmpp:eme:0", "encryption").isEmpty()) {\n',
-                  '        // Keep EME metadata for clients that understand XEP-0380 even when\n'
-                  '        // the original stanza did not carry an encryption marker.\n'
-                  '        if (messageElement.elementsByTagNameNS("urn:xmpp:eme:0", "encryption").isEmpty()) {\n'
-              ),
-              (
-                  '    QString encrypted = m_otrConnection->encryptMessage(account, contact, body.nodeValue().toHtmlEscaped());\n'
-                  '    if (encrypted.isEmpty()) {\n',
-                  '    QString encrypted = m_otrConnection->encryptMessage(account, contact, body.nodeValue().toHtmlEscaped());\n\n'
-                  '    // A failed encryption must drop the stanza rather than let the caller\n'
-                  '    // accidentally send the original plaintext body.\n'
-                  '    if (encrypted.isEmpty()) {\n'
-              ),
-              (
-                  '    const QString contact = xml.attribute(QStringLiteral("from"));\n'
-                  '    const QString type = xml.attribute(QStringLiteral("type"), QStringLiteral("available"));\n',
-                  '    // OTR is resource-bound (XEP-0364): presence/session state is tracked\n'
-                  '    // per full JID rather than collapsed to the roster bare JID.\n'
-                  '    const QString contact = xml.attribute(QStringLiteral("from"));\n'
-                  '    const QString type = xml.attribute(QStringLiteral("type"), QStringLiteral("available"));\n'
-              ),
-              (
-                  '    if (!xml.elementsByTagNameNS(QStringLiteral("urn:xmpp:eme:0"), QStringLiteral("encryption")).isEmpty())\n',
-                  '    // Do not append whitespace discovery to an already encrypted stanza or\n'
-                  '    // its plaintext fallback. XEP-0378 disco remains independent.\n'
-                  '    if (!xml.elementsByTagNameNS(QStringLiteral("urn:xmpp:eme:0"), QStringLiteral("encryption")).isEmpty())\n'
-              ),
-              (
-                  '    stanza.appendChild(document.createElementNS(QStringLiteral("urn:xmpp:hints"), QStringLiteral("no-copy")));\n',
-                  '    // XEP-0364: OTR protocol traffic is bound to one resource and must not\n'
-                  '    // be carbon-copied or permanently archived.\n'
-                  '    stanza.appendChild(document.createElementNS(QStringLiteral("urn:xmpp:hints"), QStringLiteral("no-copy")));\n'
-              ),
-              (
-                  '    if (message.startsWith(QLatin1String("?OTR:"))) {\n',
-                  '    // Data Messages get the EME marker recommended by XEP-0364/XEP-0380;\n'
-                  '    // the version Query Message is negotiation traffic, not ciphertext.\n'
-                  '    if (message.startsWith(QLatin1String("?OTR:"))) {\n'
-              ),
-              (
-                  '        correctJid = removeResource(fullJid);\n'
-                  '        if (m_contactInfo->isConference(accountIndex, correctJid))\n',
-                  '        correctJid = removeResource(fullJid);\n\n'
-                  '        // A private conference occupant may not be in the roster yet, so the\n'
-                  '        // normal privacy lookup cannot be the only reason to preserve resource.\n'
-                  '        if (m_contactInfo->isConference(accountIndex, correctJid))\n'
-              ),
-          ]
-
-          changed = False
-          for old, new in replacements:
-              if new in text:
-                  continue
-              if old not in text:
-                  raise SystemExit(f'Expected cleanup anchor not found: {old[:80]!r}')
-              text = text.replace(old, new, 1)
-              changed = True
-
-          if changed:
-              path.write_text(text, encoding='utf-8')
-          PY
-
-          if git diff --quiet; then
-            echo 'No comment restoration required.'
-            exit 0
-          fi
-
-          git config user.name 'Sergei Ilinykh'
-          git config user.email 'rion4ik@gmail.com'
-          git add generic/otrplugin/src/psiotrplugin.cpp
-          git commit -m 'Restore OTR integration comments'
-          git push origin HEAD:cleanup/otr-native
-
   test:
     name: Qt ${{ matrix.qt }} / Linux
     runs-on: ubuntu-24.04
