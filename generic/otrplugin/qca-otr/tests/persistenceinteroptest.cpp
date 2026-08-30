@@ -122,6 +122,7 @@ void PersistenceInteropTest::fingerprintsRoundTripWithLibotr()
     const QByteArray protocol(QcaOtr::LegacyPsiProtocolId);
     const QByteArray fingerprint = QByteArray::fromHex("00112233445566778899aabbccddeeff00112233");
     const QByteArray trust("native-custom-trust");
+    QByteArray mutableFingerprint = fingerprint;
 
     QcaOtr::FingerprintRecord nativeRecord;
     nativeRecord.username = user;
@@ -151,7 +152,7 @@ void PersistenceInteropTest::fingerprintsRoundTripWithLibotr()
                                              nullptr);
     QVERIFY(context);
     Fingerprint *libotrFingerprintRecord = otrl_context_find_fingerprint(
-        context, reinterpret_cast<const unsigned char *>(fingerprint.constData()), 0, nullptr);
+        context, reinterpret_cast<unsigned char *>(mutableFingerprint.data()), 0, nullptr);
     QVERIFY(libotrFingerprintRecord);
     QCOMPARE(QByteArray(libotrFingerprintRecord->trust), trust);
     otrl_userstate_free(libotr);
@@ -170,7 +171,7 @@ void PersistenceInteropTest::fingerprintsRoundTripWithLibotr()
                                 nullptr);
     QVERIFY(context);
     libotrFingerprintRecord = otrl_context_find_fingerprint(
-        context, reinterpret_cast<const unsigned char *>(fingerprint.constData()), 1, nullptr);
+        context, reinterpret_cast<unsigned char *>(mutableFingerprint.data()), 1, nullptr);
     QVERIFY(libotrFingerprintRecord);
     otrl_context_set_trust(libotrFingerprintRecord, "libotr-custom-trust");
 
