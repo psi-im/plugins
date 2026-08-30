@@ -13,6 +13,7 @@ private Q_SLOTS:
     void cleanupTestCase();
     void identityAndInstanceTagPersist();
     void fingerprintTrustLifecycle();
+    void duplicateRecordsNormalizeLastWins();
 
 private:
     QCA::Initializer *initializer_ = nullptr;
@@ -103,6 +104,84 @@ void ProfileStoreTest::fingerprintTrustLifecycle()
     QVERIFY2(reread.removeFingerprint("romeo@example.net/resource", "account-a", fingerprint, &error),
              qPrintable(error));
     QVERIFY(!reread.fingerprint("romeo@example.net/resource", "account-a", fingerprint));
+}
+
+void ProfileStoreTest::duplicateRecordsNormalizeLastWins()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+
+    QcaOtr::ProfileStore seed(dir.path(), "test-protocol");
+    QString error;
+    QVERIFY2(seed.load(&error), qPrintable(error));
+    QVERIFY2(seed.ensureIdentity("account-b", &error), qPrintable(error));
+
+    QcaOtr::ProfileData profile = seed.data();
+    QCOMPARE(profile.privateKeys.size(), 1);
+    profile.privateKeys.append(profile.privateKeys.first());
+
+    QcaOtr::InstanceTagRecord oldTag;
+    oldTag.account = "account-b";
+    oldTag.protocol = "test-protocol";
+    oldTag.instanceTag = 0x12345678;
+    QcaOtr::InstanceTagRecord newTag = oldTag;
+    newTag.instanceTag = 0x87654321;
+    profile.instanceTags = {oldTag, newTag};
+
+    const QByteArray duplicateValue = QByteArray::fromHex("00112233445566778899aabbccddeeff00112233");
+    QcaOtr::FingerprintRecord oldFingerprint;
+    oldFingerprint.username = "romeo@example.net";
+    oldFingerprint.account = "account-b";
+    oldFingerprint.protocol = "test-protocol";
+    oldFingerprint.fingerprint = duplicateValue;
+    oldFingerprint.trust = "old";
+    QcaOtr::FingerprintRecord newFingerprint = oldFingerprint;
+    newFingerprint.trust = "new";
+
+    QcaOtr::FingerprintRecord first;
+    first.username = "alpha@example.net";
+    first.account = "account-a";
+    first.protocol = "test-protocol";
+    first.fingerprint = QByteArray::fromHex("102132435465768798a9bacbdcedfe0f10213243");
+
+    QcaOtr::FingerprintRecord last;
+    last.username = "zulu@example.net";
+    last.account = "account-z";
+    last.protocol = "test-protocol";
+    last.fingerprint = QByteArray::fromHex("ffeeddccbbaa99887766554433221100ffeeddcc");
+
+    // Deliberately unsorted and duplicated. The later duplicate must win.
+    profile.fingerprints = {last, oldFingerprint, first, newFingerprint};
+    QVERIFY2(QcaOtr::Persistence::saveProfile(dir.path(), profile, &error), qPrintable(error));
+
+    QcaOtr::ProfileStore store(dir.path(), "test-protocol");
+    QVERIFY2(store.load(&error), qPrintable(error));
+
+    const QcaOtr::ProfileData &normalized = store.data();
+    QCOMPARE(normalized.privateKeys.size(), 1);
+    QCOMPARE(normalized.instanceTags.size(), 1);
+    QCOMPARE(normalized.fingerprints.size(), 3);
+
+    bool found = false;
+    QCOMPARE(store.instanceTag("account-b", &found), quint32(0x87654321));
+    QVERIFY(found);
+
+    const QcaOtr::FingerprintRecord *record = store.fingerprint("romeo@example.net", "account-b", duplicateValue);
+    QVERIFY(record);
+    QCOMPARE(record->trust, QByteArray("new"));
+
+    // Hash iteration order is intentionally irrelevant. The DTO used by tests
+    // and serialization is deterministic.
+    QCOMPARE(normalized.fingerprints.at(0).username, QByteArray("alpha@example.net"));
+    QCOMPARE(normalized.fingerprints.at(1).username, QByteArray("romeo@example.net"));
+    QCOMPARE(normalized.fingerprints.at(2).username, QByteArray("zulu@example.net"));
+
+    QVERIFY2(store.save(&error), qPrintable(error));
+    QcaOtr::ProfileData persisted;
+    QVERIFY2(QcaOtr::Persistence::loadProfile(dir.path(), &persisted, &error), qPrintable(error));
+    QCOMPARE(persisted.privateKeys.size(), 1);
+    QCOMPARE(persisted.instanceTags.size(), 1);
+    QCOMPARE(persisted.fingerprints.size(), 3);
 }
 
 QTEST_GUILESS_MAIN(ProfileStoreTest)

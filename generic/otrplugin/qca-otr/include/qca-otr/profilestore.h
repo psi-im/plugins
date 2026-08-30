@@ -6,15 +6,23 @@
 #include <QList>
 #include <QString>
 
+#include <memory>
+
 namespace QcaOtr {
 
 // Mutable application-facing view of the three libotr-compatible profile
-// stores. The protocol id is opaque application metadata; qca-otr does not
-// assign an XMPP/libpurple-specific value.
+// stores. Persistence remains line-oriented, while the in-memory view is
+// normalized by logical key with libotr-compatible last-record-wins semantics.
+// The protocol id is opaque application metadata; qca-otr does not assign an
+// XMPP/libpurple-specific value.
 class ProfileStore
 {
 public:
     ProfileStore(QString directory, QByteArray protocolId);
+    ~ProfileStore();
+
+    ProfileStore(const ProfileStore &) = delete;
+    ProfileStore &operator=(const ProfileStore &) = delete;
 
     const QString &directory() const;
     const QByteArray &protocolId() const;
@@ -22,6 +30,7 @@ public:
     bool load(QString *error = nullptr);
     bool save(QString *error = nullptr) const;
 
+    QList<PrivateKeyRecord> identities() const;
     const PrivateKeyRecord *identity(const QByteArray &account) const;
     QByteArray identityFingerprint(const QByteArray &account) const;
     bool ensureIdentity(const QByteArray &account, QString *error = nullptr);
@@ -51,12 +60,13 @@ public:
                            const QByteArray &fingerprint,
                            QString *error = nullptr);
 
+    // Deterministic persistence DTO. The returned lists are normalized and
+    // sorted; ProfileStore's canonical in-memory representation is hash-based.
     const ProfileData &data() const;
 
 private:
-    QString directory_;
-    QByteArray protocolId_;
-    ProfileData data_;
+    class Private;
+    std::unique_ptr<Private> d;
 };
 
 } // namespace QcaOtr
