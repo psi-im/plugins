@@ -5,8 +5,10 @@ SPDX-License-Identifier: MIT
 
 # Native OTR completion plan
 
-The native qca-otr work is completed in protocol layers so each stage can be
-validated against libotr 4.1.1 before the Psi plugin switches backend.
+The native qca-otr protocol stack and Psi backend switch are complete. libotr
+4.1.1 is retained only as an optional interoperability oracle; the normal plugin
+runtime is qca-otr/QCA. This file records the implementation stages and the
+remaining external/manual validation items.
 
 ## 1. Fragmentation and OTRv3 instance routing — completed
 
@@ -47,41 +49,57 @@ validated against libotr 4.1.1 before the Psi plugin switches backend.
 - explicit application-owned opaque protocol id
 - Linux Qt5/Qt6 and Windows Qt5/Win7-baseline coverage
 
-## 5. Native Psi adapter and default dependency switch
+## 5. Native Psi adapter and default dependency switch — completed
 
-The primary objective of this stage is not a long-lived dual-backend abstraction.
-The normal OTR plugin build must stop depending on libotr, libgcrypt and
-libgpg-error as soon as the native adapter is feature-complete enough to replace
-`OtrInternal`.
+The normal OTR plugin now uses qca-otr as its only runtime OTR backend rather
+than maintaining a long-lived dual-backend abstraction.
 
-- add an application-facing qca-otr `ProfileStore` for identity generation,
+- application-facing qca-otr `ProfileStore` handles identity generation,
   instance tags and fingerprint/trust management
-- make `psiotr::Fingerprint` an owning value type with no pointer into libotr
-- replace the implementation of `OtrInternal` with qca-otr `OtrSession` +
-  `ProfileStore`, preserving the existing `OtrMessaging`/UI-facing API
-- map native negotiation, encryption, disconnect, session state and SMP events
+- `psiotr::Fingerprint` is an owning value type with no pointer into libotr
+- `OtrInternal` is implemented with qca-otr `OtrSession` + `ProfileStore` while
+  preserving the existing `OtrMessaging`/UI-facing API
+- native negotiation, encryption, disconnect, session state and SMP events map
   to the existing Psi callbacks
-- preserve historical Psi persistence id `prpl-jabber` only in the Psi adapter
-- remove `LIBOTR`, `LIBGCRYPT` and `LIBGPGERROR` from the normal plugin CMake
-  dependency graph; libotr/libgcrypt remain only in optional qca-otr oracle tests
-- keep Qt5/Windows 7 and Qt6 coverage on the native path
+- historical Psi persistence id `prpl-jabber` exists only in the Psi adapter;
+  qca-otr treats protocol ids as opaque application-owned metadata
+- `LIBOTR`, `LIBGCRYPT` and `LIBGPGERROR` are absent from the normal plugin
+  dependency graph; libotr remains only in optional qca-otr oracle tests
+- Qt5/Windows 7 and Qt6 coverage exercise the native path
 
-Exit criterion: the normal OTR plugin builds and operates on qca-otr/QCA without
-linking libotr, libgcrypt or libgpg-error. Existing profiles remain compatible.
+Exit criterion met: the normal OTR plugin builds and operates on qca-otr/QCA
+without linking libotr, libgcrypt or libgpg-error, while existing profile formats
+remain compatible.
 
-## 6. Legacy cleanup and final integration
+## 6. Legacy cleanup and final integration — code cleanup completed
 
-There is no intention to return to the old libotr backend after the native switch.
-Once native behavior and interoperability smoke tests are green:
+The native backend is the only supported runtime path. The cleanup removes
+legacy implementation baggage without removing wire/profile interoperability
+with older libotr-based clients.
 
-- delete obsolete libotr callbacks, headers, `otrlextensions` and compatibility
-  implementation code
-- remove any temporary migration-only adapter seams
-- simplify `OtrMessaging` and related UI plumbing around the native model
-- run real new-Psi <-> old-Psi/libotr interoperability smoke tests
-- verify migration using an existing profile before and after the backend switch
-- remove remaining dead build configuration and documentation
+Completed in the cleanup branch:
 
-Exit criterion: the OTR plugin contains no runtime/build dependency or dead
-adapter code for libotr/libgcrypt/libgpg-error while remaining interoperable with
-older clients over the wire and preserving existing user data.
+- removed obsolete libotr callbacks, `otrlextensions` and legacy dependency
+  finder modules
+- removed the libtidy runtime/build dependency and replaced HTML normalization
+  with Qt `QTextDocument`
+- removed raw libotr-backed fingerprint pointer semantics
+- simplified `OtrMessaging` and related adapter plumbing around the native model
+- corrected XEP-0364 whitespace advertisement/discovery to the actually
+  implemented OTRv3 version
+- preserved old plugin GPL provenance/license headers where substantial legacy
+  code remains
+- licensed the independently implemented qca-otr library under MIT and added
+  Doxygen contracts to its public API
+- kept Qt5/Qt6/Linux and Qt5/Windows 7 native CI coverage
+
+Still useful as external/manual release validation rather than implementation
+work:
+
+- run a real new-Psi <-> old-Psi/libotr conversation smoke test
+- verify migration with a representative existing user profile before and after
+  the backend switch
+
+The code-level exit criterion is met: the OTR plugin contains no normal
+runtime/build dependency on libotr/libgcrypt/libgpg-error or libtidy and remains
+covered by libotr interoperability tests for wire and persistence formats.
