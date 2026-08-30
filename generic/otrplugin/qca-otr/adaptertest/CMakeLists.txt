@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Sergei Ilinykh
+# SPDX-License-Identifier: MIT
+
 find_package(Qt${QT_DEFAULT_MAJOR_VERSION} REQUIRED COMPONENTS Widgets Xml)
 
 add_executable(qca-otr-psi-adapter-compile-test

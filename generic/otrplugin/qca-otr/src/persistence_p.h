@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Sergei Ilinykh
+ * SPDX-License-Identifier: MIT
+ */
+
 #pragma once
 
 #include <QByteArray>

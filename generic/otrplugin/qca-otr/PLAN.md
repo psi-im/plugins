@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2026 Sergei Ilinykh
+SPDX-License-Identifier: MIT
+-->
+
 # Native OTR completion plan
 
 The native qca-otr work is completed in protocol layers so each stage can be

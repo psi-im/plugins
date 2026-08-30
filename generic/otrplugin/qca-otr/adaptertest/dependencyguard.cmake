@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Sergei Ilinykh
+# SPDX-License-Identifier: MIT
+
 if(NOT DEFINED PLUGIN_CMAKE OR NOT EXISTS "${PLUGIN_CMAKE}")
     message(FATAL_ERROR "OTR plugin CMakeLists.txt not found: ${PLUGIN_CMAKE}")
 endif()

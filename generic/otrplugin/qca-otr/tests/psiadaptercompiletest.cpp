@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2026 Sergei Ilinykh
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "htmlnormalizer.h"
 #include "otrmessaging.h"
 

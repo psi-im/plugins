@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2026 Sergei Ilinykh
+SPDX-License-Identifier: MIT
+-->
+
 # qca-otr
 
 `qca-otr` is an experimental Qt/QCA implementation of the OTRv3 protocol core.
@@ -69,3 +74,7 @@ repository CI builds and tests the same source against both Qt 5 and Qt 6. The
 Qt 6 Linux job consumes the published QCA 3.0.3 Ubuntu package directly, while
 the Qt 5 compatibility job builds the same QCA 3.0.3 tag because no Qt 5 Linux
 release package is currently published.
+
+## License
+
+qca-otr is licensed under the MIT License. Copyright (c) 2026 Sergei Ilinykh.
