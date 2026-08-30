@@ -1,5 +1,8 @@
 /*
  * otrinternal.h - Native qca-otr backend for the Psi OTR plugin
+ *
+ * SPDX-FileCopyrightText: 2026 Sergei Ilinykh
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #ifndef OTRINTERNAL_H_
