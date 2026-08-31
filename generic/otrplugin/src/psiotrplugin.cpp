@@ -29,7 +29,6 @@
 #include "applicationinfoaccessinghost.h"
 #include "contactinfoaccessinghost.h"
 #include "encryptionmethodaccessinghost.h"
-#include "htmlnormalizer.h"
 #include "iconfactoryaccessinghost.h"
 #include "psiaccountcontrollinghost.h"
 #include "psiotrclosure.h"
@@ -38,38 +37,122 @@
 #include <QAction>
 #include <QDomDocument>
 #include <QDomElement>
-#include <QTextDocument>
+#include <QFile>
 
 namespace psiotr {
 
 namespace {
 
-QString removeResource(const QString &aJid)
+const QString &otrWhitespaceTag()
 {
-    QString addr(aJid);
-    int pos = aJid.indexOf("/");
-    if (pos > -1)
-        addr.truncate(pos);
-    return addr;
+    static const QString tag = QString::fromLatin1(QByteArray::fromHex("20092020090909092009200920092020"));
+    return tag;
 }
 
-QString unescape(const QString &escaped)
+const QString &otrWhitespaceV1()
 {
-    QString plain(escaped);
-    plain.replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"").replace("&amp;", "&");
-    return plain;
+    static const QString tag = QString::fromLatin1(QByteArray::fromHex("2009200920200920"));
+    return tag;
 }
 
-QString htmlToPlain(const QString &html)
+const QString &otrWhitespaceV2()
 {
-    QString plain(html);
-    plain.replace(QRegularExpression(" ?\\n"), " ")
-        .replace(QRegularExpression("<br(?:\\s[^>]*)?/>"), "\n")
-        .replace(QRegularExpression("<b(?:\\s[^>]*)?>([^<]+)</b>"), "*\\1*")
-        .replace(QRegularExpression("<i(?:\\s[^>]*)?>([^<]+)</i>"), "/\\1/")
-        .replace(QRegularExpression("<u(?:\\s[^>]*)?>([^<]+)</u>"), "_\\1_")
-        .remove(QRegularExpression("<[^>]*>"));
-    return plain;
+    static const QString tag = QString::fromLatin1(QByteArray::fromHex("2020090920200920"));
+    return tag;
+}
+
+const QString &otrWhitespaceV3()
+{
+    static const QString tag = QString::fromLatin1(QByteArray::fromHex("2020090920200909"));
+    return tag;
+}
+
+bool hasOtrV3WhitespaceTag(const QString &text)
+{
+    auto searchFrom = 0;
+    while (true) {
+        const auto tagPos = text.indexOf(otrWhitespaceTag(), searchFrom);
+        if (tagPos < 0)
+            return false;
+
+        auto pos = tagPos + otrWhitespaceTag().size();
+        while (pos + 8 <= text.size()) {
+            const QString versionTag = text.mid(pos, 8);
+            if (versionTag == otrWhitespaceV3())
+                return true;
+            if (versionTag != otrWhitespaceV1() && versionTag != otrWhitespaceV2())
+                break;
+            pos += 8;
+        }
+
+        searchFrom = tagPos + otrWhitespaceTag().size();
+    }
+}
+
+bool hasDirectChild(const QDomElement &parent, const QString &ns, const QString &name)
+{
+    for (auto child = parent.firstChildElement(); !child.isNull(); child = child.nextSiblingElement()) {
+        if (child.namespaceURI() == ns && child.localName() == name)
+            return true;
+    }
+    return false;
+}
+
+QDomElement appendChildIfMissing(QDomElement &parent, const QString &ns, const QString &name)
+{
+    if (hasDirectChild(parent, ns, name))
+        return {};
+
+    auto child = parent.ownerDocument().createElementNS(ns, name);
+    parent.appendChild(child);
+    return child;
+}
+
+void addOtrProcessingHints(QDomElement &message)
+{
+    appendChildIfMissing(message, QStringLiteral("urn:xmpp:hints"), QStringLiteral("no-copy"));
+    appendChildIfMissing(message, QStringLiteral("urn:xmpp:hints"), QStringLiteral("no-permanent-store"));
+    appendChildIfMissing(message, QStringLiteral("urn:xmpp:carbons:2"), QStringLiteral("private"));
+}
+
+bool hasOtrEme(const QDomElement &message)
+{
+    for (auto child = message.firstChildElement(); !child.isNull(); child = child.nextSiblingElement()) {
+        if (child.namespaceURI() == QLatin1String("urn:xmpp:eme:0")
+            && child.localName() == QLatin1String("encryption")
+            && child.attribute(QStringLiteral("namespace")) == QLatin1String("urn:xmpp:otr:0")) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void addOtrEme(QDomElement &message)
+{
+    if (hasOtrEme(message))
+        return;
+
+    auto eme = message.ownerDocument().createElementNS(QStringLiteral("urn:xmpp:eme:0"),
+                                                       QStringLiteral("encryption"));
+    eme.setAttribute(QStringLiteral("namespace"), QStringLiteral("urn:xmpp:otr:0"));
+    message.appendChild(eme);
+}
+
+void clearChildren(QDomElement &element)
+{
+    while (!element.firstChild().isNull())
+        element.removeChild(element.firstChild());
+}
+
+bool hasConcreteResource(const QString &jid)
+{
+    const auto slash = jid.indexOf(QLatin1Char('/'));
+    return slash > 0 && slash + 1 < jid.size();
+}
+
+bool isEncodedOtrMessage(const QString &message)
+{
+    return message.startsWith(QLatin1String("?OTR:")) || message.startsWith(QLatin1String("?OTR|"));
 }
 
 } // namespace
@@ -88,8 +171,10 @@ public:
             if (!contact_.isEmpty() && provider_ && provider_->plugin_ && provider_->plugin_->m_otrConnection
                 && provider_->plugin_->m_accountInfo) {
                 const QString accountId = provider_->plugin_->m_accountInfo->getId(account_);
-                if (provider_->plugin_->m_otrConnection->getMessageState(accountId, contact_) != OTR_MESSAGESTATE_ENCRYPTED)
+                if (provider_->plugin_->m_otrConnection->getMessageState(accountId, contact_)
+                    != OTR_MESSAGESTATE_ENCRYPTED) {
                     provider_->plugin_->m_otrConnection->startSession(accountId, contact_);
+                }
             }
         }
 
@@ -102,7 +187,7 @@ public:
                 completion(std::move(result));
                 return;
             }
-            if (contact_.isEmpty()) {
+            if (!hasConcreteResource(contact_)) {
                 result.error = Error::NoRecipients;
                 result.errorString = QObject::tr("OTR requires a concrete XMPP resource");
                 completion(std::move(result));
@@ -110,7 +195,8 @@ public:
             }
 
             const QString accountId = provider_->plugin_->m_accountInfo->getId(account_);
-            if (provider_->plugin_->m_otrConnection->getMessageState(accountId, contact_) != OTR_MESSAGESTATE_ENCRYPTED) {
+            if (provider_->plugin_->m_otrConnection->getMessageState(accountId, contact_)
+                != OTR_MESSAGESTATE_ENCRYPTED) {
                 result.error = Error::NoSession;
                 result.errorString = QObject::tr("The OTR session with %1 is not established yet").arg(contact_);
                 completion(std::move(result));
@@ -148,8 +234,8 @@ public:
             document.appendChild(message);
             const QString contact = message.attribute(QStringLiteral("from"));
 
-            // XEP-0364: another resource must not act on OTR protocol traffic
-            // delivered through Message Carbons.
+            // XEP-0364: OTR protocol traffic received through Message Carbons
+            // belongs to another resource and must be ignored silently.
             if (carbon_) {
                 result.success = true;
                 result.stanza = message;
@@ -200,18 +286,18 @@ public:
     {
         if (stanza.tagName() != QLatin1String("message"))
             return false;
+
         const auto body = stanza.firstChildElement(QStringLiteral("body"));
         if (!body.isNull() && body.text().startsWith(QLatin1String("?OTR")))
             return true;
-        const auto eme = stanza.firstChildElement(QStringLiteral("encryption"));
-        return !eme.isNull() && eme.namespaceURI() == QLatin1String("urn:xmpp:eme:0")
-            && eme.attribute(QStringLiteral("namespace")) == QLatin1String(OtrNamespace);
+
+        return hasOtrEme(stanza);
     }
 
     Availability availability(int account, const QString &fullJid) const override
     {
         if (!plugin_ || !plugin_->m_enabled || !plugin_->m_contactInfo || !plugin_->m_accountInfo
-            || !plugin_->m_otrConnection || !plugin_->m_optionHost || !fullJid.contains(QLatin1Char('/'))
+            || !plugin_->m_otrConnection || !plugin_->m_optionHost || !hasConcreteResource(fullJid)
             || plugin_->m_optionHost->getPluginOption(OPTION_POLICY, DEFAULT_POLICY).toInt() == OTR_POLICY_OFF) {
             return Availability::Unavailable;
         }
@@ -225,8 +311,9 @@ public:
             return Availability::Available;
         }
 
-        // XEP-0364 discovery is still used by older clients. Lack of the
-        // XEP-0378 disco feature therefore means unknown, not unsupported.
+        // Older OTR clients advertise support using XEP-0364 whitespace tags
+        // instead of XEP-0378 disco, so absence of the disco feature alone is
+        // not evidence that a resource cannot use OTR.
         return Availability::Unknown;
     }
 
@@ -237,8 +324,12 @@ public:
             || sessionContext.recipients.size() > 1) {
             return nullptr;
         }
-        if (sessionContext.recipients.size() == 1 && !sessionContext.recipients.constFirst().contains(QLatin1Char('/')))
+
+        // An empty recipient list is used by the transient incoming-decryption
+        // path. Outgoing OTR sessions are always bound to one concrete resource.
+        if (sessionContext.recipients.size() == 1 && !hasConcreteResource(sessionContext.recipients.constFirst()))
             return nullptr;
+
         return new Session(this, account, sessionContext);
     }
 
@@ -256,7 +347,8 @@ private:
 PsiOtrPlugin::PsiOtrPlugin() :
     m_enabled(false), m_otrConnection(nullptr), m_onlineUsers(), m_optionHost(nullptr), m_senderHost(nullptr),
     m_applicationInfo(nullptr), m_accountHost(nullptr), m_accountInfo(nullptr), m_contactInfo(nullptr),
-    m_iconHost(nullptr), m_psiEvent(nullptr), m_encryptionHost(nullptr), m_encryptionProvider(nullptr), m_messageBoxList()
+    m_iconHost(nullptr), m_psiEvent(nullptr), m_encryptionHost(nullptr), m_encryptionProvider(nullptr),
+    m_messageBoxList()
 {
 }
 
@@ -273,7 +365,7 @@ QWidget *PsiOtrPlugin::options()
 
 bool PsiOtrPlugin::enable()
 {
-    QVariant policyOption = m_optionHost->getPluginOption(OPTION_POLICY, DEFAULT_POLICY);
+    const QVariant policyOption = m_optionHost->getPluginOption(OPTION_POLICY, DEFAULT_POLICY);
     m_otrConnection = new OtrMessaging(this, static_cast<OtrPolicy>(policyOption.toInt()));
     m_enabled = true;
 
@@ -412,149 +504,88 @@ QString PsiOtrPlugin::pluginInfo()
 
 bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageElement, const QString &contactOverride)
 {
-    if (!m_enabled || messageElement.isNull() || messageElement.attribute("type") == "error"
-        || messageElement.attribute("type") == "groupchat"
-        || messageElement.firstChild().toElement().namespaceURI() == "urn:xmpp:carbons:2") {
+    if (!m_enabled || messageElement.isNull() || messageElement.attribute(QStringLiteral("type")) == QLatin1String("error")
+        || messageElement.attribute(QStringLiteral("type")) == QLatin1String("groupchat")) {
         return false;
     }
 
-    bool decryptedOtrMassage = false;
-    bool ignore = false;
+    const QString contact = contactOverride.isEmpty() ? messageElement.attribute(QStringLiteral("from"))
+                                                       : contactOverride;
+    if (!hasConcreteResource(contact))
+        return false;
 
-    const QString contact = contactOverride.isEmpty() ? getCorrectJid(accountIndex, messageElement.attribute("from"))
-                                                        : contactOverride;
+    auto plainBody = messageElement.firstChildElement(QStringLiteral("body"));
+    if (plainBody.isNull())
+        return false;
+
     const QString account = m_accountInfo->getId(accountIndex);
+    QString decrypted;
+    const OtrMessageType messageType =
+        m_otrConnection->decryptMessage(account, contact, plainBody.text(), decrypted);
 
-    QDomElement htmlElement = messageElement.firstChildElement("html");
-    QDomElement plainBody = messageElement.firstChildElement("body");
-    QString cyphertext;
-    if (!htmlElement.isNull()) {
-        QTextStream textStream(&cyphertext);
-        htmlElement.firstChildElement("body").save(textStream, 0);
-    } else if (!plainBody.isNull()) {
-        cyphertext = plainBody.firstChild().toText().nodeValue().toHtmlEscaped();
-    } else {
+    if (messageType == OTR_MESSAGETYPE_NONE)
         return false;
-    }
 
     m_otrDiscoveredResources.insert(account + QLatin1Char('\n') + contact);
     if (m_encryptionHost && m_encryptionProvider)
         m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
 
-    QString decrypted;
-    OtrMessageType messageType = m_otrConnection->decryptMessage(account, contact, cyphertext, decrypted);
-    switch (messageType) {
-    case OTR_MESSAGETYPE_NONE:
-        break;
-    case OTR_MESSAGETYPE_IGNORE:
-        ignore = true;
-        break;
-    case OTR_MESSAGETYPE_OTR: {
-        decryptedOtrMassage = true;
-        QString bodyText;
-
-        const bool isHTML = !htmlElement.isNull() || Qt::mightBeRichText(decrypted);
-        if (!isHTML) {
-            bodyText = decrypted;
-        } else {
-            HtmlNormalizer normalizer("<body xmlns=\"http://www.w3.org/1999/xhtml\">" + decrypted + "</body>");
-            decrypted = normalizer.output();
-            bodyText = htmlToPlain(decrypted);
-
-            if (htmlElement.isNull()) {
-                htmlElement = messageElement.ownerDocument().createElementNS("http://jabber.org/protocol/xhtml-im", "html");
-                messageElement.appendChild(htmlElement);
-            } else {
-                htmlElement.removeChild(htmlElement.firstChildElement("body"));
-            }
-
-            QDomDocument document;
-            int errorLine = 0;
-            int errorColumn = 0;
-            QString errorText;
-#if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
-            if (document.setContent(decrypted, true, &errorText, &errorLine, &errorColumn)) {
-#else
-            auto result = document.setContent(decrypted, QDomDocument::ParseOption::UseNamespaceProcessing);
-            errorColumn = result.errorColumn;
-            errorLine = result.errorLine;
-            errorText = result.errorMessage;
-            if (result) {
-#endif
-                htmlElement.appendChild(document.documentElement());
-            } else {
-                qWarning() << "---- parsing error:\n"
-                           << decrypted << "\n----\n"
-                           << errorText << " line:" << errorLine << " column:" << errorColumn;
-                messageElement.removeChild(htmlElement);
-            }
-        }
-
-        // Replace the plaintext fallback with the authenticated OTR plaintext.
-        plainBody.removeChild(plainBody.firstChild());
-        plainBody.appendChild(messageElement.ownerDocument().createTextNode(unescape(bodyText)));
-
-        // Keep EME metadata for clients that understand XEP-0380 even when
-        // the original stanza did not carry an encryption marker.
-        if (messageElement.elementsByTagNameNS("urn:xmpp:eme:0", "encryption").isEmpty()) {
-            QDomElement encElement = messageElement.ownerDocument().createElementNS("urn:xmpp:eme:0", "encryption");
-            encElement.setAttribute("namespace", "urn:xmpp:otr:0");
-            messageElement.appendChild(encElement);
-        }
-        break;
-    }
-    }
-    if (ignore)
+    if (messageType == OTR_MESSAGETYPE_IGNORE) {
         messageElement = QDomElement();
-    return decryptedOtrMassage;
+        return false;
+    }
+
+    // XEP-0364 §4.1: decrypted OTR payload is text, even if it happens to
+    // look like XML/XHTML. Never interpret authenticated plaintext as markup.
+    auto htmlElement = messageElement.firstChildElement(QStringLiteral("html"));
+    if (!htmlElement.isNull())
+        messageElement.removeChild(htmlElement);
+
+    clearChildren(plainBody);
+    plainBody.appendChild(messageElement.ownerDocument().createTextNode(decrypted));
+
+    addOtrEme(messageElement);
+    return true;
 }
 
 bool PsiOtrPlugin::encryptMessageElement(int accountIndex, QDomElement &message, const QString &contactOverride)
 {
-    if (!m_enabled || message.attribute("type") == "groupchat")
+    if (!m_enabled || message.isNull()
+        || message.attribute(QStringLiteral("type")) == QLatin1String("groupchat")
+        || message.attribute(QStringLiteral("type")) == QLatin1String("error")) {
+        return false;
+    }
+
+    const QString contact = contactOverride.isEmpty() ? message.attribute(QStringLiteral("to"))
+                                                       : contactOverride;
+    if (!hasConcreteResource(contact))
         return false;
 
-    const QString account = m_accountInfo->getId(accountIndex);
-    const QString contact = contactOverride.isEmpty() ? getCorrectJid(accountIndex, message.attribute("to"))
-                                                       : contactOverride;
-    QDomElement bodyElement = message.firstChildElement("body");
+    auto bodyElement = message.firstChildElement(QStringLiteral("body"));
     if (bodyElement.isNull())
         return false;
 
-    QDomNode body = bodyElement.firstChild();
-    QString encrypted = m_otrConnection->encryptMessage(account, contact, body.nodeValue().toHtmlEscaped());
+    const QString account = m_accountInfo->getId(accountIndex);
+    const QString encrypted = m_otrConnection->encryptMessage(account, contact, bodyElement.text());
 
-    // A failed encryption must drop the stanza rather than let the caller
-    // accidentally send the original plaintext body.
+    // Fail closed: never let an encryption failure fall through to sending the
+    // original plaintext stanza.
     if (encrypted.isEmpty()) {
         message = QDomElement();
         return false;
     }
 
-    body.setNodeValue(unescape(encrypted));
+    clearChildren(bodyElement);
+    bodyElement.appendChild(message.ownerDocument().createTextNode(encrypted));
 
-    if (!m_onlineUsers.value(account).contains(contact))
-        m_onlineUsers[account][contact] = new PsiOtrClosure(account, contact, m_otrConnection);
-
-    QDomElement htmlElement = message.firstChildElement("html");
-    if (m_onlineUsers[account][contact]->encrypted() && !htmlElement.isNull())
+    // XHTML-IM is not authenticated separately by OTR and must not survive as
+    // a plaintext side channel next to the encrypted body.
+    auto htmlElement = message.firstChildElement(QStringLiteral("html"));
+    if (!htmlElement.isNull())
         message.removeChild(htmlElement);
 
-    if (m_onlineUsers[account][contact]->encrypted()) {
-        htmlElement = message.ownerDocument().createElementNS("urn:xmpp:eme:0", "encryption");
-        htmlElement.setAttribute("namespace", "urn:xmpp:otr:0");
-        message.appendChild(htmlElement);
-
-        htmlElement = message.ownerDocument().createElementNS("urn:xmpp:hints", "no-copy");
-        message.appendChild(htmlElement);
-
-        htmlElement = message.ownerDocument().createElementNS("urn:xmpp:hints", "no-permanent-store");
-        message.appendChild(htmlElement);
-
-        htmlElement = message.ownerDocument().createElementNS("urn:xmpp:carbons:2", "private");
-        message.appendChild(htmlElement);
-    }
-
+    addOtrEme(message);
+    addOtrProcessingHints(message);
     return true;
 }
 
@@ -562,7 +593,7 @@ void PsiOtrPlugin::setOptionAccessingHost(OptionAccessingHost *host) { m_optionH
 
 void PsiOtrPlugin::optionChanged(const QString &)
 {
-    QVariant policyOption = m_optionHost->getPluginOption(OPTION_POLICY, DEFAULT_POLICY);
+    const QVariant policyOption = m_optionHost->getPluginOption(OPTION_POLICY, DEFAULT_POLICY);
     m_otrConnection->setPolicy(static_cast<OtrPolicy>(policyOption.toInt()));
     if (m_encryptionHost && m_encryptionProvider)
         m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
@@ -579,15 +610,24 @@ void PsiOtrPlugin::setPsiAccountControllingHost(PsiAccountControllingHost *host)
         if (!m_enabled)
             return;
 
-        QString account = m_accountInfo->getId(accountIndex);
+        const QString account = m_accountInfo->getId(accountIndex);
         if (m_onlineUsers.contains(account)) {
             const QStringList contacts = m_onlineUsers.value(account).keys();
             for (const QString &contact : contacts) {
                 m_otrConnection->endSession(account, contact);
-                m_onlineUsers[account][contact]->setIsLoggedIn(false);
                 m_onlineUsers[account][contact]->updateMessageState();
             }
         }
+
+        const QString prefix = account + QLatin1Char('\n');
+        for (auto it = m_otrDiscoveredResources.begin(); it != m_otrDiscoveredResources.end();) {
+            if ((*it).startsWith(prefix))
+                it = m_otrDiscoveredResources.erase(it);
+            else
+                ++it;
+        }
+        if (m_encryptionHost && m_encryptionProvider)
+            m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
     });
 }
 
@@ -605,29 +645,21 @@ bool PsiOtrPlugin::incomingStanza(int accountIndex, const QDomElement &xml)
     const QString account = m_accountInfo->getId(accountIndex);
 
     if (xml.nodeName() == QLatin1String("message")) {
-        // XEP-0364 legacy discovery uses an invisible whitespace tag. Feed
-        // plaintext discovery messages through the native OTR parser without
-        // routing them through Psi's encrypted-stanza path.
-        const auto body = xml.firstChildElement(QStringLiteral("body"));
-        if (!body.isNull() && !body.text().startsWith(QLatin1String("?OTR"))) {
-            static const QString otrWhitespaceTag = QString::fromLatin1(
-                QByteArray::fromHex("20092020090909092009200920092020"));
-            static const QString otrWhitespaceV3 = QString::fromLatin1(QByteArray::fromHex("2020090920200909"));
-            const auto tagPos = body.text().indexOf(otrWhitespaceTag);
-            if (tagPos >= 0) {
-                const QString contact = xml.attribute(QStringLiteral("from"));
-                QString ignored;
-                m_otrConnection->decryptMessage(account, contact, body.text().toHtmlEscaped(), ignored);
+        if (xml.attribute(QStringLiteral("type")) == QLatin1String("groupchat")
+            || xml.attribute(QStringLiteral("type")) == QLatin1String("error")) {
+            return false;
+        }
 
-                // qca-otr currently implements OTRv3 only. Do not claim a
-                // resource discovered through a v2-only whitespace suffix.
-                const QString versions = body.text().mid(tagPos + otrWhitespaceTag.size());
-                if (versions.contains(otrWhitespaceV3)) {
-                    m_otrDiscoveredResources.insert(account + QLatin1Char('\n') + contact);
-                    if (m_encryptionHost && m_encryptionProvider)
-                        m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
-                }
-            }
+        // XEP-0364 legacy discovery is passive capability advertisement on an
+        // otherwise plaintext message. It must not be fed into the OTR session
+        // parser and it is scoped to the sender's concrete resource.
+        const auto body = xml.firstChildElement(QStringLiteral("body"));
+        const QString contact = xml.attribute(QStringLiteral("from"));
+        if (!body.isNull() && !body.text().startsWith(QLatin1String("?OTR"))
+            && hasConcreteResource(contact) && hasOtrV3WhitespaceTag(body.text())) {
+            m_otrDiscoveredResources.insert(account + QLatin1Char('\n') + contact);
+            if (m_encryptionHost && m_encryptionProvider)
+                m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
         }
         return false;
     }
@@ -635,26 +667,22 @@ bool PsiOtrPlugin::incomingStanza(int accountIndex, const QDomElement &xml)
     if (xml.nodeName() != QLatin1String("presence"))
         return false;
 
-    // OTR is resource-bound (XEP-0364): presence/session state is tracked
-    // per full JID rather than collapsed to the roster bare JID.
     const QString contact = xml.attribute(QStringLiteral("from"));
     const QString type = xml.attribute(QStringLiteral("type"), QStringLiteral("available"));
+    if (type != QLatin1String("unavailable") || !hasConcreteResource(contact))
+        return false;
 
-    if (type == QLatin1String("available")) {
-        if (!m_onlineUsers.value(account).contains(contact))
-            m_onlineUsers[account][contact] = new PsiOtrClosure(account, contact, m_otrConnection);
-        m_onlineUsers[account][contact]->setIsLoggedIn(true);
-    } else if (type == QLatin1String("unavailable")) {
-        if (m_onlineUsers.contains(account) && m_onlineUsers.value(account).contains(contact)) {
-            if (m_optionHost->getPluginOption(OPTION_END_WHEN_OFFLINE, DEFAULT_END_WHEN_OFFLINE).toBool())
-                m_otrConnection->expireSession(account, contact);
-            m_onlineUsers[account][contact]->setIsLoggedIn(false);
-            m_onlineUsers[account][contact]->updateMessageState();
-        }
-        m_otrDiscoveredResources.remove(account + QLatin1Char('\n') + contact);
-        if (m_encryptionHost && m_encryptionProvider)
-            m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
-    }
+    // OTR is resource-bound. Once a resource goes offline, expire only that
+    // resource's session and forget its legacy discovery state.
+    if (m_optionHost->getPluginOption(OPTION_END_WHEN_OFFLINE, DEFAULT_END_WHEN_OFFLINE).toBool())
+        m_otrConnection->expireSession(account, contact);
+
+    if (m_onlineUsers.contains(account) && m_onlineUsers.value(account).contains(contact))
+        m_onlineUsers[account][contact]->updateMessageState();
+
+    m_otrDiscoveredResources.remove(account + QLatin1Char('\n') + contact);
+    if (m_encryptionHost && m_encryptionProvider)
+        m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
 
     return false;
 }
@@ -674,22 +702,19 @@ bool PsiOtrPlugin::outgoingStanza(int accountIndex, QDomElement &xml)
     if (body.isNull() || body.text().startsWith(QLatin1String("?OTR")))
         return false;
 
-    // Do not append whitespace discovery to an already encrypted stanza or
-    // its plaintext fallback. XEP-0378 disco remains independent.
+    // Do not advertise OTR inside another encrypted method's payload/fallback.
     if (!xml.elementsByTagNameNS(QStringLiteral("urn:xmpp:eme:0"), QStringLiteral("encryption")).isEmpty())
         return false;
     for (auto child = xml.firstChildElement(); !child.isNull(); child = child.nextSiblingElement()) {
         if (child.tagName() == QLatin1String("encrypted")
-            || (child.tagName() == QLatin1String("x") && child.namespaceURI() == QLatin1String("jabber:x:encrypted"))) {
+            || (child.tagName() == QLatin1String("x")
+                && child.namespaceURI() == QLatin1String("jabber:x:encrypted"))) {
             return false;
         }
     }
 
-    static const QString otrWhitespaceTag = QString::fromLatin1(
-        QByteArray::fromHex("20092020090909092009200920092020"));
-    static const QString otrWhitespaceV3 = QString::fromLatin1(QByteArray::fromHex("2020090920200909"));
-    if (!body.text().contains(otrWhitespaceTag)) {
-        const QString discovery = otrWhitespaceTag + otrWhitespaceV3;
+    if (!hasOtrV3WhitespaceTag(body.text())) {
+        const QString discovery = otrWhitespaceTag() + otrWhitespaceV3();
         auto textNode = body.firstChild();
         if (textNode.isText())
             textNode.setNodeValue(textNode.nodeValue() + discovery);
@@ -700,20 +725,21 @@ bool PsiOtrPlugin::outgoingStanza(int accountIndex, QDomElement &xml)
     return false;
 }
 
-QList<QVariantHash> PsiOtrPlugin::getButtonParam() { return QList<QVariantHash>(); }
+QList<QVariantHash> PsiOtrPlugin::getButtonParam() { return {}; }
 
 QAction *PsiOtrPlugin::getAction(QObject *parent, int accountIndex, const QString &contactJid)
 {
     if (!m_enabled)
         return nullptr;
 
-    QString contact = getCorrectJid(accountIndex, contactJid);
-    QString account = m_accountInfo->getId(accountIndex);
+    const QString account = m_accountInfo->getId(accountIndex);
 
-    if (!m_onlineUsers.value(account).contains(contact))
-        m_onlineUsers[account][contact] = new PsiOtrClosure(account, contact, m_otrConnection);
+    // Keep the actual JID supplied by the chat. OTR sessions are resource
+    // scoped; PsiOtrClosure disables manual session start for a bare JID.
+    if (!m_onlineUsers.value(account).contains(contactJid))
+        m_onlineUsers[account][contactJid] = new PsiOtrClosure(account, contactJid, m_otrConnection);
 
-    return m_onlineUsers[account][contact]->getChatDlgMenu(parent);
+    return m_onlineUsers[account][contactJid]->getChatDlgMenu(parent);
 }
 
 QString PsiOtrPlugin::dataDir()
@@ -724,7 +750,7 @@ QString PsiOtrPlugin::dataDir()
 void PsiOtrPlugin::sendMessage(const QString &account, const QString &contact, const QString &message)
 {
     const int accountIndex = getAccountIndexById(account);
-    if (accountIndex == -1 || !m_senderHost)
+    if (accountIndex == -1 || !m_senderHost || !hasConcreteResource(contact))
         return;
 
     QDomDocument document;
@@ -733,23 +759,16 @@ void PsiOtrPlugin::sendMessage(const QString &account, const QString &contact, c
     stanza.setAttribute(QStringLiteral("type"), QStringLiteral("chat"));
 
     auto body = document.createElement(QStringLiteral("body"));
-    body.appendChild(document.createTextNode(htmlToPlain(message)));
+    body.appendChild(document.createTextNode(message));
     stanza.appendChild(body);
 
-    // XEP-0364: OTR protocol traffic is bound to one resource and must not
-    // be carbon-copied or permanently archived.
-    stanza.appendChild(document.createElementNS(QStringLiteral("urn:xmpp:hints"), QStringLiteral("no-copy")));
-    stanza.appendChild(
-        document.createElementNS(QStringLiteral("urn:xmpp:hints"), QStringLiteral("no-permanent-store")));
-    stanza.appendChild(document.createElementNS(QStringLiteral("urn:xmpp:carbons:2"), QStringLiteral("private")));
+    // XEP-0364 processing hints apply to OTR negotiation, fragments and data.
+    addOtrProcessingHints(stanza);
 
-    // Data Messages get the EME marker recommended by XEP-0364/XEP-0380;
-    // the version Query Message is negotiation traffic, not ciphertext.
-    if (message.startsWith(QLatin1String("?OTR:"))) {
-        auto eme = document.createElementNS(QStringLiteral("urn:xmpp:eme:0"), QStringLiteral("encryption"));
-        eme.setAttribute(QStringLiteral("namespace"), QString::fromLatin1(OtrEncryptionProvider::OtrNamespace));
-        stanza.appendChild(eme);
-    }
+    // EME is meaningful for encoded/fragmented OTR wire records; the query
+    // message (?OTR?v3?) is negotiation capability traffic, not ciphertext.
+    if (isEncodedOtrMessage(message))
+        addOtrEme(stanza);
 
     document.appendChild(stanza);
     m_senderHost->sendStanza(accountIndex, stanza);
@@ -768,12 +787,12 @@ void PsiOtrPlugin::notifyUser(const QString &account,
     else
         messageBoxIcon = QMessageBox::Information;
 
-    QMessageBox *messageBox = new QMessageBox(messageBoxIcon,
-                                              tr("Confirm action"),
-                                              message,
-                                              QMessageBox::Ok,
-                                              nullptr,
-                                              Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+    auto *messageBox = new QMessageBox(messageBoxIcon,
+                                       tr("Confirm action"),
+                                       message,
+                                       QMessageBox::Ok,
+                                       nullptr,
+                                       Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     m_messageBoxList.enqueue(messageBox);
 
     m_psiEvent->createNewEvent(getAccountIndexById(account),
@@ -801,17 +820,19 @@ bool PsiOtrPlugin::displayOtrMessage(const QString &account, const QString &cont
 
 void PsiOtrPlugin::stateChange(const QString &account, const QString &contact, OtrStateChange change)
 {
-    m_otrDiscoveredResources.insert(account + QLatin1Char('\n') + contact);
-    if (m_encryptionHost && m_encryptionProvider)
-        m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
+    if (hasConcreteResource(contact)) {
+        m_otrDiscoveredResources.insert(account + QLatin1Char('\n') + contact);
+        if (m_encryptionHost && m_encryptionProvider)
+            m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
+    }
 
     if (!m_onlineUsers.value(account).contains(contact))
         m_onlineUsers[account][contact] = new PsiOtrClosure(account, contact, m_otrConnection);
 
     m_onlineUsers[account][contact]->updateMessageState();
 
-    bool verified = m_otrConnection->isVerified(account, contact);
-    bool encrypted = m_onlineUsers[account][contact]->encrypted();
+    const bool verified = m_otrConnection->isVerified(account, contact);
+    const bool encrypted = m_onlineUsers[account][contact]->encrypted();
     QString msg;
     QString icon;
 
@@ -864,7 +885,7 @@ void PsiOtrPlugin::updateSMP(const QString &account, const QString &contact, int
 
 QString PsiOtrPlugin::humanAccount(const QString &accountId)
 {
-    QString human(getAccountNameById(accountId));
+    const QString human = getAccountNameById(accountId);
     return human.isEmpty() ? accountId : human;
 }
 
@@ -894,7 +915,7 @@ int PsiOtrPlugin::getAccountIndexById(const QString &accountId)
     QString id;
     int accountIndex = 0;
     while (((id = m_accountInfo->getId(accountIndex)) != "-1") && (id != accountId))
-        accountIndex++;
+        ++accountIndex;
     return (id == "-1") ? -1 : accountIndex;
 }
 
@@ -906,22 +927,6 @@ QString PsiOtrPlugin::getAccountNameById(const QString &accountId)
 QString PsiOtrPlugin::getAccountJidById(const QString &accountId)
 {
     return m_accountInfo->getJid(getAccountIndexById(accountId));
-}
-
-QString PsiOtrPlugin::getCorrectJid(int accountIndex, const QString &fullJid)
-{
-    QString correctJid;
-    if (m_contactInfo->isPrivate(accountIndex, fullJid)) {
-        correctJid = fullJid;
-    } else {
-        correctJid = removeResource(fullJid);
-
-        // A private conference occupant may not be in the roster yet, so the
-        // normal privacy lookup cannot be the only reason to preserve resource.
-        if (m_contactInfo->isConference(accountIndex, correctJid))
-            correctJid = fullJid;
-    }
-    return correctJid;
 }
 
 } // namespace psiotr
