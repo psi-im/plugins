@@ -411,7 +411,7 @@ PsiOtrClosure::~PsiOtrClosure()
 void PsiOtrClosure::initiateSession(bool b)
 {
     Q_UNUSED(b);
-    if (!m_contact.contains(QLatin1Char('/')))
+    if (m_contact.isEmpty())
         return;
     m_otr->startSession(m_account, m_contact);
 }
@@ -548,10 +548,8 @@ void PsiOtrClosure::updateMessageState()
             }
         }
 
-        const bool hasResource = m_contact.contains(QLatin1Char('/'));
-        m_startSessionAction->setToolTip(
-            hasResource ? QString() : tr("Select a concrete XMPP resource before starting OTR."));
-        if (!hasResource || m_otr->getPolicy() < OTR_POLICY_ENABLED) {
+        m_startSessionAction->setToolTip(QString());
+        if (m_otr->getPolicy() < OTR_POLICY_ENABLED) {
             m_startSessionAction->setEnabled(false);
             m_endSessionAction->setEnabled(false);
         } else {
