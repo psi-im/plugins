@@ -141,14 +141,15 @@ public:
     /**
      * Applies native OTR processing to an incoming message DOM in place.
      * Protocol-only messages clear @p message. Decrypted application messages
-     * replace the body with authenticated plaintext, discard unauthenticated
-     * XHTML-IM content, and receive an EME marker when needed.
+     * replace unauthenticated stanza content with the authenticated OTR payload.
+     * XEP-0364 peers are always rendered as plaintext; legacy peers may expose
+     * their authenticated OTR payload as normalized XHTML for compatibility.
      */
     bool decryptMessageElement(int account, QDomElement &message, const QString &contact = QString());
 
     /**
-     * Encrypts the message body for a resource-bound OTR conversation in place.
-     * On encryption failure @p message is cleared so the caller cannot send the
+     * Encrypts the message body for the exact OTR endpoint JID in place. On
+     * encryption failure @p message is cleared so the caller cannot send the
      * original plaintext accidentally.
      */
     bool encryptMessageElement(int account, QDomElement &message, const QString &contact = QString());
@@ -187,6 +188,9 @@ private slots:
 private:
     friend class OtrEncryptionProvider;
 
+    bool isXep0364Peer(int accountIndex, const QString &contact) const;
+    void markXep0364Peer(const QString &account, const QString &contact);
+
     bool m_enabled;
     OtrMessaging *m_otrConnection;
     QHash<QString, QHash<QString, PsiOtrClosure *>> m_onlineUsers;
@@ -201,6 +205,7 @@ private:
     EncryptionMethodAccessingHost *m_encryptionHost;
     EncryptionMethodProvider *m_encryptionProvider;
     QSet<QString> m_otrDiscoveredResources;
+    QSet<QString> m_xep0364Resources;
     QQueue<QMessageBox *> m_messageBoxList;
 };
 
