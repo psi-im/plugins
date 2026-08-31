@@ -188,7 +188,7 @@ private slots:
 private:
     friend class OtrEncryptionProvider;
 
-    bool isXep0364Peer(int accountIndex, const QString &contact) const;
+    bool isXep0364Peer(int accountIndex, const QString &contact);
     void markXep0364Peer(const QString &account, const QString &contact);
 
     bool m_enabled;
@@ -204,8 +204,8 @@ private:
     EventCreatingHost *m_psiEvent;
     EncryptionMethodAccessingHost *m_encryptionHost;
     EncryptionMethodProvider *m_encryptionProvider;
-    QSet<QString> m_otrDiscoveredResources;
-    QSet<QString> m_xep0364Resources;
+    QSet<QString> m_otrDiscoveredEndpoints;
+    QSet<QString> m_xep0364Endpoints;
     QQueue<QMessageBox *> m_messageBoxList;
 };
 
