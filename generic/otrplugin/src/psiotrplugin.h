@@ -140,14 +140,16 @@ public:
     // Native EncryptionMethodProvider helpers
     /**
      * Applies native OTR processing to an incoming message DOM in place.
-     * Protocol-only messages clear @p message; decrypted application messages
-     * replace body/XHTML content and receive an EME marker when needed.
+     * Protocol-only messages clear @p message. Decrypted application messages
+     * replace unauthenticated stanza content with the authenticated OTR payload.
+     * XEP-0364 peers are always rendered as plaintext; legacy peers may expose
+     * their authenticated OTR payload as normalized XHTML for compatibility.
      */
     bool decryptMessageElement(int account, QDomElement &message, const QString &contact = QString());
 
     /**
-     * Encrypts the message body for a resource-bound OTR conversation in place.
-     * On encryption failure @p message is cleared so the caller cannot send the
+     * Encrypts the message body for the exact OTR endpoint JID in place. On
+     * encryption failure @p message is cleared so the caller cannot send the
      * original plaintext accidentally.
      */
     bool encryptMessageElement(int account, QDomElement &message, const QString &contact = QString());
@@ -186,11 +188,8 @@ private slots:
 private:
     friend class OtrEncryptionProvider;
 
-    /**
-     * Returns a full JID for private/MUC contacts and a bare JID for ordinary
-     * roster contacts. OTR itself remains resource-bound once a session starts.
-     */
-    QString getCorrectJid(int accountIndex, const QString &fullJid);
+    bool isXep0364Peer(int accountIndex, const QString &contact);
+    void markXep0364Peer(const QString &account, const QString &contact);
 
     bool m_enabled;
     OtrMessaging *m_otrConnection;
@@ -205,7 +204,8 @@ private:
     EventCreatingHost *m_psiEvent;
     EncryptionMethodAccessingHost *m_encryptionHost;
     EncryptionMethodProvider *m_encryptionProvider;
-    QSet<QString> m_otrDiscoveredResources;
+    QSet<QString> m_otrDiscoveredEndpoints;
+    QSet<QString> m_xep0364Endpoints;
     QQueue<QMessageBox *> m_messageBoxList;
 };
 

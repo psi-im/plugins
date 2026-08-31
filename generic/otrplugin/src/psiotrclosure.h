@@ -96,8 +96,6 @@ public:
     PsiOtrClosure(const QString &account, const QString &contact, OtrMessaging *otrc);
     ~PsiOtrClosure();
     void     updateMessageState();
-    void     setIsLoggedIn(bool isLoggedIn);
-    bool     isLoggedIn() const;
     void     disable();
     QAction *getChatDlgMenu(QObject *parent);
     bool     encrypted() const;
@@ -115,7 +113,6 @@ private:
     QAction              *m_fingerprintAction;
     QAction              *m_startSessionAction;
     QAction              *m_endSessionAction;
-    bool                  m_isLoggedIn;
     QObject              *m_parentWidget;
     AuthenticationDialog *m_authDialog;
 
