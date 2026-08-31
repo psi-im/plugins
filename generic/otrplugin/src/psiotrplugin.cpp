@@ -331,7 +331,7 @@ public:
             return Availability::Available;
 
         const QString accountId = plugin_->m_accountInfo->getId(account);
-        if (plugin_->m_otrDiscoveredResources.contains(endpointKey(accountId, endpointJid))
+        if (plugin_->m_otrDiscoveredEndpoints.contains(endpointKey(accountId, endpointJid))
             || plugin_->m_otrConnection->getMessageState(accountId, endpointJid) == OTR_MESSAGESTATE_ENCRYPTED) {
             return Availability::Available;
         }
@@ -458,8 +458,8 @@ bool PsiOtrPlugin::disable()
         m_onlineUsers[account].clear();
     }
     m_onlineUsers.clear();
-    m_otrDiscoveredResources.clear();
-    m_xep0364Resources.clear();
+    m_otrDiscoveredEndpoints.clear();
+    m_xep0364Endpoints.clear();
 
     while (!m_messageBoxList.empty()) {
         qDeleteAll(m_messageBoxList.begin(), m_messageBoxList.end());
@@ -529,17 +529,22 @@ QString PsiOtrPlugin::pluginInfo()
     return out;
 }
 
-bool PsiOtrPlugin::isXep0364Peer(int accountIndex, const QString &contact) const
+bool PsiOtrPlugin::isXep0364Peer(int accountIndex, const QString &contact)
 {
     if (contact.isEmpty() || !m_accountInfo)
         return false;
 
     const QString account = m_accountInfo->getId(accountIndex);
-    if (m_xep0364Resources.contains(endpointKey(account, contact)))
+    if (m_xep0364Endpoints.contains(endpointKey(account, contact)))
         return true;
 
-    return m_contactInfo
-        && m_contactInfo->hasCaps(accountIndex, contact, { QStringLiteral("urn:xmpp:otr:0") });
+    if (m_contactInfo
+        && m_contactInfo->hasCaps(accountIndex, contact, { QStringLiteral("urn:xmpp:otr:0") })) {
+        markXep0364Peer(account, contact);
+        return true;
+    }
+
+    return false;
 }
 
 void PsiOtrPlugin::markXep0364Peer(const QString &account, const QString &contact)
@@ -548,8 +553,8 @@ void PsiOtrPlugin::markXep0364Peer(const QString &account, const QString &contac
         return;
 
     const QString key = endpointKey(account, contact);
-    m_xep0364Resources.insert(key);
-    m_otrDiscoveredResources.insert(key);
+    m_xep0364Endpoints.insert(key);
+    m_otrDiscoveredEndpoints.insert(key);
 }
 
 bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageElement, const QString &contactOverride)
@@ -585,7 +590,7 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
     if (messageType == OTR_MESSAGETYPE_NONE)
         return false;
 
-    m_otrDiscoveredResources.insert(endpointKey(account, contact));
+    m_otrDiscoveredEndpoints.insert(endpointKey(account, contact));
     if (m_encryptionHost && m_encryptionProvider)
         m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
 
@@ -630,9 +635,9 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
     clearChildren(plainBody);
     plainBody.appendChild(messageElement.ownerDocument().createTextNode(bodyText));
 
-    // This EME marker is local metadata for Psi after successful decryption; it
-    // does not retroactively classify a legacy peer as XEP-0364 capable.
-    addOtrEme(messageElement);
+    // Keep the peer's original EME, if present, as wire evidence. The native
+    // EncryptionManager already carries successful OTR decryption as metadata,
+    // so do not synthesize an EME marker for legacy peers after decryption.
     return true;
 }
 
@@ -723,8 +728,8 @@ void PsiOtrPlugin::setPsiAccountControllingHost(PsiAccountControllingHost *host)
                     ++it;
             }
         };
-        clearAccountState(m_otrDiscoveredResources);
-        clearAccountState(m_xep0364Resources);
+        clearAccountState(m_otrDiscoveredEndpoints);
+        clearAccountState(m_xep0364Endpoints);
 
         if (m_encryptionHost && m_encryptionProvider)
             m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
@@ -761,7 +766,7 @@ bool PsiOtrPlugin::incomingStanza(int accountIndex, const QDomElement &xml)
             m_otrConnection->decryptMessage(account, contact, body.text(), ignored);
 
             if (hasOtrV3WhitespaceTag(body.text())) {
-                m_otrDiscoveredResources.insert(endpointKey(account, contact));
+                m_otrDiscoveredEndpoints.insert(endpointKey(account, contact));
                 if (m_encryptionHost && m_encryptionProvider)
                     m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
             }
@@ -787,8 +792,8 @@ bool PsiOtrPlugin::incomingStanza(int accountIndex, const QDomElement &xml)
         m_onlineUsers[account][contact]->updateMessageState();
 
     const QString key = endpointKey(account, contact);
-    m_otrDiscoveredResources.remove(key);
-    m_xep0364Resources.remove(key);
+    m_otrDiscoveredEndpoints.remove(key);
+    m_xep0364Endpoints.remove(key);
     if (m_encryptionHost && m_encryptionProvider)
         m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
 
@@ -930,7 +935,7 @@ bool PsiOtrPlugin::displayOtrMessage(const QString &account, const QString &cont
 void PsiOtrPlugin::stateChange(const QString &account, const QString &contact, OtrStateChange change)
 {
     if (!contact.isEmpty()) {
-        m_otrDiscoveredResources.insert(endpointKey(account, contact));
+        m_otrDiscoveredEndpoints.insert(endpointKey(account, contact));
         if (m_encryptionHost && m_encryptionProvider)
             m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
     }
