@@ -395,8 +395,7 @@ void AuthenticationDialog::notify(const QMessageBox::Icon icon, const QString &m
 PsiOtrClosure::PsiOtrClosure(const QString &account, const QString &contact, OtrMessaging *otrc) :
     m_otr(otrc), m_account(account), m_contact(contact), m_chatDlgMenu(nullptr), m_chatDlgAction(nullptr),
     m_authenticateAction(nullptr), m_sessionIdAction(nullptr), m_fingerprintAction(nullptr),
-    m_startSessionAction(nullptr), m_endSessionAction(nullptr), m_isLoggedIn(false), m_parentWidget(nullptr),
-    m_authDialog(nullptr)
+    m_startSessionAction(nullptr), m_endSessionAction(nullptr), m_parentWidget(nullptr), m_authDialog(nullptr)
 {
 }
 
@@ -412,6 +411,8 @@ PsiOtrClosure::~PsiOtrClosure()
 void PsiOtrClosure::initiateSession(bool b)
 {
     Q_UNUSED(b);
+    if (!m_contact.contains(QLatin1Char('/')))
+        return;
     m_otr->startSession(m_account, m_contact);
 }
 
@@ -547,9 +548,14 @@ void PsiOtrClosure::updateMessageState()
             }
         }
 
-        if (m_otr->getPolicy() < OTR_POLICY_ENABLED) {
+        const bool hasResource = m_contact.contains(QLatin1Char('/'));
+        m_startSessionAction->setToolTip(
+            hasResource ? QString() : tr("Select a concrete XMPP resource before starting OTR."));
+        if (!hasResource || m_otr->getPolicy() < OTR_POLICY_ENABLED) {
             m_startSessionAction->setEnabled(false);
             m_endSessionAction->setEnabled(false);
+        } else {
+            m_startSessionAction->setEnabled(true);
         }
     }
 }
@@ -593,14 +599,6 @@ void PsiOtrClosure::showMenu() { m_chatDlgMenu->popup(QCursor::pos(), m_chatDlgA
 
 //-----------------------------------------------------------------------------
 
-void PsiOtrClosure::setIsLoggedIn(bool isLoggedIn) { m_isLoggedIn = isLoggedIn; }
-
-//-----------------------------------------------------------------------------
-
-bool PsiOtrClosure::isLoggedIn() const { return m_isLoggedIn; }
-
-//-----------------------------------------------------------------------------
-
 void PsiOtrClosure::disable()
 {
     if (m_chatDlgAction) {
@@ -617,4 +615,4 @@ bool PsiOtrClosure::encrypted() const
 
 //-----------------------------------------------------------------------------
 
-} // namespace
+} // namespace psiotr
