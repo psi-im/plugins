@@ -29,6 +29,7 @@
 #include "applicationinfoaccessinghost.h"
 #include "contactinfoaccessinghost.h"
 #include "encryptionmethodaccessinghost.h"
+#include "htmlnormalizer.h"
 #include "iconfactoryaccessinghost.h"
 #include "psiaccountcontrollinghost.h"
 #include "psiotrclosure.h"
@@ -38,6 +39,7 @@
 #include <QDomDocument>
 #include <QDomElement>
 #include <QFile>
+#include <QTextDocument>
 
 namespace psiotr {
 
@@ -89,6 +91,22 @@ bool hasOtrV3WhitespaceTag(const QString &text)
     }
 }
 
+QString endpointKey(const QString &account, const QString &contact)
+{
+    return account + QLatin1Char('\n') + contact;
+}
+
+QString unescapeLegacyEntities(const QString &escaped)
+{
+    QString plain(escaped);
+    plain.replace(QStringLiteral("&lt;"), QStringLiteral("<"))
+        .replace(QStringLiteral("&gt;"), QStringLiteral(">"))
+        .replace(QStringLiteral("&quot;"), QStringLiteral("\""))
+        .replace(QStringLiteral("&#39;"), QStringLiteral("'"))
+        .replace(QStringLiteral("&amp;"), QStringLiteral("&"));
+    return plain;
+}
+
 bool hasDirectChild(const QDomElement &parent, const QString &ns, const QString &name)
 {
     for (auto child = parent.firstChildElement(); !child.isNull(); child = child.nextSiblingElement()) {
@@ -138,16 +156,23 @@ void addOtrEme(QDomElement &message)
     message.appendChild(eme);
 }
 
+void removeOtrEme(QDomElement &message)
+{
+    for (auto child = message.firstChildElement(); !child.isNull();) {
+        const auto next = child.nextSiblingElement();
+        if (child.namespaceURI() == QLatin1String("urn:xmpp:eme:0")
+            && child.localName() == QLatin1String("encryption")
+            && child.attribute(QStringLiteral("namespace")) == QLatin1String("urn:xmpp:otr:0")) {
+            message.removeChild(child);
+        }
+        child = next;
+    }
+}
+
 void clearChildren(QDomElement &element)
 {
     while (!element.firstChild().isNull())
         element.removeChild(element.firstChild());
-}
-
-bool hasConcreteResource(const QString &jid)
-{
-    const auto slash = jid.indexOf(QLatin1Char('/'));
-    return slash > 0 && slash + 1 < jid.size();
 }
 
 bool isEncodedOtrMessage(const QString &message)
@@ -187,9 +212,9 @@ public:
                 completion(std::move(result));
                 return;
             }
-            if (!hasConcreteResource(contact_)) {
+            if (contact_.isEmpty()) {
                 result.error = Error::NoRecipients;
-                result.errorString = QObject::tr("OTR requires a concrete XMPP resource");
+                result.errorString = QObject::tr("OTR requires a recipient");
                 completion(std::move(result));
                 return;
             }
@@ -235,7 +260,7 @@ public:
             const QString contact = message.attribute(QStringLiteral("from"));
 
             // XEP-0364: OTR protocol traffic received through Message Carbons
-            // belongs to another resource and must be ignored silently.
+            // belongs to another endpoint and must be ignored silently.
             if (carbon_) {
                 result.success = true;
                 result.stanza = message;
@@ -294,26 +319,26 @@ public:
         return hasOtrEme(stanza);
     }
 
-    Availability availability(int account, const QString &fullJid) const override
+    Availability availability(int account, const QString &endpointJid) const override
     {
         if (!plugin_ || !plugin_->m_enabled || !plugin_->m_contactInfo || !plugin_->m_accountInfo
-            || !plugin_->m_otrConnection || !plugin_->m_optionHost || !hasConcreteResource(fullJid)
+            || !plugin_->m_otrConnection || !plugin_->m_optionHost || endpointJid.isEmpty()
             || plugin_->m_optionHost->getPluginOption(OPTION_POLICY, DEFAULT_POLICY).toInt() == OTR_POLICY_OFF) {
             return Availability::Unavailable;
         }
 
-        if (plugin_->m_contactInfo->hasCaps(account, fullJid, { QString::fromLatin1(OtrNamespace) }))
+        if (plugin_->isXep0364Peer(account, endpointJid))
             return Availability::Available;
 
         const QString accountId = plugin_->m_accountInfo->getId(account);
-        if (plugin_->m_otrDiscoveredResources.contains(accountId + QLatin1Char('\n') + fullJid)
-            || plugin_->m_otrConnection->getMessageState(accountId, fullJid) == OTR_MESSAGESTATE_ENCRYPTED) {
+        if (plugin_->m_otrDiscoveredResources.contains(endpointKey(accountId, endpointJid))
+            || plugin_->m_otrConnection->getMessageState(accountId, endpointJid) == OTR_MESSAGESTATE_ENCRYPTED) {
             return Availability::Available;
         }
 
-        // Older OTR clients advertise support using XEP-0364 whitespace tags
-        // instead of XEP-0378 disco, so absence of the disco feature alone is
-        // not evidence that a resource cannot use OTR.
+        // Older OTR endpoints can advertise only with the XEP-0364 whitespace
+        // tag (or not advertise at all), so lack of XEP-0378 caps is unknown,
+        // not proof that OTR is unsupported.
         return Availability::Unknown;
     }
 
@@ -325,9 +350,10 @@ public:
             return nullptr;
         }
 
-        // An empty recipient list is used by the transient incoming-decryption
-        // path. Outgoing OTR sessions are always bound to one concrete resource.
-        if (sessionContext.recipients.size() == 1 && !hasConcreteResource(sessionContext.recipients.constFirst()))
+        // The incoming-decryption path intentionally uses zero recipients.
+        // For an outgoing session keep the exact endpoint JID supplied by Psi;
+        // XMPP transports are allowed to expose online legacy contacts as bare JIDs.
+        if (sessionContext.recipients.size() == 1 && sessionContext.recipients.constFirst().isEmpty())
             return nullptr;
 
         return new Session(this, account, sessionContext);
@@ -433,6 +459,7 @@ bool PsiOtrPlugin::disable()
     }
     m_onlineUsers.clear();
     m_otrDiscoveredResources.clear();
+    m_xep0364Resources.clear();
 
     while (!m_messageBoxList.empty()) {
         qDeleteAll(m_messageBoxList.begin(), m_messageBoxList.end());
@@ -502,16 +529,40 @@ QString PsiOtrPlugin::pluginInfo()
     return out;
 }
 
+bool PsiOtrPlugin::isXep0364Peer(int accountIndex, const QString &contact) const
+{
+    if (contact.isEmpty() || !m_accountInfo)
+        return false;
+
+    const QString account = m_accountInfo->getId(accountIndex);
+    if (m_xep0364Resources.contains(endpointKey(account, contact)))
+        return true;
+
+    return m_contactInfo
+        && m_contactInfo->hasCaps(accountIndex, contact, { QStringLiteral("urn:xmpp:otr:0") });
+}
+
+void PsiOtrPlugin::markXep0364Peer(const QString &account, const QString &contact)
+{
+    if (contact.isEmpty())
+        return;
+
+    const QString key = endpointKey(account, contact);
+    m_xep0364Resources.insert(key);
+    m_otrDiscoveredResources.insert(key);
+}
+
 bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageElement, const QString &contactOverride)
 {
-    if (!m_enabled || messageElement.isNull() || messageElement.attribute(QStringLiteral("type")) == QLatin1String("error")
+    if (!m_enabled || messageElement.isNull()
+        || messageElement.attribute(QStringLiteral("type")) == QLatin1String("error")
         || messageElement.attribute(QStringLiteral("type")) == QLatin1String("groupchat")) {
         return false;
     }
 
     const QString contact = contactOverride.isEmpty() ? messageElement.attribute(QStringLiteral("from"))
                                                        : contactOverride;
-    if (!hasConcreteResource(contact))
+    if (contact.isEmpty())
         return false;
 
     auto plainBody = messageElement.firstChildElement(QStringLiteral("body"));
@@ -519,6 +570,14 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
         return false;
 
     const QString account = m_accountInfo->getId(accountIndex);
+
+    // EME and XEP-0378 caps are strong signals that the remote endpoint follows
+    // XEP-0364 payload semantics. Once observed, keep that knowledge for the
+    // lifetime of this exact endpoint; whitespace-only discovery remains legacy.
+    if (hasOtrEme(messageElement))
+        markXep0364Peer(account, contact);
+    const bool xep0364Peer = isXep0364Peer(accountIndex, contact);
+
     QString decrypted;
     const OtrMessageType messageType =
         m_otrConnection->decryptMessage(account, contact, plainBody.text(), decrypted);
@@ -526,7 +585,7 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
     if (messageType == OTR_MESSAGETYPE_NONE)
         return false;
 
-    m_otrDiscoveredResources.insert(account + QLatin1Char('\n') + contact);
+    m_otrDiscoveredResources.insert(endpointKey(account, contact));
     if (m_encryptionHost && m_encryptionProvider)
         m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
 
@@ -535,15 +594,44 @@ bool PsiOtrPlugin::decryptMessageElement(int accountIndex, QDomElement &messageE
         return false;
     }
 
-    // XEP-0364 §4.1: decrypted OTR payload is text, even if it happens to
-    // look like XML/XHTML. Never interpret authenticated plaintext as markup.
+    // Never trust the original stanza's XHTML-IM sibling: it was outside OTR.
+    // Legacy rich text, when applicable, is reconstructed only from the
+    // authenticated decrypted OTR payload.
     auto htmlElement = messageElement.firstChildElement(QStringLiteral("html"));
     if (!htmlElement.isNull())
         messageElement.removeChild(htmlElement);
 
-    clearChildren(plainBody);
-    plainBody.appendChild(messageElement.ownerDocument().createTextNode(decrypted));
+    QString bodyText = decrypted;
+    if (!xep0364Peer) {
+        if (Qt::mightBeRichText(decrypted)) {
+            QDomDocument document = messageElement.ownerDocument();
+            HtmlNormalizer normalizer(decrypted);
+            QDomElement normalizedBody = normalizer.output(document);
 
+            htmlElement = document.createElementNS(QStringLiteral("http://jabber.org/protocol/xhtml-im"),
+                                                   QStringLiteral("html"));
+            htmlElement.appendChild(normalizedBody);
+            messageElement.appendChild(htmlElement);
+
+            QTextDocument plainText;
+            plainText.setHtml(decrypted);
+            bodyText = plainText.toPlainText();
+        } else {
+            // Legacy OTR clients commonly treat the OTR payload as HTML even
+            // without an XHTML-IM wrapper, so undo the entity escaping used on
+            // our legacy outbound path.
+            bodyText = unescapeLegacyEntities(decrypted);
+        }
+    }
+
+    // XEP-0364 §4.1 requires XML-looking OTR plaintext to remain literal text.
+    // For legacy endpoints bodyText above is the safe plain-text fallback for
+    // the normalized authenticated HTML payload.
+    clearChildren(plainBody);
+    plainBody.appendChild(messageElement.ownerDocument().createTextNode(bodyText));
+
+    // This EME marker is local metadata for Psi after successful decryption; it
+    // does not retroactively classify a legacy peer as XEP-0364 capable.
     addOtrEme(messageElement);
     return true;
 }
@@ -558,7 +646,7 @@ bool PsiOtrPlugin::encryptMessageElement(int accountIndex, QDomElement &message,
 
     const QString contact = contactOverride.isEmpty() ? message.attribute(QStringLiteral("to"))
                                                        : contactOverride;
-    if (!hasConcreteResource(contact))
+    if (contact.isEmpty())
         return false;
 
     auto bodyElement = message.firstChildElement(QStringLiteral("body"));
@@ -566,7 +654,9 @@ bool PsiOtrPlugin::encryptMessageElement(int accountIndex, QDomElement &message,
         return false;
 
     const QString account = m_accountInfo->getId(accountIndex);
-    const QString encrypted = m_otrConnection->encryptMessage(account, contact, bodyElement.text());
+    const bool xep0364Peer = isXep0364Peer(accountIndex, contact);
+    const QString plaintext = xep0364Peer ? bodyElement.text() : bodyElement.text().toHtmlEscaped();
+    const QString encrypted = m_otrConnection->encryptMessage(account, contact, plaintext);
 
     // Fail closed: never let an encryption failure fall through to sending the
     // original plaintext stanza.
@@ -584,7 +674,12 @@ bool PsiOtrPlugin::encryptMessageElement(int accountIndex, QDomElement &message,
     if (!htmlElement.isNull())
         message.removeChild(htmlElement);
 
-    addOtrEme(message);
+    // EME also declares the XEP-0364 payload semantics to the remote endpoint.
+    // Do not emit it while using legacy HTML-compatible OTR plaintext encoding.
+    if (xep0364Peer)
+        addOtrEme(message);
+    else
+        removeOtrEme(message);
     addOtrProcessingHints(message);
     return true;
 }
@@ -620,12 +715,17 @@ void PsiOtrPlugin::setPsiAccountControllingHost(PsiAccountControllingHost *host)
         }
 
         const QString prefix = account + QLatin1Char('\n');
-        for (auto it = m_otrDiscoveredResources.begin(); it != m_otrDiscoveredResources.end();) {
-            if ((*it).startsWith(prefix))
-                it = m_otrDiscoveredResources.erase(it);
-            else
-                ++it;
-        }
+        const auto clearAccountState = [&prefix](QSet<QString> &set) {
+            for (auto it = set.begin(); it != set.end();) {
+                if ((*it).startsWith(prefix))
+                    it = set.erase(it);
+                else
+                    ++it;
+            }
+        };
+        clearAccountState(m_otrDiscoveredResources);
+        clearAccountState(m_xep0364Resources);
+
         if (m_encryptionHost && m_encryptionProvider)
             m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
     });
@@ -650,16 +750,21 @@ bool PsiOtrPlugin::incomingStanza(int accountIndex, const QDomElement &xml)
             return false;
         }
 
-        // XEP-0364 legacy discovery is passive capability advertisement on an
-        // otherwise plaintext message. It must not be fed into the OTR session
-        // parser and it is scoped to the sender's concrete resource.
+        // XEP-0364 whitespace discovery is also an active negotiation signal:
+        // qca-otr starts AKE from it for Opportunistic/Always policies. Keep the
+        // original plaintext stanza visible, but feed the exact body to qca-otr.
         const auto body = xml.firstChildElement(QStringLiteral("body"));
         const QString contact = xml.attribute(QStringLiteral("from"));
-        if (!body.isNull() && !body.text().startsWith(QLatin1String("?OTR"))
-            && hasConcreteResource(contact) && hasOtrV3WhitespaceTag(body.text())) {
-            m_otrDiscoveredResources.insert(account + QLatin1Char('\n') + contact);
-            if (m_encryptionHost && m_encryptionProvider)
-                m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
+        if (!body.isNull() && !contact.isEmpty() && !body.text().startsWith(QLatin1String("?OTR"))
+            && body.text().contains(otrWhitespaceTag())) {
+            QString ignored;
+            m_otrConnection->decryptMessage(account, contact, body.text(), ignored);
+
+            if (hasOtrV3WhitespaceTag(body.text())) {
+                m_otrDiscoveredResources.insert(endpointKey(account, contact));
+                if (m_encryptionHost && m_encryptionProvider)
+                    m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
+            }
         }
         return false;
     }
@@ -669,18 +774,21 @@ bool PsiOtrPlugin::incomingStanza(int accountIndex, const QDomElement &xml)
 
     const QString contact = xml.attribute(QStringLiteral("from"));
     const QString type = xml.attribute(QStringLiteral("type"), QStringLiteral("available"));
-    if (type != QLatin1String("unavailable") || !hasConcreteResource(contact))
+    if (type != QLatin1String("unavailable") || contact.isEmpty())
         return false;
 
-    // OTR is resource-bound. Once a resource goes offline, expire only that
-    // resource's session and forget its legacy discovery state.
+    // Track the exact endpoint provided by XMPP routing. Native XMPP peers are
+    // normally full JIDs, while XEP-0100 transports may legitimately expose an
+    // online legacy-network contact as a bare JID.
     if (m_optionHost->getPluginOption(OPTION_END_WHEN_OFFLINE, DEFAULT_END_WHEN_OFFLINE).toBool())
         m_otrConnection->expireSession(account, contact);
 
     if (m_onlineUsers.contains(account) && m_onlineUsers.value(account).contains(contact))
         m_onlineUsers[account][contact]->updateMessageState();
 
-    m_otrDiscoveredResources.remove(account + QLatin1Char('\n') + contact);
+    const QString key = endpointKey(account, contact);
+    m_otrDiscoveredResources.remove(key);
+    m_xep0364Resources.remove(key);
     if (m_encryptionHost && m_encryptionProvider)
         m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
 
@@ -734,8 +842,8 @@ QAction *PsiOtrPlugin::getAction(QObject *parent, int accountIndex, const QStrin
 
     const QString account = m_accountInfo->getId(accountIndex);
 
-    // Keep the actual JID supplied by the chat. OTR sessions are resource
-    // scoped; PsiOtrClosure disables manual session start for a bare JID.
+    // Keep exactly the endpoint JID supplied by Psi. Do not collapse a native
+    // full JID to bare, and do not reject a transport endpoint that is bare.
     if (!m_onlineUsers.value(account).contains(contactJid))
         m_onlineUsers[account][contactJid] = new PsiOtrClosure(account, contactJid, m_otrConnection);
 
@@ -750,7 +858,7 @@ QString PsiOtrPlugin::dataDir()
 void PsiOtrPlugin::sendMessage(const QString &account, const QString &contact, const QString &message)
 {
     const int accountIndex = getAccountIndexById(account);
-    if (accountIndex == -1 || !m_senderHost || !hasConcreteResource(contact))
+    if (accountIndex == -1 || !m_senderHost || contact.isEmpty())
         return;
 
     QDomDocument document;
@@ -762,12 +870,13 @@ void PsiOtrPlugin::sendMessage(const QString &account, const QString &contact, c
     body.appendChild(document.createTextNode(message));
     stanza.appendChild(body);
 
-    // XEP-0364 processing hints apply to OTR negotiation, fragments and data.
+    // Processing hints are useful for all OTR traffic regardless of the peer's
+    // payload convention: do not archive/copy negotiation, fragments, or data.
     addOtrProcessingHints(stanza);
 
-    // EME is meaningful for encoded/fragmented OTR wire records; the query
-    // message (?OTR?v3?) is negotiation capability traffic, not ciphertext.
-    if (isEncodedOtrMessage(message))
+    // EME declares XEP-0364 semantics. Emit it only when that endpoint has
+    // advertised XEP-0378 or sent us an OTR EME marker itself.
+    if (isEncodedOtrMessage(message) && isXep0364Peer(accountIndex, contact))
         addOtrEme(stanza);
 
     document.appendChild(stanza);
@@ -820,8 +929,8 @@ bool PsiOtrPlugin::displayOtrMessage(const QString &account, const QString &cont
 
 void PsiOtrPlugin::stateChange(const QString &account, const QString &contact, OtrStateChange change)
 {
-    if (hasConcreteResource(contact)) {
-        m_otrDiscoveredResources.insert(account + QLatin1Char('\n') + contact);
+    if (!contact.isEmpty()) {
+        m_otrDiscoveredResources.insert(endpointKey(account, contact));
         if (m_encryptionHost && m_encryptionProvider)
             m_encryptionHost->encryptionMethodStateChanged(m_encryptionProvider);
     }
