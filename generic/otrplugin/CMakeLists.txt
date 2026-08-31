@@ -60,6 +60,7 @@ set(_HDRS
     src/otrinternal.h
     src/psiotrconfig.h
     src/psiotrclosure.h
+    src/htmlnormalizer.h
 )
 set(_SRCS
     src/psiotrplugin.cpp
@@ -67,6 +68,7 @@ set(_SRCS
     src/otrinternal.cpp
     src/psiotrconfig.cpp
     src/psiotrclosure.cpp
+    src/htmlnormalizer.cpp
 )
 set(_RSCS ${PLUGIN}.qrc)
 
