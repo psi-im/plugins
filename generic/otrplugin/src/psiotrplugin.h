@@ -140,8 +140,9 @@ public:
     // Native EncryptionMethodProvider helpers
     /**
      * Applies native OTR processing to an incoming message DOM in place.
-     * Protocol-only messages clear @p message; decrypted application messages
-     * replace body/XHTML content and receive an EME marker when needed.
+     * Protocol-only messages clear @p message. Decrypted application messages
+     * replace the body with authenticated plaintext, discard unauthenticated
+     * XHTML-IM content, and receive an EME marker when needed.
      */
     bool decryptMessageElement(int account, QDomElement &message, const QString &contact = QString());
 
@@ -185,12 +186,6 @@ private slots:
 
 private:
     friend class OtrEncryptionProvider;
-
-    /**
-     * Returns a full JID for private/MUC contacts and a bare JID for ordinary
-     * roster contacts. OTR itself remains resource-bound once a session starts.
-     */
-    QString getCorrectJid(int accountIndex, const QString &fullJid);
 
     bool m_enabled;
     OtrMessaging *m_otrConnection;
