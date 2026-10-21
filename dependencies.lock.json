@@ -6,8 +6,8 @@
   },
   "qca": {
     "repository": "psi-im/qca",
-    "tag": "v3.0.11",
-    "commit": "0adfcc757974ca865f6d1de0955df68e7a304676"
+    "tag": "v3.0.12",
+    "commit": "96c88f9ee127d206691ff688e68676c022f505f8"
   },
   "qt": {
     "modern": "6.12.0",
