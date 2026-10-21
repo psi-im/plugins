@@ -1,0 +1,113 @@
+name: Official Psi plugins - Windows Qt6 alpha package
+on:
+  push:
+    branches: ['ci/psi2-windows-alpha-package']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+concurrency:
+  group: psi2-plugins-windows-alpha
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    runs-on: windows-2022
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          repository: psi-im/psi
+          ref: 4c5dc13246871f1a5f5c8cdfb21f5673e92ad474
+          path: _psi
+          persist-credentials: false
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: 6.11.*
+          arch: win64_msvc2022_64
+          modules: qtmultimedia qtwebchannel qtpositioning qtwebengine qtimageformats
+          aqtsource: git+https://github.com/miurahr/aqtinstall.git@refs/pull/1000/head
+          cache: true
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Install Ninja
+        shell: pwsh
+        run: |
+          choco install ninja --no-progress -y
+          if ($LASTEXITCODE -ne 0) { throw 'ninja install failed' }
+
+      - name: Retrieve same QCA dependency SDK as Psi
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          New-Item -ItemType Directory -Force sdk-download, sdk | Out-Null
+          gh release download windows-sdk-msvc-qt6-v3 --repo psi-im/psi --pattern 'psi-windows-sdk-msvc-qt6.zip' --dir sdk-download
+          if ($LASTEXITCODE -ne 0) { throw 'Could not download the Psi SDK' }
+          Expand-Archive sdk-download/psi-windows-sdk-msvc-qt6.zip sdk -Force
+          if (-not (Test-Path sdk/SDK-MANIFEST.txt)) { throw 'Missing Psi SDK manifest' }
+
+      - name: Build and stage official plugins, excluding PsiMedia
+        shell: pwsh
+        run: |
+          $source = (Get-Location).Path.Replace('\','/')
+          $sdk = "$source/sdk"
+          $stage = "$source/stage"
+          $args = @(
+            '-S', '.', '-B', 'build', '-G', 'Ninja',
+            '-DCMAKE_BUILD_TYPE=Release',
+            "-DCMAKE_INSTALL_PREFIX=$stage",
+            "-DCMAKE_PREFIX_PATH=$sdk;$env:QT_ROOT_DIR",
+            '-DQT_DEFAULT_MAJOR_VERSION=6', '-DUSE_QT6=ON',
+            '-DMAIN_PROGRAM_NAME=psi', '-DBUILD_DEV_PLUGINS=OFF',
+            '-DBUILD_PLUGINS=ALL', '-DPLUGINS_PATH=plugins',
+            "-DPsiPluginsApi_DIR=$source/_psi/plugins/cmake/modules",
+            "-DPsiPluginsApi_INCLUDE_DIR=$source/_psi/plugins/include",
+            "-DQca3-qt6_DIR=$sdk/lib/cmake/Qca3-qt6",
+            '-DCMAKE_CXX_FLAGS=/D_WIN32_WINNT=0x0A00 /DWINVER=0x0A00'
+          )
+          & cmake @args
+          if ($LASTEXITCODE -ne 0) { throw 'Plugin CMake configure failed' }
+          cmake --build build --parallel 3
+          if ($LASTEXITCODE -ne 0) { throw 'Plugin build failed' }
+          cmake --install build
+          if ($LASTEXITCODE -ne 0) { throw 'Plugin install failed' }
+          $dlls = @(Get-ChildItem "$stage/plugins" -Filter '*plugin.dll' -File -ErrorAction SilentlyContinue)
+          if ($dlls.Count -lt 2) { throw "Only $($dlls.Count) plugin DLLs staged" }
+          if (@($dlls | Where-Object Name -EQ 'mediaplugin.dll').Count -gt 0) {
+            throw 'PsiMedia belongs to its own package'
+          }
+          $meta = @{
+            psi_api_sha = '4c5dc13246871f1a5f5c8cdfb21f5673e92ad474'
+            plugins_sha = (git rev-parse HEAD).Trim()
+            qt_major = 6
+            profile = 'windows-msvc2022-x64'
+          }
+          $meta | ConvertTo-Json | Set-Content "$stage/COMPONENT-INFO.json" -Encoding UTF8
+          New-Item -ItemType Directory -Force artifacts | Out-Null
+          Compress-Archive -Path stage/* -DestinationPath artifacts/psi-plugins-windows-qt6-alpha.zip -Force
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: psi-plugins-windows-qt6-alpha
+          path: artifacts/psi-plugins-windows-qt6-alpha.zip
+          if-no-files-found: error
+
+      - name: Publish versioned binary prerelease
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = 'windows-qt6-psi2-alpha1'
+          gh release view $tag --repo $env:GITHUB_REPOSITORY 2>$null
+          if ($LASTEXITCODE -eq 0) { throw "Release $tag already exists; refusing to overwrite" }
+          $args = @('release','create', $tag, 'artifacts/psi-plugins-windows-qt6-alpha.zip',
+            '--repo', $env:GITHUB_REPOSITORY, '--target', $env:GITHUB_SHA,
+            '--prerelease','--title','Psi 2.0 alpha plugins for Windows x64',
+            '--notes','Official plugins built against Psi API commit 4c5dc132 (MSVC Qt6); no PsiMedia.')
+          & gh @args
+          if ($LASTEXITCODE -ne 0) { throw 'Plugin release upload failed' }
