@@ -1,0 +1,65 @@
+name: Psi plugins prerelease
+on:
+  push:
+    tags: ['2.*']
+permissions:
+  contents: write
+  actions: read
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wait for exact-tag Windows/macOS binary artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release staging
+          for workflow in windows-qt6.yml macos-qt6.yml; do
+            run_id=""
+            for i in $(seq 1 240); do
+              payload=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$workflow/runs?per_page=50&head_sha=$GITHUB_SHA")
+              row=$(jq -r --arg sha "$GITHUB_SHA" --arg tag "$GITHUB_REF_NAME" '
+                [.workflow_runs[] | select(.head_sha == $sha and .event == "push" and .head_branch == $tag)]
+                | sort_by(.created_at) | last | [.id,.status,(.conclusion // "")] | @tsv
+              ' <<< "$payload")
+              if [[ -n "$row" ]]; then
+                IFS=$'\t' read -r run_id state result <<< "$row"
+                if [[ "$state" == completed && "$result" == success ]]; then break; fi
+                if [[ "$state" == completed ]]; then echo "::error::$workflow failed"; exit 1; fi
+              fi
+              if (( i == 240 )); then echo "::error::Waiting for $workflow timed out"; exit 1; fi
+              sleep 20
+            done
+            if [[ "$workflow" == windows-qt6.yml ]]; then
+              artifact=psi-plugins-qt6-windows-x64
+              gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name "$artifact" --dir "staging/$artifact"
+              test -f "staging/$artifact/PLUGIN-BUILD-INFO.txt"
+              (cd "staging/$artifact" && zip -q -r "../../release/$artifact.zip" .)
+            else
+              for platform in arm64 x86_64; do
+                artifact="psi-plugins-qt6-macos-$platform"
+                gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name "$artifact" --dir "staging/$artifact"
+                test -f "staging/$artifact/PLUGIN-BUILD-INFO.txt"
+                (cd "staging/$artifact" && zip -q -r "../../release/$artifact.zip" .)
+              done
+            fi
+          done
+          (cd release && sha256sum *.zip > SHA256SUMS.txt)
+      - name: Publish immutable plugin binary prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(find release -maxdepth 1 -name '*.zip' | wc -l)" -eq 3
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "::error::Already released, refusing to overwrite"; exit 1
+          fi
+          gh release create "$GITHUB_REF_NAME" release/*.zip release/SHA256SUMS.txt \
+            --repo "$GITHUB_REPOSITORY" --verify-tag --prerelease \
+            --title "Psi plugins $GITHUB_REF_NAME" \
+            --notes 'Qt 6.12.0 plugins for Psi 2.0 alpha; requires matching Psi API and QCA 3.0.12 runtime. PsiMedia is distributed separately.'

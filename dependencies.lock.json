@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "psi_api": {
+    "repository": "psi-im/psi",
+    "commit": "4c5dc13246871f1a5f5c8cdfb21f5673e92ad474"
+  },
+  "qca": {
+    "repository": "psi-im/qca",
+    "tag": "v3.0.12",
+    "commit": "15fe3d0fb8025261d13575843daa14a79a28d705"
+  },
+  "qt": {
+    "modern": {
+      "version": "6.12.0",
+      "windows_arch": "win64_msvc2022_64"
+    },
+    "legacy": {
+      "version": "5.15.2",
+      "windows_arch": "win64_msvc2019_64"
+    }
+  }
+}

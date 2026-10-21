@@ -1,0 +1,88 @@
+name: macOS Qt6 plugin packages
+on:
+  push:
+    branches: [master]
+    tags: ['2.*']
+    paths: ['generic/**','cmake/**','dependencies.lock.json','.github/workflows/macos-qt6.yml']
+  pull_request:
+    paths: ['generic/**','cmake/**','dependencies.lock.json','.github/workflows/macos-qt6.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  macos:
+    name: Psi plugins Qt6.12.0 (matrix platform)
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            platform: arm64
+          - runner: macos-15-intel
+            platform: x86_64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Read release dependency pins
+        id: deps
+        shell: bash
+        run: |
+          echo "psi_ref=$(python3 -c 'import json;print(json.load(open("dependencies.lock.json"))["psi_api"]["commit"])')" >> "$GITHUB_OUTPUT"
+          echo "qca_tag=$(python3 -c 'import json;print(json.load(open("dependencies.lock.json"))["qca"]["tag"])')" >> "$GITHUB_OUTPUT"
+          echo "qt_version=$(python3 -c 'import json;print(json.load(open("dependencies.lock.json"))["qt"]["modern"]["version"])')" >> "$GITHUB_OUTPUT"
+      - name: Checkout pinned Psi API
+        uses: actions/checkout@v4
+        with:
+          repository: psi-im/psi
+          ref: ${{ steps.deps.outputs.psi_ref }}
+          path: _psi
+          persist-credentials: false
+      - name: Install Qt 6.12.0
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ steps.deps.outputs.qt_version }}
+          modules: qtmultimedia qtsvg qtwebchannel qtpositioning qtimageformats
+          cache: true
+      - name: Install build tools
+        run: brew install cmake ninja
+      - name: Download matching Qt6 QCA SDK
+        env:
+          GH_TOKEN: ${{ github.token }}
+          QCA_TAG: ${{ steps.deps.outputs.qca_tag }}
+          PLATFORM: ${{ matrix.platform }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release download "$QCA_TAG" --repo psi-im/qca --pattern "qca3-qt6-macos-$PLATFORM.zip" --dir .
+          mkdir -p qca-sdk
+          unzip -q "qca3-qt6-macos-$PLATFORM.zip" -d qca-sdk
+          test -f qca-sdk/lib/cmake/Qca3-qt6/Qca3-qt6Config.cmake
+      - name: Build and stage official plugins
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$PWD/stage" \
+            "-DCMAKE_PREFIX_PATH=$PWD/qca-sdk;$QT_ROOT_DIR" \
+            "-DPLUGINS_ROOT_DIR=$PWD/_psi/plugins" \
+            -DPLUGINS_PATH=plugins \
+            -DQT_DEFAULT_MAJOR_VERSION=6 -DUSE_QT6=ON \
+            -DBUILD_PLUGINS=ALL -DBUILD_DEV_PLUGINS=OFF -DBUILD_PSIMEDIA=OFF
+          cmake --build build --parallel 3
+          cmake --install build
+          count=$(find stage -type f -name '*.dylib' | wc -l)
+          test "$count" -ge 15
+          {
+            echo "Psi API: $(git -C _psi rev-parse HEAD)"
+            echo "Plugins: $(git rev-parse HEAD)"
+            echo "Qt: ${{ steps.deps.outputs.qt_version }}"
+            echo "QCA: ${{ steps.deps.outputs.qca_tag }}"
+          } > stage/PLUGIN-BUILD-INFO.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: psi-plugins-qt6-macos-${{ matrix.platform }}
+          path: stage/
+          if-no-files-found: error

@@ -1,0 +1,95 @@
+name: Windows Qt6 plugin packages
+on:
+  push:
+    branches: [master]
+    tags: ['2.*']
+    paths: ['generic/**','cmake/**','dependencies.lock.json','.github/workflows/windows-qt6.yml']
+  pull_request:
+    paths: ['generic/**','cmake/**','dependencies.lock.json','.github/workflows/windows-qt6.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    name: Psi plugins (MSVC x64, Qt 6.12.0)
+    runs-on: windows-2022
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Resolve source pins
+        id: deps
+        shell: pwsh
+        run: |
+          $d = Get-Content dependencies.lock.json -Raw | ConvertFrom-Json
+          if ($d.qt.modern.version -ne '6.12.0') { throw 'Qt must be exactly 6.12.0' }
+          if ($d.psi_api.commit -notmatch '^[a-f0-9]{40}$') { throw 'Invalid Psi ref' }
+          "psi_ref=$($d.psi_api.commit)" >> $env:GITHUB_OUTPUT
+          "qt_version=$($d.qt.modern.version)" >> $env:GITHUB_OUTPUT
+          "qca_tag=$($d.qca.tag)" >> $env:GITHUB_OUTPUT
+      - name: Checkout locked Psi API
+        uses: actions/checkout@v4
+        with:
+          repository: psi-im/psi
+          ref: ${{ steps.deps.outputs.psi_ref }}
+          path: _psi
+          persist-credentials: false
+      - name: Install Qt 6.12.0
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ steps.deps.outputs.qt_version }}
+          arch: win64_msvc2022_64
+          modules: qtmultimedia qtwebchannel qtwebengine qtpositioning qtimageformats
+          cache: true
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Install ninja
+        shell: pwsh
+        run: |
+          choco install ninja --no-progress -y
+          if ($LASTEXITCODE -ne 0) { throw 'Ninja install failed' }
+      - name: Download released shared QCA SDK
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          QCA_TAG: ${{ steps.deps.outputs.qca_tag }}
+        run: |
+          New-Item -ItemType Directory -Force qca-download, qca-sdk | Out-Null
+          gh release download $env:QCA_TAG --repo psi-im/qca --pattern qca3-qt6-windows-x64.zip --dir qca-download
+          if ($LASTEXITCODE -ne 0) { throw 'QCA release missing' }
+          Expand-Archive qca-download/qca3-qt6-windows-x64.zip qca-sdk -Force
+          if (-not (Test-Path qca-sdk/lib/cmake/Qca3-qt6/Qca3-qt6Config.cmake)) { throw 'QCA SDK is incomplete' }
+      - name: Compile normal Psi plugins
+        shell: pwsh
+        run: |
+          $args = @('-S','.', '-B','build', '-G','Ninja', '-DCMAKE_BUILD_TYPE=Release',
+                    "-DCMAKE_PREFIX_PATH=$pwd/qca-sdk;$env:QT_ROOT_DIR",
+                    "-DPLUGINS_ROOT_DIR=$pwd/_psi/plugins",
+                    "-DCMAKE_INSTALL_PREFIX=$pwd/stage",
+                    '-DPLUGINS_PATH=plugins', '-DQT_DEFAULT_MAJOR_VERSION=6',
+                    '-DUSE_QT6=ON', '-DBUILD_DEV_PLUGINS=OFF',
+                    '-DBUILD_PLUGINS=ALL', '-DBUILD_PSIMEDIA=OFF')
+          & cmake @args
+          if ($LASTEXITCODE -ne 0) { throw 'CMake configuration failed' }
+          cmake --build build --config Release --parallel 4
+          if ($LASTEXITCODE -ne 0) { throw 'Plugin compilation failed' }
+          cmake --install build --config Release
+          if ($LASTEXITCODE -ne 0) { throw 'Plugin staging failed' }
+      - name: Assert plugin files and record exact API revisions
+        shell: pwsh
+        run: |
+          $dlls = @(Get-ChildItem stage/plugins -Recurse -Filter '*.dll' -File -ErrorAction SilentlyContinue)
+          if ($dlls.Count -lt 20) { throw "Too few official plugins: $($dlls.Count)" }
+          if ($dlls.Name -contains 'mediaplugin.dll') { throw 'PsiMedia must be a separate artifact' }
+          $psiApi = (git -C _psi rev-parse HEAD).Trim()
+          $pluginHead = (git rev-parse HEAD).Trim()
+          $info = "Psi API: $psiApi\nPlugins: $pluginHead\nQt: ${{ steps.deps.outputs.qt_version }}\nQCA: ${{ steps.deps.outputs.qca_tag }}"
+          $info.Replace('\n', [Environment]::NewLine) | Set-Content stage/PLUGIN-BUILD-INFO.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: psi-plugins-qt6-windows-x64
+          path: stage/
+          if-no-files-found: error
+          retention-days: 30

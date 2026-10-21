@@ -1,0 +1,80 @@
+name: Tag verified Psi plugins Qt6.12 release
+on:
+  push:
+    branches: [release/qt-6.12-unification]
+permissions:
+  contents: write
+  actions: write
+jobs:
+  tag:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Wait for upstream QCA SDK assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag=$(python3 -c 'import json;print(json.load(open("dependencies.lock.json"))["qca"]["tag"])')
+          for i in $(seq 1 240); do
+            assets=$(gh release view "$tag" --repo psi-im/qca --json assets --jq '.assets[].name' 2>/dev/null || true)
+            if grep -Fxq qca3-qt6-windows-x64.zip <<< "$assets" &&
+               grep -Fxq qca3-qt6-macos-arm64.zip <<< "$assets" &&
+               grep -Fxq qca3-deb-ubuntu-24.04.zip <<< "$assets"; then
+              break
+            fi
+            if (( i == 240 )); then echo "::error::QCA release assets missing"; exit 1; fi
+            sleep 60
+          done
+      - name: Retry and verify independent plugin platform CI
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          workflows=(plugins-build.yml qca-otr.yml windows-qt6.yml macos-qt6.yml)
+          declare -A retried=()
+          for i in $(seq 1 240); do
+            passed=0
+            for workflow in "${workflows[@]}"; do
+              json=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$workflow/runs?head_sha=$GITHUB_SHA&per_page=30")
+              record=$(jq -r --arg sha "$GITHUB_SHA" '
+                [.workflow_runs[] | select(.head_sha == $sha and .event == "pull_request")]
+                | sort_by(.created_at) | last | [.id, .status, (.conclusion // "")] | @tsv
+              ' <<< "$json")
+              [[ -n "$record" ]] || continue
+              IFS=$'\t' read -r run state outcome <<< "$record"
+              if [[ "$state" == completed && "$outcome" == success ]]; then
+                ((passed+=1))
+              elif [[ "$state" == completed && "$outcome" != success ]]; then
+                if [[ "${retried[$workflow]:-}" == yes ]]; then
+                  echo "::error::$workflow remains $outcome after retry"; exit 1
+                fi
+                gh run rerun "$run" --failed --repo "$GITHUB_REPOSITORY"
+                retried["$workflow"]=yes
+              fi
+            done
+            if [[ "$passed" == 4 ]]; then
+              echo "All platform plugin workflows passed"; break
+            fi
+            if (( i == 240 )); then echo "::error::Timed out waiting for plugin CI"; exit 1; fi
+            sleep 30
+          done
+      - name: Publish immutable plugin source tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag=2.0-alpha1
+          git fetch origin release/qt-6.12-unification --no-tags
+          test "$(git rev-parse FETCH_HEAD)" = "$GITHUB_SHA"
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null; then
+            echo "::error::Tag already exists"; exit 1
+          fi
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          git tag -a "$tag" "$GITHUB_SHA" -m 'Psi plugins 2.0 alpha / Qt 6.12.0'
+          git push origin "refs/tags/$tag"
