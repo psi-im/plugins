@@ -17,7 +17,7 @@ permissions:
   contents: read
 
 env:
-  QCA_VERSION: 3.0.5
+  QCA_VERSION: 3.0.11
 
 jobs:
   test:
