@@ -1,0 +1,135 @@
+name: Qt 6.12 plugin packages
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/qt612-packages.yml'
+      - 'dependencies.lock.json'
+      - 'generic/**'
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/qt612-packages.yml'
+      - 'dependencies.lock.json'
+permissions:
+  contents: read
+jobs:
+  packages:
+    name: Plugins ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-x64
+            runner: windows-2022
+            qca_asset: qca3-qt6-windows-x64.zip
+          - platform: macos-arm64
+            runner: macos-15
+            qca_asset: qca3-qt6-macos-arm64.zip
+          - platform: macos-x86_64
+            runner: macos-15-intel
+            qca_asset: qca3-qt6-macos-x86_64.zip
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Verify and export dependency lock
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,os,re
+          d=json.load(open("dependencies.lock.json"))
+          assert d["schema_version"] == 1
+          assert d["qt"]["modern"] == "6.12.0"
+          for name in ("psi","qca"):
+              assert re.fullmatch("[a-f0-9]{40}", d[name]["commit"])
+          with open(os.environ["GITHUB_ENV"],"a") as out:
+              for k,v in (("PSI_API_PIN",d["psi"]["commit"]),("QCA_TAG",d["qca"]["tag"]),("QCA_SHA",d["qca"]["commit"])):
+                  print(k+"="+v,file=out)
+          PY
+      - name: Checkout locked Psi Plugin API
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --filter=blob:none https://github.com/psi-im/psi.git _psi
+          git -C _psi checkout --detach "$PSI_API_PIN"
+          test "$(git -C _psi rev-parse HEAD)" = "$PSI_API_PIN"
+          test -f _psi/plugins/include/applicationinfoaccessor.h
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: 6.12.0
+          modules: qtmultimedia
+          cache: true
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
+        with:
+          arch: x64
+      - name: Install Windows tooling
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install ninja --no-progress -y
+          if ($LASTEXITCODE -ne 0) { throw 'Ninja installation failed' }
+      - name: Install macOS tooling
+        if: runner.os == 'macOS'
+        shell: bash
+        run: brew install cmake ninja
+      - name: Install the locked released QCA SDK
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          QCA_ASSET: ${{ matrix.qca_asset }}
+        run: |
+          set -euo pipefail
+          mkdir -p qca-sdk qca-download
+          gh release download "$QCA_TAG" --repo psi-im/qca --pattern "$QCA_ASSET" --dir qca-download
+          unzip -q "qca-download/$QCA_ASSET" -d qca-sdk
+          test -f qca-sdk/lib/cmake/Qca3-qt6/Qca3-qt6Config.cmake
+          object="$(gh api "repos/psi-im/qca/git/ref/tags/$QCA_TAG" --jq '.object.sha')"
+          if [ "$object" != "$QCA_SHA" ]; then
+            test "$(gh api "repos/psi-im/qca/git/tags/$object" --jq '.object.sha')" = "$QCA_SHA"
+          fi
+      - name: Build and stage official plugins
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            "-DCMAKE_INSTALL_PREFIX=$PWD/stage" \
+            "-DPLUGINS_INSTALL_PATH=$PWD/stage/plugins" \
+            "-DPLUGINS_ROOT_DIR=$PWD/_psi/plugins" \
+            "-DCMAKE_PREFIX_PATH=$PWD/qca-sdk;$QT_ROOT_DIR" \
+            "-DQca3-qt6_DIR=$PWD/qca-sdk/lib/cmake/Qca3-qt6" \
+            -DBUILD_DEV_PLUGINS=OFF \
+            -DBUILD_PLUGINS=ALL \
+            -DUSE_QT6=ON \
+            -DQT_DEFAULT_MAJOR_VERSION=6
+          cmake --build build --parallel 3
+          cmake --install build
+      - name: Audit plugin DLLs and record manifest
+        shell: bash
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          python3 - <<'PY'
+          import os,json,hashlib
+          from pathlib import Path
+          root=Path('stage')
+          extension='.dll' if os.environ["RUNNER_OS"]=='Windows' else '.dylib'
+          libs=sorted(p for p in (root/'plugins').rglob('*') if p.is_file() and p.name.endswith(extension))
+          if len(libs)<20: raise SystemExit(f'Incomplete plugin package: {len(libs)} binaries')
+          data={"qt":"6.12.0","platform":os.environ['PLATFORM'],
+                "psi_api_commit":os.environ['PSI_API_PIN'],
+                "qca_tag":os.environ['QCA_TAG'],"qca_commit":os.environ['QCA_SHA'],
+                "plugins_commit":os.environ['GITHUB_SHA'],
+                "files":{p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in libs}}
+          (root/'PLUGINS-MANIFEST.json').write_text(json.dumps(data,indent=2)+"\n")
+          print(f"Verified {len(libs)} plugins for {data['platform']}")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: plugins-qt612-${{ matrix.platform }}
+          path: stage/
+          if-no-files-found: error
+          retention-days: 30
