@@ -1,0 +1,164 @@
+name: Official plugins release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing immutable source tag to package
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: plugins-release-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+
+      - name: Verify tagged sources and dependency lock
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          [[ "$RELEASE_TAG" =~ ^[0-9]+\.[0-9]+$ ]] || { echo "::error::Expected a version tag such as 1.6"; exit 1; }
+          git fetch --force --tags
+          test "$(git tag --list "$RELEASE_TAG")" = "$RELEASE_TAG"
+          source_sha=$(git rev-list -n 1 "refs/tags/$RELEASE_TAG")
+          test "$(git rev-parse HEAD)" = "$source_sha"
+          if [[ "$RELEASE_TAG" == 1.6 ]]; then
+            test "$source_sha" = d485d702079d9b54285cf83ce9ae4534e88b70f3 || {
+              echo "::error::plugins 1.6 must reference the fully-tested PR #152 merge"; exit 1;
+            }
+          fi
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "::error::Release $RELEASE_TAG already exists; refusing overwrite"
+            exit 1
+          fi
+          jq -e '.schema_version == 1 and .qt.modern == "6.12.0"
+                 and .qca.tag == "v3.0.12"
+                 and .qca.commit == "96c88f9ee127d206691ff688e68676c022f505f8"' dependencies.lock.json >/dev/null
+          echo "SOURCE_SHA=$source_sha" >> "$GITHUB_ENV"
+
+      - name: Package tagged sources with the existing Qt 6.12 matrix
+        id: packaging
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          workflow=qt612-packages.yml
+          baseline=$(gh run list --workflow "$workflow" --limit 50 --json databaseId |
+            jq '[.[].databaseId] | max // 0')
+          gh workflow run "$workflow" --ref "$RELEASE_TAG"
+          run_id=""
+          for _ in {1..36}; do
+            sleep 5
+            run_id=$(gh run list --workflow "$workflow" --limit 50 \
+              --json databaseId,event,headSha |
+              jq -r --arg sha "$SOURCE_SHA" --argjson baseline "$baseline" '
+                [.[] | select(.databaseId > $baseline and .event == "workflow_dispatch"
+                              and .headSha == $sha)] | sort_by(.databaseId) | last |
+                .databaseId // empty')
+            [[ -n "$run_id" ]] && break
+          done
+          [[ -n "$run_id" ]] || { echo "::error::Tagged packaging run did not appear"; exit 1; }
+          echo "Packaging run: $run_id"
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          while true; do
+            status=$(gh run view "$run_id" --json status --jq .status)
+            [[ "$status" == completed ]] && break
+            sleep 30
+          done
+          conclusion=$(gh run view "$run_id" --json conclusion --jq .conclusion)
+          [[ "$conclusion" == success ]] || {
+            echo "::error::Packaging run $run_id finished with $conclusion"
+            exit 1
+          }
+
+      - name: Download required SDK-compatible plugin artifacts
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ steps.packaging.outputs.run_id }}
+        run: |
+          set -euo pipefail
+          for platform in windows-x64 macos-arm64 macos-x86_64; do
+            gh run download "$RUN_ID" --name "plugins-qt612-$platform" --dir "staged/$platform"
+            test -s "staged/$platform/PLUGINS-MANIFEST.json"
+          done
+
+      - name: Verify package provenance and build release archives
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          from zipfile import ZipFile, ZIP_DEFLATED
+
+          source_sha = os.environ["SOURCE_SHA"]
+          tag = os.environ["RELEASE_TAG"]
+          lock = json.loads(Path("dependencies.lock.json").read_text())
+          Path("release-assets").mkdir(exist_ok=True)
+          for platform in ("windows-x64", "macos-arm64", "macos-x86_64"):
+              root = Path("staged") / platform
+              manifest = json.loads((root / "PLUGINS-MANIFEST.json").read_text())
+              assert manifest["plugins_commit"] == source_sha, (platform, "source commit")
+              assert manifest["platform"] == platform
+              assert manifest["qt"] == lock["qt"]["modern"] == "6.12.0"
+              assert manifest["qca_tag"] == lock["qca"]["tag"]
+              assert manifest["qca_commit"] == lock["qca"]["commit"]
+              assert manifest["psi_api_commit"] == lock["psi"]["commit"]
+              assert len(manifest["files"]) >= 20, (platform, "incomplete plugins")
+              for name, digest in manifest["files"].items():
+                  rel = Path(name)
+                  assert not rel.is_absolute() and ".." not in rel.parts
+                  path = root / rel
+                  assert path.is_file(), (platform, name)
+                  assert hashlib.sha256(path.read_bytes()).hexdigest() == digest, (platform, name)
+              dest = Path("release-assets") / f"psi-plugins-{tag}-qt612-{platform}.zip"
+              with ZipFile(dest, "w", compression=ZIP_DEFLATED) as archive:
+                  for path in sorted(root.rglob("*")):
+                      if path.is_file():
+                          archive.write(path, path.relative_to(root).as_posix())
+              print(f"Verified {platform}: {len(manifest['files'])} libraries, {dest}")
+          PY
+          (cd release-assets && sha256sum *.zip > SHA256SUMS.txt)
+
+      - name: Publish complete release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          cat > release-notes.md <<'NOTES'
+          Official Psi plugins built with Qt 6.12.0 for Windows x64 and
+          macOS arm64/x86_64. All binaries were compiled against the locked
+          Psi plugin API revision and QCA v3.0.12, and each archive includes
+          PLUGINS-MANIFEST.json with SHA-256 hashes and source provenance.
+
+          This release contains standalone plugin binaries, not the complete Psi
+          application or Qt runtime. Linux Qt5 distribution builds and Android
+          plugin packaging are not included.
+          NOTES
+          gh release create "$RELEASE_TAG" release-assets/*.zip release-assets/SHA256SUMS.txt \
+            --verify-tag --title "Psi plugins $RELEASE_TAG (Qt 6.12)" \
+            --notes-file release-notes.md
