@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "psi": {
+    "repository": "psi-im/psi",
+    "commit": "4c5dc13246871f1a5f5c8cdfb21f5673e92ad474"
+  },
+  "qca": {
+    "repository": "psi-im/qca",
+    "tag": "v3.0.11",
+    "commit": "0adfcc757974ca865f6d1de0955df68e7a304676"
+  },
+  "qt": {
+    "modern": "6.12.0",
+    "legacy": "distribution-managed"
+  }
+}
