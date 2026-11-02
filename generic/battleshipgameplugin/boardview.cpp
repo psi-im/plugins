@@ -23,10 +23,10 @@
 
 BoardView::BoardView(QWidget *parent) : QTableView(parent), bmodel_(nullptr) { }
 
-void BoardView::setModel(BoardModel *model)
+void BoardView::setModel(QAbstractItemModel *model)
 {
     QTableView::setModel(model);
-    bmodel_ = model;
+    bmodel_ = qobject_cast<BoardModel *>(model);
 }
 
 void BoardView::resizeEvent(QResizeEvent * /*event*/) { setCellsSize(); }
