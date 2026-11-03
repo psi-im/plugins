@@ -64,7 +64,6 @@ then
                              ${PREFIX}-qttools \
                              ${PREFIX}-qttranslations \
                              ${PREFIX}-qtmultimedia \
-                             ${PREFIX}-qtwebkit \
                              ${PREFIX}-gstreamer \
                              ${PREFIX}-gst-plugins-bad \
                              ${PREFIX}-gst-plugins-good
