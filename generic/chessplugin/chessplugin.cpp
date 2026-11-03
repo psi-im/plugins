@@ -728,7 +728,7 @@ bool ChessPlugin::incomingStanza(int account, const QDomElement &xml)
 
 bool ChessPlugin::outgoingStanza(int /*account*/, QDomElement & /*xml*/) { return false; }
 
-void ChessPlugin::doInviteDialog(const QString &jid, int account)
+void ChessPlugin::doInviteDialog(const QString &jid, int /*account*/)
 {
     if (!enabled || requests.isEmpty())
         return;

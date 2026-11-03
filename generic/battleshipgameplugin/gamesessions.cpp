@@ -378,7 +378,7 @@ void GameSession::appendInvitationEvent()
                        "showInvitationDialog");
 }
 
-void GameSession::showInvitationDialog(const QString &from, int account)
+void GameSession::showInvitationDialog(const QString & /*from*/, int /*account*/)
 {
     inviteDlg_ = new InvitationDialog(jid_, first_, boardWid_.data());
     connect(inviteDlg_.data(), SIGNAL(accepted()), this, SLOT(acceptInvitation()));

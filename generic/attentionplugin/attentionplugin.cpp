@@ -274,7 +274,7 @@ bool AttentionPlugin::incomingStanza(int account, const QDomElement &stanza)
     return false;
 }
 
-bool AttentionPlugin::outgoingStanza(int /*account*/, QDomElement &xml)
+bool AttentionPlugin::outgoingStanza(int /*account*/, QDomElement & /*xml*/)
 {
     return false;
 }

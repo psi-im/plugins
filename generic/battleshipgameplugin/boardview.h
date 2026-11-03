@@ -28,7 +28,7 @@ class BoardView : public QTableView {
     Q_OBJECT
 public:
     BoardView(QWidget *parent = nullptr);
-    void setModel(BoardModel *model);
+    void setModel(QAbstractItemModel *model) override;
 
 private:
     virtual void resizeEvent(QResizeEvent *event);
