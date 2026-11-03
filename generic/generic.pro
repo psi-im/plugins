@@ -16,7 +16,6 @@ historykeeperplugin \
 imageplugin \
 imagepreviewplugin \
 jabberdiskplugin \
-juickplugin \
 messagefilterplugin \
 omemoplugin \
 openpgpplugin \

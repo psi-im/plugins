@@ -18,7 +18,6 @@ set( plugins_list
     imageplugin
     imagepreviewplugin
     jabberdiskplugin
-    juickplugin
     messagefilterplugin
     openpgpplugin
     otrplugin
