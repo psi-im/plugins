@@ -275,7 +275,7 @@ QString BattleshipGamePlugin::pluginInfo()
 {
     return name() + "\n\n" + tr("Author: ") + "Liuch\n" + tr("Email: ") + "liuch@mail.ru\n\n"
         + tr("Play Battleship with your friends.\n"
-            "This is a paper board game where you try to sink the opponent's ships."
+             "This is a paper board game where you try to sink the opponent's ships.\n"
              "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat "
              "window.");
 }
