@@ -1,3 +1,12 @@
+2026-11-10
+v0.3.7 - VitoZz and Github Copilot
+  * The list of skins displays the name, author, and version from the XML metadata.
+  * Buttons for viewing information, applying, and removing a skin have been added, featuring icons from the plugin's resources.
+  * Fixed the search and display of screenshots in the skin information window.
+  * A Reset CSS Style button has been added to restore CSS options from defskin.skn, with a confirmation step.
+  * The deletion confirmation now displays the skin name.
+  * Warnings fixed
+
 2025-10-09
 v0.3.6
   * fixed work of backup checkbox in options

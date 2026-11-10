@@ -85,7 +85,7 @@ bool Skin::loadMetadata()
 {
     QFile file(filePass_);
     QDomDocument doc;
-    if (!doc.setContent(&file)) {
+    if (!file.open(QIODevice::ReadOnly) || !doc.setContent(&file)) {
         name_ = QFileInfo(filePass_).fileName();
         author_.clear();
         version_.clear();
@@ -116,7 +116,7 @@ bool Skin::loadMetadata()
     setText(1, author_);
     setText(2, version_);
     if (!author_.isEmpty() || !version_.isEmpty())
-        setToolTip(0, QString("%1\n%2\n%3").arg(name_, author_, version_));
+        setToolTip(0, QString("%1-%2\n%3").arg(name_, version_, filePass_));
     return true;
 }
 
@@ -137,7 +137,7 @@ bool Previewer::loadSkinInformation()
 {
     QFile file(skin_->filePass());
     QDomDocument doc;
-    if (!doc.setContent(&file)) {
+    if (!file.open(QIODevice::ReadOnly) || !doc.setContent(&file)) {
         QMessageBox::warning(this, tr("Preview Skin"), tr("Skin is not valid!"));
         return false;
     }
@@ -156,7 +156,7 @@ bool Previewer::loadSkinInformation()
         ui_.lbl_preview->setText(tr("Preview unavailable"));
     } else {
         ui_.lbl_preview->setText(QString());
-        ui_.lbl_preview->setPixmap(pix.scaled(ui_.lbl_preview->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        ui_.lbl_preview->setPixmap(pix);
     }
 
     return true;

@@ -326,7 +326,7 @@ void SkinsPlugin::getSkinName()
     if (skin) {
         QFile file(skin->filePass());
         QDomDocument doc;
-        if (doc.setContent(&file)) {
+        if (file.open(QIODevice::ReadOnly) || doc.setContent(&file)) {
             QDomElement elem = doc.documentElement();
             if (elem.tagName() == "skin") {
                 author  = elem.attribute("author");
@@ -344,7 +344,7 @@ void SkinsPlugin::createSkin(const QString &name, const QString &author, const Q
 {
     QFile file(":/skinsplugin/defskin.skn");
     QDomDocument doc, newDoc;
-    if (!doc.setContent(&file)) {
+    if (!file.open(QIODevice::ReadOnly) || !doc.setContent(&file)) {
         QMessageBox::warning(nullptr, tr("Create Skin"), tr("Unknown error!"));
         return;
     }
@@ -394,7 +394,7 @@ void SkinsPlugin::applySkin()
 
     QFile file(skin->filePass());
     QDomDocument doc;
-    if (!doc.setContent(&file)) {
+    if (!file.open(QIODevice::ReadOnly) || !doc.setContent(&file)) {
         QMessageBox::warning(nullptr, tr("Apply Skin"), tr("Unknown error!"));
         return;
     }
@@ -518,7 +518,7 @@ void SkinsPlugin::overwrite()
 
     QFile file(skin->filePass());
     QDomDocument doc;
-    if (!doc.setContent(&file)) {
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate) || !doc.setContent(&file)) {
         QMessageBox::warning(nullptr, tr("Overwrite Skin"), tr("Unknown error!"));
         return;
     }
@@ -580,7 +580,7 @@ void SkinsPlugin::resetCssStyle()
 
     QFile file(":/skinsplugin/defskin.skn");
     QDomDocument doc;
-    if (!doc.setContent(&file)) {
+    if (!file.open(QIODevice::ReadOnly) || !doc.setContent(&file)) {
         QMessageBox::warning(nullptr, tr("Reset CSS Style"), tr("Default skin is invalid!"));
         return;
     }
@@ -598,7 +598,10 @@ void SkinsPlugin::resetCssStyle()
         QDomElement optionElem = optionNode.toElement();
         const QString optionName = optionElem.tagName();
         if (optionName.endsWith(".css", Qt::CaseInsensitive)) {
-            psiOptions->setGlobalOption(optionName, QVariant(QString()));
+            QVariant optionValue = OptionsParser::instance()->elementToVariant(optionElem);
+            if (!optionValue.isValid())
+                optionValue = QString();
+            psiOptions->setGlobalOption(optionName, optionValue);
             ++count;
         }
         optionNode = optionNode.nextSibling();
