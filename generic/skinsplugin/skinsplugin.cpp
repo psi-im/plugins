@@ -551,12 +551,15 @@ void SkinsPlugin::removeSkin()
     if (!skin)
         return;
 
-    int ret = QMessageBox::question(nullptr, tr("Delete skin"), tr("Are You Sure?"),
-                                   QMessageBox::Ok | QMessageBox::Cancel);
-    if (ret == QMessageBox::Cancel)
+    const QString confirmationText
+        = tr("Are you sure you want to delete the skin \"%1\"? This will permanently remove the skin file.")
+              .arg(skin->name());
+    const int ret = QMessageBox::question(nullptr, tr("Delete skin"), confirmationText,
+                                          QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
+    if (ret != QMessageBox::Ok)
         return;
 
-    QString filePass = skin->filePass();
+    const QString filePass = skin->filePass();
     QFile file(filePass);
     if (file.open(QIODevice::ReadWrite)) {
         ui_.lw_skins->takeTopLevelItem(ui_.lw_skins->indexOfTopLevelItem(skin));
@@ -568,6 +571,12 @@ void SkinsPlugin::removeSkin()
 
 void SkinsPlugin::resetCssStyle()
 {
+    const int ret = QMessageBox::question(nullptr, tr("Reset CSS Style"),
+                                          tr("Are you sure you want to reset all CSS-related options to their default values?"),
+                                          QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
+    if (ret != QMessageBox::Ok)
+        return;
+
     QFile file(":/skinsplugin/defskin.skn");
     QDomDocument doc;
     if (!doc.setContent(&file)) {
