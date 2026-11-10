@@ -20,7 +20,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QListWidget" name="lw_skins">
+      <widget class="QTreeWidget" name="lw_skins">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
          <horstretch>0</horstretch>
@@ -33,6 +33,35 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="rootIsDecorated">
+        <bool>false</bool>
+       </property>
+       <property name="uniformRowHeights">
+        <bool>true</bool>
+       </property>
+       <property name="columnCount">
+        <number>4</number>
+       </property>
+       <column>
+        <property name="text">
+         <string>Name</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Author</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Version</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Actions</string>
+        </property>
+       </column>
       </widget>
      </item>
      <item>
@@ -113,7 +142,7 @@
        <item>
         <widget class="QPushButton" name="pb_save">
          <property name="toolTip">
-          <string>Overwrite selected skin with the current settings </string>
+          <string>Overwrite selected skin with the current settings</string>
          </property>
          <property name="text">
           <string>Save</string>
@@ -127,6 +156,16 @@
          </property>
          <property name="text">
           <string>Create</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pb_reset_css">
+         <property name="toolTip">
+          <string>Reset CSS-related settings to default skin values</string>
+         </property>
+         <property name="text">
+          <string>Reset CSS Style</string>
          </property>
         </widget>
        </item>

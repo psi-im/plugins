@@ -18,7 +18,10 @@
  */
 
 #include <QFileDialog>
+#include <QHeaderView>
+#include <QHBoxLayout>
 #include <QMessageBox>
+#include <QToolButton>
 
 #include "applicationinfoaccessinghost.h"
 #include "applicationinfoaccessor.h"
@@ -50,7 +53,7 @@ public:
     virtual void     restoreOptions();
     virtual void     setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
     virtual void     setOptionAccessingHost(OptionAccessingHost *host);
-    virtual void     optionChanged(const QString     &/*option*/) {};
+    virtual void     optionChanged(const QString &/*option*/) {};
     virtual QString  pluginInfo();
 
 private:
@@ -60,6 +63,7 @@ private:
     Ui::SkinsPlugin               ui_;
     QStringList                   skins_;
     void                          findSkins(QString dir);
+    void                          addSkinActions(Skin *skin);
     QDomDocument createSkinDocument(QDomElement sampleDoc, QString name = "", QString author = "", QString version = "",
                                     QString path = "");
     bool         validateOption(QString option);
@@ -77,6 +81,7 @@ private slots:
     void applySkin();
     void removeSkin();
     void overwrite();
+    void resetCssStyle();
 };
 
 SkinsPlugin::SkinsPlugin()
@@ -112,33 +117,51 @@ QWidget *SkinsPlugin::options()
     }
 
     optionsWidget = new QWidget();
-
     ui_.setupUi(optionsWidget);
     skins_.clear();
     updateSkins();
 
+    ui_.lw_skins->setHeaderLabels({ tr("Name"), tr("Author"), tr("Version"), tr("Actions") });
+    ui_.lw_skins->setColumnCount(4);
+    ui_.lw_skins->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+    ui_.lw_skins->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    ui_.lw_skins->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    ui_.lw_skins->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+    ui_.lw_skins->setRootIsDecorated(false);
+    ui_.lw_skins->setAlternatingRowColors(true);
+    ui_.lw_skins->setUniformRowHeights(true);
+    ui_.lw_skins->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui_.lw_skins->setSelectionMode(QAbstractItemView::SingleSelection);
+
     ui_.pb_apply->setEnabled(false);
     ui_.pb_remove->setEnabled(false);
     ui_.pb_save->setEnabled(false);
+    ui_.pb_preview->setVisible(false);
+    ui_.pb_apply->setVisible(false);
+    ui_.pb_remove->setVisible(false);
 
     ui_.lbl_wiki->setText(tr("<a href=\"https://psi-im.org/wiki/doku.php?id=en:plugins#skins_plugin\">Wiki (Online)</a>"));
     ui_.lbl_wiki->setOpenExternalLinks(true);
 
     connect(ui_.pb_update, &QPushButton::released, this, &SkinsPlugin::updateSkins);
-    connect(ui_.pb_preview, &QPushButton::released, this, &SkinsPlugin::loadPreview);
     connect(ui_.pb_update, &QPushButton::released, this, &SkinsPlugin::updateButtonPressed);
     connect(ui_.pb_open, &QPushButton::released, this, &SkinsPlugin::openButtonPressed);
     connect(ui_.pb_apply, &QPushButton::released, this, &SkinsPlugin::applySkin);
     connect(ui_.pb_create, &QPushButton::released, this, &SkinsPlugin::getSkinName);
     connect(ui_.pb_remove, &QPushButton::released, this, &SkinsPlugin::removeSkin);
     connect(ui_.pb_save, &QPushButton::released, this, &SkinsPlugin::overwrite);
-    connect(ui_.lw_skins, &QListWidget::currentRowChanged, this, &SkinsPlugin::enableButton);
-    connect(ui_.lw_skins, &QListWidget::doubleClicked, this, &SkinsPlugin::loadPreview);
+    connect(ui_.pb_reset_css, &QPushButton::released, this, &SkinsPlugin::resetCssStyle);
+    connect(ui_.lw_skins, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem *, QTreeWidgetItem *) {
+        enableButton();
+    });
+    connect(ui_.lw_skins, &QTreeWidget::itemDoubleClicked, this, [this](QTreeWidgetItem *) {
+        loadPreview();
+    });
     connect(ui_.cb_backup, &QCheckBox::toggled, this, [this]() {
-        ui_.cb_hack->toggle(); /* enable Apply button */
+        ui_.cb_hack->toggle();
     });
 
-    ui_.cb_hack->setVisible(false); // Hide hack widget needed to enable Apply button
+    ui_.cb_hack->setVisible(false);
 
     return optionsWidget;
 }
@@ -176,18 +199,18 @@ void SkinsPlugin::findSkins(QString path)
     if (!ui_.lw_skins)
         return;
 
-    QDir       dir(path);
+    QDir dir(path);
     const auto dirList = dir.entryList(QDir::Files);
     for (const auto &filename : dirList) {
         if (filename.endsWith(".skn", Qt::CaseInsensitive)) {
-            QString file = dir.absolutePath() + QString("/") + filename;
+            const QString file = dir.absoluteFilePath(filename);
             if (skins_.contains(file))
                 continue;
 
             skins_.append(file);
-            Skin *newItem = new Skin(ui_.lw_skins);
+            auto *newItem = new Skin(ui_.lw_skins);
             newItem->setFile(file);
-            newItem->setText(newItem->name());
+            addSkinActions(newItem);
         }
     }
 
@@ -196,28 +219,69 @@ void SkinsPlugin::findSkins(QString path)
         findSkins(path + QDir::separator() + subDir);
 }
 
+void SkinsPlugin::addSkinActions(Skin *skin)
+{
+    auto *actionWidget = new QWidget(ui_.lw_skins);
+    auto *layout = new QHBoxLayout(actionWidget);
+    layout->setContentsMargins(2, 0, 2, 0);
+    layout->setSpacing(2);
+
+    auto *infoButton = new QToolButton(actionWidget);
+    infoButton->setToolTip(tr("Show skin information"));
+    infoButton->setAutoRaise(true);
+    infoButton->setIcon(style()->standardIcon(QStyle::SP_MessageBoxInformation));
+    connect(infoButton, &QToolButton::clicked, this, [this, skin](bool) {
+        ui_.lw_skins->setCurrentItem(skin);
+        loadPreview();
+    });
+
+    auto *applyButton = new QToolButton(actionWidget);
+    applyButton->setToolTip(tr("Apply skin"));
+    applyButton->setAutoRaise(true);
+    applyButton->setIcon(style()->standardIcon(QStyle::SP_DialogApplyButton));
+    connect(applyButton, &QToolButton::clicked, this, [this, skin](bool) {
+        ui_.lw_skins->setCurrentItem(skin);
+        applySkin();
+    });
+
+    auto *removeButton = new QToolButton(actionWidget);
+    removeButton->setToolTip(tr("Remove skin"));
+    removeButton->setAutoRaise(true);
+    removeButton->setIcon(style()->standardIcon(QStyle::SP_TrashIcon));
+    connect(removeButton, &QToolButton::clicked, this, [this, skin](bool) {
+        ui_.lw_skins->setCurrentItem(skin);
+        removeSkin();
+    });
+
+    layout->addWidget(infoButton);
+    layout->addWidget(applyButton);
+    layout->addWidget(removeButton);
+    layout->addStretch();
+
+    ui_.lw_skins->setItemWidget(skin, 3, actionWidget);
+}
+
 void SkinsPlugin::updateButtonPressed()
 {
     if (!ui_.lw_skins)
         return;
 
     updateSkins();
-
-    // ui_.pb_apply->setEnabled(false);
 }
 
 void SkinsPlugin::loadPreview()
 {
-    Skin *skin = static_cast<Skin *>(ui_.lw_skins->currentItem());
+    Skin *skin = dynamic_cast<Skin *>(ui_.lw_skins->currentItem());
     if (!skin)
         return;
 
-    Previewer *prev = new Previewer(skin);
+    auto *prev = new Previewer(skin);
     if (prev->loadSkinInformation()) {
         connect(prev, &Previewer::applySkin, this, &SkinsPlugin::applySkin);
         prev->show();
-    } else
-        delete (prev);
+    } else {
+        delete prev;
+    }
 }
 
 void SkinsPlugin::openButtonPressed()
@@ -240,24 +304,26 @@ void SkinsPlugin::appendSkin(QString fileName)
         return;
 
     skins_.append(fileName);
-    Skin *newItem = new Skin(ui_.lw_skins);
+    auto *newItem = new Skin(ui_.lw_skins);
     newItem->setFile(fileName);
-    newItem->setText(newItem->name());
+    addSkinActions(newItem);
 }
 
 void SkinsPlugin::enableButton()
 {
-    ui_.pb_apply->setEnabled(true);
-    ui_.pb_remove->setEnabled(true);
-    ui_.pb_save->setEnabled(true);
+    Skin *skin = dynamic_cast<Skin *>(ui_.lw_skins->currentItem());
+    const bool hasSelection = (skin != nullptr);
+    ui_.pb_apply->setEnabled(hasSelection);
+    ui_.pb_remove->setEnabled(hasSelection);
+    ui_.pb_save->setEnabled(hasSelection);
 }
 
 void SkinsPlugin::getSkinName()
 {
     QString name, author, version;
-    Skin   *skin = static_cast<Skin *>(ui_.lw_skins->currentItem());
+    Skin *skin = dynamic_cast<Skin *>(ui_.lw_skins->currentItem());
     if (skin) {
-        QFile        file(skin->filePass());
+        QFile file(skin->filePass());
         QDomDocument doc;
         if (doc.setContent(&file)) {
             QDomElement elem = doc.documentElement();
@@ -268,14 +334,14 @@ void SkinsPlugin::getSkinName()
             }
         }
     }
-    GetSkinName *getName = new GetSkinName(name, author, version);
+    auto *getName = new GetSkinName(name, author, version);
     connect(getName, &GetSkinName::ok, this, &SkinsPlugin::createSkin);
     getName->show();
 }
 
 void SkinsPlugin::createSkin(const QString &name, const QString &author, const QString &version)
 {
-    QFile        file(":/skinsplugin/defskin.skn");
+    QFile file(":/skinsplugin/defskin.skn");
     QDomDocument doc, newDoc;
     if (!doc.setContent(&file)) {
         QMessageBox::warning(nullptr, tr("Create Skin"), tr("Unknown error!"));
@@ -321,11 +387,11 @@ void SkinsPlugin::createSkin(const QString &name, const QString &author, const Q
 
 void SkinsPlugin::applySkin()
 {
-    Skin *skin = static_cast<Skin *>(ui_.lw_skins->currentItem());
+    Skin *skin = dynamic_cast<Skin *>(ui_.lw_skins->currentItem());
     if (!skin)
         return;
 
-    QFile        file(skin->filePass());
+    QFile file(skin->filePass());
     QDomDocument doc;
     if (!doc.setContent(&file)) {
         QMessageBox::warning(nullptr, tr("Apply Skin"), tr("Unknown error!"));
@@ -337,7 +403,7 @@ void SkinsPlugin::applySkin()
         return;
     }
 
-    bool    backup = ui_.cb_backup->isChecked();
+    bool backup = ui_.cb_backup->isChecked();
     QString fileName;
     if (backup && skin->name().left(11) != "backupSkin_") {
         QDomDocument backUp = createSkinDocument(elem, "backup", "SkinsPlugin", "0");
@@ -366,12 +432,12 @@ void SkinsPlugin::applySkin()
         }
     }
 
-    QDomElement options    = elem.firstChildElement("options");
-    QDomNode    optionNode = options.firstChild();
+    QDomElement options = elem.firstChildElement("options");
+    QDomNode optionNode = options.firstChild();
     while (!optionNode.isNull()) {
         QDomElement optionElem = optionNode.toElement();
-        QString     oldPath    = elem.attribute("path");
-        QString     optionName = optionElem.tagName();
+        QString oldPath = elem.attribute("path");
+        QString optionName = optionElem.tagName();
         if (validateOption(optionName)) {
             QVariant optionValue = OptionsParser::instance()->elementToVariant(optionElem);
             if (!oldPath.isEmpty()
@@ -388,16 +454,14 @@ void SkinsPlugin::applySkin()
         }
         optionNode = optionNode.nextSibling();
     }
-    QString mes = QString("Skin %1 successfully applied!\n"
-                          "Some changes may only have full effect upon restart!")
+
+    QString mes = QString("Skin %1 successfully applied!\nSome changes may only have full effect upon restart!")
                       .arg(elem.attribute("name"));
-    if (backup) {
+    if (backup)
         mes += QString("\nBackup skin saved to %2").arg(fileName);
-    }
 
     QMessageBox::information(nullptr, tr("Apply Skin"), mes);
-
-    ui_.cb_hack->toggle(); // enable Apply button
+    ui_.cb_hack->toggle();
 }
 
 QDomDocument SkinsPlugin::createSkinDocument(QDomElement elem, QString name, QString author, QString version,
@@ -412,13 +476,13 @@ QDomDocument SkinsPlugin::createSkinDocument(QDomElement elem, QString name, QSt
     newElem.setAttribute("path", path);
     QDomElement newOptions = newDoc.createElement("options");
 
-    QDomElement options    = elem.firstChildElement("options");
-    QDomNode    optionNode = options.firstChild();
+    QDomElement options = elem.firstChildElement("options");
+    QDomNode optionNode = options.firstChild();
     while (!optionNode.isNull()) {
         QString optionName = optionNode.toElement().tagName();
         if (validateOption(optionName)) {
-            QVariant    optionValue = psiOptions->getGlobalOption(optionName);
-            QDomElement newOption   = newDoc.createElement(optionName);
+            QVariant optionValue = psiOptions->getGlobalOption(optionName);
+            QDomElement newOption = newDoc.createElement(optionName);
             OptionsParser::instance()->variantToElement(optionValue, newOption);
             newOptions.appendChild(newOption);
         }
@@ -447,11 +511,11 @@ void SkinsPlugin::overwrite()
     if (ret == QMessageBox::Cancel)
         return;
 
-    Skin *skin = static_cast<Skin *>(ui_.lw_skins->currentItem());
+    Skin *skin = dynamic_cast<Skin *>(ui_.lw_skins->currentItem());
     if (!skin)
         return;
 
-    QFile        file(skin->filePass());
+    QFile file(skin->filePass());
     QDomDocument doc;
     if (!doc.setContent(&file)) {
         QMessageBox::warning(nullptr, tr("Overwrite Skin"), tr("Unknown error!"));
@@ -483,23 +547,55 @@ void SkinsPlugin::overwrite()
 
 void SkinsPlugin::removeSkin()
 {
-    Skin *skin = static_cast<Skin *>(ui_.lw_skins->currentItem());
+    Skin *skin = dynamic_cast<Skin *>(ui_.lw_skins->currentItem());
     if (!skin)
         return;
 
-    int ret
-        = QMessageBox::question(nullptr, tr("Delete skin"), tr("Are You Sure?"), QMessageBox::Ok | QMessageBox::Cancel);
+    int ret = QMessageBox::question(nullptr, tr("Delete skin"), tr("Are You Sure?"),
+                                   QMessageBox::Ok | QMessageBox::Cancel);
     if (ret == QMessageBox::Cancel)
         return;
 
     QString filePass = skin->filePass();
-    QFile   file(filePass);
+    QFile file(filePass);
     if (file.open(QIODevice::ReadWrite)) {
-        ui_.lw_skins->removeItemWidget(skin);
-        delete (skin);
+        ui_.lw_skins->takeTopLevelItem(ui_.lw_skins->indexOfTopLevelItem(skin));
+        delete skin;
         file.remove();
         skins_.removeAt(skins_.indexOf(filePass));
     }
+}
+
+void SkinsPlugin::resetCssStyle()
+{
+    QFile file(":/skinsplugin/defskin.skn");
+    QDomDocument doc;
+    if (!doc.setContent(&file)) {
+        QMessageBox::warning(nullptr, tr("Reset CSS Style"), tr("Default skin is invalid!"));
+        return;
+    }
+
+    QDomElement elem = doc.documentElement();
+    if (elem.tagName() != "skin") {
+        QMessageBox::warning(nullptr, tr("Reset CSS Style"), tr("Default skin is invalid!"));
+        return;
+    }
+
+    QDomElement options = elem.firstChildElement("options");
+    QDomNode optionNode = options.firstChild();
+    int count = 0;
+    while (!optionNode.isNull()) {
+        QDomElement optionElem = optionNode.toElement();
+        const QString optionName = optionElem.tagName();
+        if (optionName.endsWith(".css", Qt::CaseInsensitive)) {
+            psiOptions->setGlobalOption(optionName, QVariant(QString()));
+            ++count;
+        }
+        optionNode = optionNode.nextSibling();
+    }
+
+    QMessageBox::information(nullptr, tr("Reset CSS Style"),
+                             tr("Reset %1 CSS-related option(s) to default values.").arg(count));
 }
 
 QString SkinsPlugin::pluginInfo()

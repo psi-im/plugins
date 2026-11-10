@@ -18,45 +18,109 @@
  */
 
 #include "skin.h"
+
 #include <QDir>
 #include <QDomDocument>
+#include <QFile>
 #include <QMessageBox>
 
-void Skin::setFile(const QString &file) { filePass_ = file; }
+Skin::Skin(QTreeWidget *parent) : QTreeWidgetItem(parent)
+{
+    setTextAlignment(2, Qt::AlignHCenter);
+}
 
-QString Skin::filePass() { return filePass_; }
+Skin::Skin(QTreeWidgetItem *parent) : QTreeWidgetItem(parent)
+{
+    setTextAlignment(2, Qt::AlignHCenter);
+}
 
-QString Skin::skinFolder()
+void Skin::setFile(const QString &file)
+{
+    filePass_ = file;
+    loadMetadata();
+}
+
+QString Skin::filePass() const { return filePass_; }
+
+QString Skin::skinFolder() const
 {
     QString folder = filePass_;
-    int     index  = folder.lastIndexOf("/");
+    const int index = folder.lastIndexOf('/');
+    if (index < 0)
+        return QString();
     folder.chop(folder.size() - index);
     return folder;
 }
 
-QPixmap Skin::previewPixmap()
+QPixmap Skin::previewPixmap() const
 {
-    QDir       dir(skinFolder());
-    QString    skinName = name();
-    QPixmap    pix      = QPixmap();
-    const auto dirList  = dir.entryList(QDir::Files);
+    QDir dir(skinFolder());
+    QString skinName = name();
+    QPixmap pix;
+    const auto dirList = dir.entryList(QDir::Files);
     for (const auto &fileName : dirList) {
         if ((fileName.endsWith(".png", Qt::CaseInsensitive) || fileName.endsWith(".jpg", Qt::CaseInsensitive))
             && skinName.left(skinName.length() - 4) == fileName.left(fileName.length() - 4)) {
-            pix = QPixmap(dir.absolutePath() + "/" + fileName);
+            pix = QPixmap(dir.absoluteFilePath(fileName));
             break;
         }
     }
     return pix;
 }
 
-QString Skin::name()
+QString Skin::name() const
 {
-    QString name  = filePass_;
-    int     index = name.lastIndexOf("/");
-    index         = name.size() - index - 1;
-    name          = name.right(index);
+    if (!name_.isEmpty())
+        return name_;
+
+    QString name = filePass_;
+    const int index = name.lastIndexOf('/');
+    if (index >= 0)
+        name = name.right(name.size() - index - 1);
     return name;
+}
+
+QString Skin::author() const { return author_; }
+
+QString Skin::version() const { return version_; }
+
+bool Skin::loadMetadata()
+{
+    QFile file(filePass_);
+    QDomDocument doc;
+    if (!doc.setContent(&file)) {
+        name_ = name();
+        author_.clear();
+        version_.clear();
+        setText(0, name_);
+        setText(1, author_);
+        setText(2, version_);
+        return false;
+    }
+
+    QDomElement elem = doc.documentElement();
+    if (elem.tagName() != "skin") {
+        name_ = name();
+        author_.clear();
+        version_.clear();
+        setText(0, name_);
+        setText(1, author_);
+        setText(2, version_);
+        return false;
+    }
+
+    name_ = elem.attribute("name");
+    author_ = elem.attribute("author");
+    version_ = elem.attribute("version");
+    if (name_.isEmpty())
+        name_ = filePass_.section('/', -1);
+
+    setText(0, name_);
+    setText(1, author_);
+    setText(2, version_);
+    if (!author_.isEmpty() || !version_.isEmpty())
+        setToolTip(0, QString("%1\n%2\n%3").arg(name_, author_, version_));
+    return true;
 }
 
 //---------------------------------
@@ -74,7 +138,7 @@ Previewer::Previewer(Skin *skin, QWidget *parent) : QDialog(parent), skin_(skin)
 
 bool Previewer::loadSkinInformation()
 {
-    QFile        file(skin_->filePass());
+    QFile file(skin_->filePass());
     QDomDocument doc;
     if (!doc.setContent(&file)) {
         QMessageBox::warning(this, tr("Preview Skin"), tr("Skin is not valid!"));
@@ -87,7 +151,7 @@ bool Previewer::loadSkinInformation()
     }
     ui_.lbl_author->setText(elem.attribute("author"));
     ui_.lbl_version->setText(elem.attribute("version"));
-    ui_.lbl_name->setText(elem.attribute("name"));
+    ui_.lbl_name->setText(skin_->name());
     QPixmap pix = skin_->previewPixmap();
     if (!pix.isNull())
         ui_.lbl_preview->setPixmap(pix);
