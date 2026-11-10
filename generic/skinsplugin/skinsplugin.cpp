@@ -123,6 +123,7 @@ QWidget *SkinsPlugin::options()
 
     ui_.lw_skins->setHeaderLabels({ tr("Name"), tr("Author"), tr("Version"), tr("Actions") });
     ui_.lw_skins->setColumnCount(4);
+    ui_.lw_skins->header()->setStretchLastSection(false);
     ui_.lw_skins->header()->setSectionResizeMode(0, QHeaderView::Stretch);
     ui_.lw_skins->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
     ui_.lw_skins->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
