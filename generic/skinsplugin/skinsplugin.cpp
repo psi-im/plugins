@@ -271,7 +271,7 @@ void SkinsPlugin::updateButtonPressed()
 
 void SkinsPlugin::loadPreview()
 {
-    Skin *skin = dynamic_cast<Skin *>(ui_.lw_skins->currentItem());
+    Skin *skin = static_cast<Skin *>(ui_.lw_skins->currentItem());
     if (!skin)
         return;
 
@@ -311,7 +311,7 @@ void SkinsPlugin::appendSkin(QString fileName)
 
 void SkinsPlugin::enableButton()
 {
-    Skin *skin = dynamic_cast<Skin *>(ui_.lw_skins->currentItem());
+    Skin *skin = static_cast<Skin *>(ui_.lw_skins->currentItem());
     const bool hasSelection = (skin != nullptr);
     ui_.pb_apply->setEnabled(hasSelection);
     ui_.pb_remove->setEnabled(hasSelection);
@@ -321,7 +321,7 @@ void SkinsPlugin::enableButton()
 void SkinsPlugin::getSkinName()
 {
     QString name, author, version;
-    Skin *skin = dynamic_cast<Skin *>(ui_.lw_skins->currentItem());
+    Skin *skin = static_cast<Skin *>(ui_.lw_skins->currentItem());
     if (skin) {
         QFile file(skin->filePass());
         QDomDocument doc;
@@ -387,7 +387,7 @@ void SkinsPlugin::createSkin(const QString &name, const QString &author, const Q
 
 void SkinsPlugin::applySkin()
 {
-    Skin *skin = dynamic_cast<Skin *>(ui_.lw_skins->currentItem());
+    Skin *skin = static_cast<Skin *>(ui_.lw_skins->currentItem());
     if (!skin)
         return;
 
@@ -511,7 +511,7 @@ void SkinsPlugin::overwrite()
     if (ret == QMessageBox::Cancel)
         return;
 
-    Skin *skin = dynamic_cast<Skin *>(ui_.lw_skins->currentItem());
+    Skin *skin = static_cast<Skin *>(ui_.lw_skins->currentItem());
     if (!skin)
         return;
 
@@ -547,7 +547,7 @@ void SkinsPlugin::overwrite()
 
 void SkinsPlugin::removeSkin()
 {
-    Skin *skin = dynamic_cast<Skin *>(ui_.lw_skins->currentItem());
+    Skin *skin = static_cast<Skin *>(ui_.lw_skins->currentItem());
     if (!skin)
         return;
 
