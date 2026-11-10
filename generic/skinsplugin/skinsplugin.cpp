@@ -230,7 +230,7 @@ void SkinsPlugin::addSkinActions(Skin *skin)
     auto *infoButton = new QToolButton(actionWidget);
     infoButton->setToolTip(tr("Show skin information"));
     infoButton->setAutoRaise(true);
-    infoButton->setIcon(infoButton->style()->standardIcon(QStyle::SP_MessageBoxInformation));
+    infoButton->setIcon(QIcon(":/skinsplugin/icons/info.xpm"));
     connect(infoButton, &QToolButton::clicked, this, [this, skin](bool) {
         ui_.lw_skins->setCurrentItem(skin);
         loadPreview();
@@ -239,7 +239,7 @@ void SkinsPlugin::addSkinActions(Skin *skin)
     auto *applyButton = new QToolButton(actionWidget);
     applyButton->setToolTip(tr("Apply skin"));
     applyButton->setAutoRaise(true);
-    applyButton->setIcon(applyButton->style()->standardIcon(QStyle::SP_DialogApplyButton));
+    applyButton->setIcon(QIcon(":/skinsplugin/icons/apply.xpm"));
     connect(applyButton, &QToolButton::clicked, this, [this, skin](bool) {
         ui_.lw_skins->setCurrentItem(skin);
         applySkin();
@@ -248,7 +248,7 @@ void SkinsPlugin::addSkinActions(Skin *skin)
     auto *removeButton = new QToolButton(actionWidget);
     removeButton->setToolTip(tr("Remove skin"));
     removeButton->setAutoRaise(true);
-    removeButton->setIcon(removeButton->style()->standardIcon(QStyle::SP_TrashIcon));
+    removeButton->setIcon(QIcon(":/skinsplugin/icons/remove.xpm"));
     connect(removeButton, &QToolButton::clicked, this, [this, skin](bool) {
         ui_.lw_skins->setCurrentItem(skin);
         removeSkin();
