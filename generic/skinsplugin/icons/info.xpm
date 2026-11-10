@@ -1,0 +1,22 @@
+/* XPM */
+static const char *info_xpm[] = {
+"16 16 3 1",
+". c None",
+"B c #2D7DD2",
+"W c #FFFFFF",
+"......BBBB......",
+"....BBBBBBBB....",
+"...BBBBBBBBBB...",
+"..BBBBBBBBBBBB..",
+".BBBBBBBBBBBBBB.",
+".BBBBBBBWWBBBBB.",
+"BBBBBBBBWWBBBBBB",
+"BBBBBBBBBBBBBBBB",
+"BBBBBBBBWWBBBBBB",
+"BBBBBBBBWWBBBBBB",
+".BBBBBBBWWBBBBB.",
+".BBBBBBBWWBBBBB.",
+"..BBBBBBBBBBBB..",
+"...BBBBBBBBBB...",
+"....BBBBBBBB....",
+"......BBBB......"};
