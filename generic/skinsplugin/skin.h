@@ -20,23 +20,31 @@
 #ifndef SKIN_H
 #define SKIN_H
 
-#include <QListWidgetItem>
+#include <QTreeWidgetItem>
 
 #include "ui_getskinname.h"
 #include "ui_previewer.h"
 
-class Skin : public QListWidgetItem {
+class Skin : public QTreeWidgetItem {
 public:
-    Skin(QListWidget *parent) : QListWidgetItem(parent) { }
-    ~Skin() { }
+    explicit Skin(QTreeWidget *parent = nullptr);
+    explicit Skin(QTreeWidgetItem *parent);
+    ~Skin() override = default;
+
     void    setFile(const QString &file);
-    QString filePass();
-    QString name();
-    QString skinFolder();
-    QPixmap previewPixmap();
+    QString filePass() const;
+    QString name() const;
+    QString author() const;
+    QString version() const;
+    QString skinFolder() const;
+    QPixmap previewPixmap() const;
+    bool    loadMetadata();
 
 private:
     QString filePass_;
+    QString name_;
+    QString author_;
+    QString version_;
 };
 
 class Previewer : public QDialog {

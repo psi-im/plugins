@@ -1,6 +1,9 @@
 <RCC>
-    <qresource prefix="/skinsplugin" >
+    <qresource prefix="/skinsplugin">
         <file>defskin.skn</file>
         <file>skins.png</file>
+        <file>icons/info.xpm</file>
+        <file>icons/apply.xpm</file>
+        <file>icons/remove.xpm</file>
     </qresource>
 </RCC>

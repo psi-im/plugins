@@ -33,7 +33,12 @@
     <options.ui.contactlist.avatars.size />
     <options.ui.contactlist.avatars.use-default-avatar />
     <options.ui.contactlist.show-client-icons />
-    <options.ui.chat.css />
+    <options.ui.chat.css type="QString">
+/* Last message correction */
+QWidget#bottomFrame>QWidget>QTextEdit[correction="true"] {
+    background-color: rgb(0,51,0);
+}
+    </options.ui.chat.css>
     <options.ui.look.contactlist.use-outlined-group-headings />    
     <options.ui.look.contactlist.use-slim-group-headings />
     <options.ui.tabs.grouping />
@@ -47,7 +52,54 @@
     <options.ui.chat.disable-paste-send />
     <options.ui.chat.use-expanding-line-edit />
     <options.ui.chat.use-message-icons />
-    <options.ui.contactlist.css />
+    <options.ui.contactlist.css type="QString">
+/* avatar frame - general settings */
+RosterAvatarFrame * {
+    margin: 1px;
+}
+
+/* avatar frame - avatar */
+QLabel#lb_avatar {
+    margin-left: 0px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    border: 1px solid #949494;
+    border-radius: 3px;
+}
+
+/* avatar frame - nick */
+QLabel#lb_nick {
+    margin: 2px;
+    margin-right: 1px;
+    margin-bottom: 3px;
+    border: 1px solid #949494;
+    border-radius: 3px;
+}
+
+/* avatar frame - buttons of PEP and status */
+QToolButton#tb_status, #tb_mood, #tb_activity {
+    margin-left: 1px;
+    margin-right: 1px;
+    margin-bottom: 2px;
+    width: 100%;
+}
+
+QToolButton#tb_status {
+    margin-top: 0px;
+    margin-bottom: 1px;
+}
+
+/* avatar frame - button of status, arrow */
+QToolButton#tb_status::menu-indicator {
+    background: argb(0,0,0,0);
+}
+
+/* avatar frame - field of status message */
+QLineEdit#le_status_text {
+    margin-right: 0px;
+    margin-bottom: 2px;
+}
+    </options.ui.contactlist.css>
     <options.ui.contactlist.enable-groups />
     <options.ui.contactlist.show-activity-icons />
     <options.ui.contactlist.show-all-client-icons />

@@ -18,45 +18,106 @@
  */
 
 #include "skin.h"
+
 #include <QDir>
 #include <QDomDocument>
+#include <QFile>
+#include <QFileInfo>
 #include <QMessageBox>
 
-void Skin::setFile(const QString &file) { filePass_ = file; }
-
-QString Skin::filePass() { return filePass_; }
-
-QString Skin::skinFolder()
+Skin::Skin(QTreeWidget *parent) : QTreeWidgetItem(parent)
 {
-    QString folder = filePass_;
-    int     index  = folder.lastIndexOf("/");
-    folder.chop(folder.size() - index);
-    return folder;
+    setTextAlignment(2, Qt::AlignHCenter);
 }
 
-QPixmap Skin::previewPixmap()
+Skin::Skin(QTreeWidgetItem *parent) : QTreeWidgetItem(parent)
 {
-    QDir       dir(skinFolder());
-    QString    skinName = name();
-    QPixmap    pix      = QPixmap();
-    const auto dirList  = dir.entryList(QDir::Files);
-    for (const auto &fileName : dirList) {
-        if ((fileName.endsWith(".png", Qt::CaseInsensitive) || fileName.endsWith(".jpg", Qt::CaseInsensitive))
-            && skinName.left(skinName.length() - 4) == fileName.left(fileName.length() - 4)) {
-            pix = QPixmap(dir.absolutePath() + "/" + fileName);
-            break;
+    setTextAlignment(2, Qt::AlignHCenter);
+}
+
+void Skin::setFile(const QString &file)
+{
+    filePass_ = file;
+    loadMetadata();
+}
+
+QString Skin::filePass() const { return filePass_; }
+
+QString Skin::skinFolder() const
+{
+    return QFileInfo(filePass_).absolutePath();
+}
+
+QPixmap Skin::previewPixmap() const
+{
+    const QDir dir(skinFolder());
+    const QString fileBaseName = QFileInfo(filePass_).completeBaseName();
+    const QString skinName = name();
+    const QStringList imagePatterns = { "*.png", "*.jpg", "*.jpeg" };
+    const QStringList imageFiles = dir.entryList(imagePatterns, QDir::Files, QDir::Name);
+
+    for (const QString &imageFile : imageFiles) {
+        const QString imageBaseName = QFileInfo(imageFile).completeBaseName();
+        if (imageBaseName.compare(fileBaseName, Qt::CaseInsensitive) == 0
+            || imageBaseName.compare(skinName, Qt::CaseInsensitive) == 0) {
+            QPixmap pixmap(dir.absoluteFilePath(imageFile));
+            if (!pixmap.isNull())
+                return pixmap;
         }
     }
-    return pix;
+
+    return QPixmap();
 }
 
-QString Skin::name()
+QString Skin::name() const
 {
-    QString name  = filePass_;
-    int     index = name.lastIndexOf("/");
-    index         = name.size() - index - 1;
-    name          = name.right(index);
-    return name;
+    if (!name_.isEmpty())
+        return name_;
+
+    return QFileInfo(filePass_).fileName();
+}
+
+QString Skin::author() const { return author_; }
+
+QString Skin::version() const { return version_; }
+
+bool Skin::loadMetadata()
+{
+    QFile file(filePass_);
+    QDomDocument doc;
+    if (!file.open(QIODevice::ReadOnly) || !doc.setContent(&file)) {
+        name_ = QFileInfo(filePass_).fileName();
+        author_.clear();
+        version_.clear();
+        setText(0, name_);
+        setText(1, author_);
+        setText(2, version_);
+        return false;
+    }
+
+    QDomElement elem = doc.documentElement();
+    if (elem.tagName() != "skin") {
+        name_ = QFileInfo(filePass_).fileName();
+        author_.clear();
+        version_.clear();
+        setText(0, name_);
+        setText(1, author_);
+        setText(2, version_);
+        return false;
+    }
+
+    name_ = elem.attribute("name");
+    author_ = elem.attribute("author");
+    version_ = elem.attribute("version");
+    if (name_.isEmpty())
+        name_ = QFileInfo(filePass_).fileName();
+
+    setText(0, name_);
+    setText(1, author_);
+    setText(2, version_);
+    if (!author_.isEmpty() || !version_.isEmpty())
+        setToolTip(0, QString("%1-%2\n%3").arg(name_, version_, filePass_));
+    return true;
 }
 
 //---------------------------------
@@ -74,9 +135,9 @@ Previewer::Previewer(Skin *skin, QWidget *parent) : QDialog(parent), skin_(skin)
 
 bool Previewer::loadSkinInformation()
 {
-    QFile        file(skin_->filePass());
+    QFile file(skin_->filePass());
     QDomDocument doc;
-    if (!doc.setContent(&file)) {
+    if (!file.open(QIODevice::ReadOnly) || !doc.setContent(&file)) {
         QMessageBox::warning(this, tr("Preview Skin"), tr("Skin is not valid!"));
         return false;
     }
@@ -87,10 +148,16 @@ bool Previewer::loadSkinInformation()
     }
     ui_.lbl_author->setText(elem.attribute("author"));
     ui_.lbl_version->setText(elem.attribute("version"));
-    ui_.lbl_name->setText(elem.attribute("name"));
-    QPixmap pix = skin_->previewPixmap();
-    if (!pix.isNull())
+    ui_.lbl_name->setText(skin_->name());
+
+    const QPixmap pix = skin_->previewPixmap();
+    ui_.lbl_preview->setPixmap(QPixmap());
+    if (pix.isNull()) {
+        ui_.lbl_preview->setText(tr("Preview unavailable"));
+    } else {
+        ui_.lbl_preview->setText(QString());
         ui_.lbl_preview->setPixmap(pix);
+    }
 
     return true;
 }
