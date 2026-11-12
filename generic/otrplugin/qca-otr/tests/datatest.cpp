@@ -11,7 +11,7 @@
 namespace {
 
 constexpr quint32 AliceInstance = 0x11111111;
-constexpr quint32 BobInstance = 0x22222222;
+constexpr quint32 BobInstance   = 0x22222222;
 
 QcaOtr::DsaPrivateKey toyKey(int x)
 {
@@ -19,7 +19,7 @@ QcaOtr::DsaPrivateKey toyKey(int x)
     key.domain.p = QCA::BigInteger(23);
     key.domain.q = QCA::BigInteger(11);
     key.domain.g = QCA::BigInteger(2);
-    key.x = QCA::BigInteger(x);
+    key.x        = QCA::BigInteger(x);
     return key;
 }
 
@@ -28,7 +28,7 @@ bool completeAke(QcaOtr::AkeSession *alice, QcaOtr::AkeSession *bob)
     if (!alice || !bob)
         return false;
 
-    bool ok = false;
+    bool             ok     = false;
     const QByteArray commit = alice->start(&ok);
     if (!ok)
         return false;
@@ -42,14 +42,12 @@ bool completeAke(QcaOtr::AkeSession *alice, QcaOtr::AkeSession *bob)
     if (signature.status != QcaOtr::AkeHandleStatus::Authenticated)
         return false;
     const QcaOtr::AkeHandleResult done = alice->processIncoming(signature.outgoingMessage);
-    return done.status == QcaOtr::AkeHandleStatus::Authenticated && alice->isAuthenticated() &&
-        bob->isAuthenticated();
+    return done.status == QcaOtr::AkeHandleStatus::Authenticated && alice->isAuthenticated() && bob->isAuthenticated();
 }
 
 } // namespace
 
-class DataTest : public QObject
-{
+class DataTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -65,15 +63,9 @@ private:
     QCA::Initializer *initializer_ = nullptr;
 };
 
-void DataTest::initTestCase()
-{
-    initializer_ = new QCA::Initializer;
-}
+void DataTest::initTestCase() { initializer_ = new QCA::Initializer; }
 
-void DataTest::cleanupTestCase()
-{
-    delete initializer_;
-}
+void DataTest::cleanupTestCase() { delete initializer_; }
 
 void DataTest::sessionKeysAreDirectional()
 {
@@ -100,18 +92,18 @@ void DataTest::wireRoundTrip()
     QVERIFY(QcaOtr::generateDhKeyPair(&next));
 
     QcaOtr::DataMessage message;
-    message.senderInstance = AliceInstance;
+    message.senderInstance   = AliceInstance;
     message.receiverInstance = BobInstance;
-    message.flags = 0x01;
-    message.senderKeyId = 7;
-    message.recipientKeyId = 9;
-    message.nextDhPublic = next.publicValue;
-    message.counter = QByteArray::fromHex("0102030405060708");
-    message.encryptedData = QByteArray::fromHex("deadbeef00");
-    message.mac = QByteArray(20, '\x11');
-    message.revealedMacKeys = QByteArray(40, '\x22');
+    message.flags            = 0x01;
+    message.senderKeyId      = 7;
+    message.recipientKeyId   = 9;
+    message.nextDhPublic     = next.publicValue;
+    message.counter          = QByteArray::fromHex("0102030405060708");
+    message.encryptedData    = QByteArray::fromHex("deadbeef00");
+    message.mac              = QByteArray(20, '\x11');
+    message.revealedMacKeys  = QByteArray(40, '\x22');
 
-    bool ok = false;
+    bool             ok      = false;
     const QByteArray encoded = QcaOtr::Wire::encodeDataMessage(message, &ok);
     QVERIFY(ok);
     QVERIFY(!encoded.isEmpty());
@@ -208,8 +200,8 @@ void DataTest::exchangesTlvs()
     QVERIFY(bob.isReady());
 
     QVector<QcaOtr::Tlv> tlvs;
-    tlvs.append({static_cast<quint16>(QcaOtr::TlvType::Padding), QByteArray::fromHex("00010200")});
-    tlvs.append({0x1234, QByteArray::fromHex("61006200ff")});
+    tlvs.append({ static_cast<quint16>(QcaOtr::TlvType::Padding), QByteArray::fromHex("00010200") });
+    tlvs.append({ 0x1234, QByteArray::fromHex("61006200ff") });
 
     QByteArray encrypted;
     QVERIFY(alice.sendMessage("control payload", tlvs, &encrypted));
@@ -239,8 +231,8 @@ void DataTest::rejectsReplayAndTampering()
     QByteArray message;
     QVERIFY(alice.sendMessage("once", &message));
 
-    QByteArray damaged = message;
-    damaged[damaged.size() - 5] = static_cast<char>(damaged.at(damaged.size() - 5) ^ 0x01);
+    QByteArray damaged                       = message;
+    damaged[damaged.size() - 5]              = static_cast<char>(damaged.at(damaged.size() - 5) ^ 0x01);
     const QcaOtr::DataReceiveResult tampered = bob.processIncoming(damaged);
     QCOMPARE(tampered.status, QcaOtr::DataReceiveStatus::Error);
     QCOMPARE(bob.peerKeyId(), quint32(1));

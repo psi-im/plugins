@@ -52,8 +52,7 @@ namespace psiotr {
 
 ConfigDialog::ConfigDialog(OtrMessaging *otr, OptionAccessingHost *optionHost, AccountInfoAccessingHost *accountInfo,
                            QWidget *parent) :
-    QWidget(parent),
-    m_otr(otr), m_optionHost(optionHost), m_accountInfo(accountInfo)
+    QWidget(parent), m_otr(otr), m_optionHost(optionHost), m_accountInfo(accountInfo)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     QTabWidget  *tabWidget  = new QTabWidget(this);

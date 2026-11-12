@@ -513,8 +513,8 @@ QString GameModel::toString() const
     res_str.append(QString("Status:%1;\n").arg(statusString()));
     QString tmp_str = res_str;
     QString crcStr  = QCryptographicHash::hash(tmp_str.replace("\n", "").toLatin1().data(), QCryptographicHash::Sha1)
-                         .toHex()
-                         .constData();
+                          .toHex()
+                          .constData();
     res_str.append(QString("Sha1Sum:%1;\n").arg(crcStr));
 
     return res_str;

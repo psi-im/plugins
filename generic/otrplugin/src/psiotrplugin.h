@@ -91,12 +91,12 @@ public:
     ~PsiOtrPlugin();
 
     // PsiPlugin
-    QString name() const override;
+    QString  name() const override;
     QWidget *options() override;
-    bool enable() override;
-    bool disable() override;
-    void applyOptions() override;
-    void restoreOptions() override;
+    bool     enable() override;
+    bool     disable() override;
+    void     applyOptions() override;
+    void     restoreOptions() override;
 
     // PluginInfoProvider
     QString pluginInfo() override;
@@ -123,7 +123,7 @@ public:
 
     // ToolbarIconAccessor
     QList<QVariantHash> getButtonParam() override;
-    QAction *getAction(QObject *parent, int accountIndex, const QString &contact) override;
+    QAction            *getAction(QObject *parent, int accountIndex, const QString &contact) override;
 
     // AccountInfoAccessor
     void setAccountInfoAccessingHost(AccountInfoAccessingHost *host) override;
@@ -156,15 +156,13 @@ public:
 
     // OtrCallback
     QString dataDir() override;
-    void sendMessage(const QString &account, const QString &contact, const QString &message) override;
-    void notifyUser(const QString &account,
-                    const QString &contact,
-                    const QString &message,
-                    const OtrNotifyType &type) override;
-    bool displayOtrMessage(const QString &account, const QString &contact, const QString &message) override;
-    void stateChange(const QString &account, const QString &contact, OtrStateChange change) override;
-    void receivedSMP(const QString &account, const QString &contact, const QString &question) override;
-    void updateSMP(const QString &account, const QString &contact, int progress) override;
+    void    sendMessage(const QString &account, const QString &contact, const QString &message) override;
+    void    notifyUser(const QString &account, const QString &contact, const QString &message,
+                       const OtrNotifyType &type) override;
+    bool    displayOtrMessage(const QString &account, const QString &contact, const QString &message) override;
+    void    stateChange(const QString &account, const QString &contact, OtrStateChange change) override;
+    void    receivedSMP(const QString &account, const QString &contact, const QString &question) override;
+    void    updateSMP(const QString &account, const QString &contact, int progress) override;
     QString humanAccount(const QString &accountId) override;
     QString humanAccountPublic(const QString &accountId) override;
     QString humanContact(const QString &accountId, const QString &contact) override;
@@ -191,22 +189,22 @@ private:
     bool isXep0364Peer(int accountIndex, const QString &contact);
     void markXep0364Peer(const QString &account, const QString &contact);
 
-    bool m_enabled;
-    OtrMessaging *m_otrConnection;
+    bool                                            m_enabled;
+    OtrMessaging                                   *m_otrConnection;
     QHash<QString, QHash<QString, PsiOtrClosure *>> m_onlineUsers;
-    OptionAccessingHost *m_optionHost;
-    StanzaSendingHost *m_senderHost;
-    ApplicationInfoAccessingHost *m_applicationInfo;
-    PsiAccountControllingHost *m_accountHost;
-    AccountInfoAccessingHost *m_accountInfo;
-    ContactInfoAccessingHost *m_contactInfo;
-    IconFactoryAccessingHost *m_iconHost;
-    EventCreatingHost *m_psiEvent;
-    EncryptionMethodAccessingHost *m_encryptionHost;
-    EncryptionMethodProvider *m_encryptionProvider;
-    QSet<QString> m_otrDiscoveredEndpoints;
-    QSet<QString> m_xep0364Endpoints;
-    QQueue<QMessageBox *> m_messageBoxList;
+    OptionAccessingHost                            *m_optionHost;
+    StanzaSendingHost                              *m_senderHost;
+    ApplicationInfoAccessingHost                   *m_applicationInfo;
+    PsiAccountControllingHost                      *m_accountHost;
+    AccountInfoAccessingHost                       *m_accountInfo;
+    ContactInfoAccessingHost                       *m_contactInfo;
+    IconFactoryAccessingHost                       *m_iconHost;
+    EventCreatingHost                              *m_psiEvent;
+    EncryptionMethodAccessingHost                  *m_encryptionHost;
+    EncryptionMethodProvider                       *m_encryptionProvider;
+    QSet<QString>                                   m_otrDiscoveredEndpoints;
+    QSet<QString>                                   m_xep0364Endpoints;
+    QQueue<QMessageBox *>                           m_messageBoxList;
 };
 
 } // namespace psiotr

@@ -9,8 +9,7 @@
 
 using namespace QcaOtr::Negotiation;
 
-class NegotiationTest : public QObject
-{
+class NegotiationTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -46,12 +45,10 @@ void NegotiationTest::parsesQueryVersions()
     QCOMPARE(queryVersions("hello ?OTRv3? world", &isQuery), VersionMask(Version3));
     QVERIFY(isQuery);
 
-    QCOMPARE(queryVersions("hello ?OTRv23? world", &isQuery),
-             VersionMask(Version2 | Version3));
+    QCOMPARE(queryVersions("hello ?OTRv23? world", &isQuery), VersionMask(Version2 | Version3));
     QVERIFY(isQuery);
 
-    QCOMPARE(queryVersions("hello ?OTR?v23? world", &isQuery),
-             VersionMask(Version1 | Version2 | Version3));
+    QCOMPARE(queryVersions("hello ?OTR?v23? world", &isQuery), VersionMask(Version1 | Version2 | Version3));
     QVERIFY(isQuery);
 
     QCOMPARE(queryVersions("ordinary plaintext", &isQuery), VersionMask(0));
@@ -68,8 +65,7 @@ void NegotiationTest::matchesMalformedQueryHandling()
     QVERIFY(isQuery);
 
     // Unknown version identifiers are ignored while known ones are retained.
-    QCOMPARE(queryVersions("?OTRv243?", &isQuery),
-             VersionMask(Version2 | Version3));
+    QCOMPARE(queryVersions("?OTRv243?", &isQuery), VersionMask(Version2 | Version3));
     QVERIFY(isQuery);
 
     QCOMPARE(queryVersions("?OTRv4?", &isQuery), VersionMask(0));
@@ -82,9 +78,7 @@ void NegotiationTest::matchesMalformedQueryHandling()
 
 void NegotiationTest::choosesBestVersion()
 {
-    QCOMPARE(bestVersion(Version1 | Version2 | Version3,
-                         Version1 | Version2 | Version3),
-             quint8(3));
+    QCOMPARE(bestVersion(Version1 | Version2 | Version3, Version1 | Version2 | Version3), quint8(3));
     QCOMPARE(bestVersion(Version1 | Version2, Version1 | Version2 | Version3), quint8(2));
     QCOMPARE(bestVersion(Version1, Version1 | Version2 | Version3), quint8(1));
     QCOMPARE(bestVersion(Version2, NativeVersions), quint8(0));
@@ -96,8 +90,7 @@ void NegotiationTest::choosesBestVersion()
 
 void NegotiationTest::buildsWhitespaceTags()
 {
-    QCOMPARE(whitespaceTag(Version3).toHex(),
-             QByteArray("200920200909090920092009200920202020090920200909"));
+    QCOMPARE(whitespaceTag(Version3).toHex(), QByteArray("200920200909090920092009200920202020090920200909"));
     QCOMPARE(whitespaceTag(Version1 | Version2 | Version3).toHex(),
              QByteArray("20092020090909092009200920092020"
                         "2009200920200920"

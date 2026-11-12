@@ -25,15 +25,9 @@
 #include <QFileInfo>
 #include <QMessageBox>
 
-Skin::Skin(QTreeWidget *parent) : QTreeWidgetItem(parent)
-{
-    setTextAlignment(2, Qt::AlignHCenter);
-}
+Skin::Skin(QTreeWidget *parent) : QTreeWidgetItem(parent) { setTextAlignment(2, Qt::AlignHCenter); }
 
-Skin::Skin(QTreeWidgetItem *parent) : QTreeWidgetItem(parent)
-{
-    setTextAlignment(2, Qt::AlignHCenter);
-}
+Skin::Skin(QTreeWidgetItem *parent) : QTreeWidgetItem(parent) { setTextAlignment(2, Qt::AlignHCenter); }
 
 void Skin::setFile(const QString &file)
 {
@@ -43,18 +37,15 @@ void Skin::setFile(const QString &file)
 
 QString Skin::filePass() const { return filePass_; }
 
-QString Skin::skinFolder() const
-{
-    return QFileInfo(filePass_).absolutePath();
-}
+QString Skin::skinFolder() const { return QFileInfo(filePass_).absolutePath(); }
 
 QPixmap Skin::previewPixmap() const
 {
-    const QDir dir(skinFolder());
-    const QString fileBaseName = QFileInfo(filePass_).completeBaseName();
-    const QString skinName = name();
+    const QDir        dir(skinFolder());
+    const QString     fileBaseName  = QFileInfo(filePass_).completeBaseName();
+    const QString     skinName      = name();
     const QStringList imagePatterns = { "*.png", "*.jpg", "*.jpeg" };
-    const QStringList imageFiles = dir.entryList(imagePatterns, QDir::Files, QDir::Name);
+    const QStringList imageFiles    = dir.entryList(imagePatterns, QDir::Files, QDir::Name);
 
     for (const QString &imageFile : imageFiles) {
         const QString imageBaseName = QFileInfo(imageFile).completeBaseName();
@@ -83,7 +74,7 @@ QString Skin::version() const { return version_; }
 
 bool Skin::loadMetadata()
 {
-    QFile file(filePass_);
+    QFile        file(filePass_);
     QDomDocument doc;
     if (!file.open(QIODevice::ReadOnly) || !doc.setContent(&file)) {
         name_ = QFileInfo(filePass_).fileName();
@@ -106,8 +97,8 @@ bool Skin::loadMetadata()
         return false;
     }
 
-    name_ = elem.attribute("name");
-    author_ = elem.attribute("author");
+    name_    = elem.attribute("name");
+    author_  = elem.attribute("author");
     version_ = elem.attribute("version");
     if (name_.isEmpty())
         name_ = QFileInfo(filePass_).fileName();
@@ -135,7 +126,7 @@ Previewer::Previewer(Skin *skin, QWidget *parent) : QDialog(parent), skin_(skin)
 
 bool Previewer::loadSkinInformation()
 {
-    QFile file(skin_->filePass());
+    QFile        file(skin_->filePass());
     QDomDocument doc;
     if (!file.open(QIODevice::ReadOnly) || !doc.setContent(&file)) {
         QMessageBox::warning(this, tr("Preview Skin"), tr("Skin is not valid!"));

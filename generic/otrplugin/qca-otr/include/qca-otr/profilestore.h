@@ -23,17 +23,16 @@ namespace QcaOtr {
  * The protocol id is opaque application metadata; qca-otr does not assign an
  * XMPP/libpurple-specific value.
  */
-class ProfileStore
-{
+class ProfileStore {
 public:
     /** Creates a store rooted at @p directory for one opaque @p protocolId. */
     ProfileStore(QString directory, QByteArray protocolId);
     ~ProfileStore();
 
-    ProfileStore(const ProfileStore &) = delete;
+    ProfileStore(const ProfileStore &)            = delete;
     ProfileStore &operator=(const ProfileStore &) = delete;
 
-    const QString &directory() const;
+    const QString    &directory() const;
     const QByteArray &protocolId() const;
 
     /** Loads all profile files and normalizes duplicate logical records. */
@@ -70,8 +69,7 @@ public:
     QList<FingerprintRecord> fingerprints() const;
 
     /** Finds the effective fingerprint record for the exact logical key. */
-    const FingerprintRecord *fingerprint(const QByteArray &username,
-                                         const QByteArray &account,
+    const FingerprintRecord *fingerprint(const QByteArray &username, const QByteArray &account,
                                          const QByteArray &fingerprint) const;
 
     /**
@@ -79,24 +77,15 @@ public:
      * @param created optionally receives true when no equivalent logical record
      * existed before the call.
      */
-    bool rememberFingerprint(const QByteArray &username,
-                             const QByteArray &account,
-                             const QByteArray &fingerprint,
-                             const QByteArray &trust = {},
-                             bool *created = nullptr,
-                             QString *error = nullptr);
+    bool rememberFingerprint(const QByteArray &username, const QByteArray &account, const QByteArray &fingerprint,
+                             const QByteArray &trust = { }, bool *created = nullptr, QString *error = nullptr);
 
     /** Replaces the opaque trust bytes associated with one fingerprint. */
-    bool setFingerprintTrust(const QByteArray &username,
-                             const QByteArray &account,
-                             const QByteArray &fingerprint,
-                             const QByteArray &trust,
-                             QString *error = nullptr);
+    bool setFingerprintTrust(const QByteArray &username, const QByteArray &account, const QByteArray &fingerprint,
+                             const QByteArray &trust, QString *error = nullptr);
 
     /** Removes one fingerprint logical record. */
-    bool removeFingerprint(const QByteArray &username,
-                           const QByteArray &account,
-                           const QByteArray &fingerprint,
+    bool removeFingerprint(const QByteArray &username, const QByteArray &account, const QByteArray &fingerprint,
                            QString *error = nullptr);
 
     /**

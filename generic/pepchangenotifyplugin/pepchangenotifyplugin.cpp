@@ -81,7 +81,7 @@ public:
     virtual bool     outgoingStanza(int account, QDomElement &xml);
     virtual void     setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
     virtual void     setOptionAccessingHost(OptionAccessingHost *host);
-    virtual void     optionChanged(const QString     &/*option*/) {};
+    virtual void     optionChanged(const QString     &/*option*/) { };
     virtual void     setPopupAccessingHost(PopupAccessingHost *host);
     virtual void     setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
     virtual void     setContactInfoAccessingHost(ContactInfoAccessingHost *host);
@@ -460,9 +460,9 @@ bool PepPlugin::checkContactState(QList<ContactState>::iterator &it, ContactStat
 bool PepPlugin::checkContactStatus(const QString &jid)
 {
     if (!contactsOnlineTime_.contains(
-            jid)) { // такое может произойти, если плагин включили, когда аккаунт уже был в онлайне
+            jid)) {  // такое может произойти, если плагин включили, когда аккаунт уже был в онлайне
         return true; // а вообще, ивенты от контактов не должны приходить раньше презенсов.
-    }                // если такое произойдет - таймаут не сработает
+    } // если такое произойдет - таймаут не сработает
     QTime contactTime = contactsOnlineTime_.value(jid);
     return (contactTime.secsTo(QTime::currentTime()) < delay) ? false : true;
 }

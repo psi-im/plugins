@@ -13,8 +13,8 @@
 
 namespace {
 
-constexpr quint32 AliceInstance = 0x11111111;
-constexpr quint32 BobInstance = 0x22222222;
+constexpr quint32 AliceInstance     = 0x11111111;
+constexpr quint32 BobInstance       = 0x22222222;
 constexpr quint32 BobSecondInstance = 0x33333333;
 
 QcaOtr::DsaPrivateKey toyKey(int x)
@@ -23,15 +23,14 @@ QcaOtr::DsaPrivateKey toyKey(int x)
     key.domain.p = QCA::BigInteger(23);
     key.domain.q = QCA::BigInteger(11);
     key.domain.g = QCA::BigInteger(2);
-    key.x = QCA::BigInteger(x);
+    key.x        = QCA::BigInteger(x);
     return key;
 }
 
-QVector<QByteArray> deliver(QcaOtr::OtrSession *target,
-                            const QVector<QByteArray> &messages,
+QVector<QByteArray> deliver(QcaOtr::OtrSession *target, const QVector<QByteArray> &messages,
                             QcaOtr::SessionResult *last = nullptr)
 {
-    QVector<QByteArray> outgoing;
+    QVector<QByteArray>   outgoing;
     QcaOtr::SessionResult current;
     for (const QByteArray &message : messages) {
         current = target->processIncoming(message);
@@ -42,11 +41,9 @@ QVector<QByteArray> deliver(QcaOtr::OtrSession *target,
     return outgoing;
 }
 
-bool completeHandshake(QcaOtr::OtrSession *initiator,
-                       quint32 responderInstance,
-                       QcaOtr::OtrSession *responder)
+bool completeHandshake(QcaOtr::OtrSession *initiator, quint32 responderInstance, QcaOtr::OtrSession *responder)
 {
-    bool ok = false;
+    bool                ok       = false;
     QVector<QByteArray> messages = initiator->start(responderInstance, 0, &ok);
     if (!ok || messages.isEmpty())
         return false;
@@ -65,8 +62,7 @@ bool completeHandshake(QcaOtr::OtrSession *initiator,
     return state.status == QcaOtr::SessionStatus::Authenticated && messages.isEmpty();
 }
 
-bool completeQueryRestart(QcaOtr::OtrSession *querySender,
-                          QcaOtr::OtrSession *queryReceiver)
+bool completeQueryRestart(QcaOtr::OtrSession *querySender, QcaOtr::OtrSession *queryReceiver)
 {
     const QcaOtr::OutgoingResult query = querySender->startNegotiation("restart");
     if (query.status != QcaOtr::OutgoingStatus::Negotiation || query.messages.size() != 1)
@@ -77,7 +73,7 @@ bool completeQueryRestart(QcaOtr::OtrSession *querySender,
         return false;
 
     QVector<QByteArray> messages = state.outgoingMessages;
-    messages = deliver(querySender, messages, &state);
+    messages                     = deliver(querySender, messages, &state);
     if (state.status != QcaOtr::SessionStatus::Handled || messages.isEmpty())
         return false;
     messages = deliver(queryReceiver, messages, &state);
@@ -92,8 +88,7 @@ bool completeQueryRestart(QcaOtr::OtrSession *querySender,
 
 } // namespace
 
-class ControlTest : public QObject
-{
+class ControlTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -109,15 +104,9 @@ private:
     QCA::Initializer *initializer_ = nullptr;
 };
 
-void ControlTest::initTestCase()
-{
-    initializer_ = new QCA::Initializer;
-}
+void ControlTest::initTestCase() { initializer_ = new QCA::Initializer; }
 
-void ControlTest::cleanupTestCase()
-{
-    delete initializer_;
-}
+void ControlTest::cleanupTestCase() { delete initializer_; }
 
 void ControlTest::errorMessagesUseFirstOtrMarker()
 {
@@ -236,11 +225,7 @@ void ControlTest::unreadableAndIgnoreUnreadableSemantics()
     QCOMPARE(received.status, QcaOtr::SessionStatus::Unreadable);
     QVERIFY(received.outgoingMessages.isEmpty());
 
-    QVERIFY(alice.sendMessage(BobInstance,
-                              "ignore outside session",
-                              &encrypted,
-                              0,
-                              QcaOtr::DataFlagIgnoreUnreadable));
+    QVERIFY(alice.sendMessage(BobInstance, "ignore outside session", &encrypted, 0, QcaOtr::DataFlagIgnoreUnreadable));
     received = bob.processIncoming(encrypted.front());
     QCOMPARE(received.status, QcaOtr::SessionStatus::Ignored);
 
@@ -255,8 +240,8 @@ void ControlTest::unreadableAndIgnoreUnreadableSemantics()
     QVERIFY(QcaOtr::Wire::decodeDataMessage(tamperedRaw, &message));
     QVERIFY(!message.mac.isEmpty());
     message.mac[0] = static_cast<char>(message.mac.at(0) ^ 0x01);
-    bool ok = false;
-    tamperedRaw = QcaOtr::Wire::encodeDataMessage(message, &ok);
+    bool ok        = false;
+    tamperedRaw    = QcaOtr::Wire::encodeDataMessage(message, &ok);
     QVERIFY(ok);
 
     received = bobTwo.processIncoming(QcaOtr::Transport::armor(tamperedRaw));

@@ -16,11 +16,11 @@
 
 namespace {
 
-constexpr quint32 QcaInstance = 0x11111111;
+constexpr quint32     QcaInstance   = 0x11111111;
 constexpr const char *LibotrAccount = "otrtest3";
-constexpr const char *Protocol = "prpl-aim";
-constexpr const char *RemoteUser = "qca-peer";
-constexpr int ExtraKeySize = 32;
+constexpr const char *Protocol      = "prpl-aim";
+constexpr const char *RemoteUser    = "qca-peer";
+constexpr int         ExtraKeySize  = 32;
 
 // Exact otrtest3 entry from libotr 4.1.1's test_suite/otr.private_key.
 const char LibotrPrivateKey[] = R"KEY((privkeys
@@ -43,7 +43,7 @@ const char LibotrPrivateKey[] = R"KEY((privkeys
 QCA::BigInteger unsignedHex(const char *hex)
 {
     const QByteArray bytes = QByteArray::fromHex(hex);
-    QByteArray positive;
+    QByteArray       positive;
     positive.reserve(bytes.size() + 1);
     positive.append('\0');
     positive.append(bytes);
@@ -53,42 +53,36 @@ QCA::BigInteger unsignedHex(const char *hex)
 QcaOtr::DsaPrivateKey qcaPrivateKey()
 {
     QcaOtr::DsaPrivateKey key;
-    key.domain.p = unsignedHex(
-        "00BD114F05B275A8A94954047983C5CD96ED95C782D2ED65A18E78C98E8EAFBAF58BBD046BE9895AD55FD0FF95907E7EBD6ACA2688D24779BDE9F0AAB13924CE65F597F9C9B9953DDBACF51DA7113FBAB9BE1DF6C6EA836DEB48983CCDCFC4125B5013D0CE52F890D0C391A035D30BCD5169A3451FD7023685274576DCB5F8FA47");
+    key.domain.p = unsignedHex("00BD114F05B275A8A94954047983C5CD96ED95C782D2ED65A18E78C98E8EAFBAF58BBD046BE9895AD55FD0F"
+                               "F95907E7EBD6ACA2688D24779BDE9F0AAB13924CE65F597F9C9B9953DDBACF51DA7113FBAB9BE1DF6C6EA83"
+                               "6DEB48983CCDCFC4125B5013D0CE52F890D0C391A035D30BCD5169A3451FD7023685274576DCB5F8FA47");
     key.domain.q = unsignedHex("00D1DA3915346A704EB2D2F2A48CD48F3DCC4CF25D");
-    key.domain.g = unsignedHex(
-        "501BCFB989AD2C346BBD7782CA0230551F976B1A07EE3AEE27E4B63B7B00B1ACA712AD85784986411278163156D4DBA9DF75C8560F9C2E02C02AEC830EC403A56B6F64432869D6CA9314A648076511343507629BF4FC96F8FDBB9797258DDF11F437B1450BA23F1AA7E885EC6A33D37B7D7EC384A004420DB238E140B94AAAFE");
-    key.x = unsignedHex("00AB1E941176D94505911118AC799A504ADCCE88F8");
+    key.domain.g = unsignedHex("501BCFB989AD2C346BBD7782CA0230551F976B1A07EE3AEE27E4B63B7B00B1ACA712AD85784986411278163"
+                               "156D4DBA9DF75C8560F9C2E02C02AEC830EC403A56B6F64432869D6CA9314A648076511343507629BF4FC96"
+                               "F8FDBB9797258DDF11F437B1450BA23F1AA7E885EC6A33D37B7D7EC384A004420DB238E140B94AAAFE");
+    key.x        = unsignedHex("00AB1E941176D94505911118AC799A504ADCCE88F8");
     return key;
 }
 
-struct CapturedTlv
-{
-    quint16 type = 0;
+struct CapturedTlv {
+    quint16    type = 0;
     QByteArray value;
 };
 
-struct AppCapture
-{
-    OtrlPolicy policy = OTRL_POLICY_MANUAL;
-    QVector<QByteArray> injected;
+struct AppCapture {
+    OtrlPolicy                policy = OTRL_POLICY_MANUAL;
+    QVector<QByteArray>       injected;
     QVector<OtrlMessageEvent> events;
-    QByteArray eventMessage;
-    bool receivedSymkey = false;
-    quint32 symkeyUse = 0;
-    QByteArray symkeyData;
-    QByteArray symkey;
+    QByteArray                eventMessage;
+    bool                      receivedSymkey = false;
+    quint32                   symkeyUse      = 0;
+    QByteArray                symkeyData;
+    QByteArray                symkey;
 };
 
-OtrlPolicy appPolicy(void *data, ConnContext *)
-{
-    return static_cast<AppCapture *>(data)->policy;
-}
+OtrlPolicy appPolicy(void *data, ConnContext *) { return static_cast<AppCapture *>(data)->policy; }
 
-int appIsLoggedIn(void *, const char *, const char *, const char *)
-{
-    return 1;
-}
+int appIsLoggedIn(void *, const char *, const char *, const char *) { return 1; }
 
 void appInjectMessage(void *data, const char *, const char *, const char *, const char *message)
 {
@@ -96,26 +90,17 @@ void appInjectMessage(void *data, const char *, const char *, const char *, cons
         static_cast<AppCapture *>(data)->injected.append(QByteArray(message));
 }
 
-void appReceivedSymkey(void *data,
-                       ConnContext *,
-                       unsigned int use,
-                       const unsigned char *useData,
-                       size_t useDataLength,
+void appReceivedSymkey(void *data, ConnContext *, unsigned int use, const unsigned char *useData, size_t useDataLength,
                        const unsigned char *symkey)
 {
-    auto *capture = static_cast<AppCapture *>(data);
+    auto *capture           = static_cast<AppCapture *>(data);
     capture->receivedSymkey = true;
-    capture->symkeyUse = use;
-    capture->symkeyData = QByteArray(reinterpret_cast<const char *>(useData),
-                                     static_cast<int>(useDataLength));
-    capture->symkey = QByteArray(reinterpret_cast<const char *>(symkey), ExtraKeySize);
+    capture->symkeyUse      = use;
+    capture->symkeyData     = QByteArray(reinterpret_cast<const char *>(useData), static_cast<int>(useDataLength));
+    capture->symkey         = QByteArray(reinterpret_cast<const char *>(symkey), ExtraKeySize);
 }
 
-void appHandleMessageEvent(void *data,
-                           OtrlMessageEvent event,
-                           ConnContext *,
-                           const char *message,
-                           gcry_error_t)
+void appHandleMessageEvent(void *data, OtrlMessageEvent event, ConnContext *, const char *message, gcry_error_t)
 {
     auto *capture = static_cast<AppCapture *>(data);
     capture->events.append(event);
@@ -123,30 +108,26 @@ void appHandleMessageEvent(void *data,
         capture->eventMessage = QByteArray(message);
 }
 
-const char *appErrorMessage(void *, ConnContext *, OtrlErrorCode)
-{
-    return "oracle error";
-}
+const char *appErrorMessage(void *, ConnContext *, OtrlErrorCode) { return "oracle error"; }
 
 OtrlMessageAppOps appOps()
 {
-    OtrlMessageAppOps ops = {};
-    ops.policy = appPolicy;
-    ops.is_logged_in = appIsLoggedIn;
-    ops.inject_message = appInjectMessage;
-    ops.received_symkey = appReceivedSymkey;
-    ops.handle_msg_event = appHandleMessageEvent;
+    OtrlMessageAppOps ops = { };
+    ops.policy            = appPolicy;
+    ops.is_logged_in      = appIsLoggedIn;
+    ops.inject_message    = appInjectMessage;
+    ops.received_symkey   = appReceivedSymkey;
+    ops.handle_msg_event  = appHandleMessageEvent;
     ops.otr_error_message = appErrorMessage;
     return ops;
 }
 
-class LibotrPeer
-{
+class LibotrPeer {
 public:
     explicit LibotrPeer(OtrlPolicy policy = OTRL_POLICY_MANUAL) : ops(appOps())
     {
         capture.policy = policy;
-        userState = otrl_userstate_create();
+        userState      = otrl_userstate_create();
         if (!userState) {
             setupError = "otrl_userstate_create failed";
             return;
@@ -158,11 +139,10 @@ public:
             return;
         }
         const size_t fixtureSize = sizeof(LibotrPrivateKey) - 1;
-        const bool written = std::fwrite(LibotrPrivateKey, 1, fixtureSize, keyFile) == fixtureSize;
+        const bool   written     = std::fwrite(LibotrPrivateKey, 1, fixtureSize, keyFile) == fixtureSize;
         if (written)
             std::rewind(keyFile);
-        const gcry_error_t keyError = written ? otrl_privkey_read_FILEp(userState, keyFile)
-                                              : gcry_error(GPG_ERR_EIO);
+        const gcry_error_t keyError = written ? otrl_privkey_read_FILEp(userState, keyFile) : gcry_error(GPG_ERR_EIO);
         std::fclose(keyFile);
         if (keyError) {
             setupError = QByteArray("otrl_privkey_read_FILEp: ") + gcry_strerror(keyError);
@@ -174,8 +154,7 @@ public:
             setupError = "instag tmpfile failed";
             return;
         }
-        const gcry_error_t instagError =
-            otrl_instag_generate_FILEp(userState, instagFile, LibotrAccount, Protocol);
+        const gcry_error_t instagError = otrl_instag_generate_FILEp(userState, instagFile, LibotrAccount, Protocol);
         std::fclose(instagFile);
         if (instagError) {
             setupError = QByteArray("otrl_instag_generate_FILEp: ") + gcry_strerror(instagError);
@@ -189,22 +168,15 @@ public:
         }
         localInstance = instag->instag;
 
-        int added = 0;
-        masterContext = otrl_context_find(userState,
-                                          RemoteUser,
-                                          LibotrAccount,
-                                          Protocol,
-                                          OTRL_INSTAG_MASTER,
-                                          1,
-                                          &added,
-                                          nullptr,
-                                          nullptr);
+        int added     = 0;
+        masterContext = otrl_context_find(userState, RemoteUser, LibotrAccount, Protocol, OTRL_INSTAG_MASTER, 1, &added,
+                                          nullptr, nullptr);
         if (!masterContext) {
             setupError = "master otrl_context_find failed";
             return;
         }
         masterContext->our_instance = localInstance;
-        valid = true;
+        valid                       = true;
     }
 
     ~LibotrPeer()
@@ -213,10 +185,7 @@ public:
             otrl_userstate_free(userState);
     }
 
-    void setPolicy(OtrlPolicy policy)
-    {
-        capture.policy = policy;
-    }
+    void setPolicy(OtrlPolicy policy) { capture.policy = policy; }
 
     QVector<QByteArray> receive(const QVector<QByteArray> &messages, QByteArray *plaintext = nullptr)
     {
@@ -225,7 +194,7 @@ public:
         capture.events.clear();
         capture.eventMessage.clear();
         capture.receivedSymkey = false;
-        capture.symkeyUse = 0;
+        capture.symkeyUse      = 0;
         capture.symkeyData.clear();
         capture.symkey.clear();
         if (plaintext)
@@ -233,21 +202,12 @@ public:
 
         for (const QByteArray &message : messages) {
             capture.injected.clear();
-            char *newMessage = nullptr;
-            OtrlTLV *tlvs = nullptr;
+            char        *newMessage  = nullptr;
+            OtrlTLV     *tlvs        = nullptr;
             ConnContext *usedContext = nullptr;
-            const int internal = otrl_message_receiving(userState,
-                                                        &ops,
-                                                        &capture,
-                                                        LibotrAccount,
-                                                        Protocol,
-                                                        RemoteUser,
-                                                        message.constData(),
-                                                        &newMessage,
-                                                        &tlvs,
-                                                        &usedContext,
-                                                        nullptr,
-                                                        nullptr);
+            const int    internal
+                = otrl_message_receiving(userState, &ops, &capture, LibotrAccount, Protocol, RemoteUser,
+                                         message.constData(), &newMessage, &tlvs, &usedContext, nullptr, nullptr);
             if (usedContext && usedContext->their_instance == QcaInstance)
                 secureContext = usedContext;
             injected += capture.injected;
@@ -256,7 +216,7 @@ public:
                 *plaintext = QByteArray(newMessage);
             for (OtrlTLV *tlv = tlvs; tlv; tlv = tlv->next) {
                 CapturedTlv captured;
-                captured.type = tlv->type;
+                captured.type  = tlv->type;
                 captured.value = QByteArray(reinterpret_cast<const char *>(tlv->data), tlv->len);
                 receivedTlvs.append(captured);
             }
@@ -275,22 +235,11 @@ public:
         messages->clear();
         capture.injected.clear();
 
-        char *returnedMessage = nullptr;
-        ConnContext *usedContext = nullptr;
-        const gcry_error_t error = otrl_message_sending(userState,
-                                                        &ops,
-                                                        &capture,
-                                                        LibotrAccount,
-                                                        Protocol,
-                                                        RemoteUser,
-                                                        QcaInstance,
-                                                        plaintext.constData(),
-                                                        tlvs,
-                                                        &returnedMessage,
-                                                        OTRL_FRAGMENT_SEND_SKIP,
-                                                        &usedContext,
-                                                        nullptr,
-                                                        nullptr);
+        char              *returnedMessage = nullptr;
+        ConnContext       *usedContext     = nullptr;
+        const gcry_error_t error = otrl_message_sending(userState, &ops, &capture, LibotrAccount, Protocol, RemoteUser,
+                                                        QcaInstance, plaintext.constData(), tlvs, &returnedMessage,
+                                                        OTRL_FRAGMENT_SEND_SKIP, &usedContext, nullptr, nullptr);
         if (usedContext && usedContext->their_instance == QcaInstance)
             secureContext = usedContext;
         if (returnedMessage) {
@@ -312,21 +261,12 @@ public:
             return false;
         messages->clear();
         capture.injected.clear();
-        otrl_message_disconnect(userState,
-                                &ops,
-                                &capture,
-                                LibotrAccount,
-                                Protocol,
-                                RemoteUser,
-                                QcaInstance);
+        otrl_message_disconnect(userState, &ops, &capture, LibotrAccount, Protocol, RemoteUser, QcaInstance);
         *messages = capture.injected;
         return !messages->isEmpty();
     }
 
-    bool sendSymmetricKey(quint32 use,
-                          const QByteArray &useData,
-                          QByteArray *key,
-                          QVector<QByteArray> *messages)
+    bool sendSymmetricKey(quint32 use, const QByteArray &useData, QByteArray *key, QVector<QByteArray> *messages)
     {
         if (!key || !messages || !secureContext)
             return false;
@@ -334,44 +274,31 @@ public:
         messages->clear();
         capture.injected.clear();
         const gcry_error_t error = otrl_message_symkey(
-            userState,
-            &ops,
-            &capture,
-            secureContext,
-            use,
-            reinterpret_cast<const unsigned char *>(useData.constData()),
-            static_cast<size_t>(useData.size()),
-            reinterpret_cast<unsigned char *>(key->data()));
+            userState, &ops, &capture, secureContext, use, reinterpret_cast<const unsigned char *>(useData.constData()),
+            static_cast<size_t>(useData.size()), reinterpret_cast<unsigned char *>(key->data()));
         *messages = capture.injected;
         return !error && !messages->isEmpty();
     }
 
-    bool isEncrypted() const
-    {
-        return secureContext && secureContext->msgstate == OTRL_MSGSTATE_ENCRYPTED;
-    }
+    bool isEncrypted() const { return secureContext && secureContext->msgstate == OTRL_MSGSTATE_ENCRYPTED; }
 
-    OtrlMessageState messageState() const
-    {
-        return secureContext ? secureContext->msgstate : OTRL_MSGSTATE_PLAINTEXT;
-    }
+    OtrlMessageState messageState() const { return secureContext ? secureContext->msgstate : OTRL_MSGSTATE_PLAINTEXT; }
 
-    OtrlUserState userState = nullptr;
-    ConnContext *masterContext = nullptr;
-    ConnContext *secureContext = nullptr;
-    OtrlMessageAppOps ops = {};
-    AppCapture capture;
+    OtrlUserState        userState     = nullptr;
+    ConnContext         *masterContext = nullptr;
+    ConnContext         *secureContext = nullptr;
+    OtrlMessageAppOps    ops           = { };
+    AppCapture           capture;
     QVector<CapturedTlv> receivedTlvs;
-    QByteArray setupError;
-    quint32 localInstance = 0;
-    bool valid = false;
+    QByteArray           setupError;
+    quint32              localInstance = 0;
+    bool                 valid         = false;
 };
 
-QVector<QByteArray> deliverToQca(QcaOtr::OtrSession *qca,
-                                 const QVector<QByteArray> &messages,
+QVector<QByteArray> deliverToQca(QcaOtr::OtrSession *qca, const QVector<QByteArray> &messages,
                                  QcaOtr::SessionResult *last = nullptr)
 {
-    QVector<QByteArray> outgoing;
+    QVector<QByteArray>   outgoing;
     QcaOtr::SessionResult current;
     for (const QByteArray &message : messages) {
         current = qca->processIncoming(message);
@@ -382,9 +309,7 @@ QVector<QByteArray> deliverToQca(QcaOtr::OtrSession *qca,
     return outgoing;
 }
 
-bool finishQcaInitiatedHandshake(QcaOtr::OtrSession *qca,
-                                 LibotrPeer *libotr,
-                                 const QVector<QByteArray> &commit)
+bool finishQcaInitiatedHandshake(QcaOtr::OtrSession *qca, LibotrPeer *libotr, const QVector<QByteArray> &commit)
 {
     QVector<QByteArray> messages = libotr->receive(commit);
     if (messages.isEmpty())
@@ -400,16 +325,14 @@ bool finishQcaInitiatedHandshake(QcaOtr::OtrSession *qca,
         return false;
 
     messages = deliverToQca(qca, messages, &state);
-    return state.status == QcaOtr::SessionStatus::Authenticated && messages.isEmpty() &&
-        qca->isEncrypted(libotr->localInstance);
+    return state.status == QcaOtr::SessionStatus::Authenticated && messages.isEmpty()
+        && qca->isEncrypted(libotr->localInstance);
 }
 
-bool finishLibotrInitiatedHandshake(QcaOtr::OtrSession *qca,
-                                    LibotrPeer *libotr,
-                                    const QVector<QByteArray> &commit)
+bool finishLibotrInitiatedHandshake(QcaOtr::OtrSession *qca, LibotrPeer *libotr, const QVector<QByteArray> &commit)
 {
     QcaOtr::SessionResult state;
-    QVector<QByteArray> messages = deliverToQca(qca, commit, &state);
+    QVector<QByteArray>   messages = deliverToQca(qca, commit, &state);
     if (state.status != QcaOtr::SessionStatus::Handled || messages.isEmpty())
         return false;
 
@@ -418,8 +341,8 @@ bool finishLibotrInitiatedHandshake(QcaOtr::OtrSession *qca,
         return false;
 
     messages = deliverToQca(qca, messages, &state);
-    if (state.status != QcaOtr::SessionStatus::Authenticated || messages.isEmpty() ||
-        !qca->isEncrypted(libotr->localInstance)) {
+    if (state.status != QcaOtr::SessionStatus::Authenticated || messages.isEmpty()
+        || !qca->isEncrypted(libotr->localInstance)) {
         return false;
     }
 
@@ -429,15 +352,14 @@ bool finishLibotrInitiatedHandshake(QcaOtr::OtrSession *qca,
 
 bool establish(QcaOtr::OtrSession *qca, LibotrPeer *libotr)
 {
-    bool ok = false;
+    bool                      ok     = false;
     const QVector<QByteArray> commit = qca->start(libotr->localInstance, 0, &ok);
     return ok && !commit.isEmpty() && finishQcaInitiatedHandshake(qca, libotr, commit);
 }
 
 } // namespace
 
-class ControlInteropTest : public QObject
-{
+class ControlInteropTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -459,10 +381,7 @@ void ControlInteropTest::initTestCase()
     QVERIFY2(QByteArray(otrl_version()).startsWith("4.1.1"), otrl_version());
 }
 
-void ControlInteropTest::cleanupTestCase()
-{
-    delete initializer_;
-}
+void ControlInteropTest::cleanupTestCase() { delete initializer_; }
 
 void ControlInteropTest::queryNegotiationBothDirections()
 {
@@ -510,7 +429,7 @@ void ControlInteropTest::whitespaceNegotiationBothDirections()
         QCOMPARE(tagged.status, QcaOtr::OutgoingStatus::Plaintext);
         QCOMPARE(tagged.messages.size(), 1);
 
-        QByteArray plaintext;
+        QByteArray                plaintext;
         const QVector<QByteArray> commit = libotr.receive(tagged.messages, &plaintext);
         QCOMPARE(plaintext, QByteArray("qca whitespace"));
         QVERIFY(!commit.isEmpty());
@@ -543,10 +462,10 @@ void ControlInteropTest::tlvSymkeyAndDisconnectBothDirections()
     QcaOtr::OtrSession qca(qcaPrivateKey(), QcaInstance);
     QVERIFY(establish(&qca, &libotr));
 
-    QVector<QByteArray> messages;
+    QVector<QByteArray>  messages;
     QVector<QcaOtr::Tlv> qcaTlvs;
-    QcaOtr::Tlv qcaTlv;
-    qcaTlv.type = 0x1234;
+    QcaOtr::Tlv          qcaTlv;
+    qcaTlv.type  = 0x1234;
     qcaTlv.value = QByteArray::fromHex("0001ff00");
     qcaTlvs.append(qcaTlv);
     QVERIFY(qca.sendMessage(libotr.localInstance, "qca tlv", qcaTlvs, &messages));
@@ -558,9 +477,8 @@ void ControlInteropTest::tlvSymkeyAndDisconnectBothDirections()
     QCOMPARE(libotr.receivedTlvs.front().value, qcaTlv.value);
 
     const QByteArray libotrTlvValue = QByteArray::fromHex("00fe0200");
-    OtrlTLV *libotrTlv = otrl_tlv_new(0x4321,
-                                     static_cast<unsigned short>(libotrTlvValue.size()),
-                                     reinterpret_cast<const unsigned char *>(libotrTlvValue.constData()));
+    OtrlTLV         *libotrTlv      = otrl_tlv_new(0x4321, static_cast<unsigned short>(libotrTlvValue.size()),
+                                                   reinterpret_cast<const unsigned char *>(libotrTlvValue.constData()));
     QVERIFY(libotrTlv != nullptr);
     QVERIFY(libotr.send("libotr tlv", libotrTlv, &messages));
     otrl_tlv_free(libotrTlv);
@@ -573,11 +491,7 @@ void ControlInteropTest::tlvSymkeyAndDisconnectBothDirections()
 
     const QByteArray qcaUseData = QByteArray::fromHex("61006200ff");
     QCA::SecureArray qcaKey;
-    QVERIFY(qca.sendSymmetricKey(libotr.localInstance,
-                                 0x01020304,
-                                 qcaUseData,
-                                 &qcaKey,
-                                 &messages));
+    QVERIFY(qca.sendSymmetricKey(libotr.localInstance, 0x01020304, qcaUseData, &qcaKey, &messages));
     libotr.receive(messages);
     QVERIFY(libotr.capture.receivedSymkey);
     QCOMPARE(libotr.capture.symkeyUse, quint32(0x01020304));
@@ -585,7 +499,7 @@ void ControlInteropTest::tlvSymkeyAndDisconnectBothDirections()
     QCOMPARE(libotr.capture.symkey, qcaKey.toByteArray());
 
     const QByteArray libotrUseData = QByteArray::fromHex("0001020300");
-    QByteArray libotrKey;
+    QByteArray       libotrKey;
     QVERIFY(libotr.sendSymmetricKey(0xa1b2c3d4, libotrUseData, &libotrKey, &messages));
     received = qca.processIncoming(messages.front());
     QCOMPARE(received.status, QcaOtr::SessionStatus::Message);
@@ -618,7 +532,7 @@ void ControlInteropTest::protocolErrorsBothDirections()
     QVERIFY2(libotr.valid, libotr.setupError.constData());
     QcaOtr::OtrSession qca(qcaPrivateKey(), QcaInstance);
 
-    libotr.receive(QVector<QByteArray>{QcaOtr::Negotiation::errorMessage("from qca")});
+    libotr.receive(QVector<QByteArray> { QcaOtr::Negotiation::errorMessage("from qca") });
     QVERIFY(libotr.capture.events.contains(OTRL_MSGEVENT_RCVDMSG_GENERAL_ERR));
     QVERIFY(libotr.capture.eventMessage.contains("from qca"));
 
@@ -633,14 +547,13 @@ void ControlInteropTest::protocolErrorsBothDirections()
     QVERIFY(QcaOtr::Wire::decodeDataMessage(raw, &data));
     QVERIFY(!data.mac.isEmpty());
     data.mac[0] = static_cast<char>(data.mac.at(0) ^ 0x01);
-    bool ok = false;
-    raw = QcaOtr::Wire::encodeDataMessage(data, &ok);
+    bool ok     = false;
+    raw         = QcaOtr::Wire::encodeDataMessage(data, &ok);
     QVERIFY(ok);
 
-    const QVector<QByteArray> errors =
-        libotr.receive(QVector<QByteArray>{QcaOtr::Transport::armor(raw)});
-    QVERIFY(libotr.capture.events.contains(OTRL_MSGEVENT_RCVDMSG_UNREADABLE) ||
-            libotr.capture.events.contains(OTRL_MSGEVENT_RCVDMSG_MALFORMED));
+    const QVector<QByteArray> errors = libotr.receive(QVector<QByteArray> { QcaOtr::Transport::armor(raw) });
+    QVERIFY(libotr.capture.events.contains(OTRL_MSGEVENT_RCVDMSG_UNREADABLE)
+            || libotr.capture.events.contains(OTRL_MSGEVENT_RCVDMSG_MALFORMED));
     QCOMPARE(errors.size(), 1);
     QVERIFY(errors.front().startsWith("?OTR Error: oracle error"));
 

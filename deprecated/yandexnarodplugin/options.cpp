@@ -21,21 +21,21 @@
 
 static const QString passwordKey = "yandexnarodpluginkey";
 
-Options *Options ::instance_ = 0;
+Options *Options::instance_ = 0;
 
-Options ::Options() : QObject(QApplication::instance()), appInfo(0), options(0) { }
+Options::Options() : QObject(QApplication::instance()), appInfo(0), options(0) { }
 
-Options ::~Options() { }
+Options::~Options() { }
 
-void Options ::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host)
+void Options::setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host)
 {
     appInfo = host;
     getProxy();
 }
 
-void Options ::setOptionAccessingHost(OptionAccessingHost *host) { options = host; }
+void Options::setOptionAccessingHost(OptionAccessingHost *host) { options = host; }
 
-Options *Options ::instance()
+Options *Options::instance()
 {
     if (!instance_)
         instance_ = new Options();
@@ -43,13 +43,13 @@ Options *Options ::instance()
     return instance_;
 }
 
-void Options ::reset()
+void Options::reset()
 {
     delete instance_;
     instance_ = 0;
 }
 
-bool Options ::useProxy() const
+bool Options::useProxy() const
 {
     bool use = false;
     if (appInfo) {
@@ -60,7 +60,7 @@ bool Options ::useProxy() const
     return use;
 }
 
-QNetworkProxy Options ::getProxy() const
+QNetworkProxy Options::getProxy() const
 {
     QNetworkProxy np;
     if (appInfo) {

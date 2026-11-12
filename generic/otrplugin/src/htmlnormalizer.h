@@ -17,8 +17,7 @@ class QDomElement;
  * The normalizer deliberately does not depend on libtidy. If Qt cannot turn
  * the input into a DOM tree, it falls back to a body containing plain text.
  */
-class HtmlNormalizer
-{
+class HtmlNormalizer {
 public:
     explicit HtmlNormalizer(QString html);
 

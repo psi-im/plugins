@@ -21,7 +21,7 @@ const QByteArray PsiOtrProtocolId("prpl-jabber");
 
 QCA::SecureArray secureUtf8(const QString &value)
 {
-    QByteArray utf8 = value.toUtf8();
+    QByteArray       utf8 = value.toUtf8();
     QCA::SecureArray result(utf8);
     utf8.fill('\0');
     return result;
@@ -30,10 +30,10 @@ QCA::SecureArray secureUtf8(const QString &value)
 QString formatFingerprint(const QByteArray &fingerprint)
 {
     if (fingerprint.size() != 20)
-        return {};
+        return { };
 
     const QByteArray hex = fingerprint.toHex().toUpper();
-    QStringList groups;
+    QStringList      groups;
     groups.reserve(10);
     for (int i = 0; i < hex.size(); i += 4)
         groups.append(QString::fromLatin1(hex.mid(i, 4)));
@@ -42,17 +42,16 @@ QString formatFingerprint(const QByteArray &fingerprint)
 
 } // namespace
 
-struct OtrInternal::Conversation
-{
-    QString account;
-    QString contact;
+struct OtrInternal::Conversation {
+    QString                             account;
+    QString                             contact;
     std::unique_ptr<QcaOtr::OtrSession> session;
-    quint32 activePeerInstance = 0;
-    QByteArray activeFingerprint;
-    QByteArray sessionId;
-    bool initiated = false;
-    bool forcedFinished = false;
-    bool smpSucceeded = false;
+    quint32                             activePeerInstance = 0;
+    QByteArray                          activeFingerprint;
+    QByteArray                          sessionId;
+    bool                                initiated      = false;
+    bool                                forcedFinished = false;
+    bool                                smpSucceeded   = false;
 };
 
 OtrInternal::OtrInternal(psiotr::OtrCallback *callback, psiotr::OtrPolicy &policy) :
@@ -70,10 +69,14 @@ OtrInternal::~OtrInternal() = default;
 QcaOtr::SessionPolicy OtrInternal::nativePolicy(psiotr::OtrPolicy policy)
 {
     switch (policy) {
-    case psiotr::OTR_POLICY_OFF: return QcaOtr::SessionPolicy::Disabled;
-    case psiotr::OTR_POLICY_ENABLED: return QcaOtr::SessionPolicy::Manual;
-    case psiotr::OTR_POLICY_AUTO: return QcaOtr::SessionPolicy::Opportunistic;
-    case psiotr::OTR_POLICY_REQUIRE: return QcaOtr::SessionPolicy::Always;
+    case psiotr::OTR_POLICY_OFF:
+        return QcaOtr::SessionPolicy::Disabled;
+    case psiotr::OTR_POLICY_ENABLED:
+        return QcaOtr::SessionPolicy::Manual;
+    case psiotr::OTR_POLICY_AUTO:
+        return QcaOtr::SessionPolicy::Opportunistic;
+    case psiotr::OTR_POLICY_REQUIRE:
+        return QcaOtr::SessionPolicy::Always;
     }
     return QcaOtr::SessionPolicy::Disabled;
 }
@@ -100,7 +103,7 @@ bool OtrInternal::ensureAccount(const QString &account, QString *error)
 OtrInternal::Conversation *OtrInternal::conversation(const QString &account, const QString &contact, bool create)
 {
     const QString key = conversationKey(account, contact);
-    auto it = m_conversations.find(key);
+    auto          it  = m_conversations.find(key);
     if (it != m_conversations.end()) {
         it.value()->session->setPolicy(nativePolicy(m_otrPolicy));
         return it.value().get();
@@ -110,20 +113,18 @@ OtrInternal::Conversation *OtrInternal::conversation(const QString &account, con
 
     QString error;
     if (!ensureAccount(account, &error)) {
-        displayProtocolError(account,
-                             contact,
-                             QObject::tr("Cannot initialize OTR for this account: %1").arg(error));
+        displayProtocolError(account, contact, QObject::tr("Cannot initialize OTR for this account: %1").arg(error));
         return nullptr;
     }
 
-    const QByteArray accountId = account.toUtf8();
-    const QcaOtr::PrivateKeyRecord *identity = m_profile->identity(accountId);
-    bool found = false;
-    const quint32 instanceTag = m_profile->instanceTag(accountId, &found);
+    const QByteArray                accountId   = account.toUtf8();
+    const QcaOtr::PrivateKeyRecord *identity    = m_profile->identity(accountId);
+    bool                            found       = false;
+    const quint32                   instanceTag = m_profile->instanceTag(accountId, &found);
     if (!identity || !found || instanceTag < 0x00000100)
         return nullptr;
 
-    auto result = std::make_shared<Conversation>();
+    auto result     = std::make_shared<Conversation>();
     result->account = account;
     result->contact = contact;
     result->session = std::make_unique<QcaOtr::OtrSession>(identity->key, instanceTag);
@@ -138,9 +139,7 @@ const OtrInternal::Conversation *OtrInternal::conversation(const QString &accoun
     return it == m_conversations.constEnd() ? nullptr : it.value().get();
 }
 
-void OtrInternal::sendTransport(const QString &account,
-                                const QString &contact,
-                                const QVector<QByteArray> &messages)
+void OtrInternal::sendTransport(const QString &account, const QString &contact, const QVector<QByteArray> &messages)
 {
     for (const QByteArray &message : messages)
         m_callback->sendMessage(account, contact, QString::fromUtf8(message));
@@ -171,8 +170,7 @@ quint32 OtrInternal::activePeer(const Conversation *conversation) const
     return peers.isEmpty() ? 0 : peers.first();
 }
 
-bool OtrInternal::activeEstablished(const Conversation *conversation,
-                                    quint32 *peerInstance,
+bool OtrInternal::activeEstablished(const Conversation *conversation, quint32 *peerInstance,
                                     QcaOtr::AkeEstablishedSession *established) const
 {
     if (!conversation || !established)
@@ -193,48 +191,41 @@ bool OtrInternal::rememberFingerprint(Conversation *conversation, quint32 peerIn
         return false;
 
     QcaOtr::AkeEstablishedSession established;
-    if (!conversation->session->establishedSession(peerInstance, &established) || established.peerFingerprint.size() != 20)
+    if (!conversation->session->establishedSession(peerInstance, &established)
+        || established.peerFingerprint.size() != 20)
         return false;
 
-    const QByteArray account = conversation->account.toUtf8();
+    const QByteArray account  = conversation->account.toUtf8();
     const QByteArray username = conversation->contact.toUtf8();
-    QByteArray inheritedTrust;
+    QByteArray       inheritedTrust;
 
     const int slash = username.indexOf('/');
     if (slash > 0) {
-        const QByteArray bare = username.left(slash);
-        const QcaOtr::FingerprintRecord *old = m_profile->fingerprint(bare, account, established.peerFingerprint);
+        const QByteArray                 bare = username.left(slash);
+        const QcaOtr::FingerprintRecord *old  = m_profile->fingerprint(bare, account, established.peerFingerprint);
         if (old)
             inheritedTrust = old->trust;
     }
 
     QString error;
-    bool wasCreated = false;
-    if (!m_profile->rememberFingerprint(username,
-                                        account,
-                                        established.peerFingerprint,
-                                        inheritedTrust,
-                                        &wasCreated,
+    bool    wasCreated = false;
+    if (!m_profile->rememberFingerprint(username, account, established.peerFingerprint, inheritedTrust, &wasCreated,
                                         &error)) {
-        displayProtocolError(conversation->account,
-                             conversation->contact,
+        displayProtocolError(conversation->account, conversation->contact,
                              QObject::tr("Cannot save OTR fingerprint: %1").arg(error));
         return false;
     }
 
     conversation->activeFingerprint = established.peerFingerprint;
-    conversation->sessionId = established.sessionId;
-    conversation->initiated = established.initiated;
+    conversation->sessionId         = established.sessionId;
+    conversation->initiated         = established.initiated;
 
     if (wasCreated) {
         const QString message = QObject::tr("You have received a new fingerprint from %1:\n%2")
                                     .arg(m_callback->humanContact(conversation->account, conversation->contact),
                                          formatFingerprint(established.peerFingerprint));
         if (!m_callback->displayOtrMessage(conversation->account, conversation->contact, message))
-            m_callback->notifyUser(conversation->account,
-                                   conversation->contact,
-                                   message,
-                                   psiotr::OTR_NOTIFY_INFO);
+            m_callback->notifyUser(conversation->account, conversation->contact, message, psiotr::OTR_NOTIFY_INFO);
     }
     if (created)
         *created = wasCreated;
@@ -246,11 +237,10 @@ void OtrInternal::handleAuthenticated(Conversation *conversation, quint32 peerIn
     if (!conversation)
         return;
     conversation->activePeerInstance = peerInstance;
-    conversation->forcedFinished = false;
-    conversation->smpSucceeded = false;
+    conversation->forcedFinished     = false;
+    conversation->smpSucceeded       = false;
     rememberFingerprint(conversation, peerInstance);
-    m_callback->stateChange(conversation->account,
-                            conversation->contact,
+    m_callback->stateChange(conversation->account, conversation->contact,
                             wasSecure ? psiotr::OTR_STATECHANGE_STILLSECURE : psiotr::OTR_STATECHANGE_GONESECURE);
 }
 
@@ -263,9 +253,7 @@ void OtrInternal::handleSmpEvent(Conversation *conversation, const QcaOtr::Sessi
     case QcaOtr::SmpEvent::AskForAnswer:
     case QcaOtr::SmpEvent::AskForSecret:
         conversation->smpSucceeded = false;
-        m_callback->receivedSMP(conversation->account,
-                                conversation->contact,
-                                QString::fromUtf8(result.smpQuestion));
+        m_callback->receivedSMP(conversation->account, conversation->contact, QString::fromUtf8(result.smpQuestion));
         break;
     case QcaOtr::SmpEvent::InProgress:
         m_callback->updateSMP(conversation->account, conversation->contact, result.smpProgress);
@@ -300,22 +288,21 @@ QString OtrInternal::encryptMessage(const QString &account, const QString &conta
 {
     Conversation *ctx = conversation(account, contact, true);
     if (!ctx)
-        return {};
+        return { };
 
-    const QcaOtr::OutgoingResult outgoing =
-        ctx->session->prepareOutgoing(message.toUtf8(), 0, m_callback->humanAccountPublic(account).toUtf8());
+    const QcaOtr::OutgoingResult outgoing
+        = ctx->session->prepareOutgoing(message.toUtf8(), 0, m_callback->humanAccountPublic(account).toUtf8());
 
     if (outgoing.status == QcaOtr::OutgoingStatus::Finished) {
-        displayProtocolError(account,
-                             contact,
-                             QObject::tr("Your message was not sent. Either end your private conversation, or restart it."));
-        return {};
+        displayProtocolError(
+            account, contact,
+            QObject::tr("Your message was not sent. Either end your private conversation, or restart it."));
+        return { };
     }
     if (outgoing.status == QcaOtr::OutgoingStatus::Error || outgoing.messages.isEmpty()) {
-        displayProtocolError(account,
-                             contact,
+        displayProtocolError(account, contact,
                              QObject::tr("Encrypting message to %1 failed.\nThe message was not sent.").arg(contact));
-        return {};
+        return { };
     }
 
     if (outgoing.peerInstance != 0)
@@ -326,17 +313,15 @@ QString OtrInternal::encryptMessage(const QString &account, const QString &conta
     return QString::fromUtf8(outgoing.messages.last());
 }
 
-psiotr::OtrMessageType OtrInternal::decryptMessage(const QString &account,
-                                                   const QString &contact,
-                                                   const QString &message,
-                                                   QString &decrypted)
+psiotr::OtrMessageType OtrInternal::decryptMessage(const QString &account, const QString &contact,
+                                                   const QString &message, QString &decrypted)
 {
     Conversation *ctx = conversation(account, contact, true);
     if (!ctx)
         return psiotr::OTR_MESSAGETYPE_NONE;
 
-    const bool wasSecure = getMessageState(account, contact) == psiotr::OTR_MESSAGESTATE_ENCRYPTED;
-    QcaOtr::SessionResult result = ctx->session->processIncoming(message.toUtf8());
+    const bool            wasSecure = getMessageState(account, contact) == psiotr::OTR_MESSAGESTATE_ENCRYPTED;
+    QcaOtr::SessionResult result    = ctx->session->processIncoming(message.toUtf8());
     if (result.peerInstance != 0)
         ctx->activePeerInstance = result.peerInstance;
     sendTransport(account, contact, result.outgoingMessages);
@@ -357,8 +342,9 @@ psiotr::OtrMessageType OtrInternal::decryptMessage(const QString &account,
         return psiotr::OTR_MESSAGETYPE_IGNORE;
     case QcaOtr::SessionStatus::Plaintext:
         if (wasSecure) {
-            const QString warning = QObject::tr("<b>The following message received from %1 was <i>not</i> encrypted:</b>")
-                                        .arg(m_callback->humanContact(account, contact));
+            const QString warning
+                = QObject::tr("<b>The following message received from %1 was <i>not</i> encrypted:</b>")
+                      .arg(m_callback->humanContact(account, contact));
             m_callback->displayOtrMessage(account, contact, warning);
         }
         return psiotr::OTR_MESSAGETYPE_NONE;
@@ -366,8 +352,7 @@ psiotr::OtrMessageType OtrInternal::decryptMessage(const QString &account,
         displayProtocolError(account, contact, QObject::tr("Received message is unreadable."));
         return psiotr::OTR_MESSAGETYPE_IGNORE;
     case QcaOtr::SessionStatus::RemoteError:
-        displayProtocolError(account,
-                             contact,
+        displayProtocolError(account, contact,
                              result.errorText.isEmpty() ? QObject::tr("Remote OTR protocol error.")
                                                         : QString::fromUtf8(result.errorText));
         return psiotr::OTR_MESSAGETYPE_IGNORE;
@@ -393,10 +378,8 @@ QList<psiotr::Fingerprint> OtrInternal::getFingerprints()
     for (const QcaOtr::FingerprintRecord &record : m_profile->fingerprints()) {
         if (record.fingerprint.size() != 20)
             continue;
-        result.append(psiotr::Fingerprint(record.fingerprint,
-                                          QString::fromUtf8(record.account),
-                                          QString::fromUtf8(record.username),
-                                          QString::fromUtf8(record.trust)));
+        result.append(psiotr::Fingerprint(record.fingerprint, QString::fromUtf8(record.account),
+                                          QString::fromUtf8(record.username), QString::fromUtf8(record.trust)));
     }
     return result;
 }
@@ -420,13 +403,9 @@ void OtrInternal::verifyFingerprint(const psiotr::Fingerprint &fingerprint, bool
     if (!m_profileLoaded || !fingerprint.isValid())
         return;
     QString error;
-    if (!m_profile->setFingerprintTrust(fingerprint.username.toUtf8(),
-                                        fingerprint.account.toUtf8(),
-                                        fingerprint.value,
-                                        verified ? QObject::tr("verified").toUtf8() : QByteArray(),
-                                        &error)) {
-        displayProtocolError(fingerprint.account,
-                             fingerprint.username,
+    if (!m_profile->setFingerprintTrust(fingerprint.username.toUtf8(), fingerprint.account.toUtf8(), fingerprint.value,
+                                        verified ? QObject::tr("verified").toUtf8() : QByteArray(), &error)) {
+        displayProtocolError(fingerprint.account, fingerprint.username,
                              QObject::tr("Cannot update OTR fingerprint trust: %1").arg(error));
         return;
     }
@@ -441,15 +420,12 @@ void OtrInternal::deleteFingerprint(const psiotr::Fingerprint &fingerprint)
     if (!m_profileLoaded || !fingerprint.isValid())
         return;
 
-    Conversation *ctx = nullptr;
-    const bool active = activeFingerprintMatches(fingerprint, &ctx);
-    QString error;
-    if (!m_profile->removeFingerprint(fingerprint.username.toUtf8(),
-                                      fingerprint.account.toUtf8(),
-                                      fingerprint.value,
+    Conversation *ctx    = nullptr;
+    const bool    active = activeFingerprintMatches(fingerprint, &ctx);
+    QString       error;
+    if (!m_profile->removeFingerprint(fingerprint.username.toUtf8(), fingerprint.account.toUtf8(), fingerprint.value,
                                       &error)) {
-        displayProtocolError(fingerprint.account,
-                             fingerprint.username,
+        displayProtocolError(fingerprint.account, fingerprint.username,
                              QObject::tr("Cannot delete OTR fingerprint: %1").arg(error));
         return;
     }
@@ -480,7 +456,7 @@ void OtrInternal::deleteKey(const QString &account)
         return;
     QString error;
     if (!m_profile->removeIdentity(account.toUtf8(), &error)) {
-        displayProtocolError(account, {}, QObject::tr("Cannot delete OTR private key: %1").arg(error));
+        displayProtocolError(account, { }, QObject::tr("Cannot delete OTR private key: %1").arg(error));
         return;
     }
 
@@ -499,8 +475,7 @@ void OtrInternal::generateKey(const QString &account)
 
     QString error;
     if (!m_profile->regenerateIdentity(account.toUtf8(), &error)) {
-        QMessageBox failMb(QMessageBox::Critical,
-                           QObject::tr("Confirm action"),
+        QMessageBox failMb(QMessageBox::Critical, QObject::tr("Confirm action"),
                            QObject::tr("Failed to generate keys for account \"%1\".\nThe OTR Plugin will not work.")
                                .arg(m_callback->humanAccount(account)),
                            QMessageBox::Ok);
@@ -516,10 +491,10 @@ void OtrInternal::generateKey(const QString &account)
     }
 
     const QString human = formatFingerprint(m_profile->identityFingerprint(account.toUtf8()));
-    QMessageBox infoMb(QMessageBox::Information,
-                       QObject::tr("Confirm action"),
-                       QObject::tr("Keys have been generated. Fingerprint for account \"%1\":\n%2\n\nThanks for your patience.")
-                           .arg(m_callback->humanAccount(account), human));
+    QMessageBox   infoMb(
+        QMessageBox::Information, QObject::tr("Confirm action"),
+        QObject::tr("Keys have been generated. Fingerprint for account \"%1\":\n%2\n\nThanks for your patience.")
+            .arg(m_callback->humanAccount(account), human));
     infoMb.exec();
 }
 
@@ -530,10 +505,10 @@ void OtrInternal::startSession(const QString &account, const QString &contact)
         return;
 
     ctx->forcedFinished = false;
-    ctx->smpSucceeded = false;
+    ctx->smpSucceeded   = false;
     m_callback->stateChange(account, contact, psiotr::OTR_STATECHANGE_GOINGSECURE);
-    const QcaOtr::OutgoingResult outgoing =
-        ctx->session->startNegotiation(m_callback->humanAccountPublic(account).toUtf8());
+    const QcaOtr::OutgoingResult outgoing
+        = ctx->session->startNegotiation(m_callback->humanAccountPublic(account).toUtf8());
     if (outgoing.status == QcaOtr::OutgoingStatus::Error || outgoing.messages.isEmpty()) {
         displayProtocolError(account, contact, QObject::tr("Could not start an OTR session."));
         return;
@@ -547,8 +522,8 @@ void OtrInternal::endSession(const QString &account, const QString &contact)
     if (!ctx)
         return;
 
-    bool hadPrivateState = false;
-    QVector<QByteArray> outgoing;
+    bool                   hadPrivateState = false;
+    QVector<QByteArray>    outgoing;
     const QVector<quint32> peers = ctx->session->peerInstances();
     for (quint32 peer : peers) {
         if (!ctx->session->isEncrypted(peer))
@@ -576,18 +551,16 @@ void OtrInternal::expireSession(const QString &account, const QString &contact)
     m_callback->stateChange(account, contact, psiotr::OTR_STATECHANGE_GONEINSECURE);
 }
 
-void OtrInternal::startSMP(const QString &account,
-                           const QString &contact,
-                           const QString &question,
+void OtrInternal::startSMP(const QString &account, const QString &contact, const QString &question,
                            const QString &secret)
 {
     Conversation *ctx = conversation(account, contact, false);
     if (!ctx)
         return;
-    QVector<QByteArray> messages;
+    QVector<QByteArray>    messages;
     const QCA::SecureArray secure = secureUtf8(secret);
-    const bool ok = question.isEmpty() ? ctx->session->startSmp(0, secure, &messages)
-                                       : ctx->session->startSmp(0, question.toUtf8(), secure, &messages);
+    const bool             ok = question.isEmpty() ? ctx->session->startSmp(0, secure, &messages)
+                                                   : ctx->session->startSmp(0, question.toUtf8(), secure, &messages);
     if (!ok) {
         m_callback->updateSMP(account, contact, -2);
         return;
@@ -601,7 +574,7 @@ void OtrInternal::continueSMP(const QString &account, const QString &contact, co
     Conversation *ctx = conversation(account, contact, false);
     if (!ctx)
         return;
-    QVector<QByteArray> messages;
+    QVector<QByteArray>    messages;
     const QCA::SecureArray secure = secureUtf8(secret);
     if (!ctx->session->respondSmp(0, secure, &messages)) {
         m_callback->updateSMP(account, contact, -2);
@@ -651,10 +624,14 @@ psiotr::OtrMessageState OtrInternal::getMessageState(const QString &account, con
 QString OtrInternal::getMessageStateString(const QString &account, const QString &contact)
 {
     switch (getMessageState(account, contact)) {
-    case psiotr::OTR_MESSAGESTATE_PLAINTEXT: return QObject::tr("plaintext");
-    case psiotr::OTR_MESSAGESTATE_ENCRYPTED: return QObject::tr("encrypted");
-    case psiotr::OTR_MESSAGESTATE_FINISHED: return QObject::tr("finished");
-    case psiotr::OTR_MESSAGESTATE_UNKNOWN: break;
+    case psiotr::OTR_MESSAGESTATE_PLAINTEXT:
+        return QObject::tr("plaintext");
+    case psiotr::OTR_MESSAGESTATE_ENCRYPTED:
+        return QObject::tr("encrypted");
+    case psiotr::OTR_MESSAGESTATE_FINISHED:
+        return QObject::tr("finished");
+    case psiotr::OTR_MESSAGESTATE_UNKNOWN:
+        break;
     }
     return QObject::tr("unknown");
 }
@@ -663,10 +640,10 @@ QString OtrInternal::getSessionId(const QString &account, const QString &contact
 {
     const Conversation *ctx = conversation(account, contact);
     if (!ctx || ctx->sessionId.isEmpty())
-        return {};
+        return { };
 
-    const int half = ctx->sessionId.size() / 2;
-    const QString first = QString::fromLatin1(ctx->sessionId.left(half).toHex());
+    const int     half   = ctx->sessionId.size() / 2;
+    const QString first  = QString::fromLatin1(ctx->sessionId.left(half).toHex());
     const QString second = QString::fromLatin1(ctx->sessionId.mid(half).toHex());
     return ctx->initiated ? QStringLiteral("<b>%1</b> %2").arg(first, second)
                           : QStringLiteral("%1 <b>%2</b>").arg(first, second);
@@ -676,13 +653,11 @@ psiotr::Fingerprint OtrInternal::getActiveFingerprint(const QString &account, co
 {
     Conversation *ctx = conversation(account, contact, false);
     if (!ctx || ctx->activeFingerprint.size() != 20)
-        return {};
+        return { };
 
-    const QcaOtr::FingerprintRecord *record =
-        m_profile->fingerprint(contact.toUtf8(), account.toUtf8(), ctx->activeFingerprint);
-    return psiotr::Fingerprint(ctx->activeFingerprint,
-                               account,
-                               contact,
+    const QcaOtr::FingerprintRecord *record
+        = m_profile->fingerprint(contact.toUtf8(), account.toUtf8(), ctx->activeFingerprint);
+    return psiotr::Fingerprint(ctx->activeFingerprint, account, contact,
                                record ? QString::fromUtf8(record->trust) : QString());
 }
 
@@ -691,8 +666,8 @@ bool OtrInternal::isVerified(const QString &account, const QString &contact)
     const Conversation *ctx = conversation(account, contact);
     if (!ctx || ctx->activeFingerprint.size() != 20 || !m_profileLoaded)
         return false;
-    const QcaOtr::FingerprintRecord *record =
-        m_profile->fingerprint(contact.toUtf8(), account.toUtf8(), ctx->activeFingerprint);
+    const QcaOtr::FingerprintRecord *record
+        = m_profile->fingerprint(contact.toUtf8(), account.toUtf8(), ctx->activeFingerprint);
     return record && !record->trust.isEmpty();
 }
 

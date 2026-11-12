@@ -97,9 +97,7 @@ public:
     virtual void sendMessage(const QString &account, const QString &contact, const QString &message) = 0;
 
     /** Reports a protocol notification which was not rendered inline. */
-    virtual void notifyUser(const QString &account,
-                            const QString &contact,
-                            const QString &message,
+    virtual void notifyUser(const QString &account, const QString &contact, const QString &message,
                             const OtrNotifyType &type) = 0;
 
     /** Displays an OTR system message; returns true when it was handled inline. */
@@ -157,7 +155,7 @@ public:
      * @p callback is non-owning and must outlive this OtrMessaging instance.
      */
     OtrMessaging(OtrCallback *callback, OtrPolicy policy);
-    OtrMessaging(const OtrMessaging &) = delete;
+    OtrMessaging(const OtrMessaging &)            = delete;
     OtrMessaging &operator=(const OtrMessaging &) = delete;
     ~OtrMessaging();
 
@@ -168,9 +166,7 @@ public:
      * Processes an incoming transport message.
      * @param decrypted receives plaintext when OTR_MESSAGETYPE_OTR is returned.
      */
-    OtrMessageType decryptMessage(const QString &account,
-                                  const QString &contact,
-                                  const QString &message,
+    OtrMessageType decryptMessage(const QString &account, const QString &contact, const QString &message,
                                   QString &decrypted);
 
     /** Returns all peer fingerprints stored in the current OTR profile. */
@@ -246,7 +242,7 @@ public:
     QString humanContact(const QString &accountId, const QString &contact);
 
 private:
-    OtrPolicy m_otrPolicy;
+    OtrPolicy    m_otrPolicy;
     OtrInternal *m_impl;
     OtrCallback *m_callback;
 };

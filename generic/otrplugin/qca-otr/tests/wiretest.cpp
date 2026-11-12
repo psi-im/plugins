@@ -7,8 +7,7 @@
 
 #include <QTest>
 
-class WireTest : public QObject
-{
+class WireTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -24,15 +23,9 @@ private:
     QCA::Initializer *initializer_ = nullptr;
 };
 
-void WireTest::initTestCase()
-{
-    initializer_ = new QCA::Initializer;
-}
+void WireTest::initTestCase() { initializer_ = new QCA::Initializer; }
 
-void WireTest::cleanupTestCase()
-{
-    delete initializer_;
-}
+void WireTest::cleanupTestCase() { delete initializer_; }
 
 void WireTest::integers()
 {
@@ -43,9 +36,9 @@ void WireTest::integers()
     QCOMPARE(writer.data().toHex(), QByteArrayLiteral("abcdef12345678"));
 
     QcaOtr::Wire::Reader reader(writer.data());
-    quint8 byte = 0;
-    quint16 shortValue = 0;
-    quint32 intValue = 0;
+    quint8               byte       = 0;
+    quint16              shortValue = 0;
+    quint32              intValue   = 0;
     QVERIFY(reader.readByte(&byte));
     QVERIFY(reader.readShort(&shortValue));
     QVERIFY(reader.readInt(&intValue));
@@ -102,7 +95,7 @@ void WireTest::opaqueData()
     writer.writeData(QByteArray::fromHex("001122ff"));
     QCOMPARE(writer.data().toHex(), QByteArrayLiteral("00000004001122ff"));
 
-    QByteArray decoded;
+    QByteArray           decoded;
     QcaOtr::Wire::Reader reader(writer.data());
     QVERIFY(reader.readData(&decoded));
     QCOMPARE(decoded, QByteArray::fromHex("001122ff"));
@@ -119,9 +112,9 @@ void WireTest::dsaPublicKey()
     key.domain.p = QCA::BigInteger(23);
     key.domain.q = QCA::BigInteger(11);
     key.domain.g = QCA::BigInteger(2);
-    key.y = QCA::BigInteger(8);
+    key.y        = QCA::BigInteger(8);
 
-    bool ok = false;
+    bool             ok      = false;
     const QByteArray encoded = QcaOtr::Wire::encodeDsaPublicKey(key, &ok);
     QVERIFY(ok);
     QCOMPARE(encoded.toHex(),
@@ -139,7 +132,7 @@ void WireTest::dsaPublicKey()
     QCOMPARE(decoded.y, key.y);
 
     QByteArray wrongType = encoded;
-    wrongType[1] = '\x01';
+    wrongType[1]         = '\x01';
     QVERIFY(!QcaOtr::Wire::decodeDsaPublicKey(wrongType, &decoded));
 }
 

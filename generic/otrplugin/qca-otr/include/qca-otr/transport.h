@@ -15,35 +15,24 @@ namespace QcaOtr::Transport {
 constexpr quint32 MinimumInstanceTag = 0x00000100;
 
 /** Sender/receiver instance routing information carried by OTRv3 messages. */
-struct Route
-{
-    quint32 senderInstance = 0;
+struct Route {
+    quint32 senderInstance   = 0;
     quint32 receiverInstance = 0;
 };
 
 /** Parsed OTRv3 fragment. */
-struct Fragment
-{
-    Route route;
-    quint16 index = 0;
-    quint16 count = 0;
+struct Fragment {
+    Route      route;
+    quint16    index = 0;
+    quint16    count = 0;
     QByteArray payload;
 };
 
 /** Result of syntactically classifying one transport fragment. */
-enum class FragmentParseStatus {
-    NotFragment,
-    Fragment,
-    Malformed
-};
+enum class FragmentParseStatus { NotFragment, Fragment, Malformed };
 
 /** Result of feeding a transport message into a fragment accumulator. */
-enum class FragmentResult {
-    Unfragmented,
-    Incomplete,
-    Complete,
-    Malformed
-};
+enum class FragmentResult { Unfragmented, Incomplete, Complete, Malformed };
 
 /** ASCII-armors a raw binary OTR protocol message as `?OTR:...`. */
 QByteArray armor(const QByteArray &raw);
@@ -69,15 +58,11 @@ FragmentParseStatus parseFragment(const QByteArray &message, Fragment *fragment)
  * If @p message already fits @p maxMessageSize, @p fragments receives the
  * original message as its only element.
  */
-bool fragmentMessage(const QByteArray &message,
-                     int maxMessageSize,
-                     quint32 senderInstance,
-                     quint32 receiverInstance,
+bool fragmentMessage(const QByteArray &message, int maxMessageSize, quint32 senderInstance, quint32 receiverInstance,
                      QVector<QByteArray> *fragments);
 
 /** Stateful, size-bounded reassembler for ordered OTRv3 fragments. */
-class FragmentAccumulator
-{
+class FragmentAccumulator {
 public:
     /**
      * @param maxBufferedBytes hard upper bound for buffered fragment payloads.
@@ -95,10 +80,10 @@ public:
     void reset();
 
 private:
-    qsizetype maxBufferedBytes_ = 0;
-    Route route_;
-    quint16 count_ = 0;
-    quint16 index_ = 0;
+    qsizetype  maxBufferedBytes_ = 0;
+    Route      route_;
+    quint16    count_ = 0;
+    quint16    index_ = 0;
     QByteArray data_;
 };
 

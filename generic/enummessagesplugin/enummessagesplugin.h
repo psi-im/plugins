@@ -73,10 +73,8 @@ public:
     virtual QString pluginInfo();
 
     // ChatTabAccessor
-    void setupChatTab(QWidget *tab, int account, const QString &contact);
-    void setupGCTab(QWidget * /*tab*/, int /*account*/, const QString & /*contact*/)
-    { /* do nothing*/
-    }
+    void         setupChatTab(QWidget *tab, int account, const QString &contact);
+    void         setupGCTab(QWidget         */*tab*/, int /*account*/, const QString         &/*contact*/) { /* do nothing*/ }
     virtual bool appendingChatMessage(int account, const QString &contact, QString &body, QDomElement &html,
                                       bool local);
 

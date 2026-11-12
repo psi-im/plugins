@@ -32,8 +32,7 @@ QByteArray queryTag(VersionMask versions = NativeVersions);
  * Builds a libotr-compatible Query Message including the human-readable
  * fallback text for peers without OTR support.
  */
-QByteArray defaultQueryMessage(const QByteArray &ourName,
-                               VersionMask versions = NativeVersions);
+QByteArray defaultQueryMessage(const QByteArray &ourName, VersionMask versions = NativeVersions);
 
 /**
  * Inspects the first `?OTR` occurrence in @p message.
@@ -45,13 +44,10 @@ QByteArray defaultQueryMessage(const QByteArray &ourName,
 VersionMask queryVersions(const QByteArray &message, bool *isQuery = nullptr);
 
 /** Returns the highest mutually supported OTR version, or zero if none match. */
-quint8 bestVersion(VersionMask peerVersions,
-                   VersionMask localVersions = NativeVersions);
+quint8 bestVersion(VersionMask peerVersions, VersionMask localVersions = NativeVersions);
 
 /** Parses a Query Message and returns the highest mutually supported version. */
-quint8 queryBestVersion(const QByteArray &message,
-                        VersionMask localVersions = NativeVersions,
-                        bool *isQuery = nullptr);
+quint8 queryBestVersion(const QByteArray &message, VersionMask localVersions = NativeVersions, bool *isQuery = nullptr);
 
 /** Builds a text-level OTR Error Message. */
 QByteArray errorMessage(const QByteArray &text);
@@ -63,12 +59,11 @@ QByteArray errorMessage(const QByteArray &text);
 bool parseErrorMessage(const QByteArray &message, QByteArray *text = nullptr);
 
 /** Location and advertised versions of an OTR whitespace discovery tag. */
-struct WhitespaceTag
-{
-    bool found = false;
+struct WhitespaceTag {
+    bool        found    = false;
     VersionMask versions = 0;
-    int start = -1;
-    int end = -1;
+    int         start    = -1;
+    int         end      = -1;
 };
 
 /** Builds an invisible OTR whitespace discovery tag. */
@@ -78,15 +73,13 @@ QByteArray whitespaceTag(VersionMask versions = NativeVersions);
 WhitespaceTag detectWhitespaceTag(const QByteArray &message);
 
 /** Returns the highest mutually supported version advertised by a whitespace tag. */
-quint8 whitespaceBestVersion(const QByteArray &message,
-                             VersionMask localVersions = NativeVersions,
+quint8 whitespaceBestVersion(const QByteArray &message, VersionMask localVersions = NativeVersions,
                              WhitespaceTag *tag = nullptr);
 
 /** Removes the first detected whitespace tag in place. */
 bool stripWhitespaceTag(QByteArray *message, VersionMask *versions = nullptr);
 
 /** Appends an OTR whitespace discovery tag unless the caller chooses no versions. */
-QByteArray appendWhitespaceTag(const QByteArray &message,
-                               VersionMask versions = NativeVersions);
+QByteArray appendWhitespaceTag(const QByteArray &message, VersionMask versions = NativeVersions);
 
 } // namespace QcaOtr::Negotiation

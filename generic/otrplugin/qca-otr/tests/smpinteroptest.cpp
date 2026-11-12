@@ -13,10 +13,10 @@
 
 namespace {
 
-constexpr quint32 QcaInstance = 0x11111111;
+constexpr quint32     QcaInstance   = 0x11111111;
 constexpr const char *LibotrAccount = "otrtest3";
-constexpr const char *Protocol = "prpl-aim";
-constexpr const char *RemoteUser = "qca-peer";
+constexpr const char *Protocol      = "prpl-aim";
+constexpr const char *RemoteUser    = "qca-peer";
 
 // Exact otrtest3 entry from libotr 4.1.1's test_suite/otr.private_key.
 const char LibotrPrivateKey[] = R"KEY((privkeys
@@ -39,7 +39,7 @@ const char LibotrPrivateKey[] = R"KEY((privkeys
 QCA::BigInteger unsignedHex(const char *hex)
 {
     const QByteArray bytes = QByteArray::fromHex(hex);
-    QByteArray positive;
+    QByteArray       positive;
     positive.reserve(bytes.size() + 1);
     positive.append('\0');
     positive.append(bytes);
@@ -49,33 +49,28 @@ QCA::BigInteger unsignedHex(const char *hex)
 QcaOtr::DsaPrivateKey qcaPrivateKey()
 {
     QcaOtr::DsaPrivateKey key;
-    key.domain.p = unsignedHex(
-        "00BD114F05B275A8A94954047983C5CD96ED95C782D2ED65A18E78C98E8EAFBAF58BBD046BE9895AD55FD0FF95907E7EBD6ACA2688D24779BDE9F0AAB13924CE65F597F9C9B9953DDBACF51DA7113FBAB9BE1DF6C6EA836DEB48983CCDCFC4125B5013D0CE52F890D0C391A035D30BCD5169A3451FD7023685274576DCB5F8FA47");
+    key.domain.p = unsignedHex("00BD114F05B275A8A94954047983C5CD96ED95C782D2ED65A18E78C98E8EAFBAF58BBD046BE9895AD55FD0F"
+                               "F95907E7EBD6ACA2688D24779BDE9F0AAB13924CE65F597F9C9B9953DDBACF51DA7113FBAB9BE1DF6C6EA83"
+                               "6DEB48983CCDCFC4125B5013D0CE52F890D0C391A035D30BCD5169A3451FD7023685274576DCB5F8FA47");
     key.domain.q = unsignedHex("00D1DA3915346A704EB2D2F2A48CD48F3DCC4CF25D");
-    key.domain.g = unsignedHex(
-        "501BCFB989AD2C346BBD7782CA0230551F976B1A07EE3AEE27E4B63B7B00B1ACA712AD85784986411278163156D4DBA9DF75C8560F9C2E02C02AEC830EC403A56B6F64432869D6CA9314A648076511343507629BF4FC96F8FDBB9797258DDF11F437B1450BA23F1AA7E885EC6A33D37B7D7EC384A004420DB238E140B94AAAFE");
-    key.x = unsignedHex("00AB1E941176D94505911118AC799A504ADCCE88F8");
+    key.domain.g = unsignedHex("501BCFB989AD2C346BBD7782CA0230551F976B1A07EE3AEE27E4B63B7B00B1ACA712AD85784986411278163"
+                               "156D4DBA9DF75C8560F9C2E02C02AEC830EC403A56B6F64432869D6CA9314A648076511343507629BF4FC96"
+                               "F8FDBB9797258DDF11F437B1450BA23F1AA7E885EC6A33D37B7D7EC384A004420DB238E140B94AAAFE");
+    key.x        = unsignedHex("00AB1E941176D94505911118AC799A504ADCCE88F8");
     return key;
 }
 
-struct AppCapture
-{
-    OtrlPolicy policy = OTRL_POLICY_MANUAL;
-    QVector<QByteArray> injected;
+struct AppCapture {
+    OtrlPolicy            policy = OTRL_POLICY_MANUAL;
+    QVector<QByteArray>   injected;
     QVector<OtrlSMPEvent> smpEvents;
-    unsigned short smpProgress = 0;
-    QByteArray smpQuestion;
+    unsigned short        smpProgress = 0;
+    QByteArray            smpQuestion;
 };
 
-OtrlPolicy appPolicy(void *data, ConnContext *)
-{
-    return static_cast<AppCapture *>(data)->policy;
-}
+OtrlPolicy appPolicy(void *data, ConnContext *) { return static_cast<AppCapture *>(data)->policy; }
 
-int appIsLoggedIn(void *, const char *, const char *, const char *)
-{
-    return 1;
-}
+int appIsLoggedIn(void *, const char *, const char *, const char *) { return 1; }
 
 void appInjectMessage(void *data, const char *, const char *, const char *, const char *message)
 {
@@ -83,11 +78,7 @@ void appInjectMessage(void *data, const char *, const char *, const char *, cons
         static_cast<AppCapture *>(data)->injected.append(QByteArray(message));
 }
 
-void appHandleSmpEvent(void *data,
-                       OtrlSMPEvent event,
-                       ConnContext *,
-                       unsigned short progress,
-                       char *question)
+void appHandleSmpEvent(void *data, OtrlSMPEvent event, ConnContext *, unsigned short progress, char *question)
 {
     auto *capture = static_cast<AppCapture *>(data);
     capture->smpEvents.append(event);
@@ -97,16 +88,15 @@ void appHandleSmpEvent(void *data,
 
 OtrlMessageAppOps appOps()
 {
-    OtrlMessageAppOps ops = {};
-    ops.policy = appPolicy;
-    ops.is_logged_in = appIsLoggedIn;
-    ops.inject_message = appInjectMessage;
-    ops.handle_smp_event = appHandleSmpEvent;
+    OtrlMessageAppOps ops = { };
+    ops.policy            = appPolicy;
+    ops.is_logged_in      = appIsLoggedIn;
+    ops.inject_message    = appInjectMessage;
+    ops.handle_smp_event  = appHandleSmpEvent;
     return ops;
 }
 
-class LibotrPeer
-{
+class LibotrPeer {
 public:
     LibotrPeer() : ops(appOps())
     {
@@ -122,11 +112,10 @@ public:
             return;
         }
         const size_t fixtureSize = sizeof(LibotrPrivateKey) - 1;
-        const bool written = std::fwrite(LibotrPrivateKey, 1, fixtureSize, keyFile) == fixtureSize;
+        const bool   written     = std::fwrite(LibotrPrivateKey, 1, fixtureSize, keyFile) == fixtureSize;
         if (written)
             std::rewind(keyFile);
-        const gcry_error_t keyError = written ? otrl_privkey_read_FILEp(userState, keyFile)
-                                              : gcry_error(GPG_ERR_EIO);
+        const gcry_error_t keyError = written ? otrl_privkey_read_FILEp(userState, keyFile) : gcry_error(GPG_ERR_EIO);
         std::fclose(keyFile);
         if (keyError) {
             setupError = QByteArray("otrl_privkey_read_FILEp: ") + gcry_strerror(keyError);
@@ -138,8 +127,7 @@ public:
             setupError = "instag tmpfile failed";
             return;
         }
-        const gcry_error_t instagError =
-            otrl_instag_generate_FILEp(userState, instagFile, LibotrAccount, Protocol);
+        const gcry_error_t instagError = otrl_instag_generate_FILEp(userState, instagFile, LibotrAccount, Protocol);
         std::fclose(instagFile);
         if (instagError) {
             setupError = QByteArray("otrl_instag_generate_FILEp: ") + gcry_strerror(instagError);
@@ -152,7 +140,7 @@ public:
             return;
         }
         localInstance = instag->instag;
-        valid = true;
+        valid         = true;
     }
 
     ~LibotrPeer()
@@ -168,10 +156,7 @@ public:
         capture.smpQuestion.clear();
     }
 
-    bool hasSmpEvent(OtrlSMPEvent event) const
-    {
-        return capture.smpEvents.contains(event);
-    }
+    bool hasSmpEvent(OtrlSMPEvent event) const { return capture.smpEvents.contains(event); }
 
     QVector<QByteArray> receive(const QVector<QByteArray> &messages)
     {
@@ -179,21 +164,11 @@ public:
         clearSmpCapture();
         for (const QByteArray &message : messages) {
             capture.injected.clear();
-            char *newMessage = nullptr;
-            OtrlTLV *tlvs = nullptr;
+            char        *newMessage  = nullptr;
+            OtrlTLV     *tlvs        = nullptr;
             ConnContext *usedContext = nullptr;
-            otrl_message_receiving(userState,
-                                   &ops,
-                                   &capture,
-                                   LibotrAccount,
-                                   Protocol,
-                                   RemoteUser,
-                                   message.constData(),
-                                   &newMessage,
-                                   &tlvs,
-                                   &usedContext,
-                                   nullptr,
-                                   nullptr);
+            otrl_message_receiving(userState, &ops, &capture, LibotrAccount, Protocol, RemoteUser, message.constData(),
+                                   &newMessage, &tlvs, &usedContext, nullptr, nullptr);
             if (usedContext && usedContext->their_instance == QcaInstance)
                 secureContext = usedContext;
             injected += capture.injected;
@@ -212,30 +187,21 @@ public:
         messages->clear();
         clearSmpCapture();
         capture.injected.clear();
-        otrl_message_initiate_smp(userState,
-                                  &ops,
-                                  &capture,
-                                  secureContext,
+        otrl_message_initiate_smp(userState, &ops, &capture, secureContext,
                                   reinterpret_cast<const unsigned char *>(secret.constData()),
                                   static_cast<size_t>(secret.size()));
         *messages = capture.injected;
         return !messages->isEmpty();
     }
 
-    bool initiateSmp(const QByteArray &question,
-                     const QByteArray &secret,
-                     QVector<QByteArray> *messages)
+    bool initiateSmp(const QByteArray &question, const QByteArray &secret, QVector<QByteArray> *messages)
     {
         if (!messages || !secureContext)
             return false;
         messages->clear();
         clearSmpCapture();
         capture.injected.clear();
-        otrl_message_initiate_smp_q(userState,
-                                    &ops,
-                                    &capture,
-                                    secureContext,
-                                    question.constData(),
+        otrl_message_initiate_smp_q(userState, &ops, &capture, secureContext, question.constData(),
                                     reinterpret_cast<const unsigned char *>(secret.constData()),
                                     static_cast<size_t>(secret.size()));
         *messages = capture.injected;
@@ -249,10 +215,7 @@ public:
         messages->clear();
         clearSmpCapture();
         capture.injected.clear();
-        otrl_message_respond_smp(userState,
-                                 &ops,
-                                 &capture,
-                                 secureContext,
+        otrl_message_respond_smp(userState, &ops, &capture, secureContext,
                                  reinterpret_cast<const unsigned char *>(secret.constData()),
                                  static_cast<size_t>(secret.size()));
         *messages = capture.injected;
@@ -271,25 +234,21 @@ public:
         return !messages->isEmpty();
     }
 
-    bool isEncrypted() const
-    {
-        return secureContext && secureContext->msgstate == OTRL_MSGSTATE_ENCRYPTED;
-    }
+    bool isEncrypted() const { return secureContext && secureContext->msgstate == OTRL_MSGSTATE_ENCRYPTED; }
 
-    OtrlUserState userState = nullptr;
-    ConnContext *secureContext = nullptr;
-    OtrlMessageAppOps ops = {};
-    AppCapture capture;
-    QByteArray setupError;
-    quint32 localInstance = 0;
-    bool valid = false;
+    OtrlUserState     userState     = nullptr;
+    ConnContext      *secureContext = nullptr;
+    OtrlMessageAppOps ops           = { };
+    AppCapture        capture;
+    QByteArray        setupError;
+    quint32           localInstance = 0;
+    bool              valid         = false;
 };
 
-QVector<QByteArray> deliverToQca(QcaOtr::OtrSession *qca,
-                                 const QVector<QByteArray> &messages,
+QVector<QByteArray> deliverToQca(QcaOtr::OtrSession *qca, const QVector<QByteArray> &messages,
                                  QcaOtr::SessionResult *last = nullptr)
 {
-    QVector<QByteArray> outgoing;
+    QVector<QByteArray>   outgoing;
     QcaOtr::SessionResult current;
     for (const QByteArray &message : messages) {
         current = qca->processIncoming(message);
@@ -302,7 +261,7 @@ QVector<QByteArray> deliverToQca(QcaOtr::OtrSession *qca,
 
 bool establish(QcaOtr::OtrSession *qca, LibotrPeer *libotr)
 {
-    bool ok = false;
+    bool                ok       = false;
     QVector<QByteArray> messages = qca->start(libotr->localInstance, 0, &ok);
     if (!ok || messages.isEmpty())
         return false;
@@ -321,19 +280,15 @@ bool establish(QcaOtr::OtrSession *qca, LibotrPeer *libotr)
         return false;
 
     messages = deliverToQca(qca, messages, &state);
-    return state.status == QcaOtr::SessionStatus::Authenticated && messages.isEmpty() &&
-        qca->isEncrypted(libotr->localInstance);
+    return state.status == QcaOtr::SessionStatus::Authenticated && messages.isEmpty()
+        && qca->isEncrypted(libotr->localInstance);
 }
 
-QCA::SecureArray secure(const QByteArray &value)
-{
-    return QCA::SecureArray(value);
-}
+QCA::SecureArray secure(const QByteArray &value) { return QCA::SecureArray(value); }
 
 } // namespace
 
-class SmpInteropTest : public QObject
-{
+class SmpInteropTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -355,10 +310,7 @@ void SmpInteropTest::initTestCase()
     QVERIFY2(QByteArray(otrl_version()).startsWith("4.1.1"), otrl_version());
 }
 
-void SmpInteropTest::cleanupTestCase()
-{
-    delete initializer_;
-}
+void SmpInteropTest::cleanupTestCase() { delete initializer_; }
 
 void SmpInteropTest::qcaInitiatedQuestionSucceeds()
 {
@@ -367,8 +319,8 @@ void SmpInteropTest::qcaInitiatedQuestionSucceeds()
     QcaOtr::OtrSession qca(qcaPrivateKey(), QcaInstance);
     QVERIFY(establish(&qca, &libotr));
 
-    const QByteArray answer("shared answer");
-    const QByteArray question("What is our shared answer?");
+    const QByteArray    answer("shared answer");
+    const QByteArray    question("What is our shared answer?");
     QVector<QByteArray> messages;
     QVERIFY(qca.startSmp(libotr.localInstance, question, secure(answer), &messages));
     QCOMPARE(messages.size(), 1);
@@ -404,7 +356,7 @@ void SmpInteropTest::libotrInitiatedSucceeds()
     QcaOtr::OtrSession qca(qcaPrivateKey(), QcaInstance);
     QVERIFY(establish(&qca, &libotr));
 
-    const QByteArray answer("same answer");
+    const QByteArray    answer("same answer");
     QVector<QByteArray> messages;
     QVERIFY(libotr.initiateSmp(answer, &messages));
     QCOMPARE(messages.size(), 1);

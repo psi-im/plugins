@@ -138,11 +138,11 @@ private:
 #endif
     QTimer fullST;
     bool   isStatusSet; // здесь храним информацию, установлен ли уже статус (чтобы не устанавливать повторно при каждом
-                      // срабатывании таймера)
-    bool setOnline;
-    int  restoreDelay; // задержка восстановления статуса
-    int  setDelay;     // задержка установки статуса
-    bool fullScreen = false;
+                        // срабатывании таймера)
+    bool   setOnline;
+    int    restoreDelay; // задержка восстановления статуса
+    int    setDelay;     // задержка установки статуса
+    bool   fullScreen = false;
 #ifdef Q_OS_WIN
     HWND lastWorkerWindow = nullptr;
 #endif

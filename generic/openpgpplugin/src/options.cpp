@@ -777,7 +777,7 @@ void Options::updateGpgAgentConfig(const int pwdExpirationTime)
         const QString &&message = tr("Attempt to save gpg-agent config is failed! "
                                      "Check that you have write permission for file:\n%1")
                                       .arg(GpgProcess().gpgAgentConfig());
-        QMessageBox msgbox(QMessageBox::Warning, tr("Warning"), message, QMessageBox::Ok, nullptr);
+        QMessageBox     msgbox(QMessageBox::Warning, tr("Warning"), message, QMessageBox::Ok, nullptr);
         msgbox.exec();
     }
 }

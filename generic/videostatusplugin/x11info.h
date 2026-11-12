@@ -24,7 +24,7 @@
 
 using Display          = struct _XDisplay;
 using xcb_connection_t = struct xcb_connection_t;
-using WindowList = QList<Window>;
+using WindowList       = QList<Window>;
 
 class X11Info {
     static Display          *_display;

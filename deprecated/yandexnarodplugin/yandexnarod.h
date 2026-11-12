@@ -63,7 +63,7 @@ public:
     virtual void                setStanzaSendingHost(StanzaSendingHost *host);
     virtual void                setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
     virtual void                setPopupAccessingHost(PopupAccessingHost *host);
-    virtual void                optionChanged(const QString                &/*option*/) {};
+    virtual void                optionChanged(const QString                &/*option*/) { };
     virtual void                applyOptions();
     virtual void                restoreOptions();
     virtual QList<QVariantHash> getAccountMenuParam();

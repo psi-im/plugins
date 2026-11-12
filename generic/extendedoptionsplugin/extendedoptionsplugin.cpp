@@ -680,8 +680,8 @@ QWidget *ExtendedOptions::options()
     tab8Layout->addWidget(ngb);
     tab8Layout->addStretch();
 
-    QLabel *wikiLink
-        = new QLabel(tr("<a href=\"https://psi-im.org/wiki/doku.php?id=en:plugins#extended_options_plugin\">Wiki (Online)</a>"));
+    QLabel *wikiLink = new QLabel(
+        tr("<a href=\"https://psi-im.org/wiki/doku.php?id=en:plugins#extended_options_plugin\">Wiki (Online)</a>"));
     wikiLink->setOpenExternalLinks(true);
 
     mainLayout->addWidget(tabs);

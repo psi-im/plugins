@@ -123,7 +123,7 @@ QString GpgProcess::findBin() const
 #ifdef Q_OS_WIN
     QStringList bins { "gpg.exe", "gpg2.exe" };
 #else
-    QStringList     bins { "gpg", "gpg2" };
+    QStringList bins { "gpg", "gpg2" };
 #endif
 
     // Prefer bundled gpg
@@ -140,17 +140,17 @@ QString GpgProcess::findBin() const
         return bin;
 #endif
 
-        // Look up at PATH environment
+    // Look up at PATH environment
 #ifdef Q_OS_WIN
     QString pathSep = ";";
 #else
-    QString         pathSep     = ":";
+    QString pathSep = ":";
 #endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
     QStringList paths = QString::fromLocal8Bit(qgetenv("PATH")).split(pathSep, Qt::SkipEmptyParts);
 #else
-    QStringList     paths       = QString::fromLocal8Bit(qgetenv("PATH")).split(pathSep, QString::SkipEmptyParts);
+    QStringList paths = QString::fromLocal8Bit(qgetenv("PATH")).split(pathSep, QString::SkipEmptyParts);
 #endif
 
 #ifdef Q_OS_MAC

@@ -13,40 +13,27 @@
 namespace QcaOtr {
 
 /** Current state of one OTRv3 authenticated key exchange. */
-enum class AkeState {
-    None,
-    AwaitingDhKey,
-    AwaitingRevealSignature,
-    AwaitingSignature,
-    Authenticated
-};
+enum class AkeState { None, AwaitingDhKey, AwaitingRevealSignature, AwaitingSignature, Authenticated };
 
 /** Result category returned by AKE message processing. */
-enum class AkeHandleStatus {
-    Ignored,
-    Handled,
-    Authenticated,
-    Error
-};
+enum class AkeHandleStatus { Ignored, Handled, Authenticated, Error };
 
 /** Immutable protocol material exposed once an AKE authenticates successfully. */
-struct AkeEstablishedSession
-{
-    DhKeyPair localDh;
+struct AkeEstablishedSession {
+    DhKeyPair       localDh;
     QCA::BigInteger peerDhPublic;
-    quint32 localKeyId = 0;
-    quint32 peerKeyId = 0;
-    DsaPublicKey peerIdentity;
-    QByteArray peerFingerprint;
-    QByteArray sessionId;
-    bool initiated = false;
+    quint32         localKeyId = 0;
+    quint32         peerKeyId  = 0;
+    DsaPublicKey    peerIdentity;
+    QByteArray      peerFingerprint;
+    QByteArray      sessionId;
+    bool            initiated = false;
 };
 
 /** Result of processing one raw AKE protocol message. */
-struct AkeHandleResult
-{
+struct AkeHandleResult {
     AkeHandleStatus status = AkeHandleStatus::Ignored;
-    QByteArray outgoingMessage;
+    QByteArray      outgoingMessage;
 };
 
 /**
@@ -55,8 +42,7 @@ struct AkeHandleResult
  * `AkeSession` consumes and produces raw binary OTR messages. Transport armor,
  * fragmentation and multi-instance routing are handled by higher layers.
  */
-class AkeSession
-{
+class AkeSession {
 public:
     /**
      * Creates an AKE using @p identityKey and @p localInstance.
@@ -66,9 +52,9 @@ public:
     AkeSession(const DsaPrivateKey &identityKey, quint32 localInstance, quint32 peerInstance = 0);
 
     AkeState state() const { return state_; }
-    quint32 localInstance() const { return localInstance_; }
-    quint32 peerInstance() const { return peerInstance_; }
-    bool isAuthenticated() const { return state_ == AkeState::Authenticated; }
+    quint32  localInstance() const { return localInstance_; }
+    quint32  peerInstance() const { return peerInstance_; }
+    bool     isAuthenticated() const { return state_ == AkeState::Authenticated; }
 
     /** Valid only after @ref isAuthenticated returns true. */
     const AkeEstablishedSession &established() const { return established_; }
@@ -96,12 +82,8 @@ private:
     bool acceptRoute(quint32 senderInstance, quint32 receiverInstance);
     bool beginAsResponder(const DhCommitMessage &message, QByteArray *outgoing);
     bool computeKeys(const QCA::BigInteger &peerPublic, AkeKeys *keys) const;
-    bool makeRevealSignature(const QCA::BigInteger &peerPublic,
-                             const AkeKeys &keys,
-                             QByteArray *outgoing) const;
-    bool makeSignature(const QCA::BigInteger &peerPublic,
-                       const AkeKeys &keys,
-                       QByteArray *outgoing) const;
+    bool makeRevealSignature(const QCA::BigInteger &peerPublic, const AkeKeys &keys, QByteArray *outgoing) const;
+    bool makeSignature(const QCA::BigInteger &peerPublic, const AkeKeys &keys, QByteArray *outgoing) const;
     void clearPending();
 
     AkeHandleResult handleCommit(const DhCommitMessage &message);
@@ -110,19 +92,19 @@ private:
     AkeHandleResult handleSignature(const SignatureMessage &message);
 
     DsaPrivateKey identityKey_;
-    quint32 localInstance_ = 0;
-    quint32 peerInstance_ = 0;
+    quint32       localInstance_ = 0;
+    quint32       peerInstance_  = 0;
 
-    AkeState state_ = AkeState::None;
-    bool initiated_ = false;
-    DhKeyPair localDh_;
-    quint32 localKeyId_ = 0;
-    QCA::BigInteger peerDhPublic_;
-    QCA::SecureArray revealKey_;
-    QByteArray encryptedGx_;
-    QByteArray hashedGx_;
-    AkeKeys keys_;
-    QByteArray lastOutgoing_;
+    AkeState              state_     = AkeState::None;
+    bool                  initiated_ = false;
+    DhKeyPair             localDh_;
+    quint32               localKeyId_ = 0;
+    QCA::BigInteger       peerDhPublic_;
+    QCA::SecureArray      revealKey_;
+    QByteArray            encryptedGx_;
+    QByteArray            hashedGx_;
+    AkeKeys               keys_;
+    QByteArray            lastOutgoing_;
     AkeEstablishedSession established_;
 };
 

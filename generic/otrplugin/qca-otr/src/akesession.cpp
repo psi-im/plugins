@@ -12,46 +12,43 @@
 namespace QcaOtr {
 namespace {
 
-constexpr quint32 MinimumInstanceTag = 0x00000100;
+    constexpr quint32 MinimumInstanceTag = 0x00000100;
 
-bool constantTimeEqual(const QByteArray &a, const QByteArray &b)
-{
-    if (a.size() != b.size())
-        return false;
+    bool constantTimeEqual(const QByteArray &a, const QByteArray &b)
+    {
+        if (a.size() != b.size())
+            return false;
 
-    unsigned char difference = 0;
-    for (int i = 0; i < a.size(); ++i)
-        difference |= static_cast<unsigned char>(a.at(i)) ^ static_cast<unsigned char>(b.at(i));
-    return difference == 0;
-}
+        unsigned char difference = 0;
+        for (int i = 0; i < a.size(); ++i)
+            difference |= static_cast<unsigned char>(a.at(i)) ^ static_cast<unsigned char>(b.at(i));
+        return difference == 0;
+    }
 
-AkeHandleResult errorResult()
-{
-    AkeHandleResult result;
-    result.status = AkeHandleStatus::Error;
-    return result;
-}
+    AkeHandleResult errorResult()
+    {
+        AkeHandleResult result;
+        result.status = AkeHandleStatus::Error;
+        return result;
+    }
 
-AkeHandleResult ignoredResult()
-{
-    return {};
-}
+    AkeHandleResult ignoredResult() { return { }; }
 
-AkeHandleResult handledResult(const QByteArray &outgoing = {})
-{
-    AkeHandleResult result;
-    result.status = AkeHandleStatus::Handled;
-    result.outgoingMessage = outgoing;
-    return result;
-}
+    AkeHandleResult handledResult(const QByteArray &outgoing = { })
+    {
+        AkeHandleResult result;
+        result.status          = AkeHandleStatus::Handled;
+        result.outgoingMessage = outgoing;
+        return result;
+    }
 
-AkeHandleResult authenticatedResult(const QByteArray &outgoing = {})
-{
-    AkeHandleResult result;
-    result.status = AkeHandleStatus::Authenticated;
-    result.outgoingMessage = outgoing;
-    return result;
-}
+    AkeHandleResult authenticatedResult(const QByteArray &outgoing = { })
+    {
+        AkeHandleResult result;
+        result.status          = AkeHandleStatus::Authenticated;
+        result.outgoingMessage = outgoing;
+        return result;
+    }
 
 } // namespace
 
@@ -73,28 +70,27 @@ bool AkeSession::bindPeerInstance(quint32 peerInstance)
 
 void AkeSession::clearPending()
 {
-    initiated_ = false;
-    localDh_ = {};
-    localKeyId_ = 0;
+    initiated_    = false;
+    localDh_      = { };
+    localKeyId_   = 0;
     peerDhPublic_ = QCA::BigInteger(0);
     revealKey_.clear();
     encryptedGx_.clear();
     hashedGx_.clear();
-    keys_ = {};
+    keys_ = { };
     lastOutgoing_.clear();
 }
 
 void AkeSession::reset()
 {
     clearPending();
-    established_ = {};
-    state_ = AkeState::None;
+    established_ = { };
+    state_       = AkeState::None;
 }
 
 bool AkeSession::acceptRoute(quint32 senderInstance, quint32 receiverInstance)
 {
-    if (senderInstance < MinimumInstanceTag ||
-        (receiverInstance != 0 && receiverInstance != localInstance_)) {
+    if (senderInstance < MinimumInstanceTag || (receiverInstance != 0 && receiverInstance != localInstance_)) {
         return false;
     }
     if (peerInstance_ != 0 && senderInstance != peerInstance_)
@@ -109,52 +105,52 @@ QByteArray AkeSession::start(bool *ok)
     if (ok)
         *ok = false;
     if (localInstance_ < MinimumInstanceTag || (peerInstance_ != 0 && peerInstance_ < MinimumInstanceTag))
-        return {};
+        return { };
 
     clearPending();
-    established_ = {};
-    state_ = AkeState::None;
+    established_ = { };
+    state_       = AkeState::None;
 
     DhKeyPair keyPair;
     if (!generateDhKeyPair(&keyPair))
-        return {};
+        return { };
 
     const QCA::SecureArray randomKey = QCA::Random::randomArray(16);
     if (randomKey.size() != 16)
-        return {};
+        return { };
 
-    bool mpiOk = false;
+    bool             mpiOk   = false;
     const QByteArray clearGx = Wire::encodeMpi(keyPair.publicValue, &mpiOk);
     if (!mpiOk)
-        return {};
+        return { };
 
     const QByteArray hashGx = sha256(clearGx);
     if (hashGx.size() != 32)
-        return {};
+        return { };
 
     QByteArray encryptedGx;
     if (!aes128Ctr(randomKey, QByteArray(16, '\0'), clearGx, &encryptedGx))
-        return {};
+        return { };
 
     DhCommitMessage commit;
-    commit.senderInstance = localInstance_;
+    commit.senderInstance   = localInstance_;
     commit.receiverInstance = peerInstance_;
-    commit.encryptedGx = encryptedGx;
-    commit.hashedGx = hashGx;
+    commit.encryptedGx      = encryptedGx;
+    commit.hashedGx         = hashGx;
 
-    bool encodedOk = false;
-    const QByteArray encoded = Wire::encodeDhCommitMessage(commit, &encodedOk);
+    bool             encodedOk = false;
+    const QByteArray encoded   = Wire::encodeDhCommitMessage(commit, &encodedOk);
     if (!encodedOk)
-        return {};
+        return { };
 
-    initiated_ = true;
-    localDh_ = keyPair;
-    localKeyId_ = 1;
-    revealKey_ = randomKey;
-    encryptedGx_ = encryptedGx;
-    hashedGx_ = hashGx;
+    initiated_    = true;
+    localDh_      = keyPair;
+    localKeyId_   = 1;
+    revealKey_    = randomKey;
+    encryptedGx_  = encryptedGx;
+    hashedGx_     = hashGx;
     lastOutgoing_ = encoded;
-    state_ = AkeState::AwaitingDhKey;
+    state_        = AkeState::AwaitingDhKey;
 
     if (ok)
         *ok = true;
@@ -171,94 +167,80 @@ bool AkeSession::beginAsResponder(const DhCommitMessage &message, QByteArray *ou
         return false;
 
     DhKeyMessage keyMessage;
-    keyMessage.senderInstance = localInstance_;
+    keyMessage.senderInstance   = localInstance_;
     keyMessage.receiverInstance = peerInstance_;
-    keyMessage.dhPublicValue = keyPair.publicValue;
+    keyMessage.dhPublicValue    = keyPair.publicValue;
 
-    bool ok = false;
+    bool             ok      = false;
     const QByteArray encoded = Wire::encodeDhKeyMessage(keyMessage, &ok);
     if (!ok)
         return false;
 
     clearPending();
-    established_ = {};
-    initiated_ = false;
-    localDh_ = keyPair;
-    localKeyId_ = 1;
-    encryptedGx_ = message.encryptedGx;
-    hashedGx_ = message.hashedGx;
+    established_  = { };
+    initiated_    = false;
+    localDh_      = keyPair;
+    localKeyId_   = 1;
+    encryptedGx_  = message.encryptedGx;
+    hashedGx_     = message.hashedGx;
     lastOutgoing_ = encoded;
-    state_ = AkeState::AwaitingRevealSignature;
-    *outgoing = encoded;
+    state_        = AkeState::AwaitingRevealSignature;
+    *outgoing     = encoded;
     return true;
 }
 
 bool AkeSession::computeKeys(const QCA::BigInteger &peerPublic, AkeKeys *keys) const
 {
     QCA::BigInteger sharedSecret;
-    return computeDhSharedSecret(localDh_.privateExponent, peerPublic, &sharedSecret) &&
-        deriveAkeKeys(sharedSecret, keys);
+    return computeDhSharedSecret(localDh_.privateExponent, peerPublic, &sharedSecret)
+        && deriveAkeKeys(sharedSecret, keys);
 }
 
-bool AkeSession::makeRevealSignature(const QCA::BigInteger &peerPublic,
-                                     const AkeKeys &keys,
-                                     QByteArray *outgoing) const
+bool AkeSession::makeRevealSignature(const QCA::BigInteger &peerPublic, const AkeKeys &keys, QByteArray *outgoing) const
 {
     if (!outgoing || revealKey_.size() != 16)
         return false;
 
     QByteArray encryptedAuthenticator;
-    if (!createAkeAuthenticator(identityKey_,
-                                localKeyId_,
-                                localDh_.publicValue,
-                                peerPublic,
-                                keys.m1,
-                                keys.c,
+    if (!createAkeAuthenticator(identityKey_, localKeyId_, localDh_.publicValue, peerPublic, keys.m1, keys.c,
                                 &encryptedAuthenticator)) {
         return false;
     }
 
     RevealSignatureMessage reveal;
-    reveal.senderInstance = localInstance_;
-    reveal.receiverInstance = peerInstance_;
-    reveal.revealedKey = revealKey_.toByteArray();
+    reveal.senderInstance     = localInstance_;
+    reveal.receiverInstance   = peerInstance_;
+    reveal.revealedKey        = revealKey_.toByteArray();
     reveal.encryptedSignature = encryptedAuthenticator;
-    reveal.mac = akeSignatureMac(encryptedAuthenticator, keys.m2);
+    reveal.mac                = akeSignatureMac(encryptedAuthenticator, keys.m2);
     if (reveal.mac.size() != 20)
         return false;
 
-    bool ok = false;
+    bool ok   = false;
     *outgoing = Wire::encodeRevealSignatureMessage(reveal, &ok);
     return ok;
 }
 
-bool AkeSession::makeSignature(const QCA::BigInteger &peerPublic,
-                               const AkeKeys &keys,
-                               QByteArray *outgoing) const
+bool AkeSession::makeSignature(const QCA::BigInteger &peerPublic, const AkeKeys &keys, QByteArray *outgoing) const
 {
     if (!outgoing)
         return false;
 
     QByteArray encryptedAuthenticator;
-    if (!createAkeAuthenticator(identityKey_,
-                                localKeyId_,
-                                localDh_.publicValue,
-                                peerPublic,
-                                keys.m1Prime,
-                                keys.cPrime,
+    if (!createAkeAuthenticator(identityKey_, localKeyId_, localDh_.publicValue, peerPublic, keys.m1Prime, keys.cPrime,
                                 &encryptedAuthenticator)) {
         return false;
     }
 
     SignatureMessage signature;
-    signature.senderInstance = localInstance_;
-    signature.receiverInstance = peerInstance_;
+    signature.senderInstance     = localInstance_;
+    signature.receiverInstance   = peerInstance_;
     signature.encryptedSignature = encryptedAuthenticator;
-    signature.mac = akeSignatureMac(encryptedAuthenticator, keys.m2Prime);
+    signature.mac                = akeSignatureMac(encryptedAuthenticator, keys.m2Prime);
     if (signature.mac.size() != 20)
         return false;
 
-    bool ok = false;
+    bool ok   = false;
     *outgoing = Wire::encodeSignatureMessage(signature, &ok);
     return ok;
 }
@@ -293,7 +275,7 @@ AkeHandleResult AkeSession::handleCommit(const DhCommitMessage &message)
         // libotr accepts a replacement commit here while keeping the same
         // responder DH key and retransmitting the exact previous D-H Key.
         encryptedGx_ = message.encryptedGx;
-        hashedGx_ = message.hashedGx;
+        hashedGx_    = message.hashedGx;
         return handledResult(lastOutgoing_);
     }
 
@@ -323,9 +305,9 @@ AkeHandleResult AkeSession::handleDhKey(const DhKeyMessage &message)
         return errorResult();
 
     peerDhPublic_ = message.dhPublicValue;
-    keys_ = derived;
+    keys_         = derived;
     lastOutgoing_ = outgoing;
-    state_ = AkeState::AwaitingSignature;
+    state_        = AkeState::AwaitingSignature;
     return handledResult(outgoing);
 }
 
@@ -337,10 +319,7 @@ AkeHandleResult AkeSession::handleRevealSignature(const RevealSignatureMessage &
         return ignoredResult();
 
     QByteArray clearGx;
-    if (!aes128Ctr(QCA::SecureArray(message.revealedKey),
-                   QByteArray(16, '\0'),
-                   encryptedGx_,
-                   &clearGx)) {
+    if (!aes128Ctr(QCA::SecureArray(message.revealedKey), QByteArray(16, '\0'), encryptedGx_, &clearGx)) {
         return errorResult();
     }
 
@@ -361,14 +340,9 @@ AkeHandleResult AkeSession::handleRevealSignature(const RevealSignatureMessage &
         return errorResult();
 
     AkeAuthenticator peerAuthenticator;
-    QByteArray peerFingerprint;
-    if (!verifyAkeAuthenticator(message.encryptedSignature,
-                                peerPublic,
-                                localDh_.publicValue,
-                                derived.m1,
-                                derived.c,
-                                &peerAuthenticator,
-                                &peerFingerprint)) {
+    QByteArray       peerFingerprint;
+    if (!verifyAkeAuthenticator(message.encryptedSignature, peerPublic, localDh_.publicValue, derived.m1, derived.c,
+                                &peerAuthenticator, &peerFingerprint)) {
         return errorResult();
     }
 
@@ -377,17 +351,17 @@ AkeHandleResult AkeSession::handleRevealSignature(const RevealSignatureMessage &
         return errorResult();
 
     peerDhPublic_ = peerPublic;
-    keys_ = derived;
+    keys_         = derived;
     lastOutgoing_ = outgoing;
 
-    established_.localDh = localDh_;
-    established_.peerDhPublic = peerPublic;
-    established_.localKeyId = localKeyId_;
-    established_.peerKeyId = peerAuthenticator.keyId;
-    established_.peerIdentity = peerAuthenticator.publicKey;
+    established_.localDh         = localDh_;
+    established_.peerDhPublic    = peerPublic;
+    established_.localKeyId      = localKeyId_;
+    established_.peerKeyId       = peerAuthenticator.keyId;
+    established_.peerIdentity    = peerAuthenticator.publicKey;
     established_.peerFingerprint = peerFingerprint;
-    established_.sessionId = derived.sessionId;
-    established_.initiated = false;
+    established_.sessionId       = derived.sessionId;
+    established_.initiated       = false;
 
     state_ = AkeState::Authenticated;
     return authenticatedResult(outgoing);
@@ -405,25 +379,20 @@ AkeHandleResult AkeSession::handleSignature(const SignatureMessage &message)
         return errorResult();
 
     AkeAuthenticator peerAuthenticator;
-    QByteArray peerFingerprint;
-    if (!verifyAkeAuthenticator(message.encryptedSignature,
-                                peerDhPublic_,
-                                localDh_.publicValue,
-                                keys_.m1Prime,
-                                keys_.cPrime,
-                                &peerAuthenticator,
-                                &peerFingerprint)) {
+    QByteArray       peerFingerprint;
+    if (!verifyAkeAuthenticator(message.encryptedSignature, peerDhPublic_, localDh_.publicValue, keys_.m1Prime,
+                                keys_.cPrime, &peerAuthenticator, &peerFingerprint)) {
         return errorResult();
     }
 
-    established_.localDh = localDh_;
-    established_.peerDhPublic = peerDhPublic_;
-    established_.localKeyId = localKeyId_;
-    established_.peerKeyId = peerAuthenticator.keyId;
-    established_.peerIdentity = peerAuthenticator.publicKey;
+    established_.localDh         = localDh_;
+    established_.peerDhPublic    = peerDhPublic_;
+    established_.localKeyId      = localKeyId_;
+    established_.peerKeyId       = peerAuthenticator.keyId;
+    established_.peerIdentity    = peerAuthenticator.publicKey;
     established_.peerFingerprint = peerFingerprint;
-    established_.sessionId = keys_.sessionId;
-    established_.initiated = true;
+    established_.sessionId       = keys_.sessionId;
+    established_.initiated       = true;
 
     state_ = AkeState::Authenticated;
     return authenticatedResult();

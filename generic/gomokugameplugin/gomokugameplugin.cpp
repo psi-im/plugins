@@ -268,10 +268,9 @@ void GomokuGamePlugin::playSound(const QString &sound_id)
 
 QString GomokuGamePlugin::pluginInfo()
 {
-    return tr(
-        "Play gomoku with your friends.\n"
-        "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat "
-        "window.");
+    return tr("Play gomoku with your friends.\n"
+              "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat "
+              "window.");
 }
 
 // --------------------- Option accessor ---------------------------

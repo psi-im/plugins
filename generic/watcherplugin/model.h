@@ -30,7 +30,7 @@ class Model : public QAbstractTableModel {
 public:
     Model(const QStringList &watchedJids_, const QStringList &Sounds_, const QStringList &enabledJids_,
           QObject *parent = nullptr);
-    ~Model() {};
+    ~Model() { };
     virtual Qt::ItemFlags flags(const QModelIndex &index) const;
     virtual QVariant      headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     virtual QVariant      data(const QModelIndex &index, int role = Qt::DisplayRole) const;

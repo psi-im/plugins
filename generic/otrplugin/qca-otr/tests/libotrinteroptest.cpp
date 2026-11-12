@@ -16,20 +16,20 @@ extern "C" {
 #include <libotr/auth.h>
 #include <libotr/b64.h>
 #include <libotr/context.h>
+#include <libotr/message.h>
 #include <libotr/privkey.h>
 #include <libotr/proto.h>
 #include <libotr/tlv.h>
-#include <libotr/message.h>
 #include <libotr/userstate.h>
 }
 
 namespace {
 
-constexpr quint32 QcaInstance = 0x11111111;
-constexpr quint32 LibotrInstance = 0x22222222;
-constexpr const char *LibotrAccount = "otrtest3";
-constexpr const char *Protocol = "prpl-aim";
-constexpr const char *RemoteUser = "qca-peer";
+constexpr quint32     QcaInstance    = 0x11111111;
+constexpr quint32     LibotrInstance = 0x22222222;
+constexpr const char *LibotrAccount  = "otrtest3";
+constexpr const char *Protocol       = "prpl-aim";
+constexpr const char *RemoteUser     = "qca-peer";
 
 // Exact otrtest3 entry from libotr 4.1.1's test_suite/otr.private_key.
 const char LibotrPrivateKey[] = R"KEY((privkeys
@@ -62,27 +62,30 @@ QCA::BigInteger unsignedHex(const char *hex)
 QcaOtr::DsaPrivateKey qcaPrivateKey()
 {
     QcaOtr::DsaPrivateKey key;
-    key.domain.p = unsignedHex(
-        "00BD114F05B275A8A94954047983C5CD96ED95C782D2ED65A18E78C98E8EAFBAF58BBD046BE9895AD55FD0FF95907E7EBD6ACA2688D24779BDE9F0AAB13924CE65F597F9C9B9953DDBACF51DA7113FBAB9BE1DF6C6EA836DEB48983CCDCFC4125B5013D0CE52F890D0C391A035D30BCD5169A3451FD7023685274576DCB5F8FA47");
+    key.domain.p = unsignedHex("00BD114F05B275A8A94954047983C5CD96ED95C782D2ED65A18E78C98E8EAFBAF58BBD046BE9895AD55FD0F"
+                               "F95907E7EBD6ACA2688D24779BDE9F0AAB13924CE65F597F9C9B9953DDBACF51DA7113FBAB9BE1DF6C6EA83"
+                               "6DEB48983CCDCFC4125B5013D0CE52F890D0C391A035D30BCD5169A3451FD7023685274576DCB5F8FA47");
     key.domain.q = unsignedHex("00D1DA3915346A704EB2D2F2A48CD48F3DCC4CF25D");
-    key.domain.g = unsignedHex(
-        "501BCFB989AD2C346BBD7782CA0230551F976B1A07EE3AEE27E4B63B7B00B1ACA712AD85784986411278163156D4DBA9DF75C8560F9C2E02C02AEC830EC403A56B6F64432869D6CA9314A648076511343507629BF4FC96F8FDBB9797258DDF11F437B1450BA23F1AA7E885EC6A33D37B7D7EC384A004420DB238E140B94AAAFE");
-    key.x = unsignedHex("00AB1E941176D94505911118AC799A504ADCCE88F8");
+    key.domain.g = unsignedHex("501BCFB989AD2C346BBD7782CA0230551F976B1A07EE3AEE27E4B63B7B00B1ACA712AD85784986411278163"
+                               "156D4DBA9DF75C8560F9C2E02C02AEC830EC403A56B6F64432869D6CA9314A648076511343507629BF4FC96"
+                               "F8FDBB9797258DDF11F437B1450BA23F1AA7E885EC6A33D37B7D7EC384A004420DB238E140B94AAAFE");
+    key.x        = unsignedHex("00AB1E941176D94505911118AC799A504ADCCE88F8");
     return key;
 }
 
 QCA::BigInteger expectedQcaPublicY()
 {
-    return unsignedHex(
-        "7C9CB7732164787DD1931BB58257665EB60D6AA72B8D64D634530A61BE93D5AF01427962646542F18401B73032B12B9CBCAE8E3CF080DAD55C6612A97D6D8776CF2CBDD3AAC75D302B60E6956E5B3C60B39E171A2D5F150A924C6E22981EFDF052D5C6507B2DEC15E96CB6CAF7B260D5386BBDD7D7F69B4BF14451D64D847AEB");
+    return unsignedHex("7C9CB7732164787DD1931BB58257665EB60D6AA72B8D64D634530A61BE93D5AF01427962646542F18401B73032B12B9"
+                       "CBCAE8E3CF080DAD55C6612A97D6D8776CF2CBDD3AAC75D302B60E6956E5B3C60B39E171A2D5F150A924C6E22981EFD"
+                       "F052D5C6507B2DEC15E96CB6CAF7B260D5386BBDD7D7F69B4BF14451D64D847AEB");
 }
 
 QByteArray toLibotrMessage(const QByteArray &raw)
 {
-    char *encoded = otrl_base64_otr_encode(
-        reinterpret_cast<const unsigned char *>(raw.constData()), static_cast<size_t>(raw.size()));
+    char *encoded = otrl_base64_otr_encode(reinterpret_cast<const unsigned char *>(raw.constData()),
+                                           static_cast<size_t>(raw.size()));
     if (!encoded)
-        return {};
+        return { };
     const QByteArray result(encoded);
     std::free(encoded);
     return result;
@@ -91,80 +94,67 @@ QByteArray toLibotrMessage(const QByteArray &raw)
 QByteArray fromLibotrMessage(const char *encoded)
 {
     if (!encoded)
-        return {};
+        return { };
 
-    unsigned char *raw = nullptr;
-    size_t length = 0;
+    unsigned char *raw    = nullptr;
+    size_t         length = 0;
     if (otrl_base64_otr_decode(encoded, &raw, &length) != 0)
-        return {};
+        return { };
     const QByteArray result(reinterpret_cast<const char *>(raw), static_cast<int>(length));
     std::free(raw);
     return result;
 }
 
-struct AuthCapture
-{
-    bool succeeded = false;
+struct AuthCapture {
+    bool       succeeded = false;
     QByteArray peerFingerprint;
     QByteArray sessionId;
-    quint32 peerKeyId = 0;
-    bool initiated = false;
+    quint32    peerKeyId = 0;
+    bool       initiated = false;
 };
 
 gcry_error_t authSucceeded(const OtrlAuthInfo *auth, void *data)
 {
-    auto *capture = static_cast<AuthCapture *>(data);
-    capture->succeeded = true;
+    auto *capture            = static_cast<AuthCapture *>(data);
+    capture->succeeded       = true;
     capture->peerFingerprint = QByteArray(reinterpret_cast<const char *>(auth->their_fingerprint), 20);
-    capture->sessionId = QByteArray(reinterpret_cast<const char *>(auth->secure_session_id),
-                                    static_cast<int>(auth->secure_session_id_len));
-    capture->peerKeyId = auth->their_keyid;
-    capture->initiated = auth->initiated != 0;
+    capture->sessionId       = QByteArray(reinterpret_cast<const char *>(auth->secure_session_id),
+                                          static_cast<int>(auth->secure_session_id_len));
+    capture->peerKeyId       = auth->their_keyid;
+    capture->initiated       = auth->initiated != 0;
     return 0;
 }
 
-struct AppCapture
-{
+struct AppCapture {
     QByteArray injected;
-    bool goneSecure = false;
+    bool       goneSecure = false;
 };
 
-OtrlPolicy appPolicy(void *, ConnContext *)
-{
-    return OTRL_POLICY_ALWAYS;
-}
+OtrlPolicy appPolicy(void *, ConnContext *) { return OTRL_POLICY_ALWAYS; }
 
-int appIsLoggedIn(void *, const char *, const char *, const char *)
-{
-    return 1;
-}
+int appIsLoggedIn(void *, const char *, const char *, const char *) { return 1; }
 
 void appInjectMessage(void *data, const char *, const char *, const char *, const char *message)
 {
-    auto *capture = static_cast<AppCapture *>(data);
+    auto *capture     = static_cast<AppCapture *>(data);
     capture->injected = message ? QByteArray(message) : QByteArray();
 }
 
-void appGoneSecure(void *data, ConnContext *)
-{
-    static_cast<AppCapture *>(data)->goneSecure = true;
-}
+void appGoneSecure(void *data, ConnContext *) { static_cast<AppCapture *>(data)->goneSecure = true; }
 
 OtrlMessageAppOps appOps()
 {
-    OtrlMessageAppOps ops = {};
-    ops.policy = appPolicy;
-    ops.is_logged_in = appIsLoggedIn;
-    ops.inject_message = appInjectMessage;
-    ops.gone_secure = appGoneSecure;
+    OtrlMessageAppOps ops = { };
+    ops.policy            = appPolicy;
+    ops.is_logged_in      = appIsLoggedIn;
+    ops.inject_message    = appInjectMessage;
+    ops.gone_secure       = appGoneSecure;
     return ops;
 }
 
-class LibotrPeer
-{
+class LibotrPeer {
 public:
-    LibotrPeer(quint32 localInstance, quint32 peerInstance)
-        : ops(appOps())
+    LibotrPeer(quint32 localInstance, quint32 peerInstance) : ops(appOps())
     {
         userState = otrl_userstate_create();
         if (!userState) {
@@ -178,7 +168,7 @@ public:
             return;
         }
         const size_t fixtureSize = sizeof(LibotrPrivateKey) - 1;
-        const bool written = std::fwrite(LibotrPrivateKey, 1, fixtureSize, file) == fixtureSize;
+        const bool   written     = std::fwrite(LibotrPrivateKey, 1, fixtureSize, file) == fixtureSize;
         if (written)
             std::rewind(file);
         const gcry_error_t readError = written ? otrl_privkey_read_FILEp(userState, file) : gcry_error(GPG_ERR_EIO);
@@ -195,23 +185,16 @@ public:
         }
 
         int added = 0;
-        context = otrl_context_find(userState,
-                                    RemoteUser,
-                                    LibotrAccount,
-                                    Protocol,
-                                    peerInstance,
-                                    1,
-                                    &added,
-                                    nullptr,
-                                    nullptr);
+        context   = otrl_context_find(userState, RemoteUser, LibotrAccount, Protocol, peerInstance, 1, &added, nullptr,
+                                      nullptr);
         if (!context) {
             setupError = "otrl_context_find failed";
             return;
         }
-        context->our_instance = localInstance;
+        context->our_instance   = localInstance;
         context->their_instance = peerInstance;
-        peerInstance_ = peerInstance;
-        valid = true;
+        peerInstance_           = peerInstance;
+        valid                   = true;
     }
 
     ~LibotrPeer()
@@ -224,7 +207,7 @@ public:
     {
         unsigned char fingerprint[20];
         if (!otrl_privkey_fingerprint_raw(userState, fingerprint, LibotrAccount, Protocol))
-            return {};
+            return { };
         return QByteArray(reinterpret_cast<const char *>(fingerprint), 20);
     }
 
@@ -238,21 +221,12 @@ public:
             return false;
 
         capture.injected.clear();
-        char *newMessage = nullptr;
-        OtrlTLV *tlvs = nullptr;
+        char        *newMessage  = nullptr;
+        OtrlTLV     *tlvs        = nullptr;
         ConnContext *usedContext = nullptr;
-        const int internal = otrl_message_receiving(userState,
-                                                    &ops,
-                                                    &capture,
-                                                    LibotrAccount,
-                                                    Protocol,
-                                                    RemoteUser,
-                                                    armored.constData(),
-                                                    &newMessage,
-                                                    &tlvs,
-                                                    &usedContext,
-                                                    nullptr,
-                                                    nullptr);
+        const int    internal
+            = otrl_message_receiving(userState, &ops, &capture, LibotrAccount, Protocol, RemoteUser,
+                                     armored.constData(), &newMessage, &tlvs, &usedContext, nullptr, nullptr);
         if (usedContext)
             context = usedContext;
 
@@ -277,22 +251,11 @@ public:
         if (!valid || !raw)
             return false;
 
-        char *encoded = nullptr;
-        ConnContext *usedContext = nullptr;
-        const gcry_error_t error = otrl_message_sending(userState,
-                                                        &ops,
-                                                        &capture,
-                                                        LibotrAccount,
-                                                        Protocol,
-                                                        RemoteUser,
-                                                        peerInstance_,
-                                                        plaintext.constData(),
-                                                        nullptr,
-                                                        &encoded,
-                                                        OTRL_FRAGMENT_SEND_SKIP,
-                                                        &usedContext,
-                                                        nullptr,
-                                                        nullptr);
+        char              *encoded     = nullptr;
+        ConnContext       *usedContext = nullptr;
+        const gcry_error_t error = otrl_message_sending(userState, &ops, &capture, LibotrAccount, Protocol, RemoteUser,
+                                                        peerInstance_, plaintext.constData(), nullptr, &encoded,
+                                                        OTRL_FRAGMENT_SEND_SKIP, &usedContext, nullptr, nullptr);
         if (usedContext)
             context = usedContext;
         if (error || !encoded)
@@ -303,18 +266,15 @@ public:
         return !raw->isEmpty();
     }
 
-    bool isEncrypted() const
-    {
-        return context && context->msgstate == OTRL_MSGSTATE_ENCRYPTED;
-    }
+    bool isEncrypted() const { return context && context->msgstate == OTRL_MSGSTATE_ENCRYPTED; }
 
-    OtrlUserState userState = nullptr;
-    OtrlPrivKey *privateKey = nullptr;
-    ConnContext *context = nullptr;
-    QByteArray setupError;
-    bool valid = false;
-    OtrlMessageAppOps ops = {};
-    AppCapture capture;
+    OtrlUserState     userState  = nullptr;
+    OtrlPrivKey      *privateKey = nullptr;
+    ConnContext      *context    = nullptr;
+    QByteArray        setupError;
+    bool              valid = false;
+    OtrlMessageAppOps ops   = { };
+    AppCapture        capture;
 
 private:
     quint32 peerInstance_ = 0;
@@ -322,8 +282,7 @@ private:
 
 } // namespace
 
-class LibotrInteropTest : public QObject
-{
+class LibotrInteropTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -348,10 +307,7 @@ void LibotrInteropTest::initTestCase()
     QCOMPARE(QcaOtr::dsaPublicKey(key).y, expectedQcaPublicY());
 }
 
-void LibotrInteropTest::cleanupTestCase()
-{
-    delete initializer_;
-}
+void LibotrInteropTest::cleanupTestCase() { delete initializer_; }
 
 void LibotrInteropTest::qcaInitiates()
 {
@@ -359,9 +315,9 @@ void LibotrInteropTest::qcaInitiates()
     QVERIFY2(libotr.valid, libotr.setupError.constData());
 
     const QcaOtr::DsaPrivateKey qcaKey = qcaPrivateKey();
-    QcaOtr::AkeSession qca(qcaKey, QcaInstance, LibotrInstance);
+    QcaOtr::AkeSession          qca(qcaKey, QcaInstance, LibotrInstance);
 
-    bool ok = false;
+    bool             ok     = false;
     const QByteArray commit = qca.start(&ok);
     QVERIFY(ok);
     const QByteArray armoredCommit = toLibotrMessage(commit);
@@ -377,14 +333,10 @@ void LibotrInteropTest::qcaInitiates()
 
     const QByteArray armoredReveal = toLibotrMessage(reveal.outgoingMessage);
     QVERIFY(!armoredReveal.isEmpty());
-    int haveMessage = 0;
+    int         haveMessage = 0;
     AuthCapture capture;
-    QCOMPARE(otrl_auth_handle_revealsig(&libotr.context->auth,
-                                        armoredReveal.constData(),
-                                        &haveMessage,
-                                        libotr.privateKey,
-                                        authSucceeded,
-                                        &capture),
+    QCOMPARE(otrl_auth_handle_revealsig(&libotr.context->auth, armoredReveal.constData(), &haveMessage,
+                                        libotr.privateKey, authSucceeded, &capture),
              gcry_error_t(0));
     QCOMPARE(haveMessage, 1);
     QVERIFY(capture.succeeded);
@@ -397,8 +349,7 @@ void LibotrInteropTest::qcaInitiates()
 
     QCOMPARE(qca.established().sessionId, capture.sessionId);
     QCOMPARE(qca.established().peerFingerprint, libotr.ownFingerprint());
-    QCOMPARE(capture.peerFingerprint,
-             QcaOtr::dsaPublicKeyFingerprint(QcaOtr::dsaPublicKey(qcaKey)));
+    QCOMPARE(capture.peerFingerprint, QcaOtr::dsaPublicKeyFingerprint(QcaOtr::dsaPublicKey(qcaKey)));
     QCOMPARE(qca.established().peerKeyId, quint32(1));
     QCOMPARE(capture.peerKeyId, quint32(1));
     QVERIFY(qca.established().initiated);
@@ -411,7 +362,7 @@ void LibotrInteropTest::libotrInitiates()
     QVERIFY2(libotr.valid, libotr.setupError.constData());
 
     const QcaOtr::DsaPrivateKey qcaKey = qcaPrivateKey();
-    QcaOtr::AkeSession qca(qcaKey, QcaInstance, LibotrInstance);
+    QcaOtr::AkeSession          qca(qcaKey, QcaInstance, LibotrInstance);
 
     QCOMPARE(otrl_auth_start_v23(&libotr.context->auth, 3), gcry_error_t(0));
     const QByteArray commit = fromLibotrMessage(libotr.context->auth.lastauthmsg);
@@ -424,10 +375,7 @@ void LibotrInteropTest::libotrInitiates()
     const QByteArray armoredDhKey = toLibotrMessage(dhKey.outgoingMessage);
     QVERIFY(!armoredDhKey.isEmpty());
     int haveMessage = 0;
-    QCOMPARE(otrl_auth_handle_key(&libotr.context->auth,
-                                  armoredDhKey.constData(),
-                                  &haveMessage,
-                                  libotr.privateKey),
+    QCOMPARE(otrl_auth_handle_key(&libotr.context->auth, armoredDhKey.constData(), &haveMessage, libotr.privateKey),
              gcry_error_t(0));
     QCOMPARE(haveMessage, 1);
 
@@ -442,19 +390,15 @@ void LibotrInteropTest::libotrInitiates()
     QVERIFY(!armoredSignature.isEmpty());
     AuthCapture capture;
     haveMessage = 0;
-    QCOMPARE(otrl_auth_handle_signature(&libotr.context->auth,
-                                        armoredSignature.constData(),
-                                        &haveMessage,
-                                        authSucceeded,
-                                        &capture),
+    QCOMPARE(otrl_auth_handle_signature(&libotr.context->auth, armoredSignature.constData(), &haveMessage,
+                                        authSucceeded, &capture),
              gcry_error_t(0));
     QCOMPARE(haveMessage, 0);
     QVERIFY(capture.succeeded);
 
     QCOMPARE(qca.established().sessionId, capture.sessionId);
     QCOMPARE(qca.established().peerFingerprint, libotr.ownFingerprint());
-    QCOMPARE(capture.peerFingerprint,
-             QcaOtr::dsaPublicKeyFingerprint(QcaOtr::dsaPublicKey(qcaKey)));
+    QCOMPARE(capture.peerFingerprint, QcaOtr::dsaPublicKeyFingerprint(QcaOtr::dsaPublicKey(qcaKey)));
     QCOMPARE(qca.established().peerKeyId, quint32(1));
     QCOMPARE(capture.peerKeyId, quint32(1));
     QVERIFY(!qca.established().initiated);
@@ -467,13 +411,13 @@ void LibotrInteropTest::qcaInitiatesDataMessages()
     QVERIFY2(libotr.valid, libotr.setupError.constData());
 
     QcaOtr::AkeSession qca(qcaPrivateKey(), QcaInstance, LibotrInstance);
-    bool ok = false;
-    const QByteArray commit = qca.start(&ok);
+    bool               ok     = false;
+    const QByteArray   commit = qca.start(&ok);
     QVERIFY(ok);
     const QByteArray armoredCommit = toLibotrMessage(commit);
     QCOMPARE(otrl_auth_handle_commit(&libotr.context->auth, armoredCommit.constData(), 3), gcry_error_t(0));
 
-    const QByteArray dhKey = fromLibotrMessage(libotr.context->auth.lastauthmsg);
+    const QByteArray              dhKey  = fromLibotrMessage(libotr.context->auth.lastauthmsg);
     const QcaOtr::AkeHandleResult reveal = qca.processIncoming(dhKey);
     QCOMPARE(reveal.status, QcaOtr::AkeHandleStatus::Handled);
 

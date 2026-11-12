@@ -8,77 +8,68 @@
 namespace QcaOtr {
 namespace {
 
-QCA::BigInteger zero()
-{
-    return QCA::BigInteger(0);
-}
+    QCA::BigInteger zero() { return QCA::BigInteger(0); }
 
-QCA::BigInteger one()
-{
-    return QCA::BigInteger(1);
-}
+    QCA::BigInteger one() { return QCA::BigInteger(1); }
 
-QCA::BigInteger two()
-{
-    return QCA::BigInteger(2);
-}
+    QCA::BigInteger two() { return QCA::BigInteger(2); }
 
-QCA::BigInteger positiveMod(const QCA::BigInteger &value, const QCA::BigInteger &modulus)
-{
-    if (modulus <= zero())
-        return zero();
+    QCA::BigInteger positiveMod(const QCA::BigInteger &value, const QCA::BigInteger &modulus)
+    {
+        if (modulus <= zero())
+            return zero();
 
-    QCA::BigInteger result(value);
-    result %= modulus;
-    if (result < zero())
-        result += modulus;
-    return result;
-}
-
-QCA::BigInteger unsignedInteger(const QByteArray &bytes)
-{
-    QByteArray positive;
-    positive.reserve(bytes.size() + 1);
-    positive.append('\0');
-    positive.append(bytes);
-    return QCA::BigInteger(QCA::SecureArray(positive));
-}
-
-QCA::BigInteger unsignedInteger(const QCA::SecureArray &bytes)
-{
-    QCA::SecureArray positive(1, '\0');
-    positive.append(bytes);
-    return QCA::BigInteger(positive);
-}
-
-bool validDomain(const DsaDomain &domain)
-{
-    return domain.p > two() && domain.q > one() && domain.g > one() && domain.g < domain.p;
-}
-
-QCA::BigInteger randomScalar(const QCA::BigInteger &q)
-{
-    QByteArray limit = q.toArray().toByteArray();
-    while (!limit.isEmpty() && limit.front() == '\0')
-        limit.remove(0, 1);
-    if (limit.isEmpty())
-        return {};
-
-    // Rejection sampling avoids the modulo bias of reducing a random integer
-    // modulo q. DSA nonces are secret values and must be uniformly selected
-    // from [1, q - 1].
-    for (int attempt = 0; attempt < 256; ++attempt) {
-        const QCA::SecureArray random = QCA::Random::randomArray(limit.size());
-        if (random.size() != limit.size())
-            return {};
-
-        const QCA::BigInteger value = unsignedInteger(random);
-        if (value > zero() && value < q)
-            return value;
+        QCA::BigInteger result(value);
+        result %= modulus;
+        if (result < zero())
+            result += modulus;
+        return result;
     }
 
-    return {};
-}
+    QCA::BigInteger unsignedInteger(const QByteArray &bytes)
+    {
+        QByteArray positive;
+        positive.reserve(bytes.size() + 1);
+        positive.append('\0');
+        positive.append(bytes);
+        return QCA::BigInteger(QCA::SecureArray(positive));
+    }
+
+    QCA::BigInteger unsignedInteger(const QCA::SecureArray &bytes)
+    {
+        QCA::SecureArray positive(1, '\0');
+        positive.append(bytes);
+        return QCA::BigInteger(positive);
+    }
+
+    bool validDomain(const DsaDomain &domain)
+    {
+        return domain.p > two() && domain.q > one() && domain.g > one() && domain.g < domain.p;
+    }
+
+    QCA::BigInteger randomScalar(const QCA::BigInteger &q)
+    {
+        QByteArray limit = q.toArray().toByteArray();
+        while (!limit.isEmpty() && limit.front() == '\0')
+            limit.remove(0, 1);
+        if (limit.isEmpty())
+            return { };
+
+        // Rejection sampling avoids the modulo bias of reducing a random integer
+        // modulo q. DSA nonces are secret values and must be uniformly selected
+        // from [1, q - 1].
+        for (int attempt = 0; attempt < 256; ++attempt) {
+            const QCA::SecureArray random = QCA::Random::randomArray(limit.size());
+            if (random.size() != limit.size())
+                return { };
+
+            const QCA::BigInteger value = unsignedInteger(random);
+            if (value > zero() && value < q)
+                return value;
+        }
+
+        return { };
+    }
 
 } // namespace
 
@@ -94,8 +85,8 @@ DsaPublicKey dsaPublicKey(const DsaPrivateKey &privateKey)
 
 bool dsaSignDigest(const DsaPrivateKey &privateKey, const QByteArray &digest, DsaSignature *signature)
 {
-    if (!signature || !validDomain(privateKey.domain) || privateKey.x <= zero() ||
-        privateKey.x >= privateKey.domain.q) {
+    if (!signature || !validDomain(privateKey.domain) || privateKey.x <= zero()
+        || privateKey.x >= privateKey.domain.q) {
         return false;
     }
 
@@ -138,9 +129,9 @@ bool dsaSignDigest(const DsaPrivateKey &privateKey, const QByteArray &digest, Ds
 
 bool dsaVerifyDigest(const DsaPublicKey &publicKey, const QByteArray &digest, const DsaSignature &signature)
 {
-    if (!validDomain(publicKey.domain) || publicKey.y <= zero() || publicKey.y >= publicKey.domain.p ||
-        signature.r <= zero() || signature.r >= publicKey.domain.q || signature.s <= zero() ||
-        signature.s >= publicKey.domain.q) {
+    if (!validDomain(publicKey.domain) || publicKey.y <= zero() || publicKey.y >= publicKey.domain.p
+        || signature.r <= zero() || signature.r >= publicKey.domain.q || signature.s <= zero()
+        || signature.s >= publicKey.domain.q) {
         return false;
     }
 
@@ -158,7 +149,7 @@ bool dsaVerifyDigest(const DsaPublicKey &publicKey, const QByteArray &digest, co
     u2 *= w;
     u2 %= publicKey.domain.q;
 
-    QCA::BigInteger v = QCA::BigIntegerMath::modPow(publicKey.domain.g, u1, publicKey.domain.p);
+    QCA::BigInteger v     = QCA::BigIntegerMath::modPow(publicKey.domain.g, u1, publicKey.domain.p);
     QCA::BigInteger yPart = QCA::BigIntegerMath::modPow(publicKey.y, u2, publicKey.domain.p);
     v *= yPart;
     v %= publicKey.domain.p;
@@ -170,7 +161,7 @@ bool dsaVerifyDigest(const DsaPublicKey &publicKey, const QByteArray &digest, co
 QByteArray sha1(const QByteArray &data)
 {
     if (!QCA::isSupported("sha1"))
-        return {};
+        return { };
 
     QCA::Hash hash(QStringLiteral("sha1"));
     return hash.hash(data).toByteArray();
@@ -179,7 +170,7 @@ QByteArray sha1(const QByteArray &data)
 QByteArray sha256(const QByteArray &data)
 {
     if (!QCA::isSupported("sha256"))
-        return {};
+        return { };
 
     QCA::Hash hash(QStringLiteral("sha256"));
     return hash.hash(data).toByteArray();
@@ -188,7 +179,7 @@ QByteArray sha256(const QByteArray &data)
 QCA::SecureArray sha1Secure(const QCA::SecureArray &data)
 {
     if (!QCA::isSupported("sha1"))
-        return {};
+        return { };
 
     QCA::Hash hash(QStringLiteral("sha1"));
     return QCA::SecureArray(hash.hash(data));
@@ -197,7 +188,7 @@ QCA::SecureArray sha1Secure(const QCA::SecureArray &data)
 QCA::SecureArray sha256Secure(const QCA::SecureArray &data)
 {
     if (!QCA::isSupported("sha256"))
-        return {};
+        return { };
 
     QCA::Hash hash(QStringLiteral("sha256"));
     return QCA::SecureArray(hash.hash(data));
@@ -206,7 +197,7 @@ QCA::SecureArray sha256Secure(const QCA::SecureArray &data)
 QByteArray hmacSha1(const QCA::SecureArray &key, const QByteArray &data)
 {
     if (!QCA::isSupported("hmac(sha1)"))
-        return {};
+        return { };
 
     QCA::MessageAuthenticationCode mac(QStringLiteral("hmac(sha1)"), QCA::SymmetricKey(key));
     mac.update(data);
@@ -216,27 +207,20 @@ QByteArray hmacSha1(const QCA::SecureArray &key, const QByteArray &data)
 QByteArray hmacSha256(const QCA::SecureArray &key, const QByteArray &data)
 {
     if (!QCA::isSupported("hmac(sha256)"))
-        return {};
+        return { };
 
     QCA::MessageAuthenticationCode mac(QStringLiteral("hmac(sha256)"), QCA::SymmetricKey(key));
     mac.update(data);
     return mac.final().toByteArray();
 }
 
-bool aes128Ctr(const QCA::SecureArray &key,
-               const QByteArray &counter,
-               const QByteArray &input,
-               QByteArray *output)
+bool aes128Ctr(const QCA::SecureArray &key, const QByteArray &counter, const QByteArray &input, QByteArray *output)
 {
     if (!output || key.size() != 16 || counter.size() != 16 || !QCA::isSupported("aes128-ctr"))
         return false;
 
-    QCA::Cipher cipher(QStringLiteral("aes128"),
-                       QCA::Cipher::CTR,
-                       QCA::Cipher::NoPadding,
-                       QCA::Encode,
-                       QCA::SymmetricKey(key),
-                       QCA::InitializationVector(counter));
+    QCA::Cipher cipher(QStringLiteral("aes128"), QCA::Cipher::CTR, QCA::Cipher::NoPadding, QCA::Encode,
+                       QCA::SymmetricKey(key), QCA::InitializationVector(counter));
 
     QByteArray result = cipher.update(input).toByteArray();
     if (!cipher.ok())

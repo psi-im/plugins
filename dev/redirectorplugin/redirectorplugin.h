@@ -50,7 +50,7 @@ class Redirector : public QObject,
                    public PluginInfoProvider,
                    public ContactInfoAccessor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "com.psi-plus.Redirector"  FILE "psiplugin.json" )
+    Q_PLUGIN_METADATA(IID "com.psi-plus.Redirector" FILE "psiplugin.json")
     Q_INTERFACES(PsiPlugin OptionAccessor StanzaSender StanzaFilter AccountInfoAccessor ApplicationInfoAccessor
                      PluginInfoProvider ContactInfoAccessor)
 

@@ -269,8 +269,8 @@ bool OMEMO::encryptMessage(const QString &ownJid, int account, QDomElement &xml,
     ivElement.appendChild(xml.ownerDocument().createTextNode(iv.toBase64()));
     header.appendChild(ivElement);
 
-    QByteArray                    key  = m_crypto->randomBytes(OMEMO_AES_128_KEY_LENGTH);
-    QDomElement                   body = xml.firstChildElement("body");
+    QByteArray                        key  = m_crypto->randomBytes(OMEMO_AES_128_KEY_LENGTH);
+    QDomElement                       body = xml.firstChildElement("body");
     std::pair<QByteArray, QByteArray> encryptedBody;
     if (!body.isNull()) {
         QString plainText = body.firstChild().nodeValue();
@@ -533,11 +533,11 @@ QString OMEMO::pepRequest(int account, const QString &ownJid, const QString &rec
     const QString &&item     = QString("<items node='%1'/>").arg(node);
     const QString &&stanzaId = m_stanzaSender->uniqueId(account);
     const QString &&stanza   = QString("<iq id='%1' from='%2' to='%3' type='get'>\n"
-                                         "<pubsub xmlns='http://jabber.org/protocol/pubsub'>\n"
-                                         "%4\n"
-                                         "</pubsub>\n"
-                                         "</iq>\n")
-                                 .arg(stanzaId, ownJid, recipient, item);
+                                       "<pubsub xmlns='http://jabber.org/protocol/pubsub'>\n"
+                                       "%4\n"
+                                       "</pubsub>\n"
+                                       "</iq>\n")
+                                   .arg(stanzaId, ownJid, recipient, item);
 
     m_stanzaSender->sendStanza(account, stanza);
     return stanzaId;

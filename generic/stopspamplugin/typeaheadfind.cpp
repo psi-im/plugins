@@ -77,9 +77,7 @@ public:
 };
 
 TypeAheadFindBar::TypeAheadFindBar(IconFactoryAccessingHost *IcoHost, QTextEdit *textedit, const QString &title,
-                                   QWidget *parent) :
-    QToolBar(title, parent),
-    icoHost_(IcoHost)
+                                   QWidget *parent) : QToolBar(title, parent), icoHost_(IcoHost)
 {
     d     = new Private();
     d->te = textedit;

@@ -33,7 +33,7 @@ class OptionsParser;
 class BaseModel : public QAbstractTableModel {
     Q_OBJECT
 public:
-    BaseModel(QObject *p = nullptr) : QAbstractTableModel(p) {};
+    BaseModel(QObject *p = nullptr) : QAbstractTableModel(p) { };
     virtual bool          setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
     virtual QVariant      headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     virtual Qt::ItemFlags flags(const QModelIndex &index) const;
@@ -61,7 +61,7 @@ signals:
 class BaseFileModel : public BaseModel {
     Q_OBJECT
 public:
-    BaseFileModel(QObject *p = nullptr) : BaseModel(p) {};
+    BaseFileModel(QObject *p = nullptr) : BaseModel(p) { };
     virtual int  rowCount(const QModelIndex &parent = QModelIndex()) const;
     QString      filePass(const QModelIndex &index) const;
     virtual void reset();
@@ -93,7 +93,7 @@ public:
 class ClearingVcardModel : public ClearingModel {
     Q_OBJECT
 public:
-    ClearingVcardModel(const QString &dir, QObject *parent = nullptr) : ClearingModel(dir, parent) {};
+    ClearingVcardModel(const QString &dir, QObject *parent = nullptr) : ClearingModel(dir, parent) { };
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 };
 
@@ -103,7 +103,7 @@ public:
 class ClearingHistoryModel : public ClearingModel {
     Q_OBJECT
 public:
-    ClearingHistoryModel(const QString &dir, QObject *parent = nullptr) : ClearingModel(dir, parent) {};
+    ClearingHistoryModel(const QString &dir, QObject *parent = nullptr) : ClearingModel(dir, parent) { };
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 };
 

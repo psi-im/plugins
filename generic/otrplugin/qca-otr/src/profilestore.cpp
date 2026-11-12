@@ -18,154 +18,143 @@
 namespace QcaOtr {
 namespace {
 
-void setError(QString *error, const QString &message)
-{
-    if (error)
-        *error = message;
-}
-
-struct IdentityKey
-{
-    QByteArray account;
-    QByteArray protocol;
-
-    bool operator==(const IdentityKey &other) const noexcept
+    void setError(QString *error, const QString &message)
     {
-        return account == other.account && protocol == other.protocol;
+        if (error)
+            *error = message;
     }
-};
 
-struct FingerprintKey
-{
-    QByteArray username;
-    QByteArray account;
-    QByteArray protocol;
-    QByteArray fingerprint;
+    struct IdentityKey {
+        QByteArray account;
+        QByteArray protocol;
 
-    bool operator==(const FingerprintKey &other) const noexcept
-    {
-        return username == other.username && account == other.account && protocol == other.protocol &&
-            fingerprint == other.fingerprint;
-    }
-};
+        bool operator==(const IdentityKey &other) const noexcept
+        {
+            return account == other.account && protocol == other.protocol;
+        }
+    };
+
+    struct FingerprintKey {
+        QByteArray username;
+        QByteArray account;
+        QByteArray protocol;
+        QByteArray fingerprint;
+
+        bool operator==(const FingerprintKey &other) const noexcept
+        {
+            return username == other.username && account == other.account && protocol == other.protocol
+                && fingerprint == other.fingerprint;
+        }
+    };
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-uint qHash(const IdentityKey &key, uint seed = 0) noexcept
-{
-    return ::qHash(key.protocol, ::qHash(key.account, seed));
-}
+    uint qHash(const IdentityKey &key, uint seed = 0) noexcept
+    {
+        return ::qHash(key.protocol, ::qHash(key.account, seed));
+    }
 
-uint qHash(const FingerprintKey &key, uint seed = 0) noexcept
-{
-    seed = ::qHash(key.username, seed);
-    seed = ::qHash(key.account, seed);
-    seed = ::qHash(key.protocol, seed);
-    return ::qHash(key.fingerprint, seed);
-}
+    uint qHash(const FingerprintKey &key, uint seed = 0) noexcept
+    {
+        seed = ::qHash(key.username, seed);
+        seed = ::qHash(key.account, seed);
+        seed = ::qHash(key.protocol, seed);
+        return ::qHash(key.fingerprint, seed);
+    }
 #else
-size_t qHash(const IdentityKey &key, size_t seed = 0) noexcept
-{
-    return ::qHash(key.protocol, ::qHash(key.account, seed));
-}
+    size_t qHash(const IdentityKey &key, size_t seed = 0) noexcept
+    {
+        return ::qHash(key.protocol, ::qHash(key.account, seed));
+    }
 
-size_t qHash(const FingerprintKey &key, size_t seed = 0) noexcept
-{
-    seed = ::qHash(key.username, seed);
-    seed = ::qHash(key.account, seed);
-    seed = ::qHash(key.protocol, seed);
-    return ::qHash(key.fingerprint, seed);
-}
+    size_t qHash(const FingerprintKey &key, size_t seed = 0) noexcept
+    {
+        seed = ::qHash(key.username, seed);
+        seed = ::qHash(key.account, seed);
+        seed = ::qHash(key.protocol, seed);
+        return ::qHash(key.fingerprint, seed);
+    }
 #endif
 
-IdentityKey identityKey(const PrivateKeyRecord &record)
-{
-    return {record.account, record.protocol};
-}
+    IdentityKey identityKey(const PrivateKeyRecord &record) { return { record.account, record.protocol }; }
 
-IdentityKey identityKey(const InstanceTagRecord &record)
-{
-    return {record.account, record.protocol};
-}
+    IdentityKey identityKey(const InstanceTagRecord &record) { return { record.account, record.protocol }; }
 
-FingerprintKey fingerprintKey(const FingerprintRecord &record)
-{
-    return {record.username, record.account, record.protocol, record.fingerprint};
-}
-
-DsaPrivateKey generateIdentity(QString *error)
-{
-    if (!QCA::isSupported("pkey") || !QCA::PKey::supportedTypes().contains(QCA::PKey::DSA)) {
-        setError(error, QStringLiteral("QCA provider does not support DSA key generation"));
-        return {};
+    FingerprintKey fingerprintKey(const FingerprintRecord &record)
+    {
+        return { record.username, record.account, record.protocol, record.fingerprint };
     }
 
-    QCA::KeyGenerator generator;
-    const QCA::DLGroup domain = generator.createDLGroup(QCA::DSA_1024);
-    if (domain.isNull()) {
-        setError(error, QStringLiteral("Cannot generate DSA domain parameters"));
-        return {};
+    DsaPrivateKey generateIdentity(QString *error)
+    {
+        if (!QCA::isSupported("pkey") || !QCA::PKey::supportedTypes().contains(QCA::PKey::DSA)) {
+            setError(error, QStringLiteral("QCA provider does not support DSA key generation"));
+            return { };
+        }
+
+        QCA::KeyGenerator  generator;
+        const QCA::DLGroup domain = generator.createDLGroup(QCA::DSA_1024);
+        if (domain.isNull()) {
+            setError(error, QStringLiteral("Cannot generate DSA domain parameters"));
+            return { };
+        }
+
+        const QCA::PrivateKey generated = generator.createDSA(domain);
+        if (generated.isNull() || !generated.isDSA()) {
+            setError(error, QStringLiteral("Cannot generate DSA private key"));
+            return { };
+        }
+
+        const QCA::DSAPrivateKey dsa = generated.toDSA();
+        if (dsa.isNull() || dsa.x() <= QCA::BigInteger(0)) {
+            setError(error, QStringLiteral("Generated DSA private key is invalid"));
+            return { };
+        }
+
+        const QCA::DLGroup keyDomain = dsa.domain();
+        DsaPrivateKey      key;
+        key.domain.p = keyDomain.p();
+        key.domain.q = keyDomain.q();
+        key.domain.g = keyDomain.g();
+        key.x        = dsa.x();
+        if (dsaPublicKey(key).y <= QCA::BigInteger(0)) {
+            setError(error, QStringLiteral("Generated DSA public key is invalid"));
+            return { };
+        }
+        return key;
     }
 
-    const QCA::PrivateKey generated = generator.createDSA(domain);
-    if (generated.isNull() || !generated.isDSA()) {
-        setError(error, QStringLiteral("Cannot generate DSA private key"));
-        return {};
-    }
-
-    const QCA::DSAPrivateKey dsa = generated.toDSA();
-    if (dsa.isNull() || dsa.x() <= QCA::BigInteger(0)) {
-        setError(error, QStringLiteral("Generated DSA private key is invalid"));
-        return {};
-    }
-
-    const QCA::DLGroup keyDomain = dsa.domain();
-    DsaPrivateKey key;
-    key.domain.p = keyDomain.p();
-    key.domain.q = keyDomain.q();
-    key.domain.g = keyDomain.g();
-    key.x = dsa.x();
-    if (dsaPublicKey(key).y <= QCA::BigInteger(0)) {
-        setError(error, QStringLiteral("Generated DSA public key is invalid"));
-        return {};
-    }
-    return key;
-}
-
-quint32 randomInstanceTag(const QHash<IdentityKey, InstanceTagRecord> &instanceTags)
-{
-    if (!QCA::haveSecureRandom())
-        return 0;
-
-    for (int attempt = 0; attempt < 64; ++attempt) {
-        const QCA::SecureArray bytes = QCA::Random::randomArray(4);
-        if (bytes.size() != 4)
+    quint32 randomInstanceTag(const QHash<IdentityKey, InstanceTagRecord> &instanceTags)
+    {
+        if (!QCA::haveSecureRandom())
             return 0;
 
-        const auto *p = reinterpret_cast<const unsigned char *>(bytes.constData());
-        const quint32 candidate = (static_cast<quint32>(p[0]) << 24) |
-            (static_cast<quint32>(p[1]) << 16) |
-            (static_cast<quint32>(p[2]) << 8) |
-            static_cast<quint32>(p[3]);
-        if (candidate < 0x00000100)
-            continue;
+        for (int attempt = 0; attempt < 64; ++attempt) {
+            const QCA::SecureArray bytes = QCA::Random::randomArray(4);
+            if (bytes.size() != 4)
+                return 0;
 
-        bool duplicate = false;
-        for (auto it = instanceTags.cbegin(); it != instanceTags.cend(); ++it) {
-            if (it.value().instanceTag == candidate) {
-                duplicate = true;
-                break;
+            const auto   *p         = reinterpret_cast<const unsigned char *>(bytes.constData());
+            const quint32 candidate = (static_cast<quint32>(p[0]) << 24) | (static_cast<quint32>(p[1]) << 16)
+                | (static_cast<quint32>(p[2]) << 8) | static_cast<quint32>(p[3]);
+            if (candidate < 0x00000100)
+                continue;
+
+            bool duplicate = false;
+            for (auto it = instanceTags.cbegin(); it != instanceTags.cend(); ++it) {
+                if (it.value().instanceTag == candidate) {
+                    duplicate = true;
+                    break;
+                }
             }
+            if (!duplicate)
+                return candidate;
         }
-        if (!duplicate)
-            return candidate;
+        return 0;
     }
-    return 0;
-}
 
 } // namespace
 
-class ProfileStore::Private
-{
+class ProfileStore::Private {
 public:
     Private(QString directoryValue, QByteArray protocolValue) :
         directory(std::move(directoryValue)), protocolId(std::move(protocolValue))
@@ -175,44 +164,44 @@ public:
     ProfileData snapshot() const
     {
         ProfileData result;
-        result.privateKeys = identities.values();
+        result.privateKeys  = identities.values();
         result.fingerprints = fingerprintRecords.values();
         result.instanceTags = instanceTags.values();
 
-        std::sort(result.privateKeys.begin(), result.privateKeys.end(), [](const PrivateKeyRecord &a, const PrivateKeyRecord &b) {
-            return std::tie(a.account, a.protocol) < std::tie(b.account, b.protocol);
-        });
-        std::sort(result.fingerprints.begin(), result.fingerprints.end(), [](const FingerprintRecord &a, const FingerprintRecord &b) {
-            return std::tie(a.username, a.account, a.protocol, a.fingerprint) <
-                std::tie(b.username, b.account, b.protocol, b.fingerprint);
-        });
-        std::sort(result.instanceTags.begin(), result.instanceTags.end(), [](const InstanceTagRecord &a, const InstanceTagRecord &b) {
-            return std::tie(a.account, a.protocol) < std::tie(b.account, b.protocol);
-        });
+        std::sort(result.privateKeys.begin(), result.privateKeys.end(),
+                  [](const PrivateKeyRecord &a, const PrivateKeyRecord &b) {
+                      return std::tie(a.account, a.protocol) < std::tie(b.account, b.protocol);
+                  });
+        std::sort(result.fingerprints.begin(), result.fingerprints.end(),
+                  [](const FingerprintRecord &a, const FingerprintRecord &b) {
+                      return std::tie(a.username, a.account, a.protocol, a.fingerprint)
+                          < std::tie(b.username, b.account, b.protocol, b.fingerprint);
+                  });
+        std::sort(result.instanceTags.begin(), result.instanceTags.end(),
+                  [](const InstanceTagRecord &a, const InstanceTagRecord &b) {
+                      return std::tie(a.account, a.protocol) < std::tie(b.account, b.protocol);
+                  });
         return result;
     }
 
     const ProfileData &cachedSnapshot() const
     {
         if (cacheDirty) {
-            cache = snapshot();
+            cache      = snapshot();
             cacheDirty = false;
         }
         return cache;
     }
 
-    void changed()
-    {
-        cacheDirty = true;
-    }
+    void changed() { cacheDirty = true; }
 
-    QString directory;
-    QByteArray protocolId;
-    QHash<IdentityKey, PrivateKeyRecord> identities;
+    QString                                  directory;
+    QByteArray                               protocolId;
+    QHash<IdentityKey, PrivateKeyRecord>     identities;
     QHash<FingerprintKey, FingerprintRecord> fingerprintRecords;
-    QHash<IdentityKey, InstanceTagRecord> instanceTags;
-    mutable ProfileData cache;
-    mutable bool cacheDirty = true;
+    QHash<IdentityKey, InstanceTagRecord>    instanceTags;
+    mutable ProfileData                      cache;
+    mutable bool                             cacheDirty = true;
 };
 
 ProfileStore::ProfileStore(QString directory, QByteArray protocolId) :
@@ -222,15 +211,9 @@ ProfileStore::ProfileStore(QString directory, QByteArray protocolId) :
 
 ProfileStore::~ProfileStore() = default;
 
-const QString &ProfileStore::directory() const
-{
-    return d->directory;
-}
+const QString &ProfileStore::directory() const { return d->directory; }
 
-const QByteArray &ProfileStore::protocolId() const
-{
-    return d->protocolId;
-}
+const QByteArray &ProfileStore::protocolId() const { return d->protocolId; }
 
 bool ProfileStore::load(QString *error)
 {
@@ -243,9 +226,9 @@ bool ProfileStore::load(QString *error)
     if (!Persistence::loadProfile(d->directory, &loaded, error))
         return false;
 
-    QHash<IdentityKey, PrivateKeyRecord> identities;
+    QHash<IdentityKey, PrivateKeyRecord>     identities;
     QHash<FingerprintKey, FingerprintRecord> fingerprints;
-    QHash<IdentityKey, InstanceTagRecord> instanceTags;
+    QHash<IdentityKey, InstanceTagRecord>    instanceTags;
 
     identities.reserve(loaded.privateKeys.size());
     fingerprints.reserve(loaded.fingerprints.size());
@@ -260,9 +243,9 @@ bool ProfileStore::load(QString *error)
     for (const InstanceTagRecord &record : loaded.instanceTags)
         instanceTags.insert(identityKey(record), record);
 
-    d->identities = std::move(identities);
+    d->identities         = std::move(identities);
     d->fingerprintRecords = std::move(fingerprints);
-    d->instanceTags = std::move(instanceTags);
+    d->instanceTags       = std::move(instanceTags);
     d->changed();
     return true;
 }
@@ -284,15 +267,14 @@ QList<PrivateKeyRecord> ProfileStore::identities() const
         if (it.value().protocol == d->protocolId)
             result.append(it.value());
     }
-    std::sort(result.begin(), result.end(), [](const PrivateKeyRecord &a, const PrivateKeyRecord &b) {
-        return a.account < b.account;
-    });
+    std::sort(result.begin(), result.end(),
+              [](const PrivateKeyRecord &a, const PrivateKeyRecord &b) { return a.account < b.account; });
     return result;
 }
 
 const PrivateKeyRecord *ProfileStore::identity(const QByteArray &account) const
 {
-    const auto it = d->identities.constFind({account, d->protocolId});
+    const auto it = d->identities.constFind({ account, d->protocolId });
     return it == d->identities.cend() ? nullptr : &it.value();
 }
 
@@ -309,14 +291,14 @@ bool ProfileStore::ensureIdentity(const QByteArray &account, QString *error)
         return false;
     }
 
-    const IdentityKey key{account, d->protocolId};
+    const IdentityKey key { account, d->protocolId };
     if (d->identities.contains(key))
         return true;
 
     PrivateKeyRecord record;
-    record.account = account;
+    record.account  = account;
     record.protocol = d->protocolId;
-    record.key = generateIdentity(error);
+    record.key      = generateIdentity(error);
     if (record.key.x <= QCA::BigInteger(0))
         return false;
 
@@ -340,15 +322,15 @@ bool ProfileStore::regenerateIdentity(const QByteArray &account, QString *error)
     if (generated.x <= QCA::BigInteger(0))
         return false;
 
-    const IdentityKey key{account, d->protocolId};
-    const auto existing = d->identities.constFind(key);
-    const bool hadPrevious = existing != d->identities.cend();
-    const PrivateKeyRecord previous = hadPrevious ? existing.value() : PrivateKeyRecord();
+    const IdentityKey      key { account, d->protocolId };
+    const auto             existing    = d->identities.constFind(key);
+    const bool             hadPrevious = existing != d->identities.cend();
+    const PrivateKeyRecord previous    = hadPrevious ? existing.value() : PrivateKeyRecord();
 
     PrivateKeyRecord replacement = hadPrevious ? previous : PrivateKeyRecord();
-    replacement.account = account;
-    replacement.protocol = d->protocolId;
-    replacement.key = generated;
+    replacement.account          = account;
+    replacement.protocol         = d->protocolId;
+    replacement.key              = generated;
     d->identities.insert(key, replacement);
 
     if (save(error)) {
@@ -364,8 +346,8 @@ bool ProfileStore::regenerateIdentity(const QByteArray &account, QString *error)
 
 bool ProfileStore::removeIdentity(const QByteArray &account, QString *error)
 {
-    const IdentityKey key{account, d->protocolId};
-    const auto it = d->identities.constFind(key);
+    const IdentityKey key { account, d->protocolId };
+    const auto        it = d->identities.constFind(key);
     if (it == d->identities.cend())
         return true;
 
@@ -383,7 +365,7 @@ quint32 ProfileStore::instanceTag(const QByteArray &account, bool *found) const
 {
     if (found)
         *found = false;
-    const auto it = d->instanceTags.constFind({account, d->protocolId});
+    const auto it = d->instanceTags.constFind({ account, d->protocolId });
     if (it == d->instanceTags.cend())
         return 0;
     if (found)
@@ -395,7 +377,7 @@ quint32 ProfileStore::ensureInstanceTag(const QByteArray &account, bool *created
 {
     if (created)
         *created = false;
-    bool found = false;
+    bool          found    = false;
     const quint32 existing = instanceTag(account, &found);
     if (found)
         return existing;
@@ -411,10 +393,10 @@ quint32 ProfileStore::ensureInstanceTag(const QByteArray &account, bool *created
         return 0;
     }
 
-    const IdentityKey key{account, d->protocolId};
+    const IdentityKey key { account, d->protocolId };
     InstanceTagRecord record;
-    record.account = account;
-    record.protocol = d->protocolId;
+    record.account     = account;
+    record.protocol    = d->protocolId;
     record.instanceTag = generated;
     d->instanceTags.insert(key, record);
     if (!save(error)) {
@@ -441,19 +423,15 @@ QList<FingerprintRecord> ProfileStore::fingerprints() const
     return result;
 }
 
-const FingerprintRecord *ProfileStore::fingerprint(const QByteArray &username,
-                                                   const QByteArray &account,
+const FingerprintRecord *ProfileStore::fingerprint(const QByteArray &username, const QByteArray &account,
                                                    const QByteArray &fingerprintValue) const
 {
-    const auto it = d->fingerprintRecords.constFind({username, account, d->protocolId, fingerprintValue});
+    const auto it = d->fingerprintRecords.constFind({ username, account, d->protocolId, fingerprintValue });
     return it == d->fingerprintRecords.cend() ? nullptr : &it.value();
 }
 
-bool ProfileStore::rememberFingerprint(const QByteArray &username,
-                                       const QByteArray &account,
-                                       const QByteArray &fingerprintValue,
-                                       const QByteArray &trust,
-                                       bool *created,
+bool ProfileStore::rememberFingerprint(const QByteArray &username, const QByteArray &account,
+                                       const QByteArray &fingerprintValue, const QByteArray &trust, bool *created,
                                        QString *error)
 {
     if (created)
@@ -463,16 +441,16 @@ bool ProfileStore::rememberFingerprint(const QByteArray &username,
         return false;
     }
 
-    const FingerprintKey key{username, account, d->protocolId, fingerprintValue};
+    const FingerprintKey key { username, account, d->protocolId, fingerprintValue };
     if (d->fingerprintRecords.contains(key))
         return true;
 
     FingerprintRecord record;
-    record.username = username;
-    record.account = account;
-    record.protocol = d->protocolId;
+    record.username    = username;
+    record.account     = account;
+    record.protocol    = d->protocolId;
     record.fingerprint = fingerprintValue;
-    record.trust = trust;
+    record.trust       = trust;
     d->fingerprintRecords.insert(key, record);
     if (!save(error)) {
         d->fingerprintRecords.remove(key);
@@ -484,21 +462,18 @@ bool ProfileStore::rememberFingerprint(const QByteArray &username,
     return true;
 }
 
-bool ProfileStore::setFingerprintTrust(const QByteArray &username,
-                                       const QByteArray &account,
-                                       const QByteArray &fingerprintValue,
-                                       const QByteArray &trust,
-                                       QString *error)
+bool ProfileStore::setFingerprintTrust(const QByteArray &username, const QByteArray &account,
+                                       const QByteArray &fingerprintValue, const QByteArray &trust, QString *error)
 {
-    const FingerprintKey key{username, account, d->protocolId, fingerprintValue};
-    auto it = d->fingerprintRecords.find(key);
+    const FingerprintKey key { username, account, d->protocolId, fingerprintValue };
+    auto                 it = d->fingerprintRecords.find(key);
     if (it == d->fingerprintRecords.end()) {
         setError(error, QStringLiteral("OTR fingerprint not found"));
         return false;
     }
 
     const QByteArray previousTrust = it.value().trust;
-    it.value().trust = trust;
+    it.value().trust               = trust;
     if (save(error)) {
         d->changed();
         return true;
@@ -507,13 +482,11 @@ bool ProfileStore::setFingerprintTrust(const QByteArray &username,
     return false;
 }
 
-bool ProfileStore::removeFingerprint(const QByteArray &username,
-                                     const QByteArray &account,
-                                     const QByteArray &fingerprintValue,
-                                     QString *error)
+bool ProfileStore::removeFingerprint(const QByteArray &username, const QByteArray &account,
+                                     const QByteArray &fingerprintValue, QString *error)
 {
-    const FingerprintKey key{username, account, d->protocolId, fingerprintValue};
-    const auto it = d->fingerprintRecords.constFind(key);
+    const FingerprintKey key { username, account, d->protocolId, fingerprintValue };
+    const auto           it = d->fingerprintRecords.constFind(key);
     if (it == d->fingerprintRecords.cend())
         return true;
 
@@ -527,9 +500,6 @@ bool ProfileStore::removeFingerprint(const QByteArray &username,
     return false;
 }
 
-const ProfileData &ProfileStore::data() const
-{
-    return d->cachedSnapshot();
-}
+const ProfileData &ProfileStore::data() const { return d->cachedSnapshot(); }
 
 } // namespace QcaOtr

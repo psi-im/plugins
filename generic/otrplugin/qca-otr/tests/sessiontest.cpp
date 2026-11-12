@@ -11,9 +11,9 @@
 
 namespace {
 
-constexpr quint32 AliceInstance = 0x11111111;
-constexpr quint32 BobInstance = 0x22222222;
-constexpr quint32 BobSecondInstance = 0x33333333;
+constexpr quint32 AliceInstance      = 0x11111111;
+constexpr quint32 BobInstance        = 0x22222222;
+constexpr quint32 BobSecondInstance  = 0x33333333;
 constexpr quint32 OtherLocalInstance = 0x44444444;
 
 QcaOtr::DsaPrivateKey toyKey(int x)
@@ -22,16 +22,14 @@ QcaOtr::DsaPrivateKey toyKey(int x)
     key.domain.p = QCA::BigInteger(23);
     key.domain.q = QCA::BigInteger(11);
     key.domain.g = QCA::BigInteger(2);
-    key.x = QCA::BigInteger(x);
+    key.x        = QCA::BigInteger(x);
     return key;
 }
 
-QVector<QByteArray> deliver(QcaOtr::OtrSession *target,
-                            const QVector<QByteArray> &messages,
-                            int maxMessageSize,
+QVector<QByteArray> deliver(QcaOtr::OtrSession *target, const QVector<QByteArray> &messages, int maxMessageSize,
                             QcaOtr::SessionResult *lastResult = nullptr)
 {
-    QVector<QByteArray> outgoing;
+    QVector<QByteArray>   outgoing;
     QcaOtr::SessionResult last;
     for (const QByteArray &message : messages) {
         last = target->processIncoming(message, maxMessageSize);
@@ -42,12 +40,10 @@ QVector<QByteArray> deliver(QcaOtr::OtrSession *target,
     return outgoing;
 }
 
-bool completeHandshake(QcaOtr::OtrSession *initiator,
-                       quint32 responderInstance,
-                       QcaOtr::OtrSession *responder,
+bool completeHandshake(QcaOtr::OtrSession *initiator, quint32 responderInstance, QcaOtr::OtrSession *responder,
                        int maxMessageSize)
 {
-    bool ok = false;
+    bool                ok       = false;
     QVector<QByteArray> messages = initiator->start(responderInstance, maxMessageSize, &ok);
     if (!ok || messages.isEmpty())
         return false;
@@ -71,8 +67,7 @@ bool completeHandshake(QcaOtr::OtrSession *initiator,
 
 } // namespace
 
-class SessionTest : public QObject
-{
+class SessionTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -91,19 +86,13 @@ private:
     QCA::Initializer *initializer_ = nullptr;
 };
 
-void SessionTest::initTestCase()
-{
-    initializer_ = new QCA::Initializer;
-}
+void SessionTest::initTestCase() { initializer_ = new QCA::Initializer; }
 
-void SessionTest::cleanupTestCase()
-{
-    delete initializer_;
-}
+void SessionTest::cleanupTestCase() { delete initializer_; }
 
 void SessionTest::fragmentedHandshakeAndData()
 {
-    constexpr int Mms = 80;
+    constexpr int      Mms = 80;
     QcaOtr::OtrSession alice(toyKey(3), AliceInstance);
     QcaOtr::OtrSession bob(toyKey(6), BobInstance);
 
@@ -117,12 +106,12 @@ void SessionTest::fragmentedHandshakeAndData()
     QVERIFY(bob.establishedSession(AliceInstance, &bobEstablished));
     QCOMPARE(aliceEstablished.sessionId, bobEstablished.sessionId);
 
-    const QByteArray plaintext = QByteArray("fragmented-data:") + QByteArray(512, 'x');
+    const QByteArray    plaintext = QByteArray("fragmented-data:") + QByteArray(512, 'x');
     QVector<QByteArray> encrypted;
     QVERIFY(alice.sendMessage(BobInstance, plaintext, &encrypted, Mms));
     QVERIFY(encrypted.size() > 1);
 
-    QcaOtr::SessionResult received;
+    QcaOtr::SessionResult     received;
     const QVector<QByteArray> response = deliver(&bob, encrypted, Mms, &received);
     QCOMPARE(received.status, QcaOtr::SessionStatus::Message);
     QCOMPARE(received.peerInstance, AliceInstance);
@@ -144,13 +133,13 @@ void SessionTest::broadcastCommitAuthenticatesMultipleInstances()
     QcaOtr::OtrSession bobOne(toyKey(6), BobInstance);
     QcaOtr::OtrSession bobTwo(toyKey(7), BobSecondInstance);
 
-    bool ok = false;
+    bool                      ok     = false;
     const QVector<QByteArray> commit = alice.start(0, 0, &ok);
     QVERIFY(ok);
     QCOMPARE(commit.size(), 1);
 
     QcaOtr::SessionResult state;
-    QVector<QByteArray> bobOneDh = deliver(&bobOne, commit, 0, &state);
+    QVector<QByteArray>   bobOneDh = deliver(&bobOne, commit, 0, &state);
     QCOMPARE(state.status, QcaOtr::SessionStatus::Handled);
     QVERIFY(!bobOneDh.isEmpty());
 
@@ -176,7 +165,7 @@ void SessionTest::broadcastCommitAuthenticatesMultipleInstances()
     QCOMPARE(state.status, QcaOtr::SessionStatus::Authenticated);
     QVERIFY(alice.isEncrypted(BobSecondInstance));
 
-    QCOMPARE(alice.peerInstances(), QVector<quint32>({BobInstance, BobSecondInstance}));
+    QCOMPARE(alice.peerInstances(), QVector<quint32>({ BobInstance, BobSecondInstance }));
     QVERIFY(bobOne.isEncrypted(AliceInstance));
     QVERIFY(bobTwo.isEncrypted(AliceInstance));
 
@@ -209,7 +198,7 @@ void SessionTest::queryNegotiationStartsAke()
     QCOMPARE(state.outgoingMessages.size(), 1);
 
     QVector<QByteArray> messages = state.outgoingMessages;
-    messages = deliver(&alice, messages, 0, &state);
+    messages                     = deliver(&alice, messages, 0, &state);
     QCOMPARE(state.status, QcaOtr::SessionStatus::Handled);
     messages = deliver(&bob, messages, 0, &state);
     QCOMPARE(state.status, QcaOtr::SessionStatus::Handled);
@@ -244,7 +233,7 @@ void SessionTest::whitespacePolicyNegotiation()
     received = alice.processIncoming("plain reply");
     QCOMPARE(received.status, QcaOtr::SessionStatus::Plaintext);
     const QcaOtr::OutgoingResult afterRejection = alice.prepareOutgoing("again");
-    QCOMPARE(afterRejection.messages, QVector<QByteArray>({QByteArray("again")}));
+    QCOMPARE(afterRejection.messages, QVector<QByteArray>({ QByteArray("again") }));
 
     QcaOtr::OtrSession opportunisticBob(toyKey(7), BobSecondInstance);
     opportunisticBob.setPolicy(QcaOtr::SessionPolicy::Opportunistic);
@@ -271,7 +260,7 @@ void SessionTest::alwaysPolicyQueuesUntilEncrypted()
     QCOMPARE(state.outgoingMessages.size(), 1);
 
     QVector<QByteArray> messages = state.outgoingMessages;
-    messages = deliver(&alice, messages, 0, &state);
+    messages                     = deliver(&alice, messages, 0, &state);
     QCOMPARE(state.status, QcaOtr::SessionStatus::Handled);
     messages = deliver(&bob, messages, 0, &state);
     QCOMPARE(state.status, QcaOtr::SessionStatus::Handled);
@@ -293,7 +282,7 @@ void SessionTest::routesTlvsThroughChildSession()
     QVERIFY(completeHandshake(&alice, BobInstance, &bob, 0));
 
     QVector<QcaOtr::Tlv> tlvs;
-    tlvs.append(QcaOtr::Tlv {0x1234, QByteArray::fromHex("00010200")});
+    tlvs.append(QcaOtr::Tlv { 0x1234, QByteArray::fromHex("00010200") });
 
     QVector<QByteArray> encrypted;
     QVERIFY(alice.sendMessage(BobInstance, "payload", tlvs, &encrypted));
@@ -313,7 +302,7 @@ void SessionTest::rejectsOtherLocalInstance()
     QcaOtr::OtrSession bob(toyKey(6), BobInstance);
     QcaOtr::OtrSession wrongRecipient(toyKey(7), OtherLocalInstance);
 
-    bool ok = false;
+    bool                      ok     = false;
     const QVector<QByteArray> commit = bob.start(AliceInstance, 0, &ok);
     QVERIFY(ok);
     QCOMPARE(commit.size(), 1);
@@ -328,17 +317,13 @@ void SessionTest::rejectsFragmentRouteMismatch()
     QcaOtr::OtrSession bob(toyKey(6), BobInstance);
     QcaOtr::OtrSession alice(toyKey(3), AliceInstance);
 
-    bool ok = false;
+    bool                      ok     = false;
     const QVector<QByteArray> commit = bob.start(AliceInstance, 0, &ok);
     QVERIFY(ok);
     QCOMPARE(commit.size(), 1);
 
     QVector<QByteArray> forgedFragments;
-    QVERIFY(QcaOtr::Transport::fragmentMessage(commit.front(),
-                                               60,
-                                               BobSecondInstance,
-                                               AliceInstance,
-                                               &forgedFragments));
+    QVERIFY(QcaOtr::Transport::fragmentMessage(commit.front(), 60, BobSecondInstance, AliceInstance, &forgedFragments));
     QVERIFY(forgedFragments.size() > 1);
 
     QcaOtr::SessionResult result;

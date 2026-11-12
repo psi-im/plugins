@@ -22,8 +22,7 @@
 
 Model::Model(const QStringList &watchedJids_, const QStringList &Sounds_, const QStringList &enabledJids_,
              QObject *parent) :
-    QAbstractTableModel(parent),
-    watchedJids(watchedJids_), sounds(Sounds_), enabledJids(enabledJids_)
+    QAbstractTableModel(parent), watchedJids(watchedJids_), sounds(Sounds_), enabledJids(enabledJids_)
 {
     headers << tr("") << tr("Watch for JIDs") << tr("Sounds (if empty default sound will be used)") << tr("") << tr("");
 

@@ -25,7 +25,8 @@ QDomElement normalizedBody(QDomDocument &target, const QString &input)
 #if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
     const bool parsed = normalized.setContent(richText.toHtml());
 #else
-    const auto parseResult = normalized.setContent(richText.toHtml(), QDomDocument::ParseOption::UseNamespaceProcessing);
+    const auto parseResult
+        = normalized.setContent(richText.toHtml(), QDomDocument::ParseOption::UseNamespaceProcessing);
     const bool parsed = static_cast<bool>(parseResult);
 #endif
     if (!parsed) {
@@ -35,7 +36,7 @@ QDomElement normalizedBody(QDomDocument &target, const QString &input)
     }
 
     const QDomElement sourceBody = normalized.documentElement().firstChildElement(QStringLiteral("body"));
-    QDomElement body = target.createElementNS(QString::fromLatin1(XhtmlNamespace), QStringLiteral("body"));
+    QDomElement       body       = target.createElementNS(QString::fromLatin1(XhtmlNamespace), QStringLiteral("body"));
     if (sourceBody.isNull()) {
         body.appendChild(target.createTextNode(richText.toPlainText()));
         return body;
@@ -52,15 +53,12 @@ HtmlNormalizer::HtmlNormalizer(QString html) : input_(std::move(html)) { }
 
 QString HtmlNormalizer::output() const
 {
-    QDomDocument document;
+    QDomDocument      document;
     const QDomElement body = normalizedBody(document, input_);
-    QString result;
-    QTextStream stream(&result);
+    QString           result;
+    QTextStream       stream(&result);
     body.save(stream, 0);
     return result;
 }
 
-QDomElement HtmlNormalizer::output(QDomDocument &document) const
-{
-    return normalizedBody(document, input_);
-}
+QDomElement HtmlNormalizer::output(QDomDocument &document) const { return normalizedBody(document, input_); }

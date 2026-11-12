@@ -60,7 +60,7 @@ QPair<QByteArray, QByteArray> Crypto::aes_gcm(Crypto::Direction direction, const
                                               const QByteArray &input, const QByteArray &tag)
 {
     Cipher     cipher(getCipherName(key.size()), Cipher::GCM, Cipher::NoPadding,
-                  direction == Encode ? QCA::Encode : QCA::Decode, key, iv, AuthTag(tag));
+                      direction == Encode ? QCA::Encode : QCA::Decode, key, iv, AuthTag(tag));
     QByteArray cryptoText = cipher.process(input).toByteArray();
     return qMakePair(cryptoText, cipher.tag().toByteArray());
 }

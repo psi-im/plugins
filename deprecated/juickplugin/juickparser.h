@@ -26,8 +26,7 @@
 struct JuickMessage {
     JuickMessage(const QString &_unick, const QString &_mes, const QStringList &_tags, const QString &_body,
                  const QString &_link, const QString &info) :
-        unick(_unick),
-        messageId(_mes), tags(_tags), body(_body), link(_link), infoText(info)
+        unick(_unick), messageId(_mes), tags(_tags), body(_body), link(_link), infoText(info)
     {
     }
     QString     unick;

@@ -31,8 +31,6 @@
 
 #include "ui_options.h"
 
-
-
 bool Redirector::enable()
 {
     if (psiOptions) {

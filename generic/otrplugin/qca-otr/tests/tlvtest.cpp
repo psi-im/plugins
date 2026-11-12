@@ -7,8 +7,7 @@
 
 #include <QTest>
 
-class TlvTest : public QObject
-{
+class TlvTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -22,10 +21,10 @@ private Q_SLOTS:
 void TlvTest::roundTripsKnownAndUnknownTypes()
 {
     QVector<QcaOtr::Tlv> tlvs;
-    tlvs.append(QcaOtr::Tlv {static_cast<quint16>(QcaOtr::TlvType::Disconnected), QByteArray()});
-    tlvs.append(QcaOtr::Tlv {0x1234, QByteArray::fromHex("deadbeef")});
+    tlvs.append(QcaOtr::Tlv { static_cast<quint16>(QcaOtr::TlvType::Disconnected), QByteArray() });
+    tlvs.append(QcaOtr::Tlv { 0x1234, QByteArray::fromHex("deadbeef") });
 
-    bool ok = false;
+    bool             ok      = false;
     const QByteArray encoded = QcaOtr::encodeTlvs(tlvs, &ok);
     QVERIFY(ok);
     QCOMPARE(encoded, QByteArray::fromHex("0001000012340004deadbeef"));
@@ -42,11 +41,11 @@ void TlvTest::roundTripsKnownAndUnknownTypes()
 void TlvTest::acceptsZeroLengthAndBinaryValues()
 {
     QVector<QcaOtr::Tlv> tlvs;
-    tlvs.append(QcaOtr::Tlv {static_cast<quint16>(QcaOtr::TlvType::Padding), QByteArray()});
-    tlvs.append(QcaOtr::Tlv {static_cast<quint16>(QcaOtr::TlvType::SymmetricKey),
-                             QByteArray::fromHex("0000002a61006200ff")});
+    tlvs.append(QcaOtr::Tlv { static_cast<quint16>(QcaOtr::TlvType::Padding), QByteArray() });
+    tlvs.append(
+        QcaOtr::Tlv { static_cast<quint16>(QcaOtr::TlvType::SymmetricKey), QByteArray::fromHex("0000002a61006200ff") });
 
-    bool ok = false;
+    bool             ok      = false;
     const QByteArray encoded = QcaOtr::encodeTlvs(tlvs, &ok);
     QVERIFY(ok);
 
@@ -56,7 +55,7 @@ void TlvTest::acceptsZeroLengthAndBinaryValues()
     QCOMPARE(decoded.at(1).value, QByteArray::fromHex("0000002a61006200ff"));
 
     QVector<QcaOtr::Tlv> empty;
-    QVERIFY(QcaOtr::decodeTlvs({}, &empty));
+    QVERIFY(QcaOtr::decodeTlvs({ }, &empty));
     QVERIFY(empty.isEmpty());
 }
 
@@ -75,7 +74,7 @@ void TlvTest::rejectsTruncatedValue()
 void TlvTest::rejectsOversizedValue()
 {
     QVector<QcaOtr::Tlv> tlvs;
-    tlvs.append(QcaOtr::Tlv {0x1234, QByteArray(65536, 'x')});
+    tlvs.append(QcaOtr::Tlv { 0x1234, QByteArray(65536, 'x') });
     bool ok = true;
     QVERIFY(QcaOtr::encodeTlvs(tlvs, &ok).isEmpty());
     QVERIFY(!ok);

@@ -390,8 +390,8 @@ bool Watcher::incomingStanza(int acc, const QDomElement &stanza)
                 }
                 if (model_->statusByJid(from) != status) {
                     model_->setStatusForJid(from, status);
-                    status[0] = status[0].toUpper();
-                    from = stanza.attribute("from"); // нужно быть уверенным, что у нас полный джид
+                    status[0]          = status[0].toUpper();
+                    from               = stanza.attribute("from"); // нужно быть уверенным, что у нас полный джид
                     const QString bare = from.split("/").first();
                     QString       nick = contactInfo->name(acc, bare);
                     QString       text;

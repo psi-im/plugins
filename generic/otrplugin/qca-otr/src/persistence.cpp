@@ -12,13 +12,13 @@
 namespace QcaOtr::Persistence {
 namespace {
 
-constexpr quint32 MinimumInstanceTag = 0x00000100;
+    constexpr quint32 MinimumInstanceTag = 0x00000100;
 
-using Private::isHex;
-using Private::readFile;
-using Private::setError;
-using Private::validTabField;
-using Private::writeFileAtomically;
+    using Private::isHex;
+    using Private::readFile;
+    using Private::setError;
+    using Private::validTabField;
+    using Private::writeFileAtomically;
 
 } // namespace
 
@@ -31,15 +31,15 @@ bool parseFingerprints(const QByteArray &data, QList<FingerprintRecord> *records
         error->clear();
 
     QList<FingerprintRecord> parsed;
-    const QList<QByteArray> lines = data.split('\n');
+    const QList<QByteArray>  lines = data.split('\n');
     for (QByteArray line : lines) {
         if (line.endsWith('\r'))
             line.chop(1);
         if (line.isEmpty())
             continue;
 
-        int positions[4] = {-1, -1, -1, -1};
-        int from = 0;
+        int positions[4] = { -1, -1, -1, -1 };
+        int from         = 0;
         for (int i = 0; i < 4; ++i) {
             positions[i] = line.indexOf('\t', from);
             if (positions[i] < 0) {
@@ -57,18 +57,18 @@ bool parseFingerprints(const QByteArray &data, QList<FingerprintRecord> *records
 
         FingerprintRecord record;
         record.username = line.left(positions[0]);
-        record.account = line.mid(positions[0] + 1, positions[1] - positions[0] - 1);
+        record.account  = line.mid(positions[0] + 1, positions[1] - positions[0] - 1);
         record.protocol = line.mid(positions[1] + 1, positions[2] - positions[1] - 1);
         QByteArray hex;
         if (positions[3] >= 0) {
-            hex = line.mid(positions[2] + 1, positions[3] - positions[2] - 1);
+            hex          = line.mid(positions[2] + 1, positions[3] - positions[2] - 1);
             record.trust = line.mid(positions[3] + 1);
         } else {
             hex = line.mid(positions[2] + 1);
         }
 
-        if (!validTabField(record.username) || !validTabField(record.account) || !validTabField(record.protocol) ||
-            hex.size() != 40) {
+        if (!validTabField(record.username) || !validTabField(record.account) || !validTabField(record.protocol)
+            || hex.size() != 40) {
             setError(error, QStringLiteral("Invalid libotr fingerprint record"));
             return false;
         }
@@ -98,13 +98,13 @@ QByteArray serializeFingerprints(const QList<FingerprintRecord> &records, bool *
         *ok = false;
     QByteArray output;
     for (const FingerprintRecord &record : records) {
-        if (!validTabField(record.username) || !validTabField(record.account) || !validTabField(record.protocol) ||
-            record.fingerprint.size() != 20 || record.trust.contains('\r') || record.trust.contains('\n') ||
-            record.trust.contains('\0')) {
-            return {};
+        if (!validTabField(record.username) || !validTabField(record.account) || !validTabField(record.protocol)
+            || record.fingerprint.size() != 20 || record.trust.contains('\r') || record.trust.contains('\n')
+            || record.trust.contains('\0')) {
+            return { };
         }
-        output += record.username + '\t' + record.account + '\t' + record.protocol + '\t' +
-            record.fingerprint.toHex() + '\t' + record.trust + '\n';
+        output += record.username + '\t' + record.account + '\t' + record.protocol + '\t' + record.fingerprint.toHex()
+            + '\t' + record.trust + '\n';
     }
     if (ok)
         *ok = true;
@@ -120,14 +120,14 @@ bool parseInstanceTags(const QByteArray &data, QList<InstanceTagRecord> *records
         error->clear();
 
     QList<InstanceTagRecord> parsed;
-    const QList<QByteArray> lines = data.split('\n');
+    const QList<QByteArray>  lines = data.split('\n');
     for (QByteArray line : lines) {
         if (line.endsWith('\r'))
             line.chop(1);
         if (line.isEmpty() || line.startsWith('#'))
             continue;
 
-        const int first = line.indexOf('\t');
+        const int first  = line.indexOf('\t');
         const int second = first >= 0 ? line.indexOf('\t', first + 1) : -1;
         if (first < 0 || second < 0 || line.indexOf('\t', second + 1) >= 0) {
             setError(error, QStringLiteral("Malformed libotr instance-tag line"));
@@ -135,8 +135,8 @@ bool parseInstanceTags(const QByteArray &data, QList<InstanceTagRecord> *records
         }
 
         InstanceTagRecord record;
-        record.account = line.left(first);
-        record.protocol = line.mid(first + 1, second - first - 1);
+        record.account       = line.left(first);
+        record.protocol      = line.mid(first + 1, second - first - 1);
         const QByteArray hex = line.mid(second + 1);
         if (!validTabField(record.account) || !validTabField(record.protocol) || hex.size() != 8) {
             setError(error, QStringLiteral("Invalid libotr instance-tag record"));
@@ -148,8 +148,8 @@ bool parseInstanceTags(const QByteArray &data, QList<InstanceTagRecord> *records
                 return false;
             }
         }
-        bool valueOk = false;
-        const qulonglong value = hex.toULongLong(&valueOk, 16);
+        bool             valueOk = false;
+        const qulonglong value   = hex.toULongLong(&valueOk, 16);
         if (!valueOk || value > std::numeric_limits<quint32>::max() || value < MinimumInstanceTag) {
             setError(error, QStringLiteral("Reserved or invalid OTR instance tag"));
             return false;
@@ -167,12 +167,14 @@ QByteArray serializeInstanceTags(const QList<InstanceTagRecord> &records, bool *
     if (ok)
         *ok = false;
 
-    QByteArray output("# WARNING! You shouldn't copy this file to another computer. It is unnecessary and can cause problems.\n");
+    QByteArray output(
+        "# WARNING! You shouldn't copy this file to another computer. It is unnecessary and can cause problems.\n");
     for (const InstanceTagRecord &record : records) {
-        if (!validTabField(record.account) || !validTabField(record.protocol) || record.instanceTag < MinimumInstanceTag)
-            return {};
-        output += record.account + '\t' + record.protocol + '\t' +
-            QByteArray::number(record.instanceTag, 16).rightJustified(8, '0') + '\n';
+        if (!validTabField(record.account) || !validTabField(record.protocol)
+            || record.instanceTag < MinimumInstanceTag)
+            return { };
+        output += record.account + '\t' + record.protocol + '\t'
+            + QByteArray::number(record.instanceTag, 16).rightJustified(8, '0') + '\n';
     }
     if (ok)
         *ok = true;
@@ -187,7 +189,7 @@ bool readFingerprintsFile(const QString &path, QList<FingerprintRecord> *records
 
 bool writeFingerprintsFile(const QString &path, const QList<FingerprintRecord> &records, QString *error)
 {
-    bool ok = false;
+    bool             ok   = false;
     const QByteArray data = serializeFingerprints(records, &ok);
     if (!ok) {
         setError(error, QStringLiteral("Cannot serialize libotr fingerprint store"));
@@ -204,7 +206,7 @@ bool readInstanceTagsFile(const QString &path, QList<InstanceTagRecord> *records
 
 bool writeInstanceTagsFile(const QString &path, const QList<InstanceTagRecord> &records, QString *error)
 {
-    bool ok = false;
+    bool             ok   = false;
     const QByteArray data = serializeInstanceTags(records, &ok);
     if (!ok) {
         setError(error, QStringLiteral("Cannot serialize libotr instance-tag store"));

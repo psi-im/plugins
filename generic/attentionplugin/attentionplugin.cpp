@@ -269,15 +269,11 @@ bool AttentionPlugin::incomingStanza(int account, const QDomElement &stanza)
             if (nudgeWindow_ && nudgeWindow_->isVisible())
                 nudge();
         }
-
     }
     return false;
 }
 
-bool AttentionPlugin::outgoingStanza(int /*account*/, QDomElement & /*xml*/)
-{
-    return false;
-}
+bool AttentionPlugin::outgoingStanza(int /*account*/, QDomElement & /*xml*/) { return false; }
 
 void AttentionPlugin::applyOptions()
 {

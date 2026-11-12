@@ -160,9 +160,9 @@ private:
     bool         LogHistory;     // логировать в историю
     bool         UseMuc, BlockAll,
         EnableBlockAllMes; // включечить для конф, блокировать все приваты, слать сообщение, если блокируем все приваты
-    bool Admin, Owner, None, Member;  // аффилиации
-    bool Moder, Participant, Visitor; // роли
-    QString BlockAllMes; // сообщение, которое шлется приватам если блокируем все приваты
+    bool    Admin, Owner, None, Member;  // аффилиации
+    bool    Moder, Participant, Visitor; // роли
+    QString BlockAllMes;                 // сообщение, которое шлется приватам если блокируем все приваты
 
     struct Blocked { // структура, необходимая для подсчета кол-ва сообщений для конкретного джида
         int       Acc;

@@ -57,7 +57,7 @@ public:
     virtual void                setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
     virtual void                setOptionAccessingHost(OptionAccessingHost *host);
     virtual void                setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
-    virtual void                optionChanged(const QString                &/*option*/) {};
+    virtual void                optionChanged(const QString                &/*option*/) { };
     virtual QList<QVariantHash> getAccountMenuParam();
     virtual QList<QVariantHash> getContactMenuParam();
     virtual QAction            *getContactAction(QObject *p, int acc, const QString &jid);
@@ -157,8 +157,8 @@ QWidget *HistoryKeeperPlugin::options()
     }
     contactsWidget->setText(text);
 
-    QLabel *wikiLink
-        = new QLabel(tr("<a href=\"https://psi-im.org/wiki/doku.php?id=en:plugins#history_keeper_plugin\">Wiki (Online)</a>"));
+    QLabel *wikiLink = new QLabel(
+        tr("<a href=\"https://psi-im.org/wiki/doku.php?id=en:plugins#history_keeper_plugin\">Wiki (Online)</a>"));
     wikiLink->setOpenExternalLinks(true);
 
     layout->addWidget(new QLabel(tr("Remove history for contacts:")));

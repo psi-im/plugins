@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "qca-otr/ake.h"
 #include "qca-otr/persistence.h"
+#include "qca-otr/ake.h"
 
 #include <QFile>
 #include <QTemporaryDir>
@@ -47,8 +47,7 @@ bool startsWith(const QCA::SecureArray &data, const char *prefix)
 
 } // namespace
 
-class PersistenceTest : public QObject
-{
+class PersistenceTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -64,27 +63,22 @@ private:
     QCA::Initializer *initializer_ = nullptr;
 };
 
-void PersistenceTest::initTestCase()
-{
-    initializer_ = new QCA::Initializer;
-}
+void PersistenceTest::initTestCase() { initializer_ = new QCA::Initializer; }
 
-void PersistenceTest::cleanupTestCase()
-{
-    delete initializer_;
-}
+void PersistenceTest::cleanupTestCase() { delete initializer_; }
 
 void PersistenceTest::privateKeysParseAndRoundTrip()
 {
     QList<QcaOtr::PrivateKeyRecord> records;
-    QString error;
-    QVERIFY2(QcaOtr::Persistence::parsePrivateKeys(QCA::SecureArray(LibotrPrivateKey), &records, &error), qPrintable(error));
+    QString                         error;
+    QVERIFY2(QcaOtr::Persistence::parsePrivateKeys(QCA::SecureArray(LibotrPrivateKey), &records, &error),
+             qPrintable(error));
     QCOMPARE(records.size(), 1);
     QCOMPARE(records.first().account, QByteArray("otrtest3"));
     QCOMPARE(records.first().protocol, QByteArray("prpl-aim"));
     QCOMPARE(fingerprint(records.first()).toHex(), QByteArray("55b7b505e08e4f5d2473df28297ea6a52305e93a"));
 
-    bool ok = false;
+    bool                   ok         = false;
     const QCA::SecureArray serialized = QcaOtr::Persistence::serializePrivateKeys(records, &ok);
     QVERIFY(ok);
     QVERIFY(startsWith(serialized, "(privkeys\n"));
@@ -103,20 +97,20 @@ void PersistenceTest::privateKeysParseAndRoundTrip()
 
 void PersistenceTest::fingerprintsParseAndRoundTrip()
 {
-    const QByteArray input =
-        "romeo@example.net\taccount-a\ttest-protocol\t00112233445566778899aabbccddeeff00112233\tverified\n"
-        "juliet@example.net\taccount-b\ttest-protocol\tffeeddccbbaa99887766554433221100ffeeddcc\tmanual\ttrust\n"
-        "mercutio@example.net\taccount-c\ttest-protocol\t0123456789abcdef0123456789abcdef01234567\n";
+    const QByteArray input
+        = "romeo@example.net\taccount-a\ttest-protocol\t00112233445566778899aabbccddeeff00112233\tverified\n"
+          "juliet@example.net\taccount-b\ttest-protocol\tffeeddccbbaa99887766554433221100ffeeddcc\tmanual\ttrust\n"
+          "mercutio@example.net\taccount-c\ttest-protocol\t0123456789abcdef0123456789abcdef01234567\n";
 
     QList<QcaOtr::FingerprintRecord> records;
-    QString error;
+    QString                          error;
     QVERIFY2(QcaOtr::Persistence::parseFingerprints(input, &records, &error), qPrintable(error));
     QCOMPARE(records.size(), 3);
     QCOMPARE(records.at(0).trust, QByteArray("verified"));
     QCOMPARE(records.at(1).trust, QByteArray("manual\ttrust"));
     QVERIFY(records.at(2).trust.isEmpty());
 
-    bool ok = false;
+    bool             ok         = false;
     const QByteArray serialized = QcaOtr::Persistence::serializeFingerprints(records, &ok);
     QVERIFY(ok);
     QList<QcaOtr::FingerprintRecord> roundTrip;
@@ -133,19 +127,18 @@ void PersistenceTest::fingerprintsParseAndRoundTrip()
 
 void PersistenceTest::instanceTagsParseAndRoundTrip()
 {
-    const QByteArray input =
-        "# WARNING! ignored by libotr\n"
-        "account-a\ttest-protocol\t00000100\n"
-        "account-b\ttest-protocol\t89abcdef\n";
+    const QByteArray input = "# WARNING! ignored by libotr\n"
+                             "account-a\ttest-protocol\t00000100\n"
+                             "account-b\ttest-protocol\t89abcdef\n";
 
     QList<QcaOtr::InstanceTagRecord> records;
-    QString error;
+    QString                          error;
     QVERIFY2(QcaOtr::Persistence::parseInstanceTags(input, &records, &error), qPrintable(error));
     QCOMPARE(records.size(), 2);
     QCOMPARE(records.at(0).instanceTag, quint32(0x00000100));
     QCOMPARE(records.at(1).instanceTag, quint32(0x89abcdef));
 
-    bool ok = false;
+    bool             ok         = false;
     const QByteArray serialized = QcaOtr::Persistence::serializeInstanceTags(records, &ok);
     QVERIFY(ok);
     QVERIFY(serialized.startsWith("# WARNING!"));
@@ -158,17 +151,17 @@ void PersistenceTest::instanceTagsParseAndRoundTrip()
 
 void PersistenceTest::malformedStoresAreRejected()
 {
-    QList<QcaOtr::PrivateKeyRecord> keys;
+    QList<QcaOtr::PrivateKeyRecord>  keys;
     QList<QcaOtr::FingerprintRecord> fingerprints;
     QList<QcaOtr::InstanceTagRecord> tags;
-    QString error;
+    QString                          error;
 
     QVERIFY(!QcaOtr::Persistence::parsePrivateKeys(QCA::SecureArray("(privkeys (account (name a)))"), &keys, &error));
     QVERIFY(!error.isEmpty());
 
     error.clear();
-    QVERIFY(!QcaOtr::Persistence::parseFingerprints(
-        "user\taccount\ttest-protocol\tnot-a-40-byte-hex-fingerprint\n", &fingerprints, &error));
+    QVERIFY(!QcaOtr::Persistence::parseFingerprints("user\taccount\ttest-protocol\tnot-a-40-byte-hex-fingerprint\n",
+                                                    &fingerprints, &error));
     QVERIFY(!error.isEmpty());
 
     error.clear();
@@ -182,35 +175,37 @@ void PersistenceTest::atomicFileRoundTrip()
     QVERIFY(dir.isValid());
 
     QList<QcaOtr::PrivateKeyRecord> keys;
-    QString error;
-    QVERIFY2(QcaOtr::Persistence::parsePrivateKeys(QCA::SecureArray(LibotrPrivateKey), &keys, &error), qPrintable(error));
+    QString                         error;
+    QVERIFY2(QcaOtr::Persistence::parsePrivateKeys(QCA::SecureArray(LibotrPrivateKey), &keys, &error),
+             qPrintable(error));
 
     QcaOtr::FingerprintRecord fp;
-    fp.username = "romeo@example.net";
-    fp.account = "account-a";
-    fp.protocol = TestProtocolId;
+    fp.username    = "romeo@example.net";
+    fp.account     = "account-a";
+    fp.protocol    = TestProtocolId;
     fp.fingerprint = QByteArray::fromHex("00112233445566778899aabbccddeeff00112233");
-    fp.trust = "verified";
-    const QList<QcaOtr::FingerprintRecord> fingerprints{fp};
+    fp.trust       = "verified";
+    const QList<QcaOtr::FingerprintRecord> fingerprints { fp };
 
     QcaOtr::InstanceTagRecord tag;
-    tag.account = "account-a";
-    tag.protocol = TestProtocolId;
+    tag.account     = "account-a";
+    tag.protocol    = TestProtocolId;
     tag.instanceTag = 0x12345678;
-    const QList<QcaOtr::InstanceTagRecord> tags{tag};
+    const QList<QcaOtr::InstanceTagRecord> tags { tag };
 
-    const QString keyPath = dir.filePath("otr.keys");
+    const QString keyPath         = dir.filePath("otr.keys");
     const QString fingerprintPath = dir.filePath("otr.fingerprints");
-    const QString tagPath = dir.filePath("otr.instags");
+    const QString tagPath         = dir.filePath("otr.instags");
     QVERIFY2(QcaOtr::Persistence::writePrivateKeysFile(keyPath, keys, &error), qPrintable(error));
     QVERIFY2(QcaOtr::Persistence::writeFingerprintsFile(fingerprintPath, fingerprints, &error), qPrintable(error));
     QVERIFY2(QcaOtr::Persistence::writeInstanceTagsFile(tagPath, tags, &error), qPrintable(error));
 
-    QList<QcaOtr::PrivateKeyRecord> loadedKeys;
+    QList<QcaOtr::PrivateKeyRecord>  loadedKeys;
     QList<QcaOtr::FingerprintRecord> loadedFingerprints;
     QList<QcaOtr::InstanceTagRecord> loadedTags;
     QVERIFY2(QcaOtr::Persistence::readPrivateKeysFile(keyPath, &loadedKeys, &error), qPrintable(error));
-    QVERIFY2(QcaOtr::Persistence::readFingerprintsFile(fingerprintPath, &loadedFingerprints, &error), qPrintable(error));
+    QVERIFY2(QcaOtr::Persistence::readFingerprintsFile(fingerprintPath, &loadedFingerprints, &error),
+             qPrintable(error));
     QVERIFY2(QcaOtr::Persistence::readInstanceTagsFile(tagPath, &loadedTags, &error), qPrintable(error));
     QCOMPARE(fingerprint(loadedKeys.first()), fingerprint(keys.first()));
     QCOMPARE(loadedFingerprints.first().trust, fp.trust);

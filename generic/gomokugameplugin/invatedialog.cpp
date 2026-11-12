@@ -61,9 +61,7 @@ void InvateDialog::closeEvent(QCloseEvent *event)
 // ----------------------------------------
 
 InvitationDialog::InvitationDialog(const int account, const QString &jid, QString color, const QString &id,
-                                   QWidget *parent) :
-    QDialog(parent),
-    accepted_(false), account_(account), id_(id)
+                                   QWidget *parent) : QDialog(parent), accepted_(false), account_(account), id_(id)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setModal(false);

@@ -11,61 +11,58 @@
 namespace QcaOtr::Wire {
 namespace {
 
-QByteArray unsignedMinimalBytes(const QCA::BigInteger &value, bool *ok)
-{
-    if (ok)
-        *ok = false;
-    if (value < QCA::BigInteger(0))
-        return {};
+    QByteArray unsignedMinimalBytes(const QCA::BigInteger &value, bool *ok)
+    {
+        if (ok)
+            *ok = false;
+        if (value < QCA::BigInteger(0))
+            return { };
 
-    QByteArray bytes = value.toArray().toByteArray();
-    while (!bytes.isEmpty() && bytes.front() == '\0')
-        bytes.remove(0, 1);
+        QByteArray bytes = value.toArray().toByteArray();
+        while (!bytes.isEmpty() && bytes.front() == '\0')
+            bytes.remove(0, 1);
 
-    if (ok)
-        *ok = true;
-    return bytes;
-}
+        if (ok)
+            *ok = true;
+        return bytes;
+    }
 
-QCA::SecureArray unsignedMinimalSecureBytes(const QCA::BigInteger &value, bool *ok)
-{
-    if (ok)
-        *ok = false;
-    if (value < QCA::BigInteger(0))
-        return {};
+    QCA::SecureArray unsignedMinimalSecureBytes(const QCA::BigInteger &value, bool *ok)
+    {
+        if (ok)
+            *ok = false;
+        if (value < QCA::BigInteger(0))
+            return { };
 
-    const QCA::SecureArray bytes = value.toArray();
-    int offset = 0;
-    while (offset < bytes.size() && bytes.at(offset) == '\0')
-        ++offset;
+        const QCA::SecureArray bytes  = value.toArray();
+        int                    offset = 0;
+        while (offset < bytes.size() && bytes.at(offset) == '\0')
+            ++offset;
 
-    QCA::SecureArray result(bytes.size() - offset);
-    if (!result.isEmpty())
-        std::memcpy(result.data(), bytes.constData() + offset, static_cast<size_t>(result.size()));
+        QCA::SecureArray result(bytes.size() - offset);
+        if (!result.isEmpty())
+            std::memcpy(result.data(), bytes.constData() + offset, static_cast<size_t>(result.size()));
 
-    if (ok)
-        *ok = true;
-    return result;
-}
+        if (ok)
+            *ok = true;
+        return result;
+    }
 
-QCA::BigInteger unsignedInteger(const QByteArray &bytes)
-{
-    if (bytes.isEmpty())
-        return QCA::BigInteger(0);
+    QCA::BigInteger unsignedInteger(const QByteArray &bytes)
+    {
+        if (bytes.isEmpty())
+            return QCA::BigInteger(0);
 
-    QByteArray positive;
-    positive.reserve(bytes.size() + 1);
-    positive.append('\0');
-    positive.append(bytes);
-    return QCA::BigInteger(QCA::SecureArray(positive));
-}
+        QByteArray positive;
+        positive.reserve(bytes.size() + 1);
+        positive.append('\0');
+        positive.append(bytes);
+        return QCA::BigInteger(QCA::SecureArray(positive));
+    }
 
 } // namespace
 
-void Writer::writeByte(quint8 value)
-{
-    data_.append(static_cast<char>(value));
-}
+void Writer::writeByte(quint8 value) { data_.append(static_cast<char>(value)); }
 
 void Writer::writeShort(quint16 value)
 {
@@ -81,14 +78,11 @@ void Writer::writeInt(quint32 value)
     data_.append(static_cast<char>(value & 0xff));
 }
 
-void Writer::writeBytes(const QByteArray &value)
-{
-    data_.append(value);
-}
+void Writer::writeBytes(const QByteArray &value) { data_.append(value); }
 
 bool Writer::writeMpi(const QCA::BigInteger &value)
 {
-    bool ok = false;
+    bool             ok    = false;
     const QByteArray bytes = unsignedMinimalBytes(value, &ok);
     if (!ok || static_cast<quint64>(bytes.size()) > std::numeric_limits<quint32>::max())
         return false;
@@ -139,7 +133,7 @@ bool Reader::readShort(quint16 *value)
         return false;
 
     const auto *p = reinterpret_cast<const unsigned char *>(data_.constData() + offset_);
-    *value = (static_cast<quint16>(p[0]) << 8) | static_cast<quint16>(p[1]);
+    *value        = (static_cast<quint16>(p[0]) << 8) | static_cast<quint16>(p[1]);
     offset_ += 2;
     return true;
 }
@@ -150,8 +144,8 @@ bool Reader::readInt(quint32 *value)
         return false;
 
     const auto *p = reinterpret_cast<const unsigned char *>(data_.constData() + offset_);
-    *value = (static_cast<quint32>(p[0]) << 24) | (static_cast<quint32>(p[1]) << 16) |
-        (static_cast<quint32>(p[2]) << 8) | static_cast<quint32>(p[3]);
+    *value = (static_cast<quint32>(p[0]) << 24) | (static_cast<quint32>(p[1]) << 16) | (static_cast<quint32>(p[2]) << 8)
+        | static_cast<quint32>(p[3]);
     offset_ += 4;
     return true;
 }
@@ -162,7 +156,7 @@ bool Reader::readMpi(QCA::BigInteger *value)
         return false;
 
     const quint64 savedOffset = offset_;
-    quint32 length = 0;
+    quint32       length      = 0;
     if (!readInt(&length) || static_cast<quint64>(length) > remaining()) {
         offset_ = savedOffset;
         return false;
@@ -191,7 +185,7 @@ bool Reader::readData(QByteArray *value)
         return false;
 
     const quint64 savedOffset = offset_;
-    quint32 length = 0;
+    quint32       length      = 0;
     if (!readInt(&length) || !readBytes(length, value)) {
         offset_ = savedOffset;
         return false;
@@ -205,10 +199,10 @@ bool Reader::readDsaPublicKey(DsaPublicKey *key)
         return false;
 
     const quint64 savedOffset = offset_;
-    quint16 type = 0;
-    DsaPublicKey decoded;
-    if (!readShort(&type) || type != 0 || !readMpi(&decoded.domain.p) || !readMpi(&decoded.domain.q) ||
-        !readMpi(&decoded.domain.g) || !readMpi(&decoded.y)) {
+    quint16       type        = 0;
+    DsaPublicKey  decoded;
+    if (!readShort(&type) || type != 0 || !readMpi(&decoded.domain.p) || !readMpi(&decoded.domain.q)
+        || !readMpi(&decoded.domain.g) || !readMpi(&decoded.y)) {
         offset_ = savedOffset;
         return false;
     }
@@ -219,7 +213,7 @@ bool Reader::readDsaPublicKey(DsaPublicKey *key)
 
 QByteArray encodeMpi(const QCA::BigInteger &value, bool *ok)
 {
-    Writer writer;
+    Writer     writer;
     const bool success = writer.writeMpi(value);
     if (ok)
         *ok = success;
@@ -231,12 +225,12 @@ QCA::SecureArray encodeMpiSecure(const QCA::BigInteger &value, bool *ok)
     if (ok)
         *ok = false;
 
-    bool bytesOk = false;
-    const QCA::SecureArray bytes = unsignedMinimalSecureBytes(value, &bytesOk);
+    bool                   bytesOk = false;
+    const QCA::SecureArray bytes   = unsignedMinimalSecureBytes(value, &bytesOk);
     if (!bytesOk || static_cast<quint64>(bytes.size()) > std::numeric_limits<quint32>::max())
-        return {};
+        return { };
 
-    const quint32 length = static_cast<quint32>(bytes.size());
+    const quint32    length = static_cast<quint32>(bytes.size());
     QCA::SecureArray encoded(4 + bytes.size());
     encoded[0] = static_cast<char>((length >> 24) & 0xff);
     encoded[1] = static_cast<char>((length >> 16) & 0xff);
@@ -258,7 +252,7 @@ bool decodeMpi(const QByteArray &encoded, QCA::BigInteger *value)
 
 QByteArray encodeDsaPublicKey(const DsaPublicKey &key, bool *ok)
 {
-    Writer writer;
+    Writer     writer;
     const bool success = writer.writeDsaPublicKey(key);
     if (ok)
         *ok = success;

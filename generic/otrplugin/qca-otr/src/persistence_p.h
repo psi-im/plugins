@@ -24,10 +24,7 @@ inline bool validTextField(const QByteArray &value)
     return !value.isEmpty() && !value.contains('\0') && !value.contains('\r') && !value.contains('\n');
 }
 
-inline bool validTabField(const QByteArray &value)
-{
-    return validTextField(value) && !value.contains('\t');
-}
+inline bool validTabField(const QByteArray &value) { return validTextField(value) && !value.contains('\t'); }
 
 inline int hexValue(char c)
 {
@@ -40,10 +37,7 @@ inline int hexValue(char c)
     return -1;
 }
 
-inline bool isHex(char c)
-{
-    return hexValue(c) >= 0;
-}
+inline bool isHex(char c) { return hexValue(c) >= 0; }
 
 inline bool readFile(const QString &path, QByteArray *data, QString *error)
 {

@@ -411,7 +411,7 @@ void GameSession::invite(const QStringList &resList)
     dlg->show();
 }
 
-void GameSession::sendInvite(const QString& jid, bool first)
+void GameSession::sendInvite(const QString &jid, bool first)
 {
     first_       = first;
     jid_         = jid;
@@ -420,12 +420,13 @@ void GameSession::sendInvite(const QString& jid, bool first)
     generateGameId();
     gsl_->updateGameKey(this);
 
-    stage_         = StageInvitation;
-    status_        = StatusWaitInviteConfirmation;
-    stanzaId_      = gsl_->getStanzaId(true);
-    QString stanza = QString("<iq type=\"set\" to=\"%1\" id=\"%2\">"
-                             "<create xmlns=\"games:board\" id=\"%3\" type=\"battleship\" first=\"%4\" /></iq>\n")
-                         .arg(XML::escapeString(jid), stanzaId_, XML::escapeString(gameId_), (first) ? "true" : "false");
+    stage_    = StageInvitation;
+    status_   = StatusWaitInviteConfirmation;
+    stanzaId_ = gsl_->getStanzaId(true);
+    QString stanza
+        = QString("<iq type=\"set\" to=\"%1\" id=\"%2\">"
+                  "<create xmlns=\"games:board\" id=\"%3\" type=\"battleship\" first=\"%4\" /></iq>\n")
+              .arg(XML::escapeString(jid), stanzaId_, XML::escapeString(gameId_), (first) ? "true" : "false");
     emit sendStanza(account_, stanza);
 }
 
@@ -539,7 +540,7 @@ void GameSession::checkOpponentBoard(const QDomElement &xml)
     opBoardChecked_ = false;
     bool cells[100];
     int  cellsCnt = 0;
-    for (bool & cell : cells)
+    for (bool &cell : cells)
         cell = false;
     QStringList data("check-opp-board");
     QDomElement el = xml.firstChildElement();
@@ -667,7 +668,7 @@ bool GameSession::handleTurnResult(const QDomElement &xml)
     return false;
 }
 
-void GameSession::boardEvent(const QString& data)
+void GameSession::boardEvent(const QString &data)
 {
     QStringList dataList = data.split('\n');
     QString     dataStr  = dataList.takeFirst();

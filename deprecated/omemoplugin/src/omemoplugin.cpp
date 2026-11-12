@@ -68,7 +68,7 @@ bool OMEMOPlugin::enable()
     m_crypto = std::make_shared<Crypto>();
     if (!m_crypto->isSupported()) {
         qWarning("omemo: crypto backend failed to initialize");
-        m_crypto = {};
+        m_crypto = { };
         return false;
     }
 
@@ -91,8 +91,8 @@ bool OMEMOPlugin::disable()
         return true;
 
     m_enabled = false;
-    m_omemo   = {};
-    m_crypto  = {};
+    m_omemo   = { };
+    m_crypto  = { };
 
     return true;
 }

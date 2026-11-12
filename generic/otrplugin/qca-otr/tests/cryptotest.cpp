@@ -8,8 +8,7 @@
 #include <QTest>
 #include <QtCrypto>
 
-class CryptoTest : public QObject
-{
+class CryptoTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -24,15 +23,9 @@ private:
     QCA::Initializer *initializer_ = nullptr;
 };
 
-void CryptoTest::initTestCase()
-{
-    initializer_ = new QCA::Initializer;
-}
+void CryptoTest::initTestCase() { initializer_ = new QCA::Initializer; }
 
-void CryptoTest::cleanupTestCase()
-{
-    delete initializer_;
-}
+void CryptoTest::cleanupTestCase() { delete initializer_; }
 
 void CryptoTest::rawDsa()
 {
@@ -43,7 +36,7 @@ void CryptoTest::rawDsa()
     privateKey.domain.p = QCA::BigInteger(23);
     privateKey.domain.q = QCA::BigInteger(11);
     privateKey.domain.g = QCA::BigInteger(2);
-    privateKey.x = QCA::BigInteger(3);
+    privateKey.x        = QCA::BigInteger(3);
 
     const QcaOtr::DsaPublicKey publicKey = QcaOtr::dsaPublicKey(privateKey);
     QCOMPARE(publicKey.y, QCA::BigInteger(8));
@@ -66,7 +59,7 @@ void CryptoTest::rawDsa()
     // different (r,s) pair can accidentally verify. Use an out-of-range value
     // that DSA validation must reject deterministically.
     QcaOtr::DsaSignature damaged = signature;
-    damaged.r = privateKey.domain.q;
+    damaged.r                    = privateKey.domain.q;
     QVERIFY(!QcaOtr::dsaVerifyDigest(publicKey, QByteArray::fromHex("09"), damaged));
 }
 
@@ -82,7 +75,7 @@ void CryptoTest::hmacSha256()
     QVERIFY2(QCA::isSupported("hmac(sha256)"), "QCA provider with HMAC-SHA256 support is required");
 
     const QCA::SecureArray key(QByteArrayLiteral("Jefe"));
-    const QByteArray data("what do ya want for nothing?");
+    const QByteArray       data("what do ya want for nothing?");
     QCOMPARE(QcaOtr::hmacSha256(key, data).toHex(),
              QByteArrayLiteral("5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843"));
 }
@@ -92,9 +85,9 @@ void CryptoTest::aes128Ctr()
     QVERIFY2(QCA::isSupported("aes128-ctr"), "QCA provider with AES-128-CTR support is required");
 
     const QCA::SecureArray key(QByteArray::fromHex("2b7e151628aed2a6abf7158809cf4f3c"));
-    const QByteArray counter = QByteArray::fromHex("f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff");
-    const QByteArray plain = QByteArray::fromHex("6bc1bee22e409f96e93d7e117393172a");
-    const QByteArray expected = QByteArray::fromHex("874d6191b620e3261bef6864990db6ce");
+    const QByteArray       counter  = QByteArray::fromHex("f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff");
+    const QByteArray       plain    = QByteArray::fromHex("6bc1bee22e409f96e93d7e117393172a");
+    const QByteArray       expected = QByteArray::fromHex("874d6191b620e3261bef6864990db6ce");
 
     QByteArray encrypted;
     QVERIFY(QcaOtr::aes128Ctr(key, counter, plain, &encrypted));

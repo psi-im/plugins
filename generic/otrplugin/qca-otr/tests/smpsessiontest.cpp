@@ -11,7 +11,7 @@
 namespace {
 
 constexpr quint32 AliceInstance = 0x11111111;
-constexpr quint32 BobInstance = 0x22222222;
+constexpr quint32 BobInstance   = 0x22222222;
 
 QcaOtr::DsaPrivateKey toyKey(int x)
 {
@@ -19,20 +19,16 @@ QcaOtr::DsaPrivateKey toyKey(int x)
     key.domain.p = QCA::BigInteger(23);
     key.domain.q = QCA::BigInteger(11);
     key.domain.g = QCA::BigInteger(2);
-    key.x = QCA::BigInteger(x);
+    key.x        = QCA::BigInteger(x);
     return key;
 }
 
-QCA::SecureArray secret(const char *text)
-{
-    return QCA::SecureArray(QByteArray(text));
-}
+QCA::SecureArray secret(const char *text) { return QCA::SecureArray(QByteArray(text)); }
 
-QVector<QByteArray> deliver(QcaOtr::OtrSession *target,
-                            const QVector<QByteArray> &messages,
+QVector<QByteArray> deliver(QcaOtr::OtrSession *target, const QVector<QByteArray> &messages,
                             QcaOtr::SessionResult *lastResult = nullptr)
 {
-    QVector<QByteArray> outgoing;
+    QVector<QByteArray>   outgoing;
     QcaOtr::SessionResult last;
     for (const QByteArray &message : messages) {
         last = target->processIncoming(message);
@@ -45,7 +41,7 @@ QVector<QByteArray> deliver(QcaOtr::OtrSession *target,
 
 bool completeHandshake(QcaOtr::OtrSession *alice, QcaOtr::OtrSession *bob)
 {
-    bool ok = false;
+    bool                ok       = false;
     QVector<QByteArray> messages = alice->start(BobInstance, 0, &ok);
     if (!ok || messages.isEmpty())
         return false;
@@ -66,8 +62,7 @@ bool completeHandshake(QcaOtr::OtrSession *alice, QcaOtr::OtrSession *bob)
 
 } // namespace
 
-class SmpSessionTest : public QObject
-{
+class SmpSessionTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -82,15 +77,9 @@ private:
     QCA::Initializer *initializer_ = nullptr;
 };
 
-void SmpSessionTest::initTestCase()
-{
-    initializer_ = new QCA::Initializer;
-}
+void SmpSessionTest::initTestCase() { initializer_ = new QCA::Initializer; }
 
-void SmpSessionTest::cleanupTestCase()
-{
-    delete initializer_;
-}
+void SmpSessionTest::cleanupTestCase() { delete initializer_; }
 
 void SmpSessionTest::matchingSecretsSucceed()
 {
@@ -159,7 +148,7 @@ void SmpSessionTest::questionAndAbort()
     QVERIFY(completeHandshake(&alice, &bob));
 
     QVector<QByteArray> messages;
-    const QByteArray question("What is our shared answer?");
+    const QByteArray    question("What is our shared answer?");
     QVERIFY(alice.startSmp(BobInstance, question, secret("answer"), &messages));
 
     QcaOtr::SessionResult state = bob.processIncoming(messages.front());
@@ -181,25 +170,15 @@ void SmpSessionTest::malformedAndUnexpectedTlvs()
     QVERIFY(completeHandshake(&alice, &bob));
 
     QVector<QcaOtr::Tlv> tlvs;
-    tlvs.append(QcaOtr::Tlv {static_cast<quint16>(QcaOtr::TlvType::Smp2), QByteArray()});
+    tlvs.append(QcaOtr::Tlv { static_cast<quint16>(QcaOtr::TlvType::Smp2), QByteArray() });
     QVector<QByteArray> messages;
-    QVERIFY(alice.sendMessage(BobInstance,
-                              QByteArray(),
-                              tlvs,
-                              &messages,
-                              0,
-                              QcaOtr::DataFlagIgnoreUnreadable));
+    QVERIFY(alice.sendMessage(BobInstance, QByteArray(), tlvs, &messages, 0, QcaOtr::DataFlagIgnoreUnreadable));
     QcaOtr::SessionResult state = bob.processIncoming(messages.front());
     QCOMPARE(state.smpEvent, QcaOtr::SmpEvent::Error);
 
     tlvs.clear();
-    tlvs.append(QcaOtr::Tlv {static_cast<quint16>(QcaOtr::TlvType::Smp1), QByteArray("truncated")});
-    QVERIFY(alice.sendMessage(BobInstance,
-                              QByteArray(),
-                              tlvs,
-                              &messages,
-                              0,
-                              QcaOtr::DataFlagIgnoreUnreadable));
+    tlvs.append(QcaOtr::Tlv { static_cast<quint16>(QcaOtr::TlvType::Smp1), QByteArray("truncated") });
+    QVERIFY(alice.sendMessage(BobInstance, QByteArray(), tlvs, &messages, 0, QcaOtr::DataFlagIgnoreUnreadable));
     state = bob.processIncoming(messages.front());
     QCOMPARE(state.smpEvent, QcaOtr::SmpEvent::Cheated);
     QCOMPARE(state.smpProgress, quint16(0));

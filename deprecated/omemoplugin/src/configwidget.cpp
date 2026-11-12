@@ -68,7 +68,7 @@ ConfigWidgetTabWithTable::ConfigWidgetTabWithTable(int account, OMEMO *omemo, QW
 {
     m_table = new QTableView(this);
     m_table->setShowGrid(true);
-    m_table->setEditTriggers({});
+    m_table->setEditTriggers({ });
     m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_table->setContextMenuPolicy(Qt::CustomContextMenu);
     m_table->setSortingEnabled(true);
@@ -381,9 +381,9 @@ void ManageDevices::deleteDevice()
         const QString &&deviceId    = m_tableModel->item(selectIndex.row(), 0)->data().toString();
         const QString &&fingerprint = m_tableModel->item(selectIndex.row(), 1)->text();
         const QString &&message     = tr("After deleting of device from list of available devices "
-                                             "it stops receiving offline messages from your contacts "
-                                             "until it will become online and your contacts mark it "
-                                             "as trusted.")
+                                         "it stops receiving offline messages from your contacts "
+                                         "until it will become online and your contacts mark it "
+                                         "as trusted.")
             + "\n\n" + tr("Device ID") + QString(": %1").arg(deviceId) + "\n" + tr("Fingerprint")
             + QString(": %1").arg(fingerprint) + "\n\n" + tr("Delete selected device?");
 

@@ -11,30 +11,26 @@
 namespace QcaOtr {
 
 /** DSA domain parameters used by OTRv3 identity keys. */
-struct DsaDomain
-{
+struct DsaDomain {
     QCA::BigInteger p;
     QCA::BigInteger q;
     QCA::BigInteger g;
 };
 
 /** DSA private identity key. The private exponent must be treated as secret. */
-struct DsaPrivateKey
-{
-    DsaDomain domain;
+struct DsaPrivateKey {
+    DsaDomain       domain;
     QCA::BigInteger x;
 };
 
 /** DSA public identity key. */
-struct DsaPublicKey
-{
-    DsaDomain domain;
+struct DsaPublicKey {
+    DsaDomain       domain;
     QCA::BigInteger y;
 };
 
 /** DSA signature pair. */
-struct DsaSignature
-{
+struct DsaSignature {
     QCA::BigInteger r;
     QCA::BigInteger s;
 };
@@ -72,9 +68,6 @@ QByteArray hmacSha256(const QCA::SecureArray &key, const QByteArray &data);
  * CTR encryption and decryption are the same operation; @p counter must contain
  * the protocol's 16-byte counter block.
  */
-bool aes128Ctr(const QCA::SecureArray &key,
-               const QByteArray &counter,
-               const QByteArray &input,
-               QByteArray *output);
+bool aes128Ctr(const QCA::SecureArray &key, const QByteArray &counter, const QByteArray &input, QByteArray *output);
 
 } // namespace QcaOtr

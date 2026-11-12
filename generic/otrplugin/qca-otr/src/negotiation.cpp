@@ -8,25 +8,25 @@
 namespace QcaOtr::Negotiation {
 namespace {
 
-const QByteArray ErrorTypePrefix("?OTR Error:");
-const QByteArray ErrorMessagePrefix("?OTR Error: ");
-const QByteArray BaseWhitespaceTag(" \t  \t\t\t\t \t \t \t  ");
-const QByteArray V1WhitespaceTag(" \t \t  \t ");
-const QByteArray V2WhitespaceTag("  \t\t  \t ");
-const QByteArray V3WhitespaceTag("  \t\t  \t\t");
+    const QByteArray ErrorTypePrefix("?OTR Error:");
+    const QByteArray ErrorMessagePrefix("?OTR Error: ");
+    const QByteArray BaseWhitespaceTag(" \t  \t\t\t\t \t \t \t  ");
+    const QByteArray V1WhitespaceTag(" \t \t  \t ");
+    const QByteArray V2WhitespaceTag("  \t\t  \t ");
+    const QByteArray V3WhitespaceTag("  \t\t  \t\t");
 
-bool isWhitespaceGroup(const QByteArray &message, int offset)
-{
-    if (offset < 0 || offset + 8 > message.size())
-        return false;
-
-    for (int i = 0; i < 8; ++i) {
-        const char ch = message.at(offset + i);
-        if (ch != ' ' && ch != '\t')
+    bool isWhitespaceGroup(const QByteArray &message, int offset)
+    {
+        if (offset < 0 || offset + 8 > message.size())
             return false;
+
+        for (int i = 0; i < 8; ++i) {
+            const char ch = message.at(offset + i);
+            if (ch != ' ' && ch != '\t')
+                return false;
+        }
+        return true;
     }
-    return true;
-}
 
 } // namespace
 
@@ -68,7 +68,7 @@ VersionMask queryVersions(const QByteArray &message, bool *isQuery)
     if (start < 0 || start + 4 >= message.size())
         return 0;
 
-    int pos = start + 4;
+    int        pos    = start + 4;
     const char marker = message.at(pos);
     if (marker != '?' && marker != 'v')
         return 0;
@@ -105,9 +105,7 @@ quint8 bestVersion(VersionMask peerVersions, VersionMask localVersions)
     return 0;
 }
 
-quint8 queryBestVersion(const QByteArray &message,
-                        VersionMask localVersions,
-                        bool *isQuery)
+quint8 queryBestVersion(const QByteArray &message, VersionMask localVersions, bool *isQuery)
 {
     return bestVersion(queryVersions(message, isQuery), localVersions);
 }
@@ -153,13 +151,13 @@ QByteArray whitespaceTag(VersionMask versions)
 WhitespaceTag detectWhitespaceTag(const QByteArray &message)
 {
     WhitespaceTag result;
-    const int start = message.indexOf(BaseWhitespaceTag);
+    const int     start = message.indexOf(BaseWhitespaceTag);
     if (start < 0)
         return result;
 
     result.found = true;
     result.start = start;
-    result.end = start + BaseWhitespaceTag.size();
+    result.end   = start + BaseWhitespaceTag.size();
 
     while (isWhitespaceGroup(message, result.end)) {
         const QByteArray group = message.mid(result.end, 8);
@@ -174,9 +172,7 @@ WhitespaceTag detectWhitespaceTag(const QByteArray &message)
     return result;
 }
 
-quint8 whitespaceBestVersion(const QByteArray &message,
-                             VersionMask localVersions,
-                             WhitespaceTag *tag)
+quint8 whitespaceBestVersion(const QByteArray &message, VersionMask localVersions, WhitespaceTag *tag)
 {
     const WhitespaceTag detected = detectWhitespaceTag(message);
     if (tag)

@@ -313,7 +313,7 @@ template <typename T> void Signal::doWithCipher(signal_protocol_address *addr, c
 
 signal_protocol_address Signal::getAddress(uint32_t deviceId, const QByteArray &name) const
 {
-    signal_protocol_address addr = {};
+    signal_protocol_address addr = { };
     addr.device_id               = deviceId;
     addr.name                    = name.data();
     addr.name_len                = static_cast<size_t>(name.length());

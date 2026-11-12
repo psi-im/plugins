@@ -58,7 +58,7 @@ private:
         StatusInviteInDialog,      // Окно приглашения к нам (входящий инвайт)
         StatusWaitOpponentCommand, // Ожидается входящая команда от оппонента (ход, сдача, загрузка игры и т.д.)
         StatusWaitGameWindow,      // Ожидается активность от окна игры
-        StatusWaitOpponentAccept // Ожидается входящий ответ от оппонента на нашу команду (Accept или Error)
+        StatusWaitOpponentAccept   // Ожидается входящий ответ от оппонента на нашу команду (Accept или Error)
     };
     struct GameSession {
         SessionStatus          status;

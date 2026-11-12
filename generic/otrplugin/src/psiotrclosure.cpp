@@ -45,8 +45,7 @@ namespace psiotr {
 
 AuthenticationDialog::AuthenticationDialog(OtrMessaging *otrc, const QString &account, const QString &contact,
                                            const QString &question, bool sender, QWidget *parent) :
-    QDialog(parent),
-    m_otr(otrc), m_method(METHOD_QUESTION), m_account(account), m_contact(contact), m_isSender(sender)
+    QDialog(parent), m_otr(otrc), m_method(METHOD_QUESTION), m_account(account), m_contact(contact), m_isSender(sender)
 {
     setAttribute(Qt::WA_DeleteOnClose);
 
@@ -57,14 +56,14 @@ AuthenticationDialog::AuthenticationDialog(OtrMessaging *otrc, const QString &ac
     QString fprExplanation;
     if (m_isSender) {
         setWindowTitle(tr("Authenticate %1").arg(m_contactName));
-        qaExplanation = tr("To authenticate via question and answer, "
-                           "ask a question whose answer is only known "
-                           "to you and %1.")
-                            .arg(m_contactName);
-        ssExplanation = tr("To authenticate via shared secret, "
-                           "enter a secret only known "
-                           "to you and %1.")
-                            .arg(m_contactName);
+        qaExplanation  = tr("To authenticate via question and answer, "
+                            "ask a question whose answer is only known "
+                            "to you and %1.")
+                             .arg(m_contactName);
+        ssExplanation  = tr("To authenticate via shared secret, "
+                            "enter a secret only known "
+                            "to you and %1.")
+                             .arg(m_contactName);
         fprExplanation = tr("To authenticate manually, exchange your "
                             "fingerprints over an authenticated channel and "
                             "compare each other's fingerprint with the one "
@@ -401,10 +400,7 @@ PsiOtrClosure::PsiOtrClosure(const QString &account, const QString &contact, Otr
 
 //-----------------------------------------------------------------------------
 
-PsiOtrClosure::~PsiOtrClosure()
-{
-    delete m_chatDlgMenu;
-}
+PsiOtrClosure::~PsiOtrClosure() { delete m_chatDlgMenu; }
 
 //-----------------------------------------------------------------------------
 

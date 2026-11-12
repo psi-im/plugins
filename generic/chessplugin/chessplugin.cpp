@@ -92,7 +92,7 @@ public:
     virtual bool                disable();
     virtual void                applyOptions();
     virtual void                restoreOptions();
-    virtual void                optionChanged(const QString                &/*option*/) {};
+    virtual void                optionChanged(const QString                &/*option*/) { };
     virtual void                setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
     virtual void                setOptionAccessingHost(OptionAccessingHost *host);
     virtual void                setActiveTabAccessingHost(ActiveTabAccessingHost *host);
@@ -119,7 +119,7 @@ public slots:
     void moveAccepted();
     void error();
     void load(const QString &settings);
-    void doInviteDialog(const QString &jid, int account=0);
+    void doInviteDialog(const QString &jid, int account = 0);
 
 private slots:
     void toolButtonPressed();
@@ -830,11 +830,10 @@ void ChessPlugin::toggleEnableSound(bool enable) { enableSound = enable; }
 
 QString ChessPlugin::pluginInfo()
 {
-    return tr(
-        "Play chess with your friends.\n"
-        "The plugin is compatible with a similar plugin for Tkabber.\n"
-        "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat "
-        "window.");
+    return tr("Play chess with your friends.\n"
+              "The plugin is compatible with a similar plugin for Tkabber.\n"
+              "To invite a friend for a game, you can use contact menu item or the button on the toolbar in a chat "
+              "window.");
 }
 
 #include "chessplugin.moc"

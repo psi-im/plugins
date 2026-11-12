@@ -57,8 +57,8 @@ public:
         return false;
     };
     virtual void    logout(int account) { Q_UNUSED(account); };
-    virtual void    applyOptions() {};
-    virtual void    restoreOptions() {};
+    virtual void    applyOptions() { };
+    virtual void    restoreOptions() { };
     virtual QString pluginInfo();
 
 private slots:

@@ -17,7 +17,7 @@ QByteArray encodeTlvs(const QVector<Tlv> &tlvs, bool *ok)
     QByteArray encoded;
     for (const Tlv &tlv : tlvs) {
         if (tlv.value.size() > std::numeric_limits<quint16>::max())
-            return {};
+            return { };
 
         const quint16 length = static_cast<quint16>(tlv.value.size());
         encoded.append(static_cast<char>((tlv.type >> 8) & 0xff));
@@ -38,13 +38,13 @@ bool decodeTlvs(const QByteArray &encoded, QVector<Tlv> *tlvs)
         return false;
 
     QVector<Tlv> decoded;
-    int offset = 0;
+    int          offset = 0;
     while (offset < encoded.size()) {
         if (encoded.size() - offset < 4)
             return false;
 
-        const auto *header = reinterpret_cast<const unsigned char *>(encoded.constData() + offset);
-        const quint16 type = (static_cast<quint16>(header[0]) << 8) | header[1];
+        const auto   *header = reinterpret_cast<const unsigned char *>(encoded.constData() + offset);
+        const quint16 type   = (static_cast<quint16>(header[0]) << 8) | header[1];
         const quint16 length = (static_cast<quint16>(header[2]) << 8) | header[3];
         offset += 4;
 
@@ -52,7 +52,7 @@ bool decodeTlvs(const QByteArray &encoded, QVector<Tlv> *tlvs)
             return false;
 
         Tlv tlv;
-        tlv.type = type;
+        tlv.type  = type;
         tlv.value = encoded.mid(offset, length);
         decoded.append(tlv);
         offset += length;

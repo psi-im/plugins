@@ -13,35 +13,19 @@
 namespace QcaOtr {
 
 /** Next SMP message expected by the primitive state machine. */
-enum class SmpExpected {
-    Message1,
-    Message2,
-    Message3,
-    Message4,
-    Message5
-};
+enum class SmpExpected { Message1, Message2, Message3, Message4, Message5 };
 
 /** Authentication outcome/progress tracked by the SMP primitive. */
-enum class SmpProgress {
-    Ok,
-    Cheated,
-    Failed,
-    Succeeded
-};
+enum class SmpProgress { Ok, Cheated, Failed, Succeeded };
 
 /** Result category for one SMP protocol step. */
-enum class SmpStepStatus {
-    Ok,
-    Unexpected,
-    Invalid
-};
+enum class SmpStepStatus { Ok, Unexpected, Invalid };
 
 /** Result of processing or generating one SMP step. */
-struct SmpStepResult
-{
-    SmpStepStatus status = SmpStepStatus::Unexpected;
-    SmpProgress progress = SmpProgress::Ok;
-    QByteArray outgoing;
+struct SmpStepResult {
+    SmpStepStatus status   = SmpStepStatus::Unexpected;
+    SmpProgress   progress = SmpProgress::Ok;
+    QByteArray    outgoing;
 };
 
 /**
@@ -51,13 +35,12 @@ struct SmpStepResult
  * the user's textual answer. `OtrSession` combines the ordered fingerprints,
  * secure session id and user-entered secret before calling this layer.
  */
-class SmpSession
-{
+class SmpSession {
 public:
     SmpSession();
     ~SmpSession();
 
-    SmpSession(const SmpSession &) = delete;
+    SmpSession(const SmpSession &)            = delete;
     SmpSession &operator=(const SmpSession &) = delete;
     SmpSession(SmpSession &&) noexcept;
     SmpSession &operator=(SmpSession &&) noexcept;

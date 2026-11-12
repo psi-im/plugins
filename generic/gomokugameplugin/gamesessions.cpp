@@ -225,7 +225,7 @@ bool GameSessions::incomingInvitation(const int account, const QString &from, co
  */
 void GameSessions::showInvitation(const QString &from, int account)
 {
-    const int idx      = findGameSessionByJid(from);
+    const int idx = findGameSessionByJid(from);
     if (idx == -1 || gameSessions.at(idx).status != StatusInviteInDialog)
         return;
     account = gameSessions.at(idx).my_acc;
@@ -262,7 +262,7 @@ void GameSessions::acceptInvite(const int account, const QString &id)
                                      "type=\"%3\" id=\"%4\"/></iq>")
                                  .arg(XML::escapeString(gameSessions.at(idx).full_jid), XML::escapeString(id),
                                       constProtoType, constProtoId);
-            emit sendStanza(account, stanza);
+            emit    sendStanza(account, stanza);
         } else {
             sendErrorIq(account, gameSessions.at(idx).full_jid, id, getLastError());
             emit doPopup(tr("You are already playing!"));
@@ -589,7 +589,7 @@ void GameSessions::sendMove(const int x, const int y)
                              "id=\"%4\"><move pos=\"%5,%6\"></move></turn></iq>")
                          .arg(XML::escapeString(gameSessions.at(idx).full_jid), id_str, constProtoType, constProtoId)
                          .arg(x, y);
-    emit sendStanza(gameSessions.at(idx).my_acc, stanza);
+    emit    sendStanza(gameSessions.at(idx).my_acc, stanza);
 }
 
 /**
@@ -605,7 +605,7 @@ void GameSessions::switchColor()
     QString stanza = QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><turn xmlns=\"games:board\" type=\"%3\" "
                              "id=\"%4\"><move pos=\"switch-color\"></move></turn></iq>")
                          .arg(XML::escapeString(gameSessions.at(idx).full_jid), id_str, constProtoType, constProtoId);
-    emit sendStanza(gameSessions.at(idx).my_acc, stanza);
+    emit    sendStanza(gameSessions.at(idx).my_acc, stanza);
 }
 
 /**
@@ -653,9 +653,9 @@ void GameSessions::sendDraw()
         QString      new_id = newId();
         sess->last_iq_id    = new_id;
         QString stanza      = QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><turn xmlns=\"games:board\" type=\"%3\" "
-                                           "id=\"%4\"><draw/></turn></iq>")
-                             .arg(XML::escapeString(sess->full_jid), new_id, constProtoType, constProtoId);
-        emit sendStanza(sess->my_acc, stanza);
+                                      "id=\"%4\"><draw/></turn></iq>")
+                                  .arg(XML::escapeString(sess->full_jid), new_id, constProtoType, constProtoId);
+        emit    sendStanza(sess->my_acc, stanza);
     }
 }
 
@@ -672,7 +672,7 @@ void GameSessions::youLose()
     QString stanza = QString("<iq type=\"set\" to=\"%1\" id=\"%2\"><turn xmlns=\"games:board\" type=\"%3\" "
                              "id=\"%4\"><resign/></turn></iq>")
                          .arg(XML::escapeString(to_str), id_str, constProtoType, constProtoId);
-    emit sendStanza(gameSessions.at(idx).my_acc, stanza);
+    emit    sendStanza(gameSessions.at(idx).my_acc, stanza);
 }
 
 /**

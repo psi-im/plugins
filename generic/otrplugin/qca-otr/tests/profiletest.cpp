@@ -20,7 +20,7 @@ QcaOtr::DsaPrivateKey toyKey(int x)
     key.domain.p = QCA::BigInteger(23);
     key.domain.q = QCA::BigInteger(11);
     key.domain.g = QCA::BigInteger(2);
-    key.x = QCA::BigInteger(x);
+    key.x        = QCA::BigInteger(x);
     return key;
 }
 
@@ -32,8 +32,7 @@ bool writeFile(const QString &path, const QByteArray &data)
 
 } // namespace
 
-class ProfileTest : public QObject
-{
+class ProfileTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -47,15 +46,9 @@ private:
     QCA::Initializer *initializer_ = nullptr;
 };
 
-void ProfileTest::initTestCase()
-{
-    initializer_ = new QCA::Initializer;
-}
+void ProfileTest::initTestCase() { initializer_ = new QCA::Initializer; }
 
-void ProfileTest::cleanupTestCase()
-{
-    delete initializer_;
-}
+void ProfileTest::cleanupTestCase() { delete initializer_; }
 
 void ProfileTest::missingProfileIsEmpty()
 {
@@ -63,7 +56,7 @@ void ProfileTest::missingProfileIsEmpty()
     QVERIFY(dir.isValid());
 
     QcaOtr::ProfileData profile;
-    QString error;
+    QString             error;
     QVERIFY2(QcaOtr::Persistence::loadProfile(dir.path(), &profile, &error), qPrintable(error));
     QVERIFY(profile.privateKeys.isEmpty());
     QVERIFY(profile.fingerprints.isEmpty());
@@ -78,41 +71,41 @@ void ProfileTest::profileRoundTripAndLookup()
     QcaOtr::ProfileData profile;
 
     QcaOtr::PrivateKeyRecord oldKey;
-    oldKey.account = "account-a";
+    oldKey.account  = "account-a";
     oldKey.protocol = TestProtocolId;
-    oldKey.key = toyKey(3);
+    oldKey.key      = toyKey(3);
     profile.privateKeys.append(oldKey);
 
     QcaOtr::PrivateKeyRecord replacementKey = oldKey;
-    replacementKey.key = toyKey(4);
+    replacementKey.key                      = toyKey(4);
     profile.privateKeys.append(replacementKey);
 
     QcaOtr::PrivateKeyRecord otherKey;
-    otherKey.account = "account-b";
+    otherKey.account  = "account-b";
     otherKey.protocol = TestProtocolId;
-    otherKey.key = toyKey(5);
+    otherKey.key      = toyKey(5);
     profile.privateKeys.append(otherKey);
 
     QcaOtr::FingerprintRecord oldFingerprint;
-    oldFingerprint.username = "romeo@example.net";
-    oldFingerprint.account = "account-a";
-    oldFingerprint.protocol = TestProtocolId;
+    oldFingerprint.username    = "romeo@example.net";
+    oldFingerprint.account     = "account-a";
+    oldFingerprint.protocol    = TestProtocolId;
     oldFingerprint.fingerprint = QByteArray::fromHex("00112233445566778899aabbccddeeff00112233");
-    oldFingerprint.trust = "old-trust";
+    oldFingerprint.trust       = "old-trust";
     profile.fingerprints.append(oldFingerprint);
 
     QcaOtr::FingerprintRecord replacementFingerprint = oldFingerprint;
-    replacementFingerprint.trust = "custom-libotr-trust";
+    replacementFingerprint.trust                     = "custom-libotr-trust";
     profile.fingerprints.append(replacementFingerprint);
 
     QcaOtr::InstanceTagRecord oldTag;
-    oldTag.account = "account-a";
-    oldTag.protocol = TestProtocolId;
+    oldTag.account     = "account-a";
+    oldTag.protocol    = TestProtocolId;
     oldTag.instanceTag = 0x11111111;
     profile.instanceTags.append(oldTag);
 
     QcaOtr::InstanceTagRecord replacementTag = oldTag;
-    replacementTag.instanceTag = 0x22222222;
+    replacementTag.instanceTag               = 0x22222222;
     profile.instanceTags.append(replacementTag);
 
     QString error;
@@ -147,21 +140,20 @@ void ProfileTest::malformedLineStoresKeepValidRecords()
     QTemporaryDir dir;
     QVERIFY(dir.isValid());
 
-    const QByteArray fingerprints =
-        "romeo@example.net\taccount-a\tprpl-jabber\t00112233445566778899aabbccddeeff00112233\tfirst\n"
-        "this is not a fingerprint record\n"
-        "juliet@example.net\taccount-b\tprpl-jabber\tffeeddccbbaa99887766554433221100ffeeddcc\tsecond\n";
-    const QByteArray instags =
-        "# WARNING! legacy comment\n"
-        "account-a\tprpl-jabber\t12345678\n"
-        "broken instance tag line\n"
-        "account-b\tprpl-jabber\t89abcdef\n";
+    const QByteArray fingerprints
+        = "romeo@example.net\taccount-a\tprpl-jabber\t00112233445566778899aabbccddeeff00112233\tfirst\n"
+          "this is not a fingerprint record\n"
+          "juliet@example.net\taccount-b\tprpl-jabber\tffeeddccbbaa99887766554433221100ffeeddcc\tsecond\n";
+    const QByteArray instags = "# WARNING! legacy comment\n"
+                               "account-a\tprpl-jabber\t12345678\n"
+                               "broken instance tag line\n"
+                               "account-b\tprpl-jabber\t89abcdef\n";
 
     QVERIFY(writeFile(dir.filePath(QcaOtr::OtrFingerprintsFileName), fingerprints));
     QVERIFY(writeFile(dir.filePath(QcaOtr::OtrInstanceTagsFileName), instags));
 
     QcaOtr::ProfileData profile;
-    QString error;
+    QString             error;
     QVERIFY2(QcaOtr::Persistence::loadProfile(dir.path(), &profile, &error), qPrintable(error));
     QVERIFY(profile.privateKeys.isEmpty());
     QCOMPARE(profile.fingerprints.size(), 2);

@@ -110,8 +110,7 @@ QRect QxtWindowSystem::windowGeometry(WId /*window*/)
      if (err != noErr) return QRect();
 
      return QRect(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);*/
-    return QRect();
-}
+  return QRect(); }
 
 /* This method is the only one that is not a complete hack
    from Quartz Event Services

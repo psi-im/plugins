@@ -27,7 +27,7 @@ class BoardDelegate : public QItemDelegate {
     Q_OBJECT
 
 public:
-    BoardDelegate(QObject *parent) : QItemDelegate(parent) {};
+    BoardDelegate(QObject *parent) : QItemDelegate(parent) { };
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 }

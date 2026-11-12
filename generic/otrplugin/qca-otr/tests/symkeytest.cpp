@@ -13,7 +13,7 @@
 namespace {
 
 constexpr quint32 AliceInstance = 0x11111111;
-constexpr quint32 BobInstance = 0x22222222;
+constexpr quint32 BobInstance   = 0x22222222;
 
 QcaOtr::DsaPrivateKey toyKey(int x)
 {
@@ -21,15 +21,14 @@ QcaOtr::DsaPrivateKey toyKey(int x)
     key.domain.p = QCA::BigInteger(23);
     key.domain.q = QCA::BigInteger(11);
     key.domain.g = QCA::BigInteger(2);
-    key.x = QCA::BigInteger(x);
+    key.x        = QCA::BigInteger(x);
     return key;
 }
 
-QVector<QByteArray> deliver(QcaOtr::OtrSession *target,
-                            const QVector<QByteArray> &messages,
+QVector<QByteArray> deliver(QcaOtr::OtrSession *target, const QVector<QByteArray> &messages,
                             QcaOtr::SessionResult *last = nullptr)
 {
-    QVector<QByteArray> outgoing;
+    QVector<QByteArray>   outgoing;
     QcaOtr::SessionResult current;
     for (const QByteArray &message : messages) {
         current = target->processIncoming(message);
@@ -40,11 +39,9 @@ QVector<QByteArray> deliver(QcaOtr::OtrSession *target,
     return outgoing;
 }
 
-bool completeHandshake(QcaOtr::OtrSession *initiator,
-                       quint32 responderInstance,
-                       QcaOtr::OtrSession *responder)
+bool completeHandshake(QcaOtr::OtrSession *initiator, quint32 responderInstance, QcaOtr::OtrSession *responder)
 {
-    bool ok = false;
+    bool                ok       = false;
     QVector<QByteArray> messages = initiator->start(responderInstance, 0, &ok);
     if (!ok || messages.isEmpty())
         return false;
@@ -65,8 +62,7 @@ bool completeHandshake(QcaOtr::OtrSession *initiator,
 
 } // namespace
 
-class SymkeyTest : public QObject
-{
+class SymkeyTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -79,15 +75,9 @@ private:
     QCA::Initializer *initializer_ = nullptr;
 };
 
-void SymkeyTest::initTestCase()
-{
-    initializer_ = new QCA::Initializer;
-}
+void SymkeyTest::initTestCase() { initializer_ = new QCA::Initializer; }
 
-void SymkeyTest::cleanupTestCase()
-{
-    delete initializer_;
-}
+void SymkeyTest::cleanupTestCase() { delete initializer_; }
 
 void SymkeyTest::exchangesSymmetricKeyBothDirections()
 {
@@ -95,14 +85,10 @@ void SymkeyTest::exchangesSymmetricKeyBothDirections()
     QcaOtr::OtrSession bob(toyKey(6), BobInstance);
     QVERIFY(completeHandshake(&alice, BobInstance, &bob));
 
-    const QByteArray aliceUseData = QByteArray::fromHex("61006200ff");
-    QCA::SecureArray aliceKey;
+    const QByteArray    aliceUseData = QByteArray::fromHex("61006200ff");
+    QCA::SecureArray    aliceKey;
     QVector<QByteArray> messages;
-    QVERIFY(alice.sendSymmetricKey(BobInstance,
-                                   0x01020304,
-                                   aliceUseData,
-                                   &aliceKey,
-                                   &messages));
+    QVERIFY(alice.sendSymmetricKey(BobInstance, 0x01020304, aliceUseData, &aliceKey, &messages));
     QCOMPARE(aliceKey.size(), 32);
     QCOMPARE(messages.size(), 1);
 
@@ -128,11 +114,7 @@ void SymkeyTest::exchangesSymmetricKeyBothDirections()
 
     const QByteArray bobUseData = QByteArray::fromHex("0001020300");
     QCA::SecureArray bobKey;
-    QVERIFY(bob.sendSymmetricKey(AliceInstance,
-                                 0xa1b2c3d4,
-                                 bobUseData,
-                                 &bobKey,
-                                 &messages));
+    QVERIFY(bob.sendSymmetricKey(AliceInstance, 0xa1b2c3d4, bobUseData, &bobKey, &messages));
     QCOMPARE(bobKey.size(), 32);
 
     received = alice.processIncoming(messages.front());
@@ -145,21 +127,17 @@ void SymkeyTest::exchangesSymmetricKeyBothDirections()
 
 void SymkeyTest::rejectsInvalidStateAndOversizedUseData()
 {
-    QcaOtr::OtrSession alice(toyKey(3), AliceInstance);
-    QCA::SecureArray key;
+    QcaOtr::OtrSession  alice(toyKey(3), AliceInstance);
+    QCA::SecureArray    key;
     QVector<QByteArray> messages;
 
-    QVERIFY(!alice.sendSymmetricKey(BobInstance, 1, {}, &key, &messages));
+    QVERIFY(!alice.sendSymmetricKey(BobInstance, 1, { }, &key, &messages));
     QVERIFY(key.isEmpty());
     QVERIFY(messages.isEmpty());
 
     QcaOtr::OtrSession bob(toyKey(6), BobInstance);
     QVERIFY(completeHandshake(&alice, BobInstance, &bob));
-    QVERIFY(!alice.sendSymmetricKey(BobInstance,
-                                    1,
-                                    QByteArray(65532, 'x'),
-                                    &key,
-                                    &messages));
+    QVERIFY(!alice.sendSymmetricKey(BobInstance, 1, QByteArray(65532, 'x'), &key, &messages));
     QVERIFY(key.isEmpty());
     QVERIFY(messages.isEmpty());
 }

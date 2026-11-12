@@ -58,7 +58,7 @@ public:
     virtual bool                enable();
     virtual bool                disable();
     virtual void                setOptionAccessingHost(OptionAccessingHost *host);
-    virtual void                optionChanged(const QString                &/*option*/) {};
+    virtual void                optionChanged(const QString                &/*option*/) { };
     virtual void                setShortcutAccessingHost(ShortcutAccessingHost *host);
     virtual void                setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
     virtual void                setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);

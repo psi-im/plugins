@@ -133,11 +133,11 @@ private:
     QString boardStatus_;
 
 private slots:
-    void sendInvite(const QString& jid, bool first);
+    void sendInvite(const QString &jid, bool first);
     void acceptInvitation();
     void rejectInvitation();
     void endSession();
-    void boardEvent(const QString& data);
+    void boardEvent(const QString &data);
     void timeout();
 
 public slots:

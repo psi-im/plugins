@@ -59,10 +59,10 @@ public:
     virtual QWidget *options();
     virtual bool     enable();
     virtual bool     disable();
-    virtual void     applyOptions() {};
-    virtual void     restoreOptions() {};
+    virtual void     applyOptions() { };
+    virtual void     restoreOptions() { };
     virtual QPixmap  icon() const;
-    virtual void     optionChanged(const QString &) {};
+    virtual void     optionChanged(const QString &) { };
     virtual void     setOptionAccessingHost(OptionAccessingHost *host);
     virtual void     setAccountInfoAccessingHost(AccountInfoAccessingHost *host);
     virtual void     setPsiAccountControllingHost(PsiAccountControllingHost *host);

@@ -30,7 +30,7 @@ class CleanerMainWindow : public QMainWindow {
 
 public:
     CleanerMainWindow(CleanerPlugin *cleaner);
-    virtual ~CleanerMainWindow() {};
+    virtual ~CleanerMainWindow() { };
     void showCleaner();
 
 private:

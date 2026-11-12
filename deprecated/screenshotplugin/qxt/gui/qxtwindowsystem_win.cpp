@@ -59,8 +59,9 @@ WId QxtWindowSystem::activeWindow() { return (WId)::GetForegroundWindow(); }
 WId QxtWindowSystem::findWindow(const QString &title)
 {
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QT_WA({ return (WId)::FindWindow(NULL, (TCHAR *)title.utf16()); },
-          { return (WId)::FindWindowA(NULL, title.toLocal8Bit()); });
+    QT_WA(
+        { return (WId)::FindWindow(NULL, (TCHAR *)title.utf16()); },
+        { return (WId)::FindWindowA(NULL, title.toLocal8Bit()); });
 #else
     return (WId)::FindWindow(NULL, (TCHAR *)title.utf16());
 #endif
@@ -82,8 +83,9 @@ QString QxtWindowSystem::windowTitle(WId window)
         TCHAR *buf = new TCHAR[len + 1];
         len        = ::GetWindowText((HWND)window, buf, len + 1);
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-        QT_WA({ title = QString::fromUtf16((const ushort *)buf, len); },
-              { title = QString::fromLocal8Bit((const char *)buf, len); });
+        QT_WA(
+            { title = QString::fromUtf16((const ushort *)buf, len); },
+            { title = QString::fromLocal8Bit((const char *)buf, len); });
 #else
         title = QString::fromUtf16((const ushort *)buf, len);
 #endif

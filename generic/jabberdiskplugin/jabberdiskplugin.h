@@ -67,7 +67,7 @@ public:
     virtual void applyOptions();
     virtual void restoreOptions();
     virtual void setOptionAccessingHost(OptionAccessingHost *host);
-    virtual void optionChanged(const QString &) {};
+    virtual void optionChanged(const QString &) { };
     virtual void setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
     virtual void setStanzaSendingHost(StanzaSendingHost *host);
     virtual void setAccountInfoAccessingHost(AccountInfoAccessingHost *host);

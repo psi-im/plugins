@@ -113,7 +113,7 @@ bool JuickPlugin::enable()
 {
     enabled = true;
 
-    QVariant v = psiOptions->getPluginOption(constVersionOpt, {});
+    QVariant v = psiOptions->getPluginOption(constVersionOpt, { });
 
     // Проверяем, обновился ли плагин
     if (!v.isValid() || v.toString() != constVersion) {
@@ -427,7 +427,7 @@ bool JuickPlugin::incomingStanza(int /*account*/, const QDomElement &stanza)
         return false;
 
     bool    isWebkit = (webkit->chatLogRenderType() == WebkitAccessingHost::RT_WebKit
-                     || webkit->chatLogRenderType() == WebkitAccessingHost::RT_WebEngine);
+                        || webkit->chatLogRenderType() == WebkitAccessingHost::RT_WebEngine);
     QString avatarUrl;
     if (stanza.tagName() == "message") {
         const QString jid(stanza.attribute("from").split('/').first());
@@ -923,7 +923,7 @@ void JuickPlugin::addAvatar(QDomElement *body, QDomDocument *doc, const QString 
                             const QString &ujid, const QString &avatarUrl)
 {
     bool        isWebkit = (webkit->chatLogRenderType() == WebkitAccessingHost::RT_WebKit
-                     || webkit->chatLogRenderType() == WebkitAccessingHost::RT_WebEngine);
+                            || webkit->chatLogRenderType() == WebkitAccessingHost::RT_WebEngine);
     QDomElement table    = doc->createElement("table");
     table.setAttribute("style", "word-wrap:break-word; table-layout: fixed; width:100%");
     QDomElement tableRow = doc->createElement("tr");

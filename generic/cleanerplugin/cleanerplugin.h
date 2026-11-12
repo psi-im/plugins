@@ -48,12 +48,12 @@ public:
     virtual bool     enable();
     virtual bool     disable();
 
-    virtual void    applyOptions() {};
-    virtual void    restoreOptions() {};
+    virtual void    applyOptions() { };
+    virtual void    restoreOptions() { };
     virtual void    setApplicationInfoAccessingHost(ApplicationInfoAccessingHost *host);
     virtual void    setIconFactoryAccessingHost(IconFactoryAccessingHost *host);
     virtual void    setOptionAccessingHost(OptionAccessingHost *host);
-    virtual void    optionChanged(const QString &) {};
+    virtual void    optionChanged(const QString &) { };
     virtual QString pluginInfo();
 
 private:

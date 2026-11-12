@@ -132,7 +132,7 @@ bool ClientSwitcherPlugin::disable()
         QString id = psiAccount->getId(i);
         if (id == "-1")
             break;
-        psiAccountCtl->setClientVersionInfo(i, {});
+        psiAccountCtl->setClientVersionInfo(i, { });
     }
 
     enabled = false;
@@ -512,7 +512,7 @@ void ClientSwitcherPlugin::restoreOptionsAcc(int acc_index)
         if (!acc_id.isEmpty()) {
             AccountSettings *as = getAccountSetting(acc_id);
             if (!as) {
-                as = new AccountSettings(); // Сразу заполняется дефолтными настройками
+                as             = new AccountSettings(); // Сразу заполняется дефолтными настройками
                 as->account_id = acc_id;
                 settingsList.push_back(as);
             }

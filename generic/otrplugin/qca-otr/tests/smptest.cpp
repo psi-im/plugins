@@ -10,15 +10,11 @@
 
 namespace {
 
-QCA::SecureArray secret(const char *text)
-{
-    return QCA::SecureArray(QByteArray(text));
-}
+QCA::SecureArray secret(const char *text) { return QCA::SecureArray(QByteArray(text)); }
 
 } // namespace
 
-class SmpTest : public QObject
-{
+class SmpTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -33,20 +29,14 @@ private:
     QCA::Initializer *initializer_ = nullptr;
 };
 
-void SmpTest::initTestCase()
-{
-    initializer_ = new QCA::Initializer;
-}
+void SmpTest::initTestCase() { initializer_ = new QCA::Initializer; }
 
-void SmpTest::cleanupTestCase()
-{
-    delete initializer_;
-}
+void SmpTest::cleanupTestCase() { delete initializer_; }
 
 void SmpTest::succeedsWithMatchingSecrets()
 {
-    QcaOtr::SmpSession alice;
-    QcaOtr::SmpSession bob;
+    QcaOtr::SmpSession     alice;
+    QcaOtr::SmpSession     bob;
     const QCA::SecureArray shared = secret("0123456789abcdef0123456789abcdef");
 
     const QcaOtr::SmpStepResult message1 = alice.initiate(shared);
@@ -105,8 +95,8 @@ void SmpTest::failsWithDifferentSecrets()
 
 void SmpTest::tracksQuestionAndExpectedMessages()
 {
-    QcaOtr::SmpSession alice;
-    QcaOtr::SmpSession bob;
+    QcaOtr::SmpSession     alice;
+    QcaOtr::SmpSession     bob;
     const QCA::SecureArray shared = secret("shared");
 
     const QcaOtr::SmpStepResult message1 = alice.initiate(shared);
@@ -125,12 +115,11 @@ void SmpTest::tracksQuestionAndExpectedMessages()
 
 void SmpTest::rejectsMalformedAndUnexpectedMessages()
 {
-    QcaOtr::SmpSession alice;
-    QcaOtr::SmpSession bob;
+    QcaOtr::SmpSession     alice;
+    QcaOtr::SmpSession     bob;
     const QCA::SecureArray shared = secret("shared");
 
-    QCOMPARE(alice.receiveMessage4(QByteArray("not a message")).status,
-             QcaOtr::SmpStepStatus::Unexpected);
+    QCOMPARE(alice.receiveMessage4(QByteArray("not a message")).status, QcaOtr::SmpStepStatus::Unexpected);
 
     const QcaOtr::SmpStepResult message1 = alice.initiate(shared);
     QCOMPARE(message1.status, QcaOtr::SmpStepStatus::Ok);

@@ -74,17 +74,14 @@ public:
     virtual int  sha512_digest_final(void *context, signal_buffer **output)                = 0;
     virtual void sha512_digest_cleanup(void *context)                                      = 0;
     virtual int  decrypt(signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len, const uint8_t *iv,
-                         size_t iv_len, const uint8_t *ciphertext, size_t ciphertext_len)
-        = 0;
-    virtual int encrypt(signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len, const uint8_t *iv,
-                        size_t iv_len, const uint8_t *plaintext, size_t plaintext_len)
-        = 0;
+                         size_t iv_len, const uint8_t *ciphertext, size_t ciphertext_len)  = 0;
+    virtual int  encrypt(signal_buffer **output, int cipherMode, const uint8_t *key, size_t key_len, const uint8_t *iv,
+                         size_t iv_len, const uint8_t *plaintext, size_t plaintext_len)    = 0;
 
     // aux methods
     virtual std::pair<QByteArray, QByteArray>
     aes_gcm(Crypto::Direction direction, const QByteArray &iv, const QByteArray &key, const QByteArray &input,
-            const QByteArray &tag = QByteArray(OMEMO_AES_GCM_TAG_LENGTH, Qt::Uninitialized))
-        = 0;
+            const QByteArray &tag = QByteArray(OMEMO_AES_GCM_TAG_LENGTH, Qt::Uninitialized)) = 0;
 
     virtual QByteArray randomBytes(int length) = 0;
     virtual uint32_t   randomInt()             = 0;

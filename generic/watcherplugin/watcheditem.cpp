@@ -26,8 +26,7 @@ WatchedItem::WatchedItem(QListWidget *parent) :
 
 WatchedItem::WatchedItem(const QString &jid, const QString &text, const QString &sFile, bool aUse,
                          QListWidget *parent) :
-    QListWidgetItem(parent),
-    jid_(jid), text_(text), sFile_(sFile), aUse_(aUse), groupChat_(false)
+    QListWidgetItem(parent), jid_(jid), text_(text), sFile_(sFile), aUse_(aUse), groupChat_(false)
 {
 }
 

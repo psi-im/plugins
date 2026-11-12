@@ -9,8 +9,7 @@
 #include <QTest>
 #include <QtCrypto>
 
-class ProfileStoreTest : public QObject
-{
+class ProfileStoreTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -31,10 +30,7 @@ void ProfileStoreTest::initTestCase()
     QVERIFY(QCA::isSupported("pkey"));
 }
 
-void ProfileStoreTest::cleanupTestCase()
-{
-    delete initializer_;
-}
+void ProfileStoreTest::cleanupTestCase() { delete initializer_; }
 
 void ProfileStoreTest::identityAndInstanceTagPersist()
 {
@@ -42,14 +38,14 @@ void ProfileStoreTest::identityAndInstanceTagPersist()
     QVERIFY(dir.isValid());
 
     QcaOtr::ProfileStore store(dir.path(), "test-protocol");
-    QString error;
+    QString              error;
     QVERIFY2(store.load(&error), qPrintable(error));
     QVERIFY2(store.ensureIdentity("account-a", &error), qPrintable(error));
     const QByteArray fingerprint = store.identityFingerprint("account-a");
     QCOMPARE(fingerprint.size(), 20);
 
-    bool created = false;
-    const quint32 tag = store.ensureInstanceTag("account-a", &created, &error);
+    bool          created = false;
+    const quint32 tag     = store.ensureInstanceTag("account-a", &created, &error);
     QVERIFY2(tag >= 0x00000100, qPrintable(error));
     QVERIFY(created);
 
@@ -71,31 +67,22 @@ void ProfileStoreTest::fingerprintTrustLifecycle()
     QVERIFY(dir.isValid());
 
     QcaOtr::ProfileStore store(dir.path(), "test-protocol");
-    QString error;
+    QString              error;
     QVERIFY2(store.load(&error), qPrintable(error));
 
     const QByteArray fingerprint = QByteArray::fromHex("00112233445566778899aabbccddeeff00112233");
-    bool created = false;
-    QVERIFY2(store.rememberFingerprint("romeo@example.net/resource",
-                                       "account-a",
-                                       fingerprint,
-                                       {},
-                                       &created,
-                                       &error),
+    bool             created     = false;
+    QVERIFY2(store.rememberFingerprint("romeo@example.net/resource", "account-a", fingerprint, { }, &created, &error),
              qPrintable(error));
     QVERIFY(created);
 
-    const QcaOtr::FingerprintRecord *record =
-        store.fingerprint("romeo@example.net/resource", "account-a", fingerprint);
+    const QcaOtr::FingerprintRecord *record = store.fingerprint("romeo@example.net/resource", "account-a", fingerprint);
     QVERIFY(record);
     QVERIFY(record->trust.isEmpty());
 
-    QVERIFY2(store.setFingerprintTrust("romeo@example.net/resource",
-                                       "account-a",
-                                       fingerprint,
-                                       "verified-by-user",
-                                       &error),
-             qPrintable(error));
+    QVERIFY2(
+        store.setFingerprintTrust("romeo@example.net/resource", "account-a", fingerprint, "verified-by-user", &error),
+        qPrintable(error));
     record = store.fingerprint("romeo@example.net/resource", "account-a", fingerprint);
     QVERIFY(record);
     QCOMPARE(record->trust, QByteArray("verified-by-user"));
@@ -117,7 +104,7 @@ void ProfileStoreTest::duplicateRecordsNormalizeLastWins()
     QVERIFY(dir.isValid());
 
     QcaOtr::ProfileStore seed(dir.path(), "test-protocol");
-    QString error;
+    QString              error;
     QVERIFY2(seed.load(&error), qPrintable(error));
     QVERIFY2(seed.ensureIdentity("account-b", &error), qPrintable(error));
 
@@ -126,37 +113,37 @@ void ProfileStoreTest::duplicateRecordsNormalizeLastWins()
     profile.privateKeys.append(profile.privateKeys.first());
 
     QcaOtr::InstanceTagRecord oldTag;
-    oldTag.account = "account-b";
-    oldTag.protocol = "test-protocol";
-    oldTag.instanceTag = 0x12345678;
+    oldTag.account                   = "account-b";
+    oldTag.protocol                  = "test-protocol";
+    oldTag.instanceTag               = 0x12345678;
     QcaOtr::InstanceTagRecord newTag = oldTag;
-    newTag.instanceTag = 0x87654321;
-    profile.instanceTags = {oldTag, newTag};
+    newTag.instanceTag               = 0x87654321;
+    profile.instanceTags             = { oldTag, newTag };
 
-    const QByteArray duplicateValue = QByteArray::fromHex("00112233445566778899aabbccddeeff00112233");
+    const QByteArray          duplicateValue = QByteArray::fromHex("00112233445566778899aabbccddeeff00112233");
     QcaOtr::FingerprintRecord oldFingerprint;
-    oldFingerprint.username = "romeo@example.net";
-    oldFingerprint.account = "account-b";
-    oldFingerprint.protocol = "test-protocol";
-    oldFingerprint.fingerprint = duplicateValue;
-    oldFingerprint.trust = "old";
+    oldFingerprint.username                  = "romeo@example.net";
+    oldFingerprint.account                   = "account-b";
+    oldFingerprint.protocol                  = "test-protocol";
+    oldFingerprint.fingerprint               = duplicateValue;
+    oldFingerprint.trust                     = "old";
     QcaOtr::FingerprintRecord newFingerprint = oldFingerprint;
-    newFingerprint.trust = "new";
+    newFingerprint.trust                     = "new";
 
     QcaOtr::FingerprintRecord first;
-    first.username = "alpha@example.net";
-    first.account = "account-a";
-    first.protocol = "test-protocol";
+    first.username    = "alpha@example.net";
+    first.account     = "account-a";
+    first.protocol    = "test-protocol";
     first.fingerprint = QByteArray::fromHex("102132435465768798a9bacbdcedfe0f10213243");
 
     QcaOtr::FingerprintRecord last;
-    last.username = "zulu@example.net";
-    last.account = "account-z";
-    last.protocol = "test-protocol";
+    last.username    = "zulu@example.net";
+    last.account     = "account-z";
+    last.protocol    = "test-protocol";
     last.fingerprint = QByteArray::fromHex("ffeeddccbbaa99887766554433221100ffeeddcc");
 
     // Deliberately unsorted and duplicated. The later duplicate must win.
-    profile.fingerprints = {last, oldFingerprint, first, newFingerprint};
+    profile.fingerprints = { last, oldFingerprint, first, newFingerprint };
     QVERIFY2(QcaOtr::Persistence::saveProfile(dir.path(), profile, &error), qPrintable(error));
 
     QcaOtr::ProfileStore store(dir.path(), "test-protocol");

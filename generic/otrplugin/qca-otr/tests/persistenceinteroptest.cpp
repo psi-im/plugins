@@ -22,29 +22,29 @@ constexpr char PsiProtocolId[] = "prpl-jabber";
 QByteArray fileContents(FILE *file)
 {
     if (!file || std::fflush(file) != 0 || std::fseek(file, 0, SEEK_END) != 0)
-        return {};
+        return { };
     const long size = std::ftell(file);
     if (size < 0 || size > INT_MAX || std::fseek(file, 0, SEEK_SET) != 0)
-        return {};
+        return { };
 
     QByteArray data;
     data.resize(static_cast<int>(size));
     if (size > 0 && std::fread(data.data(), 1, static_cast<size_t>(size), file) != static_cast<size_t>(size))
-        return {};
+        return { };
     return data;
 }
 
 QCA::SecureArray secureFileContents(FILE *file)
 {
     if (!file || std::fflush(file) != 0 || std::fseek(file, 0, SEEK_END) != 0)
-        return {};
+        return { };
     const long size = std::ftell(file);
     if (size < 0 || size > INT_MAX || std::fseek(file, 0, SEEK_SET) != 0)
-        return {};
+        return { };
 
     QCA::SecureArray data(static_cast<int>(size));
     if (size > 0 && std::fread(data.data(), 1, static_cast<size_t>(size), file) != static_cast<size_t>(size))
-        return {};
+        return { };
     return data;
 }
 
@@ -53,7 +53,9 @@ FILE *fileFromData(const QByteArray &data)
     FILE *file = std::tmpfile();
     if (!file)
         return nullptr;
-    if (!data.isEmpty() && std::fwrite(data.constData(), 1, static_cast<size_t>(data.size()), file) != static_cast<size_t>(data.size())) {
+    if (!data.isEmpty()
+        && std::fwrite(data.constData(), 1, static_cast<size_t>(data.size()), file)
+            != static_cast<size_t>(data.size())) {
         std::fclose(file);
         return nullptr;
     }
@@ -66,7 +68,9 @@ FILE *fileFromData(const QCA::SecureArray &data)
     FILE *file = std::tmpfile();
     if (!file)
         return nullptr;
-    if (!data.isEmpty() && std::fwrite(data.constData(), 1, static_cast<size_t>(data.size()), file) != static_cast<size_t>(data.size())) {
+    if (!data.isEmpty()
+        && std::fwrite(data.constData(), 1, static_cast<size_t>(data.size()), file)
+            != static_cast<size_t>(data.size())) {
         std::fclose(file);
         return nullptr;
     }
@@ -78,14 +82,13 @@ QByteArray libotrFingerprint(OtrlUserState userState, const QByteArray &account,
 {
     unsigned char fingerprint[20];
     if (!otrl_privkey_fingerprint_raw(userState, fingerprint, account.constData(), protocol.constData()))
-        return {};
+        return { };
     return QByteArray(reinterpret_cast<const char *>(fingerprint), 20);
 }
 
 } // namespace
 
-class PersistenceInteropTest : public QObject
-{
+class PersistenceInteropTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -107,10 +110,7 @@ void PersistenceInteropTest::initTestCase()
     QVERIFY2(QByteArray(otrl_version()).startsWith("4.1.1"), otrl_version());
 }
 
-void PersistenceInteropTest::cleanupTestCase()
-{
-    delete initializer_;
-}
+void PersistenceInteropTest::cleanupTestCase() { delete initializer_; }
 
 void PersistenceInteropTest::privateKeysRoundTripWithLibotr()
 {
@@ -121,7 +121,8 @@ void PersistenceInteropTest::privateKeysRoundTripWithLibotr()
     QVERIFY(original);
     FILE *generated = std::tmpfile();
     QVERIFY(generated);
-    QCOMPARE(otrl_privkey_generate_FILEp(original, generated, account.constData(), protocol.constData()), gcry_error_t(0));
+    QCOMPARE(otrl_privkey_generate_FILEp(original, generated, account.constData(), protocol.constData()),
+             gcry_error_t(0));
     const QCA::SecureArray libotrStore = secureFileContents(generated);
     std::fclose(generated);
     QVERIFY(!libotrStore.isEmpty());
@@ -130,14 +131,14 @@ void PersistenceInteropTest::privateKeysRoundTripWithLibotr()
     QCOMPARE(originalFingerprint.size(), 20);
 
     QList<QcaOtr::PrivateKeyRecord> nativeKeys;
-    QString error;
+    QString                         error;
     QVERIFY2(QcaOtr::Persistence::parsePrivateKeys(libotrStore, &nativeKeys, &error), qPrintable(error));
     QCOMPARE(nativeKeys.size(), 1);
     QCOMPARE(nativeKeys.first().account, account);
     QCOMPARE(nativeKeys.first().protocol, protocol);
     QCOMPARE(QcaOtr::dsaPublicKeyFingerprint(QcaOtr::dsaPublicKey(nativeKeys.first().key)), originalFingerprint);
 
-    bool ok = false;
+    bool                   ok          = false;
     const QCA::SecureArray nativeStore = QcaOtr::Persistence::serializePrivateKeys(nativeKeys, &ok);
     QVERIFY(ok);
     FILE *nativeFile = fileFromData(nativeStore);
@@ -160,16 +161,16 @@ void PersistenceInteropTest::fingerprintsRoundTripWithLibotr()
     const QByteArray protocol(PsiProtocolId);
     const QByteArray fingerprint = QByteArray::fromHex("00112233445566778899aabbccddeeff00112233");
     const QByteArray trust("native-custom-trust");
-    QByteArray mutableFingerprint = fingerprint;
+    QByteArray       mutableFingerprint = fingerprint;
 
     QcaOtr::FingerprintRecord nativeRecord;
-    nativeRecord.username = user;
-    nativeRecord.account = account;
-    nativeRecord.protocol = protocol;
-    nativeRecord.fingerprint = fingerprint;
-    nativeRecord.trust = trust;
-    bool ok = false;
-    const QByteArray nativeStore = QcaOtr::Persistence::serializeFingerprints({nativeRecord}, &ok);
+    nativeRecord.username        = user;
+    nativeRecord.account         = account;
+    nativeRecord.protocol        = protocol;
+    nativeRecord.fingerprint     = fingerprint;
+    nativeRecord.trust           = trust;
+    bool             ok          = false;
+    const QByteArray nativeStore = QcaOtr::Persistence::serializeFingerprints({ nativeRecord }, &ok);
     QVERIFY(ok);
 
     OtrlUserState libotr = otrl_userstate_create();
@@ -179,15 +180,8 @@ void PersistenceInteropTest::fingerprintsRoundTripWithLibotr()
     QCOMPARE(otrl_privkey_read_fingerprints_FILEp(libotr, nativeFile, nullptr, nullptr), gcry_error_t(0));
     std::fclose(nativeFile);
 
-    ConnContext *context = otrl_context_find(libotr,
-                                             user.constData(),
-                                             account.constData(),
-                                             protocol.constData(),
-                                             OTRL_INSTAG_MASTER,
-                                             0,
-                                             nullptr,
-                                             nullptr,
-                                             nullptr);
+    ConnContext *context = otrl_context_find(libotr, user.constData(), account.constData(), protocol.constData(),
+                                             OTRL_INSTAG_MASTER, 0, nullptr, nullptr, nullptr);
     QVERIFY(context);
     Fingerprint *libotrFingerprintRecord = otrl_context_find_fingerprint(
         context, reinterpret_cast<unsigned char *>(mutableFingerprint.data()), 0, nullptr);
@@ -198,15 +192,8 @@ void PersistenceInteropTest::fingerprintsRoundTripWithLibotr()
     OtrlUserState writer = otrl_userstate_create();
     QVERIFY(writer);
     int added = 0;
-    context = otrl_context_find(writer,
-                                user.constData(),
-                                account.constData(),
-                                protocol.constData(),
-                                OTRL_INSTAG_MASTER,
-                                1,
-                                &added,
-                                nullptr,
-                                nullptr);
+    context = otrl_context_find(writer, user.constData(), account.constData(), protocol.constData(), OTRL_INSTAG_MASTER,
+                                1, &added, nullptr, nullptr);
     QVERIFY(context);
     libotrFingerprintRecord = otrl_context_find_fingerprint(
         context, reinterpret_cast<unsigned char *>(mutableFingerprint.data()), 1, nullptr);
@@ -220,7 +207,7 @@ void PersistenceInteropTest::fingerprintsRoundTripWithLibotr()
     std::fclose(written);
 
     QList<QcaOtr::FingerprintRecord> nativeRecords;
-    QString error;
+    QString                          error;
     QVERIFY2(QcaOtr::Persistence::parseFingerprints(libotrStore, &nativeRecords, &error), qPrintable(error));
     QCOMPARE(nativeRecords.size(), 1);
     QCOMPARE(nativeRecords.first().username, user);
@@ -237,11 +224,11 @@ void PersistenceInteropTest::instanceTagsRoundTripWithLibotr()
     const QByteArray protocol(PsiProtocolId);
 
     QcaOtr::InstanceTagRecord nativeRecord;
-    nativeRecord.account = account;
-    nativeRecord.protocol = protocol;
-    nativeRecord.instanceTag = 0x12345678;
-    bool ok = false;
-    const QByteArray nativeStore = QcaOtr::Persistence::serializeInstanceTags({nativeRecord}, &ok);
+    nativeRecord.account         = account;
+    nativeRecord.protocol        = protocol;
+    nativeRecord.instanceTag     = 0x12345678;
+    bool             ok          = false;
+    const QByteArray nativeStore = QcaOtr::Persistence::serializeInstanceTags({ nativeRecord }, &ok);
     QVERIFY(ok);
 
     OtrlUserState libotr = otrl_userstate_create();
@@ -262,12 +249,12 @@ void PersistenceInteropTest::instanceTagsRoundTripWithLibotr()
     QCOMPARE(otrl_instag_generate_FILEp(writer, written, account.constData(), protocol.constData()), gcry_error_t(0));
     tag = otrl_instag_find(writer, account.constData(), protocol.constData());
     QVERIFY(tag);
-    const quint32 generatedTag = tag->instag;
-    const QByteArray libotrStore = fileContents(written);
+    const quint32    generatedTag = tag->instag;
+    const QByteArray libotrStore  = fileContents(written);
     std::fclose(written);
 
     QList<QcaOtr::InstanceTagRecord> nativeRecords;
-    QString error;
+    QString                          error;
     QVERIFY2(QcaOtr::Persistence::parseInstanceTags(libotrStore, &nativeRecords, &error), qPrintable(error));
     QCOMPARE(nativeRecords.size(), 1);
     QCOMPARE(nativeRecords.first().account, account);
@@ -288,42 +275,37 @@ void PersistenceInteropTest::completeProfileMigrationWithLibotr()
     const QByteArray peer("juliet@example.net");
     const QByteArray peerFingerprint = QByteArray::fromHex("102132435465768798a9bacbdcedfe0f10213243");
     const QByteArray trust("psi-user-verified");
-    QByteArray mutablePeerFingerprint = peerFingerprint;
+    QByteArray       mutablePeerFingerprint = peerFingerprint;
 
-    const QByteArray legacyKeysPath = QFile::encodeName(legacyDir.filePath(QcaOtr::OtrKeysFileName));
+    const QByteArray legacyKeysPath         = QFile::encodeName(legacyDir.filePath(QcaOtr::OtrKeysFileName));
     const QByteArray legacyFingerprintsPath = QFile::encodeName(legacyDir.filePath(QcaOtr::OtrFingerprintsFileName));
-    const QByteArray legacyInstagsPath = QFile::encodeName(legacyDir.filePath(QcaOtr::OtrInstanceTagsFileName));
+    const QByteArray legacyInstagsPath      = QFile::encodeName(legacyDir.filePath(QcaOtr::OtrInstanceTagsFileName));
 
     OtrlUserState legacy = otrl_userstate_create();
     QVERIFY(legacy);
-    QCOMPARE(otrl_privkey_generate(legacy, legacyKeysPath.constData(), account.constData(), protocol.constData()), gcry_error_t(0));
+    QCOMPARE(otrl_privkey_generate(legacy, legacyKeysPath.constData(), account.constData(), protocol.constData()),
+             gcry_error_t(0));
     const QByteArray identityFingerprint = libotrFingerprint(legacy, account, protocol);
     QCOMPARE(identityFingerprint.size(), 20);
 
-    int added = 0;
-    ConnContext *context = otrl_context_find(legacy,
-                                             peer.constData(),
-                                             account.constData(),
-                                             protocol.constData(),
-                                             OTRL_INSTAG_MASTER,
-                                             1,
-                                             &added,
-                                             nullptr,
-                                             nullptr);
+    int          added   = 0;
+    ConnContext *context = otrl_context_find(legacy, peer.constData(), account.constData(), protocol.constData(),
+                                             OTRL_INSTAG_MASTER, 1, &added, nullptr, nullptr);
     QVERIFY(context);
     Fingerprint *peerRecord = otrl_context_find_fingerprint(
         context, reinterpret_cast<unsigned char *>(mutablePeerFingerprint.data()), 1, nullptr);
     QVERIFY(peerRecord);
     otrl_context_set_trust(peerRecord, trust.constData());
     QCOMPARE(otrl_privkey_write_fingerprints(legacy, legacyFingerprintsPath.constData()), gcry_error_t(0));
-    QCOMPARE(otrl_instag_generate(legacy, legacyInstagsPath.constData(), account.constData(), protocol.constData()), gcry_error_t(0));
+    QCOMPARE(otrl_instag_generate(legacy, legacyInstagsPath.constData(), account.constData(), protocol.constData()),
+             gcry_error_t(0));
     OtrlInsTag *legacyTag = otrl_instag_find(legacy, account.constData(), protocol.constData());
     QVERIFY(legacyTag);
     const quint32 instanceTag = legacyTag->instag;
     otrl_userstate_free(legacy);
 
     QcaOtr::ProfileData migrated;
-    QString error;
+    QString             error;
     QVERIFY2(QcaOtr::Persistence::loadProfile(legacyDir.path(), &migrated, &error), qPrintable(error));
     QCOMPARE(migrated.privateKeys.size(), 1);
     QCOMPARE(migrated.fingerprints.size(), 1);
@@ -332,8 +314,8 @@ void PersistenceInteropTest::completeProfileMigrationWithLibotr()
     const QcaOtr::PrivateKeyRecord *nativeKey = QcaOtr::Persistence::findPrivateKey(migrated, account, protocol);
     QVERIFY(nativeKey);
     QCOMPARE(QcaOtr::dsaPublicKeyFingerprint(QcaOtr::dsaPublicKey(nativeKey->key)), identityFingerprint);
-    const QcaOtr::FingerprintRecord *nativePeer =
-        QcaOtr::Persistence::findFingerprint(migrated, peer, account, peerFingerprint, protocol);
+    const QcaOtr::FingerprintRecord *nativePeer
+        = QcaOtr::Persistence::findFingerprint(migrated, peer, account, peerFingerprint, protocol);
     QVERIFY(nativePeer);
     QCOMPARE(nativePeer->trust, trust);
     bool foundTag = false;
@@ -342,26 +324,20 @@ void PersistenceInteropTest::completeProfileMigrationWithLibotr()
 
     QVERIFY2(QcaOtr::Persistence::saveProfile(nativeDir.path(), migrated, &error), qPrintable(error));
 
-    const QByteArray nativeKeysPath = QFile::encodeName(nativeDir.filePath(QcaOtr::OtrKeysFileName));
+    const QByteArray nativeKeysPath         = QFile::encodeName(nativeDir.filePath(QcaOtr::OtrKeysFileName));
     const QByteArray nativeFingerprintsPath = QFile::encodeName(nativeDir.filePath(QcaOtr::OtrFingerprintsFileName));
-    const QByteArray nativeInstagsPath = QFile::encodeName(nativeDir.filePath(QcaOtr::OtrInstanceTagsFileName));
+    const QByteArray nativeInstagsPath      = QFile::encodeName(nativeDir.filePath(QcaOtr::OtrInstanceTagsFileName));
 
     OtrlUserState reread = otrl_userstate_create();
     QVERIFY(reread);
     QCOMPARE(otrl_privkey_read(reread, nativeKeysPath.constData()), gcry_error_t(0));
-    QCOMPARE(otrl_privkey_read_fingerprints(reread, nativeFingerprintsPath.constData(), nullptr, nullptr), gcry_error_t(0));
+    QCOMPARE(otrl_privkey_read_fingerprints(reread, nativeFingerprintsPath.constData(), nullptr, nullptr),
+             gcry_error_t(0));
     QCOMPARE(otrl_instag_read(reread, nativeInstagsPath.constData()), gcry_error_t(0));
     QCOMPARE(libotrFingerprint(reread, account, protocol), identityFingerprint);
 
-    context = otrl_context_find(reread,
-                                peer.constData(),
-                                account.constData(),
-                                protocol.constData(),
-                                OTRL_INSTAG_MASTER,
-                                0,
-                                nullptr,
-                                nullptr,
-                                nullptr);
+    context = otrl_context_find(reread, peer.constData(), account.constData(), protocol.constData(), OTRL_INSTAG_MASTER,
+                                0, nullptr, nullptr, nullptr);
     QVERIFY(context);
     peerRecord = otrl_context_find_fingerprint(
         context, reinterpret_cast<unsigned char *>(mutablePeerFingerprint.data()), 0, nullptr);

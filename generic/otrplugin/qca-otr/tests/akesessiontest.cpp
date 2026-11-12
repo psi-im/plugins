@@ -16,19 +16,15 @@ QcaOtr::DsaPrivateKey toyKey(int x)
     key.domain.p = QCA::BigInteger(23);
     key.domain.q = QCA::BigInteger(11);
     key.domain.g = QCA::BigInteger(2);
-    key.x = QCA::BigInteger(x);
+    key.x        = QCA::BigInteger(x);
     return key;
 }
 
-quint8 messageType(const QByteArray &message)
-{
-    return message.size() >= 3 ? static_cast<quint8>(message.at(2)) : 0;
-}
+quint8 messageType(const QByteArray &message) { return message.size() >= 3 ? static_cast<quint8>(message.at(2)) : 0; }
 
 } // namespace
 
-class AkeSessionTest : public QObject
-{
+class AkeSessionTest : public QObject {
     Q_OBJECT
 
 private Q_SLOTS:
@@ -43,27 +39,21 @@ private:
     QCA::Initializer *initializer_ = nullptr;
 };
 
-void AkeSessionTest::initTestCase()
-{
-    initializer_ = new QCA::Initializer;
-}
+void AkeSessionTest::initTestCase() { initializer_ = new QCA::Initializer; }
 
-void AkeSessionTest::cleanupTestCase()
-{
-    delete initializer_;
-}
+void AkeSessionTest::cleanupTestCase() { delete initializer_; }
 
 void AkeSessionTest::completeHandshake()
 {
     constexpr quint32 AliceInstance = 0x11111111;
-    constexpr quint32 BobInstance = 0x22222222;
+    constexpr quint32 BobInstance   = 0x22222222;
 
     const QcaOtr::DsaPrivateKey aliceKey = toyKey(3);
-    const QcaOtr::DsaPrivateKey bobKey = toyKey(6);
-    QcaOtr::AkeSession alice(aliceKey, AliceInstance, BobInstance);
-    QcaOtr::AkeSession bob(bobKey, BobInstance, AliceInstance);
+    const QcaOtr::DsaPrivateKey bobKey   = toyKey(6);
+    QcaOtr::AkeSession          alice(aliceKey, AliceInstance, BobInstance);
+    QcaOtr::AkeSession          bob(bobKey, BobInstance, AliceInstance);
 
-    bool ok = false;
+    bool             ok     = false;
     const QByteArray commit = alice.start(&ok);
     QVERIFY(ok);
     QCOMPARE(messageType(commit), quint8(0x02));
@@ -96,10 +86,8 @@ void AkeSessionTest::completeHandshake()
     QVERIFY(alice.isAuthenticated());
 
     QCOMPARE(alice.established().sessionId, bob.established().sessionId);
-    QCOMPARE(alice.established().peerFingerprint,
-             QcaOtr::dsaPublicKeyFingerprint(QcaOtr::dsaPublicKey(bobKey)));
-    QCOMPARE(bob.established().peerFingerprint,
-             QcaOtr::dsaPublicKeyFingerprint(QcaOtr::dsaPublicKey(aliceKey)));
+    QCOMPARE(alice.established().peerFingerprint, QcaOtr::dsaPublicKeyFingerprint(QcaOtr::dsaPublicKey(bobKey)));
+    QCOMPARE(bob.established().peerFingerprint, QcaOtr::dsaPublicKeyFingerprint(QcaOtr::dsaPublicKey(aliceKey)));
     QCOMPARE(alice.established().peerDhPublic, bob.established().localDh.publicValue);
     QCOMPARE(bob.established().peerDhPublic, alice.established().localDh.publicValue);
     QCOMPARE(alice.established().localKeyId, quint32(1));
@@ -113,32 +101,32 @@ void AkeSessionTest::completeHandshake()
 void AkeSessionTest::simultaneousInitiation()
 {
     constexpr quint32 AliceInstance = 0x11111111;
-    constexpr quint32 BobInstance = 0x22222222;
+    constexpr quint32 BobInstance   = 0x22222222;
 
     QcaOtr::AkeSession alice(toyKey(3), AliceInstance, BobInstance);
     QcaOtr::AkeSession bob(toyKey(6), BobInstance, AliceInstance);
 
-    bool aliceOk = false;
-    bool bobOk = false;
+    bool             aliceOk     = false;
+    bool             bobOk       = false;
     const QByteArray aliceCommit = alice.start(&aliceOk);
-    const QByteArray bobCommit = bob.start(&bobOk);
+    const QByteArray bobCommit   = bob.start(&bobOk);
     QVERIFY(aliceOk);
     QVERIFY(bobOk);
 
     const QcaOtr::AkeHandleResult aliceCollision = alice.processIncoming(bobCommit);
-    const QcaOtr::AkeHandleResult bobCollision = bob.processIncoming(aliceCommit);
+    const QcaOtr::AkeHandleResult bobCollision   = bob.processIncoming(aliceCommit);
     QCOMPARE(aliceCollision.status, QcaOtr::AkeHandleStatus::Handled);
     QCOMPARE(bobCollision.status, QcaOtr::AkeHandleStatus::Handled);
 
     const bool aliceWon = messageType(aliceCollision.outgoingMessage) == 0x02;
-    const bool bobWon = messageType(bobCollision.outgoingMessage) == 0x02;
+    const bool bobWon   = messageType(bobCollision.outgoingMessage) == 0x02;
     QVERIFY(aliceWon != bobWon);
 
-    QcaOtr::AkeSession *winner = aliceWon ? &alice : &bob;
-    QcaOtr::AkeSession *loser = aliceWon ? &bob : &alice;
-    const QByteArray winnerCommit = aliceWon ? aliceCommit : bobCommit;
-    const QByteArray loserDhKey = aliceWon ? bobCollision.outgoingMessage : aliceCollision.outgoingMessage;
-    const QByteArray winnerRetransmit = aliceWon ? aliceCollision.outgoingMessage : bobCollision.outgoingMessage;
+    QcaOtr::AkeSession *winner           = aliceWon ? &alice : &bob;
+    QcaOtr::AkeSession *loser            = aliceWon ? &bob : &alice;
+    const QByteArray    winnerCommit     = aliceWon ? aliceCommit : bobCommit;
+    const QByteArray    loserDhKey       = aliceWon ? bobCollision.outgoingMessage : aliceCollision.outgoingMessage;
+    const QByteArray    winnerRetransmit = aliceWon ? aliceCollision.outgoingMessage : bobCollision.outgoingMessage;
 
     QCOMPARE(winnerRetransmit, winnerCommit);
     QCOMPARE(winner->state(), QcaOtr::AkeState::AwaitingDhKey);
@@ -168,21 +156,21 @@ void AkeSessionTest::simultaneousInitiation()
 void AkeSessionTest::rejectsTamperingWithoutLosingState()
 {
     constexpr quint32 AliceInstance = 0x11111111;
-    constexpr quint32 BobInstance = 0x22222222;
+    constexpr quint32 BobInstance   = 0x22222222;
 
     QcaOtr::AkeSession alice(toyKey(3), AliceInstance, BobInstance);
     QcaOtr::AkeSession bob(toyKey(6), BobInstance, AliceInstance);
 
-    bool ok = false;
+    bool             ok     = false;
     const QByteArray commit = alice.start(&ok);
     QVERIFY(ok);
-    const QcaOtr::AkeHandleResult dhKey = bob.processIncoming(commit);
+    const QcaOtr::AkeHandleResult dhKey  = bob.processIncoming(commit);
     const QcaOtr::AkeHandleResult reveal = alice.processIncoming(dhKey.outgoingMessage);
     QCOMPARE(alice.state(), QcaOtr::AkeState::AwaitingSignature);
     QCOMPARE(bob.state(), QcaOtr::AkeState::AwaitingRevealSignature);
 
-    QByteArray damagedReveal = reveal.outgoingMessage;
-    damagedReveal[damagedReveal.size() - 1] = static_cast<char>(damagedReveal.back() ^ 0x01);
+    QByteArray damagedReveal                     = reveal.outgoingMessage;
+    damagedReveal[damagedReveal.size() - 1]      = static_cast<char>(damagedReveal.back() ^ 0x01);
     const QcaOtr::AkeHandleResult rejectedReveal = bob.processIncoming(damagedReveal);
     QCOMPARE(rejectedReveal.status, QcaOtr::AkeHandleStatus::Error);
     QCOMPARE(bob.state(), QcaOtr::AkeState::AwaitingRevealSignature);
@@ -190,8 +178,8 @@ void AkeSessionTest::rejectsTamperingWithoutLosingState()
     const QcaOtr::AkeHandleResult signature = bob.processIncoming(reveal.outgoingMessage);
     QCOMPARE(signature.status, QcaOtr::AkeHandleStatus::Authenticated);
 
-    QByteArray damagedSignature = signature.outgoingMessage;
-    damagedSignature[damagedSignature.size() - 1] = static_cast<char>(damagedSignature.back() ^ 0x01);
+    QByteArray damagedSignature                     = signature.outgoingMessage;
+    damagedSignature[damagedSignature.size() - 1]   = static_cast<char>(damagedSignature.back() ^ 0x01);
     const QcaOtr::AkeHandleResult rejectedSignature = alice.processIncoming(damagedSignature);
     QCOMPARE(rejectedSignature.status, QcaOtr::AkeHandleStatus::Error);
     QCOMPARE(alice.state(), QcaOtr::AkeState::AwaitingSignature);
@@ -203,14 +191,14 @@ void AkeSessionTest::rejectsTamperingWithoutLosingState()
 
 void AkeSessionTest::ignoresOtherInstances()
 {
-    constexpr quint32 AliceInstance = 0x11111111;
-    constexpr quint32 BobInstance = 0x22222222;
+    constexpr quint32 AliceInstance   = 0x11111111;
+    constexpr quint32 BobInstance     = 0x22222222;
     constexpr quint32 CharlieInstance = 0x33333333;
 
     QcaOtr::AkeSession alice(toyKey(3), AliceInstance, BobInstance);
     QcaOtr::AkeSession charlie(toyKey(6), CharlieInstance, AliceInstance);
 
-    bool ok = false;
+    bool             ok            = false;
     const QByteArray foreignCommit = charlie.start(&ok);
     QVERIFY(ok);
 

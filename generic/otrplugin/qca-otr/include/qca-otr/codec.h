@@ -15,8 +15,7 @@
 namespace QcaOtr::Wire {
 
 /** Encoder for OTR's network-byte-order primitive wire types. */
-class Writer
-{
+class Writer {
 public:
     void writeByte(quint8 value);
     void writeShort(quint16 value);
@@ -43,10 +42,9 @@ private:
 };
 
 /** Bounds-checking decoder for OTR primitive wire types. */
-class Reader
-{
+class Reader {
 public:
-    explicit Reader(const QByteArray &data) : data_(data) {}
+    explicit Reader(const QByteArray &data) : data_(data) { }
 
     bool readByte(quint8 *value);
     bool readShort(quint16 *value);
@@ -64,7 +62,7 @@ public:
 
 private:
     QByteArray data_;
-    quint64 offset_ = 0;
+    quint64    offset_ = 0;
 };
 
 /** Encodes one OTR MPI into ordinary memory. */
