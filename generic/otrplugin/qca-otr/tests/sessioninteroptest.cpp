@@ -15,10 +15,11 @@ extern "C" {
 #include <libotr/auth.h>
 #include <libotr/context.h>
 #include <libotr/instag.h>
-#include <libotr/message.h>
 #include <libotr/privkey.h>
 #include <libotr/proto.h>
 #include <libotr/tlv.h>
+
+#include <libotr/message.h>
 #include <libotr/userstate.h>
 }
 
