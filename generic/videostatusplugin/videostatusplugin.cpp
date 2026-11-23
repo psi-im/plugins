@@ -603,6 +603,11 @@ void VideoStatusChanger::setPsiGlobalStatus(const bool set)
 {
     if (!enabled)
         return;
+
+    auto normalizeStatus = [](const QString &st) -> QString {
+        return (st.compare(QLatin1String("online"), Qt::CaseInsensitive) == 0) ? QString() : st;
+    };
+
     int          account = 0;
     StatusString s;
     while (accInfo->getJid(account) != "-1") {
@@ -610,16 +615,17 @@ void VideoStatusChanger::setPsiGlobalStatus(const bool set)
         if (accStatus != "offline" && accStatus != "invisible") {
             if (set) {
                 if (statuses_.contains(account)) {
-                    s = statuses_.value(account);
-                    accControl->setStatus(account, s.status, s.message);
-                } else
-                    accControl->setStatus(account, "online", "");
+                    s = statuses_.take(account); // take() заодно очистит старую запись из map
+                    accControl->setStatus(account, normalizeStatus(s.status), s.message);
+                } else {
+                    accControl->setStatus(account, QString(), QString());
+                }
             } else {
                 s.status  = accStatus;
                 s.message = accInfo->getStatusMessage(account);
                 if (s.status != status || s.message != statusMessage)
                     statuses_.insert(account, s);
-                accControl->setStatus(account, status, statusMessage);
+                accControl->setStatus(account, normalizeStatus(status), statusMessage);
             }
         }
         ++account;

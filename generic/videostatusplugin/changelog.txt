@@ -1,3 +1,7 @@
+2026-11-23
+v0.3.4
+  * fix invalid <show>online</show> presence on status restore
+
 2025-10-14
 v0.3.3
   + Added Parole player (xfce4)
