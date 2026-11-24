@@ -2,7 +2,7 @@
   "schema_version": 1,
   "psi": {
     "repository": "psi-im/psi",
-    "commit": "3edf86dcf7ba412aa6137e49f3744d728971900c"
+    "commit": "bbf5a1c968b0cd613dae965741c00e02440af8ac"
   },
   "qca": {
     "repository": "psi-im/qca",
