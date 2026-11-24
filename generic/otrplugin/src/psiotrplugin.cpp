@@ -190,8 +190,7 @@ public:
     public:
         Session(OtrEncryptionProvider *provider, int account, const Context &context) :
             provider_(provider), account_(account),
-            contact_(context.recipients.isEmpty() ? QString() : context.recipients.constFirst()),
-            carbon_(context.options.value(QStringLiteral("forwardedCarbon")).toBool())
+            contact_(context.recipients.isEmpty() ? QString() : context.recipients.constFirst())
         {
             if (!contact_.isEmpty() && provider_ && provider_->plugin_ && provider_->plugin_->m_otrConnection
                 && provider_->plugin_->m_accountInfo) {
@@ -203,7 +202,8 @@ public:
             }
         }
 
-        void encryptStanza(const QDomElement &stanza, QObject *context, Completion completion) override
+        void encryptStanza(const QDomElement &stanza, const Context &operation, QObject *context,
+                           Completion completion) override
         {
             Result result;
             if (!provider_ || !provider_->plugin_ || !context) {
@@ -212,7 +212,16 @@ public:
                 completion(std::move(result));
                 return;
             }
-            if (contact_.isEmpty()) {
+            // A long-lived session is bound to one peer, but the operation
+            // can supply the concrete endpoint for this particular stanza.
+            if (operation.recipients.size() > 1) {
+                result.error       = Error::NoRecipients;
+                result.errorString = QObject::tr("OTR requires exactly one recipient");
+                completion(std::move(result));
+                return;
+            }
+            const QString contact = operation.recipients.isEmpty() ? contact_ : operation.recipients.constFirst();
+            if (contact.isEmpty()) {
                 result.error       = Error::NoRecipients;
                 result.errorString = QObject::tr("OTR requires a recipient");
                 completion(std::move(result));
@@ -220,10 +229,10 @@ public:
             }
 
             const QString accountId = provider_->plugin_->m_accountInfo->getId(account_);
-            if (provider_->plugin_->m_otrConnection->getMessageState(accountId, contact_)
+            if (provider_->plugin_->m_otrConnection->getMessageState(accountId, contact)
                 != OTR_MESSAGESTATE_ENCRYPTED) {
                 result.error       = Error::NoSession;
-                result.errorString = QObject::tr("The OTR session with %1 is not established yet").arg(contact_);
+                result.errorString = QObject::tr("The OTR session with %1 is not established yet").arg(contact);
                 completion(std::move(result));
                 return;
             }
@@ -231,8 +240,8 @@ public:
             QDomDocument document;
             auto         message = document.importNode(stanza, true).toElement();
             document.appendChild(message);
-            message.setAttribute(QStringLiteral("to"), contact_);
-            if (!provider_->plugin_->encryptMessageElement(account_, message, contact_) || message.isNull()) {
+            message.setAttribute(QStringLiteral("to"), contact);
+            if (!provider_->plugin_->encryptMessageElement(account_, message, contact) || message.isNull()) {
                 result.error       = Error::CryptoError;
                 result.errorString = QObject::tr("Could not encrypt the message with OTR");
                 completion(std::move(result));
@@ -244,7 +253,8 @@ public:
             completion(std::move(result));
         }
 
-        void decryptStanza(const QDomElement &stanza, QObject *context, Completion completion) override
+        void decryptStanza(const QDomElement &stanza, const Context &operation, QObject *context,
+                           Completion completion) override
         {
             Result result;
             if (!provider_ || !provider_->plugin_ || !context) {
@@ -261,7 +271,7 @@ public:
 
             // XEP-0364: OTR protocol traffic received through Message Carbons
             // belongs to another endpoint and must be ignored silently.
-            if (carbon_) {
+            if (operation.options.value(QStringLiteral("forwardedCarbon")).toBool()) {
                 result.success               = true;
                 result.stanza                = message;
                 result.metadata.sender       = contact;
@@ -295,7 +305,6 @@ public:
         OtrEncryptionProvider *provider_ = nullptr;
         int                    account_  = -1;
         QString                contact_;
-        bool                   carbon_ = false;
     };
 
     explicit OtrEncryptionProvider(PsiOtrPlugin *plugin) : plugin_(plugin) { }
