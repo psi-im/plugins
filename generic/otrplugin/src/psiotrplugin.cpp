@@ -192,14 +192,8 @@ public:
             provider_(provider), account_(account),
             contact_(context.recipients.isEmpty() ? QString() : context.recipients.constFirst())
         {
-            if (!contact_.isEmpty() && provider_ && provider_->plugin_ && provider_->plugin_->m_otrConnection
-                && provider_->plugin_->m_accountInfo) {
-                const QString accountId = provider_->plugin_->m_accountInfo->getId(account_);
-                if (provider_->plugin_->m_otrConnection->getMessageState(accountId, contact_)
-                    != OTR_MESSAGESTATE_ENCRYPTED) {
-                    provider_->plugin_->m_otrConnection->startSession(accountId, contact_);
-                }
-            }
+            // A session can be created solely to decrypt incoming or carbon
+            // traffic. Do not start an outgoing negotiation here.
         }
 
         void encryptStanza(const QDomElement &stanza, const Context &operation, QObject *context,
@@ -212,15 +206,15 @@ public:
                 completion(std::move(result));
                 return;
             }
-            // A long-lived session is bound to one peer, but the operation
-            // can supply the concrete endpoint for this particular stanza.
+            // Preserve the endpoint selected when Psi created the session.
+            // A stanza can target a bare JID while the session targets a resource.
             if (operation.recipients.size() > 1) {
                 result.error       = Error::NoRecipients;
                 result.errorString = QObject::tr("OTR requires exactly one recipient");
                 completion(std::move(result));
                 return;
             }
-            const QString contact = operation.recipients.isEmpty() ? contact_ : operation.recipients.constFirst();
+            const QString contact = contact_;
             if (contact.isEmpty()) {
                 result.error       = Error::NoRecipients;
                 result.errorString = QObject::tr("OTR requires a recipient");
@@ -231,6 +225,7 @@ public:
             const QString accountId = provider_->plugin_->m_accountInfo->getId(account_);
             if (provider_->plugin_->m_otrConnection->getMessageState(accountId, contact)
                 != OTR_MESSAGESTATE_ENCRYPTED) {
+                provider_->plugin_->m_otrConnection->startSession(accountId, contact);
                 result.error       = Error::NoSession;
                 result.errorString = QObject::tr("The OTR session with %1 is not established yet").arg(contact);
                 completion(std::move(result));
