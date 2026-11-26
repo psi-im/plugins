@@ -63,6 +63,8 @@ option( USE_QT6 "Enable Qt6 support" OFF )
 
 if(USE_QT6)
     set(QT_DEFAULT_MAJOR_VERSION 6)
+else()
+    set(QT_DEFAULT_MAJOR_VERSION 5)
 endif()
 
 if(LINUX AND (NOT (DEFINED USE_X11)))

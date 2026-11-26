@@ -53,8 +53,10 @@ if(NOT PLUGINS_INSTALL_PATH)
     endif()
 endif()
 
-if(USE_QT6)
+if(USE_QT6 OR (NOT DEFINED QT_DEFAULT_MAJOR_VERSION))
     set(QT_DEFAULT_MAJOR_VERSION 6)
+elseif()
+    set(QT_DEFAULT_MAJOR_VERSION 5)
 endif()
 
 set( _SRCS
