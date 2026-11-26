@@ -59,9 +59,9 @@ endif()
 
 option( BUILD_DEV_PLUGINS "Build plugins from dev directory" OFF )
 set(MAIN_PROGRAM_NAME "psi" CACHE STRING "Main program name: psi or psi-plus")
-option( USE_QT6 "Enable Qt6 support" OFF )
+option( USE_QT6 "Enable Qt6 support" ON )
 
-if(USE_QT6)
+if(USE_QT6 OR ("${QT_DEFAULT_MAJOR_VERSION}" STREQUAL ""))
     set(QT_DEFAULT_MAJOR_VERSION 6)
 else()
     set(QT_DEFAULT_MAJOR_VERSION 5)
@@ -123,10 +123,6 @@ if(NOT WIN32)
     set(PLUGINS_PATH "lib${LIB_SUFFIX}/${MAIN_PROGRAM_NAME}/plugins" CACHE STRING "Install suffix for plugins")
 else()
     set(PLUGINS_PATH "${MAIN_PROGRAM_NAME}/plugins" CACHE STRING "Install suffix for plugins")
-endif()
-
-if("${QT_DEFAULT_MAJOR_VERSION}" STREQUAL "")
-    set(QT_DEFAULT_MAJOR_VERSION 5)
 endif()
 
 if(GENERIC_PLUGINS_FOUND)

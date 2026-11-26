@@ -42,20 +42,20 @@ endif()
 
 if(USE_QT6 OR (NOT DEFINED QT_DEFAULT_MAJOR_VERSION))
     set(QT_DEFAULT_MAJOR_VERSION 6)
-elseif()
+else()
     set(QT_DEFAULT_MAJOR_VERSION 5)
 endif()
 
 set( _HDRS
-        ${PLUGIN}.h
+    ${PLUGIN}.h
 )
 
 set( _SRCS
-        ${PLUGIN}.cpp
+    ${PLUGIN}.cpp
 )
 
 set( _UIS
-        options.ui
+    options.ui
 )
 
 find_package( Qt${QT_DEFAULT_MAJOR_VERSION} COMPONENTS Widgets Xml REQUIRED )
